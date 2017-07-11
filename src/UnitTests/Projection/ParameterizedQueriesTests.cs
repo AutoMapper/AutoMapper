@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ParameterizedQueriesTests_with_anonymous_object_and_factory : AutoMapperSpecBase
@@ -44,7 +44,7 @@
         [Fact]
         public void Should_substitute_parameter_value()
         {
-            _dests[0].Value.ShouldEqual(15);
+            _dests[0].Value.ShouldBe(15);
         }
 
         [Fact]
@@ -52,7 +52,7 @@
         {
             var newDests = _sources.ProjectTo<Dest>(Configuration, new { value = 15 }).ToArray();
 
-            newDests[0].Value.ShouldEqual(20);
+            newDests[0].Value.ShouldBe(20);
         }
     }
 
@@ -92,7 +92,7 @@
         [Fact]
         public void Should_substitute_parameter_value()
         {
-            _dests[0].Value.ShouldEqual(15);
+            _dests[0].Value.ShouldBe(15);
         }
 
         [Fact]
@@ -100,7 +100,7 @@
         {
             var newDests = _sources.ProjectTo<Dest>(Configuration, new {value = 15}).ToArray();
 
-            newDests[0].Value.ShouldEqual(20);
+            newDests[0].Value.ShouldBe(20);
         }
     }
 
@@ -140,7 +140,7 @@
         [Fact]
         public void Should_substitute_parameter_value()
         {
-            _dests[0].Value.ShouldEqual(15);
+            _dests[0].Value.ShouldBe(15);
         }
 
         [Fact]
@@ -148,7 +148,7 @@
         {
             var newDests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
-            newDests[0].Value.ShouldEqual(20);
+            newDests[0].Value.ShouldBe(20);
         }  
     }
 
@@ -199,7 +199,7 @@
 
             var user = db.Users.ProjectTo<UserViewModel>(Configuration, new { db }).FirstOrDefault(a => a.Id == 2);
 
-            user.position.ShouldEqual(1);
+            user.position.ShouldBe(1);
         }
     }
 }

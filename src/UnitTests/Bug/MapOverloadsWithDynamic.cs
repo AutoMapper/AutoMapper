@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using System.Dynamic;
 
@@ -48,8 +48,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work()
         {
-            _settings.Timeout.ShouldEqual(2);
-            _settings.SubSettings.SubTimeout.ShouldEqual(22);
+            _settings.Timeout.ShouldBe(2);
+            _settings.SubSettings.SubTimeout.ShouldBe(22);
         }
     }
 }

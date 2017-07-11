@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers
@@ -41,29 +41,29 @@ namespace AutoMapper.UnitTests.Mappers
             var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
             destination.ShouldNotBeNull();
-            _sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
+            _sourceAsEnumerable.ValueInt.Count().ShouldBe(destination.ValueInt.Count());
             foreach (var item in _sourceAsEnumerable.ValueInt)
             {
                 destination.ValueInt.Contains(item).ShouldBeTrue();
             }
 
-            _sourceAsEnumerable.ValueString.Count().ShouldEqual(destination.ValueString.Count());
+            _sourceAsEnumerable.ValueString.Count().ShouldBe(destination.ValueString.Count());
             foreach (var item in _sourceAsEnumerable.ValueString)
             {
                 destination.ValueString.Contains(item).ShouldBeTrue();
             }
 
-            _sourceAsEnumerable.ValueUser.Count().ShouldEqual(destination.ValueUser.Count());
+            _sourceAsEnumerable.ValueUser.Count().ShouldBe(destination.ValueUser.Count());
             for (int i = 0; i < _sourceAsEnumerable.ValueUser.Count(); i++)
             {
-                _sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldEqual(destination.ValueUser.ElementAt(i).Name);
+                _sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldBe(destination.ValueUser.ElementAt(i).Name);
             }
 
-            _sourceAsEnumerable.ValueIUser.Count().ShouldEqual(destination.ValueIUser.Count());
+            _sourceAsEnumerable.ValueIUser.Count().ShouldBe(destination.ValueIUser.Count());
             for (int i = 0; i < _sourceAsEnumerable.ValueIUser.Count(); i++)
             {
-                _sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldEqual(destination.ValueIUser.ElementAt(i).Name);
-                _sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldEqual(destination.ValueIUser.ElementAt(i).Age);
+                _sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldBe(destination.ValueIUser.ElementAt(i).Name);
+                _sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldBe(destination.ValueIUser.ElementAt(i).Age);
             }
 
         }
@@ -74,13 +74,13 @@ namespace AutoMapper.UnitTests.Mappers
             var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>(_sourceAsEnumerable);
 
             destination.ShouldNotBeNull();
-            _sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
+            _sourceAsEnumerable.ValueInt.Count().ShouldBe(destination.ValueInt.Count());
             foreach (var item in _sourceAsEnumerable.ValueInt)
             {
                 destination.ValueInt.Contains(item).ShouldBeTrue();
             }
 
-            _sourceAsEnumerable.ValueString.Count().ShouldEqual(destination.ValueString.Count());
+            _sourceAsEnumerable.ValueString.Count().ShouldBe(destination.ValueString.Count());
             foreach (var item in _sourceAsEnumerable.ValueString)
             {
                 destination.ValueString.Contains(item).ShouldBeTrue();
@@ -88,14 +88,14 @@ namespace AutoMapper.UnitTests.Mappers
 
             for (int i = 0; i < _sourceAsEnumerable.ValueUser.Count(); i++)
             {
-                _sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldEqual(destination.ValueUser.ElementAt(i).Name);
+                _sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldBe(destination.ValueUser.ElementAt(i).Name);
             }
 
-            _sourceAsEnumerable.ValueIUser.Count().ShouldEqual(destination.ValueIUser.Count());
+            _sourceAsEnumerable.ValueIUser.Count().ShouldBe(destination.ValueIUser.Count());
             for (int i = 0; i < _sourceAsEnumerable.ValueIUser.Count(); i++)
             {
-                _sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldEqual(destination.ValueIUser.ElementAt(i).Name);
-                _sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldEqual(destination.ValueIUser.ElementAt(i).Age);
+                _sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldBe(destination.ValueIUser.ElementAt(i).Name);
+                _sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldBe(destination.ValueIUser.ElementAt(i).Age);
             }
         }
 
@@ -105,7 +105,7 @@ namespace AutoMapper.UnitTests.Mappers
             var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
             destination.ShouldNotBeNull();
-            destination.ValueIUser.ShouldBeType<ReadOnlyCollection<IUser>>();
+            destination.ValueIUser.ShouldBeOfType<ReadOnlyCollection<IUser>>();
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests.Mappers
             var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
             destination.ShouldNotBeNull();
-            destination.ValueUser.ShouldBeType<ReadOnlyCollection<UserDestination>>();
+            destination.ValueUser.ShouldBeOfType<ReadOnlyCollection<UserDestination>>();
         }
 
 

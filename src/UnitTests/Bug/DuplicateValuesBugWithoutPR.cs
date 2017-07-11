@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -64,8 +64,8 @@ namespace AutoMapper.UnitTests.Bug
 
             config.CreateMapper().Map(sourceList, destList);
 
-            destList.Count.ShouldEqual(2);
-            destList[0].Children.Count.ShouldEqual(1);
+            destList.Count.ShouldBe(2);
+            destList[0].Children.Count.ShouldBe(1);
             destList[0].Children[0].ShouldBeSameAs(destList[1]);
         }
     }

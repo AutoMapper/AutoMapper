@@ -2,7 +2,7 @@
 {
     namespace SetterOnlyBug
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class MappingTests : AutoMapperSpecBase

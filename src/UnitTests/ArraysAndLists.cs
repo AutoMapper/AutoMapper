@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Xunit;
-using Should;
+using Shouldly;
 using System.Linq;
 using System.Dynamic;
 
@@ -111,7 +111,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Items.Length.ShouldEqual(0);
+            _destination.Items.Length.ShouldBe(0);
         }
     }
 
@@ -153,7 +153,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Items.Count.ShouldEqual(0);
+            _destination.Items.Count.ShouldBe(0);
         }
     }
 
@@ -178,9 +178,9 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_map_by_item_type()
         {
-            mappedAuthor.Name.ShouldEqual("Charles Dickens");
-            mappedAuthor.Books[0].Name.ShouldEqual("Great Expectations");
-            mappedAuthor.Books[1].Name.ShouldEqual("Oliver Twist");
+            mappedAuthor.Name.ShouldBe("Charles Dickens");
+            mappedAuthor.Books[0].Name.ShouldBe("Great Expectations");
+            mappedAuthor.Books[1].Name.ShouldBe("Oliver Twist");
         }
 
         public class Author
@@ -222,7 +222,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_create_destination_array_the_same_size_as_the_source()
         {
-            _destination.IntCollection.Count().ShouldEqual(0);
+            _destination.IntCollection.Count().ShouldBe(0);
         }
     }
 
@@ -505,7 +505,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_assign_the_value_directly()
         {
-            _source.Values.ShouldEqual(_destination.Values);
+            _source.Values.ShouldBe(_destination.Values);
         }
     }
 
@@ -619,9 +619,9 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_assign_the_value_directly()
         {
-            _destination.Values.Count.ShouldEqual(2);
-            _destination.Values[0].Value.ShouldEqual(5);
-            _destination.Values[1].Value.ShouldEqual(10);
+            _destination.Values.Count.ShouldBe(2);
+            _destination.Values[0].Value.ShouldBe(5);
+            _destination.Values[1].Value.ShouldBe(10);
         }
     }
 
@@ -673,7 +673,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         [Fact]
         public void Should_clear_the_list_before_mapping()
         {
-            _destination.Values.Count.ShouldEqual(2);
+            _destination.Values.Count.ShouldBe(2);
         }
     }
 
@@ -698,7 +698,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         public void Should_map_correctly()
         {
             _mappedStrings.ShouldNotBeNull();
-            _mappedStrings.Count.ShouldEqual(1);
+            _mappedStrings.Count.ShouldBe(1);
             _mappedStrings[0].ShouldBeNull();
         }
     }

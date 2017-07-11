@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples
 {
@@ -93,8 +93,8 @@ namespace AutoMapperSamples
                 var mapper = config.CreateMapper();
                 OrderDto dto = mapper.Map<Order, OrderDto>(order);
 
-                dto.CustomerName.ShouldEqual("George Costanza");
-                dto.Total.ShouldEqual(74.85m);
+                dto.CustomerName.ShouldBe("George Costanza");
+                dto.Total.ShouldBe(74.85m);
             }
         }
     }

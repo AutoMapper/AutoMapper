@@ -1,6 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug

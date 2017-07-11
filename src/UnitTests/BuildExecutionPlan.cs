@@ -1,6 +1,6 @@
 ﻿using System;
 using AutoMapper;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -55,12 +55,12 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_build_the_execution_plan()
         {
-            _destination.Id.ShouldEqual(_source.Id);
-            _destination.FooId.ShouldEqual(_source.FooId.ToString());
-            _destination.ShortDescription.ShouldEqual(_source.ShortDescription);
-            _destination.FullDescription.ShouldEqual(_source.FullDescription);
-            _destination.Date.ShouldEqual(_source.Date);
-            _destination.IntValue.ShouldEqual(_source.IntValue.Value);
+            _destination.Id.ShouldBe(_source.Id);
+            _destination.FooId.ShouldBe(_source.FooId.ToString());
+            _destination.ShortDescription.ShouldBe(_source.ShortDescription);
+            _destination.FullDescription.ShouldBe(_source.FullDescription);
+            _destination.Date.ShouldBe(_source.Date);
+            _destination.IntValue.ShouldBe(_source.IntValue.Value);
         }
     }
 }

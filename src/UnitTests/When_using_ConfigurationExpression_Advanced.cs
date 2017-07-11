@@ -1,4 +1,4 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -24,11 +24,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void BeforeSeal_should_be_called_before_Seal()
         {
-            _sealed.ShouldEqual(false);
+            _sealed.ShouldBe(false);
 
             // Prove that sealed actualy seals
             SetSealed(Configuration);
-            _sealed.ShouldEqual(true);
+            _sealed.ShouldBe(true);
         }
 
         public class PlaceHolder { }

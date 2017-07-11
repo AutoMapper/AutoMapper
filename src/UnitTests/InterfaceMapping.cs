@@ -1,8 +1,9 @@
+#if NET452
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.InterfaceMapping
@@ -30,7 +31,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void ShouldMapOk()
         {
-            Mapper.Map<IDestination>(new Source { Id = 5 }).Id.ShouldEqual(5);
+            Mapper.Map<IDestination>(new Source { Id = 5 }).Id.ShouldBe(5);
         }
     }
 
@@ -117,7 +118,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_use_the_most_derived_interface()
         {
-            _result.prop2.ShouldEqual("PROP2");
+            _result.prop2.ShouldBe("PROP2");
         }
     }
 
@@ -177,13 +178,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_Child_to_SubDtoChildObject_type()
         {
-            _result.Child.ShouldBeType(typeof (SubDtoChildObject));
+            _result.Child.ShouldBeOfType(typeof (SubDtoChildObject));
         }
 
         [Fact]
         public void Should_map_ChildProperty_to_child_property_value()
         {
-            _result.Child.ChildProperty.ShouldEqual("child property value");
+            _result.Child.ChildProperty.ShouldBe("child property value");
         }
     }
 
@@ -214,13 +215,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_create_an_implementation_of_the_interface()
         {
-            _result.Value.ShouldEqual(5);
+            _result.Value.ShouldBe(5);
         }
 
         [Fact]
         public void Should_not_derive_from_INotifyPropertyChanged()
         {
-            _result.ShouldNotBeInstanceOf<INotifyPropertyChanged>();    
+            _result.ShouldNotBeOfType<INotifyPropertyChanged>();    
         }
     }
 
@@ -253,7 +254,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_create_an_implementation_of_the_interface()
         {
-            _result.Value.ShouldEqual(5);
+            _result.Value.ShouldBe(5);
         }
 
         [Fact]
@@ -270,28 +271,28 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             _result.PropertyChanged += (o, e) => {
                 count++;
                 o.ShouldBeSameAs(_result); 
-                e.PropertyName.ShouldEqual("Value");
+                e.PropertyName.ShouldBe("Value");
             };
 
             _result.Value = 42;
-            count.ShouldEqual(1);
-            _result.Value.ShouldEqual(42);
+            count.ShouldBe(1);
+            _result.Value.ShouldBe(42);
         }
 
         [Fact]
         public void Should_detach_event_handler()
         {
             _result.PropertyChanged += MyHandler;
-            _count.ShouldEqual(0);
+            _count.ShouldBe(0);
 
             _result.Value = 56;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
 
             _result.PropertyChanged -= MyHandler;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
 
             _result.Value = 75;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
         }
 
         private void MyHandler(object sender, PropertyChangedEventArgs e) {
@@ -342,13 +343,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_base_interface_property()
         {
-            _result.Id.ShouldEqual(7);
+            _result.Id.ShouldBe(7);
         }
 
         [Fact]
         public void Should_map_derived_interface_property()
         {
-            _result.SecondId.ShouldEqual(42);
+            _result.SecondId.ShouldBe(42);
         }
 
         [Fact]
@@ -412,13 +413,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_base_interface_property()
         {
-            _result.Id.ShouldEqual(7);
+            _result.Id.ShouldBe(7);
         }
 
         [Fact]
         public void Should_map_derived_interface_property()
         {
-            _result.SecondId.ShouldEqual(42);
+            _result.SecondId.ShouldBe(42);
         }
 
         [Fact]
@@ -461,7 +462,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_ignore_interface_members_for_mapping()
         {
-            _destination.Value.ShouldEqual(10);
+            _destination.Value.ShouldBe(10);
         }
 
         [Fact]
@@ -500,117 +501,9 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_use_the_derived_type_map()
         {
-            _baseDtos.First().ShouldBeType<DerivedDto>();
+            _baseDtos.First().ShouldBeOfType<DerivedDto>();
         }
 
     }
-
-    //[TestFixture, Explicit]
-    //public class MappingToInterfacesPolymorphic
-    //{
-    //    [SetUp]
-    //    public void SetUp()
-    //    {
-    //        
-    //    }
-
-    //    public interface DomainInterface
-    //    {
-    //        Guid Id { get; set; }
-    //        NestedType Nested { get; set; }
-    //    }
-
-    //    public class NestedType
-    //    {
-    //        public virtual string Name { get; set; }
-    //        public virtual decimal DecimalValue { get; set; }
-    //    }
-
-    //    public class DomainImplA : DomainInterface
-    //    {
-    //        public virtual Guid Id { get; set; }
-    //        private NestedType nested;
-
-    //        public virtual NestedType Nested
-    //        {
-    //            get
-    //            {
-    //                if (nested == null) nested = new NestedType();
-    //                return nested;
-    //            }
-    //            set { nested = value; }
-    //        }
-    //    }
-
-    //    public class DomainImplB : DomainInterface
-    //    {
-    //        public virtual Guid Id { get; set; }
-    //        private NestedType nested;
-
-    //        public virtual NestedType Nested
-    //        {
-    //            get
-    //            {
-    //                if (nested == null) nested = new NestedType();
-    //                return nested;
-    //            }
-    //            set { nested = value; }
-    //        }
-    //    }
-
-    //    public class Dto
-    //    {
-    //        public Guid Id { get; set; }
-    //        public string Name { get; set; }
-    //        public decimal DecimalValue { get; set; }
-    //    }
-
-    //    [Fact]
-    //    public void CanMapToDomainInterface()
-    //    {
-    //        Mapper.CreateMap<DomainInterface, Dto>()
-    //            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Nested.Name))
-    //            .ForMember(dest => dest.DecimalValue, opt => opt.MapFrom(src => src.Nested.DecimalValue));
-    //        Mapper.CreateMap<Dto, DomainInterface>()
-    //            .ForMember(dest => dest.Nested.Name, opt => opt.MapFrom(src => src.Name))
-    //            .ForMember(dest => dest.Nested.DecimalValue, opt => opt.MapFrom(src => src.DecimalValue));
-
-    //        var domainInstance1 = new DomainImplA();
-    //        var domainInstance2 = new DomainImplB();
-    //        var domainInstance3 = new DomainImplA();
-
-    //        var dtoCollection = new List<Dto>
-    //        {
-    //            Mapper.Map<DomainInterface, Dto>(domainInstance1),
-    //            Mapper.Map<DomainInterface, Dto>(domainInstance2),
-    //            Mapper.Map<DomainInterface, Dto>(domainInstance3)
-    //        };
-
-    //        dtoCollection[0].Id = Guid.NewGuid();
-    //        dtoCollection[0].DecimalValue = 1M;
-    //        dtoCollection[0].Name = "Bob";
-    //        dtoCollection[1].Id = Guid.NewGuid();
-    //        dtoCollection[1].DecimalValue = 0.1M;
-    //        dtoCollection[1].Name = "Frank";
-    //        dtoCollection[2].Id = Guid.NewGuid();
-    //        dtoCollection[2].DecimalValue = 2.1M;
-    //        dtoCollection[2].Name = "Sam";
-
-    //        Mapper.Map<Dto, DomainInterface>(dtoCollection[0], domainInstance1);
-    //        Mapper.Map<Dto, DomainInterface>(dtoCollection[1], domainInstance2);
-    //        Mapper.Map<Dto, DomainInterface>(dtoCollection[2], domainInstance3);
-
-    //        dtoCollection[0].Id.ShouldEqual(domainInstance1.Id);
-    //        dtoCollection[1].Id.ShouldEqual(domainInstance2.Id);
-    //        dtoCollection[2].Id.ShouldEqual(domainInstance3.Id);
-
-    //        dtoCollection[0].DecimalValue.ShouldEqual(domainInstance1.Nested.DecimalValue);
-    //        dtoCollection[1].DecimalValue.ShouldEqual(domainInstance2.Nested.DecimalValue);
-    //        dtoCollection[2].DecimalValue.ShouldEqual(domainInstance3.Nested.DecimalValue);
-
-    //        dtoCollection[0].DecimalValue.ShouldEqual(domainInstance1.Nested.Name);
-    //        dtoCollection[1].DecimalValue.ShouldEqual(domainInstance2.Nested.Name);
-    //        dtoCollection[2].DecimalValue.ShouldEqual(domainInstance3.Nested.Name);
-    //    }
-    //}
 }
+#endif

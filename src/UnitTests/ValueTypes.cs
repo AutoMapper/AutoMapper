@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {
@@ -36,13 +36,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_map_property_value()
             {
-                _destination.Value1.ShouldEqual(4);
+                _destination.Value1.ShouldBe(4);
             }
 
             [Fact]
             public void Should_map_field_value()
             {
-                _destination.Value2.ShouldEqual("hello");
+                _destination.Value2.ShouldBe("hello");
             }
         }
 
@@ -76,9 +76,9 @@ namespace AutoMapper.UnitTests
                 };
                 var dest = Mapper.Map<matrixDigiInStruct1, DigiIn1>(source);
 
-                dest.CncInfo.ShouldEqual(source.CNCinfo);
-                dest.Reg1.ShouldEqual(source.Reg1);
-                dest.Reg2.ShouldEqual(source.Reg2);
+                dest.CncInfo.ShouldBe(source.CNCinfo);
+                dest.Reg1.ShouldBe(source.Reg1);
+                dest.Reg2.ShouldBe(source.Reg2);
             }
         }
 
@@ -114,13 +114,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_map_registered_for_underlying_type()
             {
-                _destination.Value2.ShouldEqual(20);
+                _destination.Value2.ShouldBe(20);
             }
 
             [Fact]
             public void Should_still_map_value_type()
             {
-                _destination.Value1.ShouldEqual(10);
+                _destination.Value1.ShouldBe(10);
             }
 
 

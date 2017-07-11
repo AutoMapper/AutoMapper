@@ -179,7 +179,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             // find replacement method that has no more predicates
                             replacementMethod = typeof(Queryable).GetAllMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-#if NET45
+#if NET45 || NET40
                                             && m.GetParameters().All(p => typeof(Queryable).IsAssignableFrom(p.Member.ReflectedType))
 #endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
@@ -268,7 +268,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // call beforevisitors
             expression = _beforeVisitors.Aggregate(expression, (current, before) => before.Visit(current));
 
-            var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof(TDestination), typeof(TSource));
+            var typeMap = _mapper.ConfigurationProvider.ResolveTypeMap(typeof(TDestination), typeof(TSource));
             var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] { typeof(TSource) });
             var sourceExpression = visitor.Visit(expression);

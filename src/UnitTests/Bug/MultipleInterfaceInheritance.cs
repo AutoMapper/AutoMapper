@@ -1,4 +1,4 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_successfully()
         {
-            _thingDto.Items.Length.ShouldEqual(1);
+            _thingDto.Items.Length.ShouldBe(1);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_throw_when_construct_using_returns_null()
         {
             new Action(() => Mapper.Map<Source, Destination>(new Source()))
-                .ShouldThrow<AutoMapperMappingException>(ex=>ex.InnerException.ShouldBeType<NullReferenceException>());
+                .ShouldThrowException<AutoMapperMappingException>(ex=>ex.InnerException.ShouldBeOfType<NullReferenceException>());
         }
     }
 }

@@ -1,4 +1,4 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -56,13 +56,13 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_map_from_lower_to_pascal()
             {
-                _neda.ja_se_zovem_imenom.ShouldEqual("foo");
+                _neda.ja_se_zovem_imenom.ShouldBe("foo");
             }
 
             [Fact]
             public void Should_map_from_pascal_to_lower()
             {
-                _dario.JaSeZovemImenom.ShouldEqual("foo");
+                _dario.JaSeZovemImenom.ShouldBe("foo");
             }
         }
 

@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-#if NET45
+#if NET45 || NET40
     using System.Reflection.Emit;
 #endif
 
@@ -21,10 +21,14 @@ namespace AutoMapper.Internal
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if NET45
+#if NET45 || NET40
         public static Type CreateType(TypeBuilder type)
         {
+#if NET40
+            return type.CreateType();
+#else
             return type.CreateTypeInfo().AsType();
+#endif
         }
 #endif
 
@@ -150,9 +154,15 @@ namespace AutoMapper.Internal
 
         public static PropertyInfo[] GetProperties(Type type) => type.GetRuntimeProperties().ToArray();
 
+#if NET40
+        public static MethodInfo GetGetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetGetMethod();
+
+        public static MethodInfo GetSetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetSetMethod();
+#else
         public static MethodInfo GetGetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetMethod;
 
         public static MethodInfo GetSetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.SetMethod;
+#endif
 
         public static FieldInfo GetField(Type type, string name) => type.GetRuntimeField(name);
     }

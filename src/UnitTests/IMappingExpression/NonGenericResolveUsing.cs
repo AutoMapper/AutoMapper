@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 using System.Linq;
 
 namespace AutoMapper.UnitTests
@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Value.ShouldEqual(10);
+            _destination.Value.ShouldBe(10);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_handle_constructor_parameter_named_type()
         {
             var config = new MapperConfiguration(c => c.CreateMap<SourceClass, DestinationClass>());
-            new Action(config.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldEqual("Type"));
+            new Action(config.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldBe("Type"));
         }
     }
 }

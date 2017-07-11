@@ -104,7 +104,7 @@ namespace AutoMapper.QueryableExtensions
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
             var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
-#if NET45
+#if NET45 || NET40
             if(letPropertyMaps.Count > 0)
             {
                 expressions = letPropertyMaps.GetSubQueryExpression(this, expressions.First, typeMap, request, instanceParameter, typePairCount);
@@ -369,7 +369,7 @@ namespace AutoMapper.QueryableExtensions
             private static Expression NodeFallback(Type type)
             {
                 // default values for generic collections
-                if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
+                if (type.GetIsConstructedGenericType() && type.GetTypeInfo().GenericTypeArguments.Length == 1)
                 {
                     return GenericCollectionFallback(typeof(List<>), type)
                         ?? GenericCollectionFallback(typeof(HashSet<>), type)
@@ -388,7 +388,7 @@ namespace AutoMapper.QueryableExtensions
 
             private static Expression GenericCollectionFallback(Type collectionDefinition, Type type)
             {
-                var collectionType = collectionDefinition.MakeGenericType(type.GenericTypeArguments);
+                var collectionType = collectionDefinition.MakeGenericType(type.GetTypeInfo().GenericTypeArguments);
 
                 // try if an instance of this collection would suffice
                 return type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()) ? Convert(New(collectionType), type) : null;
@@ -436,7 +436,7 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
-#if NET45
+#if NET45 || NET40
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new

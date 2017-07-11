@@ -1,70 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-	    <Summary>A convention-based object-object mapper</Summary>
-        <Description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</Description>
-        <VersionPrefix>6.2.0</VersionPrefix>
-        <Authors>Jimmy Bogard</Authors>
-        <TargetFrameworks>netstandard1.3;netstandard1.1;net45</TargetFrameworks>
-        <NoWarn>$(NoWarn);1591</NoWarn>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AssemblyName>AutoMapper</AssemblyName>
-        <AssemblyOriginatorKeyFile>..\..\AutoMapper.snk</AssemblyOriginatorKeyFile>
-        <SignAssembly>true</SignAssembly>
-        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-        <PackageId>AutoMapper</PackageId>
-        <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
-        <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
-        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Summary>A convention-based object-object mapper</Summary>
+    <Description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</Description>
+    <VersionPrefix>6.2.0</VersionPrefix>
+    <Authors>Jimmy Bogard</Authors>
+    <TargetFrameworks>netstandard1.3;netstandard1.1;net45;net40</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>AutoMapper</AssemblyName>
+    <AssemblyOriginatorKeyFile>..\..\AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>AutoMapper</PackageId>
+    <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
+    <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
+  </PropertyGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-        <PackageReference Include="System.Linq" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-        <PackageReference Include="System.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Threading" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Globalization" Version="4.3.0" />
-        <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-        <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-        <PackageReference Include="System.Linq" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Threading" Version="4.3.0" />
-        <PackageReference Include="System.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Globalization" Version="4.3.0" />
-        <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-        <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-        <Reference Include="System" />
-        <Reference Include="Microsoft.CSharp" />
-    </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
 
 </Project>

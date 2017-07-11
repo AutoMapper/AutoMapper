@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance
 {
     using System;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ReverseMapWithInclude : SpecBase
@@ -28,7 +28,7 @@
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Animal, AnimalDto>(aDuck);
 
-            dto.ShouldBeType<DuckDto>();
+            dto.ShouldBeOfType<DuckDto>();
         }
     }
 
@@ -69,7 +69,7 @@
         [Fact]
         public void Should_work_together()
         {
-            _destination.Title.ShouldEqual("Name");
+            _destination.Title.ShouldBe("Name");
         }
     }
 }

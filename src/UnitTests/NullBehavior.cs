@@ -1,13 +1,34 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Should;
+using Shouldly;
 using Xunit;
 using System.Collections;
 using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_mappping_null_array_to_IEnumerable : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int[] Collection { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable<int> Collection { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
+
+        [Fact]
+        public void Should_map_to_non_null()
+        {
+            Mapper.Map<Destination>(new Source()).Collection.ShouldNotBeNull();
+        }
+    }
+
     public class When_mappping_null_list_to_ICollection : AutoMapperSpecBase
     {
         class Source
@@ -29,7 +50,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         }
     }
 
-    public class When_resolving_untyped_null : AutoMapperSpecBase
+    public class When_mapping_untyped_null_to_IEnumerable : AutoMapperSpecBase
     {
         class Source
         {
@@ -44,7 +65,32 @@ namespace AutoMapper.UnitTests.NullBehavior
         protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
 
         [Fact]
-        public void Should_map_ok()
+        public void Should_map_to_non_null()
+        {
+            Mapper.Map<Destination>(new Source()).Value.ShouldNotBeNull();
+        }
+    }
+
+    public class When_mapping_untyped_null_to_IEnumerable_and_AllowNullCollections_is_true : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public object Value { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.AllowNullCollections = true;
+            c.CreateMap<Source, Destination>();
+        });
+
+        [Fact]
+        public void Should_map_to_null()
         {
             Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
         }
@@ -207,7 +253,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_default_value_of_property_in_the_chain()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -219,7 +265,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Default_value_for_string_should_be_empty()
         {
-            _result.NullString.ShouldEqual(string.Empty);
+            _result.NullString.ShouldBe(string.Empty);
         }
     }
 
@@ -287,13 +333,13 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
         {
-            _result.SubExpressionName.ShouldEqual(null);
+            _result.SubExpressionName.ShouldBe(null);
         }
 
         [Fact]
         public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
         {
-            _result.NullableMapFrom.ShouldEqual(null);
+            _result.NullableMapFrom.ShouldBe(null);
         }
 
         [Fact]
@@ -305,7 +351,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_primitive_items_as_default()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -383,13 +429,13 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
         {
-            _result.SubExpressionName.ShouldEqual(null);
+            _result.SubExpressionName.ShouldBe(null);
         }
 
         [Fact]
         public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
         {
-            _result.NullableMapFrom.ShouldEqual(null);
+            _result.NullableMapFrom.ShouldBe(null);
         }
 
         [Fact]
@@ -401,7 +447,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_primitive_items_as_default()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -505,7 +551,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_perform_the_translation()
         {
-            _dest.Name.ShouldEqual("jon");
+            _dest.Name.ShouldBe("jon");
         }
     }
 
@@ -543,7 +589,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_to_null_on_destination_values()
         {
-            _dest.OtherValue.ShouldEqual(0);
+            _dest.OtherValue.ShouldBe(0);
         }
     }
 
@@ -592,7 +638,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_allow_the_resolver_to_handle_null_values()
         {
-            _result.IsFooBarred.ShouldEqual("(n/a)");
+            _result.IsFooBarred.ShouldBe("(n/a)");
         }
     }
 

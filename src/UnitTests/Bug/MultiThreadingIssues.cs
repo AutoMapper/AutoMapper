@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
 
     public class MultiThreadingIssues
     {

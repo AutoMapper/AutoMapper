@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {

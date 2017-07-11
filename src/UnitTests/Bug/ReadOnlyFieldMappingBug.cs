@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var dest = Mapper.Map<Destination>(source);
 
-            dest.Value.ShouldEqual(source.Value);
+            dest.Value.ShouldBe(source.Value);
         }
     }
 }

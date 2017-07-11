@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -68,7 +68,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_inherit_resolvers()
         {
-            _destination.DPropertyLevel0.ShouldEqual("SPropertyLevel0");
+            _destination.DPropertyLevel0.ShouldBe("SPropertyLevel0");
         }
     }
 }

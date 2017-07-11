@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug

@@ -1,6 +1,6 @@
 ﻿using AutoMapper.Mappers;
 using AutoMapper.Configuration.Conventions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -39,8 +39,8 @@ namespace AutoMapper.UnitTests
                 Key = "MyKey"
             };
             CategoryDto result = Mapper.Map<CategoryDto>(category);
-            result.Id.ShouldEqual("3");
-            result.MyValueProperty.ShouldEqual("MyKey");
+            result.Id.ShouldBe("3");
+            result.MyValueProperty.ShouldBe("MyKey");
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -46,10 +46,10 @@ namespace AutoMapper.UnitTests
         //    [Fact]
         //    public void Should_map_the_source_dictionary_with_all_keys_and_values_preserved()
         //    {
-        //        _result.Values.Count.ShouldEqual(2);
+        //        _result.Values.Count.ShouldBe(2);
 
-        //        _result.Values["Key1"].ShouldEqual("Value1");
-        //        _result.Values["Key2"].ShouldEqual(4);
+        //        _result.Values["Key1"].ShouldBe("Value1");
+        //        _result.Values["Key2"].ShouldBe(4);
         //    }
         //}
 
@@ -100,10 +100,10 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_perform_mapping_for_individual_values()
             {
-                _result.Values.Count.ShouldEqual(2);
+                _result.Values.Count.ShouldBe(2);
 
-                _result.Values["Key1"].Value.ShouldEqual(5);
-                _result.Values["Key2"].Value.ShouldEqual(10);
+                _result.Values["Key1"].Value.ShouldBe(5);
+                _result.Values["Key2"].Value.ShouldBe(10);
             }
         }
 
@@ -154,10 +154,10 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_perform_mapping_for_individual_values()
             {
-                _result.Values.Count.ShouldEqual(2);
+                _result.Values.Count.ShouldBe(2);
 
-                _result.Values["Key1"].Value.ShouldEqual(5);
-                _result.Values["Key2"].Value.ShouldEqual(10);
+                _result.Values["Key1"].Value.ShouldBe(5);
+                _result.Values["Key2"].Value.ShouldBe(10);
             }
         }
 
@@ -199,7 +199,7 @@ namespace AutoMapper.UnitTests
             public void Should_fill_the_destination_with_an_empty_dictionary()
             {
                 _result.Bar["lol"].Bar.ShouldNotBeNull();
-                _result.Bar["lol"].Bar.ShouldBeType<Dictionary<string, FooDto>>();
+                _result.Bar["lol"].Bar.ShouldBeOfType<Dictionary<string, FooDto>>();
             }
         }
 
@@ -243,7 +243,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_map_using_the_nongeneric_dictionaryentry()
             {
-                _dest.Values.Count.ShouldEqual(3);
+                _dest.Values.Count.ShouldBe(3);
             }
 
             // A wrapper for an IDictionary that implements IDictionary<TKey, TValue>
@@ -456,10 +456,10 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_perform_mapping_for_individual_values()
             {
-                _result.Values.Count.ShouldEqual(2);
+                _result.Values.Count.ShouldBe(2);
 
-                _result.Values["Key1"].ShouldEqual("Value1");
-                _result.Values["Key2"].ShouldEqual("Value2");
+                _result.Values["Key1"].ShouldBe("Value1");
+                _result.Values["Key2"].ShouldBe("Value2");
             }
         }
 

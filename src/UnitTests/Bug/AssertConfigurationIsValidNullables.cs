@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug

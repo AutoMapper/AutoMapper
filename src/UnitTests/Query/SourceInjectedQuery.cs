@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using Should;
+using AutoMapper.Mappers;
+using Shouldly;
 using AutoMapper.QueryableExtensions;
 using Xunit;
 
@@ -50,7 +51,7 @@ namespace AutoMapper.UnitTests.Query
               .UseAsDataSource(Mapper).For<Destination>()
               .Where(s => s.DestValue > 6);
 
-            result.Count().ShouldEqual(1);
+            result.Count().ShouldBe(1);
             result.Any(s => s.DestValue > 6).ShouldBeTrue();
         }
 
@@ -60,10 +61,10 @@ namespace AutoMapper.UnitTests.Query
             IQueryable<Destination> result = _source.AsQueryable()
                 .UseAsDataSource(Mapper).For<Destination>();
 
-            result.ElementType.ShouldEqual(typeof(Destination));
+            result.ElementType.ShouldBe(typeof(Destination));
 
             result = result.Where(s => s.DestValue > 3);
-            result.ElementType.ShouldEqual(typeof(Destination));
+            result.ElementType.ShouldBe(typeof(Destination));
         }
 
         [Fact]
@@ -72,7 +73,7 @@ namespace AutoMapper.UnitTests.Query
             IQueryable<Destination> result = _source.AsQueryable()
                 .UseAsDataSource(Mapper).For<Destination>();
 
-            result.First(s => s.DestValue > 6).ShouldBeType<Destination>();
+            result.First(s => s.DestValue > 6).ShouldBeOfType<Destination>();
         }
 
         [Fact]
@@ -94,7 +95,7 @@ namespace AutoMapper.UnitTests.Query
             var destItem = result.First(s => s.DestValue == 7);
             var sourceItem = _source.First(s => s.SrcValue == 7);
 
-            destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
+            destItem.DestValue.ShouldBe(sourceItem.SrcValue);
         }
 
         [Fact]
@@ -104,7 +105,7 @@ namespace AutoMapper.UnitTests.Query
               .UseAsDataSource(Mapper).For<Destination>()
               .OrderByDescending(s => s.DestValue);
 
-            result.First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
+            result.First().DestValue.ShouldBe(_source.Max(s => s.SrcValue));
         }
 
         [Fact]
@@ -116,7 +117,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
 
-            result.First().ShouldEqual(_source.Max(s => s.SrcValue));
+            result.First().ShouldBe(_source.Max(s => s.SrcValue));
         }
 
         [Fact]
@@ -128,7 +129,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.StringValue);
 
-            result.First().ShouldEqual(null);
+            result.First().ShouldBe(null);
         }
         [Fact]
         public void Shoud_support_enumerable_return_type()
@@ -139,7 +140,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
 
-            result.First().Count().ShouldEqual(0);
+            result.First().Count().ShouldBe(0);
         }
 
 
@@ -160,8 +161,8 @@ namespace AutoMapper.UnitTests.Query
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
 
             var item = result.First();
-            item.Length.ShouldEqual(2);
-            item.All(x => x.EndsWith("7")).ShouldEqual(true);
+            item.Length.ShouldBe(2);
+            item.All(x => x.EndsWith("7")).ShouldBe(true);
         }
 
         [Fact]
@@ -173,7 +174,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => new { A = s.DestValue });
 
-            result.First().A.ShouldEqual(_source.Max(s => s.SrcValue));
+            result.First().A.ShouldBe(_source.Max(s => s.SrcValue));
         }
         readonly User[] _source2 = new[]
                     {
@@ -188,7 +189,7 @@ namespace AutoMapper.UnitTests.Query
             var result = _source2.AsQueryable()
               .UseAsDataSource(mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
 
-            (result.First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
+            (result.First() as IEnumerable<string>).Last().ShouldBe("Bar 4");
         }
 
         [Fact]
@@ -198,7 +199,7 @@ namespace AutoMapper.UnitTests.Query
             var result = _source2.AsQueryable()
               .UseAsDataSource(mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
-            (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
+            (result.First() as IEnumerable<Thing>).Last().Bar.ShouldBe("Bar 2");
         }
 
         [Fact]
@@ -210,7 +211,7 @@ namespace AutoMapper.UnitTests.Query
             var destItem = result.ToList().First(s => s.DestValue == 7);
             var sourceItem = _source.First(s => s.SrcValue == 7);
 
-            destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
+            destItem.DestValue.ShouldBe(sourceItem.SrcValue);
         }
 
         [Fact]
@@ -220,7 +221,7 @@ namespace AutoMapper.UnitTests.Query
               .UseAsDataSource(Configuration).For<Destination>()
               .OrderByDescending(s => s.DestValue);
 
-            result.ToList().First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
+            result.ToList().First().DestValue.ShouldBe(_source.Max(s => s.SrcValue));
         }
 
         [Fact]
@@ -233,7 +234,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
 
             var list = result.ToList();
-            list.First().ShouldEqual(_source.Max(s => s.SrcValue));
+            list.First().ShouldBe(_source.Max(s => s.SrcValue));
         }
 
         [Fact]
@@ -245,7 +246,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.StringValue);
 
-            result.ToList().First().ShouldEqual(null);
+            result.ToList().First().ShouldBe(null);
         }
 
         [Fact]
@@ -283,14 +284,14 @@ namespace AutoMapper.UnitTests.Query
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
 
             var list = result.ToList();
-            list.Count.ShouldEqual(2);
+            list.Count.ShouldBe(2);
             list[0].ShouldNotBeNull();
-            list[0].Length.ShouldEqual(2);
-            list[0].All(x => x.EndsWith("7")).ShouldEqual(true);
+            list[0].Length.ShouldBe(2);
+            list[0].All(x => x.EndsWith("7")).ShouldBe(true);
 
             list[1].ShouldNotBeNull();
-            list[1].Length.ShouldEqual(2);
-            list[1].All(x => x.EndsWith("5")).ShouldEqual(true);
+            list[1].Length.ShouldBe(2);
+            list[1].All(x => x.EndsWith("5")).ShouldBe(true);
         }
 
         [Fact]
@@ -302,7 +303,7 @@ namespace AutoMapper.UnitTests.Query
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => new { A = s.DestValue });
 
-            result.ToList().First().A.ShouldEqual(_source.Max(s => s.SrcValue));
+            result.ToList().First().A.ShouldBe(_source.Max(s => s.SrcValue));
         }
 
         [Fact]
@@ -312,7 +313,7 @@ namespace AutoMapper.UnitTests.Query
             var result = _source2.AsQueryable()
               .UseAsDataSource(mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
 
-            (result.ToList().First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
+            (result.ToList().First() as IEnumerable<string>).Last().ShouldBe("Bar 4");
         }
 
         [Fact]
@@ -322,7 +323,7 @@ namespace AutoMapper.UnitTests.Query
             var result = _source2.AsQueryable()
               .UseAsDataSource(mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
-            (result.ToList().First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
+            (result.ToList().First() as IEnumerable<Thing>).Last().Bar.ShouldBe("Bar 2");
         }
 
         [Fact]
@@ -457,20 +458,20 @@ namespace AutoMapper.UnitTests.Query
                 .Where(d => d.Master.Name == "Harry Marry");
 
             // Assert
-            detailDtoQuery.ToList().Count().ShouldEqual(1);
+            detailDtoQuery.ToList().Count().ShouldBe(1);
         }
 
         private void AssertValidDtoGraph(Detail detail, Master master, DetailCyclicDto dto)
         {
             dto.ShouldNotBeNull();
-            detail.Id.ShouldEqual(dto.Id);
+            detail.Id.ShouldBe(dto.Id);
 
             detail.Master.ShouldNotBeNull();
             master.Details.ShouldNotBeEmpty();
-            detail.Master.Id.ShouldEqual(master.Id);
+            detail.Master.Id.ShouldBe(master.Id);
             
-            dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
-            //dto.GetHashCode().ShouldEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
+            dto.Master.Details.Single().Id.ShouldBe(dto.Id, "Dto was not added to inner collection");
+            //dto.GetHashCode().ShouldBe(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
 
         [Fact]
@@ -495,7 +496,7 @@ namespace AutoMapper.UnitTests.Query
             // Assert
             result.ShouldNotBeNull();
             result.ShouldNotBeEmpty();
-            result.Single().Value.ShouldEqual(15);
+            result.Single().Value.ShouldBe(15);
         }
 
         [Fact]
@@ -521,7 +522,7 @@ namespace AutoMapper.UnitTests.Query
             // Assert
             result.ShouldNotBeNull();
             result.ShouldNotBeEmpty();
-            result.Single().Value.ShouldEqual(20);
+            result.Single().Value.ShouldBe(20);
         }
 
 
@@ -590,7 +591,7 @@ namespace AutoMapper.UnitTests.Query
             results.ShouldNotBeNull();
             results.ShouldNotBeEmpty();
 
-            results.Count.ShouldEqual(2);
+            results.Count.ShouldBe(2);
             results[0].HasEditPermission.ShouldBeFalse();
             results[1].HasEditPermission.ShouldBeTrue();
         }
@@ -605,7 +606,22 @@ namespace AutoMapper.UnitTests.Query
             var destItem = result.First(s => s.InttoStringValue == "7");
             var sourceItem = _source.First(s => s.InttoStringValue == 7);
 
-            destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
+            destItem.DestValue.ShouldBe(sourceItem.SrcValue);
+        }
+
+        [Fact]
+        public void Shoud_work_with_conventions()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.AddConditionalObjectMapper()
+                .Where((s, d) => s.Name == d.Name + "Model" || s.Name + "Model" == d.Name)).CreateMapper();
+
+
+            IQueryable<Destination> result = _source.AsQueryable()
+                .UseAsDataSource(Mapper).For<Destination>()
+                .Where(s => s.DestValue > 6);
+
+            result.Count().ShouldBe(1);
+            result.Any(s => s.DestValue > 6).ShouldBeTrue();
         }
 
         private static IMapper SetupAutoMapper()

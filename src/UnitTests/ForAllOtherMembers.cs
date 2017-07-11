@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_not_ignored()
         {
-            _destination.value.ShouldEqual(12);
+            _destination.value.ShouldBe(12);
         }
     }
 }

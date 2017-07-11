@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using AutoMapper.Mappers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.Bug
             var two = engine.Map<One, Two>(one);
 
             two.ShouldNotBeNull();
-            two.Stuff.Count().ShouldEqual(2);
+            two.Stuff.Count().ShouldBe(2);
         }
     }
 }

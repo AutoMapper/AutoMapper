@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Should;
+using Shouldly;
 using Xunit;
 using System.Linq;
 
@@ -173,17 +173,17 @@ namespace AutoMapper.UnitTests
             {
 
 
-                _simpleProducts.Count.ShouldEqual(1);
-                _simpleProducts[0].Name.ShouldEqual("Foo");
-                _simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
-                _simpleProducts[0].CategoryName.ShouldEqual("Baz");
+                _simpleProducts.Count.ShouldBe(1);
+                _simpleProducts[0].Name.ShouldBe("Foo");
+                _simpleProducts[0].ProductSubcategoryName.ShouldBe("Bar");
+                _simpleProducts[0].CategoryName.ShouldBe("Baz");
 
-                _extendedProducts.Count.ShouldEqual(1);
-                _extendedProducts[0].Name.ShouldEqual("Foo");
-                _extendedProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
-                _extendedProducts[0].CategoryName.ShouldEqual("Baz");
-                _extendedProducts[0].BOM.Count.ShouldEqual(1);
-                _extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
+                _extendedProducts.Count.ShouldBe(1);
+                _extendedProducts[0].Name.ShouldBe("Foo");
+                _extendedProducts[0].ProductSubcategoryName.ShouldBe("Bar");
+                _extendedProducts[0].CategoryName.ShouldBe("Baz");
+                _extendedProducts[0].BOM.Count.ShouldBe(1);
+                _extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldBe(5);
             }
            
             [Fact]
@@ -195,26 +195,26 @@ namespace AutoMapper.UnitTests
 
                 var simpleProducts = queryable.ProjectTo<SimpleProductDto>(_config).ToList();
 
-                simpleProducts.Count.ShouldEqual(1);
-                simpleProducts[0].Name.ShouldEqual("Foo");
-                simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
-                simpleProducts[0].CategoryName.ShouldEqual("Baz");
+                simpleProducts.Count.ShouldBe(1);
+                simpleProducts[0].Name.ShouldBe("Foo");
+                simpleProducts[0].ProductSubcategoryName.ShouldBe("Bar");
+                simpleProducts[0].CategoryName.ShouldBe("Baz");
 
                 var extendedProducts = queryable.ProjectTo<ExtendedProductDto>(_config).ToList();
 
-                extendedProducts.Count.ShouldEqual(1);
-                extendedProducts[0].Name.ShouldEqual("Foo");
-                extendedProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
-                extendedProducts[0].CategoryName.ShouldEqual("Baz");
-                extendedProducts[0].BOM.Count.ShouldEqual(1);
-                extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
+                extendedProducts.Count.ShouldBe(1);
+                extendedProducts[0].Name.ShouldBe("Foo");
+                extendedProducts[0].ProductSubcategoryName.ShouldBe("Bar");
+                extendedProducts[0].CategoryName.ShouldBe("Baz");
+                extendedProducts[0].BOM.Count.ShouldBe(1);
+                extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldBe(5);
 
                 var complexProducts = queryable.ProjectTo<ComplexProductDto>(_config).ToList();
 
-                complexProducts.Count.ShouldEqual(1);
-                complexProducts[0].Name.ShouldEqual("Foo");
-                complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
-                complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
+                complexProducts.Count.ShouldBe(1);
+                complexProducts[0].Name.ShouldBe("Foo");
+                complexProducts[0].ProductSubcategory.Name.ShouldBe("Bar");
+                complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldBe("Baz");
             }
         }
 
@@ -283,7 +283,7 @@ namespace AutoMapper.UnitTests
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(Configuration));
+                    typeof(Exception).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(Configuration));
                 }
             }
         }

@@ -3,7 +3,7 @@ using AutoMapper;
 using NUnit.Framework;
 using StructureMap;
 using StructureMap.Attributes;
-using Should;
+using Shouldly;
 using StructureMap.Configuration.DSL;
 
 namespace AutoMapperSamples
@@ -35,7 +35,7 @@ namespace AutoMapperSamples
 
                 var destination = engine.Map<Source, Destination>(new Source {Value = 15});
 
-                destination.Value.ShouldEqual(15);
+                destination.Value.ShouldBe(15);
             }
 
             public class ConfigurationRegistry : Registry

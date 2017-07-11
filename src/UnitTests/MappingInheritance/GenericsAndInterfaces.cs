@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
@@ -38,14 +38,14 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             var destination = new ImplementedClass();
             Mapper.Map(source, destination, typeof(MyClass<ContainerClass>), typeof(IMyInterface<ContainerClass>));
-            destination.Container.MyProperty.ShouldEqual(3);
+            destination.Container.MyProperty.ShouldBe(3);
         }
 
         [Fact]
         public void ShouldMapToNewObject()
         {
             var destination = (IMyInterface<ContainerClass>) Mapper.Map(source, typeof(MyClass<ContainerClass>), typeof(ImplementedClass));
-            destination.Container.MyProperty.ShouldEqual(3);
+            destination.Container.MyProperty.ShouldBe(3);
         }
     }
 }

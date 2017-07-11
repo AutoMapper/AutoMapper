@@ -4,8 +4,7 @@ namespace AutoMapper.UnitTests
     using System;
     using System.Linq;
     using System.Linq.Expressions;
-    using Should;
-    using Should.Core.Assertions;
+    using Shouldly;
     using Xunit;
 
     public class ExpressionConversion
@@ -45,7 +44,7 @@ namespace AutoMapper.UnitTests
                 new Source {Value = 15}
             };
 
-            items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+            items.AsQueryable().Where(mapped).Count().ShouldBe(2);
         }
 
         [Fact]
@@ -64,7 +63,7 @@ namespace AutoMapper.UnitTests
                 new Source {Child = new ChildSrc {Value = 15}}
             };
 
-            items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+            items.AsQueryable().Where(mapped).Count().ShouldBe(2);
         }
 
         [Fact]
@@ -83,7 +82,7 @@ namespace AutoMapper.UnitTests
                 new Source {Foo = 15}
             };
 
-            items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+            items.AsQueryable().Where(mapped).Count().ShouldBe(2);
         }
 
         [Fact]

@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance
 {
-    using Should;
+    using Shouldly;
 
     public class Test : AutoMapperSpecBase
     {
@@ -43,7 +43,7 @@
         public void TestMethod1()
         {
             var dest = Mapper.Map(null, typeof(From), typeof(Concrete));
-            dest.ShouldBeType<Concrete>();
+            dest.ShouldBeOfType<Concrete>();
             ReferenceEquals(dest.GetType(), typeof(Concrete)).ShouldBeTrue();
         }
     }

@@ -3,7 +3,7 @@
     namespace ConditionBug
     {
         using System.Collections.Generic;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Example : AutoMapperSpecBase
@@ -56,7 +56,7 @@
                 src.Value.Add(new SubSource {SubValue = "x"});
                 var destination = Mapper.Map<Source, Destination>(src);
 
-                destination.Value.ShouldEqual("x");
+                destination.Value.ShouldBe("x");
             }
         }
 
@@ -86,7 +86,7 @@
             {
                 var dest = Mapper.Map<Source, Destination>(new Source());
 
-                dest.Value.ShouldEqual(0);
+                dest.Value.ShouldBe(0);
             }
         }
     }
@@ -94,7 +94,7 @@
     namespace ConditionPropertyBug
     {
         using System;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Example : AutoMapperSpecBase
@@ -140,7 +140,7 @@
                 var src = new Source();
                 var dest = Mapper.Map<Source, Destination>(src);
 
-                dest.BasePrice.ShouldEqual(0);
+                dest.BasePrice.ShouldBe(0);
             }
 
             [Fact]
@@ -149,7 +149,7 @@
                 var src = new Source {BasePrice = 15};
                 var dest = Mapper.Map<Source, Destination>(src);
 
-                dest.BasePrice.ShouldEqual(src.BasePrice);
+                dest.BasePrice.ShouldBe(src.BasePrice);
             }
         }
     }
@@ -157,7 +157,7 @@
 
     namespace SourceValueConditionPropertyBug
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Source
@@ -183,7 +183,7 @@
             {
                 var destination = new Dest();
                 Mapper.Map(new Source {Value = 5}, destination);
-                destination.Value.ShouldEqual(5);
+                destination.Value.ShouldBe(5);
             }
 
             [Fact]
@@ -191,7 +191,7 @@
             {
                 var destination = new Dest { Value = 6};
                 Mapper.Map(new Source {Value = 5}, destination);
-                destination.Value.ShouldEqual(6);
+                destination.Value.ShouldBe(6);
             }
         }
     }
@@ -199,7 +199,7 @@
     namespace SourceValueExceptionConditionPropertyBug
     {
         using System;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Source

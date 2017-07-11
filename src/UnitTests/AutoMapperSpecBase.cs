@@ -1,7 +1,5 @@
 using System;
-using Should;
 using Xunit;
-using Rhino.Mocks;
 
 namespace AutoMapper.UnitTests
 {
@@ -50,18 +48,6 @@ namespace AutoMapper.UnitTests
 
         protected virtual void Cleanup()
         {
-        }
-
-
-        protected TType CreateDependency<TType>()
-            where TType : class
-        {
-            return MockRepository.GenerateMock<TType>();
-        }
-
-        protected TType CreateStub<TType>() where TType : class
-        {
-            return MockRepository.GenerateStub<TType>();
         }
     }
     public abstract class SpecBase : SpecBaseBase, IDisposable

@@ -110,20 +110,19 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            string GetFunc(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
+            string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
                 ? pm.DestinationProperty.Name
-                : pm.CustomExpression == null && pm.SourceMember != null
+                : pm.SourceMember != null
                     ? pm.SourceMember.Name
                     : pm.DestinationProperty.Name;
+            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped()).Select(GetPropertyName).ToArray();
 
-            var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(GetFunc).ToList();
-            var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(GetFunc).ToList();
+            var autoMappedProperties = GetPropertyNames(_propertyMaps);
+            var inheritedProperties = GetPropertyNames(_inheritedMaps);
 
             IEnumerable<string> properties;
 
-            if (ConfiguredMemberList == MemberList.Destination)
+            if(ConfiguredMemberList == MemberList.Destination)
             {
                 properties = DestinationTypeDetails.PublicWriteAccessors
                     .Select(p => p.Name)
@@ -294,12 +293,12 @@ namespace AutoMapper
             if (propertyInfo == null)
                 return propertyMap;
 
-            var baseAccessor = propertyInfo.GetMethod;
+            var baseAccessor = propertyInfo.GetGetMethod();
 
             if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
                 return propertyMap;
 
-            var accessor = ((PropertyInfo)destinationProperty).GetMethod;
+            var accessor = ((PropertyInfo)destinationProperty).GetGetMethod();
 
             if (baseAccessor.DeclaringType == accessor.DeclaringType)
                 return propertyMap;
@@ -369,6 +368,10 @@ namespace AutoMapper
             {
                 AddAfterMapAction(afterMapAction);
             }
+            var notOverridenSourceConfigs =
+                inheritedTypeMap._sourceMemberConfigs.Where(
+                    baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
+            _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
         }
     }
 }

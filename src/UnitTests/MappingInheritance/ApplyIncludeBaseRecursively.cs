@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using AutoMapper;
 using Xunit;
 
@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_apply_all_included_base_maps()
         {
-            _destination.Property2.ShouldEqual("Test");
+            _destination.Property2.ShouldBe("Test");
         }
     }
 }

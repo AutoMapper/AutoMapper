@@ -3,7 +3,7 @@
 namespace AutoMapper.UnitTests.Bug
 {
     using System;
-    using Should;
+    using Shouldly;
 
     public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
     {
@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests.Bug
             };
 
             var result = Mapper.Map<DestinationClass>(source);
-            result.Type.ShouldEqual(source.Type);
+            result.Type.ShouldBe(source.Type);
         }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<SourceClass, DestinationClass>());

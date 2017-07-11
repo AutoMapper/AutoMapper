@@ -1,8 +1,9 @@
-﻿using System;
+﻿#if !NET40
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -21,7 +22,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work()
         {
-            _destination.ShouldEqual(Converter<int, object>.Result);
+            _destination.ShouldBe(Converter<int, object>.Result);
         }
 
         public class Converter<TSource, TDestination> : ITypeConverter<List<TSource>, List<TDestination>>
@@ -147,10 +148,10 @@ namespace AutoMapper.UnitTests.Bug
         {
             _destination.ShouldBeSameAs(Converter<int>.SomeDestination);
             _otherDestination.ShouldBeSameAs(Converter<int>.SomeOtherDestination);
-            _openGenericToNonGenericDestination.ShouldEqual(Converter<int>.NongenericDestination);
+            _openGenericToNonGenericDestination.ShouldBe(Converter<int>.NongenericDestination);
             _nonGenericToOpenGenericDestination.ShouldBeSameAs(Converter<int>.SomeDestination);
-            _openGenericToClosedGenericDestination.ShouldEqual(Converter<int>.ClosedDestinationViaOpenSource);
-            _closedGenericToOpenGenericDestination.ShouldEqual(Converter<int>.OpenDestinationViaClosedSource);
+            _openGenericToClosedGenericDestination.ShouldBe(Converter<int>.ClosedDestinationViaOpenSource);
+            _closedGenericToOpenGenericDestination.ShouldBe(Converter<int>.OpenDestinationViaClosedSource);
         }
 
         [Fact]
@@ -167,3 +168,4 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
+#endif

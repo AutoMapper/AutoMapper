@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 using System.Linq;
 using AutoMapper;
@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var destination = src.AsQueryable().ProjectTo<DummyDestination>(config).First();
 
-            destination.Dummy.ShouldEqual(DummyTypes.Foo);
+            destination.Dummy.ShouldBe(DummyTypes.Foo);
         }
     }
 }

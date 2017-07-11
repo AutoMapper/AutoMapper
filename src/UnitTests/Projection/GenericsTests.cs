@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class GenericsTests : AutoMapperSpecBase
@@ -40,7 +40,7 @@
         [Fact]
         public void Should_convert_even_though_mapper_not_explicitly_called_before_hand()
         {
-            _dests[0].Value.ShouldEqual("5");
+            _dests[0].Value.ShouldBe("5");
         }
     }
 }

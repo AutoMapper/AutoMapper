@@ -1,9 +1,8 @@
 ﻿namespace AutoMapper.UnitTests.Projection
 {
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using System.Linq;
-    using Should.Core.Assertions;
     using Xunit;
 
     public class ProjectEnumTest

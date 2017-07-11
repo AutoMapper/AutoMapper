@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using Xunit;
 using StringDictionary = System.Collections.Generic.Dictionary<string, object>;
 
@@ -25,8 +25,8 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_source_properties()
         {
-            _destination["Foo"].ShouldEqual("Foo");
-            _destination["Bar"].ShouldEqual("Bar");
+            _destination["Foo"].ShouldBe("Foo");
+            _destination["Bar"].ShouldBe("Bar");
         }
     }
 
@@ -45,8 +45,8 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_destination_properties()
         {
-            _destination.Foo.ShouldEqual("Foo");
-            _destination.Bar.ShouldEqual("Bar");
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBe("Bar");
         }
     }
 
@@ -71,8 +71,8 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_destination_properties()
         {
-            _destination.Foo.ShouldEqual("Foo");
-            _destination.Bar.ShouldEqual("Bar");
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBe("Bar");
         }
     }
 
@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_existing_properties()
         {
-            _destination.Foo.ShouldEqual("Foo");
+            _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
         }
     }
@@ -111,8 +111,8 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map()
         {
-            _destination["Foo"].ShouldEqual("Foo");
-            _destination["Bar"].ShouldEqual("Bar");
+            _destination["Foo"].ShouldBe("Foo");
+            _destination["Bar"].ShouldBe("Bar");
         }
     }
 
@@ -190,7 +190,7 @@ namespace AutoMapper.UnitTests.Mappers
         public void Should_throw()
         {
             new Action(()=>Mapper.Map<SomeBase>(new StringDictionary()))
-                .ShouldThrow<AutoMapperMappingException>(ex=>
+                .ShouldThrowException<AutoMapperMappingException>(ex=>
                     ex.InnerException.Message.ShouldStartWith($"Cannot create an instance of abstract type {typeof(SomeBase)}."));
 
         }

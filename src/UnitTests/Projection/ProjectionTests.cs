@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using Xunit;
-    using Should;
+    using Shouldly;
     using AutoMapper;
     using QueryableExtensions;
 
@@ -27,7 +27,7 @@
                             .ProjectTo<Target>()
                             .First();
 
-            target.Greeting.ShouldEqual(_niceGreeting);
+            target.Greeting.ShouldBe(_niceGreeting);
         }
 
 
@@ -43,7 +43,7 @@
                             .ProjectTo<Target>()
                             .First();
 
-            target.Greeting.ShouldEqual(_niceGreeting);
+            target.Greeting.ShouldBe(_niceGreeting);
         }
 
 
@@ -61,7 +61,7 @@
                             .ProjectTo<Target>()
                             .First();
 
-            target.Child.Greeting.ShouldEqual(_niceGreeting);
+            target.Child.Greeting.ShouldBe(_niceGreeting);
         }
 
 

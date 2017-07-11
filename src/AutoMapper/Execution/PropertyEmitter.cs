@@ -1,4 +1,4 @@
-#if NET45
+#if NET45 || NET40
 namespace AutoMapper.Execution
 {
     using System;

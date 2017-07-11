@@ -18,11 +18,6 @@ task clean {
 	rd "$base_dir\build" -recurse -force  -ErrorAction SilentlyContinue | out-null
 }
 
-task init {
-	# Make sure per-user dotnet is installed
-	Install-Dotnet
-}
-
 task release {
     $global:config = "release"
 }
@@ -39,6 +34,9 @@ task compile -depends clean {
 	echo "build: Package version suffix is $suffix"
 	echo "build: Build version suffix is $buildSuffix" 
 	
+	exec { dotnet --version }
+	exec { dotnet --info }
+
 	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
 
 	exec { dotnet restore $base_dir\AutoMapper.sln }
@@ -53,15 +51,18 @@ task benchmark {
 }
 
 task test {
-    $testRunners = @(gci $base_dir\packages -rec -filter Fixie.Console.exe)
 
-    if ($testRunners.Length -ne 1)
-    {
-        throw "Expected to find 1 Fixie.Console.exe, but found $($testRunners.Length)."
-    }
+    Push-Location -Path $source_dir\UnitTests
 
-    $testRunner = $testRunners[0].FullName
+    exec { & dotnet xunit -configuration Release }
 
-    exec { & $testRunner $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
-    exec { & $testRunner $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
+    Pop-Location
+
+    Push-Location -Path $source_dir\IntegrationTests
+
+    exec { & dotnet xunit -configuration Release }
+
+    Pop-Location
+
+    exec { & $env:USERPROFILE\.nuget\packages\xunit.runners\1.9.2\tools\xunit.console.clr4.exe $source_dir\UnitTests\bin\$config\net40\AutoMapper.UnitTests.dll }
 }

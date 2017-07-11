@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_int_to_nullable_decimal()
         {
-            _destination.Value.ShouldEqual(_value.ToString());
+            _destination.Value.ShouldBe(_value.ToString());
         }
     }
 }

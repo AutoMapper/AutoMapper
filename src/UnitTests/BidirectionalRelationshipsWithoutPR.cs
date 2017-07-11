@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Should;
+using Shouldly;
 
 using Xunit;
 
@@ -115,7 +115,7 @@ namespace AutoMapper.UnitTests
     //    [Fact(Skip = "This test breaks the Test Runner")]
     //    public void Should_preserve_the_parent_child_relationship_on_the_destination()
     //    {
-    //        _dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
+    //        _dto.Children[0].Parent.ID.ShouldBe(_dto.ID);
     //    }
 
     //    public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
@@ -250,11 +250,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_not_preserve_identity_when_destinations_are_incompatible()
         {
-            _dto.ShouldBeType<FooContainerModel>();
-            _dto.Input.ShouldBeType<FooInputModel>();
-            _dto.Screen.ShouldBeType<FooScreenModel>();
-            _dto.Input.Id.ShouldEqual(3);
-            _dto.Screen.Id.ShouldEqual("3");
+            _dto.ShouldBeOfType<FooContainerModel>();
+            _dto.Input.ShouldBeOfType<FooInputModel>();
+            _dto.Screen.ShouldBeOfType<FooScreenModel>();
+            _dto.Input.Id.ShouldBe(3);
+            _dto.Screen.Id.ShouldBe("3");
         }
 
         public class FooContainerModel

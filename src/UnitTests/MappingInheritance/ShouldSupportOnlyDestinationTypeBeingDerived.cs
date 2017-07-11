@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AutoMapper.Mappers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
@@ -38,9 +38,9 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_detect_unrelated_override()
         {
-            new Action(() => new MapperConfiguration(c => c.CreateMap(typeof(Source), typeof(Destination)).As(typeof(Source)))).ShouldThrow<ArgumentOutOfRangeException>(ex =>
+            new Action(() => new MapperConfiguration(c => c.CreateMap(typeof(Source), typeof(Destination)).As(typeof(Source)))).ShouldThrowException<ArgumentOutOfRangeException>(ex =>
             {
-                ex.ParamName.ShouldEqual("typeOverride");
+                ex.ParamName.ShouldBe("typeOverride");
                 ex.Message.ShouldStartWith($"{typeof(Source)} is not derived from {typeof(Destination)}.");
             });
         }
@@ -89,8 +89,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var orderDto = config.CreateMapper().Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
-            "A".ShouldEqual(customerDto.Name);
-            1.ShouldEqual(customerDto.Id);
+            "A".ShouldBe(customerDto.Name);
+            1.ShouldBe(customerDto.Id);
 
         }
 
@@ -137,8 +137,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var orderDto = config.CreateMapper().Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
-            "A".ShouldEqual(customerDto.Name);
-            1.ShouldEqual(customerDto.Id);
+            "A".ShouldBe(customerDto.Name);
+            1.ShouldBe(customerDto.Id);
 
         }
 
@@ -205,9 +205,9 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_override_the_map()
         {
-            _destination.ShouldBeType<NodeModel<int>>();
-            _destination.ID.ShouldEqual(1);
-            _destination.Name.ShouldEqual("Hi");
+            _destination.ShouldBeOfType<NodeModel<int>>();
+            _destination.ID.ShouldBe(1);
+            _destination.Name.ShouldBe("Hi");
         }
     }
 }

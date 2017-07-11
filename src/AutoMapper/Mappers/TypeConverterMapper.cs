@@ -7,6 +7,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
+#if NETSTANDARD1_3 || NET45 || NET40
     public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
@@ -53,4 +54,5 @@ namespace AutoMapper.Mappers
 
         private static TypeConverter GetTypeConverter(Type type) => TypeDescriptor.GetConverter(type);
     }
+#endif
 }

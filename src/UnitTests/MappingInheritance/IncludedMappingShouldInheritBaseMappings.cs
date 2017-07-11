@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -112,8 +112,8 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            "123".ShouldEqual(dto.BaseString);
-            "456".ShouldEqual(dto.SubString);
+            "123".ShouldBe(dto.BaseString);
+            "456".ShouldBe(dto.SubString);
         }
 
         [Fact]
@@ -136,8 +136,8 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            "123".ShouldEqual(dto.BaseString);
-            "456".ShouldEqual(dto.SubString);
+            "123".ShouldBe(dto.BaseString);
+            "456".ShouldBe(dto.SubString);
         }
 
         [Fact]
@@ -172,8 +172,8 @@ namespace AutoMapper.UnitTests.Bug
                                                                        SubString = "456"
                                                                    });
 
-            "789".ShouldEqual(dto.BaseString);
-            "456".ShouldEqual(dto.SubString);
+            "789".ShouldBe(dto.BaseString);
+            "456".ShouldBe(dto.SubString);
         }
         
         [Fact]
@@ -195,8 +195,8 @@ namespace AutoMapper.UnitTests.Bug
                                                                        SubString = "456"
                                                                    });
 
-            "789".ShouldEqual(dto.BaseString);
-            "456".ShouldEqual(dto.SubString);
+            "789".ShouldBe(dto.BaseString);
+            "456".ShouldBe(dto.SubString);
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            dto.ShouldBeType<DtoSubObject>();
+            dto.ShouldBeOfType<DtoSubObject>();
         }
         
         [Fact]
@@ -239,7 +239,7 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            dto.ShouldBeType<DtoSubObject>();
+            dto.ShouldBeOfType<DtoSubObject>();
         }
 
         [Fact]
@@ -269,7 +269,7 @@ namespace AutoMapper.UnitTests.Bug
                 DifferentBaseString = "",
             }, dest);
 
-            dest.BaseString.ShouldEqual("12345");
+            dest.BaseString.ShouldBe("12345");
         }
 
         [Fact]
@@ -292,7 +292,7 @@ namespace AutoMapper.UnitTests.Bug
             var mapper = config.CreateMapper();
             var dest = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject());
 
-            dest.BaseString.ShouldEqual("12345");
+            dest.BaseString.ShouldBe("12345");
         }
     }
 }
