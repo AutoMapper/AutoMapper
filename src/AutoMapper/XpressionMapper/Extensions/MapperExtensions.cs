@@ -178,6 +178,17 @@ namespace AutoMapper.XpressionMapper.Extensions
                 ? throw new ArgumentException(Resource.typeMappingsDictionaryIsNull)
                 : typeMappings.AddTypeMapping(typeof(TSource), typeof(TDest));
 
+        private static void AddUnderlyimgArrayElement(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        {
+            if (sourceType.IsArray && destType.IsArray)
+            {
+                Type sElementType = sourceType.GetElementType();
+                Type dElementType = destType.GetElementType();
+                if (!typeMappings.ContainsKey(sElementType) && sElementType != dElementType)
+                    typeMappings.AddTypeMapping(sElementType, dElementType);
+            }
+        }
+
         private static void AddUnderlyimgGenericTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
         {
             var sourceArguments = sourceType.GetUnderlyingGenericTypes();
@@ -216,7 +227,10 @@ namespace AutoMapper.XpressionMapper.Extensions
                 if (typeof(Delegate).IsAssignableFrom(sourceType))
                     typeMappings.AddTypeMappingsFromDelegates(sourceType, destType);
                 else
+                {
                     typeMappings.AddUnderlyimgGenericTypes(sourceType, destType);
+                    typeMappings.AddUnderlyimgArrayElement(sourceType, destType);
+                }
             }
 
             return typeMappings;

@@ -459,6 +459,19 @@ namespace AutoMapper.UnitTests
             //Assert
             Assert.NotNull(expMapped);
         }
+
+        [Fact]
+        public void Test_Error_when_mapping_nested_expressions_when_enumerable_is_array_2201()
+        {
+            //Arrange
+            Expression<Func<DataClass, bool>> expr = d => d.Children.All(c => c.Data == "abc");
+
+            //Act
+            Expression<Func<ModelClass, bool>> expMapped = mapper.Map<Expression<Func<ModelClass, bool>>>(expr);
+
+            //Assert
+            Assert.NotNull(expMapped);
+        }
         #endregion Tests
 
         private static void SetupAutoMapper()
@@ -769,10 +782,35 @@ namespace AutoMapper.UnitTests
         public int? ID2 { get; set; }
     }
 
+    public class ModelClass
+    {
+        public int ID { get; set; }
+        public ChildModelClass[] Children { get; set; }
+    }
+
+    public class ChildModelClass
+    {
+        public string Data { get; set; }
+    }
+
+    public class DataClass
+    {
+        public int ID { get; set; }
+        public ChildDataClass[] Children { get; set; }
+    }
+
+    public class ChildDataClass
+    {
+        public string Data { get; set; }
+    }
+
     public class OrganizationProfile : Profile
     {
         public OrganizationProfile()
         {
+            CreateMap<ChildModelClass, ChildDataClass>().ReverseMap();
+            CreateMap<ModelClass, DataClass>().ReverseMap();
+
             CreateMap<User, UserModel>()
                     .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
                     .ForMember(d => d.FullName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
