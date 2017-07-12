@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
 using System.Reflection;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.XpressionMapper.Extensions
 {
@@ -178,21 +179,23 @@ namespace AutoMapper.XpressionMapper.Extensions
                 ? throw new ArgumentException(Resource.typeMappingsDictionaryIsNull)
                 : typeMappings.AddTypeMapping(typeof(TSource), typeof(TDest));
 
-        private static void AddUnderlyimgArrayElement(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        private static bool HasUnderlyingType(this Type type)
         {
-            if (sourceType.IsArray && destType.IsArray)
-            {
-                Type sElementType = sourceType.GetElementType();
-                Type dElementType = destType.GetElementType();
-                if (!typeMappings.ContainsKey(sElementType) && sElementType != dElementType)
-                    typeMappings.AddTypeMapping(sElementType, dElementType);
-            }
+            return type.IsGenericType() || type.HasElementType;
         }
 
-        private static void AddUnderlyimgGenericTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        private static void AddUnderlyingTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
         {
-            var sourceArguments = sourceType.GetUnderlyingGenericTypes();
-            var destArguments = destType.GetUnderlyingGenericTypes();
+            var sourceArguments = !sourceType.HasUnderlyingType()
+                                    ? new List<Type>()
+                                    : ElementTypeHelper.GetElementTypes(sourceType).ToList();
+
+            var destArguments = !destType.HasUnderlyingType()
+                                    ? new List<Type>()
+                                    : ElementTypeHelper.GetElementTypes(destType).ToList();
+
+            if (sourceArguments.Count != destArguments.Count)
+                throw new ArgumentException(Resource.invalidArgumentCount);
 
             sourceArguments.Aggregate(typeMappings, (dic, next) =>
             {
@@ -227,10 +230,7 @@ namespace AutoMapper.XpressionMapper.Extensions
                 if (typeof(Delegate).IsAssignableFrom(sourceType))
                     typeMappings.AddTypeMappingsFromDelegates(sourceType, destType);
                 else
-                {
-                    typeMappings.AddUnderlyimgGenericTypes(sourceType, destType);
-                    typeMappings.AddUnderlyimgArrayElement(sourceType, destType);
-                }
+                    typeMappings.AddUnderlyingTypes(sourceType, destType);
             }
 
             return typeMappings;
