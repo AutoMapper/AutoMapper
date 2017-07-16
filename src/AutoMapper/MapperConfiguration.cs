@@ -112,7 +112,7 @@ namespace AutoMapper
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
-            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
+            var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
             return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
         }
 
