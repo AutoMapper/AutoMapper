@@ -212,7 +212,7 @@ namespace AutoMapper.QueryableExtensions
         {
             var bindings = new List<MemberBinding>();
 
-            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
+            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty)))
             {
                 letPropertyMaps.Push(propertyMap);
 
