@@ -9,6 +9,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers.Internal
 {
     using static Expression;
+    using static AutoMapper.Execution.ExpressionBuilder;
     using static ExpressionFactory;
 
     public static class CollectionMapperExpressionFactory
@@ -51,7 +52,7 @@ namespace AutoMapper.Mappers.Internal
             var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
             if (elementTypeMap == null)
                 return checkNull;
-            var checkContext = TypeMapPlanBuilder.CheckContext(elementTypeMap, contextExpression);
+            var checkContext = CheckContext(elementTypeMap, contextExpression);
             if (checkContext == null)
                 return checkNull;
             return Block(checkContext, checkNull);
@@ -75,7 +76,7 @@ namespace AutoMapper.Mappers.Internal
 
             var typePair = new TypePair(sourceElementType, destElementType);
 
-            var itemExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePair, itemParam, contextParam,
+            var itemExpr = MapExpression(configurationProvider, profileMap, typePair, itemParam, contextParam,
                 propertyMap);
             return ToType(itemExpr, destElementType);
         }
@@ -92,9 +93,9 @@ namespace AutoMapper.Mappers.Internal
             itemParam = Parameter(sourceElementType, "item");
             var destElementType = typeof(KeyValuePair<,>).MakeGenericType(destElementTypes);
 
-            var keyExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePairKey,
+            var keyExpr = MapExpression(configurationProvider, profileMap, typePairKey,
                 Property(itemParam, "Key"), contextParam, propertyMap);
-            var valueExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePairValue,
+            var valueExpr = MapExpression(configurationProvider, profileMap, typePairValue,
                 Property(itemParam, "Value"), contextParam, propertyMap);
             var keyPair = New(destElementType.GetConstructors().First(), keyExpr, valueExpr);
             return keyPair;

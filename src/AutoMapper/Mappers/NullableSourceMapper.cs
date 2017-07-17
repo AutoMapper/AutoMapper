@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
-                TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap,
+                ExpressionBuilder.MapExpression(configurationProvider, profileMap,
                     new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
                     Property(sourceExpression, sourceExpression.Type.GetDeclaredProperty("Value")),
                     contextExpression,

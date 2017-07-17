@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 namespace AutoMapper.Execution
 {
     using static Expression;
+    using static ExpressionBuilder;
 
     public static class DelegateFactory
     {

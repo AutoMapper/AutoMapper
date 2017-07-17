@@ -50,21 +50,6 @@ namespace AutoMapper
             return New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        public Expression BuildExpression(TypeMapPlanBuilder builder)
-        {
-            if (!CanResolve)
-                return null;
-
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(builder));
-
-            ctorArgs =
-                ctorArgs.Zip(Ctor.GetParameters(),
-                    (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
-                    .ToArray();
-            var newExpr = New(Ctor, ctorArgs);
-            return newExpr;
-        }
-
         public void AddParameter(ParameterInfo parameter, MemberInfo[] resolvers, bool canResolve)
         {
             _ctorParams.Add(new ConstructorParameterMap(parameter, resolvers, canResolve));
