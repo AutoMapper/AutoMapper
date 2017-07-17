@@ -33,7 +33,6 @@ namespace AutoMapper
             _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             Validators = configurationExpression.Advanced.GetValidators();
-            AllowAdditiveTypeMapCreation = configurationExpression.Advanced.AllowAdditiveTypeMapCreation;
             _validator = new ConfigurationValidator(this);
             _expressionValidator = new MapperConfigurationExpressionValidator(configurationExpression);
             ExpressionBuilder = new ExpressionBuilder(this);
