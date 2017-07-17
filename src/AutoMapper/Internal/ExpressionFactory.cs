@@ -19,9 +19,11 @@ namespace AutoMapper.Internal
                         null;
         }
 
-        public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
+        public static MethodInfo Method<T>(Expression<Func<T>> expression) => GetExpressionBodyMethod(expression);
 
-        public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression) => ((MethodCallExpression)expression.Body).Method;
+        public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression) => GetExpressionBodyMethod(expression);
+
+        private static MethodInfo GetExpressionBodyMethod(LambdaExpression expression) => ((MethodCallExpression) expression.Body).Method;
 
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
