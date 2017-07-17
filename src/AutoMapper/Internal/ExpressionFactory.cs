@@ -21,6 +21,12 @@ namespace AutoMapper.Internal
 
         public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
 
+        public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression)
+        {
+            var methodInfo = ((MethodCallExpression)expression.Body).Method;
+            return methodInfo.IsGenericMethod ? methodInfo.GetGenericMethodDefinition() : methodInfo;
+        }
+
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
             if(collection.Type.IsArray)

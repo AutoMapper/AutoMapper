@@ -1,4 +1,3 @@
-using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Execution
 {
@@ -6,6 +5,7 @@ namespace AutoMapper.Execution
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using AutoMapper.Configuration;
     using AutoMapper.Internal;
     using AutoMapper.Mappers.Internal;
@@ -15,6 +15,9 @@ namespace AutoMapper.Execution
     {
         private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
             mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
+
+        private static readonly MethodInfo ContextMapMethod =
+            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null));            
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap,
@@ -132,9 +135,7 @@ namespace AutoMapper.Execution
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
             Expression destinationParameter)
         {
-            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods()
-                .First(m => m.Name == "Map")
-                .MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
+            var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
         }
 
