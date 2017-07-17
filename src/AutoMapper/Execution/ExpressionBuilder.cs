@@ -17,7 +17,7 @@ namespace AutoMapper.Execution
             mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
 
         private static readonly MethodInfo ContextMapMethod =
-            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null));            
+            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null)).GetGenericMethodDefinition();            
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap,
