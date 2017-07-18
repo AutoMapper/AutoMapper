@@ -455,7 +455,11 @@ namespace AutoMapper.QueryableExtensions
                 var letProperties = letMapInfos.Select(m => m.Property);
                 var letType = ProxyGenerator.GetSimilarType(request.SourceType, letProperties);
                 var typeMapFactory = new TypeMapFactory();
-                var firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
+                TypeMap firstTypeMap;
+                lock(_configurationProvider)
+                {
+                    firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
+                }
                 var secondParameter = Parameter(letType, "dto");
 
                 ReplaceSubQueries();

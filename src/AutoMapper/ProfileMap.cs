@@ -167,11 +167,13 @@ namespace AutoMapper
             ApplyDerivedMaps(typeMapRegistry, typeMap, typeMap);
         }
 
-        public TypeMap ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
+        public bool IsConventionMap(TypePair types)
         {
-            if (!TypeConfigurations.Any(c => c.IsMatch(types)))
-                return null;
+            return TypeConfigurations.Any(c => c.IsMatch(types));
+        }
 
+        public TypeMap CreateConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
+        {
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
 
             var config = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
@@ -183,7 +185,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
+        public TypeMap CreateClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
             var openMapConfig = _openTypeMapConfigs
                 .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })

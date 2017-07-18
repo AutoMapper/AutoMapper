@@ -325,30 +325,38 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var typeMap = Profiles
-                .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
-                .FirstOrDefault(t => t != null);
-
-            if (!Configuration.CreateMissingTypeMaps)
+            var profile = Profiles.FirstOrDefault(p => p.IsConventionMap(typePair));
+            if(profile == null)
             {
-                typeMap?.Seal(this);
+                return null;
             }
-
-            return typeMap;
+            lock(this)
+            {
+                var typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
+                if(!Configuration.CreateMissingTypeMaps)
+                {
+                    typeMap.Seal(this);
+                }
+                return typeMap;
+            }
         }
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair, TypePair requestedTypes)
         {
-            if (typePair.GetOpenGenericTypePair() == null)
+            if(typePair.GetOpenGenericTypePair() == null)
+            {
                 return null;
+            }
+            lock(this)
+            {
+                var typeMap = Profiles
+                    .Select(p => p.CreateClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
+                    .FirstOrDefault(t => t != null);
 
-            var typeMap = Profiles
-                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
-                .FirstOrDefault(t => t != null);
+                typeMap?.Seal(this);
 
-            typeMap?.Seal(this);
-
-            return typeMap;
+                return typeMap;
+            }
         }
 
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
