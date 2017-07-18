@@ -239,12 +239,18 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination 
-            => Include(typeof(TOtherSource), typeof(TOtherDestination));
+            => IncludeCore(typeof(TOtherSource), typeof(TOtherDestination));
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
-            TypeMapActions.Add(tm => tm.IncludeDerivedTypes(otherSourceType, otherDestinationType));
+            CheckIsDerived(otherSourceType, typeof(TSource));
+            CheckIsDerived(otherDestinationType, typeof(TDestination));
+            return IncludeCore(otherSourceType, otherDestinationType); ;
+        }
 
+        IMappingExpression<TSource, TDestination> IncludeCore(Type otherSourceType, Type otherDestinationType)
+        {
+            TypeMapActions.Add(tm => tm.IncludeDerivedTypes(otherSourceType, otherDestinationType));
             return this;
         }
 
@@ -253,8 +259,9 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
+            CheckIsDerived(typeof(TSource), sourceBase);
+            CheckIsDerived(typeof(TDestination), destinationBase);
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(sourceBase, destinationBase));
-
             return this;
         }
 
@@ -489,11 +496,16 @@ namespace AutoMapper.Configuration
 
         public void As(Type typeOverride)
         {
-            if(!DestinationType.IsAssignableFrom(typeOverride) && !typeOverride.IsGenericTypeDefinition() && !DestinationType.IsGenericTypeDefinition())
-            {
-                throw new ArgumentOutOfRangeException(nameof(typeOverride), $"{typeOverride} is not derived from {DestinationType}.");
-            }
+            CheckIsDerived(typeOverride, DestinationType);
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
+        }
+
+        private void CheckIsDerived(Type derivedType, Type baseType)
+        {
+            if(!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition() && !baseType.IsGenericTypeDefinition())
+            {
+                throw new ArgumentOutOfRangeException(nameof(derivedType), $"{derivedType} is not derived from {baseType}.");
+            }
         }
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
