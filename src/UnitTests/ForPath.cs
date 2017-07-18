@@ -7,6 +7,67 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class InheritForPath : AutoMapperSpecBase
+    {
+        public class RootModel
+        {
+            public int ID { get; set; }
+            public string Title { get; set; }
+            public NestedModel Nested { get; set; }
+        }
+
+        public class NestedModel
+        {
+            public int NestedID { get; set; }
+            public string NestedTitle { get; set; }
+            public string NestedTitle2 { get; set; }
+        }
+
+        public class DerivedModel : RootModel
+        {
+            public string DescendantField { get; set; }
+        }
+        // destination types
+        public class DataModel
+        {
+            public int ID { get; set; }
+            public string Title { get; set; }
+
+            public int OtherID { get; set; }
+            public string Title2 { get; set; }
+        }
+
+        public class DerivedDataModel : DataModel
+        {
+            public string DescendantField { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<RootModel, DataModel>()
+                            .ForMember(dest => dest.OtherID, opt => opt.MapFrom(src => src.Nested.NestedID))
+                            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Nested.NestedTitle))
+                            .ForMember(dest => dest.Title2, opt => opt.MapFrom(src => src.Nested.NestedTitle2))
+                            .ReverseMap()
+                            .ForPath(d=>d.Nested.NestedTitle2, o=>o.Ignore());
+
+            cfg.CreateMap<DerivedModel, DerivedDataModel>()
+                            .IncludeBase<RootModel, DataModel>().ReverseMap()
+                            .ForPath(d=>d.Nested.NestedTitle, o=>o.Ignore())
+                            .ForPath(d => d.Nested.NestedTitle2, opt => opt.MapFrom(src => src.Title2));
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var source = new DerivedDataModel() { OtherID = 2, Title2 = "nested test", ID = 1, Title = "test", DescendantField = "descendant field" };
+            var destination = Mapper.Map<DerivedModel>(source);
+            destination.Nested.NestedID.ShouldBe(2);
+            destination.Nested.NestedTitle.ShouldBeNull();
+            destination.Nested.NestedTitle2.ShouldBe("nested test");
+        }
+    }
+
     public class ForPath : AutoMapperSpecBase
     {
         public class Order
