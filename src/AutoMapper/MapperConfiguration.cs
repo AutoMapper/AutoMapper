@@ -330,15 +330,19 @@ namespace AutoMapper
             {
                 return null;
             }
+            TypeMap typeMap;
             lock(this)
             {
-                var typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
-                if(!Configuration.CreateMissingTypeMaps)
+                typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
+            }
+            if(!Configuration.CreateMissingTypeMaps)
+            {
+                lock(typeMap)
                 {
                     typeMap.Seal(this);
                 }
-                return typeMap;
             }
+            return typeMap;
         }
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair, TypePair requestedTypes)
@@ -347,16 +351,22 @@ namespace AutoMapper
             {
                 return null;
             }
+            TypeMap typeMap;
             lock(this)
             {
-                var typeMap = Profiles
+                typeMap = Profiles
                     .Select(p => p.CreateClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                     .FirstOrDefault(t => t != null);
-
-                typeMap?.Seal(this);
-
-                return typeMap;
             }
+            if(typeMap == null)
+            {
+                return null;
+            }
+            lock(typeMap)
+            {
+                typeMap.Seal(this);
+            }
+            return typeMap;
         }
 
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
