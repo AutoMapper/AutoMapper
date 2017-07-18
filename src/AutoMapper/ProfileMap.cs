@@ -185,28 +185,15 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap CreateClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
+        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
-            var openMapConfig = _openTypeMapConfigs
-                .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })
-                //.Where(tm => tm.IsOpenGeneric)
-                .Where(tm =>
-                    tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
-                    tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())
-                .OrderByDescending(tm => tm.DestinationType == closedTypes.DestinationType) // Favor more specific destination matches,
-                .ThenByDescending(tm => tm.SourceType == closedTypes.SourceType) // then more specific source matches
-                .FirstOrDefault();
-
-            if (openMapConfig == null)
-                return null;
-
             var closedMap = _typeMapFactory.CreateTypeMap(requestedTypes.SourceType, requestedTypes.DestinationType, this, openMapConfig.MemberList);
 
             openMapConfig.Configure(closedMap);
 
             Configure(typeMapRegistry, closedMap);
 
-            if (closedMap.TypeConverterType != null)
+            if(closedMap.TypeConverterType != null)
             {
                 var typeParams =
                     (openMapConfig.SourceType.IsGenericTypeDefinition() ? closedTypes.SourceType.GetGenericArguments() : new Type[0])
@@ -216,7 +203,7 @@ namespace AutoMapper
                 var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
                 closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
             }
-            if (closedMap.DestinationTypeOverride?.IsGenericTypeDefinition() == true)
+            if(closedMap.DestinationTypeOverride?.IsGenericTypeDefinition() == true)
             {
                 var neededParameters = closedMap.DestinationTypeOverride.GetGenericParameters().Length;
                 closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GetGenericArguments().Take(neededParameters).ToArray());
@@ -224,6 +211,17 @@ namespace AutoMapper
             return closedMap;
         }
 
+        public ITypeMapConfiguration GetGenericMap(TypePair closedTypes)
+        {
+            return _openTypeMapConfigs
+                .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })
+                .Where(tm =>
+                    tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
+                    tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())
+                .OrderByDescending(tm => tm.DestinationType == closedTypes.DestinationType) // Favor more specific destination matches,
+                .ThenByDescending(tm => tm.SourceType == closedTypes.SourceType) // then more specific source matches
+                .FirstOrDefault();
+        }
 
         private static void ApplyBaseMaps(TypeMapRegistry typeMapRegistry, TypeMap derivedMap, TypeMap currentMap)
         {

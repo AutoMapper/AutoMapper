@@ -351,16 +351,15 @@ namespace AutoMapper
             {
                 return null;
             }
+            var mapInfo = Profiles.Select(p => new { GenericMap = p.GetGenericMap(typePair), Profile = p }).FirstOrDefault(p => p.GenericMap != null);
+            if(mapInfo == null)
+            {
+                return null;
+            }
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = Profiles
-                    .Select(p => p.CreateClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
-                    .FirstOrDefault(t => t != null);
-            }
-            if(typeMap == null)
-            {
-                return null;
+                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair, requestedTypes);
             }
             lock(typeMap)
             {
