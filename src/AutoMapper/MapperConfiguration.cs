@@ -325,29 +325,46 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var typeMap = Profiles
-                .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
-                .FirstOrDefault(t => t != null);
-
-            if (!Configuration.CreateMissingTypeMaps)
+            var profile = Profiles.FirstOrDefault(p => p.IsConventionMap(typePair));
+            if(profile == null)
             {
-                typeMap?.Seal(this);
+                return null;
             }
-
+            TypeMap typeMap;
+            lock(this)
+            {
+                typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
+            }
+            if(!Configuration.CreateMissingTypeMaps)
+            {
+                lock(typeMap)
+                {
+                    typeMap.Seal(this);
+                }
+            }
             return typeMap;
         }
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair, TypePair requestedTypes)
         {
-            if (typePair.GetOpenGenericTypePair() == null)
+            if(typePair.GetOpenGenericTypePair() == null)
+            {
                 return null;
-
-            var typeMap = Profiles
-                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
-                .FirstOrDefault(t => t != null);
-
-            typeMap?.Seal(this);
-
+            }
+            var mapInfo = Profiles.Select(p => new { GenericMap = p.GetGenericMap(typePair), Profile = p }).FirstOrDefault(p => p.GenericMap != null);
+            if(mapInfo == null)
+            {
+                return null;
+            }
+            TypeMap typeMap;
+            lock(this)
+            {
+                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair, requestedTypes);
+            }
+            lock(typeMap)
+            {
+                typeMap.Seal(this);
+            }
             return typeMap;
         }
 
