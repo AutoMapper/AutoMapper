@@ -291,13 +291,6 @@ namespace AutoMapper.Execution
                 return Invoke(ctor);
             }
 #endif
-
-            if (_typeMap.DestinationTypeToUse.IsAbstract())
-                return Constant(null);
-
-            if (_typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
-                return Constant(null);
-
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 

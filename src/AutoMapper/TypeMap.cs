@@ -372,6 +372,10 @@ namespace AutoMapper
                 inheritedTypeMap._sourceMemberConfigs.Where(
                     baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
             _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
+            var notOverridenPathMaps =
+                inheritedTypeMap.PathMaps.Where(
+                    baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath));
+            _pathMaps.AddRange(notOverridenPathMaps);
         }
     }
 }
