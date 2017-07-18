@@ -5,6 +5,27 @@ using Shouldly;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_mapping_to_an_abstract_type : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Value { get; set; }
+        }
+
+        abstract class Destination
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+
+        [Fact]
+        public void Should_throw()
+        {
+            new Action(() => Mapper.Map<Destination>(new Source())).ShouldThrow<ArgumentException>($"Cannot create an instance of abstract type {typeof(Destination)}.");
+        }
+    }
+
     public class When_a_constructor_with_extra_parameters_doesnt_match : AutoMapperSpecBase
     {
         PersonTarget _destination;
