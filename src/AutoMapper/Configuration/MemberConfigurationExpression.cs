@@ -229,7 +229,11 @@ namespace AutoMapper.Configuration
 
         public void Ignore()
         {
-            PropertyMapActions.Add(pm => pm.Ignored = true);
+            PropertyMapActions.Add(pm =>
+            {
+                pm.Ignored = true;
+                pm.TypeMap.IgnorePaths(DestinationMember);
+            });
         }
 
         public void AllowNull()
