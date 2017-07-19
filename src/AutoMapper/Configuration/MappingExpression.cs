@@ -245,7 +245,7 @@ namespace AutoMapper.Configuration
         {
             CheckIsDerived(otherSourceType, typeof(TSource));
             CheckIsDerived(otherDestinationType, typeof(TDestination));
-            return IncludeCore(otherSourceType, otherDestinationType); ;
+            return IncludeCore(otherSourceType, otherDestinationType);
         }
 
         IMappingExpression<TSource, TDestination> IncludeCore(Type otherSourceType, Type otherDestinationType)
