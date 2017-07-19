@@ -337,10 +337,7 @@ namespace AutoMapper
             }
             if(!Configuration.CreateMissingTypeMaps)
             {
-                lock(typeMap)
-                {
-                    typeMap.Seal(this);
-                }
+                typeMap.Seal(this);
             }
             return typeMap;
         }
@@ -361,10 +358,7 @@ namespace AutoMapper
             {
                 typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair, requestedTypes);
             }
-            lock(typeMap)
-            {
-                typeMap.Seal(this);
-            }
+            typeMap.Seal(this);
             return typeMap;
         }
 
