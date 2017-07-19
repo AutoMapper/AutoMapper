@@ -40,7 +40,6 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             new Action(() => new MapperConfiguration(c => c.CreateMap(typeof(Source), typeof(Destination)).As(typeof(Source)))).ShouldThrowException<ArgumentOutOfRangeException>(ex =>
             {
-                ex.ParamName.ShouldBe("typeOverride");
                 ex.Message.ShouldStartWith($"{typeof(Source)} is not derived from {typeof(Destination)}.");
             });
         }
