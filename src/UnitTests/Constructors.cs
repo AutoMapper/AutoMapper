@@ -5,6 +5,52 @@ using Shouldly;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_construct_mapping_a_struct : AutoMapperSpecBase
+    {
+        public class Dto
+        {
+            public double Value { get; set; }
+        }
+
+        public class Entity
+        {
+            public double Value { get; set; }
+        }
+
+        public struct Source
+        {
+            public Dto Property { get; set; }
+        }
+
+        public struct Destination
+        {
+            public Destination(Entity property)
+            {
+                Property = property;
+            }
+
+            public Entity Property { get; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Dto, Entity>().ReverseMap();
+            cfg.CreateMap<Source, Destination>().ReverseMap();
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var source = new Source
+            {
+                Property = new Dto { Value = 5.0 }
+            };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Property.Value.ShouldBe(5.0);
+            Mapper.Map<Source>(destination).Property.Value.ShouldBe(5.0);
+        }
+    }
+
     public class When_mapping_to_an_abstract_type : AutoMapperSpecBase
     {
         class Source
