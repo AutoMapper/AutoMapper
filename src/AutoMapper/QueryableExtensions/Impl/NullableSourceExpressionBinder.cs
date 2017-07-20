@@ -16,6 +16,6 @@ namespace AutoMapper.QueryableExtensions
         }
 
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            result.Type.IsNullableType() && !propertyMap.DestinationPropertyType.IsNullableType();
+            result.Type.IsNullableType() && !propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.IsValueType();
     }
 }
