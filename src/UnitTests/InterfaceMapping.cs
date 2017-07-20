@@ -8,6 +8,113 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.InterfaceMapping
 {
+    public class GenericsAndInterfaces : AutoMapperSpecBase
+    {
+        MyClass<ContainerClass> source = new MyClass<ContainerClass> { Container = new ContainerClass { MyProperty = 3 } };
+
+        public interface IMyInterface<T>
+        {
+            T Container { get; set; }
+        }
+
+        public class ContainerClass
+        {
+            public int MyProperty { get; set; }
+        }
+
+        public class ImplementedClass : IMyInterface<ContainerClass>
+        {
+            public ContainerClass Container
+            {
+                get;
+                set;
+            }
+        }
+
+        public class MyClass<T>
+        {
+            public T Container { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap(typeof(MyClass<>), typeof(IMyInterface<>)));
+
+        [Fact]
+        public void ShouldMapToExistingObject()
+        {
+            var destination = new ImplementedClass();
+            Mapper.Map(source, destination, typeof(MyClass<ContainerClass>), typeof(IMyInterface<ContainerClass>));
+            destination.Container.MyProperty.ShouldBe(3);
+        }
+
+        [Fact]
+        public void ShouldMapToNewObject()
+        {
+            var destination = (IMyInterface<ContainerClass>) Mapper.Map(source, typeof(MyClass<ContainerClass>), typeof(IMyInterface<ContainerClass>));
+            destination.Container.MyProperty.ShouldBe(3);
+        }
+    }
+
+    public class When_mapping_generic_interface : AutoMapperSpecBase
+    {
+        public class Source<T> : List<T>
+        {
+            public String PropertyToMap { get; set; }
+            public String PropertyToIgnore { get; set; } = "I am not ignored";
+        }
+
+        public class Destination : DestinationBase<String>
+        {
+        }
+
+        public abstract class DestinationBase<T> : DestinationBaseBase, IDestinationBase<T>
+        {
+            private String m_PropertyToIgnore;
+
+            public virtual String PropertyToMap { get; set; }
+
+            [IgnoreMap]
+            public override String PropertyToIgnore
+            {
+                get
+                {
+                    return m_PropertyToIgnore ?? (m_PropertyToIgnore = "Ignore me");
+                }
+                set
+                {
+                    m_PropertyToIgnore = value;
+                }
+            }
+
+            public virtual List<T> Items { get; set; }
+        }
+
+        public abstract class DestinationBaseBase
+        {
+            [IgnoreMap]
+            public virtual String PropertyToIgnore { get; set; }
+        }
+
+        public interface IDestinationBase<T>
+        {
+            String PropertyToMap { get; set; }
+            List<T> Items { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+            cfg.CreateMap(typeof(IList<>), typeof(IDestinationBase<>))
+                    .ForMember(nameof(IDestinationBase<Object>.Items), p_Expression => p_Expression.MapFrom(p_Source => p_Source)));
+
+        [Fact]
+        public void Should_work()
+        {
+            var source = new Source<String>{"Cat", "Dog"};
+            source.PropertyToMap = "Hello World";
+            var destination = Mapper.Map<IDestinationBase<string>>(source);
+            destination.PropertyToMap.ShouldBeNull();
+            destination.Items.ShouldBe(source);
+        }
+    }
+
     public class When_mapping_an_interface_with_getter_only_member : AutoMapperSpecBase
     {
         interface ISource

@@ -185,9 +185,9 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
+        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
-            var closedMap = _typeMapFactory.CreateTypeMap(requestedTypes.SourceType, requestedTypes.DestinationType, this, openMapConfig.MemberList);
+            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
 
             openMapConfig.Configure(closedMap);
 

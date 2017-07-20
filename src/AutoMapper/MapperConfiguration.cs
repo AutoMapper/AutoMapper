@@ -209,7 +209,7 @@ namespace AutoMapper
                 {
                     return typeMap;
                 }
-                typeMap = FindClosedGenericTypeMapFor(types, initialTypes);
+                typeMap = FindClosedGenericTypeMapFor(types);
                 if (typeMap != null)
                 {
                     return typeMap;
@@ -342,7 +342,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair, TypePair requestedTypes)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
             if(typePair.GetOpenGenericTypePair() == null)
             {
@@ -356,7 +356,7 @@ namespace AutoMapper
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair, requestedTypes);
+                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair);
             }
             typeMap.Seal(this);
             return typeMap;
