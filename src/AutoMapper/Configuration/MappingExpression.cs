@@ -179,11 +179,14 @@ namespace AutoMapper.Configuration
                 throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
             }
             var expression = new PathConfigurationExpression<TSource, TDestination>(destinationMember);
-            IgnoreDestinationMember(expression.MemberPath.First);
+            var firstMember = expression.MemberPath.First;
+            var firstMemberConfig = GetDestinationMemberConfiguration(firstMember);
+            if(firstMemberConfig == null)
+            {
+                IgnoreDestinationMember(firstMember, ignorePaths: false);
+            }
             _memberConfigurations.Add(expression);
-
             memberOptions(expression);
-
             return this;
         }
 
@@ -204,7 +207,7 @@ namespace AutoMapper.Configuration
         public void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
         {
             _allMemberOptions = memberOptions;
-            _memberFilter = m => _memberConfigurations.All(c=>!Equals(c.DestinationMember, m));
+            _memberFilter = m => GetDestinationMemberConfiguration(m) == null;
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
@@ -222,9 +225,9 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        private void IgnoreDestinationMember(MemberInfo property)
+        private void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true)
         {
-            ForDestinationMember<object>(property, options => options.Ignore());
+            ForDestinationMember<object>(property, options => options.Ignore(ignorePaths));
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
@@ -481,7 +484,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        private IMappingExpression<TSource, TDestination> ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
+        private IMappingExpression<TSource, TDestination> ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<MemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             var expression = (MemberConfigurationExpression<TSource, TDestination, TMember>) CreateMemberConfigurationExpression<TMember>(destinationProperty, SourceType);
 
@@ -529,6 +532,11 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember)
+        {
+            return _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
+        }
+
         public void Configure(TypeMap typeMap)
         {
             foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
@@ -539,7 +547,7 @@ namespace AutoMapper.Configuration
                     ForMember(destProperty.Name, y => y.Ignore());
                     _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
                 }
-                if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && _memberConfigurations.All(m => !Equals(m.DestinationMember, destProperty)))
+                if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
                     ForMember(destProperty.Name, y => y.Ignore());
                 }

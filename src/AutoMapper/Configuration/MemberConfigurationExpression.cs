@@ -229,10 +229,18 @@ namespace AutoMapper.Configuration
 
         public void Ignore()
         {
+            Ignore(ignorePaths: true);
+        }
+
+        public void Ignore(bool ignorePaths)
+        {
             PropertyMapActions.Add(pm =>
             {
                 pm.Ignored = true;
-                pm.TypeMap.IgnorePaths(DestinationMember);
+                if(ignorePaths)
+                {
+                    pm.TypeMap.IgnorePaths(DestinationMember);
+                }
             });
         }
 
