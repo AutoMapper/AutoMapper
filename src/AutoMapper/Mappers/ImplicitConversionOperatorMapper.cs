@@ -17,10 +17,6 @@ namespace AutoMapper.Mappers
         private static MethodInfo GetImplicitConversionOperator(TypePair context)
         {
             var destinationType = context.DestinationType;
-            if(destinationType.IsNullableType())
-            {
-                destinationType = destinationType.GetTypeOfNullable();
-            }
             var sourceTypeMethod = context.SourceType
                 .GetDeclaredMethods()
                 .FirstOrDefault(mi => mi.IsPublic && mi.IsStatic && mi.Name == "op_Implicit" && mi.ReturnType == destinationType);
