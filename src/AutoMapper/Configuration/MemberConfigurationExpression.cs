@@ -232,7 +232,7 @@ namespace AutoMapper.Configuration
             Ignore(ignorePaths: true);
         }
 
-        public void Ignore(bool ignorePaths)
+        internal void Ignore(bool ignorePaths)
         {
             PropertyMapActions.Add(pm =>
             {
