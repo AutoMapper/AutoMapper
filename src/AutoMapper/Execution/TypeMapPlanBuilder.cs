@@ -93,7 +93,7 @@ namespace AutoMapper.Execution
                 }
                 else
                 {
-                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType}=>{propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
+                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
                     propertyTypeMap.PreserveReferences = true;
                 }
             }
