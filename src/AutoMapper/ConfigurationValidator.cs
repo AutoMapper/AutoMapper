@@ -77,12 +77,6 @@ namespace AutoMapper
             else
             {
                 var mapperToUse = _config.FindMapper(types);
-                if (mapperToUse == null && types.SourceType.IsNullableType())
-                {
-                    var nullableTypes = new TypePair(Nullable.GetUnderlyingType(types.SourceType),
-                        types.DestinationType);
-                    mapperToUse = _config.FindMapper(nullableTypes);
-                }
                 if (mapperToUse == null)
                 {
                     throw new AutoMapperConfigurationException(types) { PropertyMap = propertyMap };

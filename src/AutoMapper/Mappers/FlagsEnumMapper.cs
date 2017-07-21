@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
                 ToType(
                     Call(EnumParseMethod,
-                        Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type),
+                        Constant(destExpression.Type),
                         Call(sourceExpression, sourceExpression.Type.GetDeclaredMethod("ToString")),
                         Constant(true)
                     ),

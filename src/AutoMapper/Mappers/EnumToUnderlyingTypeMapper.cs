@@ -26,7 +26,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
                 ToType(
                     Call(ChangeTypeMethod, ToObject(sourceExpression),
-                        Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type)),
+                        Constant(destExpression.Type)),
                     destExpression.Type
                 );
     }

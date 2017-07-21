@@ -49,11 +49,6 @@ namespace AutoMapper.Mappers.Internal
 
         public static Type GetEnumerationType(Type enumType)
         {
-            if (enumType.IsNullableType())
-            {
-                enumType = enumType.GetTypeInfo().GenericTypeArguments[0];
-            }
-
             return !enumType.IsEnum() ? null : enumType;
         }
 

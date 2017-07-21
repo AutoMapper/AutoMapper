@@ -24,7 +24,7 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
                 ToType(
-                    Call(EnumToObject, Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type),
+                    Call(EnumToObject, Constant(destExpression.Type),
                         ToObject(sourceExpression)),
                     destExpression.Type
                 );
