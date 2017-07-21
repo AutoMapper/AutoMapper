@@ -8,6 +8,68 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_the_source_has_cyclical_references : AutoMapperSpecBase
+    {
+        public class Article
+        {
+            public int Id { get; set; }
+
+            public virtual Supplier Supplier { get; set; }
+        }
+
+        public class Supplier
+        {
+            public int Id { get; set; }
+
+            public virtual ICollection<Contact> Contacts { get; set; }
+        }
+
+        public class Contact
+        {
+            public int Id { get; set; }
+
+            public virtual ICollection<Supplier> Suppliers { get; set; }
+        }
+
+        public class ArticleViewModel
+        {
+            public int Id { get; set; }
+
+            public SupplierViewModel Supplier { get; set; }
+        }
+
+        public class SupplierViewModel
+        {
+            public int Id { get; set; }
+
+            public List<ContactViewModel> Contacts { get; set; }
+
+        }
+
+        public class ContactViewModel
+        {
+            public int Id { get; set; }
+
+            public List<SupplierViewModel> Suppliers { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Article, ArticleViewModel>();
+            cfg.CreateMap<Supplier, SupplierViewModel>();
+            cfg.CreateMap<Contact, ContactViewModel>();
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var article = new Article { Supplier = new Supplier() };
+            article.Supplier.Contacts = new List<Contact> { new Contact { Suppliers = new List<Supplier> { article.Supplier } } };
+            var supplier = Mapper.Map<ArticleViewModel>(article).Supplier;
+            supplier.ShouldBe(supplier.Contacts[0].Suppliers[0]);
+        }
+    }
+
     public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
     {
         private ParentDto _dto;

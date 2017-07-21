@@ -9,6 +9,7 @@ namespace AutoMapper.Execution
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
+    using System.Diagnostics;
 
     public class TypeMapPlanBuilder
     {
@@ -70,36 +71,30 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> visitedTypeMaps)
         {
-            if (_typeMap.PreserveReferences)
-                return;
-            bool isRoot;
-            if (visitedTypeMaps == null)
+            if(_typeMap.PreserveReferences)
             {
-                isRoot = true;
+                return;
+            }
+            if(visitedTypeMaps == null)
+            {
                 visitedTypeMaps = new HashSet<TypeMap>();
             }
-            else
+            visitedTypeMaps.Add(_typeMap);
+            var propertyTypeMaps =
+                (from propertyTypeMap in
+                (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
+                where propertyTypeMap != null && !propertyTypeMap.PreserveReferences
+                select propertyTypeMap).Distinct();
+            foreach (var propertyTypeMap in propertyTypeMaps)
             {
-                isRoot = false;
-            }
-
-            CheckPropertyMapsForCycles();
-
-            if (isRoot && visitedTypeMaps.Contains(_typeMap))
-                _typeMap.PreserveReferences = true;
-
-            void CheckPropertyMapsForCycles()
-            {
-                var propertyTypeMaps =
-                    from propertyTypeMap in
-                    (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
-                    where propertyTypeMap != null && !propertyTypeMap.PreserveReferences &&
-                          !visitedTypeMaps.Contains(propertyTypeMap)
-                    select propertyTypeMap;
-                foreach (var propertyTypeMap in propertyTypeMaps)
+                if(visitedTypeMaps.Add(propertyTypeMap))
                 {
-                    visitedTypeMaps.Add(propertyTypeMap);
                     propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                }
+                else
+                {
+                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType}=>{propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
+                    propertyTypeMap.PreserveReferences = true;
                 }
             }
         }
