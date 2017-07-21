@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
             };
             return
                 (from sourceType in primitiveTypes
-                 from destinationType in primitiveTypes.Concat(from type in primitiveTypes.Where(t => t.IsValueType()) select typeof(Nullable<>).MakeGenericType(type))
+                 from destinationType in primitiveTypes
                  select new
                  {
                      Key = new TypePair(sourceType, destinationType),
@@ -34,8 +34,7 @@ namespace AutoMapper.Mappers
 
         static LambdaExpression ConvertExpression(Type sourceType, Type destinationType)
         {
-            var underlyingDestinationType = Nullable.GetUnderlyingType(destinationType) ?? destinationType;
-            var convertMethod = typeof(Convert).GetDeclaredMethod("To" + underlyingDestinationType.Name, new[] { sourceType });
+            var convertMethod = typeof(Convert).GetDeclaredMethod("To" + destinationType.Name, new[] { sourceType });
             var sourceParameter = Parameter(sourceType, "source");
             return Lambda(Call(convertMethod, sourceParameter), sourceParameter);
         }

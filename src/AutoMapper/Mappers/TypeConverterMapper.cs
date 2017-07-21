@@ -19,12 +19,6 @@ namespace AutoMapper.Mappers
                 return (TDestination)typeConverter.ConvertTo(source, typeof(TDestination));
             }
 
-            if (typeof(TDestination).IsNullableType() &&
-                typeConverter.CanConvertTo(Nullable.GetUnderlyingType(typeof(TDestination))))
-            {
-                return (TDestination)typeConverter.ConvertTo(source, Nullable.GetUnderlyingType(typeof(TDestination)));
-            }
-
             typeConverter = GetTypeConverter(typeof(TDestination));
             if (typeConverter.CanConvertFrom(typeof(TSource)))
             {
@@ -41,8 +35,7 @@ namespace AutoMapper.Mappers
             var sourceTypeConverter = GetTypeConverter(context.SourceType);
             var destTypeConverter = GetTypeConverter(context.DestinationType);
 
-            return sourceTypeConverter.CanConvertTo(context.DestinationType) || context.DestinationType.IsNullableType() &&
-                   sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) || destTypeConverter.CanConvertFrom(context.SourceType);
+            return sourceTypeConverter.CanConvertTo(context.DestinationType) || destTypeConverter.CanConvertFrom(context.SourceType);
         }
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,

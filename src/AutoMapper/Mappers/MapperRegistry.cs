@@ -7,6 +7,7 @@ namespace AutoMapper.Mappers
         public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
             new NullableSourceMapper(),
+            new NullableDestinationMapper(),
             new ExpressionMapper(), 
             new FlagsEnumMapper(),
             new StringToEnumMapper(), 
