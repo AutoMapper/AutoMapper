@@ -251,7 +251,7 @@ namespace AutoMapper
             }
         }
 
-        public void Seal(IConfigurationProvider configurationProvider, Stack<TypeMap> visitedTypeMaps = null)
+        public void Seal(IConfigurationProvider configurationProvider, Stack<TypeMap> typeMapsPath = null)
         {
             if(_sealed)
             {
@@ -269,7 +269,7 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(visitedTypeMaps);
+            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
         }
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)

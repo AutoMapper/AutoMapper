@@ -44,7 +44,7 @@ namespace AutoMapper.Execution
 
         public ParameterExpression Context { get; }
 
-        public LambdaExpression CreateMapperLambda(Stack<TypeMap> visitedTypeMaps)
+        public LambdaExpression CreateMapperLambda(Stack<TypeMap> typeMapsPath)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() ||
                 _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
@@ -55,7 +55,7 @@ namespace AutoMapper.Execution
                 return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source,
                     _initialDestination, Context);
 
-            CheckForCycles(visitedTypeMaps);
+            CheckForCycles(typeMapsPath);
 
             var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
 
@@ -69,17 +69,17 @@ namespace AutoMapper.Execution
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
         }
 
-        private void CheckForCycles(Stack<TypeMap> visitedTypeMaps)
+        private void CheckForCycles(Stack<TypeMap> typeMapsPath)
         {
             if(_typeMap.PreserveReferences)
             {
                 return;
             }
-            if(visitedTypeMaps == null)
+            if(typeMapsPath == null)
             {
-                visitedTypeMaps = new Stack<TypeMap>();
+                typeMapsPath = new Stack<TypeMap>();
             }
-            visitedTypeMaps.Push(_typeMap);
+            typeMapsPath.Push(_typeMap);
             var propertyTypeMaps =
                 (from propertyTypeMap in
                 (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
@@ -87,17 +87,17 @@ namespace AutoMapper.Execution
                 select propertyTypeMap).Distinct();
             foreach (var propertyTypeMap in propertyTypeMaps)
             {
-                if(visitedTypeMaps.Contains(propertyTypeMap))
+                if(typeMapsPath.Contains(propertyTypeMap))
                 {
                     Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
                     propertyTypeMap.PreserveReferences = true;
                 }
                 else
                 {
-                    propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                    propertyTypeMap.Seal(_configurationProvider, typeMapsPath);
                 }
             }
-            visitedTypeMaps.Pop();
+            typeMapsPath.Pop();
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
