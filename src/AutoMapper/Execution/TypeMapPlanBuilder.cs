@@ -44,7 +44,7 @@ namespace AutoMapper.Execution
 
         public ParameterExpression Context { get; }
 
-        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> visitedTypeMaps)
+        public LambdaExpression CreateMapperLambda(Stack<TypeMap> visitedTypeMaps)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() ||
                 _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
@@ -69,7 +69,7 @@ namespace AutoMapper.Execution
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
         }
 
-        private void CheckForCycles(HashSet<TypeMap> visitedTypeMaps)
+        private void CheckForCycles(Stack<TypeMap> visitedTypeMaps)
         {
             if(_typeMap.PreserveReferences)
             {
@@ -77,9 +77,9 @@ namespace AutoMapper.Execution
             }
             if(visitedTypeMaps == null)
             {
-                visitedTypeMaps = new HashSet<TypeMap>();
+                visitedTypeMaps = new Stack<TypeMap>();
             }
-            visitedTypeMaps.Add(_typeMap);
+            visitedTypeMaps.Push(_typeMap);
             var propertyTypeMaps =
                 (from propertyTypeMap in
                 (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
@@ -87,16 +87,17 @@ namespace AutoMapper.Execution
                 select propertyTypeMap).Distinct();
             foreach (var propertyTypeMap in propertyTypeMaps)
             {
-                if(visitedTypeMaps.Add(propertyTypeMap))
-                {
-                    propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
-                }
-                else
+                if(visitedTypeMaps.Contains(propertyTypeMap))
                 {
                     Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
                     propertyTypeMap.PreserveReferences = true;
                 }
+                else
+                {
+                    propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                }
             }
+            visitedTypeMaps.Pop();
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)

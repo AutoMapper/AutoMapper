@@ -8,6 +8,55 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_the_same_map_is_used_again : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public InnerSource Inner;
+            public OtherInnerSource OtherInner;
+        }
+
+        class InnerSource
+        {
+            public int Value;
+        }
+
+        class OtherInnerSource
+        {
+            public int Value;
+        }
+
+        class InnerDestination
+        {
+            public int Value;
+        }
+
+        class OtherInnerDestination
+        {
+            public int Value;
+        }
+
+        class Destination
+        {
+            public InnerDestination Inner;
+            public OtherInnerDestination OtherInner;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<InnerSource, InnerDestination>();
+            cfg.CreateMap<OtherInnerSource, OtherInnerDestination>();
+            cfg.CreateMap<int, int>();
+        });
+
+        [Fact]
+        public void Should_not_set_preserve_references()
+        {
+            Configuration.ResolveTypeMap(typeof(int), typeof(int)).PreserveReferences.ShouldBeFalse();
+        }
+    }
+
     public class When_the_source_has_cyclical_references : AutoMapperSpecBase
     {
         public class Article

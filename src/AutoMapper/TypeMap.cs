@@ -251,7 +251,7 @@ namespace AutoMapper
             }
         }
 
-        public void Seal(IConfigurationProvider configurationProvider, HashSet<TypeMap> visitedTypeMaps = null)
+        public void Seal(IConfigurationProvider configurationProvider, Stack<TypeMap> visitedTypeMaps = null)
         {
             if(_sealed)
             {
