@@ -227,10 +227,17 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ExplicitExpansion = true);
         }
 
-        public void Ignore()
-        {
-            PropertyMapActions.Add(pm => pm.Ignored = true);
-        }
+        public void Ignore() => Ignore(ignorePaths: true);
+
+        internal void Ignore(bool ignorePaths) =>
+            PropertyMapActions.Add(pm =>
+            {
+                pm.Ignored = true;
+                if(ignorePaths)
+                {
+                    pm.TypeMap.IgnorePaths(DestinationMember);
+                }
+            });
 
         public void AllowNull()
         {

@@ -158,6 +158,48 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class ReverseDefaultFlatteningWithIgnoreMember : AutoMapperSpecBase
+    {
+        public class Order
+        {
+            public CustomerHolder Customerholder { get; set; }
+        }
+
+        public class CustomerHolder
+        {
+            public Customer Customer { get; set; }
+        }
+
+        public class Customer
+        {
+            public string Name { get; set; }
+            public decimal Total { get; set; }
+        }
+
+        public class OrderDto
+        {
+            public string CustomerholderCustomerName { get; set; }
+            public decimal CustomerholderCustomerTotal { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Order, OrderDto>()
+                .ReverseMap()
+                .ForMember(d=>d.Customerholder, o=>o.Ignore())
+                .ForPath(d=>d.Customerholder.Customer.Total, o=>o.MapFrom(s=>s.CustomerholderCustomerTotal));
+        });
+
+        [Fact]
+        public void Should_unflatten()
+        {
+            var dto = new OrderDto { CustomerholderCustomerName = "George Costanza", CustomerholderCustomerTotal = 74.85m };
+            var model = Mapper.Map<Order>(dto);
+            model.Customerholder.Customer.Name.ShouldBeNull();
+            model.Customerholder.Customer.Total.ShouldBe(74.85m);
+        }
+    }
+
     public class ReverseDefaultFlattening : AutoMapperSpecBase
     {
         public class Order

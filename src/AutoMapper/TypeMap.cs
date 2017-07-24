@@ -219,6 +219,14 @@ namespace AutoMapper
             _includedBaseTypes.Add(baseTypes);
         }
 
+        internal void IgnorePaths(MemberInfo destinationMember)
+        {
+            foreach(var pathMap in _pathMaps.Where(pm => pm.MemberPath.First == destinationMember))
+            {
+                pathMap.Ignored = true;
+            }
+        }
+
         public Type GetDerivedTypeFor(Type derivedSourceType)
         {
             if (DestinationTypeOverride != null)

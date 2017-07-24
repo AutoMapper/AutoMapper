@@ -39,6 +39,7 @@ namespace AutoMapper.Configuration
             PathMapActions.Add(pm =>
             {
                 pm.SourceExpression = sourceExpression;
+                pm.Ignored = false;
             });
         }
 
