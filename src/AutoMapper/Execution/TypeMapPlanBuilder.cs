@@ -102,15 +102,15 @@ namespace AutoMapper.Execution
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
         {
-            if (propertyMap.SourceType == null)
+            if(propertyMap.SourceType == null)
+            {
                 return null;
+            }
             var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
             var typeMap = _configurationProvider.ResolveTypeMap(types);
-            if (typeMap == null)
+            if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
             {
-                var mapper = _configurationProvider.FindMapper(types) as IObjectMapperInfo;
-                if (mapper != null)
-                    typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
+                typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
             }
             return typeMap;
         }
