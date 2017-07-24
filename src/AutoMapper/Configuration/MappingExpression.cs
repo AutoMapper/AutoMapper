@@ -225,10 +225,8 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        private void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true)
-        {
+        private void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true) =>
             ForDestinationMember<object>(property, options => options.Ignore(ignorePaths));
-        }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
@@ -532,10 +530,8 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember)
-        {
-            return _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
-        }
+        private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
+            _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
 
         public void Configure(TypeMap typeMap)
         {
