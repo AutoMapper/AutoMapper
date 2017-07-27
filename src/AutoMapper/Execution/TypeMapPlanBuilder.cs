@@ -9,6 +9,7 @@ namespace AutoMapper.Execution
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
+    using System.Diagnostics;
 
     public class TypeMapPlanBuilder
     {
@@ -43,7 +44,7 @@ namespace AutoMapper.Execution
 
         public ParameterExpression Context { get; }
 
-        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> visitedTypeMaps)
+        public LambdaExpression CreateMapperLambda(Stack<TypeMap> typeMapsPath)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() ||
                 _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
@@ -54,7 +55,7 @@ namespace AutoMapper.Execution
                 return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source,
                     _initialDestination, Context);
 
-            CheckForCycles(visitedTypeMaps);
+            CheckForCycles(typeMapsPath);
 
             var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
 
@@ -68,53 +69,48 @@ namespace AutoMapper.Execution
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
         }
 
-        private void CheckForCycles(HashSet<TypeMap> visitedTypeMaps)
+        private void CheckForCycles(Stack<TypeMap> typeMapsPath)
         {
-            if (_typeMap.PreserveReferences)
+            if(_typeMap.PreserveReferences)
+            {
                 return;
-            bool isRoot;
-            if (visitedTypeMaps == null)
-            {
-                isRoot = true;
-                visitedTypeMaps = new HashSet<TypeMap>();
             }
-            else
+            if(typeMapsPath == null)
             {
-                isRoot = false;
+                typeMapsPath = new Stack<TypeMap>();
             }
-
-            CheckPropertyMapsForCycles();
-
-            if (isRoot && visitedTypeMaps.Contains(_typeMap))
-                _typeMap.PreserveReferences = true;
-
-            void CheckPropertyMapsForCycles()
+            typeMapsPath.Push(_typeMap);
+            var propertyTypeMaps =
+                (from propertyTypeMap in
+                (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
+                where propertyTypeMap != null && !propertyTypeMap.PreserveReferences
+                select propertyTypeMap).Distinct();
+            foreach (var propertyTypeMap in propertyTypeMaps)
             {
-                var propertyTypeMaps =
-                    from propertyTypeMap in
-                    (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
-                    where propertyTypeMap != null && !propertyTypeMap.PreserveReferences &&
-                          !visitedTypeMaps.Contains(propertyTypeMap)
-                    select propertyTypeMap;
-                foreach (var propertyTypeMap in propertyTypeMaps)
+                if(typeMapsPath.Contains(propertyTypeMap))
                 {
-                    visitedTypeMaps.Add(propertyTypeMap);
-                    propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
+                    propertyTypeMap.PreserveReferences = true;
+                }
+                else
+                {
+                    propertyTypeMap.Seal(_configurationProvider, typeMapsPath);
                 }
             }
+            typeMapsPath.Pop();
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
         {
-            if (propertyMap.SourceType == null)
+            if(propertyMap.SourceType == null)
+            {
                 return null;
+            }
             var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
             var typeMap = _configurationProvider.ResolveTypeMap(types);
-            if (typeMap == null)
+            if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
             {
-                var mapper = _configurationProvider.FindMapper(types) as IObjectMapperInfo;
-                if (mapper != null)
-                    typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
+                typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
             }
             return typeMap;
         }

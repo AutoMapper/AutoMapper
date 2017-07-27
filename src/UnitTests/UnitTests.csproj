@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <TargetFrameworks>net40;net452;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>net452;net40;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
