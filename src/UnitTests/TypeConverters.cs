@@ -305,6 +305,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 #if NET452 || NET40
         public When_specifying_mapping_with_the_BCL_type_converter_class()
         {
+            // only needed for the xUnitRunner without AppDomains
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 return Assembly.Load(args.Name);
