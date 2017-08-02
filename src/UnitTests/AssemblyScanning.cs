@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { "AutoMapper.UnitTests" });
+                cfg.AddProfiles(new[] { typeof(When_scanning_by_name).Assembly().FullName });
             });
 
             [Fact]

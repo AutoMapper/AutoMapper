@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void ShouldMapToNewISet()
         {
-            const int threadCount = 130;
+            const int threadCount = 13;
 
             for(int i = 0; i < threadCount; i++)
             {
