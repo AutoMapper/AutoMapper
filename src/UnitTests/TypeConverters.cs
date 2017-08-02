@@ -298,10 +298,19 @@ namespace AutoMapper.UnitTests.CustomMapping
             _result.Value.Type.ShouldBe(5);
         }
     }
-#if NETSTANDARD1_3 || NET45 || NET40
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+#if NET452 || NET40
+        public When_specifying_mapping_with_the_BCL_type_converter_class()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                return Assembly.Load(args.Name);
+            };
+        }
+#endif
 
         [TypeConverter(typeof(CustomTypeConverter))]
         public class Source
@@ -362,7 +371,6 @@ namespace AutoMapper.UnitTests.CustomMapping
             destination.Value.ShouldBe(5);
         }
     }
-#endif
     public class When_specifying_a_type_converter_for_a_non_generic_configuration : NonValidatingSpecBase
     {
         private Destination _result;
