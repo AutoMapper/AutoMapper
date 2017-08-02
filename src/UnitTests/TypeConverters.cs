@@ -308,7 +308,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             // only needed for the xUnitRunner without AppDomains
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                return Assembly.Load(args.Name);
+                return args.Name == typeof(CustomTypeConverter).Assembly.FullName ? typeof(CustomTypeConverter).Assembly : null;
             };
         }
 #endif
