@@ -111,11 +111,7 @@ namespace AutoMapper
         internal bool IsDefault => this == Mapper.DefaultContext;
 
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
-        {
-            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
-            var mapperFunc = Mapper.ConfigurationProvider.GetMapperFunc<TSource, TDestination>(types);
-            return mapperFunc(source, destination, this);
-        }
+            => Mapper.Map(source, destination, this);
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType) 
             => Mapper.Map(source, destination, sourceType, destinationType, this);
