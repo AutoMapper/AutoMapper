@@ -222,6 +222,17 @@ namespace AutoMapper.Configuration
             });
         }
 
+        public void PreCondition(Func<TSource, ResolutionContext, bool> condition)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, ResolutionContext, bool>> expr =
+                    (src, ctxt) => condition(src, ctxt);
+
+                pm.PreCondition = expr;
+            });
+        }
+
         public void ExplicitExpansion()
         {
             PropertyMapActions.Add(pm => pm.ExplicitExpansion = true);
