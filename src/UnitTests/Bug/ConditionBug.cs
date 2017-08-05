@@ -199,25 +199,61 @@
     namespace SourceValueExceptionConditionPropertyBug
     {
         using System;
+        using System.Collections.Generic;
         using Shouldly;
         using Xunit;
 
+        public enum Property
+        {
+            Value1 = 0,
+            Value2 = 1,
+            Value3 = 2
+        }
+
         public class Source
         {
-            public bool Accessed = false;
-            public int Value
+            public Dictionary<Property, bool> Accessed = new Dictionary<Property, bool>
+            {
+                {Property.Value1, false},
+                {Property.Value2, false},
+                {Property.Value3, false}
+            };
+
+            public int Value1
             {
                 get
                 {
-                    Accessed = true;
+                    Accessed[Property.Value1] = true;
                     return 5;
+                }
+            }
+
+            public int Value2
+            {
+                get
+                {
+                    Accessed[Property.Value2] = true;
+                    return 10;
+                }
+            }
+
+            public int Value3
+            {
+                get
+                {
+                    Accessed[Property.Value3] = true;
+                    return 15;
                 }
             }
         }
 
         public class Dest
         {
-            public int Value { get; set; }
+            public int Value1 { get; set; }
+
+            public int Value2 { get; set; }
+
+            public int Value3 { get; set; }
         }
 
         public class ConditionTests : NonValidatingSpecBase
@@ -225,16 +261,35 @@
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false));
+                    .ForMember(d => d.Value1, opt => opt.PreCondition((Source src) => false))
+                    .ForMember(d => d.Value2, opt => opt.PreCondition((ResolutionContext rc) => false))
+                    .ForMember(d => d.Value3, opt => opt.PreCondition((src, rc) => false));
             });
 
             [Fact]
-            public void Should_not_map()
+            public void Should_not_map_when_precondition_with_source_parameter_is_false()
             {
                 var source = new Source();
                 Mapper.Map<Source, Dest>(source);
-                source.Accessed.ShouldBeFalse();
+                source.Accessed[Property.Value1].ShouldBeFalse();
             }
+
+            [Fact]
+            public void Should_not_map_when_precondition_with_resolutioncontext_parameter_is_false()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value2].ShouldBeFalse();
+            }
+
+            [Fact]
+            public void Should_not_map_when_precondition_with_source_and_resolutioncontext_parameters_is_false()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value3].ShouldBeFalse();
+            }
+
         }
     }
 
