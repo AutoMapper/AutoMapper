@@ -185,6 +185,12 @@ namespace AutoMapper
         void PreCondition(Func<ResolutionContext, bool> condition);
 
         /// <summary>
+        /// Conditionally map this member, evaluated before accessing the source value
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object and the current resolution context</param>
+        void PreCondition(Func<TSource, ResolutionContext, bool> condition);
+
+        /// <summary>
         /// Ignore this member for LINQ projections unless explicitly expanded during projection
         /// </summary>
         void ExplicitExpansion();
