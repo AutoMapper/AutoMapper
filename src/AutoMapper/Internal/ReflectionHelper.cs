@@ -152,8 +152,10 @@ namespace AutoMapper.Internal
                     return pInfo.PropertyType;
                 case FieldInfo fInfo:
                     return fInfo.FieldType;
+                case null:
+                    throw new ArgumentNullException(nameof(memberInfo));
                 default:
-                    return null;
+                    throw new ArgumentOutOfRangeException(nameof(memberInfo));
             }
         }
 
