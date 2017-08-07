@@ -36,18 +36,35 @@ namespace AutoMapper
 
         public static IEnumerable<MemberInfo> GetAllMembers(this Type type)
         {
-            while (true)
+            if (type.IsInterface())
             {
-                foreach (var memberInfo in type.GetTypeInfo().DeclaredMembers)
+                var typeInfo = type.GetTypeInfo();
+                foreach (var memberInfo in typeInfo.DeclaredMembers)
                 {
                     yield return memberInfo;
                 }
 
-                type = type.BaseType();
-
-                if (type == null)
+                foreach (var memberInfo in typeInfo.ImplementedInterfaces.SelectMany(i => i.GetDeclaredMembers()))
                 {
-                    yield break;
+                    yield return memberInfo;
+                }
+                yield break;
+            }
+            else
+            {
+                while (true)
+                {
+                    foreach (var memberInfo in type.GetTypeInfo().DeclaredMembers)
+                    {
+                        yield return memberInfo;
+                    }
+
+                    type = type.BaseType();
+
+                    if (type == null)
+                    {
+                        yield break;
+                    }
                 }
             }
         }

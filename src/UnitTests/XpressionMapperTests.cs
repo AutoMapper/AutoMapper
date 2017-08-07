@@ -119,6 +119,34 @@ namespace AutoMapper.UnitTests
             //Assert
             Assert.True(users.Count == 1);
         }
+        
+        [Fact]
+        public void Map_works_with_members_from_interfaces()
+        {
+            //Arrange
+            Expression<Func<IUserModel, bool>> selection = s => s.LoggedOn == "Y";
+
+            //Act
+            Expression<Func<User, bool>> selectionMapped = mapper.Map<Expression<Func<User, bool>>>(selection);
+            List<User> users = Users.Where(selectionMapped).ToList();
+
+            //Assert
+            Assert.True(users.Count == 1);
+        }
+
+        [Fact]
+        public void Map_works_with_members_from_base_interfaces()
+        {
+            //Arrange
+            Expression<Func<IUserModel, bool>> selection = s => s.Id == 14;
+
+            //Act
+            Expression<Func<User, bool>> selectionMapped = mapper.Map<Expression<Func<User, bool>>>(selection);
+            List<User> users = Users.Where(selectionMapped).ToList();
+
+            //Assert
+            Assert.True(users.Count == 1);
+        }
 
         [Fact]
         public void Map_object_type_change_again()
@@ -668,7 +696,7 @@ namespace AutoMapper.UnitTests
         public Account Account { get; set; }
     }
 
-    public class UserModel
+    public class UserModel : IUserModel
     {
         public int Id { get; set; }
         public string FullName { get; set; }
@@ -678,6 +706,21 @@ namespace AutoMapper.UnitTests
         public int AgeInYears { get; set; }
         public bool IsActive { get; set; }
         public AccountModel AccountModel { get; set; }
+    }
+
+    public interface IIdentifiable
+    {
+        int Id { get; set; }
+    }
+
+    public interface IUserModel : IIdentifiable
+    {
+        string FullName { get; set; }
+        string AccountName { get; set; }
+        bool IsOverEighty { get; set; }
+        string LoggedOn { get; set; }
+        int AgeInYears { get; set; }
+        bool IsActive { get; set; }
     }
 
     public class OrderLine
@@ -827,6 +870,24 @@ namespace AutoMapper.UnitTests
                 .ForMember(d => d.Age, opt => opt.MapFrom(s => s.AgeInYears))
                 .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive))
                 .ForMember(d => d.Account, opt => opt.MapFrom(s => s.AccountModel));
+
+
+            CreateMap<User, IUserModel>()
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
+                .ForMember(d => d.FullName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
+                .ForMember(d => d.LoggedOn, opt => opt.MapFrom(s => s.IsLoggedOn ? "Y" : "N"))
+                .ForMember(d => d.IsOverEighty, opt => opt.MapFrom(s => s.Age > 80))
+                .ForMember(d => d.AccountName, opt => opt.MapFrom(s => s.Account == null ? string.Empty : string.Concat(s.Account.Branch.Name, " ", s.Account.Branch.Id.ToString())))
+                .ForMember(d => d.AgeInYears, opt => opt.MapFrom(s => s.Age))
+                .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Active));
+
+            CreateMap<IUserModel, User>()
+                .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
+                .ForMember(d => d.FirstName, opt => opt.MapFrom(s => s.FullName))
+                .ForMember(d => d.IsLoggedOn, opt => opt.MapFrom(s => s.LoggedOn.ToUpper() == "Y"))
+                .ForMember(d => d.Age, opt => opt.MapFrom(s => s.AgeInYears))
+                .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive));
+
 
             CreateMap<Account, AccountModel>()
                 .ForMember(d => d.Bal, opt => opt.MapFrom(s => s.Balance))
