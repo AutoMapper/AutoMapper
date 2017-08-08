@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using AutoMapper.Configuration;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
@@ -185,18 +186,17 @@ namespace AutoMapper.XpressionMapper
 
         private static void AddPropertyMapInfo(Type parentType, string name, List<PropertyMapInfo> propertyMapInfoList)
         {
-            var sourceMemberInfo = parentType.GetInheritedMember(name);
+            var sourceMemberInfo = parentType.GetFieldOrProperty(name);
             switch (sourceMemberInfo)
             {
-                case MethodInfo methodInfo:
-                    propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {methodInfo}));
-                    break;
                 case PropertyInfo propertyInfo:
                     propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {propertyInfo}));
                     break;
                 case FieldInfo fieldInfo:
                     propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {fieldInfo}));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(name), "Expected a field or property, not " +sourceMemberInfo.ToString()); 
             }
         }
 
@@ -231,7 +231,7 @@ namespace AutoMapper.XpressionMapper
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
-                var sourceMemberInfo = typeSource.GetInheritedMember(propertyMap.DestinationProperty.Name);
+                var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.ValueResolverConfig != null)
                 {
                     throw new InvalidOperationException(Resource.customResolversNotSupported);
@@ -254,7 +254,7 @@ namespace AutoMapper.XpressionMapper
                 var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
                 
-                var sourceMemberInfo = typeSource.GetInheritedMember(propertyMap.DestinationProperty.Name);
+                var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));
 

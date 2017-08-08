@@ -8,6 +8,9 @@ using AutoMapper.XpressionMapper.Structures;
 
 namespace AutoMapper.XpressionMapper.Extensions
 {
+    using AutoMapper.Internal;
+    using Configuration;
+
     internal static class VisitorExtensions
     {
         /// <summary>
@@ -141,26 +144,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <param name="newParameter"></param>
         /// <param name="fullName"></param>
         /// <returns></returns>
-        public static MemberExpression BuildExpression(this ParameterExpression newParameter, string fullName)
-        {
-            var parts = fullName.Split('.');
-
-            Expression parent = newParameter;
-            foreach (var mInfo in parts.Select(part => parent.Type.GetInheritedMember(part)))
-            {
-                switch (mInfo)
-                {
-                    case PropertyInfo pInfo:
-                        parent = Expression.Property(parent, pInfo);
-                        break;
-                    case FieldInfo fInfo:
-                        parent = Expression.Field(parent, fInfo);
-                        break;
-                }
-            }
-
-            return (MemberExpression)parent;
-        }
+        public static MemberExpression BuildExpression(this Expression newParameter, string fullName) => 
+            ExpressionFactory.MemberAccess(fullName, newParameter);
 
         /// <summary>
         /// Adds member expressions to an existing expression.

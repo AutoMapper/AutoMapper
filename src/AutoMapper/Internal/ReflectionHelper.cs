@@ -8,6 +8,8 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
+    using Configuration;
+
     public static class ReflectionHelper
     {
         public static bool CanBeSet(MemberInfo propertyOrField)
@@ -80,7 +82,7 @@ namespace AutoMapper.Internal
             foreach (var memberName in fullMemberName.Split('.'))
             {
                 var currentType = GetCurrentType(property, type);
-                yield return property = currentType.GetInheritedMember(memberName);
+                yield return property = currentType.GetFieldOrProperty(memberName);
             }
         }
 

@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using static Expression;
+
     internal static class ExpressionExtensions
     {
+        public static Expression MemberAccess(this IEnumerable<MemberInfo> members, Expression obj) =>
+            members.Aggregate(obj, (expression, member) => MakeMemberAccess(expression, member));
+
         public static IEnumerable<MemberExpression> GetMembers(this Expression expression)
         {
             var memberExpression = expression as MemberExpression;
