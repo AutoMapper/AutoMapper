@@ -103,7 +103,7 @@ namespace AutoMapper
 
         private static IEnumerable<Type> GetAllTypes(Type type)
         {
-            var typeInheritance = GetTypeInheritance(type);
+            var typeInheritance = type.GetTypeInheritance();
             foreach(var item in typeInheritance)
             {
                 yield return item;
@@ -116,25 +116,13 @@ namespace AutoMapper
             }
         }
 
-        private static IEnumerable<Type> GetTypeInheritance(Type type)
-        {
-            yield return type;
-
-            var baseType = type.BaseType();
-            while (baseType != null)
-            {
-                yield return baseType;
-                baseType = baseType.BaseType();
-            }
-        }
-
         private class InterfaceComparer : IComparer<Type>
         {
             private readonly List<TypeInfo> _typeInheritance;
 
             public InterfaceComparer(Type target)
             {
-                _typeInheritance = GetTypeInheritance(target).Select(type => type.GetTypeInfo()).Reverse().ToList();
+                _typeInheritance = target.GetTypeInheritance().Select(type => type.GetTypeInfo()).Reverse().ToList();
             }
 
             public int Compare(Type x, Type y)
