@@ -58,16 +58,13 @@ namespace AutoMapper
         public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
 
         public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters) =>
-                type.GetAllMethods()
-                .Where(mi => mi.Name == name)
-                .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
+                type.GetAllMethods().Where(mi => mi.Name == name).MatchParameters(parameters);
 
         public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) =>
-                type.GetTypeInfo()
-                .DeclaredConstructors
-                .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
+               GetConstructors(type).MatchParameters(parameters);
+
+        private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
+            methods.FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type) => type.GetRuntimeMethods();
 
