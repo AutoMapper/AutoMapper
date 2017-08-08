@@ -11,7 +11,7 @@ namespace AutoMapper
 
     internal static class ExpressionExtensions
     {
-        public static Expression MemberAccess(this IEnumerable<MemberInfo> members, Expression obj) =>
+        public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
             members.Aggregate(obj, (expression, member) => MakeMemberAccess(expression, member));
 
         public static IEnumerable<MemberExpression> GetMembers(this Expression expression)

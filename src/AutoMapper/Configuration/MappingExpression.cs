@@ -600,7 +600,7 @@ namespace AutoMapper.Configuration
                 {
                     var memberPath = new MemberPath(propertyMap.SourceMembers);
                     var newDestination = Parameter(reverseTypeMap.DestinationType, "destination");
-                    var path = propertyMap.SourceMembers.MemberAccess(newDestination);
+                    var path = propertyMap.SourceMembers.MemberAccesses(newDestination);
                     var forPathLambda = Lambda(path, newDestination);
 
                     var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);

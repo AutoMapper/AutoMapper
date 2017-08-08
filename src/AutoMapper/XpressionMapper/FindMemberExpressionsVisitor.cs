@@ -38,7 +38,7 @@ namespace AutoMapper.XpressionMapper
                     return result;
                 });
 
-                return ExpressionFactory.MemberAccess(member, _newParameter);
+                return ExpressionFactory.MemberAccesses(member, _newParameter);
             }
         }
 

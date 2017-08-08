@@ -80,14 +80,14 @@ namespace AutoMapper.XpressionMapper
                 var visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
 
                 var ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
-                    ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
+                    ? visitor.Visit(last.CustomExpression.Body.MemberAccesses(afterCustExpression))
                     : visitor.Visit(last.CustomExpression.Body);
 
                 this.TypeMappings.AddTypeMapping(node.Type, ex.Type);
                 return ex;
             }
             fullName = BuildFullName(propertyMapInfoList);
-            var me = ExpressionFactory.MemberAccess(fullName, InfoDictionary[parameterExpression].NewParameter);
+            var me = ExpressionFactory.MemberAccesses(fullName, InfoDictionary[parameterExpression].NewParameter);
 
             this.TypeMappings.AddTypeMapping(node.Type, me.Type);
             return me;
@@ -196,8 +196,6 @@ namespace AutoMapper.XpressionMapper
                 case FieldInfo fieldInfo:
                     propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {fieldInfo}));
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(name), "Expected a field or property, not " +sourceMemberInfo.ToString()); 
             }
         }
 

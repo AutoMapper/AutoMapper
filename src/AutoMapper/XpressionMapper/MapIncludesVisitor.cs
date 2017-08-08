@@ -93,7 +93,7 @@ namespace AutoMapper.XpressionMapper
                 var visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
 
                 var ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
-                    ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
+                    ? visitor.Visit(last.CustomExpression.Body.MemberAccesses(afterCustExpression))
                     : visitor.Visit(last.CustomExpression.Body);
 
                 var v = new FindMemberExpressionsVisitor(InfoDictionary[parameterExpression].NewParameter);
@@ -102,7 +102,7 @@ namespace AutoMapper.XpressionMapper
                 return v.Result;
             }
             fullName = BuildFullName(propertyMapInfoList);
-            var me = ExpressionFactory.MemberAccess(fullName, InfoDictionary[parameterExpression].NewParameter);
+            var me = ExpressionFactory.MemberAccesses(fullName, InfoDictionary[parameterExpression].NewParameter);
             if (me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType || (me.Type.GetTypeInfo().IsGenericType
                                                                                                                                              && me.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
                                                                                                                                              && Nullable.GetUnderlyingType(me.Type).GetTypeInfo().IsValueType)))

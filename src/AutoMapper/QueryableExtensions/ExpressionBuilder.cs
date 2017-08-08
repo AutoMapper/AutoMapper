@@ -442,7 +442,7 @@ namespace AutoMapper.QueryableExtensions
                 var letMapInfos = _savedPaths.Select(path => new
                 {
                     MapFrom = path.Last.CustomExpression,
-                    MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccess(instanceParameter),
+                    MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccesses(instanceParameter),
                     Property = new PropertyDescription
                     (
                         string.Join("_", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),

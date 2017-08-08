@@ -144,8 +144,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <param name="exp"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static MemberExpression AddExpressions(this Expression exp, List<PropertyMapInfo> list) =>
-            (MemberExpression) list.SelectMany(propertyMapInfo => propertyMapInfo.DestinationPropertyInfos).MemberAccess(exp);
+        public static MemberExpression MemberAccesses(this Expression exp, List<PropertyMapInfo> list) =>
+            (MemberExpression) list.SelectMany(propertyMapInfo => propertyMapInfo.DestinationPropertyInfos).MemberAccesses(exp);
 
         /// <summary>
         /// For the given a Lambda Expression, returns the fully qualified name of the member starting with the immediate child member of the parameter
