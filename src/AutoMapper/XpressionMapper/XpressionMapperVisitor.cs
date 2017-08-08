@@ -254,7 +254,7 @@ namespace AutoMapper.XpressionMapper
                 var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
                 
-                var sourceMemberInfo = typeSource.GetAllMembers().First(mi => mi.Name == propertyMap.DestinationProperty.Name);
+                var sourceMemberInfo = typeSource.GetInheritedMember(propertyMap.DestinationProperty.Name);
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));
 

@@ -34,7 +34,7 @@ namespace AutoMapper
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 
-        public static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
+        private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
             type.GetTypeInheritance().SelectMany(i => i.GetDeclaredMembers())
             .Concat(
             type.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetDeclaredMembers()));
