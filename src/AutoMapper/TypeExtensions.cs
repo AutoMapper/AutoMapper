@@ -61,7 +61,7 @@ namespace AutoMapper
                 type.GetAllMethods().Where(mi => mi.Name == name).MatchParameters(parameters);
 
         public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) =>
-               GetConstructors(type).MatchParameters(parameters);
+               type.GetDeclaredConstructors().MatchParameters(parameters);
 
         private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
             methods.FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
@@ -133,8 +133,6 @@ namespace AutoMapper
         public static bool IsValueType(this Type type) => type.GetTypeInfo().IsValueType;
 
         public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
-
-        public static ConstructorInfo[] GetConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors.ToArray();
 
         public static PropertyInfo[] GetProperties(this Type type) => type.GetRuntimeProperties().ToArray();
 
