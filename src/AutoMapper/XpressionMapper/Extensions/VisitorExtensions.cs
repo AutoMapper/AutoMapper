@@ -146,7 +146,7 @@ namespace AutoMapper.XpressionMapper.Extensions
             var parts = fullName.Split('.');
 
             Expression parent = newParameter;
-            foreach (var mInfo in parts.Select(part => parent.Type.GetMember(part).First()))
+            foreach (var mInfo in parts.Select(part => parent.Type.GetInheritedMember(part)))
             {
                 switch (mInfo)
                 {

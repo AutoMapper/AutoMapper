@@ -51,7 +51,7 @@ namespace AutoMapper
             }
         }
 
-        public static MemberInfo[] GetMember(this Type type, string name) => type.GetAllMembers().Where(mi => mi.Name == name).ToArray();
+        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
 

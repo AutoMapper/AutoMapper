@@ -182,7 +182,7 @@ namespace AutoMapper.UnitTests
             //Arrange
             //Expression<Func<UserModel, bool>> selection = s => s != null && s.AccountModel != null && s.AccountModel.Bal > 555.20;
             ParameterExpression userParam = Expression.Parameter(typeof(UserModel), "s");
-            MemberExpression accountModelProperty = Expression.Property(userParam, (System.Reflection.PropertyInfo)typeof(UserModel).GetMember("AccountModel")[0]);
+            MemberExpression accountModelProperty = Expression.Property(userParam, (System.Reflection.PropertyInfo)typeof(UserModel).GetInheritedMember("AccountModel"));
             Expression<Func<UserModel, bool>> selection = Expression.Lambda<Func<UserModel, bool>>
                 (
                     Expression.AndAlso
@@ -194,7 +194,7 @@ namespace AutoMapper.UnitTests
                                 ),
                             Expression.GreaterThan
                                 (
-                                    Expression.Property(accountModelProperty, (System.Reflection.PropertyInfo)typeof(AccountModel).GetMember("Bal")[0]),
+                                    Expression.Property(accountModelProperty, (System.Reflection.PropertyInfo)typeof(AccountModel).GetInheritedMember("Bal")),
                                     Expression.Constant(555.20, typeof(double))
                                 )
                         ),

@@ -133,7 +133,7 @@ namespace AutoMapper.Configuration
 
         public void MapFrom(string sourceMember)
         {
-            var memberInfo = _sourceType.GetMember(sourceMember).FirstOrDefault();
+            var memberInfo = _sourceType.GetInheritedMember(sourceMember);
             if (memberInfo == null)
                 throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
 

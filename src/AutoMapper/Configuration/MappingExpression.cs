@@ -307,7 +307,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
-            var memberInfo = SourceType.GetMember(sourceMemberName).First();
+            var memberInfo = SourceType.GetInheritedMember(sourceMemberName);
 
             var srcConfig = new SourceMappingExpression(memberInfo);
 

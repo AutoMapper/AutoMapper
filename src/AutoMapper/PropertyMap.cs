@@ -74,7 +74,7 @@ namespace AutoMapper
             get
             {
                 if (CustomSourceMemberName != null)
-                    return TypeMap.SourceType.GetMember(CustomSourceMemberName).FirstOrDefault();
+                    return TypeMap.SourceType.GetInheritedMember(CustomSourceMemberName);
 
                 if (CustomExpression != null)
                 {

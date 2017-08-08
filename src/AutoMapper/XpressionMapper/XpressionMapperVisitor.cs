@@ -185,7 +185,7 @@ namespace AutoMapper.XpressionMapper
 
         private static void AddPropertyMapInfo(Type parentType, string name, List<PropertyMapInfo> propertyMapInfoList)
         {
-            var sourceMemberInfo = parentType.GetMember(name).First();
+            var sourceMemberInfo = parentType.GetInheritedMember(name);
             switch (sourceMemberInfo)
             {
                 case MethodInfo methodInfo:
@@ -231,7 +231,7 @@ namespace AutoMapper.XpressionMapper
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
-                var sourceMemberInfo = typeSource.GetAllMembers().First(mi => mi.Name == propertyMap.DestinationProperty.Name);
+                var sourceMemberInfo = typeSource.GetInheritedMember(propertyMap.DestinationProperty.Name);
                 if (propertyMap.ValueResolverConfig != null)
                 {
                     throw new InvalidOperationException(Resource.customResolversNotSupported);

@@ -15,24 +15,16 @@ namespace AutoMapper.Configuration.Internal
         }
 
         public static MethodInfo GetInheritedMethod(Type type, string name)
-            => GetMember(type, name) as MethodInfo;
+            => type.GetInheritedMember(name) as MethodInfo;
 
         public static MemberInfo GetFieldOrProperty(Type type, string name)
         {
-            var memberInfo = GetMember(type, name);
+            var memberInfo = type.GetInheritedMember(name);
             if (memberInfo == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
             }
             return memberInfo;
-        }
-
-        private static MemberInfo GetMember(Type type, string name)
-        {
-            return
-                new[] { type }.Concat(type.GetTypeInfo().ImplementedInterfaces)
-                    .SelectMany(i => i.GetMember(name))
-                    .FirstOrDefault();
         }
 
         public static bool IsNullableType(Type type) 
