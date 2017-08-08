@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
@@ -86,7 +87,7 @@ namespace AutoMapper.XpressionMapper
                 return ex;
             }
             fullName = BuildFullName(propertyMapInfoList);
-            var me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
+            var me = ExpressionFactory.MemberAccess(fullName, InfoDictionary[parameterExpression].NewParameter);
 
             this.TypeMappings.AddTypeMapping(node.Type, me.Type);
             return me;

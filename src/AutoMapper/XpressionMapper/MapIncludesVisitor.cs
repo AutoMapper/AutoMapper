@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
 
@@ -101,7 +102,7 @@ namespace AutoMapper.XpressionMapper
                 return v.Result;
             }
             fullName = BuildFullName(propertyMapInfoList);
-            var me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
+            var me = ExpressionFactory.MemberAccess(fullName, InfoDictionary[parameterExpression].NewParameter);
             if (me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType || (me.Type.GetTypeInfo().IsGenericType
                                                                                                                                              && me.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
                                                                                                                                              && Nullable.GetUnderlyingType(me.Type).GetTypeInfo().IsValueType)))

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 using AutoMapper.XpressionMapper.Extensions;
 
 namespace AutoMapper.XpressionMapper
@@ -37,7 +38,7 @@ namespace AutoMapper.XpressionMapper
                     return result;
                 });
 
-                return _newParameter.BuildExpression(member);
+                return ExpressionFactory.MemberAccess(member, _newParameter);
             }
         }
 
