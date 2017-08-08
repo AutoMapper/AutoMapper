@@ -15,9 +15,7 @@ namespace AutoMapper.Configuration.Internal
         }
 
         private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
-            type.GetTypeInheritance().SelectMany(i => i.GetDeclaredMembers())
-            .Concat(
-            type.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetDeclaredMembers()));
+            type.GetTypeInheritance().Concat(type.GetTypeInfo().ImplementedInterfaces).SelectMany(i => i.GetDeclaredMembers());
 
         private static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
 
