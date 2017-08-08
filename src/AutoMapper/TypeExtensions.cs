@@ -34,11 +34,6 @@ namespace AutoMapper
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 
-        private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
-            type.GetTypeInheritance().SelectMany(i => i.GetDeclaredMembers())
-            .Concat(
-            type.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetDeclaredMembers()));
-
         public static IEnumerable<Type> GetTypeInheritance(this Type type)
         {
             yield return type;
@@ -50,8 +45,6 @@ namespace AutoMapper
                 baseType = baseType.BaseType();
             }
         }
-
-        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
 

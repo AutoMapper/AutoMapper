@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration.Internal
 {
-    public class PrimitiveHelper
+    public static class PrimitiveHelper
     {
         public static TValue GetOrDefault<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
         {
@@ -14,8 +14,15 @@ namespace AutoMapper.Configuration.Internal
             return value;
         }
 
+        private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
+            type.GetTypeInheritance().SelectMany(i => i.GetDeclaredMembers())
+            .Concat(
+            type.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetDeclaredMembers()));
+
+        private static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
+
         public static MethodInfo GetInheritedMethod(Type type, string name)
-            => type.GetInheritedMember(name) as MethodInfo;
+            => type.GetInheritedMember(name) as MethodInfo ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
 
         public static MemberInfo GetFieldOrProperty(Type type, string name) 
             => type.GetInheritedMember(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
