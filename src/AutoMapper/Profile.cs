@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
@@ -25,8 +26,8 @@ namespace AutoMapper
         private readonly List<ITypeMapConfiguration> _openTypeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
         private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
-
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
+        private readonly List<ValueConverterConfiguration> _valueConverterConfigs = new List<ValueConverterConfiguration>();
 
         protected Profile(string profileName)
             : this() => ProfileName = profileName;
@@ -180,6 +181,30 @@ namespace AutoMapper
                         m =>
                             m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
                             m.GetParameters().Length == 1));
+        }
+
+        public void ApplyTransform<TDestination>(Expression<Func<TDestination, TDestination>> transformer)
+        {
+            var config = new ValueConverterConfiguration
+            {
+                SourceType = typeof(object),
+                DestinationType = typeof(TDestination),
+                TransformerExpression = transformer
+            };
+
+            _valueConverterConfigs.Add(config);
+        }
+
+        public void ApplyTransform<TSource, TDestination>(Expression<Func<TSource, TDestination, TDestination>> transformer)
+        {
+            var config = new ValueConverterConfiguration
+            {
+                SourceType = typeof(TSource),
+                DestinationType = typeof(TDestination),
+                TransformerExpression = transformer
+            };
+
+            _valueConverterConfigs.Add(config);
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

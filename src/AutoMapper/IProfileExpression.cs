@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
@@ -152,5 +153,8 @@ namespace AutoMapper
         /// </summary>
         /// <param name="type">Static type that contains extension methods</param>
         void IncludeSourceExtensionMethods(Type type);
+
+        void ApplyTransform<TDestination>(Expression<Func<TDestination, TDestination>> transformer);
+        void ApplyTransform<TSource, TDestination>(Expression<Func<TSource, TDestination, TDestination>> transformer);
     }
 }
