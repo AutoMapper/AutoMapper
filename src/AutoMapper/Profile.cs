@@ -27,7 +27,7 @@ namespace AutoMapper
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
         private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
-        private readonly List<ValueConverterConfiguration> _valueConverterConfigs = new List<ValueConverterConfiguration>();
+        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         protected Profile(string profileName)
             : this() => ProfileName = profileName;
@@ -64,6 +64,7 @@ namespace AutoMapper
         IEnumerable<IConditionalObjectMapper> IProfileConfiguration.TypeConfigurations => _typeConfigurations;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
+        IEnumerable<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
 
         public virtual string ProfileName { get; }
 
@@ -183,28 +184,11 @@ namespace AutoMapper
                             m.GetParameters().Length == 1));
         }
 
-        public void ApplyTransform<TDestination>(Expression<Func<TDestination, TDestination>> transformer)
+        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
         {
-            var config = new ValueConverterConfiguration
-            {
-                SourceType = typeof(object),
-                DestinationType = typeof(TDestination),
-                TransformerExpression = transformer
-            };
+            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
 
-            _valueConverterConfigs.Add(config);
-        }
-
-        public void ApplyTransform<TSource, TDestination>(Expression<Func<TSource, TDestination, TDestination>> transformer)
-        {
-            var config = new ValueConverterConfiguration
-            {
-                SourceType = typeof(TSource),
-                DestinationType = typeof(TDestination),
-                TransformerExpression = transformer
-            };
-
-            _valueConverterConfigs.Add(config);
+            _valueTransformerConfigs.Add(config);
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

@@ -5,7 +5,7 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Configuration;
+    using Configuration;
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
@@ -521,6 +521,10 @@ namespace AutoMapper.Execution
                         ToType(DelegateFactory.GenerateNonNullConstructorExpression(toCreate), propertyMap.SourceType)
                     );
             }
+
+            valueResolverFunc = _typeMap.Profile.ValueTransformers
+                .Where(vt => vt.IsMatch(propertyMap))
+                .Aggregate(valueResolverFunc, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
 
             return valueResolverFunc;
         }

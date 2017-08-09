@@ -154,7 +154,6 @@ namespace AutoMapper
         /// <param name="type">Static type that contains extension methods</param>
         void IncludeSourceExtensionMethods(Type type);
 
-        void ApplyTransform<TDestination>(Expression<Func<TDestination, TDestination>> transformer);
-        void ApplyTransform<TSource, TDestination>(Expression<Func<TSource, TDestination, TDestination>> transformer);
+        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 }
