@@ -199,6 +199,13 @@ namespace AutoMapper
         /// The destination member being configured.
         /// </summary>
         MemberInfo DestinationMember { get; }
+
+        /// <summary>
+        /// Apply a transformation function after any resolved destination member value with the given type
+        /// </summary>
+        /// <typeparam name="TValue">Value type to match and transform</typeparam>
+        /// <param name="transformer">Transformation expression</param>
+        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 
     /// <summary>

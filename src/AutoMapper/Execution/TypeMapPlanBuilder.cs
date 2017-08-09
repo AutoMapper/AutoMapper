@@ -522,7 +522,8 @@ namespace AutoMapper.Execution
                     );
             }
 
-            valueResolverFunc = _typeMap.ValueTransformers
+            valueResolverFunc = propertyMap.ValueTransformers
+                .Concat(_typeMap.ValueTransformers)
                 .Concat(_typeMap.Profile.ValueTransformers)
                 .Where(vt => vt.IsMatch(propertyMap))
                 .Aggregate(valueResolverFunc, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
