@@ -170,5 +170,41 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class StackingRootAndProfileAndMemberConfig : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public string Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public string Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.ApplyTransform<string>(dest => dest + "! No joke!");
+                cfg.CreateProfile("Other", p =>
+                {
+                    p.CreateMap<Source, Dest>()
+                     .ApplyTransform<string>(dest => dest + ", for real,");
+                    p.ApplyTransform<string>(dest => dest + " is straight up dope");
+                });
+            });
+
+            [Fact]
+            public void ShouldApplyTypeMapThenProfileThenRoot()
+            {
+                var source = new Source
+                {
+                    Value = "Jimmy"
+                };
+                var dest = Mapper.Map<Source, Dest>(source);
+
+                dest.Value.ShouldBe("Jimmy, for real, is straight up dope! No joke!");
+            }
+        }
+
     }
 }

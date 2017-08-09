@@ -530,6 +530,18 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        public IMappingExpression<TSource, TDestination> ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
+        {
+            TypeMapActions.Add(tm =>
+            {
+                var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
+
+                tm.AddValueTransformation(config);
+            });
+
+            return this;
+        }
+
         private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
             _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
 

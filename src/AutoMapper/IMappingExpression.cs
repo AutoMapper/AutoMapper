@@ -439,5 +439,13 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> DisableCtorValidation();
+
+        /// <summary>
+        /// Apply a transformation function after any resolved destination member value with the given type
+        /// </summary>
+        /// <typeparam name="TValue">Value type to match and transform</typeparam>
+        /// <param name="transformer">Transformation expression</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 }
