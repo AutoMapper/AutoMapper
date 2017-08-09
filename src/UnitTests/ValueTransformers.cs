@@ -135,5 +135,40 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class TransformingValueTypes : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public int Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.ApplyTransform<int>(dest => dest * 2);
+                cfg.CreateProfile("Other", p =>
+                {
+                    p.CreateMap<Source, Dest>();
+                    p.ApplyTransform<int>(dest => dest + 3);
+                });
+            });
+
+            [Fact]
+            public void ShouldApplyProfileFirstThenRoot()
+            {
+                var source = new Source
+                {
+                    Value = 5
+                };
+                var dest = Mapper.Map<Source, Dest>(source);
+
+                dest.Value.ShouldBe((5 + 3) * 2);
+            }
+        }
+
     }
 }
