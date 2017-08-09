@@ -47,7 +47,7 @@ namespace AutoMapper
                     : Enumerable.Empty<IConditionalObjectMapper>())
                 .ToArray();
 
-            ValueTransformers = profile.ValueTransformers.ToArray();
+            ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
 
             MemberConfigurations = profile.MemberConfigurations.ToArray();
 
