@@ -34,53 +34,30 @@ namespace AutoMapper
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 
-        public static IEnumerable<MemberInfo> GetAllMembers(this Type type)
+        public static IEnumerable<Type> GetTypeInheritance(this Type type)
         {
-            while (true)
+            yield return type;
+
+            var baseType = type.BaseType();
+            while(baseType != null)
             {
-                foreach (var memberInfo in type.GetTypeInfo().DeclaredMembers)
-                {
-                    yield return memberInfo;
-                }
-
-                type = type.BaseType();
-
-                if (type == null)
-                {
-                    yield break;
-                }
+                yield return baseType;
+                baseType = baseType.BaseType();
             }
-        }
-
-        public static MemberInfo[] GetMember(this Type type, string name)
-        {
-            return type.GetAllMembers().Where(mi => mi.Name == name).ToArray();
         }
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name)
-        {
-            return type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
-        }
+        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters)
-        {
-            return type
-                .GetAllMethods()
-                .Where(mi => mi.Name == name)
-                .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
-        }
+        public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters) =>
+                type.GetAllMethods().Where(mi => mi.Name == name).MatchParameters(parameters);
 
-        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters)
-        {
-            return type
-                .GetTypeInfo()
-                .DeclaredConstructors
-                .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
-        }
+        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) =>
+               type.GetDeclaredConstructors().MatchParameters(parameters);
+
+        private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
+            methods.FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type) => type.GetRuntimeMethods();
 
@@ -149,8 +126,6 @@ namespace AutoMapper
         public static bool IsValueType(this Type type) => type.GetTypeInfo().IsValueType;
 
         public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
-
-        public static ConstructorInfo[] GetConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors.ToArray();
 
         public static PropertyInfo[] GetProperties(this Type type) => type.GetRuntimeProperties().ToArray();
 

@@ -28,7 +28,7 @@ namespace AutoMapper.Mappers
             var list = MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, Default(listType), contextExpression, _ => Constant(false), typeof(List<>), MapItemExpr);
             var dest = Variable(listType, "dest");
 
-            return Block(new[] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetConstructors().First(), dest), Default(destExpression.Type)));
+            return Block(new[] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetDeclaredConstructors().First(), dest), Default(destExpression.Type)));
         }
     }
 }

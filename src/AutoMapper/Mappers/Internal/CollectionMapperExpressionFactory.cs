@@ -97,7 +97,7 @@ namespace AutoMapper.Mappers.Internal
                 Property(itemParam, "Key"), contextParam, propertyMap);
             var valueExpr = MapExpression(configurationProvider, profileMap, typePairValue,
                 Property(itemParam, "Value"), contextParam, propertyMap);
-            var keyPair = New(destElementType.GetConstructors().First(), keyExpr, valueExpr);
+            var keyPair = New(destElementType.GetDeclaredConstructors().First(), keyExpr, valueExpr);
             return keyPair;
         }
 

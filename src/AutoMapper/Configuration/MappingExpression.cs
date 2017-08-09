@@ -307,7 +307,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
-            var memberInfo = SourceType.GetMember(sourceMemberName).First();
+            var memberInfo = SourceType.GetFieldOrProperty(sourceMemberName);
 
             var srcConfig = new SourceMappingExpression(memberInfo);
 
@@ -600,7 +600,7 @@ namespace AutoMapper.Configuration
                 {
                     var memberPath = new MemberPath(propertyMap.SourceMembers);
                     var newDestination = Parameter(reverseTypeMap.DestinationType, "destination");
-                    var path = propertyMap.SourceMembers.Aggregate((Expression)newDestination, (obj, member) => MakeMemberAccess(obj, member));
+                    var path = propertyMap.SourceMembers.MemberAccesses(newDestination);
                     var forPathLambda = Lambda(path, newDestination);
 
                     var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);

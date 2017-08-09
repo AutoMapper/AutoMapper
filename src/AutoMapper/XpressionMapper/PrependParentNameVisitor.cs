@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using AutoMapper.Internal;
 using AutoMapper.XpressionMapper.Extensions;
 
 namespace AutoMapper.XpressionMapper
@@ -39,7 +40,7 @@ namespace AutoMapper.XpressionMapper
                             ? sourcePath
                             : string.Concat(ParentFullName, ".", sourcePath);
 
-            var me = NewParameter.BuildExpression(fullName);
+            var me = ExpressionFactory.MemberAccesses(fullName, NewParameter);
 
             return me;
         }

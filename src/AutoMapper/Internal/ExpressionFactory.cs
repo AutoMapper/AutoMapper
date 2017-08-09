@@ -11,6 +11,9 @@ namespace AutoMapper.Internal
 
     public static class ExpressionFactory
     {
+        public static MemberExpression MemberAccesses(string members, Expression obj) =>
+            (MemberExpression) ReflectionHelper.GetMemberPath(obj.Type, members).MemberAccesses(obj);
+
         public static Expression GetSetter(MemberExpression memberExpression)
         {
             var propertyOrField = memberExpression.Member;

@@ -8,6 +8,9 @@ using AutoMapper.XpressionMapper.Structures;
 
 namespace AutoMapper.XpressionMapper.Extensions
 {
+    using AutoMapper.Internal;
+    using Configuration;
+
     internal static class VisitorExtensions
     {
         /// <summary>
@@ -136,58 +139,13 @@ namespace AutoMapper.XpressionMapper.Extensions
         }
 
         /// <summary>
-        /// Builds and new member expression for the given parameter given its Type and fullname
-        /// </summary>
-        /// <param name="newParameter"></param>
-        /// <param name="fullName"></param>
-        /// <returns></returns>
-        public static MemberExpression BuildExpression(this ParameterExpression newParameter, string fullName)
-        {
-            var parts = fullName.Split('.');
-
-            Expression parent = newParameter;
-            foreach (var mInfo in parts.Select(part => parent.Type.GetMember(part).First()))
-            {
-                switch (mInfo)
-                {
-                    case PropertyInfo pInfo:
-                        parent = Expression.Property(parent, pInfo);
-                        break;
-                    case FieldInfo fInfo:
-                        parent = Expression.Field(parent, fInfo);
-                        break;
-                }
-            }
-
-            return (MemberExpression)parent;
-        }
-
-        /// <summary>
         /// Adds member expressions to an existing expression.
         /// </summary>
         /// <param name="exp"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static MemberExpression AddExpressions(this Expression exp, List<PropertyMapInfo> list)
-        {
-            foreach (var memberInfo in list.SelectMany(propertyMapInfo => propertyMapInfo.DestinationPropertyInfos))
-            {
-                switch (memberInfo)
-                {
-                    case PropertyInfo pInfo:
-                        exp = Expression.Property(exp, pInfo);
-                        break;
-                    case FieldInfo fInfo:
-                        exp = Expression.Field(exp, fInfo);
-                        break;
-                    case MethodInfo mInfo:
-                        exp = Expression.Call(exp, mInfo);
-                        break;
-                }
-            }
-
-            return (MemberExpression)exp;
-        }
+        public static MemberExpression MemberAccesses(this Expression exp, List<PropertyMapInfo> list) =>
+            (MemberExpression) list.SelectMany(propertyMapInfo => propertyMapInfo.DestinationPropertyInfos).MemberAccesses(exp);
 
         /// <summary>
         /// For the given a Lambda Expression, returns the fully qualified name of the member starting with the immediate child member of the parameter

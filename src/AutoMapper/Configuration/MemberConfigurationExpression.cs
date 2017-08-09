@@ -133,10 +133,7 @@ namespace AutoMapper.Configuration
 
         public void MapFrom(string sourceMember)
         {
-            var memberInfo = _sourceType.GetMember(sourceMember).FirstOrDefault();
-            if (memberInfo == null)
-                throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
-
+            _sourceType.GetFieldOrProperty(sourceMember);
             PropertyMapActions.Add(pm => pm.CustomSourceMemberName = sourceMember);
         }
 
