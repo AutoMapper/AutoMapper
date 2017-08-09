@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -59,15 +58,6 @@ namespace AutoMapper.UnitTests
             });
 
             typeof(DuplicateTypeMapConfigurationException).ShouldBeThrownBy(() => config.AssertConfigurationIsValid());
-
-            try
-            {
-                config.AssertConfigurationIsValid();
-            }
-            catch (DuplicateTypeMapConfigurationException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
         }
 
         [Fact]
