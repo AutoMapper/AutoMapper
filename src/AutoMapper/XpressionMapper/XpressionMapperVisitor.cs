@@ -227,6 +227,9 @@ namespace AutoMapper.XpressionMapper
             var typeMap = ConfigurationProvider.ResolveTypeMap(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
             //we need the expressions used to create the source from the destination 
 
+            if (typeMap == null)
+                throw new AutoMapperMappingException("Missing type map configuration or unsupported mapping.", null, new TypePair(typeDestination, typeSource));
+            
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);

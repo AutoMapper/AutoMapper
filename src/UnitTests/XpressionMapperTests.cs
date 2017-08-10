@@ -212,6 +212,27 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
+        public void Map_expression_should_throws_exception_when_mapping_is_missed()
+        {
+            // Arrange
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Car, CarModel>();
+            });
+
+            var customMapper = config.CreateMapper();
+
+            Expression<Func<Car, bool>> expression = car => car.Year == 2017;
+
+            // Act
+            var exception = Assert.Throws<AutoMapperMappingException>(() => customMapper.MapExpression<Expression<Func<CarModel, bool>>>(expression));
+
+            //Assert
+            Assert.Equal(typeof(CarModel), exception.Types?.SourceType);
+            Assert.Equal(typeof(Car), exception.Types?.DestinationType);
+        }
+
+        [Fact]
         public void Map_project_truncated_time()
         {
             //Arrange
