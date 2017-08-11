@@ -225,11 +225,10 @@ namespace AutoMapper.UnitTests
             Expression<Func<Car, bool>> expression = car => car.Year == 2017;
 
             // Act
-            var exception = Assert.Throws<AutoMapperMappingException>(() => customMapper.MapExpression<Expression<Func<CarModel, bool>>>(expression));
+            var exception = Assert.Throws<InvalidOperationException>(() => customMapper.MapExpression<Expression<Func<CarModel, bool>>>(expression));
 
             //Assert
-            Assert.Equal(typeof(CarModel), exception.Types?.SourceType);
-            Assert.Equal(typeof(Car), exception.Types?.DestinationType);
+            Assert.Contains("Mapper.CreateMap<CarModel, Car>", exception.Message);
         }
 
         [Fact]

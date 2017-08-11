@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using AutoMapper.Configuration;
 using AutoMapper.Internal;
+using AutoMapper.QueryableExtensions.Impl;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
@@ -229,8 +230,7 @@ namespace AutoMapper.XpressionMapper
 
             if (typeMap == null)
             {
-                var missedTypePair = new TypePair(sourceType: typeDestination, destinationType: typeSource);
-                throw new AutoMapperMappingException("Missing type map configuration or unsupported mapping.", null, missedTypePair);
+                throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
             }
                 
             
