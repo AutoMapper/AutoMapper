@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using AutoMapper.Configuration;
 using AutoMapper.Internal;
+using AutoMapper.QueryableExtensions.Impl;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
@@ -224,9 +225,15 @@ namespace AutoMapper.XpressionMapper
                 return;
             }
 
-            var typeMap = ConfigurationProvider.ResolveTypeMap(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
+            var typeMap = ConfigurationProvider.ResolveTypeMap(sourceType: typeDestination, destinationType: typeSource);//The destination becomes the source because to map a source expression to a destination expression,
             //we need the expressions used to create the source from the destination 
 
+            if (typeMap == null)
+            {
+                throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
+            }
+                
+            
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);

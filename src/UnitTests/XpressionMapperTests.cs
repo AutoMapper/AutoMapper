@@ -1,11 +1,9 @@
 ﻿using AutoMapper.XpressionMapper.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -209,6 +207,30 @@ namespace AutoMapper.UnitTests
 
             //Assert
             Assert.True(users.Count == 2);
+        }
+
+        [Fact]
+        public void Map_expression_should_throws_exception_when_mapping_is_missed()
+        {
+            // Arrange
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Car, CarModel>();
+            });
+
+            var customMapper = config.CreateMapper();
+
+            Expression<Func<Car, bool>> expression = car => car.Year == 2017;
+
+            // Act + Assert
+            new Action(() => customMapper.Map<Expression<Func<CarModel, bool>>>(expression))
+                .ShouldThrowException<AutoMapperMappingException>(
+                    exception =>
+                    {
+                        exception.InnerException.ShouldNotBeNull();
+                        exception.InnerException.ShouldBeOfType<InvalidOperationException>();
+                        exception.InnerException.Message.ShouldContain("Mapper.CreateMap<CarModel, Car>", Case.Insensitive);
+                    });
         }
 
         [Fact]
