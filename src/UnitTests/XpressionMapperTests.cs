@@ -1,11 +1,9 @@
 ﻿using AutoMapper.XpressionMapper.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -224,11 +222,15 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Car, bool>> expression = car => car.Year == 2017;
 
-            // Act
-            var exception = Assert.Throws<InvalidOperationException>(() => customMapper.MapExpression<Expression<Func<CarModel, bool>>>(expression));
-
-            //Assert
-            Assert.Contains("Mapper.CreateMap<CarModel, Car>", exception.Message);
+            // Act + Assert
+            new Action(() => customMapper.Map<Expression<Func<CarModel, bool>>>(expression))
+                .ShouldThrowException<AutoMapperMappingException>(
+                    exception =>
+                    {
+                        exception.InnerException.ShouldNotBeNull();
+                        exception.InnerException.ShouldBeOfType<InvalidOperationException>();
+                        exception.InnerException.Message.ShouldContain("Mapper.CreateMap<CarModel, Car>", Case.Insensitive);
+                    });
         }
 
         [Fact]
