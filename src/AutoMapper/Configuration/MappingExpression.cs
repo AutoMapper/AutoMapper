@@ -540,12 +540,12 @@ namespace AutoMapper.Configuration
                 var attrs = destProperty.GetCustomAttributes(true);
                 if (attrs.Any(x => x is IgnoreMapAttribute))
                 {
-                    ForMember(destProperty.Name, y => y.Ignore());
+                    IgnoreDestinationMember(destProperty);
                     _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
                 }
                 if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
-                    ForMember(destProperty.Name, y => y.Ignore());
+                    IgnoreDestinationMember(destProperty);
                 }
             }
 
