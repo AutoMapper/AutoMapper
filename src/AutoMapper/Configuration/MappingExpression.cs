@@ -541,7 +541,14 @@ namespace AutoMapper.Configuration
                 if (attrs.Any(x => x is IgnoreMapAttribute))
                 {
                     IgnoreDestinationMember(destProperty);
-                    _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
+                    try
+                    {
+                        _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        // Silently ignore it. in cases that there is no reverse property to IgnoreMap. issue #2266
+                    }
                 }
                 if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
