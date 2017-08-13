@@ -25,6 +25,9 @@ namespace AutoMapper.Configuration.Internal
         public static MemberInfo GetFieldOrProperty(Type type, string name) 
             => type.GetInheritedMember(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
+        public static bool HasFieldOrProperty(Type type, string name)
+            => type.GetInheritedMember(name) != null;
+
         public static bool IsNullableType(Type type) 
             => type.IsGenericType(typeof(Nullable<>));
 
