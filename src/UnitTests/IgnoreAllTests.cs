@@ -200,5 +200,22 @@ namespace AutoMapper.UnitTests
             destination.ShouldNotBeMapped.ShouldBe(null);
 
         }
+
+        public class Source2
+        {
+        }
+
+        public class Destination2
+        {
+            [IgnoreMap]
+            public string ShouldNotThrowExceptionOnReverseMapping { get; set; }
+        }
+
+        [Fact]
+        public void Sould_not_throw_exception_when_reverse_property_does_not_exist()
+        {
+            typeof(ArgumentOutOfRangeException).ShouldNotBeThrownBy(() => new MapperConfiguration(cfg => cfg.CreateMap<Source2, Destination2>()
+                 .ReverseMap()));
+        }
     }
 }

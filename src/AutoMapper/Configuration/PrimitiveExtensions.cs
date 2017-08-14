@@ -19,9 +19,6 @@ namespace AutoMapper.Configuration
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
             => PrimitiveHelper.GetFieldOrProperty(type, name);
 
-        public static bool HasFieldOrProperty(this Type type, string name)
-            => PrimitiveHelper.HasFieldOrProperty(type, name);
-
         public static bool IsNullableType(this Type type)
             => PrimitiveHelper.IsNullableType(type);
 
