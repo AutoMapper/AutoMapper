@@ -24,6 +24,12 @@ namespace AutoMapper
 
         public bool AllowAdditiveTypeMapCreation { get; set; }
 
+        /// <summary>
+        /// How many levels deep should AutoMapper try to inline the execution plan for child classes.
+        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// </summary>
+        public int MaxExecutionPlanDepth { get; set; } = 1;
+
         internal Validator[] GetValidators() => _validators.ToArray();
     }
 }

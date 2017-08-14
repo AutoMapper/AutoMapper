@@ -100,6 +100,8 @@ namespace AutoMapper
         /// </summary>
         bool EnableNullPropagationForQueryMapping { get; }
 
+        int MaxExecutionPlanDepth { get; }
+
         IExpressionBuilder ExpressionBuilder { get; }
 
         /// <summary>
