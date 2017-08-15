@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration
         private readonly MemberInfo _destinationMember;
         private LambdaExpression _sourceMember;
         private readonly Type _sourceType;
-        protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
+        public List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
         public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
         {
@@ -230,16 +230,6 @@ namespace AutoMapper.Configuration
                     (src, ctxt) => condition(src, ctxt);
 
                 pm.PreCondition = expr;
-            });
-        }
-
-        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
-
-                pm.AddValueTransformation(config);
             });
         }
 

@@ -47,7 +47,7 @@ namespace AutoMapper
                     : Enumerable.Empty<IConditionalObjectMapper>())
                 .ToArray();
 
-            ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
+            ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<IValueTransformConfiguration>()).ToArray();
 
             MemberConfigurations = profile.MemberConfigurations.ToArray();
 
@@ -96,7 +96,7 @@ namespace AutoMapper
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         public IEnumerable<string> Prefixes { get; }
         public IEnumerable<string> Postfixes { get; }
-        public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
+        public IEnumerable<IValueTransformConfiguration> ValueTransformers { get; }
 
         public TypeDetails CreateTypeDetails(Type type) => _typeDetails.GetOrAdd(type);
 

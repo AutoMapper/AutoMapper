@@ -156,7 +156,7 @@ namespace AutoMapper.Configuration
         public Type DestinationType => Types.DestinationType;
         public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
-        protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
+        public List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
 
         public IMappingExpression<TSource, TDestination> PreserveReferences()
         {
@@ -530,17 +530,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public IMappingExpression<TSource, TDestination> ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
-
-                tm.AddValueTransformation(config);
-            });
-
-            return this;
-        }
+        
 
         private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
             _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);

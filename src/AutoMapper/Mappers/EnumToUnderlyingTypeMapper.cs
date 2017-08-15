@@ -24,11 +24,6 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
-                ToType(
-                    Call(ChangeTypeMethod, ToObject(sourceExpression),
-                        Constant(destExpression.Type)),
-                    destExpression.Type
-                );
+                Call(ChangeTypeMethod, ToObject(sourceExpression),Constant(destExpression.Type)).ToType(destExpression.Type);
     }
-    
 }

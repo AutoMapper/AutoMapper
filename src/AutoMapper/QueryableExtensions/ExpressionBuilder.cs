@@ -300,7 +300,7 @@ namespace AutoMapper.QueryableExtensions
             private Expression NullCheck(Expression input)
             {
                 var underlyingType = input.Type.GetTypeOfNullable();
-                var nullSubstitute = ToType(Constant(_nullSubstitute), underlyingType);
+                var nullSubstitute = Constant(_nullSubstitute).ToType(underlyingType);
                 return Condition(Property(input, "HasValue"), Property(input, "Value"), nullSubstitute, underlyingType);
             }
         }

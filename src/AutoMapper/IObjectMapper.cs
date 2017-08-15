@@ -63,8 +63,8 @@ namespace AutoMapper
             Call(
                 Constant(this),
                 MapMethod,
-                ToType(sourceExpression, typeof(TSource)),
-                ToType(destExpression, typeof(TDestination)),
+                sourceExpression.ToType(typeof(TSource)),
+                destExpression.ToType(typeof(TDestination)),
                 contextExpression);
     }
 }

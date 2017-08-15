@@ -1,16 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper
 {
+    public interface IMemberConfigurationExpressionBase
+    {
+        List<Action<PropertyMap>> PropertyMapActions { get; }
+    }
+
     /// <summary>
     /// Member configuration options
     /// </summary>
     /// <typeparam name="TSource">Source type for this member</typeparam>
     /// <typeparam name="TMember">Type for this member</typeparam>
     /// <typeparam name="TDestination">Destination type for this map</typeparam>
-    public interface IMemberConfigurationExpression<TSource, TDestination, TMember>
+    public interface IMemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpressionBase
     {
         /// <summary>
         /// Do not precompute the execution plan for this member, just map it at runtime.
@@ -199,13 +205,6 @@ namespace AutoMapper
         /// The destination member being configured.
         /// </summary>
         MemberInfo DestinationMember { get; }
-
-        /// <summary>
-        /// Apply a transformation function after any resolved destination member value with the given type
-        /// </summary>
-        /// <typeparam name="TValue">Value type to match and transform</typeparam>
-        /// <param name="transformer">Transformation expression</param>
-        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 
     /// <summary>

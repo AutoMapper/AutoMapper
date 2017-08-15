@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    public interface IMappingExpressionBase
+    {
+        List<Action<TypeMap>> TypeMapActions { get; }
+    }
     /// <summary>
     /// Mapping configuration options for non-generic maps
     /// </summary>
-    public interface IMappingExpression
+    public interface IMappingExpression : IMappingExpressionBase
     {
         /// <summary>
         /// Preserve object identity. Useful for circular references.
@@ -188,7 +193,7 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type</typeparam>
     /// <typeparam name="TDestination">Destination type</typeparam>
-    public interface IMappingExpression<TSource, TDestination>
+    public interface IMappingExpression<TSource, TDestination> : IMappingExpressionBase
     {
         /// <summary>
         /// Customize configuration for a path inside the destination object.
@@ -439,13 +444,5 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> DisableCtorValidation();
-
-        /// <summary>
-        /// Apply a transformation function after any resolved destination member value with the given type
-        /// </summary>
-        /// <typeparam name="TValue">Value type to match and transform</typeparam>
-        /// <param name="transformer">Transformation expression</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 }

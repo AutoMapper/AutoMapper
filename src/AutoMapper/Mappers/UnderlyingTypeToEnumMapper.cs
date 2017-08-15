@@ -23,10 +23,7 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
-                ToType(
                     Call(EnumToObject, Constant(destExpression.Type),
-                        ToObject(sourceExpression)),
-                    destExpression.Type
-                );
+                        ToObject(sourceExpression)).ToType(destExpression.Type);
     }
 }

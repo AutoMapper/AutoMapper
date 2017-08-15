@@ -45,7 +45,7 @@ namespace AutoMapper.Mappers.Internal
                     IfThenElse(condition ?? Constant(false),
                         Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
                         Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
-                    ToType(mapExpr, passedDestination.Type)
+                    mapExpr.ToType(passedDestination.Type)
                 );
             if (propertyMap != null)
                 return checkNull;
@@ -65,7 +65,7 @@ namespace AutoMapper.Mappers.Internal
                     ifInterfaceType.MakeGenericType(ElementTypeHelper.GetElementTypes(baseType,
                         ElementTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
-            return ToType(newExpr, baseType);
+            return newExpr.ToType(baseType);
         }
 
         public static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
@@ -78,7 +78,7 @@ namespace AutoMapper.Mappers.Internal
 
             var itemExpr = MapExpression(configurationProvider, profileMap, typePair, itemParam, contextParam,
                 propertyMap);
-            return ToType(itemExpr, destElementType);
+            return itemExpr.ToType(destElementType);
         }
 
         public static Expression MapKeyPairValueExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)

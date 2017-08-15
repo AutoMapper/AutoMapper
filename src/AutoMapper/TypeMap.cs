@@ -29,7 +29,7 @@ namespace AutoMapper
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
-        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
+        private readonly List<IValueTransformConfiguration> _valueTransformerConfigs = new List<IValueTransformConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, ProfileMap profile)
         {
@@ -81,7 +81,7 @@ namespace AutoMapper
 
         public IEnumerable<LambdaExpression> BeforeMapActions => _beforeMapActions;
         public IEnumerable<LambdaExpression> AfterMapActions => _afterMapActions;
-        public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
+        public IEnumerable<IValueTransformConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public bool PreserveReferences { get; set; }
         public LambdaExpression Condition { get; set; }
@@ -261,7 +261,7 @@ namespace AutoMapper
             }
         }
 
-        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
+        public void AddValueTransformation(IValueTransformConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }

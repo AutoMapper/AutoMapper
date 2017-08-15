@@ -127,11 +127,11 @@ namespace AutoMapper
                 var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
                 var contextParameter = Parameter(typeof(ResolutionContext), "context");
 
-                mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                    ToType(requestedSourceParameter, typeMapSourceParameter.Type),
-                    ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
+                mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                    requestedSourceParameter.ToType(typeMapSourceParameter.Type),
+                    requestedDestinationParameter.ToType(typeMapDestinationParameter.Type),
                     contextParameter
-                    ), mapRequest.RuntimeTypes.DestinationType),
+                    ).ToType(mapRequest.RuntimeTypes.DestinationType),
                     requestedSourceParameter, requestedDestinationParameter, contextParameter);
             }
 
@@ -154,12 +154,12 @@ namespace AutoMapper
             else
             {
                 var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, 
-                                                                        ToType(source, mapRequest.RuntimeTypes.SourceType), 
-                                                                        ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
+                                                                        source.ToType(mapRequest.RuntimeTypes.SourceType), 
+                                                                        destination.ToType(mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
                 var exception = Parameter(typeof(Exception), "ex");
                 fullExpression =
-                    TryCatch(ToType(map, destinationType),
+                    TryCatch(map.ToType(destinationType),
                     MakeCatchBlock(typeof(Exception), exception, Block(
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
@@ -389,9 +389,7 @@ namespace AutoMapper
                 var destination = requestedDestinationType.IsValueType() ? Coalesce(destinationParameter, New(requestedDestinationType)) : (Expression)destinationParameter;
                 // Invoking a delegate here
                 return Lambda<UntypedMapperFunc>(
-                            ToType(
-                                Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
-                                , typeof(object)),
+                                Invoke(typedExpression, sourceParameter.ToType(requestedSourceType), destination.ToType(requestedDestinationType), contextParameter).ToType(typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
         }

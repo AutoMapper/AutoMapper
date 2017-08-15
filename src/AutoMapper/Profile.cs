@@ -27,7 +27,7 @@ namespace AutoMapper
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
         private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
-        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
+        private readonly List<IValueTransformConfiguration> _valueTransformerConfigs = new List<IValueTransformConfiguration>();
 
         protected Profile(string profileName)
             : this() => ProfileName = profileName;
@@ -64,7 +64,8 @@ namespace AutoMapper
         IEnumerable<IConditionalObjectMapper> IProfileConfiguration.TypeConfigurations => _typeConfigurations;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
-        IEnumerable<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
+        IEnumerable<IValueTransformConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
+        IList<IValueTransformConfiguration> IProfileExpression.ValueTransformers => _valueTransformerConfigs;
 
         public virtual string ProfileName { get; }
 
@@ -182,13 +183,6 @@ namespace AutoMapper
                         m =>
                             m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
                             m.GetParameters().Length == 1));
-        }
-
-        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
-        {
-            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
-
-            _valueTransformerConfigs.Add(config);
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

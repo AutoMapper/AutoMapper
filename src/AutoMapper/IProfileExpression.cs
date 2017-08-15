@@ -1,5 +1,5 @@
 using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
@@ -154,11 +154,6 @@ namespace AutoMapper
         /// <param name="type">Static type that contains extension methods</param>
         void IncludeSourceExtensionMethods(Type type);
 
-        /// <summary>
-        /// Apply a transformation function after any resolved destination member value with the given type
-        /// </summary>
-        /// <typeparam name="TValue">Value type to match and transform</typeparam>
-        /// <param name="transformer">Transformation expression</param>
-        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
+        IList<IValueTransformConfiguration> ValueTransformers { get; }
     }
 }

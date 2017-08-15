@@ -188,7 +188,7 @@ namespace AutoMapper.UnitTests
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>()
-                     .ApplyTransform<string>(dest => dest + ", for real,");
+                     .ApplyTransform<IMappingExpression<Source,Dest>, string>(dest => dest + ", for real,");
                     p.ApplyTransform<string>(dest => dest + " is straight up dope");
                 });
             });
@@ -224,7 +224,7 @@ namespace AutoMapper.UnitTests
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>()
-                     .ApplyTransform<string>(dest => dest + ", for real,")
+                     .ApplyTransform<IMappingExpression<Source, Dest>, string>(dest => dest + ", for real,")
                      .ForMember(d => d.Value, opt => opt.ApplyTransform<string>(d => d + ", seriously"));
                     p.ApplyTransform<string>(dest => dest + " is straight up dope");
                 });

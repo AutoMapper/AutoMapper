@@ -32,15 +32,14 @@ namespace AutoMapper.Mappers
                 if (attribute?.Value != null)
                 {
                     var switchCase = Expression.SwitchCase(
-                        ToType(Expression.Constant(Enum.ToObject(destinationEnumType, memberInfo.GetMemberValue(null))),
-                            destinationType), Expression.Constant(attribute.Value));
+                        Expression.Constant(Enum.ToObject(destinationEnumType, memberInfo.GetMemberValue(null))).ToType(destinationType), Expression.Constant(attribute.Value));
                     switchCases.Add(switchCase);
                 }
             }
             var equalsMethodInfo = Method(() => StringCompareOrdinalIgnoreCase(null, null));
             var switchTable = switchCases.Count > 0
-                ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), equalsMethodInfo, switchCases)
-                : ToType(enumParse, destinationType);
+                ? Expression.Switch(sourceExpression, enumParse.ToType(destinationType), equalsMethodInfo, switchCases)
+                : enumParse.ToType(destinationType);
             var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
             return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
         }

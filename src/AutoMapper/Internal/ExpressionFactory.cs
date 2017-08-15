@@ -88,7 +88,7 @@ namespace AutoMapper.Internal
                 ? expression 
                 : Expression.Convert(expression, typeof(object));
 
-        public static Expression ToType(Expression expression, Type type) => 
+        public static Expression ToType(this Expression expression, Type type) => 
             expression.Type == type 
                 ? expression 
             : Expression.Convert(expression, type);

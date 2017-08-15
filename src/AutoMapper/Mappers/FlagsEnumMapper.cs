@@ -28,13 +28,10 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
-                ToType(
                     Call(EnumParseMethod,
                         Constant(destExpression.Type),
                         Call(sourceExpression, sourceExpression.Type.GetDeclaredMethod("ToString")),
                         Constant(true)
-                    ),
-                    destExpression.Type
-                );
+                    ).ToType(destExpression.Type);
     }
 }
