@@ -542,9 +542,10 @@ namespace AutoMapper.Configuration
                 if (attrs.Any(x => x is IgnoreMapAttribute))
                 {
                     IgnoreDestinationMember(destProperty);
-                    if (typeMap.SourceType.GetInheritedMember(destProperty.Name) != null)
+                    var sourceProperty = typeMap.SourceType.GetInheritedMember(destProperty.Name);
+                    if (sourceProperty != null)
                     {
-                        _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
+                        _reverseMap?.IgnoreDestinationMember(sourceProperty);
                     }
                 }
                 if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
