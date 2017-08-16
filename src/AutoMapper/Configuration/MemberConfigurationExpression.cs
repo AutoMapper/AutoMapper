@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration
         private readonly MemberInfo _destinationMember;
         private LambdaExpression _sourceMember;
         private readonly Type _sourceType;
-        protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
+        public List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
         public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
         {
@@ -140,61 +140,6 @@ namespace AutoMapper.Configuration
         public void UseValue<TValue>(TValue value)
         {
             MapFrom(s => value);
-        }
-
-        public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember, ctxt);
-
-                pm.Condition = expr;
-            });
-        }
-
-        public void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember);
-
-                pm.Condition = expr;
-            });
-        }
-
-        public void Condition(Func<TSource, TDestination, TMember, bool> condition)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember);
-
-                pm.Condition = expr;
-            });
-        }
-
-        public void Condition(Func<TSource, TDestination, bool> condition)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest);
-
-                pm.Condition = expr;
-            });
-        }
-
-        public void Condition(Func<TSource, bool> condition)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src);
-
-                pm.Condition = expr;
-            });
         }
 
         public void PreCondition(Func<TSource, bool> condition)

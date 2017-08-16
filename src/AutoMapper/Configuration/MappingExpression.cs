@@ -77,10 +77,7 @@ namespace AutoMapper.Configuration
 
             return this;
         }
-
-        public new IMappingExpression MaxDepth(int depth) 
-            => (IMappingExpression)base.MaxDepth(depth);
-
+        
         public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions) 
             => (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
 
@@ -156,7 +153,7 @@ namespace AutoMapper.Configuration
         public Type DestinationType => Types.DestinationType;
         public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
-        protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
+        public List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
 
         public IMappingExpression<TSource, TDestination> PreserveReferences()
         {
@@ -269,13 +266,6 @@ namespace AutoMapper.Configuration
         public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
         {
             TypeMapActions.Add(tm => tm.CustomProjection = projectionExpression);
-        }
-
-        public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
-        {
-            TypeMapActions.Add(tm => tm.MaxDepth = depth);
-
-            return PreserveReferences();
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator()

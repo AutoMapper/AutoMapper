@@ -52,7 +52,7 @@ namespace AutoMapper.Mappers.Internal
             var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
             if (elementTypeMap == null)
                 return checkNull;
-            var checkContext = CheckContext(elementTypeMap, contextExpression);
+            var checkContext = elementTypeMap.CheckContext(contextExpression);
             if (checkContext == null)
                 return checkNull;
             return Block(checkContext, checkNull);

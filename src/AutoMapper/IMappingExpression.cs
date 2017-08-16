@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace AutoMapper
@@ -41,14 +42,6 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression ConstructUsingServiceLocator();
-
-        /// <summary>
-        /// For self-referential types, limit recurse depth.
-        /// Enables PreserveReferences.
-        /// </summary>
-        /// <param name="depth">Number of levels to limit to</param>
-        /// <returns>Itself</returns>
-        IMappingExpression MaxDepth(int depth);
         
         /// <summary>
         /// Supply a custom instantiation expression for the destination type for LINQ projection
@@ -380,13 +373,7 @@ namespace AutoMapper
         /// <typeparam name="T">Destination type to use</typeparam>
         void As<T>() where T : TDestination;
 
-        /// <summary>
-        /// For self-referential types, limit recurse depth.
-        /// Enables PreserveReferences.
-        /// </summary>
-        /// <param name="depth">Number of levels to limit to</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> MaxDepth(int depth);
+        List<Action<TypeMap>> TypeMapActions { get; }
 
         /// <summary>
         /// Construct the destination object using the service locator
