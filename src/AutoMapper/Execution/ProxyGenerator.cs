@@ -1,4 +1,3 @@
-#if NET45 || NET40
 namespace AutoMapper.Execution
 {
     using System;
@@ -38,10 +37,10 @@ namespace AutoMapper.Execution
             name.SetPublicKey(privateKey);
             name.SetPublicKeyToken(privateKeyToken);
 
-#if NET45
-            AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-#else
+#if NET40
             AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+#else
+            AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
 #endif
 
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
@@ -59,7 +58,7 @@ namespace AutoMapper.Execution
             Debug.WriteLine(name, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(name,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
-                interfaceType.IsInterface ? new[] { interfaceType } : Type.EmptyTypes);
+                interfaceType.IsInterface() ? new[] { interfaceType } : new Type[0]);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                 CallingConventions.Standard, new Type[0]);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
@@ -243,4 +242,3 @@ namespace AutoMapper.Execution
         public static bool operator !=(PropertyDescription left, PropertyDescription right) => !left.Equals(right);
     }
 }
-#endif

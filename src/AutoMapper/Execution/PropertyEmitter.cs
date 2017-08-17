@@ -1,4 +1,3 @@
-#if NET45 || NET40
 namespace AutoMapper.Execution
 {
     using System;
@@ -37,6 +36,9 @@ namespace AutoMapper.Execution
             _setterBuilder = owner.DefineMethod($"set_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName, typeof (void), new[] {propertyType});
+            // begin workaround, should be removed when upgrading the .NET Core SDK, https://github.com/dotnet/corefx/issues/7596
+            _setterBuilder.DefineParameter(1, ParameterAttributes.In, "_");
+            // end workaround
             ILGenerator setterIl = _setterBuilder.GetILGenerator();
             setterIl.Emit(OpCodes.Ldarg_0);
             setterIl.Emit(OpCodes.Ldarg_1);
@@ -66,4 +68,3 @@ namespace AutoMapper.Execution
             : _setterBuilder;
     }
 }
-#endif
