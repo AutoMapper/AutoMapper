@@ -23,12 +23,6 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (expression == null)
                 return default(TDestDelegate);
 
-            if (expression.GetType().GetGenericTypeDefinition() != typeof(Expression<>)
-                || typeof(TDestDelegate).GetGenericTypeDefinition() != typeof(Expression<>))
-            {
-                throw new ArgumentException(Resource.mustBeExpressions);
-            }
-
             var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
             var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
 
@@ -68,12 +62,6 @@ namespace AutoMapper.XpressionMapper.Extensions
         {
             if (expression == null)
                 return null;
-
-            if (expression.GetType().GetGenericTypeDefinition() != typeof(Expression<>)
-                || typeof(TDestDelegate).GetGenericTypeDefinition() != typeof(Expression<>))
-            {
-                throw new ArgumentException(Resource.mustBeExpressions);
-            }
 
             var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
             var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
