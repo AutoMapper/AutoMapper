@@ -80,21 +80,26 @@ namespace AutoMapper.Execution
                 typeMapsPath = new Stack<TypeMap>();
             }
             typeMapsPath.Push(_typeMap);
-            var propertyTypeMaps =
-                (from propertyTypeMap in
-                (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
+            var properties =
+                from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue()
+                let propertyTypeMap = ResolvePropertyTypeMap(pm)
                 where propertyTypeMap != null && !propertyTypeMap.PreserveReferences
-                select propertyTypeMap).Distinct();
-            foreach (var propertyTypeMap in propertyTypeMaps)
+                select new { PropertyTypeMap = propertyTypeMap, PropertyMap = pm };
+            foreach(var property in properties)
             {
-                if(typeMapsPath.Contains(propertyTypeMap))
+                if(typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
-                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
-                    propertyTypeMap.PreserveReferences = true;
+                    property.PropertyMap.Inline = false;
+                    Debug.WriteLine($"Resetting Inline: {property.PropertyMap.DestinationProperty} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
+                }
+                if(typeMapsPath.Contains(property.PropertyTypeMap))
+                {
+                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {property.PropertyTypeMap.SourceType} - {property.PropertyTypeMap.DestinationType}");
+                    property.PropertyTypeMap.PreserveReferences = true;
                 }
                 else
                 {
-                    propertyTypeMap.Seal(_configurationProvider, typeMapsPath);
+                    property.PropertyTypeMap.Seal(_configurationProvider, typeMapsPath);
                 }
             }
             typeMapsPath.Pop();

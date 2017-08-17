@@ -19,6 +19,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
             });
+            Mapper.AssertConfigurationIsValid();
             _customer = new Customer()
             {
                 Address = new Address() { City = "istanbul", Country = "turkey", Id = 1, Street = "istiklal cad." },
@@ -182,65 +183,115 @@ namespace Benchmark.Flattening
 
         public void Initialize()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Foo, Foo>());
-            _foo = new Foo
+            Mapper.Initialize(cfg =>
             {
-                Name = "foo",
-                Int32 = 12,
-                Int64 = 123123,
-                NullInt = 16,
-                DateTime = DateTime.Now,
-                Doublen = 2312112,
-                Foo1 = new Foo { Name = "foo one" },
-                Foos = new List<Foo>
-                {
-                    new Foo {Name = "j1", Int64 = 123, NullInt = 321},
-                    new Foo {Name = "j2", Int32 = 12345, NullInt = 54321},
-                    new Foo {Name = "j3", Int32 = 12345, NullInt = 54321},
-                },
-                FooArr = new[]
-                {
-                    new Foo {Name = "a1"},
-                    new Foo {Name = "a2"},
-                    new Foo {Name = "a3"},
-                },
-                IntArr = new[] { 1, 2, 3, 4, 5 },
-                Ints = new[] { 7, 8, 9 },
-            };
+                cfg.CreateMap<Foo, FooDest>();
+                cfg.CreateMap<InnerFoo, InnerFooDest>();
+            });
+            Mapper.AssertConfigurationIsValid();
+            _foo = Foo.New();
         }
 
         public object Map()
         {
-            return Mapper.Map<Foo, Foo>(_foo);
+            var dest = Mapper.Map<Foo, FooDest>(_foo);
+            return dest;
         }
+    }
 
-        public class Foo
+    public class Foo
+    {
+        public static Foo New() => new Foo
         {
-            public string Name { get; set; }
+            Name = "foo",
+            Int32 = 12,
+            Int64 = 123123,
+            NullInt = 16,
+            DateTime = DateTime.Now,
+            Doublen = 2312112,
+            Foo1 = new InnerFoo { Name = "foo one" },
+            Foos = new List<InnerFoo>
+                {
+                    new InnerFoo {Name = "j1", Int64 = 123, NullInt = 321},
+                    new InnerFoo {Name = "j2", Int32 = 12345, NullInt = 54321},
+                    new InnerFoo {Name = "j3", Int32 = 12345, NullInt = 54321},
+                },
+            FooArr = new[]
+                {
+                    new InnerFoo {Name = "a1"},
+                    new InnerFoo {Name = "a2"},
+                    new InnerFoo {Name = "a3"},
+                },
+            IntArr = new[] { 1, 2, 3, 4, 5 },
+            Ints = new[] { 7, 8, 9 },
+        };
 
-            public int Int32 { get; set; }
+        public string Name { get; set; }
 
-            public long Int64 { set; get; }
+        public int Int32 { get; set; }
 
-            public int? NullInt { get; set; }
+        public long Int64 { set; get; }
 
-            public float Floatn { get; set; }
+        public int? NullInt { get; set; }
 
-            public double Doublen { get; set; }
+        public float Floatn { get; set; }
 
-            public DateTime DateTime { get; set; }
+        public double Doublen { get; set; }
 
-            public Foo Foo1 { get; set; }
+        public DateTime DateTime { get; set; }
 
-            public List<Foo> Foos { get; set; }
+        public InnerFoo Foo1 { get; set; }
 
-            public Foo[] FooArr { get; set; }
+        public List<InnerFoo> Foos { get; set; }
 
-            public int[] IntArr { get; set; }
+        public InnerFoo[] FooArr { get; set; }
 
-            public int[] Ints { get; set; }
-        }
+        public int[] IntArr { get; set; }
 
+        public int[] Ints { get; set; }
+    }
+
+    public class InnerFoo
+    {
+        public string Name { get; set; }
+        public int Int32 { get; set; }
+        public long Int64 { set; get; }
+        public int? NullInt { get; set; }
+    }
+
+    public class InnerFooDest
+    {
+        public string Name { get; set; }
+        public int Int32 { get; set; }
+        public long Int64 { set; get; }
+        public int? NullInt { get; set; }
+    }
+
+    public class FooDest
+    {
+        public string Name { get; set; }
+
+        public int Int32 { get; set; }
+
+        public long Int64 { set; get; }
+
+        public int? NullInt { get; set; }
+
+        public float Floatn { get; set; }
+
+        public double Doublen { get; set; }
+
+        public DateTime DateTime { get; set; }
+
+        public InnerFooDest Foo1 { get; set; }
+
+        public List<InnerFooDest> Foos { get; set; }
+
+        public InnerFooDest[] FooArr { get; set; }
+
+        public int[] IntArr { get; set; }
+
+        public int[] Ints { get; set; }
     }
 
     public class ManualComplexTypeMapper : IObjectToObjectMapper
@@ -250,35 +301,12 @@ namespace Benchmark.Flattening
 
         public void Initialize()
         {
-            _foo = new Foo
-            {
-                Name = "foo",
-                Int32 = 12,
-                Int64 = 123123,
-                NullInt = 16,
-                DateTime = DateTime.Now,
-                Doublen = 2312112,
-                Foo1 = new Foo { Name = "foo one" },
-                Foos = new List<Foo>
-                {
-                    new Foo {Name = "j1", Int64 = 123, NullInt = 321},
-                    new Foo {Name = "j2", Int32 = 12345, NullInt = 54321},
-                    new Foo {Name = "j3", Int32 = 12345, NullInt = 54321},
-                },
-                FooArr = new[]
-                {
-                    new Foo {Name = "a1"},
-                    new Foo {Name = "a2"},
-                    new Foo {Name = "a3"},
-                },
-                IntArr = new[] { 1, 2, 3, 4, 5 },
-                Ints = new[] { 7, 8, 9 },
-            };
+            _foo = Foo.New();
         }
 
         public object Map()
         {
-            return new Foo
+            var dest = new FooDest
             {
                 Name = _foo.Name,
                 Int32 = _foo.Int32,
@@ -286,41 +314,25 @@ namespace Benchmark.Flattening
                 NullInt = _foo.NullInt,
                 DateTime = _foo.DateTime,
                 Doublen = _foo.Doublen,
-                Foo1 = new Foo { Name = _foo.Foo1.Name },
-                Foos = _foo.Foos.Select(f => new Foo { Name = f.Name, Int64 = f.Int64, NullInt = f.NullInt }).ToList(),
-                FooArr = _foo.Foos.Select(f => new Foo { Name = f.Name, Int64 = f.Int64, NullInt = f.NullInt }).ToArray(),
-                IntArr = _foo.IntArr.Select(i => i).ToArray(),
+                Foo1 = new InnerFooDest { Name = _foo.Foo1.Name },
+                Foos = new List<InnerFooDest>(_foo.Foos.Count),
+                FooArr = new InnerFooDest[_foo.Foos.Count],
+                IntArr = new int[_foo.IntArr.Length],
                 Ints = _foo.Ints.ToArray(),
             };
+            foreach(var foo in _foo.Foos)
+            {
+                dest.Foos.Add(new InnerFooDest { Name = foo.Name, Int64 = foo.Int64, NullInt = foo.NullInt });
+            }
+            ;
+            for(int index = 0; index < _foo.Foos.Count; index++)
+            {
+                var foo = _foo.Foos[index];
+                dest.FooArr[index] = new InnerFooDest { Name = foo.Name, Int64 = foo.Int64, NullInt = foo.NullInt };
+            }
+            Array.Copy(_foo.IntArr, dest.IntArr, _foo.IntArr.Length);
+            return dest;
         }
-
-        public class Foo
-        {
-            public string Name { get; set; }
-
-            public int Int32 { get; set; }
-
-            public long Int64 { set; get; }
-
-            public int? NullInt { get; set; }
-
-            public float Floatn { get; set; }
-
-            public double Doublen { get; set; }
-
-            public DateTime DateTime { get; set; }
-
-            public Foo Foo1 { get; set; }
-
-            public IEnumerable<Foo> Foos { get; set; }
-
-            public Foo[] FooArr { get; set; }
-
-            public int[] IntArr { get; set; }
-
-            public IEnumerable<int> Ints { get; set; }
-        }
-
     }
 
 
@@ -333,6 +345,7 @@ namespace Benchmark.Flattening
         public void Initialize()
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
+            Mapper.AssertConfigurationIsValid();
             _model = new Model11 { Value = 5 };
         }
 
@@ -384,6 +397,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
+            Mapper.AssertConfigurationIsValid();
             _source = new ModelObject
             {
                 BaseDate = new DateTime(2007, 4, 5),

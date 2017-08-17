@@ -39,6 +39,7 @@ namespace AutoMapper
 
             ServiceCtor = configurationExpression.ServiceCtor;
             EnableNullPropagationForQueryMapping = configurationExpression.EnableNullPropagationForQueryMapping ?? false;
+            MaxExecutionPlanDepth = configurationExpression.Advanced.MaxExecutionPlanDepth + 1;
 
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
@@ -70,6 +71,8 @@ namespace AutoMapper
         public Func<Type, object> ServiceCtor { get; }
 
         public bool EnableNullPropagationForQueryMapping { get; }
+
+        public int MaxExecutionPlanDepth { get; }
 
         private ProfileMap Configuration { get; }
 
