@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
+using AutoMapper.Configuration.Internal;
 
 namespace AutoMapper.Configuration
 {
@@ -541,7 +542,11 @@ namespace AutoMapper.Configuration
                 if (attrs.Any(x => x is IgnoreMapAttribute))
                 {
                     IgnoreDestinationMember(destProperty);
-                    _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
+                    var sourceProperty = typeMap.SourceType.GetInheritedMember(destProperty.Name);
+                    if (sourceProperty != null)
+                    {
+                        _reverseMap?.IgnoreDestinationMember(sourceProperty);
+                    }
                 }
                 if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {

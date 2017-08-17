@@ -17,7 +17,7 @@ namespace AutoMapper.Configuration.Internal
         private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
             type.GetTypeInheritance().Concat(type.GetTypeInfo().ImplementedInterfaces).SelectMany(i => i.GetDeclaredMembers());
 
-        private static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
+        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
 
         public static MethodInfo GetInheritedMethod(Type type, string name)
             => type.GetInheritedMember(name) as MethodInfo ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
