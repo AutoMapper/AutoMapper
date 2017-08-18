@@ -123,22 +123,43 @@ namespace AutoMapper.Internal
 
         public static Expression IfNotNull(Expression expression, Type destinationType)
         {
-            var node = expression;
-            var isMemberAccess = node.NodeType == ExpressionType.MemberAccess || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0);
-            while (isMemberAccess)
+            var target = expression;
+            Expression nullConditions = Constant(false);
+            do
             {
-                node = (node as MemberExpression)?.Expression 
-                    ?? (node as MethodCallExpression)?.Object;
-                isMemberAccess =
-                    (node != null) && (
-                    node.NodeType == ExpressionType.MemberAccess 
-                    || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0));
+                if(target is MemberExpression member)
+                {
+                    target = member.Expression;
+                    if(!member.Member.IsStatic())
+                    {
+                        NullCheck();
+                    }
+                }
+                else if(target is MethodCallExpression method)
+                {
+                    target = method.Method.IsStatic() ? method.Arguments[0] : method.Object;
+                    NullCheck();
+                }
+                else if(target?.NodeType == ExpressionType.Parameter)
+                {
+                    var returnType = Nullable.GetUnderlyingType(destinationType) == expression.Type ? destinationType : expression.Type;
+                    var nullCheck = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
+                    return nullCheck;
+                }
+                else
+                {
+                    return expression;
+                }
             }
-            if(node != null && node.NodeType == ExpressionType.Parameter)
+            while(true);
+            void NullCheck()
             {
-                return new IfNotNullVisitor().VisitRoot(expression, destinationType);
+                if(target.Type.IsValueType())
+                {
+                    return;
+                }
+                nullConditions = OrElse(Equal(target, Constant(null, target.Type)), nullConditions);
             }
-            return expression;
         }
 
         public static Expression RemoveIfNotNull(Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
@@ -147,30 +168,6 @@ namespace AutoMapper.Internal
         {
             var isNull = expression.Type.IsValueType() && !expression.Type.IsNullableType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
             return Condition(isNull, then, ToType(@else ?? Default(then.Type), then.Type));
-        }
-
-        internal class IfNotNullVisitor : ExpressionVisitor
-        {
-            private Expression _nullConditions = Expression.Constant(false);
-
-            public Expression VisitRoot(Expression node, Type destinationType)
-            {
-                var returnType = Nullable.GetUnderlyingType(destinationType) == node.Type ? destinationType : node.Type;
-                var expression = Visit(node);
-                var checkNull = Expression.Condition(_nullConditions, Expression.Default(returnType), ToType(expression, returnType));
-                return checkNull;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                var returnNode = base.VisitMember(node);
-                if(node.Expression == null || node.Expression.Type.IsValueType())
-                {
-                    return returnNode;
-                }
-                _nullConditions = Expression.OrElse(_nullConditions, Expression.Equal(node.Expression, Expression.Constant(null, node.Expression.Type)));
-                return returnNode;
-            }
         }
 
         internal class RemoveIfNotNullVisitor : ExpressionVisitor
