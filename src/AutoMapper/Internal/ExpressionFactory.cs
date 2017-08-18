@@ -90,11 +90,6 @@ namespace AutoMapper.Internal
 
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
 
-        public static Expression ConsoleWriteLine(string value, params Expression[] values) =>
-            Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
-                Constant(value),
-                NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
-
         public static Expression ReplaceParameters(LambdaExpression exp, params Expression[] replace)
         {
             var replaceExp = exp.Body;
