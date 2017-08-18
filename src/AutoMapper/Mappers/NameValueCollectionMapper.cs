@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
 using System.Reflection;
 
-#if NETSTANDARD1_3 || NET45 || NET40
+#if !NETSTANDARD1_1
 namespace AutoMapper.Mappers
 {
     public class NameValueCollectionMapper : IObjectMapper

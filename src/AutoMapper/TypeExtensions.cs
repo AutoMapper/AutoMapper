@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace AutoMapper
 {
@@ -21,7 +22,12 @@ namespace AutoMapper
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if NET45 || NET40
+#if !NET40 && !NET45
+        public static MethodInfo GetAddMethod(this EventInfo eventInfo) => eventInfo.AddMethod;
+
+        public static MethodInfo GetRemoveMethod(this EventInfo eventInfo) => eventInfo.RemoveMethod;
+#endif
+
         public static Type CreateType(this TypeBuilder type)
         {
 #if NET40
@@ -30,7 +36,6 @@ namespace AutoMapper
             return type.CreateTypeInfo().AsType();
 #endif
         }
-#endif
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 

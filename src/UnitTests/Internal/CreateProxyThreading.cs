@@ -1,5 +1,4 @@
-﻿#if NET452
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper.Execution;
@@ -36,4 +35,3 @@ namespace AutoMapper.UnitTests
 
     }
 }
-#endif

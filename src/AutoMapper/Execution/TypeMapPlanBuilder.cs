@@ -280,7 +280,7 @@ namespace AutoMapper.Execution
                 constructorMapping = true;
                 return CreateNewDestinationExpression(_typeMap.ConstructorMap);
             }
-#if NET45 || NET40
+
             if (_typeMap.DestinationTypeToUse.IsInterface())
             {
                 var ctor = Call(null,
@@ -291,7 +291,7 @@ namespace AutoMapper.Execution
                 // We're invoking a delegate here to make it have the right accessibility
                 return Invoke(ctor);
             }
-#endif
+
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 

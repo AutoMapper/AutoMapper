@@ -1,4 +1,3 @@
-#if NET45 || NET40
 namespace AutoMapper.Execution
 {
     using System;
@@ -66,4 +65,3 @@ namespace AutoMapper.Execution
             : _setterBuilder;
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if NET452
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -613,4 +612,3 @@ namespace AutoMapper.UnitTests.InterfaceMapping
 
     }
 }
-#endif

@@ -104,12 +104,10 @@ namespace AutoMapper.QueryableExtensions
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
             var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
-#if NET45 || NET40
             if(letPropertyMaps.Count > 0)
             {
                 expressions = letPropertyMaps.GetSubQueryExpression(this, expressions.First, typeMap, request, instanceParameter, typePairCount);
             }
-#endif
             if(expressions.First == null)
             {
                 return null;
@@ -436,7 +434,6 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
-#if NET45 || NET40
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new
@@ -470,7 +467,7 @@ namespace AutoMapper.QueryableExtensions
                 {
                     foreach(var letMapInfo in letMapInfos)
                     {
-                        var letProperty = letType.GetProperty(letMapInfo.Property.Name);
+                        var letProperty = letType.GetDeclaredProperty(letMapInfo.Property.Name);
                         var letPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(letProperty);
                         letPropertyMap.CustomExpression =
                             Lambda(letMapInfo.MapFrom.ReplaceParameters(letMapInfo.MapFromSource), (ParameterExpression)instanceParameter);
@@ -479,7 +476,6 @@ namespace AutoMapper.QueryableExtensions
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
-#endif
 
             class ReplaceMemberAccessesVisitor : ExpressionVisitor
             {
