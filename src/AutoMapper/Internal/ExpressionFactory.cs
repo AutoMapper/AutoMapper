@@ -32,29 +32,29 @@ namespace AutoMapper.Internal
         {
             if(collection.Type.IsArray)
             {
-                return ForEachArrayItem(collection, arrayItem => Expression.Block(new[] { loopVar }, Expression.Assign(loopVar, arrayItem), loopContent));
+                return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
             var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
-            var enumeratorVar = Expression.Variable(enumeratorType, "enumerator");
-            var enumeratorAssign = Expression.Assign(enumeratorVar, getEnumeratorCall);
+            var enumeratorVar = Variable(enumeratorType, "enumerator");
+            var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
             var moveNextCall = Call(enumeratorVar, moveNext);
 
-            var breakLabel = Expression.Label("LoopBreak");
+            var breakLabel = Label("LoopBreak");
 
-            var loop = Expression.Block(new[] { enumeratorVar },
+            var loop = Block(new[] { enumeratorVar },
                 enumeratorAssign,
-                Expression.Loop(
-                    Expression.IfThenElse(
-                        Expression.Equal(moveNextCall, Expression.Constant(true)),
-                        Expression.Block(new[] { loopVar },
-                            Expression.Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
+                Loop(
+                    IfThenElse(
+                        Equal(moveNextCall, Constant(true)),
+                        Block(new[] { loopVar },
+                            Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
                             loopContent
                         ),
-                        Expression.Break(breakLabel)
+                        Break(breakLabel)
                     ),
                 breakLabel)
             );
@@ -65,41 +65,35 @@ namespace AutoMapper.Internal
         public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
         {
             var length = Property(array, "Length");
-            return For(length, index => body(Expression.ArrayAccess(array, index)));
+            return For(length, index => body(ArrayAccess(array, index)));
         }
 
         public static Expression For(Expression count, Func<Expression, Expression> body)
         {
-            var breakLabel = Expression.Label("LoopBreak");
-            var index = Expression.Variable(typeof(int), "sourceArrayIndex");
-            var initialize = Expression.Assign(index, Expression.Constant(0, typeof(int)));
-            var loop = Expression.Block(new[] { index },
+            var breakLabel = Label("LoopBreak");
+            var index = Variable(typeof(int), "sourceArrayIndex");
+            var initialize = Assign(index, Constant(0, typeof(int)));
+            var loop = Block(new[] { index },
                 initialize,
-                Expression.Loop(
-                    Expression.IfThenElse(
-                        Expression.LessThan(index, count),
-                        Expression.Block(body(index), Expression.PostIncrementAssign(index)),
-                        Expression.Break(breakLabel)
+                Loop(
+                    IfThenElse(
+                        LessThan(index, count),
+                        Block(body(index), PostIncrementAssign(index)),
+                        Break(breakLabel)
                     ),
                 breakLabel)
             );
             return loop;
         }
 
-        public static Expression ToObject(Expression expression) => 
-            expression.Type == typeof(object) 
-                ? expression 
-                : Expression.Convert(expression, typeof(object));
+        public static Expression ToObject(Expression expression) => ToType(expression, typeof(object));
 
-        public static Expression ToType(Expression expression, Type type) => 
-            expression.Type == type 
-                ? expression 
-            : Expression.Convert(expression, type);
+        public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
 
         public static Expression ConsoleWriteLine(string value, params Expression[] values) =>
             Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
-                Expression.Constant(value),
-                Expression.NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
+                Constant(value),
+                NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
 
         public static Expression ReplaceParameters(LambdaExpression exp, params Expression[] replace)
         {
@@ -201,7 +195,7 @@ namespace AutoMapper.Internal
             {
                 if (node.Expression == _oldParam)
                 {
-                    node = Expression.MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member);
+                    node = MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member);
                 }
 
                 return base.VisitMember(node);
@@ -257,14 +251,14 @@ namespace AutoMapper.Internal
                 {
                     var expression = node;
                     if (node.Type == typeof(object))
-                        expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
+                        expression = Convert(node, _overrideExpression.Parameters[0].Type);
 
                     return ReplaceParameters(_overrideExpression, expression);
                 }
                 return base.Visit(node);
             }
 
-            protected override Expression VisitLambda<T>(Expression<T> node) => Expression.Lambda(Visit(node.Body), node.Parameters);
+            protected override Expression VisitLambda<T>(Expression<T> node) => Lambda(Visit(node.Body), node.Parameters);
         }
     }
 }
