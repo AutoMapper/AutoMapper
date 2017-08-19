@@ -31,12 +31,13 @@ namespace AutoMapper.UnitTests
         public class FooDto
         {
             public string BarSimpleName { get; set; }
+            public Guid Value { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.IncludeSourceExtensionMethods(typeof(BarExtensions));
-            cfg.CreateMap<Foo, FooDto>();
+            cfg.CreateMap<Foo, FooDto>().ForMember(d=>d.Value, o=>o.MapFrom(s=>Guid.New());
         });
 
         [Fact]
