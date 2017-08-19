@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.IncludeSourceExtensionMethods(typeof(BarExtensions));
-            cfg.CreateMap<Foo, FooDto>().ForMember(d=>d.Value, o=>o.MapFrom(s=>Guid.New());
+            cfg.CreateMap<Foo, FooDto>().ForMember(d=>d.Value, o=>o.MapFrom(s=>Guid.New()));
         });
 
         [Fact]
