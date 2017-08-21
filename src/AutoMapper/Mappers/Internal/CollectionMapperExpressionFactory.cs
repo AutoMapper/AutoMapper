@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers.Internal
         public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
-            var condition = conditionalExpression(passedDestination);
+            var destinationExists = conditionalExpression(passedDestination);
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
 
@@ -45,7 +45,7 @@ namespace AutoMapper.Mappers.Internal
                     Assign(passedDestination, destExpression),
                     useDestinationValue ? 
                         (Expression) Empty() : 
-                        IfThenElse(condition ?? Constant(false),
+                        IfThenElse(destinationExists,
                             Assign(newExpression, passedDestination),
                             Assign(newExpression, createInstance)),
                     Call(destination, clearMethod),
