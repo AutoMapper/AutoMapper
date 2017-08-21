@@ -244,7 +244,7 @@ namespace AutoMapper.Execution
                     mapperFunc,
                     Default(_typeMap.DestinationTypeToUse));
 
-            if (_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
+            if (_typeMap.Profile.AllowNullDestinationValues)
                 mapperFunc = Source.IfNullElse(Default(_typeMap.DestinationTypeToUse), mapperFunc);
 
             if (_typeMap.PreserveReferences)
