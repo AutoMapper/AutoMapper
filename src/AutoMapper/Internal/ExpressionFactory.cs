@@ -110,7 +110,7 @@ namespace AutoMapper.Internal
 
         public static LambdaExpression Concat(LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression IfNotNull(Expression expression, Type destinationType)
+        public static Expression NullCheck(Expression expression, Type destinationType)
         {
             var target = expression;
             Expression nullConditions = Constant(false);
@@ -151,28 +151,10 @@ namespace AutoMapper.Internal
             }
         }
 
-        public static Expression RemoveIfNotNull(Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
-
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
         {
             var isNull = expression.Type.IsValueType() && !expression.Type.IsNullableType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
             return Condition(isNull, then, ToType(@else ?? Default(then.Type), then.Type));
-        }
-
-        internal class RemoveIfNotNullVisitor : ExpressionVisitor
-        {
-            private readonly Expression[] _expressions;
-
-            public RemoveIfNotNullVisitor(params Expression[] expressions) => _expressions = expressions;
-
-            protected override Expression VisitConditional(ConditionalExpression node)
-            {
-                var member = node.IfFalse as MemberExpression;
-                var binary = node.Test as BinaryExpression;
-                if(member == null || binary == null || !_expressions.Contains(binary.Left) || !(binary.Right is DefaultExpression))
-                    return base.VisitConditional(node);
-                return node.IfFalse;
-            }
         }
 
         internal class ConvertingVisitor : ExpressionVisitor

@@ -245,9 +245,7 @@ namespace AutoMapper.Execution
                     Default(_typeMap.DestinationTypeToUse));
 
             if (_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
-                mapperFunc =
-                    Condition(Equal(Source, Default(_typeMap.SourceType)),
-                        Default(_typeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(Source));
+                mapperFunc = Source.IfNullElse(Default(_typeMap.DestinationTypeToUse), mapperFunc);
 
             if (_typeMap.PreserveReferences)
             {
@@ -325,7 +323,7 @@ namespace AutoMapper.Execution
         {
             if (ctorParamMap.CustomExpression != null)
                 return ctorParamMap.CustomExpression.ConvertReplaceParameters(Source)
-                    .IfNotNull(ctorParamMap.DestinationType);
+                    .NullCheck(ctorParamMap.DestinationType);
             if (ctorParamMap.CustomValueResolver != null)
                 return ctorParamMap.CustomValueResolver.ConvertReplaceParameters(Source, Context);
             if (ctorParamMap.Parameter.IsOptional)
@@ -339,7 +337,7 @@ namespace AutoMapper.Execution
                         ? Call(getter.IsStatic() ? null : inner, (MethodInfo) getter)
                         : (Expression) MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                 )
-                .IfNotNull(ctorParamMap.DestinationType);
+                .NullCheck(ctorParamMap.DestinationType);
         }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
@@ -468,7 +466,7 @@ namespace AutoMapper.Execution
             else if (propertyMap.CustomExpression != null)
             {
                 var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(Source)
-                    .IfNotNull(destinationPropertyType);
+                    .NullCheck(destinationPropertyType);
                 var destinationNullable = destinationPropertyType.IsNullableType();
                 var returnType = destinationNullable && destinationPropertyType.GetTypeOfNullable() ==
                                  nullCheckedExpression.Type
@@ -500,7 +498,7 @@ namespace AutoMapper.Execution
                                 : (Expression) Call(inner, (MethodInfo) getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                     );
-                    valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);
+                    valueResolverFunc = valueResolverFunc.NullCheck(destinationPropertyType);
                 }
             }
             else if (propertyMap.SourceMember != null)

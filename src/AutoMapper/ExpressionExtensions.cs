@@ -50,11 +50,8 @@ namespace AutoMapper
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat)
             => ExpressionFactory.Concat(expr, concat);
 
-        public static Expression IfNotNull(this Expression expression, Type destinationType)
-            => ExpressionFactory.IfNotNull(expression, destinationType);
-
-        public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions)
-            => ExpressionFactory.RemoveIfNotNull(expression, expressions);
+        public static Expression NullCheck(this Expression expression, Type destinationType)
+            => ExpressionFactory.NullCheck(expression, destinationType);
 
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
             => ExpressionFactory.IfNullElse(expression, then, @else);
