@@ -43,9 +43,12 @@ namespace AutoMapper.Mappers.Internal
             var checkNull =
                 Block(new[] {newExpression, passedDestination},
                     Assign(passedDestination, destExpression),
-                    IfThenElse(condition ?? Constant(false),
-                        Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
-                        Assign(newExpression, createInstance)),
+                    useDestinationValue ? 
+                        (Expression) Empty() : 
+                        IfThenElse(condition ?? Constant(false),
+                            Assign(newExpression, passedDestination),
+                            Assign(newExpression, createInstance)),
+                    Call(destination, clearMethod),
                     ToType(mapExpr, createInstance.Type)
                 );
             if (propertyMap != null)
