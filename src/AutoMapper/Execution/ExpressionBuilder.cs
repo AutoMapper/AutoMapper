@@ -44,8 +44,8 @@ namespace AutoMapper.Execution
             }
             var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
                 sourceParameter, contextParameter, propertyMap, destinationParameter);
-            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression,
-                propertyMap);
+            var nullCheckSource = NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression, propertyMap);
+            return ExpressionFactory.ToType(nullCheckSource, typePair.DestinationType);
         }
 
         public static Expression NullCheckSource(ProfileMap profileMap,
@@ -54,15 +54,14 @@ namespace AutoMapper.Execution
             Expression objectMapperExpression,
             PropertyMap propertyMap = null)
         {
-            var destinationType = destinationParameter.Type;
-            var defaultDestination = propertyMap == null
-                ? destinationParameter.IfNullElse(DefaultDestination(destinationType, profileMap), destinationParameter)
-                : (propertyMap.UseDestinationValue
-                    ? destinationParameter
-                    : DefaultDestination(destinationType, profileMap));
-            var ifSourceNull = destinationType.IsCollectionType() ? ClearDestinationCollection() : defaultDestination;
+            var declaredDestinationType = destinationParameter.Type;
+            var destinationType = objectMapperExpression.Type;
+            var defaultDestination = DefaultDestination(destinationType, declaredDestinationType, profileMap);
+            var destination = propertyMap == null
+                ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
+                : (propertyMap.UseDestinationValue ? destinationParameter : defaultDestination);
+            var ifSourceNull = destinationParameter.Type.IsCollectionType() ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
-
             Expression ClearDestinationCollection()
             {
                 var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
@@ -75,45 +74,22 @@ namespace AutoMapper.Execution
                     Assign(destinationVariable,
                         ExpressionFactory.ToType(destinationParameter, destinationCollectionType)),
                     destinationVariable.IfNullElse(Empty(), clear),
-                    defaultDestination);
+                    destination);
             }
         }
 
-        private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
+        private static Expression DefaultDestination(Type destinationType, Type declaredDestinationType, ProfileMap profileMap)
         {
-            var defaultValue = Default(destinationType);
-            if (profileMap.AllowNullCollections || destinationType == typeof(string) ||
-                !destinationType.IsEnumerableType())
-                return defaultValue;
-            if (destinationType.IsArray)
+            if(profileMap.AllowNullCollections || destinationType == typeof(string) || !destinationType.IsEnumerableType())
+            {
+                return Default(declaredDestinationType);
+            }
+            if(destinationType.IsArray)
             {
                 var destinationElementType = destinationType.GetElementType();
-                return NewArrayBounds(destinationElementType,
-                    Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+                return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
             }
-            if (destinationType.IsDictionaryType())
-                return CreateCollection(typeof(Dictionary<,>));
-            if (destinationType.IsSetType())
-                return CreateCollection(typeof(HashSet<>));
-            return CreateCollection(typeof(List<>));
-
-            Expression CreateCollection(Type collectionType)
-            {
-                Type concreteDestinationType;
-                if (destinationType.IsInterface())
-                {
-                    var genericArguments = destinationType.GetGenericArguments();
-                    if (genericArguments.Length == 0)
-                        genericArguments = new[] {typeof(object)};
-                    concreteDestinationType = collectionType.MakeGenericType(genericArguments);
-                }
-                else
-                {
-                    concreteDestinationType = destinationType;
-                }
-                var constructor = DelegateFactory.GenerateNonNullConstructorExpression(concreteDestinationType);
-                return ExpressionFactory.ToType(constructor, destinationType);
-            }
+            return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
         }
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
@@ -125,10 +101,8 @@ namespace AutoMapper.Execution
             {
                 var mapperExpression = match.MapExpression(configurationProvider, profileMap, propertyMap,
                     sourceParameter, destinationParameter, contextParameter);
-
-                return ExpressionFactory.ToType(mapperExpression, typePair.DestinationType);
+                return mapperExpression;
             }
-
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
 

@@ -50,27 +50,6 @@ namespace AutoMapper.UnitTests.NullBehavior
         }
     }
 
-    public class When_mapping_untyped_null_to_IEnumerable : AutoMapperSpecBase
-    {
-        class Source
-        {
-            public object Value { get; set; }
-        }
-
-        class Destination
-        {
-            public IEnumerable Value { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
-
-        [Fact]
-        public void Should_map_to_non_null()
-        {
-            Mapper.Map<Destination>(new Source()).Value.ShouldNotBeNull();
-        }
-    }
-
     public class When_mapping_untyped_null_to_IEnumerable_and_AllowNullCollections_is_true : AutoMapperSpecBase
     {
         class Source

@@ -33,19 +33,20 @@ namespace AutoMapper.Mappers.Internal
             if (!destinationCollectionType.IsAssignableFrom(destExpression.Type))
                 destinationCollectionType = typeof(IList);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
-            var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
+            var useDestinationValue = propertyMap?.UseDestinationValue == true;
+            var destination = useDestinationValue ? passedDestination : newExpression;
             var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
-
             var mapExpr = Block(addItems, destination);
 
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
+            var createInstance = useDestinationValue ? passedDestination : passedDestination.Type.NewExpr(ifInterfaceType);
             var checkNull =
                 Block(new[] {newExpression, passedDestination},
                     Assign(passedDestination, destExpression),
                     IfThenElse(condition ?? Constant(false),
                         Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
-                        Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
-                    ToType(mapExpr, passedDestination.Type)
+                        Assign(newExpression, createInstance)),
+                    ToType(mapExpr, createInstance.Type)
                 );
             if (propertyMap != null)
                 return checkNull;
@@ -65,7 +66,7 @@ namespace AutoMapper.Mappers.Internal
                     ifInterfaceType.MakeGenericType(ElementTypeHelper.GetElementTypes(baseType,
                         ElementTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
-            return ToType(newExpr, baseType);
+            return newExpr;
         }
 
         public static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
