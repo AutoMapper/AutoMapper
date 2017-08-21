@@ -119,14 +119,11 @@ namespace AutoMapper.Internal
                 if(target is MemberExpression member)
                 {
                     target = member.Expression;
-                    if(!member.Member.IsStatic())
-                    {
-                        NullCheck();
-                    }
+                    NullCheck();
                 }
                 else if(target is MethodCallExpression method)
                 {
-                    target = method.Method.IsStatic() ? method.Arguments[0] : method.Object;
+                    target = method.Method.IsStatic() ? method.Arguments.FirstOrDefault() : method.Object;
                     NullCheck();
                 }
                 else if(target?.NodeType == ExpressionType.Parameter)
@@ -143,7 +140,7 @@ namespace AutoMapper.Internal
             while(true);
             void NullCheck()
             {
-                if(target.Type.IsValueType())
+                if(target == null || target.Type.IsValueType())
                 {
                     return;
                 }
