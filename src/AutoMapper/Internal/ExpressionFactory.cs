@@ -150,8 +150,12 @@ namespace AutoMapper.Internal
 
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
         {
-            var isNull = expression.Type.IsValueType() && !expression.Type.IsNullableType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
-            return Condition(isNull, then, ToType(@else ?? Default(then.Type), then.Type));
+            var nonNullElse = ToType(@else ?? Default(then.Type), then.Type);
+            if(expression.Type.IsValueType() && !expression.Type.IsNullableType())
+            {
+                return nonNullElse;
+            }
+            return Condition(Equal(expression, Constant(null)), then, nonNullElse);
         }
 
         internal class ConvertingVisitor : ExpressionVisitor
