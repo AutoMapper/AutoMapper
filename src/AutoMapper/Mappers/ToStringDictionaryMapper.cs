@@ -18,8 +18,8 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, propertyMap,
-                    Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, IfNotNull,
-                    typeof(Dictionary<,>), MapKeyPairValueExpr);
+                Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, typeof(Dictionary<,>),
+                MapKeyPairValueExpr);
 
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)
         {

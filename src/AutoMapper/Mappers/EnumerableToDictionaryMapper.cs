@@ -16,6 +16,6 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             =>
             MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression,
-                contextExpression, IfNotNull, typeof(Dictionary<,>), MapItemExpr);
+                contextExpression, typeof(Dictionary<,>), MapItemExpr);
     }
 }

@@ -67,13 +67,11 @@ namespace AutoMapper.Execution
                 var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
                 var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-                var clear = Condition(Property(destinationVariable, "IsReadOnly"),
-                    Empty(), Call(destinationVariable, clearMethod));
+                var clear = Call(destinationVariable, destinationCollectionType.GetDeclaredMethod("Clear"));
+                var isReadOnly = Property(destinationVariable, "IsReadOnly");
                 return Block(new[] {destinationVariable},
-                    Assign(destinationVariable,
-                        ExpressionFactory.ToType(destinationParameter, destinationCollectionType)),
-                    destinationVariable.IfNullElse(Empty(), clear),
+                    Assign(destinationVariable, ExpressionFactory.ToType(destinationParameter, destinationCollectionType)),
+                    Condition(OrElse(Equal(destinationVariable, Constant(null)), isReadOnly), Empty(), clear),
                     destination);
             }
         }

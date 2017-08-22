@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var listType = typeof(List<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
-            var list = MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, Default(listType), contextExpression, _ => Constant(false), typeof(List<>), MapItemExpr);
+            var list = MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, Default(listType), contextExpression, typeof(List<>), MapItemExpr);
             var dest = Variable(listType, "dest");
 
             return Block(new[] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetDeclaredConstructors().First(), dest), Default(destExpression.Type)));

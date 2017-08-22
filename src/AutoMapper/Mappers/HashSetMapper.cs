@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
             => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-            => MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression, IfNotNull, typeof(HashSet<>), MapItemExpr);
+            => MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression, typeof(HashSet<>), MapItemExpr);
 
         private static bool IsSetType(Type type) => type.IsSetType();
     }

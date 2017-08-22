@@ -24,9 +24,7 @@ namespace AutoMapper.Mappers
                 destExpression = Convert(destExpression, listType);
             }
             return MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression,
-                destExpression, contextExpression, IfEditableList, typeof(List<>), MapItemExpr);
+                destExpression, contextExpression, typeof(List<>), MapItemExpr);
         }
-
-        private static Expression IfEditableList(Expression dest) => AndAlso(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
     }
 }
