@@ -243,21 +243,14 @@ namespace AutoMapper.Mappers
                 return newExpression;
             }
 
-            private Type GetSourceType(PropertyMap propertyMap)
-            {
-                if (propertyMap.SourceMember == null)
-                {
-                    return propertyMap.SourceType ??
-                        throw new AutoMapperMappingException(
-                            "Could not determine object source type.", 
-                            null, 
-                            new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType), 
-                            propertyMap.TypeMap, 
-                            propertyMap);
-                }
-
-                return propertyMap.SourceMember.GetMemberType();
-            }
+            private Type GetSourceType(PropertyMap propertyMap) =>
+                propertyMap.SourceType ??
+                throw new AutoMapperMappingException(
+                    "Could not determine source property type. Make sure the property is mapped.", 
+                    null, 
+                    new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType), 
+                    propertyMap.TypeMap, 
+                    propertyMap);
 
             private PropertyMap FindPropertyMapOfExpression(MemberExpression expression)
             {
