@@ -7,10 +7,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Xunit;
 
     public class ExpressionMappingWithUseAsDataSource
     {
-        public void When_Apply_Where_Clause_Over_Queryable_With_UseAsDataSource_Returns_Correct_Result()
+        [Fact]
+        public void When_Apply_Where_Clause_Over_Queryable_As_Data_Source()
         {
             // Arrange
             var mapper = CreateMapper();

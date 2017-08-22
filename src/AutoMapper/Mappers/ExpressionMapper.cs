@@ -247,7 +247,13 @@ namespace AutoMapper.Mappers
             {
                 if (propertyMap.SourceMember == null)
                 {
-                    return propertyMap.SourceType;
+                    return propertyMap.SourceType ??
+                        throw new AutoMapperMappingException(
+                            "Could not determine object source type.", 
+                            null, 
+                            new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType), 
+                            propertyMap.TypeMap, 
+                            propertyMap);
                 }
 
                 return propertyMap.SourceMember.GetMemberType();
