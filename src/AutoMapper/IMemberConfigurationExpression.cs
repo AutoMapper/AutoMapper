@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -23,6 +24,8 @@ namespace AutoMapper
         /// </summary>
         /// <param name="nullSubstitute">Value to use</param>
         void NullSubstitute(object nullSubstitute);
+
+        List<Action<PropertyMap>> PropertyMapActions { get; }
 
         /// <summary>
         /// Resolve destination member using a custom value resolver
@@ -141,36 +144,6 @@ namespace AutoMapper
         /// <typeparam name="TValue">Value type</typeparam>
         /// <param name="value">Value to use</param>
         void UseValue<TValue>(TValue value);
-
-        /// <summary>
-        /// Conditionally map this member against the source, destination, source and destination members
-        /// </summary>
-        /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition);
-
-        /// <summary>
-        /// Conditionally map this member
-        /// </summary>
-        /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition);
-
-        /// <summary>
-        /// Conditionally map this member
-        /// </summary>
-        /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, bool> condition);
-       
-        /// <summary>
-        /// Conditionally map this member
-        /// </summary>
-        /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, bool> condition);
-       
-        /// <summary>
-        /// Conditionally map this member
-        /// </summary>
-        /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, bool> condition);
        
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value

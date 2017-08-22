@@ -13,8 +13,6 @@ namespace AutoMapper.Execution
 
     public static class ExpressionBuilder
     {
-        private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
-            mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
 
         private static readonly MethodInfo ContextMapMethod =
             ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null)).GetGenericMethodDefinition();            
@@ -138,16 +136,5 @@ namespace AutoMapper.Execution
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
         }
-
-        public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
-        {
-            if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
-            {
-                var mapper = Property(context, "Mapper");
-                return IfThen(Property(context, "IsDefault"), Assign(context, Invoke(CreateContext, mapper)));
-            }
-            return null;
-        }
-
     }
 }

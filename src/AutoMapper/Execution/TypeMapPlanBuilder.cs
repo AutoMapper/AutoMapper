@@ -16,15 +16,6 @@ namespace AutoMapper.Execution
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
             () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
 
-        private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo =
-            ctxt => ctxt.IncrementTypeDepth(default(TypePair));
-
-        private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
-            ctxt => ctxt.DecrementTypeDepth(default(TypePair));
-
-        private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
-            ctxt => ctxt.GetTypeDepth(default(TypePair));
-
         private readonly IConfigurationProvider _configurationProvider;
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
@@ -63,7 +54,7 @@ namespace AutoMapper.Execution
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
-            var checkContext = CheckContext(_typeMap, Context);
+            var checkContext = _typeMap.CheckContext(Context);
             var lambaBody = checkContext != null ? new[] {checkContext, mapperFunc} : new[] {mapperFunc};
 
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
@@ -185,20 +176,16 @@ namespace AutoMapper.Execution
             foreach (var beforeMapAction in _typeMap.BeforeMapActions)
                 actions.Insert(0, beforeMapAction.ReplaceParameters(Source, _destination, Context));
             actions.Insert(0, destinationFunc);
-            if (_typeMap.MaxDepth > 0)
-                actions.Insert(0,
-                    Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
+            actions.Insert(0, _typeMap.MaxDepthIncrement(Context));
             actions.AddRange(
                 _typeMap.AfterMapActions.Select(
                     afterMapAction => afterMapAction.ReplaceParameters(Source, _destination, Context)));
 
-            if (_typeMap.MaxDepth > 0)
-                actions.Add(Call(Context, ((MethodCallExpression) DecTypeDepthInfo.Body).Method,
-                    Constant(_typeMap.Types)));
+            actions.Insert(0, _typeMap.MaxDepthDecrement(Context));
 
             actions.Add(_destination);
 
-            return Block(actions);
+            return Block(actions.Where(_ => _ != null));
         }
 
         private Expression HandlePath(PathMap pathMap)
@@ -230,19 +217,8 @@ namespace AutoMapper.Execution
         {
             var mapperFunc = assignmentFunc;
 
-            if (_typeMap.Condition != null)
-                mapperFunc =
-                    Condition(_typeMap.Condition.Body,
-                        mapperFunc, Default(_typeMap.DestinationTypeToUse));
-
-            if (_typeMap.MaxDepth > 0)
-                mapperFunc = Condition(
-                    LessThanOrEqual(
-                        Call(Context, ((MethodCallExpression) GetTypeDepthInfo.Body).Method, Constant(_typeMap.Types)),
-                        Constant(_typeMap.MaxDepth)
-                    ),
-                    mapperFunc,
-                    Default(_typeMap.DestinationTypeToUse));
+            mapperFunc = mapperFunc.ConditionalCheck(_typeMap);
+            mapperFunc = mapperFunc.MaxDepthCheck(_typeMap, Context);
 
             if (_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
                 mapperFunc =
@@ -425,17 +401,7 @@ namespace AutoMapper.Execution
                     mapperExpr = Assign(destMember, ToType(propertyValue, propertyMap.DestinationPropertyType));
             }
 
-            if (propertyMap.Condition != null)
-                mapperExpr = IfThen(
-                    propertyMap.Condition.ConvertReplaceParameters(
-                        Source,
-                        _destination,
-                        ToType(propertyValue, propertyMap.Condition.Parameters[2].Type),
-                        ToType(getter, propertyMap.Condition.Parameters[2].Type),
-                        Context
-                    ),
-                    mapperExpr
-                );
+            mapperExpr = mapperExpr.ConditionalCheck(propertyMap, Source, _destination, propertyValue, getter, Context);
 
             mapperExpr = Block(new[] {setResolvedValue, setPropertyValue, mapperExpr}.Distinct());
 

@@ -144,8 +144,7 @@ namespace AutoMapper.QueryableExtensions
         private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
             var bindings = new List<MemberBinding>();
-            var depth = GetDepth(request, typePairCount);
-            if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
+            if(typeMap.ExceedsMaxDepth(request, typePairCount))
             {
                 if(typeMap.Profile.AllowNullDestinationValues)
                 {
@@ -167,16 +166,6 @@ namespace AutoMapper.QueryableExtensions
                 bindings.ToArray()
                 );
             return expression;
-        }
-
-        private static int GetDepth(ExpressionRequest request, TypePairCount typePairCount)
-        {
-            if (typePairCount.TryGetValue(request, out int visitCount))
-            {
-                visitCount = visitCount + 1;
-            }
-            typePairCount[request] = visitCount;
-            return visitCount;
         }
 
         private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
