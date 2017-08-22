@@ -232,7 +232,7 @@ namespace AutoMapper.Mappers
                 var propertyMap = FindPropertyMapOfExpression(node.Expression as MemberExpression);
                 if (propertyMap == null)
                     return node;
-                var sourceType = propertyMap.SourceMember.GetMemberType();
+                var sourceType = GetSourceType(propertyMap);
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return MakeMemberAccess(baseExpression, node.Member);
@@ -241,6 +241,16 @@ namespace AutoMapper.Mappers
                 var newExpression = subVisitor.Visit(node);
                 _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();
                 return newExpression;
+            }
+
+            private Type GetSourceType(PropertyMap propertyMap)
+            {
+                if (propertyMap.SourceMember == null)
+                {
+                    return propertyMap.SourceType;
+                }
+
+                return propertyMap.SourceMember.GetMemberType();
             }
 
             private PropertyMap FindPropertyMapOfExpression(MemberExpression expression)
