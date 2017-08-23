@@ -248,7 +248,7 @@ namespace AutoMapper.Mappers
                 throw new AutoMapperMappingException(
                     "Could not determine source property type. Make sure the property is mapped.", 
                     null, 
-                    new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType), 
+                    new TypePair(null, propertyMap.DestinationPropertyType), 
                     propertyMap.TypeMap, 
                     propertyMap);
 
