@@ -244,10 +244,8 @@ namespace AutoMapper.Execution
                     mapperFunc,
                     Default(_typeMap.DestinationTypeToUse));
 
-            if (_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
-                mapperFunc =
-                    Condition(Equal(Source, Default(_typeMap.SourceType)),
-                        Default(_typeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(Source));
+            if (_typeMap.Profile.AllowNullDestinationValues)
+                mapperFunc = Source.IfNullElse(Default(_typeMap.DestinationTypeToUse), mapperFunc);
 
             if (_typeMap.PreserveReferences)
             {
@@ -325,7 +323,7 @@ namespace AutoMapper.Execution
         {
             if (ctorParamMap.CustomExpression != null)
                 return ctorParamMap.CustomExpression.ConvertReplaceParameters(Source)
-                    .IfNotNull(ctorParamMap.DestinationType);
+                    .NullCheck(ctorParamMap.DestinationType);
             if (ctorParamMap.CustomValueResolver != null)
                 return ctorParamMap.CustomValueResolver.ConvertReplaceParameters(Source, Context);
             if (ctorParamMap.Parameter.IsOptional)
@@ -333,13 +331,7 @@ namespace AutoMapper.Execution
                 ctorParamMap.DefaultValue = true;
                 return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
             }
-            return ctorParamMap.SourceMembers.Aggregate(
-                    (Expression) Source,
-                    (inner, getter) => getter is MethodInfo
-                        ? Call(getter.IsStatic() ? null : inner, (MethodInfo) getter)
-                        : (Expression) MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
-                )
-                .IfNotNull(ctorParamMap.DestinationType);
+            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);
         }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
@@ -468,7 +460,7 @@ namespace AutoMapper.Execution
             else if (propertyMap.CustomExpression != null)
             {
                 var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(Source)
-                    .IfNotNull(destinationPropertyType);
+                    .NullCheck(destinationPropertyType);
                 var destinationNullable = destinationPropertyType.IsNullableType();
                 var returnType = destinationNullable && destinationPropertyType.GetTypeOfNullable() ==
                                  nullCheckedExpression.Type
@@ -492,15 +484,7 @@ namespace AutoMapper.Execution
                 }
                 else
                 {
-                    valueResolverFunc = propertyMap.SourceMembers.Aggregate(
-                        (Expression) Source,
-                        (inner, getter) => getter is MethodInfo
-                            ? getter.IsStatic()
-                                ? Call(null, (MethodInfo) getter, inner)
-                                : (Expression) Call(inner, (MethodInfo) getter)
-                            : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
-                    );
-                    valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);
+                    valueResolverFunc = Chain(propertyMap.SourceMembers, destinationPropertyType);
                 }
             }
             else if (propertyMap.SourceMember != null)
@@ -529,6 +513,15 @@ namespace AutoMapper.Execution
 
             return valueResolverFunc;
         }
+
+        private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>
+            members
+                .Aggregate(
+                        (Expression) Source,
+                        (inner, getter) => getter is MethodInfo method ? 
+                            (getter.IsStatic() ? Call(null, method, inner) : (Expression) Call(inner, method)) : 
+                            MakeMemberAccess(getter.IsStatic() ? null : inner, getter))
+                .NullCheck(destinationType);
 
         private Expression CreateInstance(Type type)
             => Call(Property(Context, nameof(ResolutionContext.Options)),

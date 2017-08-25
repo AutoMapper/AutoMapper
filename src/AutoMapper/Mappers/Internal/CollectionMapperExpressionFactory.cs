@@ -18,10 +18,9 @@ namespace AutoMapper.Mappers.Internal
             PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
 
-        public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
+        public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
-            var condition = conditionalExpression(passedDestination);
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
 
@@ -33,19 +32,21 @@ namespace AutoMapper.Mappers.Internal
             if (!destinationCollectionType.IsAssignableFrom(destExpression.Type))
                 destinationCollectionType = typeof(IList);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
-            var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
-            var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
 
+            Expression destination, createInstance, assignNewExpression;
+
+            UseDestinationValue();
+
+            var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
             var mapExpr = Block(addItems, destination);
 
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var checkNull =
-                Block(new[] {newExpression, passedDestination},
+                Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
-                    IfThenElse(condition ?? Constant(false),
-                        Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
-                        Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
-                    ToType(mapExpr, passedDestination.Type)
+                    assignNewExpression,
+                    Call(destination, clearMethod),
+                    ToType(mapExpr, createInstance.Type)
                 );
             if (propertyMap != null)
                 return checkNull;
@@ -56,6 +57,23 @@ namespace AutoMapper.Mappers.Internal
             if (checkContext == null)
                 return checkNull;
             return Block(checkContext, checkNull);
+            void UseDestinationValue()
+            {
+                if(propertyMap?.UseDestinationValue == true)
+                {
+                    createInstance = passedDestination;
+                    destination = passedDestination;
+                    assignNewExpression = Empty();
+                }
+                else
+                {
+                    destination = newExpression;
+                    createInstance = passedDestination.Type.NewExpr(ifInterfaceType);
+                    var isReadOnly = Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
+                    assignNewExpression = Assign(newExpression,
+                        Condition(OrElse(Equal(passedDestination, Constant(null)), isReadOnly), ToType(createInstance, passedDestination.Type), passedDestination));
+                }
+            }
         }
 
         private static Expression NewExpr(this Type baseType, Type ifInterfaceType)
@@ -65,7 +83,7 @@ namespace AutoMapper.Mappers.Internal
                     ifInterfaceType.MakeGenericType(ElementTypeHelper.GetElementTypes(baseType,
                         ElementTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
-            return ToType(newExpr, baseType);
+            return newExpr;
         }
 
         public static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
@@ -100,7 +118,5 @@ namespace AutoMapper.Mappers.Internal
             var keyPair = New(destElementType.GetDeclaredConstructors().First(), keyExpr, valueExpr);
             return keyPair;
         }
-
-        public static BinaryExpression IfNotNull(Expression destExpression) => NotEqual(destExpression, Constant(null));
     }
 }

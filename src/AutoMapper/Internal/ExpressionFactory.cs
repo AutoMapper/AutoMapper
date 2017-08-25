@@ -32,29 +32,29 @@ namespace AutoMapper.Internal
         {
             if(collection.Type.IsArray)
             {
-                return ForEachArrayItem(collection, arrayItem => Expression.Block(new[] { loopVar }, Expression.Assign(loopVar, arrayItem), loopContent));
+                return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
             var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
-            var enumeratorVar = Expression.Variable(enumeratorType, "enumerator");
-            var enumeratorAssign = Expression.Assign(enumeratorVar, getEnumeratorCall);
+            var enumeratorVar = Variable(enumeratorType, "enumerator");
+            var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
             var moveNextCall = Call(enumeratorVar, moveNext);
 
-            var breakLabel = Expression.Label("LoopBreak");
+            var breakLabel = Label("LoopBreak");
 
-            var loop = Expression.Block(new[] { enumeratorVar },
+            var loop = Block(new[] { enumeratorVar },
                 enumeratorAssign,
-                Expression.Loop(
-                    Expression.IfThenElse(
-                        Expression.Equal(moveNextCall, Expression.Constant(true)),
-                        Expression.Block(new[] { loopVar },
-                            Expression.Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
+                Loop(
+                    IfThenElse(
+                        Equal(moveNextCall, Constant(true)),
+                        Block(new[] { loopVar },
+                            Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
                             loopContent
                         ),
-                        Expression.Break(breakLabel)
+                        Break(breakLabel)
                     ),
                 breakLabel)
             );
@@ -65,41 +65,30 @@ namespace AutoMapper.Internal
         public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
         {
             var length = Property(array, "Length");
-            return For(length, index => body(Expression.ArrayAccess(array, index)));
+            return For(length, index => body(ArrayAccess(array, index)));
         }
 
         public static Expression For(Expression count, Func<Expression, Expression> body)
         {
-            var breakLabel = Expression.Label("LoopBreak");
-            var index = Expression.Variable(typeof(int), "sourceArrayIndex");
-            var initialize = Expression.Assign(index, Expression.Constant(0, typeof(int)));
-            var loop = Expression.Block(new[] { index },
+            var breakLabel = Label("LoopBreak");
+            var index = Variable(typeof(int), "sourceArrayIndex");
+            var initialize = Assign(index, Constant(0, typeof(int)));
+            var loop = Block(new[] { index },
                 initialize,
-                Expression.Loop(
-                    Expression.IfThenElse(
-                        Expression.LessThan(index, count),
-                        Expression.Block(body(index), Expression.PostIncrementAssign(index)),
-                        Expression.Break(breakLabel)
+                Loop(
+                    IfThenElse(
+                        LessThan(index, count),
+                        Block(body(index), PostIncrementAssign(index)),
+                        Break(breakLabel)
                     ),
                 breakLabel)
             );
             return loop;
         }
 
-        public static Expression ToObject(Expression expression) => 
-            expression.Type == typeof(object) 
-                ? expression 
-                : Expression.Convert(expression, typeof(object));
+        public static Expression ToObject(Expression expression) => ToType(expression, typeof(object));
 
-        public static Expression ToType(Expression expression, Type type) => 
-            expression.Type == type 
-                ? expression 
-            : Expression.Convert(expression, type);
-
-        public static Expression ConsoleWriteLine(string value, params Expression[] values) =>
-            Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
-                Expression.Constant(value),
-                Expression.NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
+        public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
 
         public static Expression ReplaceParameters(LambdaExpression exp, params Expression[] replace)
         {
@@ -121,72 +110,52 @@ namespace AutoMapper.Internal
 
         public static LambdaExpression Concat(LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression IfNotNull(Expression expression, Type destinationType)
+        public static Expression NullCheck(Expression expression, Type destinationType)
         {
-            var node = expression;
-            var isMemberAccess = node.NodeType == ExpressionType.MemberAccess || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0);
-            while (isMemberAccess)
+            var target = expression;
+            Expression nullConditions = Constant(false);
+            do
             {
-                node = (node as MemberExpression)?.Expression 
-                    ?? (node as MethodCallExpression)?.Object;
-                isMemberAccess =
-                    (node != null) && (
-                    node.NodeType == ExpressionType.MemberAccess 
-                    || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0));
+                if(target is MemberExpression member)
+                {
+                    target = member.Expression;
+                    NullCheck();
+                }
+                else if(target is MethodCallExpression method)
+                {
+                    target = method.Method.IsStatic() ? method.Arguments.FirstOrDefault() : method.Object;
+                    NullCheck();
+                }
+                else if(target?.NodeType == ExpressionType.Parameter)
+                {
+                    var returnType = Nullable.GetUnderlyingType(destinationType) == expression.Type ? destinationType : expression.Type;
+                    var nullCheck = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
+                    return nullCheck;
+                }
+                else
+                {
+                    return expression;
+                }
             }
-            if(node != null && node.NodeType == ExpressionType.Parameter)
+            while(true);
+            void NullCheck()
             {
-                return new IfNotNullVisitor().VisitRoot(expression, destinationType);
+                if(target == null || target.Type.IsValueType())
+                {
+                    return;
+                }
+                nullConditions = OrElse(Equal(target, Constant(null, target.Type)), nullConditions);
             }
-            return expression;
         }
-
-        public static Expression RemoveIfNotNull(Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
         {
-            var isNull = expression.Type.IsValueType() && !expression.Type.IsNullableType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
-            return Condition(isNull, then, ToType(@else ?? Default(then.Type), then.Type));
-        }
-
-        internal class IfNotNullVisitor : ExpressionVisitor
-        {
-            private Expression _nullConditions = Expression.Constant(false);
-
-            public Expression VisitRoot(Expression node, Type destinationType)
+            var nonNullElse = ToType(@else ?? Default(then.Type), then.Type);
+            if(expression.Type.IsValueType() && !expression.Type.IsNullableType())
             {
-                var returnType = Nullable.GetUnderlyingType(destinationType) == node.Type ? destinationType : node.Type;
-                var expression = Visit(node);
-                var checkNull = Expression.Condition(_nullConditions, Expression.Default(returnType), ToType(expression, returnType));
-                return checkNull;
+                return nonNullElse;
             }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                var returnNode = base.VisitMember(node);
-                if(node.Expression == null || node.Expression.Type.IsValueType())
-                {
-                    return returnNode;
-                }
-                _nullConditions = Expression.OrElse(_nullConditions, Expression.Equal(node.Expression, Expression.Constant(null, node.Expression.Type)));
-                return returnNode;
-            }
-        }
-
-        internal class RemoveIfNotNullVisitor : ExpressionVisitor
-        {
-            private readonly Expression[] _expressions;
-
-            public RemoveIfNotNullVisitor(params Expression[] expressions) => _expressions = expressions;
-
-            protected override Expression VisitConditional(ConditionalExpression node)
-            {
-                var member = node.IfFalse as MemberExpression;
-                var binary = node.Test as BinaryExpression;
-                if(member == null || binary == null || !_expressions.Contains(binary.Left) || !(binary.Right is DefaultExpression))
-                    return base.VisitConditional(node);
-                return node.IfFalse;
-            }
+            return Condition(Equal(expression, Constant(null)), then, nonNullElse);
         }
 
         internal class ConvertingVisitor : ExpressionVisitor
@@ -204,7 +173,7 @@ namespace AutoMapper.Internal
             {
                 if (node.Expression == _oldParam)
                 {
-                    node = Expression.MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member);
+                    node = MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member);
                 }
 
                 return base.VisitMember(node);
@@ -260,14 +229,14 @@ namespace AutoMapper.Internal
                 {
                     var expression = node;
                     if (node.Type == typeof(object))
-                        expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
+                        expression = Convert(node, _overrideExpression.Parameters[0].Type);
 
                     return ReplaceParameters(_overrideExpression, expression);
                 }
                 return base.Visit(node);
             }
 
-            protected override Expression VisitLambda<T>(Expression<T> node) => Expression.Lambda(Visit(node.Body), node.Parameters);
+            protected override Expression VisitLambda<T>(Expression<T> node) => Lambda(Visit(node.Body), node.Parameters);
         }
     }
 }
