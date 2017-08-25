@@ -20,6 +20,10 @@ namespace AutoMapper.Execution
             return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
         }
 
+        internal static Expression CreateInstance(this Type type, Expression Context)
+            => Call(Property(Context, nameof(ResolutionContext.Options)),
+                nameof(IMappingOperationOptions.CreateInstance), new[] { type });
+
         public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration) =>
             configuration.AllowNullDestinationValues
                 ? GenerateConstructorExpression(type)
