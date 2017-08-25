@@ -26,12 +26,6 @@ namespace AutoMapper.QueryableExtensions
 
     public class ExpressionBuilder : IExpressionBuilder
     {
-        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
-        {
-            new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter()
-        };
-
         private static readonly IExpressionBinder[] Binders =
         {
             new CustomProjectionExpressionBinder(),
@@ -235,13 +229,8 @@ namespace AutoMapper.QueryableExtensions
         private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
             Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
-            var result = new ExpressionResolutionResult(instanceParameter, currentType);
-
-            var matchingExpressionConverter =
-                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
-            result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps) 
-                ?? throw new Exception("Can't resolve this to Queryable Expression");
-
+            var result = instanceParameter.ResolveExpression(currentType, propertyMap, letPropertyMaps);
+            
             if(propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
                 var currentChild = result.ResolutionExpression;

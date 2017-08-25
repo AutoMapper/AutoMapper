@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
-using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 using static AutoMapper.Execution.ExpressionBuilder;
 
@@ -69,14 +68,19 @@ namespace AutoMapper
 
             return mappingExpression;
         }
+
+        public static bool ConstructorParameterMatches(this TypeMap typeMap, string destinationPropertyName)
+        {
+            return typeMap.ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+        }
     }
 }
 
-namespace AutoMapper.Map.ConstructorMap
+namespace AutoMapper.MapPlan.ConstructorMap
 {
     internal static class Extensions
     {
-        internal static Expression CreateNewDestinationExpression(this global::AutoMapper.ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
+        internal static Expression CreateNewDestinationExpression(this AutoMapper.ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
         {
             if (!constructorMap.CanResolve)
                 return null;
@@ -137,17 +141,13 @@ namespace AutoMapper.QueryableExtensions.ConstructorMap
 
         internal static LambdaExpression DestinationConstructorExpression(this TypeMap typeMap, Expression instanceParameter)
         {
-            return typeMap.ConstructExpression ?? Lambda(typeMap.NewExpression(instanceParameter));
+            return typeMap.ConstructExpression ??
+                   Lambda(typeMap.ConstructorMap?.CanResolve == true
+                       ? typeMap.ConstructorMap.NewExpression(instanceParameter)
+                       : New(typeMap.DestinationTypeToUse));
         }
 
-        private static Expression NewExpression(this TypeMap typeMap, Expression instanceParameter)
-        {
-            return typeMap.ConstructorMap?.CanResolve == true
-                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
-                : New(typeMap.DestinationTypeToUse);
-        }
-
-        private static Expression NewExpression(this global::AutoMapper.ConstructorMap constructorMap, Expression instanceParameter)
+        private static Expression NewExpression(this AutoMapper.ConstructorMap constructorMap, Expression instanceParameter)
         {
             var parameters = constructorMap.CtorParams.Select(map =>
             {
@@ -163,5 +163,74 @@ namespace AutoMapper.QueryableExtensions.ConstructorMap
             });
             return New(constructorMap.Ctor, parameters.Select(p => p.ResolutionExpression));
         }
+
+        internal static ExpressionResolutionResult ResolveExpression(this Expression instanceParameter, Type currentType, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps)
+        {
+            var result = new ExpressionResolutionResult(instanceParameter, currentType);
+            var matchingExpressionConverter =
+                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+
+            return matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps)
+                     ?? throw new Exception("Can't resolve this to Queryable Expression");
+        }
+    }
+
+    internal class MemberResolverExpressionResultConverter : IExpressionResultConverter
+    {
+        public ExpressionResolutionResult GetExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps)
+        {
+            Expression subQueryMarker;
+            if ((subQueryMarker = letPropertyMaps.GetSubQueryMarker()) != null)
+            {
+                return new ExpressionResolutionResult(subQueryMarker, subQueryMarker.Type);
+            }
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
+        }
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, LambdaExpression lambdaExpression)
+        {
+            var currentChild = lambdaExpression.ReplaceParameters(expressionResolutionResult.ResolutionExpression);
+            var currentChildType = currentChild.Type;
+
+            return new ExpressionResolutionResult(currentChild, currentChildType);
+        }
+
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap) => ExpressionResolutionResult(expressionResolutionResult, null);
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            PropertyMap propertyMap) => propertyMap.CustomExpression != null;
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap) => false;
+    }
+
+    internal class MemberGetterExpressionResultConverter : IExpressionResultConverter
+    {
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps)
+            => ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
+
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap)
+            => ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, IEnumerable<MemberInfo> sourceMembers)
+            => sourceMembers.Aggregate(expressionResolutionResult, ExpressionResolutionResult);
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
+        {
+            var member = Expression.MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
+            return new ExpressionResolutionResult(member, member.Type);
+        }
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
+            => propertyMap.SourceMembers.Any();
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
+            => propertyMap.SourceMembers.Any();
     }
 }
