@@ -10,12 +10,6 @@ namespace AutoMapper
     public interface IMappingExpression
     {
         /// <summary>
-        /// Preserve object identity. Useful for circular references.
-        /// </summary>
-        /// <returns></returns>
-        IMappingExpression PreserveReferences();
-
-        /// <summary>
         /// Customize configuration for individual constructor parameter
         /// </summary>
         /// <param name="ctorParamName">Constructor parameter name</param>
@@ -174,6 +168,8 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression AfterMap<TMappingAction>()
             where TMappingAction : IMappingAction<object, object>;
+
+        List<Action<TypeMap>> TypeMapActions { get; }
     }
 
     /// <summary>
@@ -191,13 +187,7 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination>> memberOptions);
-
-        /// <summary>
-        /// Preserve object identity. Useful for circular references.
-        /// </summary>
-        /// <returns></returns>
-        IMappingExpression<TSource, TDestination> PreserveReferences();
-
+        
         /// <summary>
         /// Customize configuration for members not previously configured
         /// </summary>

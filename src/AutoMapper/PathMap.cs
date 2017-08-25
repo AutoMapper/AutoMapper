@@ -31,12 +31,12 @@ namespace AutoMapper
 
     public static class PathMapExtension
     {
-        internal static Expression HandlePath(this TypeMapPlanBuilder planBuilder, PathMap pathMap)
+        internal static Expression HandlePath(this PathMap pathMap, TypeMapPlanBuilder planBuilder)
         {
             var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(planBuilder.Destination))
                 .Expression;
             var createInnerObjects = CreateInnerObjects(destination);
-            var setFinalValue = planBuilder.CreatePropertyMapFunc(new PropertyMap(pathMap));
+            var setFinalValue = new PropertyMap(pathMap).CreatePropertyMapFunc(planBuilder);
             return Block(createInnerObjects, setFinalValue);
         }
 

@@ -161,7 +161,28 @@ namespace AutoMapper
 
     public static class PropertyMapExtension
     {
-        internal static Expression CreatePropertyMapFunc(this TypeMapPlanBuilder planBuilder, PropertyMap propertyMap)
+        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
+            () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
+
+        internal static Expression TryCatchPropertyMap(this PropertyMap propertyMap, TypeMapPlanBuilder planBuilder)
+        {
+            var pmExpression = propertyMap.CreatePropertyMapFunc(planBuilder);
+
+            if (pmExpression == null)
+                return null;
+
+            var exception = Parameter(typeof(Exception), "ex");
+
+            var mappingExceptionCtor = ((NewExpression)CtorExpression.Body).Constructor;
+
+            return TryCatch(Block(typeof(void), pmExpression),
+                MakeCatchBlock(typeof(Exception), exception,
+                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
+                        Constant(propertyMap.TypeMap.Types), Constant(propertyMap.TypeMap), Constant(propertyMap))),
+                    null));
+        }
+
+        internal static Expression CreatePropertyMapFunc(this PropertyMap propertyMap, TypeMapPlanBuilder planBuilder)
         {
             var destMember = MakeMemberAccess(planBuilder.Destination, propertyMap.DestinationProperty);
 

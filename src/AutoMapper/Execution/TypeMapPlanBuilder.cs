@@ -5,16 +5,12 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Configuration;
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
-    using System.Diagnostics;
 
     public class TypeMapPlanBuilder
     {
-        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
-            () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
         
         public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMap typeMap)
         {   
@@ -44,7 +40,7 @@ namespace AutoMapper.Execution
                 return Lambda(customExpression.ReplaceParameters(Source, InitialDestination, Context), Source,
                     InitialDestination, Context);
 
-            CheckForCycles(typeMapsPath);
+            this.CheckForCycles(typeMapsPath);
 
             var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
 
@@ -57,53 +53,7 @@ namespace AutoMapper.Execution
 
             return Lambda(Block(new[] {Destination}, lambaBody), Source, InitialDestination, Context);
         }
-
-        private void CheckForCycles(Stack<TypeMap> typeMapsPath)
-        {
-            if(TypeMap.PreserveReferences)
-            {
-                return;
-            }
-            if(typeMapsPath == null)
-            {
-                typeMapsPath = new Stack<TypeMap>();
-            }
-            typeMapsPath.Push(TypeMap);
-            var propertyTypeMaps =
-                (from propertyTypeMap in
-                (from pm in TypeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
-                where propertyTypeMap != null && !propertyTypeMap.PreserveReferences
-                select propertyTypeMap).Distinct();
-            foreach (var propertyTypeMap in propertyTypeMaps)
-            {
-                if(typeMapsPath.Contains(propertyTypeMap))
-                {
-                    Debug.WriteLine($"Setting PreserveReferences: {TypeMap.SourceType} - {TypeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
-                    propertyTypeMap.PreserveReferences = true;
-                }
-                else
-                {
-                    propertyTypeMap.Seal(ConfigurationProvider, typeMapsPath);
-                }
-            }
-            typeMapsPath.Pop();
-        }
-
-        private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
-        {
-            if(propertyMap.SourceType == null)
-            {
-                return null;
-            }
-            var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
-            var typeMap = ConfigurationProvider.ResolveTypeMap(types);
-            if(typeMap == null && ConfigurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
-            {
-                typeMap = ConfigurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
-            }
-            return typeMap;
-        }
-
+        
         private LambdaExpression TypeConverterMapper()
         {
             if (TypeMap.TypeConverterType == null)
@@ -142,16 +92,7 @@ namespace AutoMapper.Execution
 
             Expression destinationFunc = Assign(Destination, getDest);
 
-            if (TypeMap.PreserveReferences)
-            {
-                var dest = Variable(typeof(object), "dest");
-                var setValue = Context.Type.GetDeclaredMethod("CacheDestination");
-                var set = Call(Context, setValue, Source, Constant(Destination.Type), Destination);
-                var setCache = IfThen(NotEqual(Source, Constant(null)), set);
-
-                destinationFunc = Block(new[] {dest}, Assign(dest, destinationFunc), setCache, dest);
-            }
-            return destinationFunc;
+            return destinationFunc.GetCache(this);
         }
 
         private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
@@ -159,13 +100,13 @@ namespace AutoMapper.Execution
             var actions = new List<Expression>();
             foreach (var propertyMap in TypeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
-                var property = TryPropertyMap(propertyMap);
+                var property = propertyMap.TryCatchPropertyMap(this);
                 if (constructorMapping && TypeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
                     property = IfThen(NotEqual(InitialDestination, Constant(null)), property);
                 actions.Add(property);
             }
             foreach (var pathMap in TypeMap.PathMaps.Where(pm => !pm.Ignored))
-                actions.Add(HandlePath(pathMap));
+                actions.Add(pathMap.HandlePath(this));
             foreach (var beforeMapAction in TypeMap.BeforeMapActions)
                 actions.Insert(0, beforeMapAction.ReplaceParameters(Source, Destination, Context));
             actions.Insert(0, destinationFunc);
@@ -180,16 +121,7 @@ namespace AutoMapper.Execution
 
             return Block(actions.Where(_ => _ != null));
         }
-
-        private Expression HandlePath(PathMap pathMap)
-        {
-            var destination = ((MemberExpression) pathMap.DestinationExpression.ConvertReplaceParameters(Destination))
-                .Expression;
-            var createInnerObjects = destination.CreateInnerObjects();
-            var setFinalValue = this.CreatePropertyMapFunc(new PropertyMap(pathMap));
-            return Block(createInnerObjects, setFinalValue);
-        }
-
+        
         private Expression CreateMapperFunc(Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
@@ -201,22 +133,7 @@ namespace AutoMapper.Execution
                 mapperFunc =
                     Condition(Equal(Source, Default(TypeMap.SourceType)),
                         Default(TypeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(Source));
-
-            if (TypeMap.PreserveReferences)
-            {
-                var cache = Variable(TypeMap.DestinationTypeToUse, "cachedDestination");
-                var getDestination = Context.Type.GetDeclaredMethod("GetDestination");
-                var assignCache =
-                    Assign(cache,
-                        ToType(Call(Context, getDestination, Source, Constant(Destination.Type)), Destination.Type));
-                var condition = Condition(
-                    AndAlso(NotEqual(Source, Constant(null)), NotEqual(assignCache, Constant(null))),
-                    cache,
-                    mapperFunc);
-
-                mapperFunc = Block(new[] {cache}, condition);
-            }
-            return mapperFunc;
+            return mapperFunc.AssignCache(this);
         }
 
         private Expression CreateNewDestinationFunc(out bool constructorMapping)
@@ -295,23 +212,7 @@ namespace AutoMapper.Execution
                 .IfNotNull(ctorParamMap.DestinationType);
         }
 
-        private Expression TryPropertyMap(PropertyMap propertyMap)
-        {
-            var pmExpression = this.CreatePropertyMapFunc(propertyMap);
-
-            if (pmExpression == null)
-                return null;
-
-            var exception = Parameter(typeof(Exception), "ex");
-
-            var mappingExceptionCtor = ((NewExpression) CtorExpression.Body).Constructor;
-
-            return TryCatch(Block(typeof(void), pmExpression),
-                MakeCatchBlock(typeof(Exception), exception,
-                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
-                        Constant(propertyMap.TypeMap.Types), Constant(propertyMap.TypeMap), Constant(propertyMap))),
-                    null));
-        }
+        
 
 
         

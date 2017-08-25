@@ -80,9 +80,7 @@ namespace AutoMapper.Configuration
         
         public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions) 
             => (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
-
-        public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
-
+        
         protected override IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
@@ -154,13 +152,6 @@ namespace AutoMapper.Configuration
         public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
         public List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
-
-        public IMappingExpression<TSource, TDestination> PreserveReferences()
-        {
-            TypeMapActions.Add(tm => tm.PreserveReferences = true);
-
-            return this;
-        }
 
         protected virtual IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType) 
             => new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
