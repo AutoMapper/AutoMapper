@@ -205,7 +205,7 @@ namespace AutoMapper
         /// </summary>
         /// <typeparam name="TValue">Value type to match and transform</typeparam>
         /// <param name="transformer">Transformation expression</param>
-        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
+        void AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 
     /// <summary>

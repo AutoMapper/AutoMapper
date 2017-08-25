@@ -77,6 +77,7 @@ namespace AutoMapper
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
 
+        public IList<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public void DisableConstructorMapping()
         {
@@ -186,9 +187,6 @@ namespace AutoMapper
 
         public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
         {
-            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
-
-            _valueTransformerConfigs.Add(config);
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

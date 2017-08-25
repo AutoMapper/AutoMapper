@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
@@ -155,10 +156,8 @@ namespace AutoMapper
         void IncludeSourceExtensionMethods(Type type);
 
         /// <summary>
-        /// Apply a transformation function after any resolved destination member value with the given type
+        /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
         /// </summary>
-        /// <typeparam name="TValue">Value type to match and transform</typeparam>
-        /// <param name="transformer">Transformation expression</param>
-        void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
+        IList<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }

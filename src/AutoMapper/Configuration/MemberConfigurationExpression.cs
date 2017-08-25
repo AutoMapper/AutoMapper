@@ -233,7 +233,7 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
+        public void AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
         {
             PropertyMapActions.Add(pm =>
             {

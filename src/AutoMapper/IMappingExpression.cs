@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace AutoMapper
@@ -181,6 +182,9 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression AfterMap<TMappingAction>()
             where TMappingAction : IMappingAction<object, object>;
+
+        IList<ValueTransformerConfiguration> ValueTransformers { get; }
+
     }
 
     /// <summary>
@@ -440,12 +444,14 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> DisableCtorValidation();
 
+        IList<ValueTransformerConfiguration> ValueTransformers { get; }
+
         /// <summary>
         /// Apply a transformation function after any resolved destination member value with the given type
         /// </summary>
         /// <typeparam name="TValue">Value type to match and transform</typeparam>
         /// <param name="transformer">Transformation expression</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
+        IMappingExpression<TSource, TDestination> AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
     }
 }

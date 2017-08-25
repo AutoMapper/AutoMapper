@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
-                cfg.ApplyTransform<string>(dest => dest + " is straight up dope");
+                cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
             });
 
             [Fact]
@@ -51,8 +51,8 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
-                cfg.ApplyTransform<string>(dest => dest + " is straight up dope");
-                cfg.ApplyTransform<string>(dest => dest + "! No joke!");
+                cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
+                cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
             });
 
             [Fact]
@@ -83,8 +83,8 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
-                cfg.ApplyTransform<string>(dest => dest + " is straight up dope");
-                cfg.CreateProfile("Other", p => p.ApplyTransform<string>(dest => dest + "! No joke!"));
+                cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
+                cfg.CreateProfile("Other", p => p.ValueTransformers.Add<string>(dest => dest + "! No joke!"));
             });
 
             [Fact]
@@ -114,11 +114,11 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.ApplyTransform<string>(dest => dest + "! No joke!");
+                cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>();
-                    p.ApplyTransform<string>(dest => dest + " is straight up dope");
+                    p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
             });
 
@@ -149,11 +149,11 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.ApplyTransform<int>(dest => dest * 2);
+                cfg.ValueTransformers.Add<int>(dest => dest * 2);
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>();
-                    p.ApplyTransform<int>(dest => dest + 3);
+                    p.ValueTransformers.Add<int>(dest => dest + 3);
                 });
             });
 
@@ -184,12 +184,12 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.ApplyTransform<string>(dest => dest + "! No joke!");
+                cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>()
-                     .ApplyTransform<string>(dest => dest + ", for real,");
-                    p.ApplyTransform<string>(dest => dest + " is straight up dope");
+                     .ValueTransformers.Add<string>(dest => dest + ", for real,");
+                    p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
             });
 
@@ -220,13 +220,13 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.ApplyTransform<string>(dest => dest + "! No joke!");
+                cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
                     p.CreateMap<Source, Dest>()
-                     .ApplyTransform<string>(dest => dest + ", for real,")
-                     .ForMember(d => d.Value, opt => opt.ApplyTransform<string>(d => d + ", seriously"));
-                    p.ApplyTransform<string>(dest => dest + " is straight up dope");
+                     .AddTransform<string>(dest => dest + ", for real,")
+                     .ForMember(d => d.Value, opt => opt.AddTransform<string>(d => d + ", seriously"));
+                    p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
             });
 

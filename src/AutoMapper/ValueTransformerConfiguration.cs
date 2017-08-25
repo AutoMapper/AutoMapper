@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace AutoMapper
@@ -17,6 +18,23 @@ namespace AutoMapper
         public bool IsMatch(PropertyMap propertyMap)
         {
             return ValueType.IsAssignableFrom(propertyMap.DestinationPropertyType);
+        }
+    }
+
+    public static class ValueTransformerConfigurationExtensions
+    {
+        /// <summary>
+        /// Apply a transformation function after any resolved destination member value with the given type
+        /// </summary>
+        /// <typeparam name="TValue">Value type to match and transform</typeparam>
+        /// <param name="valueTransformers">Value transformer list</param>
+        /// <param name="transformer">Transformation expression</param>
+        public static void Add<TValue>(this IList<ValueTransformerConfiguration> valueTransformers,
+            Expression<Func<TValue, TValue>> transformer)
+        {
+            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
+
+            valueTransformers.Add(config);
         }
     }
 }
