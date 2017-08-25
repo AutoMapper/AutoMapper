@@ -6,9 +6,9 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Configuration;
-    using AutoMapper.Internal;
-    using AutoMapper.Mappers.Internal;
+    using Configuration;
+    using Internal;
+    using Mappers.Internal;
     using static System.Linq.Expressions.Expression;
 
     public static class ExpressionBuilder
@@ -22,7 +22,7 @@ namespace AutoMapper.Execution
             TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
-            AutoMapper.PropertyMap propertyMap = null, Expression destinationParameter = null)
+            PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
             if (destinationParameter == null)
                 destinationParameter = Default(typePair.DestinationType);

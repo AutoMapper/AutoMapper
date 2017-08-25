@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using static System.Linq.Expressions.Expression;
-using static AutoMapper.Internal.ExpressionFactory;
 
 namespace AutoMapper
 {
@@ -91,6 +89,9 @@ namespace AutoMapper
 
 namespace AutoMapper.Execution
 {
+    using static Expression;
+    using static Internal.ExpressionFactory;
+
     internal static class ConditionExtensions
     {
         internal static Expression ConditionalCheck(this Expression mapperExpr, AutoMapper.PropertyMap propertyMap, Expression source, Expression destination, Expression propertyValue, Expression getter, Expression context)
@@ -108,7 +109,7 @@ namespace AutoMapper.Execution
         internal static Expression ConditionalCheck(this Expression mapperFunc, TypeMap typeMap)
         {
             return typeMap.Condition != null
-                ? Expression.Condition(typeMap.Condition.Body, mapperFunc, Default(typeMap.DestinationTypeToUse))
+                ? Condition(typeMap.Condition.Body, mapperFunc, Default(typeMap.DestinationTypeToUse))
                 : mapperFunc;
         }
     }
