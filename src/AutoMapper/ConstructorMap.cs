@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Execution;
 using static System.Linq.Expressions.Expression;
 using static AutoMapper.Execution.ExpressionBuilder;
 
@@ -31,7 +30,7 @@ namespace AutoMapper
         }
     }
     
-    public static class Extensions
+    public static class ConstructorMapExtensions
     {
         /// <summary>
         /// Supply a custom instantiation expression for the destination type for LINQ projection
@@ -76,11 +75,11 @@ namespace AutoMapper
     }
 }
 
-namespace AutoMapper.MapPlan.ConstructorMap
+namespace AutoMapper.Execution
 {
-    internal static class Extensions
+    internal static class ConstructorMapExtensions
     {
-        internal static Expression CreateNewDestinationExpression(this AutoMapper.ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
+        internal static Expression CreateNewDestinationExpression(this ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
         {
             if (!constructorMap.CanResolve)
                 return null;
@@ -129,9 +128,9 @@ namespace AutoMapper.MapPlan.ConstructorMap
     }
 }
 
-namespace AutoMapper.QueryableExtensions.ConstructorMap
+namespace AutoMapper.QueryableExtensions
 {
-    internal static class Extensions
+    internal static class ConstructorMapExtensions
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
@@ -147,7 +146,7 @@ namespace AutoMapper.QueryableExtensions.ConstructorMap
                        : New(typeMap.DestinationTypeToUse));
         }
 
-        private static Expression NewExpression(this AutoMapper.ConstructorMap constructorMap, Expression instanceParameter)
+        private static Expression NewExpression(this ConstructorMap constructorMap, Expression instanceParameter)
         {
             var parameters = constructorMap.CtorParams.Select(map =>
             {
@@ -223,7 +222,7 @@ namespace AutoMapper.QueryableExtensions.ConstructorMap
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
         {
-            var member = Expression.MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
+            var member = MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
             return new ExpressionResolutionResult(member, member.Type);
         }
 

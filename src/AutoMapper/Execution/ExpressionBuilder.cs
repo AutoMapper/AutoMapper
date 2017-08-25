@@ -22,7 +22,7 @@ namespace AutoMapper.Execution
             TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
-            PropertyMap propertyMap = null, Expression destinationParameter = null)
+            AutoMapper.PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
             if (destinationParameter == null)
                 destinationParameter = Default(typePair.DestinationType);

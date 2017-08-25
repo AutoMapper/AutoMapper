@@ -7,7 +7,6 @@ using static AutoMapper.Internal.ExpressionFactory;
 using static AutoMapper.Execution.ExpressionBuilder;
 using System.Reflection;
 using AutoMapper.Configuration;
-using AutoMapper.Execution;
 
 #if NET40
 using System.Collections.ObjectModel;
@@ -15,8 +14,6 @@ using System.Collections.ObjectModel;
 
 namespace AutoMapper
 {
-    using static Expression;
-
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
@@ -103,7 +100,7 @@ namespace AutoMapper
                     return CustomExpression.ReturnType;
                 if (CustomResolver != null)
                     return CustomResolver.ReturnType;
-                if(ValueResolverConfig != null)
+                if (ValueResolverConfig != null)
                     return typeof(object);
                 return SourceMember?.GetMemberType();
             }
@@ -119,7 +116,7 @@ namespace AutoMapper
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            if(inheritedMappedProperty.Ignored && !ResolveConfigured())
+            if (inheritedMappedProperty.Ignored && !ResolveConfigured())
             {
                 Ignored = true;
             }
@@ -138,7 +135,8 @@ namespace AutoMapper
 
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
-        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || CustomSourceMemberName != null;
+        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null ||
+                                           CustomExpression != null || CustomSourceMemberName != null;
 
         public void MapFrom(LambdaExpression sourceMember)
         {
@@ -158,8 +156,13 @@ namespace AutoMapper
             }
         }
     }
+}
 
-    public static class PropertyMapExtension
+namespace AutoMapper.Execution
+{
+    using static Expression;
+
+    internal static class PropertyMapExtension
     {
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
             () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
@@ -309,7 +312,7 @@ namespace AutoMapper
                         (inner, getter) => getter is MethodInfo
                             ? getter.IsStatic()
                                 ? Call(null, (MethodInfo)getter, inner)
-                                : (Expression)Expression.Call(inner, (MethodInfo)getter)
+                                : (Expression)Call(inner, (MethodInfo)getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                     );
                     valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);

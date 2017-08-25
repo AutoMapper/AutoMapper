@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Execution;
-using AutoMapper.QueryableExtensions;
 using static System.Linq.Expressions.Expression;
 using static AutoMapper.Internal.ExpressionFactory;
 
@@ -50,7 +48,13 @@ namespace AutoMapper
 
             return self;
         }
+    }
+}
 
+namespace AutoMapper.Execution
+{
+    internal static class MaxDepthExtensions
+    {
         private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
             ctxt => ctxt.GetTypeDepth(default(TypePair));
 
@@ -100,7 +104,7 @@ namespace AutoMapper
             typeMapsPath.Pop();
         }
 
-        private static TypeMap ResolvePropertyTypeMap(this TypeMapPlanBuilder planBuilder, PropertyMap propertyMap)
+        private static TypeMap ResolvePropertyTypeMap(this TypeMapPlanBuilder planBuilder, AutoMapper.PropertyMap propertyMap)
         {
             if (propertyMap.SourceType == null)
             {
@@ -136,7 +140,7 @@ namespace AutoMapper
             var assignCache =
                 Assign(cache,
                     ToType(Call(planBuilder.Context, GetDestinationMethodInfo, planBuilder.Source, Constant(planBuilder.Destination.Type)), planBuilder.Destination.Type));
-            var condition = Condition(
+            var condition = Expression.Condition(
                 AndAlso(NotEqual(planBuilder.Source, Constant(null)), NotEqual(assignCache, Constant(null))),
                 cache,
                 expression);
@@ -147,30 +151,30 @@ namespace AutoMapper
         internal static Expression MaxDepthCheck(this Expression mapperFunc, TypeMap typeMap, Expression context)
         {
             return typeMap.MaxDepth > 0
-                ? Condition(
+                ? Expression.Condition(
                     LessThanOrEqual(
-                        Call(context, ((MethodCallExpression) GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
+                        Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
                         Constant(typeMap.MaxDepth)
                     ),
                     mapperFunc,
                     Default(typeMap.DestinationTypeToUse))
                 : mapperFunc;
         }
-        
+
         internal static Expression MaxDepthIncrement(this TypeMap typeMap, Expression Context)
         {
             return typeMap.MaxDepth > 0
-                ? Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(typeMap.Types))
+                ? Call(Context, ((MethodCallExpression)IncTypeDepthInfo.Body).Method, Constant(typeMap.Types))
                 : null;
         }
-        
+
         internal static Expression MaxDepthDecrement(this TypeMap typeMap, Expression Context)
         {
             return typeMap.MaxDepth > 0
-                ? Call(Context, ((MethodCallExpression) DecTypeDepthInfo.Body).Method, Constant(typeMap.Types))
+                ? Call(Context, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types))
                 : null;
         }
-        
+
         internal static ConditionalExpression CheckContext(this TypeMap typeMap, Expression context)
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
@@ -180,7 +184,13 @@ namespace AutoMapper
             }
             return null;
         }
-        
+    }
+}
+
+namespace AutoMapper.QueryableExtensions
+{
+    internal static class MaxDepthExtensions
+    {
         internal static bool ExceedsMaxDepth(this TypeMap typeMap, ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
             return typeMap.MaxDepth > 0 && request.GetDepth(typePairCount) >= typeMap.MaxDepth;

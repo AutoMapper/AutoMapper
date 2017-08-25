@@ -5,7 +5,7 @@ using static AutoMapper.Internal.ExpressionFactory;
 
 namespace AutoMapper
 {
-    public static class ConditionConfiguration
+    public static class ConditionExtensions
     {
         /// <summary>
         /// Conditionally map this member against the source, destination, source and destination members
@@ -86,8 +86,14 @@ namespace AutoMapper
                 pm.Condition = expr;
             });
         }
+    }
+}
 
-        internal static Expression ConditionalCheck(this Expression mapperExpr, PropertyMap propertyMap, Expression source, Expression destination, Expression propertyValue, Expression getter, Expression context)
+namespace AutoMapper.Execution
+{
+    internal static class ConditionExtensions
+    {
+        internal static Expression ConditionalCheck(this Expression mapperExpr, AutoMapper.PropertyMap propertyMap, Expression source, Expression destination, Expression propertyValue, Expression getter, Expression context)
         {
             return propertyMap.Condition != null
                 ? IfThen(
@@ -95,7 +101,7 @@ namespace AutoMapper
                         source, destination,
                         ToType(propertyValue, propertyMap.Condition.Parameters[2].Type),
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
-                        context),mapperExpr)
+                        context), mapperExpr)
                 : mapperExpr;
         }
 
