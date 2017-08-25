@@ -4,10 +4,15 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    public interface IExpressionBase
+    {
+        List<Action<TypeMap>> TypeMapActions { get; }
+    }
+
     /// <summary>
     /// Mapping configuration options for non-generic maps
     /// </summary>
-    public interface IMappingExpression
+    public interface IMappingExpression : IExpressionBase
     {
         /// <summary>
         /// Customize configuration for individual constructor parameter
@@ -131,38 +136,6 @@ namespace AutoMapper
         /// <param name="destinationBase">Base destination type</param>
         /// <returns></returns>
         IMappingExpression IncludeBase(Type sourceBase, Type destinationBase);
-
-        /// <summary>
-        /// Execute a custom function to the source and/or destination types before member mapping
-        /// </summary>
-        /// <param name="beforeFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression BeforeMap(Action<object, object> beforeFunction);
-
-        /// <summary>
-        /// Execute a custom mapping action before member mapping
-        /// </summary>
-        /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
-        /// <returns>Itself</returns>
-        IMappingExpression BeforeMap<TMappingAction>()
-            where TMappingAction : IMappingAction<object, object>;
-
-        /// <summary>
-        /// Execute a custom function to the source and/or destination types after member mapping
-        /// </summary>
-        /// <param name="afterFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression AfterMap(Action<object, object> afterFunction);
-
-        /// <summary>
-        /// Execute a custom mapping action after member mapping
-        /// </summary>
-        /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
-        /// <returns>Itself</returns>
-        IMappingExpression AfterMap<TMappingAction>()
-            where TMappingAction : IMappingAction<object, object>;
-
-        List<Action<TypeMap>> TypeMapActions { get; }
     }
 
     /// <summary>
@@ -170,7 +143,7 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type</typeparam>
     /// <typeparam name="TDestination">Destination type</typeparam>
-    public interface IMappingExpression<TSource, TDestination>
+    public interface IMappingExpression<TSource, TDestination> : IExpressionBase
     {
         /// <summary>
         /// Customize configuration for a path inside the destination object.
@@ -286,50 +259,6 @@ namespace AutoMapper
         void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 
         /// <summary>
-        /// Execute a custom function to the source and/or destination types before member mapping
-        /// </summary>
-        /// <param name="beforeFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
-
-        /// <summary>
-        /// Execute a custom function to the source and/or destination types before member mapping
-        /// </summary>
-        /// <param name="beforeFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction);
-
-        /// <summary>
-        /// Execute a custom mapping action before member mapping
-        /// </summary>
-        /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>()
-            where TMappingAction : IMappingAction<TSource, TDestination>;
-
-        /// <summary>
-        /// Execute a custom function to the source and/or destination types after member mapping
-        /// </summary>
-        /// <param name="afterFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
-
-        /// <summary>
-        /// Execute a custom function to the source and/or destination types after member mapping
-        /// </summary>
-        /// <param name="afterFunction">Callback for the source/destination types</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction);
-
-        /// <summary>
-        /// Execute a custom mapping action after member mapping
-        /// </summary>
-        /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>()
-            where TMappingAction : IMappingAction<TSource, TDestination>;
-
-        /// <summary>
         /// Supply a custom instantiation function for the destination type
         /// </summary>
         /// <param name="ctor">Callback to create the destination type given the source object</param>
@@ -348,9 +277,7 @@ namespace AutoMapper
         /// </summary>
         /// <typeparam name="T">Destination type to use</typeparam>
         void As<T>() where T : TDestination;
-
-        List<Action<TypeMap>> TypeMapActions { get; }
-
+        
         /// <summary>
         /// Construct the destination object using the service locator
         /// </summary>

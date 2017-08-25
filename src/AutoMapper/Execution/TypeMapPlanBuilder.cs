@@ -106,13 +106,11 @@ namespace AutoMapper.Execution
             }
             foreach (var pathMap in TypeMap.PathMaps.Where(pm => !pm.Ignored))
                 actions.Add(pathMap.HandlePath(this));
-            foreach (var beforeMapAction in TypeMap.BeforeMapActions)
-                actions.Insert(0, beforeMapAction.ReplaceParameters(Source, Destination, Context));
+            foreach (var beforeMapExpression in this.GetBeforeExpressions(TypeMap))
+                actions.Insert(0, beforeMapExpression);
             actions.Insert(0, destinationFunc);
             actions.Insert(0, TypeMap.MaxDepthIncrement(Context));
-            actions.AddRange(
-                TypeMap.AfterMapActions.Select(
-                    afterMapAction => afterMapAction.ReplaceParameters(Source, Destination, Context)));
+            actions.AddRange(this.GetAfterExpressions(TypeMap));
 
             actions.Insert(0, TypeMap.MaxDepthDecrement(Context));
 

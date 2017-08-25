@@ -52,19 +52,7 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression IncludeBase(Type sourceBase, Type destinationBase) 
             => (IMappingExpression)base.IncludeBase(sourceBase, destinationBase);
-
-        public new IMappingExpression BeforeMap(Action<object, object> beforeFunction) 
-            => (IMappingExpression)base.BeforeMap(beforeFunction);
-
-        public new IMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<object, object> 
-            => (IMappingExpression)base.BeforeMap<TMappingAction>();
-
-        public new IMappingExpression AfterMap(Action<object, object> afterFunction) 
-            => (IMappingExpression)base.AfterMap(afterFunction);
-
-        public new IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object> 
-            => (IMappingExpression)base.AfterMap<TMappingAction>();
-
+        
         public new IMappingExpression ConstructUsing(Func<object, object> ctor)
             => (IMappingExpression)base.ConstructUsing(ctor);
 
@@ -345,74 +333,6 @@ namespace AutoMapper.Configuration
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
             TypeMapActions.Add(tm => tm.TypeConverterType = typeof (TTypeConverter));
-        }
-
-        public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest);
-
-                tm.AddBeforeMapAction(expr);
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest, ctxt);
-
-                tm.AddBeforeMapAction(expr);
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
-        {
-            void BeforeFunction(TSource src, TDestination dest, ResolutionContext ctxt) 
-                => ((TMappingAction) ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
-
-            return BeforeMap(BeforeFunction);
-        }
-
-        public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest);
-
-                tm.AddAfterMapAction(expr);
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest, ctxt);
-
-                tm.AddAfterMapAction(expr);
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
-        {
-            void AfterFunction(TSource src, TDestination dest, ResolutionContext ctxt) 
-                => ((TMappingAction) ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
-
-            return AfterMap(AfterFunction);
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)

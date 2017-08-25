@@ -118,8 +118,8 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             cfg.ConstructServicesUsing(t => Activator.CreateInstance(t, 2));
 
             cfg.CreateMap<Source, Destination>()
-                .BeforeMap<BeforeMapAction>()
-                .AfterMap<AfterMapAction>();
+                .BeforeMap<BeforeMapAction, Source, Destination>()
+                .AfterMap<AfterMapAction, Source, Destination>();
         });
 
         protected override void Because_of()
