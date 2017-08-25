@@ -167,7 +167,21 @@ namespace AutoMapper.Execution
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
             () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
 
-        internal static Expression TryCatchPropertyMap(this PropertyMap propertyMap, TypeMapPlanBuilder planBuilder)
+        internal static IEnumerable<Expression> GetPropertyExpressions(this TypeMapPlanBuilder planBuilder, bool constructorMapping)
+        {
+            return planBuilder.TypeMap.GetPropertyMaps()
+                .Where(pm => pm.CanResolveValue())
+                .Select(_ =>
+                {
+                    var propertyExpression = _.TryCatchPropertyMap(planBuilder);
+                    if (constructorMapping && planBuilder.TypeMap.ConstructorParameterMatches(_.DestinationProperty.Name))
+                        return IfThen(NotEqual(planBuilder.InitialDestination, Constant(null)), propertyExpression);
+                    return propertyExpression;
+                })
+                .ToList();
+        }
+
+        private static Expression TryCatchPropertyMap(this PropertyMap propertyMap, TypeMapPlanBuilder planBuilder)
         {
             var pmExpression = propertyMap.CreatePropertyMapFunc(planBuilder);
 

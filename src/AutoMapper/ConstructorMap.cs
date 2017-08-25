@@ -68,6 +68,7 @@ namespace AutoMapper
             return mappingExpression;
         }
 
+        // This should be in Execution but it's used for a test
         public static bool ConstructorParameterMatches(this TypeMap typeMap, string destinationPropertyName)
         {
             return typeMap.ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
@@ -77,9 +78,54 @@ namespace AutoMapper
 
 namespace AutoMapper.Execution
 {
+    using static Expression;
+    using static Internal.ExpressionFactory;
+
     internal static class ConstructorMapExtensions
     {
-        internal static Expression CreateNewDestinationExpression(this ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
+        internal static Expression CreateDestinationFunc(this TypeMapPlanBuilder planBuilder, out bool constructorMapping)
+        {
+            var newDestFunc = ToType(planBuilder.CreateNewDestinationFunc(out constructorMapping), planBuilder.TypeMap.DestinationTypeToUse);
+
+            var getDest = planBuilder.TypeMap.DestinationTypeToUse.IsValueType()
+                ? newDestFunc
+                : Coalesce(planBuilder.InitialDestination, newDestFunc);
+
+            Expression destinationFunc = Assign(planBuilder.Destination, getDest);
+
+            return destinationFunc.GetCache(planBuilder);
+        }
+
+        private static Expression CreateNewDestinationFunc(this TypeMapPlanBuilder planBuilder, out bool constructorMapping)
+        {
+            constructorMapping = false;
+            if (planBuilder.TypeMap.DestinationCtor != null)
+                return planBuilder.TypeMap.DestinationCtor.ReplaceParameters(planBuilder.Source, planBuilder.Context);
+
+            if (planBuilder.TypeMap.ConstructDestinationUsingServiceLocator)
+                return planBuilder.TypeMap.DestinationTypeToUse.CreateInstance(planBuilder.Context);
+
+            if (planBuilder.TypeMap.ConstructorMap?.CanResolve == true)
+            {
+                constructorMapping = true;
+                return planBuilder.TypeMap.ConstructorMap.CreateNewDestinationExpression(planBuilder);
+            }
+#if NET45 || NET40
+            if (planBuilder.TypeMap.DestinationTypeToUse.IsInterface())
+            {
+                var ctor = Call(null,
+                    typeof(DelegateFactory).GetDeclaredMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
+                    Call(null,
+                        typeof(ProxyGenerator).GetDeclaredMethod(nameof(ProxyGenerator.GetProxyType)),
+                        Constant(planBuilder.TypeMap.DestinationTypeToUse)));
+                // We're invoking a delegate here to make it have the right accessibility
+                return Invoke(ctor);
+            }
+#endif
+            return DelegateFactory.GenerateConstructorExpression(planBuilder.TypeMap.DestinationTypeToUse);
+        }
+
+        private static Expression CreateNewDestinationExpression(this ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
         {
             if (!constructorMap.CanResolve)
                 return null;

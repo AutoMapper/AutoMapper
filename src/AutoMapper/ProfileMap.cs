@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
@@ -242,4 +243,24 @@ namespace AutoMapper
             }
         }
     }
+}
+
+namespace AutoMapper.Execution
+{
+    using static Expression;
+
+    internal static class ProfileMapExtensions
+    {
+        internal static Expression ApplyAllowNullDestinations(this Expression mapExpression, TypeMapPlanBuilder planBuilder)
+        {
+            return planBuilder.TypeMap.Profile.AllowNullDestinationValues &&
+                   !planBuilder.TypeMap.SourceType.IsValueType()
+                ? Condition(
+                    Equal(planBuilder.Source, Default(planBuilder.TypeMap.SourceType)),
+                    Default(planBuilder.TypeMap.DestinationTypeToUse),
+                    mapExpression.RemoveIfNotNull(planBuilder.Source))
+                : mapExpression;
+        }
+    } 
+
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -34,7 +35,10 @@ namespace AutoMapper.Execution
 
     public static class PathMapExtension
     {
-        internal static Expression HandlePath(this PathMap pathMap, TypeMapPlanBuilder planBuilder)
+        internal static IEnumerable<Expression> GetPathExpressions(this TypeMapPlanBuilder planBuilder)
+            => planBuilder.TypeMap.PathMaps.Where(pm => !pm.Ignored).Select(_ => _.HandlePath(planBuilder)).ToList();
+
+        private static Expression HandlePath(this PathMap pathMap, TypeMapPlanBuilder planBuilder)
         {
             var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(planBuilder.Destination))
                 .Expression;

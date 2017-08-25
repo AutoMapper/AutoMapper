@@ -67,7 +67,7 @@ namespace AutoMapper.Execution
 {
     internal static class AfterMapExtensions
     {
-        internal static IEnumerable<Expression> GetAfterExpressions(this TypeMapPlanBuilder planBuilder, TypeMap typeMap)
-            => typeMap.AfterMapActions.Select(_ => _.ReplaceParameters(planBuilder.Source, planBuilder.Destination, planBuilder.Context)).ToList();
+        internal static IEnumerable<Expression> GetAfterExpressions(this TypeMapPlanBuilder planBuilder)
+            => planBuilder.TypeMap.AfterMapActions.Select(_ => _.ReplaceParameters(planBuilder.Source, planBuilder.Destination, planBuilder.Context)).ToList();
     }
 }

@@ -67,7 +67,7 @@ namespace AutoMapper.Execution
 {
     internal static class BeforeMapExtensions
     {
-        internal static IEnumerable<Expression> GetBeforeExpressions(this TypeMapPlanBuilder planBuilder, TypeMap typeMap)
-            => typeMap.BeforeMapActions.Select(_ => _.ReplaceParameters(planBuilder.Source, planBuilder.Destination, planBuilder.Context)).ToList();
+        internal static IEnumerable<Expression> GetBeforeExpressions(this TypeMapPlanBuilder planBuilder)
+            => planBuilder.TypeMap.BeforeMapActions.Select(_ => _.ReplaceParameters(planBuilder.Source, planBuilder.Destination, planBuilder.Context)).ToList();
     }
 }

@@ -131,7 +131,7 @@ namespace AutoMapper.Execution
             return Block(new[] { dest }, Assign(dest, expression), setCache, dest);
         }
 
-        internal static Expression AssignCache(this Expression expression, TypeMapPlanBuilder planBuilder)
+        internal static Expression ApplyAssigningCache(this Expression expression, TypeMapPlanBuilder planBuilder)
         {
             if (!planBuilder.TypeMap.PreserveReferences)
                 return expression;
@@ -140,7 +140,7 @@ namespace AutoMapper.Execution
             var assignCache =
                 Assign(cache,
                     ToType(Call(planBuilder.Context, GetDestinationMethodInfo, planBuilder.Source, Constant(planBuilder.Destination.Type)), planBuilder.Destination.Type));
-            var condition = Expression.Condition(
+            var condition = Condition(
                 AndAlso(NotEqual(planBuilder.Source, Constant(null)), NotEqual(assignCache, Constant(null))),
                 cache,
                 expression);
@@ -148,31 +148,29 @@ namespace AutoMapper.Execution
             return Block(new[] { cache }, condition);
         }
 
-        internal static Expression MaxDepthCheck(this Expression mapperFunc, TypeMap typeMap, Expression context)
+        internal static Expression ApplyMaxDepthCheck(this Expression mapperFunc, TypeMapPlanBuilder planBuilder)
         {
-            return typeMap.MaxDepth > 0
-                ? Expression.Condition(
+            return planBuilder.TypeMap.MaxDepth > 0
+                ? Condition(
                     LessThanOrEqual(
-                        Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
-                        Constant(typeMap.MaxDepth)
+                        Call(planBuilder.Context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(planBuilder.TypeMap.Types)),
+                        Constant(planBuilder.TypeMap.MaxDepth)
                     ),
                     mapperFunc,
-                    Default(typeMap.DestinationTypeToUse))
+                    Default(planBuilder.TypeMap.DestinationTypeToUse))
                 : mapperFunc;
         }
 
-        internal static Expression MaxDepthIncrement(this TypeMap typeMap, Expression Context)
+        internal static IEnumerable<Expression> MaxDepthIncrement(this TypeMapPlanBuilder planBuilder)
         {
-            return typeMap.MaxDepth > 0
-                ? Call(Context, ((MethodCallExpression)IncTypeDepthInfo.Body).Method, Constant(typeMap.Types))
-                : null;
+            if (planBuilder.TypeMap.MaxDepth > 0)
+                yield return Call(planBuilder.Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(planBuilder.TypeMap.Types));
         }
 
-        internal static Expression MaxDepthDecrement(this TypeMap typeMap, Expression Context)
+        internal static IEnumerable<Expression> MaxDepthDecrement(this TypeMapPlanBuilder planBuilder)
         {
-            return typeMap.MaxDepth > 0
-                ? Call(Context, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types))
-                : null;
+            if (planBuilder.TypeMap.MaxDepth > 0)
+                yield return Call(planBuilder.Context, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(planBuilder.TypeMap.Types));
         }
 
         internal static ConditionalExpression CheckContext(this TypeMap typeMap, Expression context)

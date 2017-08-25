@@ -41,11 +41,19 @@ namespace AutoMapper.Execution
 
             this.CheckForCycles(typeMapsPath);
 
-            var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
-
-            var assignmentFunc = CreateAssignmentFunc(destinationFunc, constructorMapping);
-
-            var mapperFunc = CreateMapperFunc(assignmentFunc);
+            var mapperFunc = Block(
+                    this.MaxDepthIncrement()
+                        .Concat(new[] {this.CreateDestinationFunc(out bool constructorMapping)})
+                        .Concat(this.GetBeforeExpressions())
+                        .Concat(this.GetPropertyExpressions(constructorMapping))
+                        .Concat(this.GetPathExpressions())
+                        .Concat(this.GetAfterExpressions())
+                        .Concat(this.MaxDepthDecrement())
+                        .Concat(new Expression[] {Destination}))
+                .ApplyConditionalCheck(this)
+                .ApplyMaxDepthCheck(this)
+                .ApplyAllowNullDestinations(this)
+                .ApplyAssigningCache(this);
 
             var checkContext = TypeMap.CheckContext(Context);
             var lambaBody = checkContext != null ? new[] {checkContext, mapperFunc} : new[] {mapperFunc};
@@ -79,87 +87,6 @@ namespace AutoMapper.Execution
                     Source, InitialDestination, Context
                 ),
                 Source, InitialDestination, Context);
-        }
-
-        private Expression CreateDestinationFunc(out bool constructorMapping)
-        {
-            var newDestFunc = ToType(CreateNewDestinationFunc(out constructorMapping), TypeMap.DestinationTypeToUse);
-
-            var getDest = TypeMap.DestinationTypeToUse.IsValueType()
-                ? newDestFunc
-                : Coalesce(InitialDestination, newDestFunc);
-
-            Expression destinationFunc = Assign(Destination, getDest);
-
-            return destinationFunc.GetCache(this);
-        }
-
-        private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
-        {
-            var actions = new List<Expression>();
-            foreach (var propertyMap in TypeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
-            {
-                var property = propertyMap.TryCatchPropertyMap(this);
-                if (constructorMapping && TypeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
-                    property = IfThen(NotEqual(InitialDestination, Constant(null)), property);
-                actions.Add(property);
-            }
-            foreach (var pathMap in TypeMap.PathMaps.Where(pm => !pm.Ignored))
-                actions.Add(pathMap.HandlePath(this));
-            foreach (var beforeMapExpression in this.GetBeforeExpressions(TypeMap))
-                actions.Insert(0, beforeMapExpression);
-            actions.Insert(0, destinationFunc);
-            actions.Insert(0, TypeMap.MaxDepthIncrement(Context));
-            actions.AddRange(this.GetAfterExpressions(TypeMap));
-
-            actions.Insert(0, TypeMap.MaxDepthDecrement(Context));
-
-            actions.Add(Destination);
-
-            return Block(actions.Where(_ => _ != null));
-        }
-        
-        private Expression CreateMapperFunc(Expression assignmentFunc)
-        {
-            var mapperFunc = assignmentFunc;
-
-            mapperFunc = mapperFunc.ConditionalCheck(TypeMap);
-            mapperFunc = mapperFunc.MaxDepthCheck(TypeMap, Context);
-
-            if (TypeMap.Profile.AllowNullDestinationValues && !TypeMap.SourceType.IsValueType())
-                mapperFunc =
-                    Condition(Equal(Source, Default(TypeMap.SourceType)),
-                        Default(TypeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(Source));
-            return mapperFunc.AssignCache(this);
-        }
-
-        private Expression CreateNewDestinationFunc(out bool constructorMapping)
-        {
-            constructorMapping = false;
-            if (TypeMap.DestinationCtor != null)
-                return TypeMap.DestinationCtor.ReplaceParameters(Source, Context);
-
-            if (TypeMap.ConstructDestinationUsingServiceLocator)
-                return TypeMap.DestinationTypeToUse.CreateInstance(Context);
-
-            if (TypeMap.ConstructorMap?.CanResolve == true)
-            {
-                constructorMapping = true;
-                return TypeMap.ConstructorMap.CreateNewDestinationExpression(this);
-            }
-#if NET45 || NET40
-            if (TypeMap.DestinationTypeToUse.IsInterface())
-            {
-                var ctor = Call(null,
-                    typeof(DelegateFactory).GetDeclaredMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
-                    Call(null,
-                        typeof(ProxyGenerator).GetDeclaredMethod(nameof(ProxyGenerator.GetProxyType)),
-                        Constant(TypeMap.DestinationTypeToUse)));
-                // We're invoking a delegate here to make it have the right accessibility
-                return Invoke(ctor);
-            }
-#endif
-            return DelegateFactory.GenerateConstructorExpression(TypeMap.DestinationTypeToUse);
         }
     }
 }

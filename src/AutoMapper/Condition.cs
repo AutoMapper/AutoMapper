@@ -106,10 +106,10 @@ namespace AutoMapper.Execution
                 : mapperExpr;
         }
 
-        internal static Expression ConditionalCheck(this Expression mapperFunc, TypeMap typeMap)
+        internal static Expression ApplyConditionalCheck(this Expression mapperFunc, TypeMapPlanBuilder planBuilder)
         {
-            return typeMap.Condition != null
-                ? Condition(typeMap.Condition.Body, mapperFunc, Default(typeMap.DestinationTypeToUse))
+            return planBuilder.TypeMap.Condition != null
+                ? Condition(planBuilder.TypeMap.Condition.Body, mapperFunc, Default(planBuilder.TypeMap.DestinationTypeToUse))
                 : mapperFunc;
         }
     }
