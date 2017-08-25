@@ -157,7 +157,7 @@ namespace AutoMapper.QueryableExtensions
             {
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount, letPropertyMaps);
             }
-            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
+            Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
             if(instanceParameter is ParameterExpression)
                 constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
@@ -169,21 +169,7 @@ namespace AutoMapper.QueryableExtensions
                 );
             return expression;
         }
-
-        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
-        {
-            var ctorExpr = typeMap.ConstructExpression;
-            if (ctorExpr != null)
-            {
-                return ctorExpr;
-            }
-            var newExpression = typeMap.ConstructorMap?.CanResolve == true
-                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
-                : New(typeMap.DestinationTypeToUse);
-
-            return Lambda(newExpression);
-        }
-
+        
         private class NewFinderVisitor : ExpressionVisitor
         {
             public NewExpression NewExpression { get; private set; }

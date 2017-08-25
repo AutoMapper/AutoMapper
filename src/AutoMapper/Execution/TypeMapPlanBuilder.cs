@@ -148,7 +148,7 @@ namespace AutoMapper.Execution
             if (TypeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return CreateNewDestinationExpression(TypeMap.ConstructorMap);
+                return TypeMap.ConstructorMap.CreateNewDestinationExpression(this);
             }
 #if NET45 || NET40
             if (TypeMap.DestinationTypeToUse.IsInterface())
@@ -164,58 +164,5 @@ namespace AutoMapper.Execution
 #endif
             return DelegateFactory.GenerateConstructorExpression(TypeMap.DestinationTypeToUse);
         }
-
-        private Expression CreateNewDestinationExpression(ConstructorMap constructorMap)
-        {
-            if (!constructorMap.CanResolve)
-                return null;
-
-            var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
-
-            ctorArgs =
-                ctorArgs.Zip(constructorMap.Ctor.GetParameters(),
-                        (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
-                    .ToArray();
-            var newExpr = New(constructorMap.Ctor, ctorArgs);
-            return newExpr;
-        }
-
-        private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
-        {
-            var valueResolverExpression = ResolveSource(ctorParamMap);
-            var sourceType = valueResolverExpression.Type;
-            var resolvedValue = Variable(sourceType, "resolvedValue");
-            return Block(new[] {resolvedValue},
-                Assign(resolvedValue, valueResolverExpression),
-                MapExpression(ConfigurationProvider, TypeMap.Profile,
-                    new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue, Context, null, null));
-        }
-
-        private Expression ResolveSource(ConstructorParameterMap ctorParamMap)
-        {
-            if (ctorParamMap.CustomExpression != null)
-                return ctorParamMap.CustomExpression.ConvertReplaceParameters(Source)
-                    .IfNotNull(ctorParamMap.DestinationType);
-            if (ctorParamMap.CustomValueResolver != null)
-                return ctorParamMap.CustomValueResolver.ConvertReplaceParameters(Source, Context);
-            if (ctorParamMap.Parameter.IsOptional)
-            {
-                ctorParamMap.DefaultValue = true;
-                return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
-            }
-            return ctorParamMap.SourceMembers.Aggregate(
-                    (Expression) Source,
-                    (inner, getter) => getter is MethodInfo
-                        ? Call(getter.IsStatic() ? null : inner, (MethodInfo) getter)
-                        : (Expression) MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
-                )
-                .IfNotNull(ctorParamMap.DestinationType);
-        }
-
-        
-
-
-        
-
     }
 }

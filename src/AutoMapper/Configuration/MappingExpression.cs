@@ -70,13 +70,6 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor) 
             => (IMappingExpression)base.ConstructUsing(ctor);
-
-        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
-        {
-            TypeMapActions.Add(tm => tm.ConstructExpression = ctor);
-
-            return this;
-        }
         
         public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions) 
             => (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
@@ -441,23 +434,6 @@ namespace AutoMapper.Configuration
                 Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
 
                 tm.DestinationCtor = expr;
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> ConstructProjectionUsing(Expression<Func<TSource, TDestination>> ctor)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                tm.ConstructExpression = ctor;
-
-                var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
-                var srcParam = Parameter(typeof (TSource), "src");
-
-                var body = ctor.ReplaceParameters(srcParam);
-
-                tm.DestinationCtor = Lambda(body, srcParam, ctxtParam);
             });
 
             return this;
