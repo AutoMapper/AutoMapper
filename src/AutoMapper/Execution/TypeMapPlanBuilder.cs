@@ -7,7 +7,7 @@ namespace AutoMapper.Execution
     using System.Reflection;
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
-    using static ExpressionBuilder;
+    using Map.ConstructorMap;
 
     public class TypeMapPlanBuilder
     {

@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
 using AutoMapper.Internal;
 using AutoMapper.Execution;
+using AutoMapper.QueryableExtensions.ConstructorMap;
 using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 

@@ -4,14 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
-using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
+using static System.Linq.Expressions.Expression;
+using static AutoMapper.Execution.ExpressionBuilder;
 
 namespace AutoMapper
 {
-    using static Expression;
-    using static Execution.ExpressionBuilder;
-
     public class ConstructorMap
     {
         private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
@@ -33,8 +31,8 @@ namespace AutoMapper
             _ctorParams.Add(new ConstructorParameterMap(parameter, resolvers, canResolve));
         }
     }
-
-    public static class ConstructorMapExtensions
+    
+    public static class Extensions
     {
         /// <summary>
         /// Supply a custom instantiation expression for the destination type for LINQ projection
@@ -71,43 +69,14 @@ namespace AutoMapper
 
             return mappingExpression;
         }
+    }
+}
 
-        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
-        {
-            new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter()
-        };
-
-        internal static LambdaExpression DestinationConstructorExpression(this TypeMap typeMap, Expression instanceParameter)
-        {
-            return typeMap.ConstructExpression ?? Lambda(typeMap.NewExpression(instanceParameter));
-        }
-
-        private static Expression NewExpression(this TypeMap typeMap, Expression instanceParameter)
-        {
-            return typeMap.ConstructorMap?.CanResolve == true
-                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
-                : New(typeMap.DestinationTypeToUse);
-        }
-
-        private static Expression NewExpression(this ConstructorMap constructorMap, Expression instanceParameter)
-        {
-            var parameters = constructorMap.CtorParams.Select(map =>
-            {
-                var result = new ExpressionResolutionResult(instanceParameter, constructorMap.Ctor.DeclaringType);
-
-                var matchingExpressionConverter =
-                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
-
-                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map)
-                         ?? throw new Exception("Can't resolve this to Queryable Expression");
-
-                return result;
-            });
-            return New(constructorMap.Ctor, parameters.Select(p => p.ResolutionExpression));
-        }
-
-        internal static Expression CreateNewDestinationExpression(this ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
+namespace AutoMapper.Map.ConstructorMap
+{
+    internal static class Extensions
+    {
+        internal static Expression CreateNewDestinationExpression(this global::AutoMapper.ConstructorMap constructorMap, TypeMapPlanBuilder planBuilder)
         {
             if (!constructorMap.CanResolve)
                 return null;
@@ -121,7 +90,7 @@ namespace AutoMapper
             var newExpr = New(constructorMap.Ctor, ctorArgs);
             return newExpr;
         }
-        
+
         private static Expression CreateConstructorParameterExpression(this ConstructorParameterMap ctorParamMap, TypeMapPlanBuilder planBuilder)
         {
             var valueResolverExpression = planBuilder.ResolveSource(ctorParamMap);
@@ -152,6 +121,47 @@ namespace AutoMapper
                         : (Expression)MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                 )
                 .IfNotNull(ctorParamMap.DestinationType);
+        }
+    }
+}
+
+namespace AutoMapper.QueryableExtensions.ConstructorMap
+{
+    internal static class Extensions
+    {
+        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
+        {
+            new MemberResolverExpressionResultConverter(),
+            new MemberGetterExpressionResultConverter()
+        };
+
+        internal static LambdaExpression DestinationConstructorExpression(this TypeMap typeMap, Expression instanceParameter)
+        {
+            return typeMap.ConstructExpression ?? Lambda(typeMap.NewExpression(instanceParameter));
+        }
+
+        private static Expression NewExpression(this TypeMap typeMap, Expression instanceParameter)
+        {
+            return typeMap.ConstructorMap?.CanResolve == true
+                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
+                : New(typeMap.DestinationTypeToUse);
+        }
+
+        private static Expression NewExpression(this global::AutoMapper.ConstructorMap constructorMap, Expression instanceParameter)
+        {
+            var parameters = constructorMap.CtorParams.Select(map =>
+            {
+                var result = new ExpressionResolutionResult(instanceParameter, constructorMap.Ctor.DeclaringType);
+
+                var matchingExpressionConverter =
+                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
+
+                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map)
+                         ?? throw new Exception("Can't resolve this to Queryable Expression");
+
+                return result;
+            });
+            return New(constructorMap.Ctor, parameters.Select(p => p.ResolutionExpression));
         }
     }
 }
