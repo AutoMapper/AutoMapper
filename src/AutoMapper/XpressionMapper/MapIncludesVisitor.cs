@@ -26,14 +26,11 @@ namespace AutoMapper.XpressionMapper
                     var me = node.Operand as MemberExpression;
                     var parameterExpression = node.GetParameterExpression();
                     var sType = parameterExpression?.Type;
-                    if (me != null && (sType != null && me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType || (me.Type.GetTypeInfo().IsGenericType
-                                                                                                                                                                                     && me.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
-                                                                                                                                                                                     && Nullable.GetUnderlyingType(me.Type).GetTypeInfo().IsValueType))))
+                    if (me != null && (sType != null && me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType)))
                     {
-                        //ParameterExpression parameter = me.Expression.GetParameter();
-                        //string fullName = me.Expression.GetPropertyFullName();
-                        //return parameter.BuildExpression(sType, fullName);
-                        return Visit(me.Expression);
+                        //just pass me and let the FindMemberExpressionsVisitor handle removing of the value type
+                        //me.Expression will not match the PathMap name.
+                        return Visit(me);
                     }
                     else
                     {
@@ -46,9 +43,6 @@ namespace AutoMapper.XpressionMapper
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.NodeType == ExpressionType.Constant)
-                return base.VisitMember(node);
-
             string sourcePath;
 
             var parameterExpression = node.GetParameterExpression();
