@@ -52,7 +52,7 @@ namespace AutoMapper
 
         public PathMap FindPathMapByDestinationPath(string destinationFullPath)
         {
-            return this.PathMaps?.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
+            return PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
         }
 
         public LambdaExpression MapExpression { get; private set; }
