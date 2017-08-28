@@ -229,8 +229,6 @@ namespace AutoMapper.UnitTests
                 .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Customer.Total))
                 .ForPath(o => o.CustomerHolder.Customer.Address, o => o.MapFrom(s => s.CustomerAddress))
                 .ForPath(o => o.CustomerHolder.Customer.Age, o => o.MapFrom(s => s.CustomerAge));
-
-            CreateMissingTypeMaps = true;
         }
     }
 }
