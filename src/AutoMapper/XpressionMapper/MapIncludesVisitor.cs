@@ -26,7 +26,7 @@ namespace AutoMapper.XpressionMapper
                     var me = node.Operand as MemberExpression;
                     var parameterExpression = node.GetParameterExpression();
                     var sType = parameterExpression?.Type;
-                    if (me != null && (sType != null && me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType)))
+                    if (me != null && (sType != null && me.Expression.NodeType == ExpressionType.MemberAccess && me.Type.IsLiteralType()))
                     {
                         //just pass me and let the FindMemberExpressionsVisitor handle removing of the value type
                         //me.Expression will not match the PathMap name.

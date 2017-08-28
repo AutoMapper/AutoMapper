@@ -48,11 +48,9 @@ namespace AutoMapper.XpressionMapper
             var sType = parameterExpression?.Type;
             if (sType != null && _newParameter.Type == sType && node.IsMemberExpression())
             {
-                if (node.Expression.NodeType == ExpressionType.MemberAccess && (node.Type == typeof(string)
-                                                                                    || node.Type.GetTypeInfo().IsValueType))
+                if (node.Expression.NodeType == ExpressionType.MemberAccess && node.Type.IsLiteralType())
                     _memberExpressions.Add((MemberExpression)node.Expression);
-                else if (node.Expression.NodeType == ExpressionType.Parameter && (node.Type == typeof(string)
-                                                                                    || node.Type.GetTypeInfo().IsValueType))
+                else if (node.Expression.NodeType == ExpressionType.Parameter && node.Type.IsLiteralType())
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.mappedMemberIsChildOfTheParameterFormat, node.GetPropertyFullName(), node.Type.FullName, sType.FullName));
                 else
                     _memberExpressions.Add(node);

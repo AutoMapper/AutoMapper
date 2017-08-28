@@ -200,7 +200,7 @@ namespace AutoMapper.UnitTests
         public string Name { get; set; }
         public string Address { get; set; }
         public decimal? Total { get; set; }
-        public decimal Age { get; set; }
+        public decimal? Age { get; set; }
     }
 
     public class CustomerDto
@@ -212,7 +212,7 @@ namespace AutoMapper.UnitTests
     public class OrderDto
     {
         public string CustomerAddress { get; set; }
-        public decimal CustomerAge { get; set; }
+        public decimal? CustomerAge { get; set; }
         public CustomerDto Customer { get; set; }
     }
 

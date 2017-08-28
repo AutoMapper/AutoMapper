@@ -233,7 +233,7 @@ namespace AutoMapper.XpressionMapper
                 throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
             }
 
-            PathMap pathMap = typeMap.PathMaps.SingleOrDefault(item => string.Join(period, item.MemberPath.Members.Select(m => m.Name)) == sourceFullName);
+            PathMap pathMap = typeMap.FindPathMapByDestinationPath(sourceFullName);
             if (pathMap != null)
             {
                 propertyMapInfoList.Add(new PropertyMapInfo(pathMap.SourceExpression, new List<MemberInfo>()));
