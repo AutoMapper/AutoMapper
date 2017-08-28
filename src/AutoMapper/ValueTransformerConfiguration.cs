@@ -17,7 +17,7 @@ namespace AutoMapper
 
         public bool IsMatch(PropertyMap propertyMap)
         {
-            return ValueType.IsAssignableFrom(propertyMap.DestinationPropertyType);
+            return propertyMap.DestinationPropertyType.IsAssignableFrom(ValueType);
         }
 
         public Expression Visit(Expression expression, PropertyMap propertyMap)
