@@ -233,10 +233,15 @@ namespace AutoMapper.XpressionMapper
                 throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
             }
                 
-            
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
+                if (propertyMap == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing property map from {typeDestination.Name} to {typeSource.Name} for {sourceFullName} property. Create using Mapper.CreateMap<{typeDestination.Name}, {typeSource.Name}>.");
+                }
+
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.ValueResolverConfig != null)
                 {

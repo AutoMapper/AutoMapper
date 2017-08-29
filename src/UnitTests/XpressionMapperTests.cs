@@ -234,6 +234,30 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
+        public void Map_expression_should_throws_exception_when_mapping_for_property_is_missed()
+        {
+            // Arrange    
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ThingModel, Thing>();
+            });
+
+            var customMapper = config.CreateMapper();
+
+            Expression<Func<Thing, object>> expression = thing => thing.Foo;
+            
+            // Act + Assert
+            new Action(() => customMapper.Map<Expression<Func<ThingModel, object>>>(expression))
+                .ShouldThrowException<AutoMapperMappingException>(
+                    exception =>
+                    {
+                        exception.InnerException.ShouldNotBeNull();
+                        exception.InnerException.ShouldBeOfType<InvalidOperationException>();
+                        exception.InnerException.Message.ShouldContain("Missing property map from ThingModel to Thing for Foo property. Create using Mapper.CreateMap<ThingModel, Thing>.", Case.Insensitive);
+                    });
+        }
+
+        [Fact]
         public void Map_project_truncated_time()
         {
             //Arrange
