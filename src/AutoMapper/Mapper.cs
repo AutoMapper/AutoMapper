@@ -21,7 +21,7 @@ namespace AutoMapper
         public static IConfigurationProvider Configuration
         {
             get => _configuration ?? throw new InvalidOperationException(InvalidOperationMessage);
-            private set => _configuration = value;
+            private set => _configuration = (_configuration == null) ? value : throw new InvalidOperationException(AlreadyInitialized);
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace AutoMapper
         public static IMapper Instance
         {
             get => _instance ?? throw new InvalidOperationException(InvalidOperationMessage);
-            private set => _instance = (_instance == null) ? value : throw new InvalidOperationException(AlreadyInitialized);
+            private set => _instance = value;
         }
 
         /// <summary>
