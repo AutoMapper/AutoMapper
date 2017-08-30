@@ -238,8 +238,7 @@ namespace AutoMapper.XpressionMapper
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
                 if (propertyMap == null)
                 {
-                    throw new InvalidOperationException(
-                        $"Missing property map from {typeDestination.Name} to {typeSource.Name} for {sourceFullName} property. Create using Mapper.CreateMap<{typeDestination.Name}, {typeSource.Name}>.");
+                    throw QueryMapperHelper.MissingPropertyMapException(sourceFullName, sourceType: typeDestination, destinationType: typeSource);
                 }
 
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
@@ -264,7 +263,11 @@ namespace AutoMapper.XpressionMapper
             {
                 var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
-                
+                if (propertyMap == null)
+                {
+                    throw QueryMapperHelper.MissingPropertyMapException(propertyName, sourceType: typeDestination, destinationType: typeSource);
+                }
+
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));

@@ -253,7 +253,9 @@ namespace AutoMapper.UnitTests
                     {
                         exception.InnerException.ShouldNotBeNull();
                         exception.InnerException.ShouldBeOfType<InvalidOperationException>();
-                        exception.InnerException.Message.ShouldContain("Missing property map from ThingModel to Thing for Foo property. Create using Mapper.CreateMap<ThingModel, Thing>.", Case.Insensitive);
+                        exception.InnerException.Message.ShouldContain(
+                            "Missing property map for Foo property. Add a property map for Thing.Foo from a ThingModel member using Mapper.CreateMap<ThingModel, Thing>.FromMember().",
+                            Case.Insensitive);
                     });
         }
 
