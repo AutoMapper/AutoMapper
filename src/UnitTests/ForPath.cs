@@ -365,7 +365,7 @@ namespace AutoMapper.UnitTests
                 })
                 .ForPath(o => o.CustomerHolder.Customer.Value, o =>
                 {
-                    o.Condition(c => c.Source.Value > 0);
+                    o.Condition(c => c.Destination.CustomerHolder.Customer.Value == 0);
                     o.MapFrom(s => s.Value);
                 });
         });
