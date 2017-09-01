@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    using System;
     using Internal;
 
     [DebuggerDisplay("{DestinationExpression}")]
@@ -22,5 +23,6 @@ namespace AutoMapper
         public MemberPath MemberPath { get; }
         public MemberInfo DestinationMember => MemberPath.Last;
         public bool Ignored { get; set; }
+        public LambdaExpression Condition { get; set; }
     }
 }
