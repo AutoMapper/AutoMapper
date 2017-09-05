@@ -10,7 +10,7 @@ namespace AutoMapper
     /// <typeparam name="TSource">Source type for this member</typeparam>
     /// <typeparam name="TMember">Type for this member</typeparam>
     /// <typeparam name="TDestination">Destination type for this map</typeparam>
-    public interface IMemberConfigurationExpression<TSource, out TDestination, TMember>
+    public interface IMemberConfigurationExpression<TSource, TDestination, TMember>
     {
         /// <summary>
         /// Do not precompute the execution plan for this member, just map it at runtime.
@@ -199,6 +199,12 @@ namespace AutoMapper
         /// The destination member being configured.
         /// </summary>
         MemberInfo DestinationMember { get; }
+
+        /// <summary>
+        /// Apply a transformation function after any resolved destination member value with the given type
+        /// </summary>
+        /// <param name="transformer">Transformation expression</param>
+        void AddTransform(Expression<Func<TMember, TMember>> transformer);
     }
 
     /// <summary>

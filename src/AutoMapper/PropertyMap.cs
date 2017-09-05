@@ -14,6 +14,7 @@ namespace AutoMapper
     public class PropertyMap
     {
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
+        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public PropertyMap(PathMap pathMap)
         {
@@ -54,6 +55,7 @@ namespace AutoMapper
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
+        public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public MemberInfo SourceMember
         {
@@ -126,6 +128,11 @@ namespace AutoMapper
         {
             CustomExpression = sourceMember;
             Ignored = false;
+        }
+
+        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
+        {
+            _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
 
         private class MemberFinderVisitor : ExpressionVisitor

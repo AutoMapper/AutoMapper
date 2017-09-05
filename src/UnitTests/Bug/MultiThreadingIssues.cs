@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = createSource();
 
-            Console.WriteLine(@"Mapping {0} on thread {1}", source.GetType(), Thread.CurrentThread.ManagedThreadId);
+            Debug.WriteLine(@"Mapping {0} on thread {1}", source.GetType(), Thread.CurrentThread.ManagedThreadId);
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap(source.GetType(), typeof(DestType)));
 

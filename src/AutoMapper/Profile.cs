@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
@@ -25,8 +26,8 @@ namespace AutoMapper
         private readonly List<ITypeMapConfiguration> _openTypeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
         private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
-
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
+        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         protected Profile(string profileName)
             : this() => ProfileName = profileName;
@@ -63,6 +64,7 @@ namespace AutoMapper
         IEnumerable<IConditionalObjectMapper> IProfileConfiguration.TypeConfigurations => _typeConfigurations;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
+        IEnumerable<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
 
         public virtual string ProfileName { get; }
 
@@ -75,6 +77,7 @@ namespace AutoMapper
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
 
+        public IList<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public void DisableConstructorMapping()
         {
@@ -180,6 +183,10 @@ namespace AutoMapper
                         m =>
                             m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
                             m.GetParameters().Length == 1));
+        }
+
+        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
+        {
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

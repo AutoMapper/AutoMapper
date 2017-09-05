@@ -135,6 +135,7 @@ namespace AutoMapper.Configuration
         private readonly List<IPropertyMapConfiguration> _memberConfigurations = new List<IPropertyMapConfiguration>();
         private readonly List<SourceMappingExpression> _sourceMemberConfigurations = new List<SourceMappingExpression>();
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
+        private readonly List<ValueTransformerConfiguration> _valueTransformers = new List<ValueTransformerConfiguration>();
         private MappingExpression<TDestination, TSource> _reverseMap;
         private Action<IMemberConfigurationExpression<TSource, TDestination, object>> _allMemberOptions;
         private Func<MemberInfo, bool> _memberFilter;
@@ -157,6 +158,7 @@ namespace AutoMapper.Configuration
         public Type DestinationType => Types.DestinationType;
         public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
+        public IList<ValueTransformerConfiguration> ValueTransformers => _valueTransformers;
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
 
         public IMappingExpression<TSource, TDestination> PreserveReferences()
@@ -531,6 +533,15 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        public IMappingExpression<TSource, TDestination> AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
+        {
+            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
+
+            _valueTransformers.Add(config);
+
+            return this;
+        }
+
         private IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
             _memberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
 
@@ -577,6 +588,10 @@ namespace AutoMapper.Configuration
             foreach (var paramConfig in _ctorParamConfigurations)
             {
                 paramConfig.Configure(typeMap);
+            }
+            foreach (var valueTransformer in _valueTransformers)
+            {
+                typeMap.AddValueTransformation(valueTransformer);
             }
 
             if (_reverseMap != null)

@@ -5,7 +5,7 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Configuration;
+    using Configuration;
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
@@ -387,6 +387,12 @@ namespace AutoMapper.Execution
                 ? MapExpression(_configurationProvider, _typeMap.Profile, typePair, valueResolverExpr, Context,
                     propertyMap, destValueExpr)
                 : ContextMap(typePair, valueResolverExpr, Context, destValueExpr);
+
+            valueResolverExpr = propertyMap.ValueTransformers
+                .Concat(_typeMap.ValueTransformers)
+                .Concat(_typeMap.Profile.ValueTransformers)
+                .Where(vt => vt.IsMatch(propertyMap))
+                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;

@@ -44,5 +44,6 @@ namespace AutoMapper.Configuration
         INamingConvention DestinationMemberNamingConvention { get; }
         IEnumerable<ITypeMapConfiguration> TypeMapConfigs { get; }
         IEnumerable<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
+        IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }

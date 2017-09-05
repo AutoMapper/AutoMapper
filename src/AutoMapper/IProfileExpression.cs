@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
@@ -152,5 +154,10 @@ namespace AutoMapper
         /// </summary>
         /// <param name="type">Static type that contains extension methods</param>
         void IncludeSourceExtensionMethods(Type type);
+
+        /// <summary>
+        /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
+        /// </summary>
+        IList<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }
