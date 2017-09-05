@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0691ABF2-B3C7-43BF-9862-2D8D1299CE58}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,9 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples.EF", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples.OData", "src\AutoMapperSamples.OData\AutoMapperSamples.OData.csproj", "{E87F3347-5604-42DD-915B-173BDE2AAAF3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "src\UnitTests\UnitTests.csproj", "{4F96C184-FF4B-4256-B8BC-C51D1167C489}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.UnitTests", "src\UnitTests\AutoMapper.UnitTests.csproj", "{4F96C184-FF4B-4256-B8BC-C51D1167C489}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "src\IntegrationTests\IntegrationTests.csproj", "{24B47F4C-0035-4F29-AAD9-4C47E1AAD98E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.IntegrationTests", "src\IntegrationTests\AutoMapper.IntegrationTests.csproj", "{24B47F4C-0035-4F29-AAD9-4C47E1AAD98E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,5 +155,8 @@ Global
 		{E87F3347-5604-42DD-915B-173BDE2AAAF3} = {B84E9CD3-2DDB-47FA-84BE-732EBF2F46CD}
 		{4F96C184-FF4B-4256-B8BC-C51D1167C489} = {1BCC7A00-6382-4891-936A-F164614D26A4}
 		{24B47F4C-0035-4F29-AAD9-4C47E1AAD98E} = {1BCC7A00-6382-4891-936A-F164614D26A4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D8272EE-D8E3-4B7E-A063-B334CBF8C42F}
 	EndGlobalSection
 EndGlobal
