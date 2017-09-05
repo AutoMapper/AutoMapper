@@ -232,7 +232,14 @@ namespace AutoMapper.XpressionMapper
             {
                 throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
             }
-                
+
+            PathMap pathMap = typeMap.FindPathMapByDestinationPath(sourceFullName);
+            if (pathMap != null)
+            {
+                propertyMapInfoList.Add(new PropertyMapInfo(pathMap.SourceExpression, new List<MemberInfo>()));
+                return;
+            }
+
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);

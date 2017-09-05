@@ -296,69 +296,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
-    public class When_testing_a_dto_with_mismatched_members_with_static_config : SpecBase
-    {
-        public class ModelObject
-        {
-            public string Foo { get; set; }
-            public string Barr { get; set; }
-        }
-
-        public class ModelDto
-        {
-            public string Foo { get; set; }
-            public string Bar { get; set; }
-        }
-
-        public class ModelObject2
-        {
-            public string Foo { get; set; }
-            public string Barr { get; set; }
-        }
-
-        public class ModelDto2
-        {
-            public string Foo { get; set; }
-            public string Bar { get; set; }
-            public string Bar1 { get; set; }
-            public string Bar2 { get; set; }
-            public string Bar3 { get; set; }
-            public string Bar4 { get; set; }
-        }
-
-        public class ModelObject3
-        {
-            public string Foo { get; set; }
-            public string Bar { get; set; }
-            public string Bar1 { get; set; }
-            public string Bar2 { get; set; }
-            public string Bar3 { get; set; }
-            public string Bar4 { get; set; }
-        }
-
-        public class ModelDto3
-        {
-            public string Foo { get; set; }
-            public string Bar { get; set; }
-        }
-
-        protected override void Establish_context()
-        {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<ModelObject, ModelDto>();
-                cfg.CreateMap<ModelObject2, ModelDto2>();
-                cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
-            });
-        }
-
-        [Fact]
-        public void Should_fail_a_configuration_check()
-        {
-            typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
-        }
-    }
-
     public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : NonValidatingSpecBase
     {
         public class ModelObject

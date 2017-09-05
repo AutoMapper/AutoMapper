@@ -10,16 +10,18 @@ namespace Benchmark.Flattening
     public class DeepTypeMapper : IObjectToObjectMapper
     {
         private Customer _customer;
+        private IMapper _mapper;
         public string Name { get; } = "Deep Types";
         public void Initialize()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Address, Address>();
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
+            _mapper = config.CreateMapper();
             _customer = new Customer()
             {
                 Address = new Address() { City = "istanbul", Country = "turkey", Id = 1, Street = "istiklal cad." },
@@ -42,7 +44,7 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return Mapper.Map<Customer, CustomerDTO>(_customer);
+            return _mapper.Map<Customer, CustomerDTO>(_customer);
         }
 
         public class Address
@@ -180,21 +182,24 @@ namespace Benchmark.Flattening
     {
         private Foo _foo;
         public string Name { get; } = "Complex Types";
+        private IMapper _mapper;
+
 
         public void Initialize()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Foo, FooDest>();
                 cfg.CreateMap<InnerFoo, InnerFooDest>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
+            _mapper = config.CreateMapper();
             _foo = Foo.New();
         }
 
         public object Map()
         {
-            var dest = Mapper.Map<Foo, FooDest>(_foo);
+            var dest = _mapper.Map<Foo, FooDest>(_foo);
             return dest;
         }
     }
@@ -342,16 +347,19 @@ namespace Benchmark.Flattening
 
         public string Name => "CtorMapper";
 
+        private IMapper _mapper;
+
         public void Initialize()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
-            Mapper.AssertConfigurationIsValid();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Model11, Dto11>());
+            config.AssertConfigurationIsValid();
+            _mapper = config.CreateMapper();
             _model = new Model11 { Value = 5 };
         }
 
         public object Map()
         {
-            return Mapper.Map<Model11, Dto11>(_model);
+            return _mapper.Map<Model11, Dto11>(_model);
         }
     }
 
@@ -375,6 +383,7 @@ namespace Benchmark.Flattening
     public class FlatteningMapper : IObjectToObjectMapper
     {
         private ModelObject _source;
+        private IMapper _mapper;
 
         public string Name
         {
@@ -383,7 +392,7 @@ namespace Benchmark.Flattening
 
         public void Initialize()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Model1, Dto1>();
                 cfg.CreateMap<Model2, Dto2>();
@@ -397,7 +406,8 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
+            _mapper = config.CreateMapper();
             _source = new ModelObject
             {
                 BaseDate = new DateTime(2007, 4, 5),
@@ -422,7 +432,7 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return Mapper.Map<ModelObject, ModelDto>(_source);
+            return _mapper.Map<ModelObject, ModelDto>(_source);
         }
     }
 
