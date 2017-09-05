@@ -323,4 +323,61 @@ namespace AutoMapper.UnitTests
             model.CustomerHolder.Customer.Total.ShouldBe(74.85m);
         }
     }
+
+    public class ForPathWithConditions : AutoMapperSpecBase
+    {
+        public class Order
+        {
+            public CustomerHolder CustomerHolder { get; set; }
+        }
+
+        public class CustomerHolder
+        {
+            public Customer Customer { get; set; }
+        }
+
+        public class Customer
+        {
+            public string Name { get; set; }
+            public decimal Total { get; set; }
+            public int Value { get; set; }
+        }
+
+        public class OrderDto
+        {
+            public string CustomerName { get; set; }
+            public decimal Total { get; set; }
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<OrderDto, Order>()
+                .ForPath(o => o.CustomerHolder.Customer.Name, o =>
+                {
+                    o.Condition(c => !c.SourceMember.StartsWith("George"));
+                    o.MapFrom(s => s.CustomerName);
+                })
+                .ForPath(o => o.CustomerHolder.Customer.Total, o =>
+                {
+                    o.Condition(c => c.Source.Total < 50);
+                    o.MapFrom(s => s.Total);
+                })
+                .ForPath(o => o.CustomerHolder.Customer.Value, o =>
+                {
+                    o.Condition(c => c.Destination.CustomerHolder.Customer.Value == 0);
+                    o.MapFrom(s => s.Value);
+                });
+        });
+
+        [Fact]
+        public void Should_unflatten()
+        {
+            var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m, Value = 100 };
+            var model = Mapper.Map<Order>(dto);
+            model.CustomerHolder.Customer.Name.ShouldBeNull();
+            model.CustomerHolder.Customer.Total.ShouldBe(0);
+            model.CustomerHolder.Customer.Value.ShouldBe(100);
+        }
+    }
 }

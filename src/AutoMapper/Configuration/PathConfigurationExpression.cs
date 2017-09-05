@@ -7,7 +7,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
-    public class PathConfigurationExpression<TSource, TDestination> : IPathConfigurationExpression<TSource, TDestination>, IPropertyMapConfiguration
+    public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;
         private LambdaExpression _sourceExpression;
@@ -64,7 +64,7 @@ namespace AutoMapper.Configuration
             {
                 return null;
             }
-            var reversed = new PathConfigurationExpression<TSource, TDestination>(destination);
+            var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
             if(reversed.MemberPath.Length == 1)
             {
                 var reversedMemberExpression = new MemberConfigurationExpression<TSource, TDestination, object>(reversed.DestinationMember, typeof(TSource));
@@ -78,6 +78,17 @@ namespace AutoMapper.Configuration
         public IPropertyMapConfiguration Reverse()
         {
             return Create(_sourceExpression, _destinationExpression);
+        }
+
+        public void Condition(Func<ConditionParameters<TSource, TDestination, TMember>, bool> condition)
+        {
+            PathMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => 
+                        condition(new ConditionParameters<TSource, TDestination, TMember>(src, dest, srcMember, destMember, ctxt));
+                pm.Condition = expr;
+            });
         }
     }
 }

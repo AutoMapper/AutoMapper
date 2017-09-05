@@ -17,6 +17,7 @@ namespace AutoMapper
 
         public PropertyMap(PathMap pathMap)
         {
+            Condition = pathMap.Condition;
             DestinationProperty = pathMap.DestinationMember;
             CustomExpression = pathMap.SourceExpression;
             TypeMap = pathMap.TypeMap;

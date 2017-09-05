@@ -173,13 +173,13 @@ namespace AutoMapper.Configuration
             => new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
 
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
-            Action<IPathConfigurationExpression<TSource, TDestination>> memberOptions)
+            Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             if(!destinationMember.IsMemberPath())
             {
                 throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
             }
-            var expression = new PathConfigurationExpression<TSource, TDestination>(destinationMember);
+            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
             var firstMember = expression.MemberPath.First;
             var firstMemberConfig = GetDestinationMemberConfiguration(firstMember);
             if(firstMemberConfig == null)

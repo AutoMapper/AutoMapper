@@ -197,7 +197,7 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
-            Action<IPathConfigurationExpression<TSource, TDestination>> memberOptions);
+            Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions);
 
         /// <summary>
         /// Preserve object identity. Useful for circular references.
