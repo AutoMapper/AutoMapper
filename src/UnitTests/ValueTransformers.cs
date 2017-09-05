@@ -225,7 +225,7 @@ namespace AutoMapper.UnitTests
                 {
                     p.CreateMap<Source, Dest>()
                      .AddTransform<string>(dest => dest + ", for real,")
-                     .ForMember(d => d.Value, opt => opt.AddTransform<string>(d => d + ", seriously"));
+                     .ForMember(d => d.Value, opt => opt.AddTransform(d => d + ", seriously"));
                     p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
             });
