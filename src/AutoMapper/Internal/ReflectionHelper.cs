@@ -127,7 +127,7 @@ namespace AutoMapper.Internal
                             memberExpression.Expression.NodeType != ExpressionType.Convert)
                         {
                             throw new ArgumentException(
-                                $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.",
+                                $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. You can use ForPath, a custom resolver on the child type or the AfterMap option instead.",
                                 nameof(lambdaExpression));
                         }
 
