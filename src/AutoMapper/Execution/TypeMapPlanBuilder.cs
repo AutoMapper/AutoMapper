@@ -391,6 +391,12 @@ namespace AutoMapper.Execution
                     propertyMap, destValueExpr)
                 : ContextMap(typePair, valueResolverExpr, Context, destValueExpr);
 
+            valueResolverExpr = propertyMap.ValueTransformers
+                .Concat(_typeMap.ValueTransformers)
+                .Concat(_typeMap.Profile.ValueTransformers)
+                .Where(vt => vt.IsMatch(propertyMap))
+                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
+
             ParameterExpression propertyValue;
             Expression setPropertyValue;
             if (valueResolverExpr == resolvedValue)
@@ -521,12 +527,6 @@ namespace AutoMapper.Execution
                         ToType(DelegateFactory.GenerateNonNullConstructorExpression(toCreate), propertyMap.SourceType)
                     );
             }
-
-            valueResolverFunc = propertyMap.ValueTransformers
-                .Concat(_typeMap.ValueTransformers)
-                .Concat(_typeMap.Profile.ValueTransformers)
-                .Where(vt => vt.IsMatch(propertyMap))
-                .Aggregate(valueResolverFunc, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
 
             return valueResolverFunc;
         }
