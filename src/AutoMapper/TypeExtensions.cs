@@ -130,6 +130,8 @@ namespace AutoMapper
 
         public static bool IsValueType(this Type type) => type.GetTypeInfo().IsValueType;
 
+        public static bool IsLiteralType(this Type type) => type == typeof(string) || type.GetTypeInfo().IsValueType;
+
         public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
 
         public static PropertyInfo[] GetProperties(this Type type) => type.GetRuntimeProperties().ToArray();
