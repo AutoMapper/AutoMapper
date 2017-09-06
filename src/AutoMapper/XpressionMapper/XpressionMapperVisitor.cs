@@ -238,7 +238,7 @@ namespace AutoMapper.XpressionMapper
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
                 if (propertyMap == null)
                 {
-                    throw QueryMapperHelper.MissingPropertyMapException(sourceFullName, sourceType: typeDestination, destinationType: typeSource);
+                    throw QueryMapperHelper.MissingPropertyMapException(typeMap, sourceFullName);
                 }
 
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
@@ -265,7 +265,7 @@ namespace AutoMapper.XpressionMapper
                 var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
                 if (propertyMap == null)
                 {
-                    throw QueryMapperHelper.MissingPropertyMapException(propertyName, sourceType: typeDestination, destinationType: typeSource);
+                    throw QueryMapperHelper.MissingPropertyMapException( typeMap, propertyName);
                 }
 
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
