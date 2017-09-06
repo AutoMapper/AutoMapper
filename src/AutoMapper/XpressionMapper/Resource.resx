@@ -154,4 +154,8 @@
   <data name="mustBeExpressions" xml:space="preserve">
     <value>Arguments must be expressions.</value>
   </data>
+  <data name="mappedMemberIsChildOfTheParameterFormat" xml:space="preserve">
+    <value>The mapped member {0} is of type {1} and a child of the parameter type {2}.  No reference type (parent of) {0} is available to map as an include.</value>
+    <comment>0=memberName, 1=memberType; 2=parameterType</comment>
+  </data>
 </root>

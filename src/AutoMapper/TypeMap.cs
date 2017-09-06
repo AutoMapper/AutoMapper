@@ -50,6 +50,9 @@ namespace AutoMapper
             return pathMap;
         }
 
+        public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
+            PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
+
         public LambdaExpression MapExpression { get; private set; }
 
         public TypePair Types { get; }
@@ -94,10 +97,8 @@ namespace AutoMapper
         public PropertyMap[] GetPropertyMaps() => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         public IEnumerable<PathMap> PathMaps => _pathMaps;
 
-        public bool ConstructorParameterMatches(string destinationPropertyName)
-        {
-            return ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
-        }
+        public bool ConstructorParameterMatches(string destinationPropertyName) =>
+            ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
 
         public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
         {

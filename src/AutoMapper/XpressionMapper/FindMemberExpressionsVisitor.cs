@@ -44,19 +44,14 @@ namespace AutoMapper.XpressionMapper
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.NodeType == ExpressionType.Constant)
-                return base.VisitMember(node);
-
             var parameterExpression = node.GetParameterExpression();
             var sType = parameterExpression?.Type;
             if (sType != null && _newParameter.Type == sType && node.IsMemberExpression())
             {
-                if (node.Expression.NodeType == ExpressionType.MemberAccess && (node.Type == typeof(string) 
-                                                                                    || node.Type.GetTypeInfo().IsValueType
-                                                                                    || (node.Type.GetTypeInfo().IsGenericType 
-                                                                                        && node.Type.GetGenericTypeDefinition() == typeof(Nullable<>)
-                                                                                        && Nullable.GetUnderlyingType(node.Type).GetTypeInfo().IsValueType)))
+                if (node.Expression.NodeType == ExpressionType.MemberAccess && node.Type.IsLiteralType())
                     _memberExpressions.Add((MemberExpression)node.Expression);
+                else if (node.Expression.NodeType == ExpressionType.Parameter && node.Type.IsLiteralType())
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.mappedMemberIsChildOfTheParameterFormat, node.GetPropertyFullName(), node.Type.FullName, sType.FullName));
                 else
                     _memberExpressions.Add(node);
             }
