@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using AutoMapper;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -15,10 +16,17 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)
-            {
-                var message = $"Missing property map from {sourceMemberInfo.DeclaringType.Name} to {destinationMemberType.Name} for {sourceMemberInfo.Name} property. Create using Mapper.CreateMap<{sourceMemberInfo.DeclaringType.Name}, {destinationMemberType.Name}>.";
-                throw new InvalidOperationException(message);
-            }
+                throw new AutoMapperConfigurationException(new AutoMapperConfigurationException.TypeMapConfigErrors[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, new string[] { sourceMemberInfo.Name }, true) });
+
+            return propertyMap;
+        }
+
+        public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
+        {
+            var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == destinationPropertyName);
+            if (propertyMap == null)
+                throw new AutoMapperConfigurationException(new AutoMapperConfigurationException.TypeMapConfigErrors[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, new string[] { destinationPropertyName }, true) });
+
             return propertyMap;
         }
 
