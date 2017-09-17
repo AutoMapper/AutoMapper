@@ -246,8 +246,17 @@ namespace AutoMapper.QueryableExtensions
                     var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap,
                         propertyRequest, result, typePairCount, letPropertyMaps);
 
-                    if(bindExpression != null)
+
+                    if (bindExpression != null)
                     {
+                        var rhs = propertyMap.ValueTransformers
+                            .Concat(typeMap.ValueTransformers)
+                            .Concat(typeMap.Profile.ValueTransformers)
+                            .Where(vt => vt.IsMatch(propertyMap))
+                            .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationPropertyType));
+
+                        bindExpression = bindExpression.Update(rhs);
+
                         bindings.Add(bindExpression);
                     }
                 }
