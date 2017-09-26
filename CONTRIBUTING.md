@@ -27,7 +27,7 @@ Please log a new issue in the appropriate GitHub repo:
 ## Other discussions
 https://gitter.im/AutoMapper/AutoMapper
 
-## Filling issues
+## Filing issues
 The best way to get your bug fixed is to be as detailed as you can be about the problem.
 Providing a minimal project with steps to reproduce the problem is ideal.
 Here are questions you can answer before you file a bug to make sure you're not missing any important information.
