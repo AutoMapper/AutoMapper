@@ -12,7 +12,7 @@ namespace AutoMapper.Configuration
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression
     {
-        public MappingExpression(TypePair types, MemberList memberList) : base(memberList, types.SourceType, types.DestinationType)
+        public MappingExpression(TypePair types, MemberList memberList) : base(memberList, types)
         {
         }
 
@@ -146,10 +146,15 @@ namespace AutoMapper.Configuration
         }
 
         public MappingExpression(MemberList memberList, Type sourceType, Type destinationType)
+            : this(memberList, new TypePair(sourceType, destinationType))
+        {
+        }
+
+        public MappingExpression(MemberList memberList, TypePair types)
         {
             MemberList = memberList;
-            Types = new TypePair(sourceType, destinationType);
-            IsOpenGeneric = sourceType.IsGenericTypeDefinition() || destinationType.IsGenericTypeDefinition();
+            Types = types;
+            IsOpenGeneric = types.SourceType.IsGenericTypeDefinition() || types.DestinationType.IsGenericTypeDefinition();
         }
 
         public MemberList MemberList { get; }
@@ -247,8 +252,8 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
-            CheckIsDerived(otherSourceType, typeof(TSource));
-            CheckIsDerived(otherDestinationType, typeof(TDestination));
+            CheckIsDerived(otherSourceType, SourceType);
+            CheckIsDerived(otherDestinationType, DestinationType);
             return IncludeCore(otherSourceType, otherDestinationType);
         }
 
@@ -263,8 +268,8 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
-            CheckIsDerived(typeof(TSource), sourceBase);
-            CheckIsDerived(typeof(TDestination), destinationBase);
+            CheckIsDerived(SourceType, sourceBase);
+            CheckIsDerived(DestinationType, destinationBase);
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(sourceBase, destinationBase));
             return this;
         }
