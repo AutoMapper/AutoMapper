@@ -56,6 +56,7 @@ namespace AutoMapper
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
+        public string CustomSourceMemberName { get; set; }
 
         public MemberInfo SourceMember
         {
@@ -93,7 +94,6 @@ namespace AutoMapper
             }
         }
 
-        public string CustomSourceMemberName { get; set; }
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
@@ -114,6 +114,7 @@ namespace AutoMapper
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
+            CustomSourceMemberName = CustomSourceMemberName ?? inheritedMappedProperty.CustomSourceMemberName;
         }
 
         public bool IsMapped() => HasSource() || Ignored;
