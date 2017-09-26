@@ -1,11 +1,11 @@
 # How to contribute
 
-The easiest ways to contribute is to open an issue and start a discussion. 
+The easiest way to contribute is to open an issue and start a discussion. 
 Then we can decide if and how a feature or a change could be implemented and if you should submit a pull requests with code changes.
 
 Also read this first: [Being a good open source citizen](https://hackernoon.com/being-a-good-open-source-citizen-9060d0ab9732#.x3hocgw85)
 
-## General feedback and discussions?
+## General feedback and discussions
 Please start a discussion on the [core repo issue tracker](https://github.com/AutoMapper/AutoMapper/issues).
 
 ## Platform
@@ -67,6 +67,6 @@ Summary of the changes (Less than 80 chars)
 **Tests**
 
 -  Tests need to be provided for every bug/feature that is completed.
--  Tests only need to be present for issues that need to be verified by QA (e.g. not tasks)
+-  Tests only need to be present for issues that need to be verified by QA (e.g. not tasks).
 -  If there is a scenario that is far too hard to test there does not need to be a test for it.
   - "Too hard" is determined by the team as a whole.
