@@ -237,7 +237,7 @@ namespace AutoMapper.XpressionMapper
 
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
-                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(destinationPropertyName: sourceFullName);
+                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(sourceFullName);
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.ValueResolverConfig != null)
                 {
@@ -259,7 +259,7 @@ namespace AutoMapper.XpressionMapper
             else
             {
                 var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
-                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(destinationPropertyName: propertyName);
+                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(propertyName);
 
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
