@@ -15,7 +15,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)
-                throw PropertyConfigurationException(typeMap, new string[] { sourceMemberInfo.Name });
+                throw PropertyConfigurationException(typeMap, sourceMemberInfo.Name);
 
             return propertyMap;
         }
@@ -24,7 +24,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == destinationPropertyName);
             if (propertyMap == null)
-                throw PropertyConfigurationException(typeMap, new string[] { destinationPropertyName });
+                throw PropertyConfigurationException(typeMap, destinationPropertyName);
 
             return propertyMap;
         }
@@ -39,7 +39,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return typeMap;
         }
 
-        public static Exception PropertyConfigurationException(TypeMap typeMap, string[] unmappedPropertyNames)
+        public static Exception PropertyConfigurationException(TypeMap typeMap, params string[] unmappedPropertyNames)
             => new AutoMapperConfigurationException(new AutoMapperConfigurationException.TypeMapConfigErrors[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, true) });
 
         public static Exception MissingMapException(Type sourceType, Type destinationType) 
