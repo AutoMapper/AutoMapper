@@ -4,6 +4,44 @@
     using Shouldly;
     using Xunit;
 
+    public class RecursiveOpenGenerics : AutoMapperSpecBase
+    {
+        public class SourceTree<T>
+        {
+            public SourceTree(T value, SourceTree<T>[] children)
+            {
+                Value = value;
+                Children = children;
+            }
+
+            public T Value { get; }
+
+            public SourceTree<T>[] Children { get; }
+        }
+
+        public class DestinationTree<T>
+        {
+            public DestinationTree(T value, DestinationTree<T>[] children)
+            {
+                Value = value;
+                Children = children;
+            }
+
+            public T Value { get; }
+
+            public DestinationTree<T>[] Children { get; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap(typeof(SourceTree<>), typeof(DestinationTree<>)));
+
+        [Fact]
+        public void Should_work()
+        {
+            var source = new SourceTree<string>("value", new SourceTree<string>[0]);
+            Mapper.Map<DestinationTree<string>>(source).Value.ShouldBe("value");
+        }
+    }
+
     public class OpenGenerics
     {
         public class Source<T>
