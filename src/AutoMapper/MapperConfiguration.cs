@@ -189,7 +189,8 @@ namespace AutoMapper
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
-            if(typeMap != null && Configuration.CreateMissingTypeMaps)
+            // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
+            if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetTypeMap(typePair) == null)
             {
                 lock(typeMap)
                 {
@@ -338,10 +339,6 @@ namespace AutoMapper
             {
                 typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
             }
-            if(!Configuration.CreateMissingTypeMaps)
-            {
-                typeMap.Seal(this);
-            }
             return typeMap;
         }
 
@@ -361,7 +358,6 @@ namespace AutoMapper
             {
                 typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair);
             }
-            typeMap.Seal(this);
             return typeMap;
         }
 
