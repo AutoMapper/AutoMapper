@@ -15,10 +15,17 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)
-            {
-                var message = $"Missing property map from {sourceMemberInfo.DeclaringType.Name} to {destinationMemberType.Name} for {sourceMemberInfo.Name} property. Create using Mapper.CreateMap<{sourceMemberInfo.DeclaringType.Name}, {destinationMemberType.Name}>.";
-                throw new InvalidOperationException(message);
-            }
+                throw PropertyConfigurationException(typeMap, sourceMemberInfo.Name);
+
+            return propertyMap;
+        }
+
+        public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
+        {
+            var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == destinationPropertyName);
+            if (propertyMap == null)
+                throw PropertyConfigurationException(typeMap, destinationPropertyName);
+
             return propertyMap;
         }
 
@@ -31,6 +38,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             return typeMap;
         }
+
+        public static Exception PropertyConfigurationException(TypeMap typeMap, params string[] unmappedPropertyNames)
+            => new AutoMapperConfigurationException(new[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, true) });
 
         public static Exception MissingMapException(Type sourceType, Type destinationType) 
             => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using Mapper.CreateMap<{sourceType.Name}, {destinationType.Name}>.");

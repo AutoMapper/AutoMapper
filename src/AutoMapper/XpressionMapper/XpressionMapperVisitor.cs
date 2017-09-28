@@ -96,8 +96,7 @@ namespace AutoMapper.XpressionMapper
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            Type newType;
-            if (this.TypeMappings.TryGetValue(node.Type, out newType))
+            if (this.TypeMappings.TryGetValue(node.Type, out Type newType))
                 return base.VisitConstant(Expression.Constant(node.Value, newType));
 
             return base.VisitConstant(node);
@@ -225,15 +224,10 @@ namespace AutoMapper.XpressionMapper
                 return;
             }
 
-            var typeMap = ConfigurationProvider.ResolveTypeMap(sourceType: typeDestination, destinationType: typeSource);//The destination becomes the source because to map a source expression to a destination expression,
+            var typeMap = ConfigurationProvider.CheckIfMapExists(sourceType: typeDestination, destinationType: typeSource);//The destination becomes the source because to map a source expression to a destination expression,
             //we need the expressions used to create the source from the destination 
 
-            if (typeMap == null)
-            {
-                throw QueryMapperHelper.MissingMapException(sourceType: typeDestination, destinationType: typeSource);
-            }
-
-            PathMap pathMap = typeMap.FindPathMapByDestinationPath(sourceFullName);
+            PathMap pathMap = typeMap.FindPathMapByDestinationPath(destinationFullPath: sourceFullName);
             if (pathMap != null)
             {
                 propertyMapInfoList.Add(new PropertyMapInfo(pathMap.SourceExpression, new List<MemberInfo>()));
@@ -243,7 +237,7 @@ namespace AutoMapper.XpressionMapper
 
             if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
-                var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
+                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(sourceFullName);
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.ValueResolverConfig != null)
                 {
@@ -265,8 +259,8 @@ namespace AutoMapper.XpressionMapper
             else
             {
                 var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
-                var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
-                
+                var propertyMap = typeMap.GetPropertyMapByDestinationProperty(propertyName);
+
                 var sourceMemberInfo = typeSource.GetFieldOrProperty(propertyMap.DestinationProperty.Name);
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));
