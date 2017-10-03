@@ -71,7 +71,7 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(Stack<TypeMap> typeMapsPath)
         {
-            if(_typeMap.PreserveReferences)
+            if(_typeMap.PreserveReferences || _typeMap.SourceType.IsValueType())
             {
                 return;
             }

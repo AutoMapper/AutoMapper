@@ -283,7 +283,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(tm => tm.MaxDepth = depth);
 
-            return PreserveReferences();
+            return this;
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator()
