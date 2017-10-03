@@ -71,7 +71,7 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(Stack<TypeMap> typeMapsPath)
         {
-            if(_typeMap.PreserveReferences || _typeMap.SourceType.IsValueType())
+            if(_typeMap.PreserveReferences)
             {
                 return;
             }
@@ -92,7 +92,7 @@ namespace AutoMapper.Execution
                     property.PropertyMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {property.PropertyMap.DestinationProperty} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
                 }
-                if(typeMapsPath.Contains(property.PropertyTypeMap))
+                if(typeMapsPath.Contains(property.PropertyTypeMap) && !property.PropertyTypeMap.SourceType.IsValueType())
                 {
                     Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {property.PropertyTypeMap.SourceType} - {property.PropertyTypeMap.DestinationType}");
                     property.PropertyTypeMap.PreserveReferences = true;
