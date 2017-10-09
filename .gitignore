@@ -28,3 +28,6 @@ project.lock.json
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Read the Docs
+docs/_build
