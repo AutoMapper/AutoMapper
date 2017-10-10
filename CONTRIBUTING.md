@@ -1,6 +1,6 @@
 # How to contribute
 
-The easiest way to contribute is to open an issue and start a discussion. 
+The easiest way to contribute is to open an issue and start a discussion.
 Then we can decide if and how a feature or a change could be implemented and if you should submit a pull requests with code changes.
 
 Also read this first: [Being a good open source citizen](https://hackernoon.com/being-a-good-open-source-citizen-9060d0ab9732#.x3hocgw85)
@@ -32,14 +32,14 @@ The best way to get your bug fixed is to be as detailed as you can be about the 
 Providing a minimal project with steps to reproduce the problem is ideal.
 Here are questions you can answer before you file a bug to make sure you're not missing any important information.
 
-1. Did you read the [documentation](https://github.com/AutoMapper/AutoMapper/wiki)?
+1. Did you read the [documentation](http://automapper.readthedocs.io/en/latest/)?
 2. Did you include the snippet of broken code in the issue?
 3. What are the *EXACT* steps to reproduce this problem (including source/destination types, mapping configuration and execution)?
 
 GitHub supports [markdown](http://github.github.com/github-flavored-markdown/), so when filing bugs make sure you check the formatting before clicking submit.
 
 ## Contributing code and content
-You will need to sign a [Contributor License Agreement](https://cla.dotnetfoundation.org/) before submitting your pull request. 
+You will need to sign a [Contributor License Agreement](https://cla.dotnetfoundation.org/) before submitting your pull request.
 
 Make sure you can build the code. Familiarize yourself with the project workflow and our coding conventions. If you don't know what a pull request is read this article: https://help.github.com/articles/using-pull-requests.
 
