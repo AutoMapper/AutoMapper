@@ -1,4 +1,4 @@
-<img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper"> 
+<img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
 
 [![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/develop?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/develop)
 [![NuGet](http://img.shields.io/nuget/v/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
@@ -32,7 +32,7 @@ var fooDto = Mapper.Map<FooDto>(foo);
 var barDto = Mapper.Map<BarDto>(bar);
 ```
 
-Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started). When you're done there, the [wiki](https://github.com/AutoMapper/AutoMapper/wiki) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](http://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
+Check out the [getting started guide](http://automapper.readthedocs.io/en/latest/Getting-started.html). When you're done there, the [wiki](http://automapper.readthedocs.io/en/latest/) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](http://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
 
 ### Where can I get it?
 
@@ -44,16 +44,16 @@ PM> Install-Package AutoMapper
 
 ### Do you have an issue?
 
-First check if it's already fixed by trying the [MyGet build](https://github.com/AutoMapper/AutoMapper/wiki/The-MyGet-build).
+First check if it's already fixed by trying the [MyGet build](http://automapper.readthedocs.io/en/latest/The-MyGet-build.html).
 
-You might want to know exactly what [your mapping does](https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping) at runtime.
+You might want to know exactly what [your mapping does](http://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html) at runtime.
 
 If you're still running into problems, file an issue above.
 
 ### License, etc.
 
 This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our community.
-For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct). 
+For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct).
 
 AutoMapper is Copyright &copy; 2009 [Jimmy Bogard](https://jimmybogard.com) and other contributors under the [MIT license](LICENSE.txt).
 
