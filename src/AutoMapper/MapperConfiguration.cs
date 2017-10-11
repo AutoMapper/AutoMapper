@@ -365,19 +365,17 @@ namespace AutoMapper
 
         internal struct MapperFuncs
         {
-            private readonly Lazy<UntypedMapperFunc> _untyped;
-
             public Delegate Typed { get; }
 
-            public UntypedMapperFunc Untyped => _untyped.Value;
+            public UntypedMapperFunc Untyped { get; }
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
                 Typed = typedExpression.Compile();
-                _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(mapRequest, typedExpression).Compile());
+                Untyped = Wrap(mapRequest, Typed).Compile();
             }
 
-            private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
+            private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, Delegate typedDelegate)
             {
                 var sourceParameter = Parameter(typeof(object), "source");
                 var destinationParameter = Parameter(typeof(object), "destination");
@@ -389,7 +387,7 @@ namespace AutoMapper
                 // Invoking a delegate here
                 return Lambda<UntypedMapperFunc>(
                             ToType(
-                                Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
+                                Invoke(Constant(typedDelegate), ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
