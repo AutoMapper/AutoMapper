@@ -92,17 +92,28 @@ namespace AutoMapper.Execution
                     property.PropertyMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {property.PropertyMap.DestinationProperty} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
                 }
-                if(typeMapsPath.Contains(property.PropertyTypeMap) && !property.PropertyTypeMap.SourceType.IsValueType())
+
+                var propertyTypeMap = property.PropertyTypeMap;
+                if(typeMapsPath.Contains(propertyTypeMap) && !propertyTypeMap.SourceType.IsValueType())
                 {
-                    Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {property.PropertyTypeMap.SourceType} - {property.PropertyTypeMap.DestinationType}");
-                    property.PropertyTypeMap.PreserveReferences = true;
+                    SetPreserveReferences(propertyTypeMap);
+                    foreach(var derivedTypeMap in propertyTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
+                    {
+                        SetPreserveReferences(derivedTypeMap);
+                    }
                 }
                 else
                 {
-                    property.PropertyTypeMap.Seal(_configurationProvider, typeMapsPath);
+                    propertyTypeMap.Seal(_configurationProvider, typeMapsPath);
                 }
             }
             typeMapsPath.Pop();
+        }
+
+        private void SetPreserveReferences(TypeMap propertyTypeMap)
+        {
+            Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {propertyTypeMap.SourceType} - {propertyTypeMap.DestinationType}");
+            propertyTypeMap.PreserveReferences = true;
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
@@ -112,6 +123,11 @@ namespace AutoMapper.Execution
                 return null;
             }
             var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
+            return ResolveTypeMap(types);
+        }
+
+        private TypeMap ResolveTypeMap(TypePair types)
+        {
             var typeMap = _configurationProvider.ResolveTypeMap(types);
             if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
             {
