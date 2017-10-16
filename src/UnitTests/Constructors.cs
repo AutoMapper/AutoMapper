@@ -2,9 +2,59 @@
 using System.Linq.Expressions;
 using Xunit;
 using Shouldly;
+using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class Preserve_references_with_constructor_mapping : AutoMapperSpecBase
+    {
+        public class ParentDTO
+        {
+            public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
+            public int Id { get; set; }
+        }
+
+        public class ChildDTO
+        {
+            public int Id { get; set; }
+            public ParentDTO Parent { get; set; }
+        }
+
+        public class ParentModel
+        {
+            public List<ChildModel> Children { get; set; } = new List<ChildModel>();
+            public int Id { get; set; }
+        }
+
+        public class ChildModel
+        {
+            public ChildModel(ParentModel parent) // This causes the exception.
+            {
+                Parent = parent;
+            }
+
+            public int Id { get; set; }
+            public ParentModel Parent { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<ParentDTO, ParentModel>().PreserveReferences();
+            cfg.CreateMap<ChildDTO, ChildModel>().PreserveReferences();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var parentDto = new ParentDTO { Id = 1 };
+            for(var i = 0; i < 5; i++)
+            {
+                parentDto.Children.Add(new ChildDTO { Id = i, Parent = parentDto });
+            }
+            var children = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+        }
+    }
+
     public class When_construct_mapping_a_struct : AutoMapperSpecBase
     {
         public class Dto
