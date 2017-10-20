@@ -294,4 +294,47 @@ namespace AutoMapper.UnitTests.DynamicMapping
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
     }
+
+    public class When_dynamically_mapping_a_badly_configured_map : NonValidatingSpecBase
+    {
+        public class Source
+        {
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+
+        [Fact]
+        public void Should_throw()
+        {
+            typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(new Source()));
+        }
+    }
+
+    public class When_automatically_dynamically_mapping : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
+
+        [Fact]
+        public void Should_map()
+        {
+            var source = new Source {Value = 5};
+            var dest = Mapper.Map<Dest>(source);
+            dest.Value.ShouldBe(5);
+        }
+    }
 }

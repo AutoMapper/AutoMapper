@@ -98,6 +98,8 @@ namespace AutoMapper
 
         public PropertyMap[] GetPropertyMaps() => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         public IEnumerable<PathMap> PathMaps => _pathMaps;
+        public bool IsConventionMap { get; set; }
+        public bool? IsValid { get; set; }
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
@@ -352,7 +354,8 @@ namespace AutoMapper
                                              && CustomProjection == null
                                              && TypeConverterType == null
                                              && DestinationTypeOverride == null
-                                             && ConfiguredMemberList != MemberList.None;
+                                             && ConfiguredMemberList != MemberList.None
+                                             && !(IsValid ?? false);
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {

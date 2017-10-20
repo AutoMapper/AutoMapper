@@ -38,7 +38,7 @@ namespace AutoMapper
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
-            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? false;
+            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? true;
 
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
@@ -177,6 +177,8 @@ namespace AutoMapper
         public TypeMap CreateConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
         {
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
+
+            typeMap.IsConventionMap = true;
 
             var config = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
 

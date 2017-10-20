@@ -73,6 +73,7 @@ namespace AutoMapper
                 var context = new ValidationContext(types, propertyMap, typeMap);
                 _config.Validate(context);
                 CheckPropertyMaps(typeMapsChecked, typeMap);
+                typeMap.IsValid = true;
             }
             else
             {

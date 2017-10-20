@@ -19,6 +19,9 @@ namespace AutoMapper.Execution
         private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo =
             ctxt => ctxt.IncrementTypeDepth(default(TypePair));
 
+        private static readonly Expression<Action<ResolutionContext>> ValidateMap =
+            ctxt => ctxt.ValidateMap(default(TypeMap));
+
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
             ctxt => ctxt.DecrementTypeDepth(default(TypePair));
 
@@ -202,8 +205,14 @@ namespace AutoMapper.Execution
                 actions.Insert(0, beforeMapAction.ReplaceParameters(Source, _destination, Context));
             actions.Insert(0, destinationFunc);
             if (_typeMap.MaxDepth > 0)
+            {
                 actions.Insert(0,
                     Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
+            }
+            if (_typeMap.IsConventionMap)
+            {
+                actions.Insert(0, Call(Context, ((MethodCallExpression) ValidateMap.Body).Method, Constant(_typeMap)));
+            }
             actions.AddRange(
                 _typeMap.AfterMapActions.Select(
                     afterMapAction => afterMapAction.ReplaceParameters(Source, _destination, Context)));

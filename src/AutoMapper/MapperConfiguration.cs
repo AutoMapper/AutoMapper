@@ -192,7 +192,7 @@ namespace AutoMapper
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
             if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetTypeMap(typePair) == null)
             {
-                lock(typeMap)
+                lock (typeMap)
                 {
                     typeMap.Seal(this);
                 }
