@@ -8,6 +8,7 @@ namespace AutoMapper.UnitTests.Bug
     {
         public class ParentDTO
         {
+            public ChildDTO First => Children[0];
             public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
             public int Id { get; set; }
         }
@@ -20,6 +21,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class ParentModel
         {
+            public ChildModel First { get; set; }
             public List<ChildModel> Children { get; set; } = new List<ChildModel>();
             public int Id { get; set; }
         }
@@ -53,8 +55,9 @@ namespace AutoMapper.UnitTests.Bug
                 parentDto.Children.Add(new ChildDTO { Id = i, Parent = parentDto });
             }
 
-            typeof(Exception).ShouldNotBeThrownBy(() => 
-                Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children)); 
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children));
+            var parentModel = mappedChildren.Select(c=>c.Parent).Single();
+            parentModel.First.ShouldBe(parentModel.Children[0]);
         }
     }
 }
