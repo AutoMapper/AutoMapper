@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests.Bug
                 parentDto.Children.Add(new ChildDTO { Id = i, Parent = parentDto });
             }
 
-            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children));
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
             var parentModel = mappedChildren.Select(c=>c.Parent).Single();
             parentModel.First.ShouldBe(parentModel.Children[0]);
         }
