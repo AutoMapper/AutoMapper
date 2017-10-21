@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.Bug
             }
 
             var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
-            var parentModel = mappedChildren.Select(c=>c.Parent).Single();
+            var parentModel = mappedChildren.Select(c=>c.Parent).Distinct().Single();
             parentModel.First.ShouldBe(parentModel.Children[0]);
         }
     }
