@@ -246,38 +246,42 @@ namespace AutoMapper.Execution
         {
             var mapperFunc = assignmentFunc;
 
-            if (_typeMap.Condition != null)
+            if(_typeMap.Condition != null)
                 mapperFunc =
                     Condition(_typeMap.Condition.Body,
                         mapperFunc, Default(_typeMap.DestinationTypeToUse));
 
-            if (_typeMap.MaxDepth > 0)
+            if(_typeMap.MaxDepth > 0)
                 mapperFunc = Condition(
                     LessThanOrEqual(
-                        Call(Context, ((MethodCallExpression) GetTypeDepthInfo.Body).Method, Constant(_typeMap.Types)),
+                        Call(Context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(_typeMap.Types)),
                         Constant(_typeMap.MaxDepth)
                     ),
                     mapperFunc,
                     Default(_typeMap.DestinationTypeToUse));
 
-            if (_typeMap.Profile.AllowNullDestinationValues)
+            if(_typeMap.Profile.AllowNullDestinationValues)
                 mapperFunc = Source.IfNullElse(Default(_typeMap.DestinationTypeToUse), mapperFunc);
 
-            if (_typeMap.PreserveReferences)
-            {
-                var cache = Variable(_typeMap.DestinationTypeToUse, "cachedDestination");
-                var getDestination = Context.Type.GetDeclaredMethod("GetDestination");
-                var assignCache =
-                    Assign(cache,
-                        ToType(Call(Context, getDestination, Source, Constant(_destination.Type)), _destination.Type));
-                var condition = Condition(
-                    AndAlso(NotEqual(Source, Constant(null)), NotEqual(assignCache, Constant(null))),
-                    cache,
-                    mapperFunc);
+            return CheckReferencesCache(mapperFunc);
+        }
 
-                mapperFunc = Block(new[] {cache}, condition);
+        private Expression CheckReferencesCache(Expression valueBuilder)
+        {
+            if(!_typeMap.PreserveReferences)
+            {
+                return valueBuilder;
             }
-            return mapperFunc;
+            var cache = Variable(_typeMap.DestinationTypeToUse, "cachedDestination");
+            var getDestination = Context.Type.GetDeclaredMethod("GetDestination");
+            var assignCache =
+                Assign(cache,
+                    ToType(Call(Context, getDestination, Source, Constant(_destination.Type)), _destination.Type));
+            var condition = Condition(
+                AndAlso(NotEqual(Source, Constant(null)), NotEqual(assignCache, Constant(null))),
+                cache,
+                valueBuilder);
+            return Block(new[] { cache }, condition);
         }
 
         private Expression CreateNewDestinationFunc(out bool constructorMapping)
@@ -311,17 +315,13 @@ namespace AutoMapper.Execution
 
         private Expression CreateNewDestinationExpression(ConstructorMap constructorMap)
         {
-            if (!constructorMap.CanResolve)
-                return null;
-
             var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
-
-            ctorArgs =
-                ctorArgs.Zip(constructorMap.Ctor.GetParameters(),
-                        (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
-                    .ToArray();
-            var newExpr = New(constructorMap.Ctor, ctorArgs);
-            return newExpr;
+            var variables = constructorMap.Ctor.GetParameters().Select(parameter => Variable(parameter.ParameterType, parameter.Name)).ToArray();
+            var body = variables.Zip(ctorArgs,
+                                                (variable, expression) => (Expression) Assign(variable, ToType(expression, variable.Type)))
+                                                .Concat(new[] { CheckReferencesCache(New(constructorMap.Ctor, variables)) })
+                                                .ToArray();
+            return Block(variables, body);
         }
 
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -331,8 +331,7 @@ namespace AutoMapper.Execution
             var resolvedValue = Variable(sourceType, "resolvedValue");
             return Block(new[] {resolvedValue},
                 Assign(resolvedValue, valueResolverExpression),
-                MapExpression(_configurationProvider, _typeMap.Profile,
-                    new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue, Context, null, null));
+                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue, Context));
         }
 
         private Expression ResolveSource(ConstructorParameterMap ctorParamMap)

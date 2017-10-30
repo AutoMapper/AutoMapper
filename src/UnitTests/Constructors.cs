@@ -1,57 +1,144 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Xunit;
 using Shouldly;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
-    public class Preserve_references_with_constructor_mapping : AutoMapperSpecBase
+    public class Constructor_mapping_without_PreserveReferences : AutoMapperSpecBase
     {
         public class ParentDTO
         {
+            public ChildDTO First => Children[0];
             public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
-            public int Id { get; set; }
+            public int IdParent { get; set; }
         }
 
         public class ChildDTO
         {
-            public int Id { get; set; }
+            public int IdChild { get; set; }
             public ParentDTO Parent { get; set; }
         }
 
         public class ParentModel
         {
+            public ChildModel First { get; set; }
             public List<ChildModel> Children { get; set; } = new List<ChildModel>();
-            public int Id { get; set; }
+            public int IdParent { get; set; }
         }
 
         public class ChildModel
         {
-            public ChildModel(ParentModel parent) // This causes the exception.
+            int _idChild;
+
+            public ChildModel(ParentModel parent)
             {
                 Parent = parent;
             }
 
-            public int Id { get; set; }
+            public int IdChild
+            {
+                get => _idChild;
+                set
+                {
+                    if(_idChild != 0)
+                    {
+                        throw new Exception("Set IdChild again.");
+                    }
+                    _idChild = value;
+                }
+            }
+            public ParentModel Parent { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<ParentDTO, ParentModel>();
+            cfg.CreateMap<ChildDTO, ChildModel>().ForMember(c => c.Parent, o => o.Ignore());
+        });
+
+        //[Fact]
+        public void Should_work()
+        {
+            var parentDto = new ParentDTO { IdParent = 1 };
+            for(var i = 0; i < 5; i++)
+            {
+                parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
+            }
+
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+            var parentModel = mappedChildren.Select(c => c.Parent).Distinct().Single();
+            parentModel.First.ShouldBe(mappedChildren[0]);
+        }
+    }
+
+    public class Preserve_references_with_constructor_mapping : AutoMapperSpecBase
+    {
+        public class ParentDTO
+        {
+            public ChildDTO First => Children[0];
+            public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildDTO
+        {
+            public int IdChild { get; set; }
+            public ParentDTO Parent { get; set; }
+        }
+
+        public class ParentModel
+        {
+            public ChildModel First { get; set; }
+            public List<ChildModel> Children { get; set; } = new List<ChildModel>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildModel
+        {
+            int _idChild;
+
+            public ChildModel(ParentModel parent)
+            {
+                Parent = parent;
+            }
+
+            public int IdChild
+            {
+                get => _idChild;
+                set
+                {
+                    if(_idChild != 0)
+                    {
+                        throw new Exception("Set IdChild again.");
+                    }
+                    _idChild = value;
+                }
+            }
             public ParentModel Parent { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
             cfg.CreateMap<ParentDTO, ParentModel>().PreserveReferences();
-            cfg.CreateMap<ChildDTO, ChildModel>().PreserveReferences();
+            cfg.CreateMap<ChildDTO, ChildModel>().ForMember(c => c.Parent, o => o.Ignore()).PreserveReferences();
         });
 
         [Fact]
         public void Should_work()
         {
-            var parentDto = new ParentDTO { Id = 1 };
+            var parentDto = new ParentDTO { IdParent = 1 };
             for(var i = 0; i < 5; i++)
             {
-                parentDto.Children.Add(new ChildDTO { Id = i, Parent = parentDto });
+                parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
             }
-            var children = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+            var parentModel = mappedChildren.Select(c => c.Parent).Distinct().Single();
+            parentModel.First.ShouldBe(mappedChildren[0]);
         }
     }
 
