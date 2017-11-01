@@ -24,7 +24,7 @@ namespace AutoMapper
 
         internal void CacheDestination(object source, Type destinationType, object destination)
         {
-            InstanceCache.Add(new ContextCacheKey(source, destinationType), destination);
+            InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
         }
 
         /// <summary>
