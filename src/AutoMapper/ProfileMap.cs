@@ -42,9 +42,6 @@ namespace AutoMapper
 
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
-                .Concat(CreateMissingTypeMaps
-                    ? Enumerable.Repeat(new ConditionalObjectMapper { Conventions = { tp => !ExcludedTypes.Contains(tp.SourceType) && !ExcludedTypes.Contains(tp.DestinationType)} }, 1)
-                    : Enumerable.Empty<IConditionalObjectMapper>())
                 .ToArray();
 
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();

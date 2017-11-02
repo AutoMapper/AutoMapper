@@ -113,6 +113,13 @@ namespace AutoMapper
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
+            if (Configuration.CreateMissingTypeMaps && mapperToUse == null)
+            {
+                typeMap = Configuration.CreateConventionTypeMap(_typeMapRegistry, mapRequest.RuntimeTypes);
+                _typeMapPlanCache[mapRequest.RuntimeTypes] = typeMap;
+                typeMap.Seal(this);
+                return GenerateTypeMapExpression(mapRequest, typeMap);
+            }
             return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
         }
 
@@ -202,6 +209,7 @@ namespace AutoMapper
 
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
+            var hasMapper = new Lazy<bool>(() => FindMapper(initialTypes) != null);
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
                 if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
@@ -218,7 +226,7 @@ namespace AutoMapper
                 {
                     return typeMap;
                 }
-                if (FindMapper(initialTypes) == null)
+                if (!hasMapper.Value)
                 {
                     typeMap = FindConventionTypeMapFor(types);
                     if (typeMap != null)
@@ -227,6 +235,7 @@ namespace AutoMapper
                     }
                 }
             }
+
             return null;
         }
 

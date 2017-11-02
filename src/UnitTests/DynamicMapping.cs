@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
             _result.Value.ShouldBe(ConsoleColor.DarkGreen);
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
     }
 
     public class When_mapping_nested_types : NonValidatingSpecBase
@@ -308,7 +308,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
-        [Fact]
+        [Fact(Skip ="Coming next")]
         public void Should_throw()
         {
             typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(new Source()));
