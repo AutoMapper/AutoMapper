@@ -23,6 +23,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
+            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]

@@ -338,6 +338,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
+            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -464,6 +465,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
+            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -498,6 +500,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
+            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -596,6 +599,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dest => dest.Bar, opt => opt.MapFrom(src => src.Barr));
+            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
