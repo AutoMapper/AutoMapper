@@ -335,4 +335,100 @@ namespace AutoMapper.UnitTests.DynamicMapping
             dest.Value.ShouldBe(5);
         }
     }
+
+    public class When_mixing_auto_and_manual_map : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+            public Inner Value2 { get; set; }
+
+            public class Inner
+            {
+                public string Value { get; set; }
+            }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+            public Inner Value2 { get; set; }
+
+            public class Inner
+            {
+                public string Value { get; set; }
+            }
+
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value + 5)));
+
+        [Fact]
+        public void Should_map()
+        {
+            var source = new Source
+            {
+                Value = 5,
+                Value2 = new Source.Inner
+                {
+                    Value = "asdf"
+                }
+            };
+
+            var dest = Mapper.Map<Dest>(source);
+
+            dest.Value.ShouldBe(source.Value + 5);
+            dest.Value2.Value.ShouldBe(source.Value2.Value);
+        }
+    }
+
+    public class When_mixing_auto_and_manual_map_with_mismatched_properties : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+            public Inner Value2 { get; set; }
+
+            public class Inner
+            {
+                public string Value { get; set; }
+            }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+            public Inner Value2 { get; set; }
+
+            public class Inner
+            {
+                public string Valuefff { get; set; }
+            }
+
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value + 5)));
+
+        [Fact]
+        public void Should_pass_validation()
+        {
+            Action assert = () => Configuration.AssertConfigurationIsValid();
+
+            assert.ShouldNotThrow();
+        }
+
+        [Fact]
+        public void Should_not_pass_runtime_validation()
+        {
+            Action assert = () => Mapper.Map<Dest>(new Source { Value = 5, Value2 = new Source.Inner { Value = "asdf"}});
+
+            var exception = assert.ShouldThrow<AutoMapperMappingException>();
+            var inner = exception.InnerException as AutoMapperConfigurationException;
+
+            inner.ShouldNotBeNull();
+
+            inner.Errors.Select(e => e.TypeMap.Types).ShouldContain(tp => tp == new TypePair(typeof(Source.Inner), typeof(Dest.Inner)));
+        }
+    }
+
 }
