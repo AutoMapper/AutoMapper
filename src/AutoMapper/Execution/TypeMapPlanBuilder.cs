@@ -211,7 +211,7 @@ namespace AutoMapper.Execution
             }
             if (_typeMap.IsConventionMap)
             {
-                //actions.Insert(0, Call(Context, ((MethodCallExpression) ValidateMap.Body).Method, Constant(_typeMap)));
+                actions.Insert(0, Call(Context, ((MethodCallExpression)ValidateMap.Body).Method, Constant(_typeMap)));
             }
             actions.AddRange(
                 _typeMap.AfterMapActions.Select(

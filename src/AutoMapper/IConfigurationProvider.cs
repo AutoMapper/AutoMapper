@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper
@@ -118,6 +119,7 @@ namespace AutoMapper
         IMapper CreateMapper(Func<Type, object> serviceCtor);
 
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest);
 
         /// <summary>
         /// Compile all underlying mapping expressions to cached delegates.

@@ -185,10 +185,6 @@ namespace AutoMapper
                             m.GetParameters().Length == 1));
         }
 
-        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
-        {
-        }
-
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(
             MemberList memberList)
         {

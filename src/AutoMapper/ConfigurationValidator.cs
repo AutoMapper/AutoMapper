@@ -80,6 +80,10 @@ namespace AutoMapper
                 var mapperToUse = _config.FindMapper(types);
                 if (mapperToUse == null)
                 {
+                    // Convention maps with no match get mapped at runtime yolo
+                    if (propertyMap.TypeMap.IsConventionMap)
+                        return;
+
                     throw new AutoMapperConfigurationException(propertyMap.TypeMap.Types) { PropertyMap = propertyMap };
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);

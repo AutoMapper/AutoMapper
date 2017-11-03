@@ -82,8 +82,11 @@ namespace AutoMapper
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
             var mapRequest = new MapRequest(key, types);
-            return (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
+            return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
+
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest) 
+            => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
 
         public void CompileMappings()
         {
@@ -115,7 +118,7 @@ namespace AutoMapper
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
             if (Configuration.CreateMissingTypeMaps && mapperToUse == null)
             {
-                typeMap = Configuration.CreateConventionTypeMap(_typeMapRegistry, mapRequest.RuntimeTypes);
+                typeMap = Configuration.CreateInlineMap(_typeMapRegistry, mapRequest.InlineConfig ?? new DefaultTypeMapConfig(mapRequest.RuntimeTypes));
                 _typeMapPlanCache[mapRequest.RuntimeTypes] = typeMap;
                 typeMap.Seal(this);
                 return GenerateTypeMapExpression(mapRequest, typeMap);
@@ -400,6 +403,23 @@ namespace AutoMapper
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
+        }
+
+        private class DefaultTypeMapConfig : ITypeMapConfiguration
+        {
+            public DefaultTypeMapConfig(TypePair types)
+            {
+                Types = types;
+            }
+
+            public void Configure(TypeMap typeMap) { }
+
+            public MemberList MemberList => MemberList.Destination;
+            public Type SourceType => Types.SourceType;
+            public Type DestinationType => Types.DestinationType;
+            public bool IsOpenGeneric => false;
+            public TypePair Types { get; }
+            public ITypeMapConfiguration ReverseTypeMap => null;
         }
     }
 

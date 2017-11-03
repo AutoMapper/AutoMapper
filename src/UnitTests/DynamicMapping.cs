@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public TestDto Patient { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -93,7 +93,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         [Fact]
         public void Should_dynamically_map_the_two_types()
@@ -135,8 +135,6 @@ namespace AutoMapper.UnitTests.DynamicMapping
         {
             cfg.CreateMap<Original, Target>()
                 .ForMember(t => t.Child, o => o.ResolveUsing<TargetResolver>());
-
-            cfg.CreateMissingTypeMaps = true;
         });
 
         [Fact]
@@ -178,7 +176,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public string Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
 
         public When_mapping_two_non_configured_types_with_nesting()
         {
@@ -218,12 +216,12 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public int Valuefff { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         [Fact]
         public void Should_ignore_any_members_that_do_not_match()
         {
-            var destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
+            var destination = Mapper.Map<Source, Destination>(new Source {Value = 5}, opt => opt.ConfigureMap(MemberList.None));
 
             destination.Valuefff.ShouldBe(0);
         }
@@ -231,7 +229,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         [Fact]
         public void Should_not_throw_any_configuration_errors()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 5 }));
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 5 }, opt => opt.ConfigureMap(MemberList.None)));
         }
     }
 
@@ -251,12 +249,12 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public int Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
 
         public When_mapping_to_an_existing_destination_object()
         {
             _destination = new Destination { Valuefff = 7};
-            Mapper.Map(new Source { Value = 5, Value2 = 3}, _destination);
+            Mapper.Map(new Source { Value = 5, Value2 = 3}, _destination, opt => opt.ConfigureMap(MemberList.None));
         }
 
         [Fact]
@@ -292,7 +290,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
             _result.Value.ShouldBe(5);
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
     }
 
     public class When_dynamically_mapping_a_badly_configured_map : NonValidatingSpecBase
@@ -306,9 +304,9 @@ namespace AutoMapper.UnitTests.DynamicMapping
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
-        [Fact(Skip ="Coming next")]
+        [Fact]
         public void Should_throw()
         {
             typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(new Source()));

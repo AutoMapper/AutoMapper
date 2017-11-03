@@ -186,6 +186,19 @@ namespace AutoMapper
             return typeMap;
         }
 
+        public TypeMap CreateInlineMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration inlineConfig)
+        {
+            var typeMap = _typeMapFactory.CreateTypeMap(inlineConfig.SourceType, inlineConfig.DestinationType, this, inlineConfig.MemberList);
+
+            typeMap.IsConventionMap = true;
+
+            inlineConfig.Configure(typeMap);
+
+            Configure(typeMapRegistry, typeMap);
+
+            return typeMap;
+        }
+
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
             var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
