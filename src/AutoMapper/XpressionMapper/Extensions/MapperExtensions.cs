@@ -169,7 +169,7 @@ namespace AutoMapper.XpressionMapper.Extensions
 
         private static bool HasUnderlyingType(this Type type)
         {
-            return type.IsGenericType() || type.HasElementType;
+            return (type.IsGenericType() && typeof(System.Collections.IEnumerable).IsAssignableFrom(type)) || type.IsArray;
         }
 
         private static void AddUnderlyingTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)

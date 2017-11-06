@@ -102,16 +102,6 @@ namespace AutoMapper.XpressionMapper
             return base.VisitConstant(node);
         }
 
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            var newLeft = Visit(node.Left);
-            var newRight = Visit(node.Right);
-            if ((newLeft.Type.GetTypeInfo().IsGenericType && newLeft.Type.GetGenericTypeDefinition() == typeof(Nullable<>)) ^ (newRight.Type.GetTypeInfo().IsGenericType && newRight.Type.GetGenericTypeDefinition() == typeof(Nullable<>)))
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resource.cannotCreateBinaryExpressionFormat, newLeft.ToString(), newLeft.Type.Name, newRight.ToString(), newRight.Type.Name));
-
-            return base.VisitBinary(node);
-        }
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var parameterExpression = node.GetParameterExpression();
