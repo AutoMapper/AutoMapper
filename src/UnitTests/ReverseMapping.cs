@@ -6,6 +6,49 @@ using System.Text.RegularExpressions;
 
 namespace AutoMapper.UnitTests
 {
+    public class InvalidReverseMap : NonValidatingSpecBase
+    {
+        public class One
+        {
+            public string Name { get; set; }
+            public Three2 Three2 { get; set; }
+        }
+
+        public class Two
+        {
+            public string Name { get; set; }
+            public Three Three { get; set; }
+        }
+
+        public class Three
+        {
+        }
+
+        public class Three2
+        {
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<One, Two>()
+                .ForMember(d => d.Name, o => o.MapFrom(s => s))
+                .ForMember(d => d.Three, o => o.MapFrom(s => s.Three2))
+                .ReverseMap();
+            cfg.CreateMap<Three, Three2>();
+        });
+
+        [Fact]
+        public void Should_report_the_error()
+        {
+            new Action(() => Configuration.AssertConfigurationIsValid())
+                .ShouldThrowException<AutoMapperConfigurationException>(ex =>
+                {
+                    ex.PropertyMap.DestinationProperty.ShouldBe(typeof(Two).GetProperty("Three"));
+                    ex.Types.ShouldBe(new TypePair(typeof(One), typeof(Two)));
+                });
+        }
+    }
+
     public class MapFromReverseResolveUsing : AutoMapperSpecBase
     {
         public class Source

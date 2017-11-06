@@ -179,10 +179,8 @@ namespace AutoMapper.UnitTests
         {
             new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
             {
-                ex.PropertyMap.SourceMember.Name.ShouldBe("ShipsTo");
-                var types = ex.Types.Value;
-                types.SourceType.ShouldBe(typeof(List<string>));
-                types.DestinationType.ShouldBe(typeof(MyCollection));
+                ex.PropertyMap.SourceMember.ShouldBe(typeof(SourceItem).GetProperty("ShipsTo"));
+                ex.Types.Value.ShouldBe(new TypePair(typeof(SourceItem), typeof(DestItem)));
             });
         } 
     }

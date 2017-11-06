@@ -79,7 +79,7 @@ namespace AutoMapper
                 var mapperToUse = _config.FindMapper(types);
                 if (mapperToUse == null)
                 {
-                    throw new AutoMapperConfigurationException(types) { PropertyMap = propertyMap };
+                    throw new AutoMapperConfigurationException(propertyMap.TypeMap.Types) { PropertyMap = propertyMap };
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);
                 _config.Validate(context);
