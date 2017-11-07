@@ -87,7 +87,7 @@ Mapper.Initialize(cfg =>
 );
 ```
 
-AutoMapper will scan the designated assemblies for public classes inheriting from Profile and add them to the configuration.
+AutoMapper will scan the designated assemblies for classes inheriting from Profile and add them to the configuration.
 
 ## Naming Conventions
 
