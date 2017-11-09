@@ -96,7 +96,7 @@ namespace AutoMapper
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>
-        /// Allows to enable null-value propagation for query mapping. 
+        /// Allows to enable null-value propagation for query mapping.
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>
         bool EnableNullPropagationForQueryMapping { get; }
@@ -134,7 +134,7 @@ namespace AutoMapper
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
-        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// See <a href="http://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the wiki</a> for details.
         /// </summary>
         /// <param name="sourceType">the runtime type of the source object</param>
         /// <param name="destinationType">the runtime type of the destination object</param>
@@ -144,7 +144,7 @@ namespace AutoMapper
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
-        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// See <a href="http://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the wiki</a> for details.
         /// </summary>
         /// <param name="mapRequest">The source/destination map request</param>
         /// <returns>the execution plan</returns>

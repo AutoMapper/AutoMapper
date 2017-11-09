@@ -26,7 +26,7 @@ namespace AutoMapper
 
         /// <summary>
         /// How many levels deep should AutoMapper try to inline the execution plan for child classes.
-        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// See <a href="http://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the wiki</a> for details.
         /// </summary>
         public int MaxExecutionPlanDepth { get; set; } = 1;
 
