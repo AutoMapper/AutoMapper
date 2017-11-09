@@ -30,6 +30,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
+            cfg.CreateMissingTypeMaps = false;
             cfg.CreateMap<One, Two>()
                 .ForMember(d => d.Name, o => o.MapFrom(s => s))
                 .ForMember(d => d.Three, o => o.MapFrom(s => s.Three2))

@@ -209,7 +209,7 @@ namespace AutoMapper.Execution
                 actions.Insert(0,
                     Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
             }
-            if (_typeMap.IsConventionMap)
+            if (_typeMap.IsConventionMap && _typeMap.Profile.ValidateInlineMaps)
             {
                 actions.Insert(0, Call(Context, ((MethodCallExpression)ValidateMap.Body).Method, Constant(_typeMap)));
             }

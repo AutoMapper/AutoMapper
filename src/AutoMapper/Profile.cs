@@ -53,6 +53,7 @@ namespace AutoMapper
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
         public bool? ConstructorMappingEnabled { get; private set; }
         public bool? CreateMissingTypeMaps { get; set; }
+        public bool? ValidateInlineMaps { get; set; }
 
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> IProfileConfiguration.AllPropertyMapActions
             => _allPropertyMapActions;

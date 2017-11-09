@@ -39,6 +39,7 @@ namespace AutoMapper
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
             CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? true;
+            ValidateInlineMaps = profile.ValidateInlineMaps ?? configuration?.ValidateInlineMaps ?? true;
 
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
@@ -76,10 +77,12 @@ namespace AutoMapper
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
         }
 
+
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
         public bool CreateMissingTypeMaps { get; }
+        public bool ValidateInlineMaps { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }

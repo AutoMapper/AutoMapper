@@ -313,6 +313,31 @@ namespace AutoMapper.UnitTests.DynamicMapping
         }
     }
 
+    public class When_dynamically_mapping_a_badly_configured_map_and_turning_off_validation : NonValidatingSpecBase
+    {
+        public class Source
+        {
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.ValidateInlineMaps = false;
+            });
+
+        [Fact]
+        public void Should_not_throw()
+        {
+            Action action = () => Mapper.Map<Source, Dest>(new Source());
+
+            action.ShouldNotThrow();
+        }
+    }
+
     public class When_automatically_dynamically_mapping : NonValidatingSpecBase
     {
         public class Source
