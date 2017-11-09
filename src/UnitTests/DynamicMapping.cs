@@ -270,6 +270,41 @@ namespace AutoMapper.UnitTests.DynamicMapping
         }
     }
 
+    public class When_inline_mapping_with_inline_captured_closure : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(_ => {});
+
+        [Fact]
+        public void Should_use_inline_value()
+        {
+            var value = 0;
+
+            var source = new Source { Value = 10 };
+
+            void ConfigOpts(IMappingOperationOptions<Source, Dest> opt) => opt.ConfigureMap().ForMember(d => d.Value, m => m.MapFrom(src => src.Value + value));
+
+            var dest = Mapper.Map<Source, Dest>(source, ConfigOpts);
+
+            dest.Value.ShouldBe(10);
+
+            value = 10;
+
+            dest = Mapper.Map<Source, Dest>(source, ConfigOpts);
+
+            dest.Value.ShouldBe(20);
+        }
+    }
+
     public class When_mapping_from_an_anonymous_type_to_an_interface : NonValidatingSpecBase
     {
         private IDestination _result;
