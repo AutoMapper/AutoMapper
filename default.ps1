@@ -29,6 +29,7 @@ task compile -depends clean {
 	$suffix = @{ $true = ""; $false = "ci-$revision"}[$tag -ne $NULL -and $revision -ne "local"]
 	$commitHash = $(git rev-parse --short HEAD)
 	$buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
+    $versionSuffix = @{ $true = "--version-suffix=$($suffix)"; $false = ""}[$suffix -ne ""]
 
 	echo "build: Tag is $tag"
 	echo "build: Package version suffix is $suffix"
@@ -43,7 +44,7 @@ task compile -depends clean {
 
     exec { dotnet build $base_dir\AutoMapper.sln -c $config --version-suffix=$buildSuffix -v q /nologo }
 
-	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build --version-suffix=$suffix }
+	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build $versionSuffix }
 }
 
 task benchmark {
