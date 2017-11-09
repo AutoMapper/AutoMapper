@@ -82,8 +82,11 @@ namespace AutoMapper
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
             var mapRequest = new MapRequest(key, types);
-            return (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
+            return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
+
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest) 
+            => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
 
         public void CompileMappings()
         {
@@ -113,6 +116,13 @@ namespace AutoMapper
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
+            if (Configuration.CreateMissingTypeMaps && mapperToUse == null)
+            {
+                typeMap = Configuration.CreateInlineMap(_typeMapRegistry, mapRequest.InlineConfig ?? new DefaultTypeMapConfig(mapRequest.RuntimeTypes));
+                _typeMapPlanCache[mapRequest.RuntimeTypes] = typeMap;
+                typeMap.Seal(this);
+                return GenerateTypeMapExpression(mapRequest, typeMap);
+            }
             return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
         }
 
@@ -192,7 +202,7 @@ namespace AutoMapper
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
             if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetTypeMap(typePair) == null)
             {
-                lock(typeMap)
+                lock (typeMap)
                 {
                     typeMap.Seal(this);
                 }
@@ -202,6 +212,7 @@ namespace AutoMapper
 
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
+            var hasMapper = new Lazy<bool>(() => FindMapper(initialTypes) != null);
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
                 if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
@@ -218,7 +229,7 @@ namespace AutoMapper
                 {
                     return typeMap;
                 }
-                if (FindMapper(initialTypes) == null)
+                if (!hasMapper.Value)
                 {
                     typeMap = FindConventionTypeMapFor(types);
                     if (typeMap != null)
@@ -227,6 +238,7 @@ namespace AutoMapper
                     }
                 }
             }
+
             return null;
         }
 
@@ -391,6 +403,23 @@ namespace AutoMapper
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
+        }
+
+        private class DefaultTypeMapConfig : ITypeMapConfiguration
+        {
+            public DefaultTypeMapConfig(TypePair types)
+            {
+                Types = types;
+            }
+
+            public void Configure(TypeMap typeMap) { }
+
+            public MemberList MemberList => MemberList.Destination;
+            public Type SourceType => Types.SourceType;
+            public Type DestinationType => Types.DestinationType;
+            public bool IsOpenGeneric => false;
+            public TypePair Types { get; }
+            public ITypeMapConfiguration ReverseTypeMap => null;
         }
     }
 

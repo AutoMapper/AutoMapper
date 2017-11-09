@@ -159,5 +159,10 @@ namespace AutoMapper
         /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
         /// </summary>
         IList<ValueTransformerConfiguration> ValueTransformers { get; }
+
+        /// <summary>
+        /// Validate maps created dynamically/inline on the first map. Defaults to true.
+        /// </summary>
+        bool? ValidateInlineMaps { get; set; }
     }
 }

@@ -38,13 +38,11 @@ namespace AutoMapper
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
-            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? false;
+            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? true;
+            ValidateInlineMaps = profile.ValidateInlineMaps ?? configuration?.ValidateInlineMaps ?? true;
 
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
-                .Concat(CreateMissingTypeMaps
-                    ? Enumerable.Repeat(new ConditionalObjectMapper { Conventions = { tp => !ExcludedTypes.Contains(tp.SourceType) && !ExcludedTypes.Contains(tp.DestinationType)} }, 1)
-                    : Enumerable.Empty<IConditionalObjectMapper>())
                 .ToArray();
 
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
@@ -79,10 +77,12 @@ namespace AutoMapper
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
         }
 
+
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
         public bool CreateMissingTypeMaps { get; }
+        public bool ValidateInlineMaps { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
@@ -178,9 +178,24 @@ namespace AutoMapper
         {
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
 
+            typeMap.IsConventionMap = true;
+
             var config = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
 
             config.Configure(typeMap);
+
+            Configure(typeMapRegistry, typeMap);
+
+            return typeMap;
+        }
+
+        public TypeMap CreateInlineMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration inlineConfig)
+        {
+            var typeMap = _typeMapFactory.CreateTypeMap(inlineConfig.SourceType, inlineConfig.DestinationType, this, inlineConfig.MemberList);
+
+            typeMap.IsConventionMap = true;
+
+            inlineConfig.Configure(typeMap);
 
             Configure(typeMapRegistry, typeMap);
 

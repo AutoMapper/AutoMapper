@@ -53,6 +53,7 @@ namespace AutoMapper
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
         public bool? ConstructorMappingEnabled { get; private set; }
         public bool? CreateMissingTypeMaps { get; set; }
+        public bool? ValidateInlineMaps { get; set; }
 
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> IProfileConfiguration.AllPropertyMapActions
             => _allPropertyMapActions;
@@ -183,10 +184,6 @@ namespace AutoMapper
                         m =>
                             m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
                             m.GetParameters().Length == 1));
-        }
-
-        public void ApplyTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
-        {
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(

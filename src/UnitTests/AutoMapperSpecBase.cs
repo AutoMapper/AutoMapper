@@ -27,13 +27,13 @@ namespace AutoMapper.UnitTests
 
     public abstract class SpecBaseBase
     {
-        public virtual void MainSetup()
+        protected virtual void MainSetup()
         {
             Establish_context();
             Because_of();
         }
 
-        public virtual void MainTeardown()
+        protected virtual void MainTeardown()
         {
             Cleanup();
         }
@@ -54,12 +54,13 @@ namespace AutoMapper.UnitTests
     {
         protected SpecBase()
         {
-            MainSetup();
+            Establish_context();
+            Because_of();
         }
 
         public void Dispose()
         {
-            MainTeardown();
+            Cleanup();
         }
     }
 

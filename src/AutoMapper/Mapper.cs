@@ -228,13 +228,17 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, typeof(TSource), typeof(TDestination));
 
-            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
-
-            var destination = default(TDestination);
+            var key = new TypePair(typeof(TSource), typeof(TDestination));
 
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
 
             opts(typedOptions);
+
+            var mapRequest = new MapRequest(key, types, typedOptions.InlineConfiguration);
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(mapRequest);
+
+            var destination = default(TDestination);
 
             typedOptions.BeforeMapAction(source, destination);
 
@@ -259,12 +263,15 @@ namespace AutoMapper
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
-
-            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+            var key = new TypePair(typeof(TSource), typeof(TDestination));
 
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
 
             opts(typedOptions);
+
+            var mapRequest = new MapRequest(key, types, typedOptions.InlineConfiguration);
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(mapRequest);
 
             typedOptions.BeforeMapAction(source, destination);
 
@@ -290,11 +297,11 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, sourceType, destinationType);
 
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
-
             var options = new ObjectMappingOperationOptions(_serviceCtor);
 
             opts(options);
+
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, options.InlineConfiguration));
 
             options.BeforeMapAction(source, null);
 
@@ -321,11 +328,11 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
-
             var options = new ObjectMappingOperationOptions(_serviceCtor);
 
             opts(options);
+
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, options.InlineConfiguration));
 
             options.BeforeMapAction(source, destination);
 

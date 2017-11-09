@@ -136,7 +136,7 @@ namespace AutoMapper.UnitTests.Bug
             cfg.EnableNullPropagationForQueryMapping = true;
         });
 
-        public override void MainTeardown()
+        protected override void MainTeardown()
         {
             Should_Validate();
             base.MainTeardown();

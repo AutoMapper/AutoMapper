@@ -73,12 +73,17 @@ namespace AutoMapper
                 var context = new ValidationContext(types, propertyMap, typeMap);
                 _config.Validate(context);
                 CheckPropertyMaps(typeMapsChecked, typeMap);
+                typeMap.IsValid = true;
             }
             else
             {
                 var mapperToUse = _config.FindMapper(types);
                 if (mapperToUse == null)
                 {
+                    // Maps with no match get mapped at runtime yolo
+                    if (propertyMap.TypeMap.Profile.CreateMissingTypeMaps)
+                        return;
+
                     throw new AutoMapperConfigurationException(propertyMap.TypeMap.Types) { PropertyMap = propertyMap };
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);

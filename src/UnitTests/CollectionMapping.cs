@@ -172,7 +172,11 @@ namespace AutoMapper.UnitTests
         }
 
         protected override MapperConfiguration Configuration => 
-            new MapperConfiguration(cfg => cfg.CreateMap<SourceItem, DestItem>());
+            new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<SourceItem, DestItem>();
+                cfg.CreateMissingTypeMaps = false;
+            });
 
         [Fact]
         public void Should_report_missing_map()

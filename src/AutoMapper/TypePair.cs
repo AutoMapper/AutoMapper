@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
@@ -11,11 +12,18 @@ namespace AutoMapper
     {
         public TypePair RequestedTypes { get; }
         public TypePair RuntimeTypes { get; }
+        public ITypeMapConfiguration InlineConfig { get; }
 
-        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes)
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes) 
+            : this(requestedTypes, runtimeTypes, null)
+        {
+        }
+
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes, ITypeMapConfiguration inlineConfig)
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;
+            InlineConfig = inlineConfig;
         }
 
         public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);

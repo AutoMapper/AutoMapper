@@ -115,6 +115,9 @@ namespace AutoMapper
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType) 
             => Mapper.Map(source, destination, sourceType, destinationType, this);
+
+        internal void ValidateMap(TypeMap typeMap)
+            => ConfigurationProvider.AssertConfigurationIsValid(typeMap);
     }
 
     public struct ContextCacheKey : IEquatable<ContextCacheKey>

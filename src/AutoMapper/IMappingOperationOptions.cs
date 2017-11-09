@@ -36,7 +36,7 @@ namespace AutoMapper
         void AfterMap(Action<object, object> afterFunction);
     }
 
-    public interface IMappingOperationOptions<out TSource, out TDestination> : IMappingOperationOptions
+    public interface IMappingOperationOptions<TSource, TDestination> : IMappingOperationOptions
     {
         /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping
@@ -49,5 +49,18 @@ namespace AutoMapper
         /// </summary>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         void AfterMap(Action<TSource, TDestination> afterFunction);
+
+        /// <summary>
+        /// Configure inline map
+        /// </summary>
+        /// <returns>Mapping configuration expression</returns>
+        IMappingExpression<TSource, TDestination> ConfigureMap();
+
+        /// <summary>
+        /// Configure inline map with member list to validate
+        /// </summary>
+        /// <param name="memberList">Member list to validate for the inline map</param>
+        /// <returns>Mapping configuration expression</returns>
+        IMappingExpression<TSource, TDestination> ConfigureMap(MemberList memberList);
     }
 }
