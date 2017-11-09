@@ -13,7 +13,8 @@ domain and application layer.
 
 AutoMapper supports the following platforms:
 
-* .NET 4.5
+* .NET 4.0
+* .NET 4.5.2+
 * .NET Platform Standard 1.1 & 1.3
 
 New to AutoMapper? Check out the :doc:`Getting-started` page first.
@@ -39,6 +40,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Reverse-Mapping-and-Unflattening
    Projection
    Configuration-validation
+   Inline-Mapping
    Lists-and-arrays
    Nested-mappings
    Custom-type-converters
