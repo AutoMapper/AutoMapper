@@ -146,6 +146,14 @@ namespace AutoMapper
         IMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
 
         /// <summary>
+        /// Ignores destination members as specified in an array of expressions
+        /// </summary>
+        /// <param name="memberExpressionTrees">An array of expressions that evaluate to properties that should be ignored when mapping.</param>
+        /// <returns>Itself</returns>
+        /// <remarks>This method is syntactic sugar for calling .ForMember and .Ignore repeatedly.</remarks>
+        IMappingExpression IgnoreMembers(params Expression<Func<object, object>>[] memberExpressionTrees);
+
+        /// <summary>
         /// Include the base type map's configuration in this map
         /// </summary>
         /// <param name="sourceBase">Base source type</param>
@@ -250,6 +258,21 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+
+        /// <summary>
+        /// Ignores <typeparamref name="TDestination"/> members as specified in an array of expressions
+        /// </summary>
+        /// <param name="memberExpressionTrees">An array of expressions that evaluate to properties that should be ignored when mapping.</param>
+        /// <returns>Itself</returns>
+        /// <remarks>This method is syntactic sugar for calling .ForMember and .Ignore repeatedly.</remarks>
+        /// <example>
+        /// To ignore several properties when mapping, specify each in a lambda expression.
+        /// <code>
+        /// config.CreateMap&gt;Foo, FooDto&lt;()
+        ///       .IgnoreMembers(target => target.Number, target => target.Name, target => target.CreateDate);
+        /// </code>
+        /// </example>
+        IMappingExpression<TSource, TDestination> IgnoreMembers(params Expression<Func<TDestination, object>>[] memberExpressionTrees);
 
         /// <summary>
         /// Include this configuration in derived types' maps

@@ -51,6 +51,9 @@ namespace AutoMapper.Configuration
         public new IMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter() 
             => (IMappingExpression)base.IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
 
+        public new IMappingExpression IgnoreMembers(params Expression<Func<object, object>>[] memberExpressionTrees)
+            => (IMappingExpression)base.IgnoreMembers(memberExpressionTrees);
+
         public new IMappingExpression IncludeBase(Type sourceBase, Type destinationBase) 
             => (IMappingExpression)base.IncludeBase(sourceBase, destinationBase);
 
@@ -244,6 +247,14 @@ namespace AutoMapper.Configuration
             }
             return this;
         }
+
+        public IMappingExpression<TSource, TDestination> IgnoreMembers(
+            params Expression<Func<TDestination, object>>[] memberExpressionTrees
+        ) =>
+            memberExpressionTrees.Length < 1
+                ? this
+                : ForMember(memberExpressionTrees[0], options => options.Ignore())
+                    .IgnoreMembers(memberExpressionTrees.Skip(1).ToArray());
 
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
