@@ -268,10 +268,10 @@ namespace AutoMapper
         /// <example>
         /// To ignore several properties when mapping, specify each in a lambda expression.
         /// <code>
-        /// config.CreateMap&gt;Foo, FooDto&lt;()
+        /// config.CreateMap&lt;Foo, FooDto&gt;()
         ///       .IgnoreMembers(target => target.Number, target => target.Name, target => target.CreateDate);
-        /// </code>
-        /// </example>
+        /// </code> 
+        /// </example> 
         IMappingExpression<TSource, TDestination> IgnoreMembers(params Expression<Func<TDestination, object>>[] memberExpressionTrees);
 
         /// <summary>
