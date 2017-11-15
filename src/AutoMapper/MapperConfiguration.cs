@@ -254,7 +254,10 @@ namespace AutoMapper
                 && !ExcludedTypes.Contains(initialTypes.SourceType)
                 && !ExcludedTypes.Contains(initialTypes.DestinationType))
             {
-                return Configuration.CreateInlineMap(_typeMapRegistry, initialTypes);
+                lock (this)
+                {
+                    return Configuration.CreateInlineMap(_typeMapRegistry, initialTypes);
+                }
             }
 
             return null;
