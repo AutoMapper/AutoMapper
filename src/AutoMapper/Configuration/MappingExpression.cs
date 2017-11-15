@@ -152,12 +152,11 @@ namespace AutoMapper.Configuration
 
         public MappingExpression(MemberList memberList, TypePair types)
         {
-            MemberList = memberList;
             Types = types;
             IsOpenGeneric = types.SourceType.IsGenericTypeDefinition() || types.DestinationType.IsGenericTypeDefinition();
+            TypeMapActions.Add(tm => tm.ConfiguredMemberList = memberList);
         }
 
-        public MemberList MemberList { get; }
         public TypePair Types { get; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;

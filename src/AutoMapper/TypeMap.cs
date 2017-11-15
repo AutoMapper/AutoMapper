@@ -31,13 +31,12 @@ namespace AutoMapper
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, ProfileMap profile)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
         {
             SourceTypeDetails = sourceType;
             DestinationTypeDetails = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
-            ConfiguredMemberList = memberList;
         }
 
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
@@ -77,7 +76,7 @@ namespace AutoMapper
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
-        public MemberList ConfiguredMemberList { get; }
+        public MemberList ConfiguredMemberList { get; set; }
 
         public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
         public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;

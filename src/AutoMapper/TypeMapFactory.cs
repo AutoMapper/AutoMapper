@@ -8,12 +8,12 @@ namespace AutoMapper
 {
     public class TypeMapFactory
     {
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, MemberList memberList)
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options)
         {
             var sourceTypeInfo = options.CreateTypeDetails(sourceType);
             var destTypeInfo = options.CreateTypeDetails(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList, options);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, options);
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {

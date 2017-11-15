@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Shouldly;
 using System.Collections.Generic;
+using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper.UnitTests.DynamicMapping
 {
@@ -393,6 +394,32 @@ namespace AutoMapper.UnitTests.DynamicMapping
             var source = new Source {Value = 5};
             var dest = Mapper.Map<Dest>(source);
             dest.Value.ShouldBe(5);
+        }
+    }
+
+    public class When_automatically_dynamically_projecting : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
+
+        [Fact]
+        public void Should_map()
+        {
+            var source = new Source {Value = 5};
+            var items = new[] {source}.AsQueryable();
+            var dest = items.ProjectTo<Dest>(ConfigProvider).ToArray();
+
+            dest.Length.ShouldBe(1);
+            dest[0].Value.ShouldBe(5);
         }
     }
 

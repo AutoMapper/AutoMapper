@@ -15,7 +15,7 @@ namespace AutoMapper
         public ITypeMapConfiguration InlineConfig { get; }
 
         public MapRequest(TypePair requestedTypes, TypePair runtimeTypes) 
-            : this(requestedTypes, runtimeTypes, null)
+            : this(requestedTypes, runtimeTypes, new MapperConfiguration.DefaultTypeMapConfig(requestedTypes))
         {
         }
 

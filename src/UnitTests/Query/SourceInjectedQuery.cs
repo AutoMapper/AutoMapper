@@ -628,6 +628,7 @@ namespace AutoMapper.UnitTests.Query
         {
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = false;
                 cfg.CreateMap<User, UserModel>()
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
                 .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name))

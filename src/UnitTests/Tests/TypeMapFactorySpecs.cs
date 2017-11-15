@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests.Tests
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             var profile = new ProfileMap(mappingOptions);
 
-            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), profile, MemberList.Destination);
+            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), profile);
 
             var propertyMaps = typeMap.GetPropertyMaps();
 
@@ -116,7 +116,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Because_of()
         {
-            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
+            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Because_of()
         {
-            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
+            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
         }
 
         [Fact]

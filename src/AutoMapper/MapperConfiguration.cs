@@ -18,6 +18,7 @@ namespace AutoMapper
 
     public class MapperConfiguration : IConfigurationProvider
     {
+        private static readonly Type[] ExcludedTypes = { typeof(object), typeof(ValueType), typeof(Enum) };
         private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetDeclaredConstructors().Single(c => c.GetParameters().Length == 3);
 
         private readonly IEnumerable<IObjectMapper> _mappers;
@@ -110,19 +111,12 @@ namespace AutoMapper
 
         public LambdaExpression BuildExecutionPlan(MapRequest mapRequest)
         {
-            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
+            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes, mapRequest.InlineConfig) ?? ResolveTypeMap(mapRequest.RequestedTypes, mapRequest.InlineConfig);
             if (typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
-            if (Configuration.CreateMissingTypeMaps && mapperToUse == null)
-            {
-                typeMap = Configuration.CreateInlineMap(_typeMapRegistry, mapRequest.InlineConfig ?? new DefaultTypeMapConfig(mapRequest.RuntimeTypes));
-                _typeMapPlanCache[mapRequest.RuntimeTypes] = typeMap;
-                typeMap.Seal(this);
-                return GenerateTypeMapExpression(mapRequest, typeMap);
-            }
             return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
         }
 
@@ -193,10 +187,20 @@ namespace AutoMapper
         {
             var typePair = new TypePair(sourceType, destinationType);
 
-            return ResolveTypeMap(typePair);
+            return ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair));
+        }
+
+        public TypeMap ResolveTypeMap(Type sourceType, Type destinationType, ITypeMapConfiguration inlineConfiguration)
+        {
+            var typePair = new TypePair(sourceType, destinationType);
+
+            return ResolveTypeMap(typePair, inlineConfiguration);
         }
 
         public TypeMap ResolveTypeMap(TypePair typePair)
+            => ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair));
+
+        public TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
@@ -204,6 +208,7 @@ namespace AutoMapper
             {
                 lock (typeMap)
                 {
+                    inlineConfiguration.Configure(typeMap);
                     typeMap.Seal(this);
                 }
             }
@@ -217,7 +222,10 @@ namespace AutoMapper
             {
                 if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
                 {
-                    return typeMap;
+                    if (typeMap != null)
+                    {
+                        return typeMap;
+                    }
                 }
                 typeMap = FindTypeMapFor(types);
                 if (typeMap != null)
@@ -237,6 +245,16 @@ namespace AutoMapper
                         return typeMap;
                     }
                 }
+            }
+
+            if (!hasMapper.Value 
+                && Configuration.CreateMissingTypeMaps
+                && !(initialTypes.SourceType.IsAbstract() && initialTypes.SourceType.IsClass())
+                && !(initialTypes.DestinationType.IsAbstract() && initialTypes.DestinationType.IsClass())
+                && !ExcludedTypes.Contains(initialTypes.SourceType)
+                && !ExcludedTypes.Contains(initialTypes.DestinationType))
+            {
+                return Configuration.CreateInlineMap(_typeMapRegistry, initialTypes);
             }
 
             return null;
@@ -405,7 +423,7 @@ namespace AutoMapper
             }
         }
 
-        private class DefaultTypeMapConfig : ITypeMapConfiguration
+        internal class DefaultTypeMapConfig : ITypeMapConfiguration
         {
             public DefaultTypeMapConfig(TypePair types)
             {
@@ -414,7 +432,6 @@ namespace AutoMapper
 
             public void Configure(TypeMap typeMap) { }
 
-            public MemberList MemberList => MemberList.Destination;
             public Type SourceType => Types.SourceType;
             public Type DestinationType => Types.DestinationType;
             public bool IsOpenGeneric => false;

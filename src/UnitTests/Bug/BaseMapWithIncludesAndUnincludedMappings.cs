@@ -51,12 +51,12 @@ namespace AutoMapper.UnitTests.Bug
         {
             public BaseB Item { get; set; }
         }
-        public class BaseA
+        public abstract class BaseA
         {
             public string Name { get; set; }
         }
 
-        public class BaseB
+        public abstract class BaseB
         {
             public string Name { get; set; }
         }
@@ -84,7 +84,8 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<Container, Container2>();
             });
 
-            var mapped = config.CreateMapper().Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
+            var mapped = config.CreateMapper()
+                .Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
             Assert.IsType<SubB>(mapped.Item);
 
         }
