@@ -217,7 +217,8 @@ namespace AutoMapper
 
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
-            var hasMapper = new Lazy<bool>(() => FindMapper(initialTypes) != null);
+            var doesNotHaveMapper = FindMapper(initialTypes) == null;
+
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
                 if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
@@ -237,7 +238,7 @@ namespace AutoMapper
                 {
                     return typeMap;
                 }
-                if (!hasMapper.Value)
+                if (doesNotHaveMapper)
                 {
                     typeMap = FindConventionTypeMapFor(types);
                     if (typeMap != null)
@@ -247,7 +248,7 @@ namespace AutoMapper
                 }
             }
 
-            if (!hasMapper.Value 
+            if (doesNotHaveMapper
                 && Configuration.CreateMissingTypeMaps
                 && !(initialTypes.SourceType.IsAbstract() && initialTypes.SourceType.IsClass())
                 && !(initialTypes.DestinationType.IsAbstract() && initialTypes.DestinationType.IsClass())
