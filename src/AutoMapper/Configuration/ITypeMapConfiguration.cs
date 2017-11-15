@@ -5,7 +5,6 @@ namespace AutoMapper.Configuration
     public interface ITypeMapConfiguration
     {
         void Configure(TypeMap typeMap);
-        MemberList MemberList { get; }
         Type SourceType { get; }
         Type DestinationType { get; }
         bool IsOpenGeneric { get; }

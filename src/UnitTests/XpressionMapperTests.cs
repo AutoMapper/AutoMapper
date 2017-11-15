@@ -216,6 +216,7 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Car, CarModel>();
+                cfg.CreateMissingTypeMaps = false;
             });
 
             var customMapper = config.CreateMapper();

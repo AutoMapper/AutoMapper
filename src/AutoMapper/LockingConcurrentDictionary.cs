@@ -16,6 +16,7 @@ namespace AutoMapper
         }
 
         public TValue GetOrAdd(TKey key) => _dictionary.GetOrAdd(key, _valueFactory).Value;
+        public TValue GetOrAdd(TKey key, Func<TKey, Lazy<TValue>> valueFactory) => _dictionary.GetOrAdd(key, valueFactory).Value;
 
         public TValue this[TKey key]
         {

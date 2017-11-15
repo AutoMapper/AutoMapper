@@ -463,7 +463,7 @@ namespace AutoMapper.QueryableExtensions
                 TypeMap firstTypeMap;
                 lock(_configurationProvider)
                 {
-                    firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
+                    firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
                 }
                 var secondParameter = Parameter(letType, "dto");
 

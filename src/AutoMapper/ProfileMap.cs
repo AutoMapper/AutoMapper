@@ -16,7 +16,6 @@ namespace AutoMapper
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
-        private static readonly Type[] ExcludedTypes = { typeof(object), typeof(ValueType), typeof(Enum), typeof(IComparable), typeof(IFormattable), typeof(IConvertible) };
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
         private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
@@ -129,7 +128,7 @@ namespace AutoMapper
 
         private void BuildTypeMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config)
         {
-            var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
+            var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
 
             config.Configure(typeMap);
 
@@ -176,7 +175,7 @@ namespace AutoMapper
 
         public TypeMap CreateConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
         {
-            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
+            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
 
             typeMap.IsConventionMap = true;
 
@@ -189,13 +188,11 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap CreateInlineMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration inlineConfig)
+        public TypeMap CreateInlineMap(TypeMapRegistry typeMapRegistry, TypePair types)
         {
-            var typeMap = _typeMapFactory.CreateTypeMap(inlineConfig.SourceType, inlineConfig.DestinationType, this, inlineConfig.MemberList);
+            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
 
             typeMap.IsConventionMap = true;
-
-            inlineConfig.Configure(typeMap);
 
             Configure(typeMapRegistry, typeMap);
 
@@ -204,7 +201,7 @@ namespace AutoMapper
 
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
-            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
+            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
 
             openMapConfig.Configure(closedMap);
 
