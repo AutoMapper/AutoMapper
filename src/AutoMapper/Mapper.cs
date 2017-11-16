@@ -54,6 +54,15 @@ namespace AutoMapper
         }
 
         /// <summary>
+        /// Resets the mapper configuration
+        /// </summary>
+        public static void Reset()
+        {
+            Configuration = null;
+            Instance = null;
+        }
+
+        /// <summary>
         /// Execute a mapping from the source object to a new destination object.
         /// The source type is inferred from the source object.
         /// </summary>
