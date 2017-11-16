@@ -65,21 +65,26 @@
             public int Value { get; set; }
         }
 
-        static StaticMapping()
+        private void InitializeMapping()
         {
-            Mapper.Reset();
-            Mapper.Initialize(cfg =>
+            lock (this)
             {
-                cfg.CreateMap<Source, Dest>();
-                cfg.CreateMap<ModelObject, ModelDto>();
-                cfg.CreateMap<ModelObject2, ModelDto2>();
-                cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
-            });
+                Mapper.Reset();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Dest>();
+                    cfg.CreateMap<ModelObject, ModelDto>();
+                    cfg.CreateMap<ModelObject2, ModelDto2>();
+                    cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
+                });
+            }
         }
 
         [Fact]
         public void Can_map_statically()
         {
+            InitializeMapping();
+
             var source = new Source {Value = 5};
 
             var dest = Mapper.Map<Source, Dest>(source);
@@ -90,6 +95,8 @@
         [Fact]
         public void Can_project_statically()
         {
+            InitializeMapping();
+
             var source = new Source {Value = 5};
             var sources = new[] {source}.AsQueryable();
 
@@ -102,6 +109,8 @@
         [Fact]
         public void Should_fail_a_configuration_check()
         {
+            InitializeMapping();
+
             typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
         }
 
