@@ -58,8 +58,8 @@ namespace AutoMapper
         /// </summary>
         public static void Reset()
         {
-            Configuration = null;
-            Instance = null;
+            _configuration = null;
+            _instance = null;
         }
 
         /// <summary>
