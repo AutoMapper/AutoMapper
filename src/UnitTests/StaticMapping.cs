@@ -6,6 +6,9 @@
     using QueryableExtensions;
     using System;
 
+#if !NET40
+    [Collection(nameof(StaticMapping))]
+#endif
     public class StaticMapping
     {
         public class ModelObject
@@ -64,6 +67,7 @@
 
         static StaticMapping()
         {
+            Mapper.Reset();
             Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
@@ -106,5 +110,19 @@
         {
             typeof(InvalidOperationException).ShouldBeThrownBy(() => Mapper.Initialize(_ => { }));
         }
+
+        [Fact]
+        public void Should_not_throw_when_resetting()
+        {
+            Mapper.Reset();
+            var action = new Action(() =>
+            {
+                Mapper.Initialize(cfg => { });
+                Mapper.Reset();
+                Mapper.Initialize(cfg => { });
+            });
+            action.ShouldNotThrow();
+        }
+
     }
 }
