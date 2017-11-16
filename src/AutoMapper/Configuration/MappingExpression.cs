@@ -79,6 +79,9 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        public new IMappingExpression ValidateMemberList(MemberList memberList)
+            => (IMappingExpression) base.ValidateMemberList(memberList);
+
         public new IMappingExpression MaxDepth(int depth) 
             => (IMappingExpression)base.MaxDepth(depth);
 
@@ -543,6 +546,15 @@ namespace AutoMapper.Configuration
 
             _valueTransformers.Add(config);
 
+            return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> ValidateMemberList(MemberList memberList)
+        {
+            TypeMapActions.Add(tm =>
+            {
+                tm.ConfiguredMemberList = memberList;
+            });
             return this;
         }
 

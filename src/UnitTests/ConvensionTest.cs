@@ -6,7 +6,7 @@ using AutoMapper.Configuration.Conventions;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests
+namespace AutoMapper.UnitTests.Conventions
 {
     public class ConvensionTest
     {
@@ -142,6 +142,40 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Client, bool>> expr = c => c.ID < 5;
             var clientExp = config.CreateMapper().Map<Expression<Func<ClientDto, bool>>>(expr);
+        }
+    }
+
+    public class ConventionsValidations
+    {
+        public class Foo
+        {
+            public string Bar { get; set; }
+        }
+
+        public class FooViewModel
+        {
+            public string Bar { get; set; }
+            public string Extra { get; set; }
+        }
+
+        public class ViewModelConvention : Profile
+        {
+            public ViewModelConvention()
+            {
+                AddConditionalObjectMapper().Where((source, dest) => dest.Name == source.Name + "ViewModel");
+                ForAllMaps((tm, m) => m.ValidateMemberList(MemberList.None));
+            }
+        }
+
+        [Fact]
+        public void TestMappingWithMissingTargetProperty()
+        {
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<ViewModelConvention>());
+            var mapper = config.CreateMapper();
+
+            var action = new Action(() => mapper.Map<FooViewModel>(new Foo {Bar = "Baz"}));
+
+            action.ShouldNotThrow();
         }
     }
 }

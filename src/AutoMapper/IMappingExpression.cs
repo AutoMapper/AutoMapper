@@ -185,6 +185,12 @@ namespace AutoMapper
 
         IList<ValueTransformerConfiguration> ValueTransformers { get; }
 
+        /// <summary>
+        /// Specify which member list to validate
+        /// </summary>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Itself</returns>
+        IMappingExpression ValidateMemberList(MemberList memberList);
     }
 
     /// <summary>
@@ -453,5 +459,13 @@ namespace AutoMapper
         /// <param name="transformer">Transformation expression</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
+
+        /// <summary>
+        /// Specify which member list to validate
+        /// </summary>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ValidateMemberList(MemberList memberList);
+
     }
 }
