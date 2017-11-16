@@ -54,7 +54,7 @@ namespace AutoMapper
         }
 
         /// <summary>
-        /// Resets the mapper configuration
+        /// Resets the mapper configuration. Not intended for production use, but for testing scenarios.
         /// </summary>
         public static void Reset()
         {
