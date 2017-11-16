@@ -108,15 +108,19 @@
         [Fact]
         public void Should_throw_when_initializing_twice()
         {
-            typeof(InvalidOperationException).ShouldBeThrownBy(() => Mapper.Initialize(_ => { }));
+            typeof(InvalidOperationException).ShouldBeThrownBy(() =>
+            {
+                Mapper.Initialize(_ => { });
+                Mapper.Initialize(_ => { });
+            });
         }
 
         [Fact]
         public void Should_not_throw_when_resetting()
         {
-            Mapper.Reset();
             var action = new Action(() =>
             {
+                Mapper.Reset();
                 Mapper.Initialize(cfg => { });
                 Mapper.Reset();
                 Mapper.Initialize(cfg => { });
