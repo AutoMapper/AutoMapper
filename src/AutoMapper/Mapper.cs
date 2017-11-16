@@ -54,6 +54,15 @@ namespace AutoMapper
         }
 
         /// <summary>
+        /// Resets the mapper configuration. Not intended for production use, but for testing scenarios.
+        /// </summary>
+        public static void Reset()
+        {
+            _configuration = null;
+            _instance = null;
+        }
+
+        /// <summary>
         /// Execute a mapping from the source object to a new destination object.
         /// The source type is inferred from the source object.
         /// </summary>

@@ -217,3 +217,15 @@ Mapper.Configuration.CompileMappings();
 ```
 
 For a few hundred mappings, this may take a couple of seconds.
+
+## Resetting static mapping configuration
+
+The static `Mapper.Initialize` is intended to be called only once. To reset the static mapping configuration (for example, at the start of tests):
+
+```c#
+Mapper.Reset();
+
+Mapper.Initialize(cfg => { /* configure again */ });
+```
+
+`Reset` should not be used in production code. It is intended to support testing scenarios only.
