@@ -196,7 +196,7 @@ namespace AutoMapper.Execution
             {
                 var property = TryPropertyMap(propertyMap);
                 if (constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
-                    property = IfThen(NotEqual(_initialDestination, Constant(null)), property);
+                    property = _initialDestination.IfNullElse(Empty(), property);
                 actions.Add(property);
             }
             foreach (var pathMap in _typeMap.PathMaps.Where(pm => !pm.Ignored))
