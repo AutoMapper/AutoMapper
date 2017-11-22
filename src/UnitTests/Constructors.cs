@@ -75,6 +75,37 @@ namespace AutoMapper.UnitTests.Constructors
         }
     }
 
+    public class When_construct_mapping_a_struct_with_string : AutoMapperSpecBase
+    {
+        public struct Source
+        {
+            public string Property { get; set; }
+        }
+
+        public struct Destination
+        {
+            public Destination(string property)
+            {
+                Property = property;
+            }
+
+            public string Property { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var source = new Source { Property = "value" };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Property.ShouldBe("value");
+        }
+    }
+
     public class When_construct_mapping_a_struct : AutoMapperSpecBase
     {
         public class Dto
