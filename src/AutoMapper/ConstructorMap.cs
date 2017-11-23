@@ -43,7 +43,7 @@ namespace AutoMapper
                     ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
 
                 result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map)
-                    ?? throw new AutoMapperMappingException($"Unable to generate the instantiation expression for the constructor {Ctor}: no expression could be mapped for constructor parameter '{map.Parameter}'.", null, TypeMap.Types, null, null);
+                    ?? throw new AutoMapperMappingException($"Unable to generate the instantiation expression for the constructor {Ctor}: no expression could be mapped for constructor parameter '{map.Parameter}'.", null, TypeMap.Types);
 
                 return result;
             });
