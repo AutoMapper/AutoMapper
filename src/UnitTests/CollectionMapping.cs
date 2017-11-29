@@ -9,6 +9,41 @@ using System.Collections;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_to_existing_observable_collection : AutoMapperSpecBase
+    {
+        class CollectionHolder
+        {
+            public CollectionHolder()
+            {
+                Observable = new ObservableCollection<List<int>>();
+            }
+
+            public ObservableCollection<List<int>> Observable { get; set; }
+        }
+
+        class CollectionHolderDto
+        {
+            public CollectionHolderDto()
+            {
+                Observable = new List<List<int>>();
+            }
+
+            public List<List<int>> Observable { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<CollectionHolderDto, CollectionHolder>().ForMember(a => a.Observable, opt => opt.UseDestinationValue()));
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var ch = new CollectionHolderDto();
+            var list = new List<int>{ 5, 6 };
+            ch.Observable.Add(list);
+            var mapped = Mapper.Map<CollectionHolder>(ch);
+            mapped.Observable.Single().ShouldBe(list);
+        }
+    }
+
     public class When_mapping_to_existing_collection_typed_as_IEnumerable : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(_=>{ });

@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
 
-            var itemExpr = MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
+            var itemExpr = MapItemExpr(configurationProvider, profileMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];
