@@ -53,6 +53,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Queryable-Extensions
    Configuration
    Conditional-mapping
+   Editing-Resolvers-and-Conditions
    Open-Generics
    Understanding-your-mapping
 
