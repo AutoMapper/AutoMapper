@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers.Internal
                 destinationCollectionType = typeof(IList);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
 
-            Expression destination, createInstance, assignNewExpression;
+            Expression destination, assignNewExpression;
 
             UseDestinationValue();
 
@@ -48,7 +48,6 @@ namespace AutoMapper.Mappers.Internal
                     assignNewExpression,
                     Call(destination, clearMethod),
                     mapExpr
-                    //ToType(mapExpr, createInstance.Type)
                 );
             if (propertyMap != null)
                 return checkNull;
@@ -63,14 +62,13 @@ namespace AutoMapper.Mappers.Internal
             {
                 if(propertyMap?.UseDestinationValue == true)
                 {
-                    createInstance = passedDestination;
                     destination = passedDestination;
                     assignNewExpression = Empty();
                 }
                 else
                 {
                     destination = newExpression;
-                    createInstance = passedDestination.Type.NewExpr(ifInterfaceType);
+                    Expression createInstance = passedDestination.Type.NewExpr(ifInterfaceType);
                     var isReadOnly = Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
                     assignNewExpression = Assign(newExpression,
                         Condition(OrElse(Equal(passedDestination, Constant(null)), isReadOnly), ToType(createInstance, passedDestination.Type), passedDestination));

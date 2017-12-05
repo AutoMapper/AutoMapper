@@ -655,8 +655,6 @@ namespace AutoMapper.UnitTests
             };
             var dest = new Dest();
 
-            var plan = Mapper.ConfigurationProvider.FindTypeMapFor<Source, Dest>().MapExpression;
-
             Mapper.Map(source, dest);
 
             dest.Items.Count.ShouldBe(1);
