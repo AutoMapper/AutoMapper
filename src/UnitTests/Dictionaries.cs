@@ -192,6 +192,8 @@ namespace AutoMapper.UnitTests
                             }
                 };
 
+                var plan = Configuration.FindTypeMapFor<Foo, FooDto>().MapExpression;
+
                 _result = Mapper.Map<Foo, FooDto>(foo1);
             }
 

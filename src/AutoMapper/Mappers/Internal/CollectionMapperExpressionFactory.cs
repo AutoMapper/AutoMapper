@@ -9,8 +9,9 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers.Internal
 {
     using static Expression;
-    using static AutoMapper.Execution.ExpressionBuilder;
+    using static ExpressionBuilder;
     using static ExpressionFactory;
+    using static ElementTypeHelper;
 
     public static class CollectionMapperExpressionFactory
     {
@@ -22,7 +23,7 @@ namespace AutoMapper.Mappers.Internal
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
-            var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
+            var sourceElementType = GetElementType(sourceExpression.Type);
 
             var itemExpr = mapItem(configurationProvider, profileMap, sourceExpression.Type, passedDestination.Type,
                 contextExpression, out ParameterExpression itemParam);
@@ -46,7 +47,8 @@ namespace AutoMapper.Mappers.Internal
                     Assign(passedDestination, destExpression),
                     assignNewExpression,
                     Call(destination, clearMethod),
-                    ToType(mapExpr, createInstance.Type)
+                    mapExpr
+                    //ToType(mapExpr, createInstance.Type)
                 );
             if (propertyMap != null)
                 return checkNull;
@@ -80,7 +82,7 @@ namespace AutoMapper.Mappers.Internal
         {
             var newExpr = baseType.IsInterface()
                 ? New(
-                    ifInterfaceType.MakeGenericType(ElementTypeHelper.GetElementTypes(baseType,
+                    ifInterfaceType.MakeGenericType(GetElementTypes(baseType,
                         ElementTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
             return newExpr;
@@ -88,8 +90,8 @@ namespace AutoMapper.Mappers.Internal
 
         public static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
-            var sourceElementType = ElementTypeHelper.GetElementType(sourceType);
-            var destElementType = ElementTypeHelper.GetElementType(destType);
+            var sourceElementType = GetElementType(sourceType);
+            var destElementType = GetElementType(destType);
             itemParam = Parameter(sourceElementType, "item");
 
             var typePair = new TypePair(sourceElementType, destElementType);
@@ -100,8 +102,8 @@ namespace AutoMapper.Mappers.Internal
 
         public static Expression MapKeyPairValueExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
-            var sourceElementTypes = ElementTypeHelper.GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
-            var destElementTypes = ElementTypeHelper.GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
+            var sourceElementTypes = GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
+            var destElementTypes = GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
 
             var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
             var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);

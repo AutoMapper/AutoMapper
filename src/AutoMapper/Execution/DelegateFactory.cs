@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Execution
 {
     using static Expression;
-    using static ExpressionBuilder;
+    using static Internal.ExpressionFactory;
+    using static ElementTypeHelper;
 
     public static class DelegateFactory
     {
@@ -44,6 +48,15 @@ namespace AutoMapper.Execution
                 return Constant(null, typeof(string));
             }
 
+            if (type.IsInterface())
+            {
+                return type.ImplementsGenericInterface(typeof(IDictionary<,>))
+                    ? CreateCollection(type, typeof(Dictionary<,>))
+                    : (type.ImplementsGenericInterface(typeof(ICollection<>))
+                        ? CreateCollection(type, typeof(List<>))
+                        : InvalidType(type, $"Cannot create an instance of interface type {type}."));
+            }
+
             if (type.IsAbstract())
             {
                 return InvalidType(type, $"Cannot create an instance of abstract type {type}.");
@@ -66,6 +79,15 @@ namespace AutoMapper.Execution
 
             //create the ctor expression
             return New(ctorWithOptionalArgs, args);
+        }
+
+        private static Expression CreateCollection(Type type, Type collectionType)
+        {
+            var listType = collectionType.MakeGenericType(GetElementTypes(type, ElementTypeFlags.BreakKeyValuePair));
+            if (type.IsAssignableFrom(listType))
+                return ToType(New(listType), type);
+
+            return InvalidType(type, $"Cannot create an instance of interface type {type}.");
         }
 
         private static Expression InvalidType(Type type, string message)
