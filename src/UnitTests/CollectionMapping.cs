@@ -616,6 +616,52 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_mapping_from_ICollection_types_but_implementations_are_different : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public ICollection<Item> Items { get; set; }
+
+            public class Item
+            {
+                public int Value { get; set; }
+            }
+        }
+        public class Dest
+        {
+            public ICollection<Item> Items { get; set; } = new HashSet<Item>();
+
+            public class Item
+            {
+                public int Value { get; set; }
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Dest>();
+            cfg.CreateMap<Source.Item, Dest.Item>();
+        });
+
+        [Fact]
+        public void Should_map_items()
+        {
+            var source = new Source
+            {
+                Items = new List<Source.Item>
+                {
+                    new Source.Item { Value = 5 }
+                }
+            };
+            var dest = new Dest();
+
+            Mapper.Map(source, dest);
+
+            dest.Items.Count.ShouldBe(1);
+            dest.Items.First().Value.ShouldBe(5);
+        }
+    }
+
     public class When_mapping_enumerable_to_array : AutoMapperSpecBase
     {
         public class Source
