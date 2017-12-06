@@ -64,7 +64,9 @@ public class OrderDto
 }
 ```
 
-When you configure a source/destination type pair in AutoMapper, the configurator attempts to match properties and methods on the source type to properties on the destination type.  If for any property on the destination type a property, method, or a method prefixed with "Get" does not exist on the source type, AutoMapper splits the destination member name into individual words (by PascalCase conventions).
+When you configure a source/destination type pair in AutoMapper, the configurator attempts to match properties and methods from the source type to properties on the destination type. 
+
+When no property, method or method prefixed with "Get" in the source type match the property of the destination type, AutoMapper will splits the destination member name into individual words (by PascalCase conventions).
 
 ```c#
 // Complex model
@@ -96,6 +98,6 @@ dto.CustomerName.ShouldEqual("George Costanza");
 dto.Total.ShouldEqual(74.85m);
 ```
 
-We configured the type map in AutoMapper with the CreateMap method.  AutoMapper can only map type pairs it knows about, so we have explicitly register the source/destination type pair with CreateMap.  To perform the mapping, we use the Map method.
+We configured the type map in AutoMapper with the **_CreateMap_** method.  AutoMapper can only map type pairs it knows about, so we have explicitly register the source/destination type pair with CreateMap.  To perform the mapping, we use the **_Map_** method.
 
-On the OrderDto type, the Total property matched to the GetTotal() method on Order.  The CustomerName property matched to the Customer.Name property on Order.  As long as we name our destination properties appropriately, we do not need to configure individual property matching.
+On the OrderDto type, the Total property was matched to the GetTotal() method on Order.  The CustomerName property was matched to the Customer.Name property on Order.  As long as we name our destination properties appropriately, we do not need to configure individual property matching.
