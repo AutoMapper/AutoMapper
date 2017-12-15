@@ -6,7 +6,10 @@
         using Shouldly;
         using Xunit;
 
-        public abstract class Animal { }
+        public abstract class Animal
+        {
+            public int key;
+        }
         public class Cat : Animal { }
         public class Dog : Animal { }
 
@@ -18,11 +21,14 @@
         public class CatProxy : Cat
         {
             public Type ToConvert { get; set; }
-            
+
         }
         public class DogProxy : Dog { }
 
-        public abstract class AnimalDto { }
+        public abstract class AnimalDto
+        {
+            public int key;
+        }
         public class CatDto : AnimalDto { }
         public class DogDto : AnimalDto { }
 
@@ -34,18 +40,24 @@
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Animal, AnimalDto>()
-                    .Substitute(CastToEntity)
+                    .Substitute(CastToEntity).AfterMap(TransformDestination)
                     .Include<Cat, CatDto>()
                     .Include<Dog, DogDto>();
                 cfg.CreateMap<Cat, CatDto>();
                 cfg.CreateMap<Dog, DogDto>();
             });
 
+            private static void TransformDestination(Animal arg1, AnimalDto arg2)
+            {
+                arg2.key = 0;
+            }
+
             protected override void Because_of()
             {
                 var proxy = new CatProxy
                 {
-                    ToConvert = typeof (Cat)
+                    key = 1,
+                    ToConvert = typeof(Cat)
                 };
                 _animalDto = Mapper.Map<Animal, AnimalDto>(proxy);
             }
@@ -54,6 +66,7 @@
             public void Should_substitute_correct_object()
             {
                 _animalDto.ShouldBeOfType<CatDto>();
+                Assert.Equal(0, _animalDto.key);
             }
 
             private static object CastToEntity(Animal entity)
