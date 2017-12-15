@@ -511,7 +511,7 @@ namespace AutoMapper.Execution
             else if(propertyMap.SourceMembers.Any() && propertyMap.SourceType != null)
             {
                 var last = propertyMap.SourceMembers.Last();
-                if(last is PropertyInfo pi && pi.GetGetMethod(ignored: true) == null)
+                if(last is PropertyInfo pi && pi.GetGetMethod(true) == null)
                 {
                     valueResolverFunc = Default(last.GetMemberType());
                 }
