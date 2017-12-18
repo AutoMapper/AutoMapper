@@ -503,11 +503,6 @@ namespace AutoMapper.Execution
                         Catch(typeof(ArgumentNullException), Default(returnType))
                     );
             }
-            else if(propertyMap.CustomSourceMemberName != null)
-            {
-                var customMember = _typeMap.SourceType.GetFieldOrProperty(propertyMap.CustomSourceMemberName);
-                valueResolverFunc = MakeMemberAccess(Source, customMember);
-            }
             else if(propertyMap.SourceMembers.Any() && propertyMap.SourceType != null)
             {
                 var last = propertyMap.SourceMembers.Last();
