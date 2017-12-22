@@ -171,7 +171,8 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var nullCheckSource = NullCheckSource(Configuration, source, destination, fullExpression, mapRequest.PropertyMap);
+            var profileMap = mapRequest.PropertyMap?.TypeMap?.Profile ?? Configuration;
+            var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.PropertyMap);
             return Lambda(nullCheckSource, source, destination, context);
         }
 
