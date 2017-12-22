@@ -28,7 +28,8 @@ namespace AutoMapper
             PropertyMap = propertyMap;
         }
 
-        public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
+        public bool Equals(MapRequest other) => 
+            RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) && Equals(PropertyMap, other.PropertyMap);
 
         public override bool Equals(object obj)
         {
