@@ -356,6 +356,11 @@ namespace AutoMapper
 
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context)
         {
+            if(destinationType.IsValueType())
+            {
+                destination = null;
+            }
+
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
@@ -365,6 +370,11 @@ namespace AutoMapper
 
         TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
         {
+            if(typeof(TDestination).IsValueType())
+            {
+                destination = default(TDestination);
+            }
+
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);

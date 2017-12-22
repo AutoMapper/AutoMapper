@@ -32,13 +32,13 @@ namespace AutoMapper.Internal
         {
             var memberType = GetMemberType(member);
             var destValue = GetMemberValue(member, destination);
-            return context.Mapper.Map(value, destValue, value?.GetType() ?? memberType, memberType, context);
+            return context.Map(value, destValue, value?.GetType() ?? memberType, memberType);
         }
 
         public static object MapMember(ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = GetMemberType(member);
-            return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
+            return context.Map(value, null, value?.GetType() ?? memberType, memberType);
         }
 
         public static bool IsDynamic(object obj) => obj is IDynamicMetaObjectProvider;
