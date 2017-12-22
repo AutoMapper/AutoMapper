@@ -5,6 +5,37 @@ using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_a_source_child_object_is_null : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public Child Child { get; set; }
+        }
+
+        public class Destination
+        {
+            public Child Child { get; set; } = new Child();
+        }
+
+        public class Child
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.Child, o => o.MapAtRuntime());
+        });
+
+        [Fact]
+        public void Should_overwrite_the_existing_child_destination()
+        {
+            var destination = new Destination();
+            Mapper.Map(new Source(), destination);
+            destination.Child.ShouldBeNull();
+        }
+    }
+
     public class When_the_destination_object_is_specified : AutoMapperSpecBase
     {
         private Source _source;
@@ -122,37 +153,6 @@ namespace AutoMapper.UnitTests
         {
             _dest.Name.ShouldBe("foo");
             _dest.Child.Name.ShouldBe("bar");
-        }
-    }
-
-    public class When_a_source_child_object_is_null : AutoMapperSpecBase
-    {
-        public class Source
-        {
-            public Child Child { get; set; }
-        }
-
-        public class Destination
-        {
-            public Child Child { get; set; } = new Child();
-        }
-
-        public class Child
-        {
-            public int Value { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>().ForMember(d=>d.Child, o=>o.MapAtRuntime());
-        });
-
-        [Fact]
-        public void Should_overwrite_the_existing_child_destination()
-        {
-            var destination = new Destination();
-            Mapper.Map(new Source(), destination);
-            destination.Child.ShouldBeNull();
         }
     }
 
