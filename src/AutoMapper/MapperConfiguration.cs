@@ -79,10 +79,10 @@ namespace AutoMapper
 
         public IEnumerable<ProfileMap> Profiles { get; }
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types)
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap)
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, types);
+            var mapRequest = new MapRequest(key, types, propertyMap);
             return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
 
@@ -160,7 +160,7 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, 
+                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, mapRequest.PropertyMap, 
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType), 
                                                                         ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
@@ -171,7 +171,7 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var nullCheckSource = NullCheckSource(Configuration, source, destination, fullExpression);
+            var nullCheckSource = NullCheckSource(Configuration, source, destination, fullExpression, mapRequest.PropertyMap);
             return Lambda(nullCheckSource, source, destination, context);
         }
 

@@ -17,7 +17,7 @@ namespace AutoMapper.Execution
             mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
 
         private static readonly MethodInfo ContextMapMethod =
-            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null)).GetGenericMethodDefinition();            
+            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();            
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap,
@@ -38,9 +38,9 @@ namespace AutoMapper.Execution
                     return typeMap.MapExpression != null
                         ? typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter,
                             contextParameter)
-                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
                 }
-                return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+                return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
             }
             var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
                 sourceParameter, contextParameter, propertyMap, destinationParameter);
@@ -52,7 +52,7 @@ namespace AutoMapper.Execution
             Expression sourceParameter,
             Expression destinationParameter,
             Expression objectMapperExpression,
-            PropertyMap propertyMap = null)
+            PropertyMap propertyMap)
         {
             var declaredDestinationType = destinationParameter.Type;
             var destinationType = objectMapperExpression.Type;
@@ -101,14 +101,14 @@ namespace AutoMapper.Execution
                     sourceParameter, destinationParameter, contextParameter);
                 return mapperExpression;
             }
-            return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+            return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
         }
 
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            Expression destinationParameter)
+            Expression destinationParameter, PropertyMap propertyMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
+            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(propertyMap, typeof(PropertyMap)));
         }
 
         public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)

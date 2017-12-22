@@ -110,11 +110,11 @@ namespace AutoMapper
 
         internal bool IsDefault => this == Mapper.DefaultContext;
 
-        internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
-            => Mapper.Map(source, destination, this);
+        internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, PropertyMap propertyMap)
+            => Mapper.Map(source, destination, this, propertyMap);
 
-        internal object Map(object source, object destination, Type sourceType, Type destinationType) 
-            => Mapper.Map(source, destination, sourceType, destinationType, this);
+        internal object Map(object source, object destination, Type sourceType, Type destinationType, PropertyMap propertyMap) 
+            => Mapper.Map(source, destination, sourceType, destinationType, this, propertyMap);
 
         internal void ValidateMap(TypeMap typeMap)
             => ConfigurationProvider.AssertConfigurationIsValid(typeMap);

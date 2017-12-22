@@ -162,6 +162,8 @@ namespace AutoMapper.UnitTests.Mappers
             public int? NullableInt { get; set; }
             public int Int { get; set; }
             public SomeBody SomeBody { get; set; } = new SomeBody { Value = 15 };
+            public SomeOne SomeOne { get; set; } = new SomeOne();
+            public string String { get; set; } = "value";
         }
 
         [Fact]
@@ -171,7 +173,9 @@ namespace AutoMapper.UnitTests.Mappers
             source["Int"] = 10;
             source["NullableDate"] = null;
             source["NullableInt"] = null;
+            source["String"] = null;
             source["SomeBody"] = new SomeOne();
+            source["SomeOne"] = null;
             var destination = new Destination { NullableInt = 1, NullableDate = DateTime.Now };
             var someBody = destination.SomeBody;
 
@@ -182,6 +186,8 @@ namespace AutoMapper.UnitTests.Mappers
             destination.NullableDate.ShouldBeNull();
             destination.SomeBody.ShouldBe(someBody);
             destination.SomeBody.Value.ShouldBe(15);
+            destination.String.ShouldBeNull();
+            destination.SomeOne.ShouldBeNull();
         }
     }
 
