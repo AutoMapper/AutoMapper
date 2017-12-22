@@ -2,10 +2,11 @@
 using System.Data.Entity;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.UnitTests;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests.Projection
+namespace AutoMapper.IntegrationTests
 {
     public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase
     {
