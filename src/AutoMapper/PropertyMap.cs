@@ -16,7 +16,7 @@ namespace AutoMapper
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        internal static PropertyMap Default { get; } = new PropertyMap(null, null);
+        internal static PropertyMap Default { get; } = new PropertyMap(default(MemberInfo), default(TypeMap));
         
         public PropertyMap(PathMap pathMap)
         {
