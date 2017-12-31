@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
 
     public class MultidimensionalArrayMapper : IObjectMapper
     {
-        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, PropertyMap propertyMap)
+        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
             where TSource : IEnumerable
         {
             var destElementType = ElementTypeHelper.GetElementType(typeof(TDestination));
@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
             var filler = new MultidimensionalArrayFiller(destinationArray);
             foreach (var item in sourceList)
             {
-                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType, propertyMap));
+                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType, PropertyMap.Default));
             }
             return destinationArray;
         }
@@ -53,8 +53,7 @@ namespace AutoMapper.Mappers
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
                     ElementTypeHelper.GetElementType(sourceExpression.Type)),
                 sourceExpression,
-                contextExpression,
-                Constant(propertyMap, typeof(PropertyMap)));
+                contextExpression);
 
         public class MultidimensionalArrayFiller
         {
