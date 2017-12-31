@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
             var filler = new MultidimensionalArrayFiller(destinationArray);
             foreach (var item in sourceList)
             {
-                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType, PropertyMap.Default));
+                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType, null));
             }
             return destinationArray;
         }
