@@ -117,7 +117,7 @@ namespace AutoMapper
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
-            return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
+            return GenerateObjectMapperExpression(mapRequest, mapperToUse);
         }
 
         private static LambdaExpression GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
@@ -145,7 +145,7 @@ namespace AutoMapper
             return mapExpression;
         }
 
-        private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
+        private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse)
         {
             var destinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -160,7 +160,7 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, mapRequest.PropertyMap, 
+                var map = mapperToUse.MapExpression(this, Configuration, mapRequest.PropertyMap, 
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType), 
                                                                         ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
