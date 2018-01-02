@@ -9,7 +9,7 @@ namespace AutoMapper.UnitTests.Bug
         class Person
         {
             public int Age { get; set; }
-            public int Age2 => DateTime.Now.Year - Birthday.Year;
+            public int Age2 => 2017 - Birthday.Year;
             public DateTime Birthday { get; set; }
             public string Name { get; set; }
         }
