@@ -11,7 +11,7 @@ You can create value transformers at several different levels:
 
 ```c#
 Mapper.Initialize(cfg => {
-    cfg.ValueTransformers.Add<string>(val + "!!!");
+    cfg.ValueTransformers.Add<string>(val => val + "!!!");
 });
 
 var source = new Source { Value = "Hello" };
