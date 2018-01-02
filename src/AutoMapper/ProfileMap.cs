@@ -251,6 +251,7 @@ namespace AutoMapper
         {
             foreach (var inheritedTypeMap in typeMap.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
             {
+                inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
                 inheritedTypeMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
             }
