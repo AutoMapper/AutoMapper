@@ -410,7 +410,7 @@ namespace AutoMapper.Execution
             valueResolverExpr = propertyMap.Inline
                 ? MapExpression(_configurationProvider, _typeMap.Profile, typePair, valueResolverExpr, Context,
                     propertyMap, destValueExpr)
-                : ContextMap(typePair, valueResolverExpr, Context, destValueExpr);
+                : ContextMap(typePair, valueResolverExpr, Context, destValueExpr, propertyMap);
 
             valueResolverExpr = propertyMap.ValueTransformers
                 .Concat(_typeMap.ValueTransformers)

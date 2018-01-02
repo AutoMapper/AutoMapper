@@ -52,7 +52,7 @@ namespace AutoMapper.Execution
             {
                 return type.ImplementsGenericInterface(typeof(IDictionary<,>))
                     ? CreateCollection(type, typeof(Dictionary<,>))
-                    : (type.ImplementsGenericInterface(typeof(ICollection<>))
+                    : (type.IsEnumerableType()
                         ? CreateCollection(type, typeof(List<>))
                         : InvalidType(type, $"Cannot create an instance of interface type {type}."));
             }

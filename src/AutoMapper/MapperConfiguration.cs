@@ -79,10 +79,10 @@ namespace AutoMapper
 
         public IEnumerable<ProfileMap> Profiles { get; }
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types)
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap)
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, types);
+            var mapRequest = new MapRequest(key, types, propertyMap);
             return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
 
@@ -117,7 +117,7 @@ namespace AutoMapper
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
-            return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
+            return GenerateObjectMapperExpression(mapRequest, mapperToUse);
         }
 
         private static LambdaExpression GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
@@ -145,7 +145,7 @@ namespace AutoMapper
             return mapExpression;
         }
 
-        private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
+        private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse)
         {
             var destinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -160,7 +160,7 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, 
+                var map = mapperToUse.MapExpression(this, Configuration, mapRequest.PropertyMap, 
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType), 
                                                                         ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
@@ -171,7 +171,8 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var nullCheckSource = NullCheckSource(Configuration, source, destination, fullExpression);
+            var profileMap = mapRequest.PropertyMap?.TypeMap?.Profile ?? Configuration;
+            var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.PropertyMap);
             return Lambda(nullCheckSource, source, destination, context);
         }
 
