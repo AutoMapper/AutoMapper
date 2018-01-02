@@ -133,6 +133,7 @@ namespace AutoMapper.UnitTests.Mappers
             public override int Y { get { return _y + 20; } }
             private int _z = 300;
             public int Z { get { return _z + 30; } }
+            public int Value { get; set; }
         }
 
         public class SomeOne : SomeBase
@@ -153,6 +154,40 @@ namespace AutoMapper.UnitTests.Mappers
             var someOne = new StringDictionary();
 
             Mapper.Map(someOne, someBase);
+        }
+
+        public class Destination
+        {
+            public DateTime? NullableDate { get; set; }
+            public int? NullableInt { get; set; }
+            public int Int { get; set; }
+            public SomeBody SomeBody { get; set; } = new SomeBody { Value = 15 };
+            public SomeOne SomeOne { get; set; } = new SomeOne();
+            public string String { get; set; } = "value";
+        }
+
+        [Fact]
+        public void Should_override_existing_values()
+        {
+            var source = new StringDictionary();
+            source["Int"] = 10;
+            source["NullableDate"] = null;
+            source["NullableInt"] = null;
+            source["String"] = null;
+            source["SomeBody"] = new SomeOne();
+            source["SomeOne"] = null;
+            var destination = new Destination { NullableInt = 1, NullableDate = DateTime.Now };
+            var someBody = destination.SomeBody;
+
+            Mapper.Map(source, destination);
+
+            destination.Int.ShouldBe(10);
+            destination.NullableInt.ShouldBeNull();
+            destination.NullableDate.ShouldBeNull();
+            destination.SomeBody.ShouldBe(someBody);
+            destination.SomeBody.Value.ShouldBe(15);
+            destination.String.ShouldBeNull();
+            destination.SomeOne.ShouldBeNull();
         }
     }
 

@@ -17,6 +17,7 @@
     <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
     <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' Or '$(TargetFramework)' == 'netstandard1.3' ">

@@ -8,6 +8,27 @@ using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_mappping_null_array_to_IEnumerable_with_MapAtRuntime : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int[] Collection { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable<int> Collection { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().ForMember(d=>d.Collection, o=>o.MapAtRuntime()));
+
+        [Fact]
+        public void Should_map_to_non_null()
+        {
+            Mapper.Map<Destination>(new Source()).Collection.ShouldNotBeNull();
+        }
+    }
+
     public class When_mappping_null_array_to_IEnumerable : AutoMapperSpecBase
     {
         class Source
@@ -690,6 +711,89 @@ namespace AutoMapper.UnitTests.NullBehavior
         public void Should_allow_null_collections()
         {
             _dest.Values6.ShouldBeNull();
+        }
+    }
+
+    public class When_overriding_collection_null_behavior_in_profile_with_MapAtRuntime : AutoMapperSpecBase
+    {
+        private Dest _dest;
+
+        public class Source
+        {
+            public IEnumerable<int> Values1 { get; set; }
+            public List<int> Values2 { get; set; }
+            public Dictionary<string, int> Values3 { get; set; }
+            public int[] Values4 { get; set; }
+            public ReadOnlyCollection<int> Values5 { get; set; }
+            public Collection<int> Values6 { get; set; }
+            public int[,] Values7 { get; set; }
+        }
+
+        public class Dest
+        {
+            public IEnumerable<int> Values1 { get; set; }
+            public List<int> Values2 { get; set; }
+            public Dictionary<string, int> Values3 { get; set; }
+            public int[] Values4 { get; set; }
+            public ReadOnlyCollection<int> Values5 { get; set; }
+            public Collection<int> Values6 { get; set; }
+            public int[,] Values7 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateProfile("MyProfile", p =>
+            {
+                p.CreateMap<Source, Dest>().ForAllMembers(o=>o.MapAtRuntime());
+                p.AllowNullCollections = true;
+            });
+        });
+
+        protected override void Because_of()
+        {
+            _dest = Mapper.Map<Source, Dest>(new Source());
+        }
+
+        [Fact]
+        public void Should_allow_null_ienumerables()
+        {
+            _dest.Values1.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_lists()
+        {
+            _dest.Values2.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_dictionaries()
+        {
+            _dest.Values3.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_arrays()
+        {
+            _dest.Values4.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_read_only_collections()
+        {
+            _dest.Values5.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_collections()
+        {
+            _dest.Values6.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_allow_null_multidimensional_arrays()
+        {
+            _dest.Values7.ShouldBeNull();
         }
     }
 
