@@ -503,10 +503,12 @@ namespace AutoMapper.Execution
                         Catch(typeof(ArgumentNullException), Default(returnType))
                     );
             }
-            else if(propertyMap.SourceMembers.Any() && propertyMap.SourceType != null)
+            else if (propertyMap.SourceMembers.Any()
+                     && propertyMap.SourceType != null
+            )
             {
                 var last = propertyMap.SourceMembers.Last();
-                if(last is PropertyInfo pi && pi.GetGetMethod(true) == null)
+                if (last is PropertyInfo pi && pi.GetGetMethod(true) == null)
                 {
                     valueResolverFunc = Default(last.GetMemberType());
                 }
@@ -514,6 +516,10 @@ namespace AutoMapper.Execution
                 {
                     valueResolverFunc = Chain(propertyMap.SourceMembers, destinationPropertyType);
                 }
+            }
+            else if (propertyMap.SourceMember != null)
+            {
+                valueResolverFunc = MakeMemberAccess(Source, propertyMap.SourceMember);
             }
             else
             {

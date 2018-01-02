@@ -11,16 +11,6 @@ namespace AutoMapper.Internal
 
     public static class ExpressionFactory
     {
-        public static LambdaExpression MemberAccessLambda(Type type, string propertyOrField) =>
-            MemberAccessLambda(type.GetFieldOrProperty(propertyOrField));
-
-        public static LambdaExpression MemberAccessLambda(MemberInfo propertyOrField)
-        {
-            var source = Parameter(propertyOrField.DeclaringType, "source");
-            return Lambda(MakeMemberAccess(source, propertyOrField), source);
-        }
-
-
         public static MemberExpression MemberAccesses(string members, Expression obj) =>
             (MemberExpression) ReflectionHelper.GetMemberPath(obj.Type, members).MemberAccesses(obj);
 
