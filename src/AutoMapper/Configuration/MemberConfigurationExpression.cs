@@ -7,7 +7,6 @@ using System.Reflection;
 namespace AutoMapper.Configuration
 {
     using static Expression;
-    using static AutoMapper.Internal.ExpressionFactory;
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
@@ -135,7 +134,7 @@ namespace AutoMapper.Configuration
         public void MapFrom(string sourceMember)
         {
             _sourceType.GetFieldOrProperty(sourceMember);
-            PropertyMapActions.Add(pm => pm.MapFrom(sourceMember));
+            PropertyMapActions.Add(pm => pm.CustomSourceMemberName = sourceMember);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -297,7 +296,9 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            var newSourceExpression = MemberAccessLambda(_destinationMember);
+            var newSource = Parameter(DestinationMember.DeclaringType, "source");
+            var newSourceProperty = MakeMemberAccess(newSource, _destinationMember);
+            var newSourceExpression = Lambda(newSourceProperty, newSource);
             return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, newSourceExpression);
         }
     }
