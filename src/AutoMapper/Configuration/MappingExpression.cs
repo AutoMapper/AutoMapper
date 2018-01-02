@@ -9,6 +9,7 @@ using AutoMapper.Configuration.Internal;
 namespace AutoMapper.Configuration
 {
     using static Expression;
+    using static ExpressionFactory;
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression
     {
@@ -641,8 +642,7 @@ namespace AutoMapper.Configuration
 
                     var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
 
-                    var newSource = Parameter(reverseTypeMap.SourceType, "source");
-                    pathMap.SourceExpression = Lambda(MakeMemberAccess(newSource, propertyMap.DestinationProperty), newSource);
+                    pathMap.SourceExpression = MemberAccessLambda(propertyMap.DestinationProperty);
                 });
             }
         }
