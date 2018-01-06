@@ -51,3 +51,8 @@ Mapper.Initialize(cfg =>
 ```
 
 To skip validation altogether for this map, use `MemberList.None`.
+
+
+## Custom validations
+
+You can add custom validations through an extension point. See [here](https://github.com/AutoMapper/AutoMapper/blob/7a00700de61cd3234b6a6eb4bf0f6bbe402369b1/src/UnitTests/ConfigurationValidation.cs#L30).
