@@ -44,6 +44,45 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_mapping_to_member_typed_as_IEnumerable : AutoMapperSpecBase
+    {
+        public class SourceItem { }
+        public class DestItem { }
+        public class SourceA
+        {
+            public IEnumerable<SourceItem> Items { get; set; }
+            public IEnumerable<SourceB> Bs { get; set; } // Problem
+        }
+
+        public class SourceB
+        {
+            public IEnumerable<SourceItem> Items { get; set; }
+        }
+
+        public class DestA
+        {
+            public IEnumerable<DestItem> Items { get; set; }
+            public IEnumerable<DestB> Bs { get; set; } // Problem
+        }
+
+        public class DestB
+        {
+            public IEnumerable<DestItem> Items { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<SourceA, DestA>();
+            cfg.CreateMap<SourceB, DestB>();
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            Mapper.Map<DestB>(new SourceB()).Items.ShouldBeEmpty();
+        }
+    }
+    
     public class When_mapping_to_existing_collection_typed_as_IEnumerable : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(_=>{ });
