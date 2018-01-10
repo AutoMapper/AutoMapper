@@ -48,6 +48,19 @@ For the non-generic enumerable types, only unmapped, assignable types are suppor
 
 When mapping to an existing collection, the destination collection is cleared first. If this is not what you want, take a look at [AutoMapper.Collection](https://github.com/AutoMapper/AutoMapper.Collection).
 
+## Handling null collections
+
+When mapping a collection property, if the source value is null AutoMapper will map the destination field to an empty collection rather than setting the destination value to null. This aligns with the behavior of Entity Framework and Framework Design Guidelines that believe C# references, arrays, lists, collections, dictionaries and IEnumerables should NEVER be null, ever. 
+
+This behavior can be changed by setting the `AllowNullCollections` property to true when configuring the mapper.
+
+```c#
+Mapper.Initialize(cfg => {
+    cfg.AllowNullCollections = true;
+    cfg.CreateMap<Source, Destination>();
+});
+```
+
 ## Polymorphic element types in collections
 
 Many times, we might have a hierarchy of types in both our source and destination types.  AutoMapper supports polymorphic arrays and collections, such that derived source/destination types are used if found.
