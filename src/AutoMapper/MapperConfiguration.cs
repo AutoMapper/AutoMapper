@@ -365,7 +365,7 @@ namespace AutoMapper
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
             var profile = Profiles.FirstOrDefault(p => p.IsConventionMap(typePair));
-            if(profile == null)
+            if (profile == null)
             {
                 return null;
             }
