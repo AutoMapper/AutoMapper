@@ -200,8 +200,7 @@ namespace AutoMapper
         ///     configuration ?? throw new InvalidOperationException(InvalidOperationMessage)
         /// </code>
         /// </summary>
-        /// <param name="mapper"></param>
-        /// <returns></returns>
+        /// <returns>True if mapper instance is initialized else false</returns>
         public bool IsInitialized()
         {
             return _configuration != null;
