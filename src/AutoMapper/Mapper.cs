@@ -194,12 +194,11 @@ namespace AutoMapper
         public ResolutionContext DefaultContext { get; }
 
         /// <summary>
-        /// Returns true if mapper is initialized, else false
+        /// Returns true if mapper is initialized else false
         /// Code taken directly from AutoMapper source code:
         /// <code>
         ///     configuration ?? throw new InvalidOperationException(InvalidOperationMessage)
         /// </code>
-        /// <see href="https://github.com/AutoMapper/AutoMapper/blob/894412e72e98cb0d6da957b5a5be52f888fc6cd5/src/AutoMapper/Mapper.cs#L23" />
         /// </summary>
         /// <param name="mapper"></param>
         /// <returns></returns>
