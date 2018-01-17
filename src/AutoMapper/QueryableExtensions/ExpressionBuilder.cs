@@ -504,14 +504,14 @@ namespace AutoMapper.QueryableExtensions
                     MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccesses(instanceParameter),
                     Property = new PropertyDescription
                     (
-                        string.Join("_", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
+                        string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
                         path.Last.SourceType
                     ),
                     Marker = path.Marker
                 }).ToArray();
 
-                var letProperties = letMapInfos.Select(m => m.Property);
-                var letType = ProxyGenerator.GetSimilarType(request.SourceType, letProperties);
+                var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
+                var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
                 var typeMapFactory = new TypeMapFactory();
                 TypeMap firstTypeMap;
                 lock(_configurationProvider)
@@ -539,9 +539,37 @@ namespace AutoMapper.QueryableExtensions
                 }
             }
 
+            class GetMemberAccessesVisitor : ExpressionVisitor
+            {
+                private readonly Expression _target;
+
+                public List<MemberInfo> Members { get; } = new List<MemberInfo>();
+
+                public GetMemberAccessesVisitor(Expression target)
+                {
+                    _target = target;
+                }
+
+                protected override Expression VisitMember(MemberExpression node)
+                {
+                    if(node.Expression == _target)
+                    {
+                        Members.Add(node.Member);
+                    }
+                    return base.VisitMember(node);
+                }
+
+                public static IEnumerable<PropertyDescription> Retrieve(Expression expression, Expression target)
+                {
+                    var visitor = new GetMemberAccessesVisitor(target);
+                    visitor.Visit(expression);
+                    return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
+                }
+            }
+
             class ReplaceMemberAccessesVisitor : ExpressionVisitor
             {
-                Expression _oldObject, _newObject;
+                private readonly Expression _oldObject, _newObject;
 
                 public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
                 {

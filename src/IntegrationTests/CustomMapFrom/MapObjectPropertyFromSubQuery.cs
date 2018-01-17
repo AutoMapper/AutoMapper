@@ -8,6 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests
 {
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq.Expressions;
     using QueryableExtensions;
 
@@ -162,6 +163,8 @@ namespace AutoMapper.IntegrationTests
             public bool ECommercePublished { get; set; }
             public virtual ICollection<Article> Articles { get; set; }
             public int Value { get; }
+            [NotMapped]
+            public int NotMappedValue { get; set; }
             public virtual List<Article> OtherArticles { get; }
         }
 
