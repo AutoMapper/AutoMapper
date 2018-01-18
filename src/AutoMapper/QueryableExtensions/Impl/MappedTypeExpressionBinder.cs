@@ -3,6 +3,8 @@ using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using static Expression;
+
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => 
@@ -18,17 +20,14 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 return null;
             }
-            // Handles null source property so it will not create an object with possible non-nullable propeerties 
+            // Handles null source property so it will not create an object with possible non-nullable properties 
             // which would result in an exception.
             if (propertyMap.TypeMap.Profile.AllowNullDestinationValues && !propertyMap.AllowNull)
             {
-                var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
-                transformedExpression =
-                    Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)),
-                        transformedExpression, expressionNull);
+                transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty, transformedExpression);
+            return Bind(propertyMap.DestinationProperty, transformedExpression);
         }
     }
 }
