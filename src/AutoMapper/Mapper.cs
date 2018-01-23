@@ -193,6 +193,19 @@ namespace AutoMapper
 
         public ResolutionContext DefaultContext { get; }
 
+        /// <summary>
+        /// Returns true if mapper is initialized else false
+        /// Code taken directly from AutoMapper source code:
+        /// <code>
+        ///     configuration ?? throw new InvalidOperationException(InvalidOperationMessage)
+        /// </code>
+        /// </summary>
+        /// <returns>True if mapper instance is initialized else false</returns>
+        public bool IsInitialized()
+        {
+            return _configuration != null;
+        }
+
         Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
 
         IConfigurationProvider IMapper.ConfigurationProvider => _configurationProvider;
