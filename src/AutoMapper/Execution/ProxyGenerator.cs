@@ -51,12 +51,11 @@ namespace AutoMapper.Execution
             var interfaceType = typeDescription.Type;
             var additionalProperties = typeDescription.AdditionalProperties;
             var propertyNames = string.Join("_", additionalProperties.Select(p => p.Name));
-            string name =
-                $"Proxy{propertyNames}<{Regex.Replace(interfaceType.AssemblyQualifiedName ?? interfaceType.FullName ?? interfaceType.Name, @"[\s,]+", "_")}>";
+            var typeName = $"Proxy_{interfaceType.FullName}_{propertyNames}_{typeDescription.GetHashCode()}";
             var allInterfaces = new List<Type> { interfaceType };
             allInterfaces.AddRange(interfaceType.GetTypeInfo().ImplementedInterfaces);
-            Debug.WriteLine(name, "Emitting proxy type");
-            TypeBuilder typeBuilder = proxyModule.DefineType(name,
+            Debug.WriteLine(typeName, "Emitting proxy type");
+            TypeBuilder typeBuilder = proxyModule.DefineType(typeName,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
                 interfaceType.IsInterface() ? new[] { interfaceType } : new Type[0]);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
@@ -176,7 +175,11 @@ namespace AutoMapper.Execution
         public TypeDescription(Type type, IEnumerable<PropertyDescription> additionalProperties)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            AdditionalProperties = additionalProperties?.ToArray() ?? throw new ArgumentNullException(nameof(additionalProperties));
+            if(additionalProperties == null)
+            {
+                throw new ArgumentNullException(nameof(additionalProperties));
+            }
+            AdditionalProperties = additionalProperties.OrderBy(p => p.Name).ToArray();
         }
 
         public Type Type { get; }
