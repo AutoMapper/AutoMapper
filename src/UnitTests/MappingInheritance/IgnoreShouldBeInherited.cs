@@ -61,7 +61,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof(BaseUserDto<>), typeof(BaseUserEntity<>)).ForMember("Id", opt => opt.Ignore());
-            cfg.CreateMap(typeof(ConcreteUserDto), typeof(ConcreteUserEntity)).IncludeBase(typeof(BaseUserDto<>), typeof(BaseUserEntity<>));
+            cfg.CreateMap(typeof(ConcreteUserDto), typeof(ConcreteUserEntity)).IncludeBase(typeof(BaseUserDto<string>), typeof(BaseUserEntity<string>));
         });
 
         [Fact]
