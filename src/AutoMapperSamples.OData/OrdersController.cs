@@ -16,11 +16,14 @@ namespace AutoMapperSamples.OData
     public class OrdersController : ApiController
     {
         private TestDbContext context = null;
+        private MapperConfiguration _config;
+        private Mapper _mapper;
         internal static Action<Exception> OnException { get; set; }
 
         public OrdersController()
         {
-            Mapper.Initialize(MappingConfiguration.Configure);
+            _config = new MapperConfiguration(MappingConfiguration.Configure);
+            _mapper = new Mapper(_config);
 
             context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient());
         }
@@ -28,7 +31,7 @@ namespace AutoMapperSamples.OData
         [EnableQuery]
         public IQueryable<OrderDto> Get()
         {
-            return context.OrderSet.Include("Customer").UseAsDataSource(Mapper.Instance)
+            return context.OrderSet.Include("Customer").UseAsDataSource(_mapper)
                 // add an optional exceptionhandler that will be invoked
                 // in case an exception is raised upon query execution.
                 // otherwise it would get lost on the WebApi side and all we would get would be
@@ -53,10 +56,10 @@ namespace AutoMapperSamples.OData
                     var customerIds = enumerator.OfType<OrderDto>().Select(o => o.Customer.Id);
                     // add IDs of orders
                     var customersOrders = context.CustomerSet
-                                                    .Include("Orders")
-                                                    .Where(c => customerIds.Contains(c.Id))
-                                                    .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
-                                                    .ToDictionary(c => c.CustomerId);
+                        .Include("Orders")
+                        .Where(c => customerIds.Contains(c.Id))
+                        .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
+                        .ToDictionary(c => c.CustomerId);
                     // apply the list of IDs to each OrderDto
                     foreach (var order in enumerator.OfType<OrderDto>())
                     {
