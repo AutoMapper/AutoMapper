@@ -258,7 +258,7 @@ namespace AutoMapper
             {
                 lock (this)
                 {
-                    return Configuration.CreateInlineMap(_typeMapRegistry, initialTypes);
+                    return Configuration.CreateInlineMap(initialTypes, this);
                 }
             }
 
@@ -313,7 +313,7 @@ namespace AutoMapper
 
             foreach (var profile in Profiles)
             {
-                profile.Configure(_typeMapRegistry);
+                profile.Configure(this);
             }
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
@@ -372,7 +372,7 @@ namespace AutoMapper
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = profile.CreateConventionTypeMap(_typeMapRegistry, typePair);
+                typeMap = profile.CreateConventionTypeMap(typePair, this);
             }
             return typeMap;
         }
@@ -391,7 +391,7 @@ namespace AutoMapper
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, _typeMapRegistry, typePair);
+                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, typePair, this);
             }
             return typeMap;
         }
