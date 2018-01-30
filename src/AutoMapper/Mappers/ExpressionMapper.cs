@@ -93,11 +93,14 @@ namespace AutoMapper.Mappers
 
                 // check if the non-string expression is a null constent
                 // as this would lead to a "null.ToString()" and thus an error when executing the expression
-                var isNullConstant = new Func<Expression, bool>(xpr => xpr is ConstantExpression c && c.Value == null);
+                bool IsNullConstant(Expression xpr)
+                {
+                    return xpr is ConstantExpression c && c.Value == null;
+                }
 
-                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string) && !isNullConstant(newLeft))
+                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string) && !IsNullConstant(newLeft))
                     newLeft = Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
-                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string) && !isNullConstant(newRight))
+                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string) && !IsNullConstant(newRight))
                     newRight = Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
                 CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
                 CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
