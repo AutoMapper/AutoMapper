@@ -35,7 +35,7 @@ namespace AutoMapperSamples.OData
             // Start OWIN host 
             _webApp = WebApp.Start<Startup>(url: _baseAddress);
         }
-        
+
         [TearDown]
         public virtual void TearDown()
         {
@@ -325,7 +325,7 @@ namespace AutoMapperSamples.OData
 
             // Act
             var response = client.GetAsync(_baseAddress + "api/Orders?$filter=OrderDate gt DateTime'2015-02-01T00:00:00'").Result;
-            
+
             // Assert
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);

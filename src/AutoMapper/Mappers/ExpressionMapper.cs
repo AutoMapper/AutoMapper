@@ -91,13 +91,16 @@ namespace AutoMapper.Mappers
                 var newLeft = Visit(node.Left);
                 var newRight = Visit(node.Right);
 
-                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string))
+                // check if the non-string expression is a null constent
+                // as this would lead to a "null.ToString()" and thus an error when executing the expression
+                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string) && !IsNullConstant(newLeft))
                     newLeft = Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
-                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string))
+                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string) && !IsNullConstant(newRight))
                     newRight = Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
                 CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
                 CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
                 return MakeBinary(node.NodeType, newLeft, newRight);
+                bool IsNullConstant(Expression expression) => expression is ConstantExpression constant && constant.Value == null;
             }
 
             private static void CheckNullableToNonNullableChanges(Expression left, Expression right, ref Expression newLeft, ref Expression newRight)

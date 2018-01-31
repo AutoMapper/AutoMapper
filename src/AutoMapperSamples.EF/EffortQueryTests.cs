@@ -15,6 +15,9 @@ namespace AutoMapperSamples.EF
     [TestFixture]
     public class EffortQueryTests
     {
+        private Mapper _mapper;
+        private MapperConfiguration _config;
+
         static EffortQueryTests()
         {
             Effort.Provider.EffortProviderConfiguration.RegisterProvider();
@@ -23,7 +26,10 @@ namespace AutoMapperSamples.EF
         [SetUp]
         public void SetUp()
         {
-            Mapper.Initialize(MappingConfiguration.Configure);
+            //Mapper.Initialize(MappingConfiguration.Configure);
+
+            _config = new MapperConfiguration(MappingConfiguration.Configure);
+            _mapper = new Mapper(_config);
         }
 
         [Test]
@@ -34,8 +40,8 @@ namespace AutoMapperSamples.EF
                 IQueryable<OrderDto> sourceResult = new OrderDto[0]
                     .AsQueryable()
                     .Where(s => s.FullName.EndsWith("Bestellung"))
-                    .Map<OrderDto, Order>(context.OrderSet)
-                    .ProjectTo<OrderDto>(); // projection added
+                    .Map<OrderDto, Order>(context.OrderSet, _config)
+                    .ProjectTo<OrderDto>(_config); // projection added
 
                 var dtos = sourceResult.ToList();
 
@@ -54,8 +60,8 @@ namespace AutoMapperSamples.EF
                 IQueryable<OrderDto> sourceResult = new OrderDto[0]
                     .AsQueryable()
                     .Where(s => s.FullName.EndsWith("Bestellung"))
-                    .Map<OrderDto, Order>(context.OrderSet)
-                    .ProjectTo<OrderDto>(); // projection added
+                    .Map<OrderDto, Order>(context.OrderSet, _config)
+                    .ProjectTo<OrderDto>(_config); // projection added
                 var dtos = sourceResult.ToList();
                 Assert.AreEqual(2, dtos.Count);
 
@@ -70,8 +76,8 @@ namespace AutoMapperSamples.EF
                 {
                     IQueryable<OrderDto> sourceResult2 = new OrderDto[0]
                         .AsQueryable()
-                        .Map<OrderDto, Order>(context.OrderSet)
-                        .ProjectTo<OrderDto>(); // projection added
+                        .Map<OrderDto, Order>(context.OrderSet, _config)
+                        .ProjectTo<OrderDto>(_config); // projection added
                     var dtos2 = sourceResult
                         .Where(s => s.FullName.EndsWith("Bestellung"))
                         .ToList();
@@ -81,9 +87,9 @@ namespace AutoMapperSamples.EF
                 catch (NotSupportedException)
                 {
                 }
-                
+
                 // Using "AsDataSource"
-                IQueryable<OrderDto> sourceResult4 = context.OrderSet.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
+                IQueryable<OrderDto> sourceResult4 = context.OrderSet.UseAsDataSource(_config).For<OrderDto>();
                 var dtos4 = sourceResult4.Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
                 Assert.AreEqual(2, dtos4.Count);
@@ -97,7 +103,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(_mapper).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
@@ -112,9 +118,25 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet;
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(_mapper).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.FullName).Skip(2).ToList();
+
+                Assert.AreEqual(1, dtos3.Count);
+                Assert.AreEqual("Zalando Bestellung", dtos3.Single().FullName);
+            }
+        }
+
+        [Test]
+        public void Effort_FilterByDto_FullName_Contains()
+        {
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
+            {
+                var orders = context.OrderSet;
+
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(_mapper).For<OrderDto>();
+                var dtos3 = lazilyMappedQuery
+                    .Where(dto => dto.FullName.Contains("Zalando")).ToList();
 
                 Assert.AreEqual(1, dtos3.Count);
                 Assert.AreEqual("Zalando Bestellung", dtos3.Single().FullName);
@@ -128,7 +150,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet;
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(_mapper).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.Price).Skip(2).ToList();
 
@@ -144,7 +166,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet.OrderBy(o => o.Name);
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(_mapper).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Skip(1).Take(1).ToList();
 
