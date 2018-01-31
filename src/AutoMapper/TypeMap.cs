@@ -39,14 +39,21 @@ namespace AutoMapper
             Profile = profile;
         }
 
-        public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
+        public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, in MemberPath path, TypeMap typeMap)
         {
-            var pathMap = _pathMaps.SingleOrDefault(p => p.MemberPath == path);
-            if(pathMap == null)
+            PathMap pathMap = null;
+            foreach (var map in _pathMaps)
             {
-                pathMap = new PathMap(destinationExpression, path, typeMap);
-                _pathMaps.Add(pathMap);
+                if (map.MemberPath == path)
+                    pathMap = map;
             }
+
+            if (pathMap != null)
+                return pathMap;
+
+            pathMap = new PathMap(destinationExpression, path, typeMap);
+            _pathMaps.Add(pathMap);
+
             return pathMap;
         }
 
