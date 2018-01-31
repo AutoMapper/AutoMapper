@@ -148,6 +148,8 @@ namespace AutoMapper
 
         Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
 
+        void RegisterTypeMap(TypeMap typeMap);
+
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.

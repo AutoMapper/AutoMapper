@@ -35,4 +35,46 @@ namespace AutoMapper.UnitTests.Bug
             dto.SpecificProperty.ShouldBeNull();
         }
     }
+
+    public class IgnoreShouldBeInheritedWithOpenGenerics : AutoMapperSpecBase
+    {
+        public abstract class BaseUserDto<TIdType>
+        {
+            public TIdType Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class ConcreteUserDto : BaseUserDto<string>
+        {
+        }
+
+        public abstract class BaseUserEntity<TIdType>
+        {
+            public TIdType Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class ConcreteUserEntity : BaseUserEntity<string>
+        {
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(BaseUserDto<>), typeof(BaseUserEntity<>)).ForMember("Id", opt => opt.Ignore());
+            cfg.CreateMap(typeof(ConcreteUserDto), typeof(ConcreteUserEntity)).IncludeBase(typeof(BaseUserDto<string>), typeof(BaseUserEntity<string>));
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var user = new ConcreteUserDto
+            {
+                Id = "my-id",
+                Name = "my-User"
+            };
+            var userEntity = Mapper.Map<ConcreteUserEntity>(user);
+            userEntity.Id.ShouldBeNull();
+            userEntity.Name.ShouldBe("my-User");
+        }
+    }
 }
