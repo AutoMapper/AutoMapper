@@ -6,6 +6,7 @@ using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Mappers;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
@@ -168,10 +169,7 @@ namespace AutoMapper
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
         }
 
-        public bool IsConventionMap(TypePair types)
-        {
-            return TypeConfigurations.Any(c => c.IsMatch(types));
-        }
+        public bool IsConventionMap(TypePair types) => TypeConfigurations.Any(c => c.IsMatch(types));
 
         public TypeMap CreateConventionTypeMap(TypePair types, IConfigurationProvider configurationProvider)
         {
@@ -239,7 +237,7 @@ namespace AutoMapper
 
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IConfigurationProvider configurationProvider)
         {
-            foreach (var baseMap in GetTypeMaps(currentMap.IncludedBaseTypes, configurationProvider))
+            foreach (var baseMap in GetIncludedTypeMaps(currentMap.IncludedBaseTypes, configurationProvider))
             {
                 baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
                 derivedMap.AddInheritedMap(baseMap);
@@ -249,7 +247,7 @@ namespace AutoMapper
 
         private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
-            foreach (var inheritedTypeMap in GetTypeMaps(typeMap.IncludedDerivedTypes, configurationProvider))
+            foreach (var inheritedTypeMap in GetIncludedTypeMaps(typeMap.IncludedDerivedTypes, configurationProvider))
             {
                 inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
                 inheritedTypeMap.AddInheritedMap(baseMap);
@@ -257,7 +255,23 @@ namespace AutoMapper
             }
         }
 
-        private static IEnumerable<TypeMap> GetTypeMaps(IEnumerable<TypePair> types, IConfigurationProvider configurationProvider) =>
-            types.Select(pair => configurationProvider.ResolveTypeMap(pair)).Where(map => map != null);
+        private static IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes, IConfigurationProvider configurationProvider)
+        {
+            foreach(var pair in includedTypes)
+            {
+                var typeMap = configurationProvider.FindTypeMapFor(pair);
+                if(typeMap != null)
+                {
+                    yield return typeMap;
+                }
+                typeMap = configurationProvider.ResolveTypeMap(pair);
+                // we want the exact map the user included, but we could instantiate an open generic
+                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                {
+                    throw QueryMapperHelper.MissingMapException(pair);
+                }
+                yield return typeMap;
+            }
+        }
     }
 }

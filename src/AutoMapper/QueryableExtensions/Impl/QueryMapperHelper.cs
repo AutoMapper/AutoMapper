@@ -42,6 +42,9 @@ namespace AutoMapper.QueryableExtensions.Impl
         public static Exception PropertyConfigurationException(TypeMap typeMap, params string[] unmappedPropertyNames)
             => new AutoMapperConfigurationException(new[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, true) });
 
+        public static Exception MissingMapException(TypePair types)
+            => MissingMapException(types.SourceType, types.DestinationType);
+
         public static Exception MissingMapException(Type sourceType, Type destinationType) 
             => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using Mapper.CreateMap<{sourceType.Name}, {destinationType.Name}>.");
     }
