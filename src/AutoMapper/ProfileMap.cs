@@ -101,15 +101,15 @@ namespace AutoMapper
 
         private TypeDetails TypeDetailsFactory(Type type) => new TypeDetails(type, this);
 
-        public void Register(TypeMapRegistry typeMapRegistry)
+        public void Register(IConfigurationProvider configurationProvider)
         {
             foreach (var config in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
             {
-                BuildTypeMap(typeMapRegistry, config);
+                BuildTypeMap(configurationProvider, config);
 
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(typeMapRegistry, config.ReverseTypeMap);
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
                 }
             }
         }
@@ -126,13 +126,13 @@ namespace AutoMapper
             }
         }
 
-        private void BuildTypeMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config)
+        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
         {
             var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
 
             config.Configure(typeMap);
 
-            typeMapRegistry.RegisterTypeMap(typeMap);
+            configurationProvider.RegisterTypeMap(typeMap);
         }
 
         private void Configure(ITypeMapConfiguration typeMapConfiguration, IConfigurationProvider configurationProvider)

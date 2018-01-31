@@ -22,7 +22,7 @@ namespace AutoMapper
         private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetDeclaredConstructors().Single(c => c.GetParameters().Length == 3);
 
         private readonly IEnumerable<IObjectMapper> _mappers;
-        private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
+        private readonly Dictionary<TypePair, TypeMap> _typeMapRegistry = new Dictionary<TypePair, TypeMap>();
         private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
@@ -176,13 +176,13 @@ namespace AutoMapper
             return Lambda(nullCheckSource, source, destination, context);
         }
 
-        public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
+        public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.Values.ToArray();
 
         public TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
 
         public TypeMap FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(new TypePair(typeof(TSource), typeof(TDestination)));
 
-        public TypeMap FindTypeMapFor(TypePair typePair) => _typeMapRegistry.GetTypeMap(typePair);
+        public TypeMap FindTypeMapFor(TypePair typePair) => _typeMapRegistry.GetOrDefault(typePair);
 
         public TypeMap ResolveTypeMap(Type sourceType, Type destinationType)
         {
@@ -205,7 +205,7 @@ namespace AutoMapper
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetTypeMap(typePair) == null)
+            if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetOrDefault(typePair) == null)
             {
                 lock (typeMap)
                 {
@@ -272,7 +272,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.Name == profileName));
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
@@ -285,7 +285,7 @@ namespace AutoMapper
         {
             _expressionValidator.AssertConfigurationExpressionIsValid();
 
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.Values.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
         }
 
         public IMapper CreateMapper() => new Mapper(this);
@@ -308,7 +308,7 @@ namespace AutoMapper
 
             foreach (var profile in Profiles)
             {
-                profile.Register(_typeMapRegistry);
+                profile.Register(this);
             }
 
             foreach (var profile in Profiles)
@@ -316,7 +316,7 @@ namespace AutoMapper
                 profile.Configure(this);
             }
 
-            foreach (var typeMap in _typeMapRegistry.TypeMaps)
+            foreach (var typeMap in _typeMapRegistry.Values)
             {
                 _typeMapPlanCache[typeMap.Types] = typeMap;
 
@@ -339,7 +339,7 @@ namespace AutoMapper
                 _typeMapPlanCache[derivedMap.Item1] = derivedMap.Item2;
             }
 
-            foreach (var typeMap in _typeMapRegistry.TypeMaps)
+            foreach (var typeMap in _typeMapRegistry.Values)
             {
                 typeMap.Seal(this);
             }
@@ -397,6 +397,8 @@ namespace AutoMapper
         }
 
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
+
+        public void RegisterTypeMap(TypeMap typeMap) => _typeMapRegistry[typeMap.Types] = typeMap;
 
         internal struct MapperFuncs
         {
