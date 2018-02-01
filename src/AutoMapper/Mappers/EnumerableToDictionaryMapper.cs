@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class EnumerableToDictionaryMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.DestinationType.IsDictionaryType()
+        public bool IsMatch(in TypePair context) => context.DestinationType.IsDictionaryType()
                                                  && context.SourceType.IsEnumerableType()
                                                  && !context.SourceType.IsDictionaryType();
 

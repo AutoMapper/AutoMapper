@@ -26,13 +26,13 @@ namespace AutoMapper
         public AutoMapperMappingException(string message, Exception innerException)
             : base(message, innerException) => _message = message;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types)
+        public AutoMapperMappingException(string message, Exception innerException, in TypePair types)
             : this(message, innerException) => Types = types;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
+        public AutoMapperMappingException(string message, Exception innerException, in TypePair types, TypeMap typeMap)
             : this(message, innerException, types) => TypeMap = typeMap;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, PropertyMap propertyMap)
+        public AutoMapperMappingException(string message, Exception innerException, in TypePair types, TypeMap typeMap, PropertyMap propertyMap)
             : this(message, innerException, types, typeMap) => PropertyMap = propertyMap;
 
         public TypePair? Types { get; set; }

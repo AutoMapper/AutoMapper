@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class DictionaryMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType();
+        public bool IsMatch(in TypePair context) => context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression, typeof(Dictionary<,>), MapKeyPairValueExpr);

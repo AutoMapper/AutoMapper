@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class NullableSourceMapper : IObjectMapperInfo
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsNullableType();
+        public bool IsMatch(in TypePair context) => context.SourceType.IsNullableType();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
@@ -22,7 +22,7 @@ namespace AutoMapper.Mappers
                     destExpression
                 );
 
-        public TypePair GetAssociatedTypes(TypePair initialTypes)
+        public TypePair GetAssociatedTypes(in TypePair initialTypes)
         {
             return new TypePair(Nullable.GetUnderlyingType(initialTypes.SourceType), initialTypes.DestinationType);
         }

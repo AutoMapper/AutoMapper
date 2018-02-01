@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
 
     public class EnumerableMapper : EnumerableMapperBase
     {
-        public override bool IsMatch(TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
+        public override bool IsMatch(in TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
                                                   context.DestinationType.IsListType())
                                                  && context.SourceType.IsEnumerableType();
 

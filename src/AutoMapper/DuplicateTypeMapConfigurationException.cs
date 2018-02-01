@@ -28,7 +28,7 @@ namespace AutoMapper
             public string[] ProfileNames { get; }
             public TypePair Types { get; }
 
-            public TypeMapConfigErrors(TypePair types, string[] profileNames)
+            public TypeMapConfigErrors(in TypePair types, string[] profileNames)
             {
                 Types = types;
                 ProfileNames = profileNames;

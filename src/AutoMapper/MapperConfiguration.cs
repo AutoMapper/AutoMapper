@@ -79,7 +79,7 @@ namespace AutoMapper
 
         public IEnumerable<ProfileMap> Profiles { get; }
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap)
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(in TypePair types, PropertyMap propertyMap)
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
             var mapRequest = new MapRequest(key, types, propertyMap);
@@ -182,7 +182,7 @@ namespace AutoMapper
 
         public TypeMap FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(new TypePair(typeof(TSource), typeof(TDestination)));
 
-        public TypeMap FindTypeMapFor(TypePair typePair) => _typeMapRegistry.GetOrDefault(typePair);
+        public TypeMap FindTypeMapFor(in TypePair typePair) => _typeMapRegistry.GetOrDefault(typePair);
 
         public TypeMap ResolveTypeMap(Type sourceType, Type destinationType)
         {
@@ -198,10 +198,10 @@ namespace AutoMapper
             return ResolveTypeMap(typePair, inlineConfiguration);
         }
 
-        public TypeMap ResolveTypeMap(TypePair typePair)
+        public TypeMap ResolveTypeMap(in TypePair typePair)
             => ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair));
 
-        public TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration)
+        public TypeMap ResolveTypeMap(in TypePair typePair, ITypeMapConfiguration inlineConfiguration)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
@@ -216,7 +216,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeMap GetTypeMap(TypePair initialTypes)
+        private TypeMap GetTypeMap(in TypePair initialTypes)
         {
             var doesNotHaveMapper = FindMapper(initialTypes) == null;
 
@@ -362,9 +362,18 @@ namespace AutoMapper
             }
         }
 
-        private TypeMap FindConventionTypeMapFor(TypePair typePair)
+        private TypeMap FindConventionTypeMapFor(in TypePair typePair)
         {
-            var profile = Profiles.FirstOrDefault(p => p.IsConventionMap(typePair));
+            ProfileMap profile = null;
+            foreach (var p in Profiles)
+            {
+                if (p.IsConventionMap(typePair))
+                {
+                    profile = p;
+                    break;
+                }
+            }
+
             if (profile == null)
             {
                 return null;
@@ -396,7 +405,15 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
+        public IObjectMapper FindMapper(in TypePair types)
+        {
+            foreach (var m in _mappers)
+            {
+                if (m.IsMatch(types)) return m;
+            }
+
+            return null;
+        }
 
         public void RegisterTypeMap(TypeMap typeMap) => _typeMapRegistry[typeMap.Types] = typeMap;
 
@@ -432,7 +449,7 @@ namespace AutoMapper
 
         internal class DefaultTypeMapConfig : ITypeMapConfiguration
         {
-            public DefaultTypeMapConfig(TypePair types)
+            public DefaultTypeMapConfig(in TypePair types)
             {
                 Types = types;
             }
@@ -454,15 +471,15 @@ namespace AutoMapper
         public TypeMap TypeMap { get; }
         public TypePair Types { get; }
 
-        public ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper) : this(types, propertyMap, objectMapper, null)
+        public ValidationContext(in TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper) : this(types, propertyMap, objectMapper, null)
         {
         }
 
-        public ValidationContext(TypePair types, PropertyMap propertyMap, TypeMap typeMap) : this(types, propertyMap, null, typeMap)
+        public ValidationContext(in TypePair types, PropertyMap propertyMap, TypeMap typeMap) : this(types, propertyMap, null, typeMap)
         {
         }
 
-        private ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper, TypeMap typeMap)
+        private ValidationContext(in TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper, TypeMap typeMap)
         {
             ObjectMapper = objectMapper;
             TypeMap = typeMap;

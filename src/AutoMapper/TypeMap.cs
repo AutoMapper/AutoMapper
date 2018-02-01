@@ -250,7 +250,7 @@ namespace AutoMapper
             return match.DestinationType ?? DestinationType;
         }
 
-        public bool TypeHasBeenIncluded(TypePair derivedTypes) => _includedDerivedTypes.Contains(derivedTypes);
+        public bool TypeHasBeenIncluded(in TypePair derivedTypes) => _includedDerivedTypes.Contains(derivedTypes);
 
         public bool HasDerivedTypesToInclude() => _includedDerivedTypes.Any() || DestinationTypeOverride != null;
 

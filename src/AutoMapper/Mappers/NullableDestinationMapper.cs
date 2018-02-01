@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 {
     public class NullableDestinationMapper : IObjectMapperInfo
     {
-        public bool IsMatch(TypePair context) => context.DestinationType.IsNullableType();
+        public bool IsMatch(in TypePair context) => context.DestinationType.IsNullableType();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
@@ -20,7 +20,7 @@ namespace AutoMapper.Mappers
                 Expression.Property(destExpression, destExpression.Type.GetDeclaredProperty("Value"))
             );
 
-        public TypePair GetAssociatedTypes(TypePair initialTypes)
+        public TypePair GetAssociatedTypes(in TypePair initialTypes)
         {
             return new TypePair(initialTypes.SourceType, Nullable.GetUnderlyingType(initialTypes.DestinationType));
         }

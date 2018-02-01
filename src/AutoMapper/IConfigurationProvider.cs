@@ -29,7 +29,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap FindTypeMapFor(TypePair typePair);
+        TypeMap FindTypeMapFor(in TypePair typePair);
 
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type
@@ -62,14 +62,14 @@ namespace AutoMapper
         /// <param name="typePair">Type pair</param>
         /// <param name="inlineConfiguration">Inline type map configuration if exists</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration);
+        TypeMap ResolveTypeMap(in TypePair typePair, ITypeMapConfiguration inlineConfiguration);
 
         /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair);
+        TypeMap ResolveTypeMap(in TypePair typePair);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
@@ -105,7 +105,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="types">the types to match</param>
         /// <returns>the matching mapper or null</returns>
-        IObjectMapper FindMapper(TypePair types);
+        IObjectMapper FindMapper(in TypePair types);
 
         /// <summary>
         /// Factory method to create formatters, resolvers and type converters
@@ -135,7 +135,7 @@ namespace AutoMapper
         /// <returns>The mapper instance</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
 
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap = null);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(in TypePair types, PropertyMap propertyMap = null);
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest);
 
         /// <summary>
