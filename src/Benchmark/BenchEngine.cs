@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using Microsoft.VisualStudio.Profiler;
+//using Microsoft.VisualStudio.Profiler;
 
 namespace Benchmark
 {
@@ -20,7 +20,7 @@ namespace Benchmark
             _mapper.Initialize();
             _mapper.Map();
 
-            DataCollection.CommentMarkProfile(1, "BEGIN " + _mapper);
+            //DataCollection.CommentMarkProfile(1, "BEGIN " + _mapper);
 
             var timer = Stopwatch.StartNew();
 
@@ -31,7 +31,7 @@ namespace Benchmark
 
             timer.Stop();
 
-            DataCollection.CommentMarkProfile(1, "END " + _mapper);
+            //DataCollection.CommentMarkProfile(1, "END " + _mapper);
 
             Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.Elapsed.TotalSeconds);
         }

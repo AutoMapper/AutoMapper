@@ -12,21 +12,21 @@ namespace AutoMapper
     internal static class ExpressionExtensions
     {
         public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
-            members.Aggregate(obj, (expression, member) => MakeMemberAccess(expression, member));
+            members.Aggregate(obj, MakeMemberAccess);
 
         public static IEnumerable<MemberExpression> GetMembers(this Expression expression)
         {
-            var memberExpression = expression as MemberExpression;
-            if(memberExpression == null)
+            if (!(expression is MemberExpression memberExpression))
             {
                 return new MemberExpression[0];
             }
+
             return memberExpression.GetMembers();
         }
 
         public static IEnumerable<MemberExpression> GetMembers(this MemberExpression expression)
         {
-            while(expression != null)
+            while (expression != null)
             {
                 yield return expression;
                 expression = expression.Expression as MemberExpression;
@@ -55,5 +55,17 @@ namespace AutoMapper
 
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
             => ExpressionFactory.IfNullElse(expression, then, @else);
+
+#if NET40 || NETSTANDARD1_1
+        public static TDelegate CompileFast<TDelegate>(this Expression<TDelegate> expression)
+        {
+            return expression.Compile();
+        }
+
+        public static Delegate CompileFast(this LambdaExpression expression)
+        {
+            return expression.Compile();
+        }
+#endif
     }
 }
