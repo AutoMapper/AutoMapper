@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.XpressionMapper.Extensions;
 using static System.Linq.Expressions.Expression;
 
@@ -209,9 +210,18 @@ namespace AutoMapper.Mappers
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
+				{
+					replacedExpression = propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
-                Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
+					if (!node.Type.IsAssignableFrom(replacedExpression.Type))
+					{
+						replacedExpression = ExpressionFactory.ToType(replacedExpression, node.Type);
+					}
+
+					return replacedExpression;
+				}
+
+				Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
 
                 return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
