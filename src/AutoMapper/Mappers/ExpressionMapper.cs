@@ -212,12 +212,8 @@ namespace AutoMapper.Mappers
                 if (propertyMap.CustomExpression != null)
 				{
 					replacedExpression = propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
-
-					if (!node.Type.IsAssignableFrom(replacedExpression.Type))
-					{
-						replacedExpression = ExpressionFactory.ToType(replacedExpression, node.Type);
-					}
-
+					replacedExpression = ExpressionFactory.ToType(replacedExpression, node.Type);
+					
 					return replacedExpression;
 				}
 
