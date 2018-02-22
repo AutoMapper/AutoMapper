@@ -47,7 +47,7 @@ In the below example, we'll use the first option, telling AutoMapper the custom 
 ```c#
 Mapper.Initialize(cfg =>
    cfg.CreateMap<Source, Destination>()
-	 .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>());
+	 .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>()));
 Mapper.AssertConfigurationIsValid();
 
 var source = new Source
@@ -83,7 +83,7 @@ If we don't want AutoMapper to use reflection to create the instance, we can sup
 Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
 	.ForMember(dest => dest.Total,
 		opt => opt.ResolveUsing(new CustomResolver())
-	);
+	));
 ```
 
 AutoMapper will use that specific object, helpful in scenarios where the resolver might have constructor arguments or need to be constructed by an IoC container.
