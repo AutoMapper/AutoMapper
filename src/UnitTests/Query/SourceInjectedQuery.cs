@@ -469,9 +469,10 @@ namespace AutoMapper.UnitTests.Query
             var config = new MapperConfiguration(c =>
             {
                 c.CreateMap<CustomMaster, MasterDto>()
-                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.NameBase))
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.CustomName))
                     .ReverseMap();
                 c.CreateMap<CustomString, string>().ProjectUsing(x => !x.IsNull ? x.Value : string.Empty);
+                c.CreateMap<string, CustomString>().ProjectUsing(x => !string.IsNullOrEmpty(x) ? null : x);
             });
 
             config.AssertConfigurationIsValid();
@@ -479,7 +480,7 @@ namespace AutoMapper.UnitTests.Query
             var mapper = config.CreateMapper();
 
             var source = new List<CustomMaster> {
-                new CustomMaster { Id = Guid.NewGuid(), NameBase = "Harry Marry" }
+                new CustomMaster { Id = Guid.NewGuid(), CustomName = "Harry Marry" }
             };
 
             // Act
@@ -495,7 +496,7 @@ namespace AutoMapper.UnitTests.Query
             // Assert
             masterDtoQuery.ToList().Count().ShouldBe(1);
         }
-        
+
         private void AssertValidDtoGraph(Detail detail, Master master, DetailCyclicDto dto)
         {
             dto.ShouldNotBeNull();
@@ -867,7 +868,7 @@ namespace AutoMapper.UnitTests.Query
     public class CustomMaster
     {
         public Guid Id { get; set; }
-        public CustomString NameBase { get; set; }
+        public CustomString CustomName { get; set; }
     }
 
     public struct CustomString : IComparable, IConvertible

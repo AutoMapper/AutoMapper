@@ -188,7 +188,16 @@ namespace AutoMapper.Mappers
             protected override Expression VisitMember(MemberExpression node)
             {
                 if (node == _oldParam)
+                {
+                    if (node.Type == _newParam.Type)
+                        return _newParam;
+
+                    if (_newParam.Type.CanImplicitConvert(node.Type))
+                        return ExpressionFactory.ToType(_newParam, node.Type);
+                    
                     return _newParam;
+                }
+
                 var propertyMap = PropertyMap(node);
 
                 if (propertyMap == null)
@@ -210,17 +219,19 @@ namespace AutoMapper.Mappers
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-				{
-					replacedExpression = propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
-					replacedExpression = ExpressionFactory.ToType(replacedExpression, node.Type);
-					
-					return replacedExpression;
-				}
+                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
                 Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
 
                 return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
+            }
+
+            protected override Expression VisitNew(NewExpression expression)
+            {
+                var convertedArguments = expression.Arguments.Select(x => GetConvertedArgument(x)).ToList();
+
+                return New(expression.Constructor, convertedArguments);
             }
 
             private class IsConstantExpressionVisitor : ExpressionVisitor
@@ -233,6 +244,28 @@ namespace AutoMapper.Mappers
 
                     return base.VisitConstant(node);
                 }
+            }
+
+            private Expression GetConvertedArgument(Expression node)
+            {
+                var baseExpression = Visit(node);
+
+                if (node.Type == baseExpression.Type)
+                    return baseExpression;
+
+                var propertyMap = FindPropertyMapOfExpression(node as MemberExpression);
+                if (propertyMap == null)
+                {
+                    return ExpressionFactory.ToType(baseExpression, node.Type);
+                }
+
+                var sourceType = GetSourceType(propertyMap);
+                var destType = propertyMap.DestinationPropertyType;
+                var typeMap = _configurationProvider.ResolveTypeMap(sourceType, destType);
+                var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node, baseExpression, this);
+                var newExpression = subVisitor.Visit(node);
+
+                return newExpression;
             }
 
             private Expression GetConvertedSubMemberCall(MemberExpression node)
