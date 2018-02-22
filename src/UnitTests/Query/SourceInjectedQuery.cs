@@ -461,6 +461,36 @@ namespace AutoMapper.UnitTests.Query
             detailDtoQuery.ToList().Count().ShouldBe(1);
         }
 
+        [Fact]
+        [Description("Fix for issue #2538")]
+        public void Should_cast_expression_type_to_source_if_not_assignable()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            try
+            {
+                var masterDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
+                    .For<MasterDto>()
+                    .Where(d => d.Name == "Harry Marry");
+
+                // Assert
+                masterDtoQuery.ToList().Count().ShouldBe(1);
+            } catch { }
+        }
+
         private void AssertValidDtoGraph(Detail detail, Master master, DetailCyclicDto dto)
         {
             dto.ShouldNotBeNull();
@@ -827,6 +857,240 @@ namespace AutoMapper.UnitTests.Query
     {
         public string Title { get; set; }
         public bool HasEditPermission { get; set; }
+    }
+
+    public class CustomMaster
+    {
+        public Guid Id { get; set; }
+        public CustomString Name { get; set; }
+    }
+
+    public struct CustomString : IComparable, IConvertible
+    {
+        private string value;
+        private bool isNull;
+
+        public CustomString(string value)
+        {
+            this.isNull = string.IsNullOrEmpty(value);
+            this.value = value ?? string.Empty;
+        }
+
+        public string Value
+        {
+            get
+            {
+                if (IsNull || value == null)
+                    return string.Empty;
+                return value;
+            }
+            set
+            {
+                if (Value == value && !IsNull)
+                    return;
+
+                if (string.IsNullOrEmpty(value) && !isNull)
+                {
+                    isNull = true;
+                }
+
+                this.value = value ?? string.Empty;
+            }
+        }
+
+        public bool IsNull
+        {
+            get
+            {
+                return isNull;
+            }
+            set
+            {
+                if (isNull == value) return;
+                isNull = value;
+            }
+        }
+
+        public static implicit operator CustomString(string a)
+        {
+            return new CustomString(a);
+        }
+
+        public static implicit operator string(CustomString a)
+        {
+            return a.Value;
+        }
+
+        public static bool operator ==(CustomString a, CustomString b)
+        {
+            return a.Value == b.Value;
+        }
+
+        public static bool operator ==(CustomString a, string b)
+        {
+            return a.Value == b;
+        }
+
+        public static bool operator ==(string a, CustomString b)
+        {
+            return a == b.Value;
+        }
+
+        public static bool operator !=(CustomString a, CustomString b)
+        {
+            return a.Value != b.Value;
+        }
+
+        public static bool operator !=(CustomString a, string b)
+        {
+            return a.Value != b;
+        }
+
+        public static bool operator !=(string a, CustomString b)
+        {
+            return a != b.Value;
+        }
+
+        public static bool operator <(CustomString a, CustomString b)
+        {
+            return a.CompareTo(b) < 0;
+        }
+
+        public static bool operator >(CustomString a, CustomString b)
+        {
+            return a.CompareTo(b) > 0;
+        }
+
+        public static bool operator <=(CustomString a, CustomString b)
+        {
+            return a.CompareTo(b) <= 0;
+        }
+
+        public static bool operator >=(CustomString a, CustomString b)
+        {
+            return a.CompareTo(b) >= 0;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Value.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is CustomString)
+                return this == (CustomString)obj;
+            if (obj is string)
+                return this == (CustomString)((string)obj);
+            return false;
+        }
+
+
+        public int CompareTo(object obj)
+        {
+            if (!(obj is CustomString))
+                return -1;
+            return CompareTo((CustomString)obj);
+        }
+
+        public TypeCode GetTypeCode()
+        {
+            if (this.IsNull)
+                return TypeCode.String;
+            return this.Value.GetTypeCode();
+        }
+
+        public bool EqualsValue(string obj)
+        {
+            return this.Equals((object)obj);
+        }
+
+        public override string ToString()
+        {
+            if (IsNull)
+                return string.Empty;
+            return Value;
+        }
+
+        public bool ToBoolean(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToBoolean(provider);
+        }
+
+        public byte ToByte(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToByte(provider);
+        }
+
+        public char ToChar(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToChar(provider);
+        }
+
+        public DateTime ToDateTime(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToDateTime(provider);
+        }
+
+        public decimal ToDecimal(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToDecimal(provider);
+        }
+
+        public double ToDouble(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToDouble(provider);
+        }
+
+        public short ToInt16(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToInt16(provider);
+        }
+
+        public int ToInt32(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToInt32(provider);
+        }
+
+        public long ToInt64(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToInt64(provider);
+        }
+
+        public sbyte ToSByte(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToSByte(provider);
+        }
+
+        public float ToSingle(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToSingle(provider);
+        }
+
+        public string ToString(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToString(provider);
+        }
+
+        public object ToType(Type conversionType, IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToType(conversionType, provider);
+        }
+
+        public ushort ToUInt16(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToUInt16(provider);
+        }
+
+        public uint ToUInt32(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToUInt32(provider);
+        }
+
+        public ulong ToUInt64(IFormatProvider provider)
+        {
+            return ((IConvertible)this.Value).ToUInt64(provider);
+        }
     }
 }
 
