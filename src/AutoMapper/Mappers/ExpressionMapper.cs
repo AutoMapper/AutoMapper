@@ -189,12 +189,6 @@ namespace AutoMapper.Mappers
             {
                 if (node == _oldParam)
                 {
-                    if (node.Type == _newParam.Type)
-                        return _newParam;
-
-                    if (_newParam.Type.CanImplicitConvert(node.Type))
-                        return ExpressionFactory.ToType(_newParam, node.Type);
-                    
                     return _newParam;
                 }
 
@@ -219,19 +213,41 @@ namespace AutoMapper.Mappers
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
+                {
+                    replacedExpression = propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
+                }
+                else
+                {
+                    Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
 
-                Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
+                    replacedExpression = propertyMap.SourceMembers
+                        .Aggregate(replacedExpression, getExpression);
+                }
 
-                return propertyMap.SourceMembers
-                    .Aggregate(replacedExpression, getExpression);
+                //if (replacedExpression.Type != propertyMap.DestinationPropertyType)
+                //{
+                //    // convert replaced return type to node
+                //    if (replacedExpression is MemberExpression)
+                //    {
+                //        var typeMap = _configurationProvider.ResolveTypeMap(replacedExpression.Type, propertyMap.DestinationPropertyType);
+                //        if (typeMap != null)
+                //        {
+                //            return typeMap.MapExpression.ReplaceParameters(replacedExpression);
+                //        }
+                //    }
+
+                //    if (replacedExpression.Type.CanImplicitConvert(propertyMap.DestinationPropertyType))
+                //        return ExpressionFactory.ToType(replacedExpression, propertyMap.DestinationPropertyType);
+                //}
+
+                return replacedExpression;
             }
 
-            protected override Expression VisitNew(NewExpression expression)
+            protected override Expression VisitNew(NewExpression node)
             {
-                var convertedArguments = expression.Arguments.Select(x => GetConvertedArgument(x)).ToList();
+                var convertedArguments = node.Arguments.Select(GetConvertedArgument).ToList();
 
-                return New(expression.Constructor, convertedArguments);
+                return New(node.Constructor, convertedArguments);
             }
 
             private class IsConstantExpressionVisitor : ExpressionVisitor
@@ -267,7 +283,7 @@ namespace AutoMapper.Mappers
 
                 return newExpression;
             }
-
+            
             private Expression GetConvertedSubMemberCall(MemberExpression node)
             {
                 var baseExpression = Visit(node.Expression);

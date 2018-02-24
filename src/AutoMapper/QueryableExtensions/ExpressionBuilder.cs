@@ -37,6 +37,7 @@ namespace AutoMapper.QueryableExtensions
             new NullableDestinationExpressionBinder(),
             new NullableSourceExpressionBinder(),
             new AssignableExpressionBinder(),
+            new ImplicitAssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
             new StringExpressionBinder()

@@ -441,7 +441,6 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
-        [Description("Fix for issue #882")]
         public void Should_support_propertypath_expressons_with_equally_named_properties()
         {
             // Arrange
@@ -462,17 +461,13 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
-        [Description("Fix for issue #2538")]
-        public void Should_cast_expression_type_to_source_if_not_assignable()
+        public void Project_from_custom_struct()
         {
             // Arrange
             var config = new MapperConfiguration(c =>
             {
                 c.CreateMap<CustomMaster, MasterDto>()
-                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.CustomName))
                     .ReverseMap();
-                c.CreateMap<CustomString, string>().ProjectUsing(x => !x.IsNull ? x.Value : string.Empty);
-                c.CreateMap<string, CustomString>().ProjectUsing(x => !string.IsNullOrEmpty(x) ? null : x);
             });
 
             config.AssertConfigurationIsValid();
@@ -480,11 +475,39 @@ namespace AutoMapper.UnitTests.Query
             var mapper = config.CreateMapper();
 
             var source = new List<CustomMaster> {
-                new CustomMaster { Id = Guid.NewGuid(), CustomName = "Harry Marry" }
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
             };
 
             // Act
             var masterDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .Where(d => d.Name == "Harry Marry")
+                .ToList();
+
+            // Assert
+            masterDtoQuery.First().Name.ShouldBe("Harry Marry");
+        }
+
+        [Fact]
+        public void Project_from_custom_struct_with_projection()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoProjectedQuery = source.AsQueryable().UseAsDataSource(mapper)
                 .For<MasterDto>()
                 .Where(d => d.Name == "Harry Marry")
                 .Select(x => new
@@ -494,7 +517,227 @@ namespace AutoMapper.UnitTests.Query
                 .ToList();
 
             // Assert
-            masterDtoQuery.ToList().Count().ShouldBe(1);
+            masterDtoProjectedQuery.First().Name.ShouldBe("Harry Marry");
+        }
+
+        [Fact]
+        public void Project_from_custom_struct_with_custom_mapping()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .ToList();
+
+            // Assert
+            masterDtoQuery.First().Name.ShouldBe("Harry Marry !!!");
+        }
+
+        [Fact]
+        public void Project_from_custom_struct_with_custom_mapping_and_projection()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoProjectedQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .Select(x => new
+                {
+                    x.Name
+                })
+                .ToList();
+
+            // Assert
+            masterDtoProjectedQuery.First().Name.ShouldBe("Harry Marry !!!");
+        }
+
+        [Fact]
+        public void Project_from_custom_struct_with_custom_mapping_and_binding()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoProjectedQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .Select(x => new MasterDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .ToList();
+
+            // Assert
+            masterDtoProjectedQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
+        }
+
+
+        [Fact]
+        public void Project_to_custom_struct()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<MasterDto, CustomMaster>()
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<MasterDto> {
+                new MasterDto { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var customMasterQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<CustomMaster>()
+                .Where(d => d.Name == "Harry Marry")
+                .ToList();
+
+            // Assert
+            customMasterQuery.First().Name.ToString().ShouldBe("Harry Marry");
+        }
+
+        [Fact]
+        public void Project_to_custom_struct_with_projection()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<MasterDto, CustomMaster>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<MasterDto> {
+                new MasterDto { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var customMasterQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<CustomMaster>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .Select(x => new
+                {
+                    x.Name
+                })
+                .ToList();
+
+            // Assert
+            customMasterQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
+        }
+
+        [Fact]
+        public void Project_to_custom_struct_with_custom_mapping()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<MasterDto, CustomMaster>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<MasterDto> {
+                new MasterDto { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var customMasterQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<CustomMaster>()
+                .Where(d => d.Name == "Harry Marry")
+                .ToList();
+
+            // Assert
+            customMasterQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
+        }
+
+        [Fact]
+        public void Project_to_custom_struct_with_custom_mapping_and_projection()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<MasterDto, CustomMaster>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<MasterDto> {
+                new MasterDto { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var customMasterQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<CustomMaster>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .Select(x => new
+                {
+                    x.Name
+                })
+                .ToList();
+
+            // Assert
+            customMasterQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
         }
 
         private void AssertValidDtoGraph(Detail detail, Master master, DetailCyclicDto dto)
@@ -868,7 +1111,7 @@ namespace AutoMapper.UnitTests.Query
     public class CustomMaster
     {
         public Guid Id { get; set; }
-        public CustomString CustomName { get; set; }
+        public CustomString Name { get; set; }
     }
 
     public struct CustomString : IComparable, IConvertible
