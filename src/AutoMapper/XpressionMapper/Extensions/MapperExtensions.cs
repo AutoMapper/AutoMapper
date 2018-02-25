@@ -35,18 +35,14 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            remappedBody = VerifyType(typeDestFunc.GetGenericArguments().Last(), remappedBody);
-
-            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda
+                                    (
+                                        typeDestFunc,
+                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
+                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
+                                    );
         }
 
-        private static Expression VerifyType(Type type, Expression remappedBody)
-        {
-            if (type != remappedBody.Type)
-                remappedBody = ExpressionFactory.ToType(remappedBody, type);
-
-            return remappedBody;
-        }
 
         /// <summary>
         /// Maps an expression given a dictionary of types where the source type is the key and the destination type is the value.
@@ -85,9 +81,12 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            remappedBody = VerifyType(typeDestFunc.GetGenericArguments().Last(), remappedBody);
-
-            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda
+                                    (
+                                        typeDestFunc,
+                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
+                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
+                                    );
         }
 
         /// <summary>
