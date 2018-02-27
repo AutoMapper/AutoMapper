@@ -187,8 +187,11 @@ namespace AutoMapper.Internal
             var simpleConvertToType = convertTo.IsNullableType() ? convertTo.GetTypeOfNullable() : convertTo;
 
             return simpleFromType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
-                && x.ReturnType == simpleConvertToType
-                && x.GetParameters().First().ParameterType == simpleFromType);
+                    && x.ReturnType == simpleConvertToType
+                    && x.GetParameters().First().ParameterType == simpleFromType)
+                || simpleConvertToType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
+                    && x.ReturnType == simpleConvertToType
+                    && x.GetParameters().First().ParameterType == simpleFromType);
         }
     }
 }

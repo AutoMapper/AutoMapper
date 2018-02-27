@@ -616,6 +616,39 @@ namespace AutoMapper.UnitTests.Query
             masterDtoProjectedQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
         }
 
+        [Fact]
+        public void Project_from_custom_struct_with_custom_mapping_and_anonymus_type()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.Name + " !!!"))
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoProjectedQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .Where(d => d.Name == "Harry Marry !!!")
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Name
+                })
+                .ToList();
+
+            // Assert
+            masterDtoProjectedQuery.First().Name.ToString().ShouldBe("Harry Marry !!!");
+        }
 
         [Fact]
         public void Project_to_custom_struct()
@@ -700,7 +733,7 @@ namespace AutoMapper.UnitTests.Query
             // Act
             var customMasterQuery = source.AsQueryable().UseAsDataSource(mapper)
                 .For<CustomMaster>()
-                .Where(d => d.Name == "Harry Marry")
+                .Where(d => d.Name == "Harry Marry !!!")
                 .ToList();
 
             // Assert

@@ -91,7 +91,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     Inspector.SourceResult(sourceExpression, sourceResult);
 
-                    destResult = new ProjectionExpression((IQueryable<TSource>)sourceResult, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>(_parameters, _membersToExpand);
+                    destResult = sourceResult.ElementType == typeof(TDestination)
+                        ? sourceResult
+                        : new ProjectionExpression((IQueryable<TSource>)sourceResult, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>(_parameters, _membersToExpand);
                 }
                 // case #2: query is arbitrary ("manual") projection
                 // exaple: users.UseAsDataSource().For<UserDto>().Select(user => user.Age).ToList()

@@ -67,24 +67,40 @@ namespace AutoMapper.Mappers
             {
                 if (!node.Method.IsGenericMethod)
                     return node;
+
                 var convertedArguments = Visit(node.Arguments);
-                var convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
+                Type[] convertedMethodArgumentTypes;
+                if (node.Method.Name == "Select")
+                {
+                    convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select((t, idx) => idx == 0 ? GetConvertingTypeIfExists(node.Arguments, t, convertedArguments) : t).ToArray();
+                }
+                else
+                {
+                    convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
+                }
+
                 var convertedMethodCall = node.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
+
                 return Call(convertedMethodCall, convertedArguments);
             }
 
             private static Type GetConvertingTypeIfExists(IList<Expression> args, Type t, IList<Expression> arguments)
             {
-                var matchingArgument = args.Where(a => !a.Type.IsGenericType()).FirstOrDefault(a => a.Type == t);
+                var matchingArgument = args.FirstOrDefault(a => !a.Type.IsGenericType() && a.Type == t);
                 if (matchingArgument != null)
                 {
                     var index = args.IndexOf(matchingArgument);
                     return index < 0 ? t : arguments[index].Type;
                 }
 
-                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType()).FirstOrDefault(a => a.Type.GetTypeInfo().GenericTypeArguments[0] == t);
-                var index2 = args.IndexOf(matchingEnumerableArgument);
-                return index2 < 0 ? t : arguments[index2].Type.GetTypeInfo().GenericTypeArguments[0];
+                var matchingEnumerableArgument = args.FirstOrDefault(a => a.Type.IsGenericType() && a.Type.GetTypeInfo().GenericTypeArguments[0] == t);
+                if (matchingEnumerableArgument != null)
+                {
+                    var index2 = args.IndexOf(matchingEnumerableArgument);
+                    return index2 < 0 ? t : arguments[index2].Type.GetTypeInfo().GenericTypeArguments[0];
+                }
+
+                return t;
             }
 
             protected override Expression VisitBinary(BinaryExpression node)
@@ -92,15 +108,46 @@ namespace AutoMapper.Mappers
                 var newLeft = Visit(node.Left);
                 var newRight = Visit(node.Right);
 
-                // check if the non-string expression is a null constent
-                // as this would lead to a "null.ToString()" and thus an error when executing the expression
-                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string) && !IsNullConstant(newLeft))
-                    newLeft = Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
-                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string) && !IsNullConstant(newRight))
-                    newRight = Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
-                CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
-                CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
-                return MakeBinary(node.NodeType, newLeft, newRight);
+                if (newLeft.Type != newRight.Type)
+                {
+                    if (ReflectionHelper.CanImplicitConvert(newRight.Type, newLeft.Type))
+                    {
+                        newRight = ExpressionFactory.ToType(newRight, newLeft.Type);
+                    }
+                    else if (ReflectionHelper.CanImplicitConvert(newLeft.Type, newRight.Type))
+                    {
+                        newLeft = ExpressionFactory.ToType(newLeft, newRight.Type);
+                    }
+                    else
+                    {
+                        var typeMap = _configurationProvider.ResolveTypeMap(newRight.Type, newLeft.Type);
+                        if (typeMap != null)
+                        {
+                            var visitor = new MappingVisitor(_configurationProvider, typeMap, newRight, newLeft, this);
+                            newRight = visitor.Visit(newRight);
+                        }
+                        else
+                        {
+                            // check if the non-string expression is a null constent
+                            // as this would lead to a "null.ToString()" and thus an error when executing the expression
+                            if (newLeft.Type != newRight.Type && newRight.Type == typeof(string) && !IsNullConstant(newLeft))
+                                newLeft = Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
+                            if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string) && !IsNullConstant(newRight))
+                                newRight = Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
+                            CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
+                            CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
+                        }
+                    }
+                }
+
+                switch (node.NodeType)
+                {
+                    case ExpressionType.Add:
+                        return MakeBinary(node.NodeType, newLeft, newRight, node.IsLiftedToNull, node.Method);
+                    default:
+                        return MakeBinary(node.NodeType, newLeft, newRight);
+                }
+
                 bool IsNullConstant(Expression expression) => expression is ConstantExpression constant && constant.Value == null;
             }
 
@@ -213,34 +260,12 @@ namespace AutoMapper.Mappers
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-                {
-                    replacedExpression = propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
-                }
-                else
-                {
-                    Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
+                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
-                    replacedExpression = propertyMap.SourceMembers
-                        .Aggregate(replacedExpression, getExpression);
-                }
+                Func<Expression, MemberInfo, Expression> getExpression = MakeMemberAccess;
 
-                //if (replacedExpression.Type != propertyMap.DestinationPropertyType)
-                //{
-                //    // convert replaced return type to node
-                //    if (replacedExpression is MemberExpression)
-                //    {
-                //        var typeMap = _configurationProvider.ResolveTypeMap(replacedExpression.Type, propertyMap.DestinationPropertyType);
-                //        if (typeMap != null)
-                //        {
-                //            return typeMap.MapExpression.ReplaceParameters(replacedExpression);
-                //        }
-                //    }
-
-                //    if (replacedExpression.Type.CanImplicitConvert(propertyMap.DestinationPropertyType))
-                //        return ExpressionFactory.ToType(replacedExpression, propertyMap.DestinationPropertyType);
-                //}
-
-                return replacedExpression;
+                return propertyMap.SourceMembers
+                    .Aggregate(replacedExpression, getExpression);
             }
 
             protected override Expression VisitNew(NewExpression node)
@@ -248,6 +273,25 @@ namespace AutoMapper.Mappers
                 var convertedArguments = node.Arguments.Select(GetConvertedArgument).ToList();
 
                 return New(node.Constructor, convertedArguments);
+            }
+
+            protected override MemberBinding VisitMemberBinding(MemberBinding node)
+            {
+                return base.VisitMemberBinding(node);
+            }
+
+            protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
+            {
+                var convertedExpression = Visit(node.Expression);
+                return base.VisitMemberAssignment(node.Update(convertedExpression));
+            }
+                        
+            private class TypeConvertingExpressionVisitor : ExpressionVisitor
+            {
+                protected override Expression VisitMember(MemberExpression node)
+                {
+                    return base.VisitMember(node);
+                }
             }
 
             private class IsConstantExpressionVisitor : ExpressionVisitor
@@ -277,11 +321,22 @@ namespace AutoMapper.Mappers
 
                 var sourceType = GetSourceType(propertyMap);
                 var destType = propertyMap.DestinationPropertyType;
-                var typeMap = _configurationProvider.ResolveTypeMap(sourceType, destType);
-                var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node, baseExpression, this);
-                var newExpression = subVisitor.Visit(node);
 
-                return newExpression;
+                if (sourceType != destType)
+                {
+                    if (ReflectionHelper.CanImplicitConvert(sourceType, destType))
+                    {
+                        return ExpressionFactory.ToType(baseExpression, destType);
+                    }
+                }
+
+                var typeMap = _configurationProvider.ResolveTypeMap(sourceType, destType);
+                if (typeMap != null)
+                {
+                    var visitor = new MappingVisitor(_configurationProvider, typeMap, node, baseExpression, this);
+                    return visitor.Visit(node);
+                }
+                return baseExpression;
             }
             
             private Expression GetConvertedSubMemberCall(MemberExpression node)
