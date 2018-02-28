@@ -70,13 +70,17 @@ namespace AutoMapper.Mappers
 
                 var convertedArguments = Visit(node.Arguments);
                 Type[] convertedMethodArgumentTypes;
-                if (node.Method.Name == "Select")
+                switch (node.Method.Name)
                 {
-                    convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select((t, idx) => idx == 0 ? GetConvertingTypeIfExists(node.Arguments, t, convertedArguments) : t).ToArray();
-                }
-                else
-                {
-                    convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
+                    case "Select":
+                        convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select((t, idx) => idx == 0 ? GetConvertingTypeIfExists(node.Arguments[idx], t, convertedArguments[idx]) : t).ToArray();
+                        break;
+                    case "OrderBy":
+                        convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select((t, idx) => GetConvertingTypeIfExists(node.Arguments[idx], t, convertedArguments[idx])).ToArray();
+                        break;
+                    default:
+                        convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select((t, idx) => GetConvertingTypeIfExists(node.Arguments[idx], t, convertedArguments[idx])).ToArray();
+                        break;
                 }
 
                 var convertedMethodCall = node.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
@@ -84,22 +88,30 @@ namespace AutoMapper.Mappers
                 return Call(convertedMethodCall, convertedArguments);
             }
 
-            private static Type GetConvertingTypeIfExists(IList<Expression> args, Type t, IList<Expression> arguments)
+            private static Type GetConvertingTypeIfExists(Expression arg, Type t, Expression converted)
             {
-                var matchingArgument = args.FirstOrDefault(a => !a.Type.IsGenericType() && a.Type == t);
-                if (matchingArgument != null)
+                if (arg.Type.IsGenericType() && arg.Type == t)
                 {
-                    var index = args.IndexOf(matchingArgument);
-                    return index < 0 ? t : arguments[index].Type;
+                    return converted.Type;
                 }
 
-                var matchingEnumerableArgument = args.FirstOrDefault(a => a.Type.IsGenericType() && a.Type.GetTypeInfo().GenericTypeArguments[0] == t);
-                if (matchingEnumerableArgument != null)
+                if (arg.Type.IsGenericType() && arg.Type.GetTypeInfo().GenericTypeArguments[0] == t)
                 {
-                    var index2 = args.IndexOf(matchingEnumerableArgument);
-                    return index2 < 0 ? t : arguments[index2].Type.GetTypeInfo().GenericTypeArguments[0];
+                    return converted.Type.GetTypeInfo().GenericTypeArguments[0];
                 }
 
+                var expr = arg as UnaryExpression;
+                if (expr != null)
+                {
+                    var convertedExpr = converted as UnaryExpression;
+
+                    var lambdaExpr = expr.Operand as LambdaExpression;
+                    if (lambdaExpr != null && lambdaExpr.ReturnType == t)
+                    {
+                        return ((LambdaExpression)convertedExpr.Operand).ReturnType;
+                    }
+                }
+                
                 return t;
             }
 

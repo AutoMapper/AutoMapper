@@ -651,6 +651,35 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
+        public void Project_from_custom_struct_orderby()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Marry Harry" },
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            // Assert
+            masterDtoQuery.First().Name.ShouldBe("Harry Marry");
+        }
+
+        [Fact]
         public void Project_to_custom_struct()
         {
             // Arrange
@@ -1273,6 +1302,11 @@ namespace AutoMapper.UnitTests.Query
             if (!(obj is CustomString))
                 return -1;
             return CompareTo((CustomString)obj);
+        }
+
+        public int CompareTo(CustomString val)
+        {
+            return Value.CompareTo(val.Value);
         }
 
         public TypeCode GetTypeCode()
