@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Summary>A convention-based object-object mapper</Summary>
     <Description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</Description>
-    <VersionPrefix>6.2.2</VersionPrefix>
+    <VersionPrefix>6.3.0</VersionPrefix>
     <Authors>Jimmy Bogard</Authors>
     <TargetFrameworks>netstandard1.3;netstandard1.1;net45;net40</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
