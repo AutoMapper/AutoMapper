@@ -180,5 +180,18 @@ namespace AutoMapper.Internal
 
             return targetType;
         }
+
+        public static bool CanImplicitConvert(this Type convertFrom, Type convertTo)
+        {
+            var simpleFromType = convertFrom.IsNullableType() ? convertFrom.GetTypeOfNullable() : convertFrom;
+            var simpleConvertToType = convertTo.IsNullableType() ? convertTo.GetTypeOfNullable() : convertTo;
+
+            return simpleFromType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
+                    && x.ReturnType == simpleConvertToType
+                    && x.GetParameters().First().ParameterType == simpleFromType)
+                || simpleConvertToType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
+                    && x.ReturnType == simpleConvertToType
+                    && x.GetParameters().First().ParameterType == simpleFromType);
+        }
     }
 }
