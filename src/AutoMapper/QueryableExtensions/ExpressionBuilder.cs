@@ -504,7 +504,7 @@ namespace AutoMapper.QueryableExtensions
                     MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccesses(instanceParameter),
                     Property = new PropertyDescription
                     (
-                        string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
+                        "__"+string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
                         path.Last.SourceType
                     ),
                     Marker = path.Marker
