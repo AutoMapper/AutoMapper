@@ -102,7 +102,7 @@ namespace AutoMapper.QueryableExtensions
         public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             // this is the input parameter of this expression with name <variableName>
-            var instanceParameter = Parameter(request.SourceType, "dto");
+            var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
             var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
             if(letPropertyMaps.Count > 0)
             {
@@ -474,7 +474,7 @@ namespace AutoMapper.QueryableExtensions
                     return null;
                 }
                 var type = mapFrom.Body.Type;
-                var marker = Parameter(type, "marker" + propertyMap.DestinationProperty.Name);
+                var marker = Constant(null, type);
                 _savedPaths.Add(new PropertyPath(_currentPath.Reverse().ToArray(), marker));
                 return marker;
                 bool IsSubQuery()
@@ -507,7 +507,7 @@ namespace AutoMapper.QueryableExtensions
                         "__"+string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
                         path.Last.SourceType
                     ),
-                    Marker = path.Marker
+                    path.Marker
                 }).ToArray();
 
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
@@ -518,11 +518,11 @@ namespace AutoMapper.QueryableExtensions
                 {
                     firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
                 }
-                var secondParameter = Parameter(letType, "dto");
+                var secondParameter = Parameter(letType, "dtoLet");
 
                 ReplaceSubQueries();
 
-                var firstExpression = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap, LetPropertyMaps.Default);
+                var firstExpression = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap, Default);
                 return new QueryExpressions(firstExpression, projection, secondParameter);
 
                 void ReplaceSubQueries()
@@ -584,6 +584,15 @@ namespace AutoMapper.QueryableExtensions
                         return base.VisitMember(node);
                     }
                     return MakeMemberAccess(_newObject, _newObject.Type.GetFieldOrProperty(node.Member.Name));
+                }
+
+                protected override Expression VisitParameter(ParameterExpression node)
+                {
+                    if(node != _oldObject)
+                    {
+                        return base.VisitParameter(node);
+                    }
+                    return _newObject;
                 }
             }
         }

@@ -425,6 +425,7 @@ namespace AutoMapper.IntegrationTests
         {
             cfg.CreateMap<ProductArticle, ProductArticleModel>();
             cfg.CreateMap<Product, ProductModel>()
+                .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
                 .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
             cfg.CreateMap<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
@@ -440,12 +441,19 @@ namespace AutoMapper.IntegrationTests
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(1);
                 var productModel = projection.First().Products.First();
-                productModel.Articles.RegionId.ShouldBe((short)1);
-                productModel.Articles.IsDefault.ShouldBeTrue();
-                productModel.Articles.Id.ShouldBe(1);
+                Check(productModel.Articles);
                 productModel.Id.ShouldBe(1);
                 productModel.ArticlesCount.ShouldBe(1);
+                productModel.ArticlesModel.Articles.Count.ShouldBe(1);
+                Check(productModel.ArticlesModel.Articles.Single());
             }
+        }
+
+        private static void Check(PriceModel priceModel)
+        {
+            priceModel.RegionId.ShouldBe((short)1);
+            priceModel.IsDefault.ShouldBeTrue();
+            priceModel.Id.ShouldBe(1);
         }
 
         class FirstOrDefaultCounter : ExpressionVisitor
@@ -503,6 +511,12 @@ namespace AutoMapper.IntegrationTests
             public int Id { get; set; }
             public PriceModel Articles { get; set; }
             public int ArticlesCount { get; set; }
+            public ArticlesModel ArticlesModel { get; set; }
+        }
+
+        public class ArticlesModel
+        {
+            public ICollection<PriceModel> Articles { get; set; }
         }
 
         class Initializer : DropCreateDatabaseAlways<ClientContext>
