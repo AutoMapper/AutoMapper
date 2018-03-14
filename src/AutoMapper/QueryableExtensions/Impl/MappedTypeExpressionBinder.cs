@@ -22,7 +22,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             // Handles null source property so it will not create an object with possible non-nullable properties 
             // which would result in an exception.
-            if (propertyMap.TypeMap.Profile.AllowNullDestinationValues && !propertyMap.AllowNull)
+            if (propertyMap.TypeMap.Profile.AllowNullDestinationValues && !propertyMap.AllowNull && !(result.ResolutionExpression is ParameterExpression))
             {
                 transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }
