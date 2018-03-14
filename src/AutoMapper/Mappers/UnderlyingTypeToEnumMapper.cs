@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo EnumToObject = Method(() => Enum.ToObject(typeof(object), null));
 
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);
 

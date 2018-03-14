@@ -5,6 +5,7 @@
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

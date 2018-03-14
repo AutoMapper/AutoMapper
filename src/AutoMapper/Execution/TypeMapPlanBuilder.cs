@@ -129,7 +129,7 @@ namespace AutoMapper.Execution
             return ResolveTypeMap(types);
         }
 
-        private TypeMap ResolveTypeMap(TypePair types)
+        private TypeMap ResolveTypeMap(in TypePair types)
         {
             var typeMap = _configurationProvider.ResolveTypeMap(types);
             if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)

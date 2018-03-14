@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return new DestinationType();
             }
 
-            public bool IsMatch(TypePair context)
+            public bool IsMatch(in TypePair context)
             {
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
@@ -103,7 +103,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return Instance;
             }
 
-            public override bool IsMatch(TypePair context)
+            public override bool IsMatch(in TypePair context)
             {
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
@@ -146,7 +146,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         class EnumMapper : ObjectMapper<object, string>
         {
-            public override bool IsMatch(TypePair types)
+            public override bool IsMatch(in TypePair types)
             {
                 var underlyingType = Nullable.GetUnderlyingType(types.SourceType) ?? types.SourceType;
                 return underlyingType.IsEnum() && types.DestinationType == typeof(string);

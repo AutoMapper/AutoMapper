@@ -53,7 +53,7 @@ namespace AutoMapper
     }
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public struct TypePair : IEquatable<TypePair>
+    public readonly struct TypePair : IEquatable<TypePair>
     {
         public static bool operator ==(TypePair left, TypePair right) => left.Equals(right);
         public static bool operator !=(TypePair left, TypePair right) => !left.Equals(right);

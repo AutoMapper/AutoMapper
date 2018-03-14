@@ -169,9 +169,18 @@ namespace AutoMapper
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
         }
 
-        public bool IsConventionMap(TypePair types) => TypeConfigurations.Any(c => c.IsMatch(types));
+        public bool IsConventionMap(in TypePair types)
+        {
+            foreach (var c in TypeConfigurations)
+            {
+                if (c.IsMatch(types))
+                    return true;
+            }
 
-        public TypeMap CreateConventionTypeMap(TypePair types, IConfigurationProvider configurationProvider)
+            return false;
+        }
+
+        public TypeMap CreateConventionTypeMap(in TypePair types, IConfigurationProvider configurationProvider)
         {
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
 
@@ -186,7 +195,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap CreateInlineMap(TypePair types, IConfigurationProvider configurationProvider)
+        public TypeMap CreateInlineMap(in TypePair types, IConfigurationProvider configurationProvider)
         {
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
 
@@ -197,7 +206,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IConfigurationProvider configurationProvider)
+        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, in TypePair closedTypes, IConfigurationProvider configurationProvider)
         {
             var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
 

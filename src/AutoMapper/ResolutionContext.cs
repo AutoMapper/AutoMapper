@@ -69,17 +69,17 @@ namespace AutoMapper
             }
         }
 
-        internal void IncrementTypeDepth(TypePair types)
+        internal void IncrementTypeDepth(in TypePair types)
         {
             TypeDepth[types]++;
         }
 
-        internal void DecrementTypeDepth(TypePair types)
+        internal void DecrementTypeDepth(in TypePair types)
         {
             TypeDepth[types]--;
         }
 
-        internal int GetTypeDepth(TypePair types)
+        internal int GetTypeDepth(in TypePair types)
         {
             if (!TypeDepth.ContainsKey(types))
                 TypeDepth[types] = 1;

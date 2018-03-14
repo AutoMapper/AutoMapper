@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo EnumParseMethod = Method(() => Enum.Parse(null, null, true));
 
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);

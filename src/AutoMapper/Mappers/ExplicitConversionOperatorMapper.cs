@@ -6,20 +6,25 @@ namespace AutoMapper.Mappers
 {
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var methodInfo = GetExplicitConversionOperator(context);
 
             return methodInfo != null;
         }
 
-        private static MethodInfo GetExplicitConversionOperator(TypePair context)
+        private static MethodInfo GetExplicitConversionOperator(in TypePair context)
         {
-            var sourceTypeMethod = context.SourceType
-                .GetDeclaredMethods()
-                .Where(mi => mi.IsPublic && mi.IsStatic)
-                .Where(mi => mi.Name == "op_Explicit")
-                .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
+            MethodInfo sourceTypeMethod = null;
+            foreach (var mi in context.SourceType.GetDeclaredMethods())
+            {
+                if (mi.IsPublic && mi.IsStatic &&
+                    (mi.Name == "op_Explicit" && mi.ReturnType == context.DestinationType))
+                {
+                    sourceTypeMethod = mi;
+                    break;
+                }
+            }
 
             var destTypeMethod = context.DestinationType.GetDeclaredMethod("op_Explicit", new[] {context.SourceType});
 

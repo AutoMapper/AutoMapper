@@ -7,10 +7,10 @@ namespace AutoMapper
     using System;
     using Internal;
 
-    [DebuggerDisplay("{DestinationExpression}")]
+    [DebuggerDisplay("{" + nameof(DestinationExpression) + "}")]
     public class PathMap
     {
-        public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
+        public PathMap(LambdaExpression destinationExpression, in MemberPath memberPath, TypeMap typeMap)
         {
             MemberPath = memberPath;
             TypeMap = typeMap;

@@ -21,7 +21,7 @@ namespace AutoMapper.Execution
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap,
-            TypePair typePair,
+            in TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
             PropertyMap propertyMap = null, Expression destinationParameter = null)
@@ -91,7 +91,7 @@ namespace AutoMapper.Execution
         }
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
-            ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter,
+            ProfileMap profileMap, in TypePair typePair, Expression sourceParameter, Expression contextParameter,
             PropertyMap propertyMap, Expression destinationParameter)
         {
             var match = configurationProvider.FindMapper(typePair);
@@ -104,7 +104,7 @@ namespace AutoMapper.Execution
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
         }
 
-        public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
+        public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression contextParameter,
             Expression destinationParameter, PropertyMap propertyMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);

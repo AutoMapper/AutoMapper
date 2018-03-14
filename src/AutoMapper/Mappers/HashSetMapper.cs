@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
 
     public class HashSetMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
             => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

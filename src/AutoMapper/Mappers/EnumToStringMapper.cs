@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 {
     public class EnumToStringMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.DestinationType == typeof(string) &&
+        public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string) &&
                                                  ElementTypeHelper.GetEnumerationType(context.SourceType) != null;
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,

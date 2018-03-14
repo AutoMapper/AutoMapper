@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression
     {
-        public MappingExpression(TypePair types, MemberList memberList) : base(memberList, types)
+        public MappingExpression(in TypePair types, MemberList memberList) : base(memberList, types)
         {
         }
 
@@ -154,7 +154,7 @@ namespace AutoMapper.Configuration
         {
         }
 
-        public MappingExpression(MemberList memberList, TypePair types)
+        public MappingExpression(MemberList memberList, in TypePair types)
         {
             Types = types;
             IsOpenGeneric = types.SourceType.IsGenericTypeDefinition() || types.DestinationType.IsGenericTypeDefinition();

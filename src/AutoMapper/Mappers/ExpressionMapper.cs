@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context) => typeof(LambdaExpression).IsAssignableFrom(context.SourceType)
+        public bool IsMatch(in TypePair context) => typeof(LambdaExpression).IsAssignableFrom(context.SourceType)
                                                  && context.SourceType != typeof(LambdaExpression)
                                                  && typeof(LambdaExpression).IsAssignableFrom(context.DestinationType)
                                                  && context.DestinationType != typeof(LambdaExpression);

@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-    public struct MemberPath : IEquatable<MemberPath>
+    public readonly struct MemberPath : IEquatable<MemberPath>
     {
-        public MemberInfo[] Members { get; }
+        public ReadOnlyCollection<MemberInfo> Members { get; }
 
         public MemberPath(IEnumerable<MemberInfo> members)
         {
-            Members = members.ToArray();
+            Members = new ReadOnlyCollection<MemberInfo>(members.ToList());
         }
 
-        public MemberInfo Last => Members[Members.Length - 1];
+        public MemberInfo Last => Members[Members.Count - 1];
 
         public MemberInfo First => Members[0];
 
-        public int Length => Members.Length;
+        public int Length => Members.Count;
 
         public bool Equals(MemberPath other) => Members.SequenceEqual(other.Members);
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj)) return false;
-            return obj is MemberPath && Equals((MemberPath)obj);
+            if(obj is null) return false;
+
+            return obj is MemberPath path && Equals(path);
         }
 
         public override int GetHashCode()

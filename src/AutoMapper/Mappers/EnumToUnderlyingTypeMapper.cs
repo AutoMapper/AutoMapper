@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo ChangeTypeMethod = Method(() => Convert.ChangeType(null, typeof(object)));
 
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
 

@@ -47,7 +47,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
+        public bool IsMatch(in TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,

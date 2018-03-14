@@ -36,7 +36,7 @@ namespace AutoMapper
 
         public AutoMapperConfigurationException(TypeMapConfigErrors[] errors) => Errors = errors;
 
-        public AutoMapperConfigurationException(TypePair types) => Types = types;
+        public AutoMapperConfigurationException(in TypePair types) => Types = types;
 
         public override string Message
         {
