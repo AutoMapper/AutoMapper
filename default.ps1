@@ -11,7 +11,7 @@ properties {
 
 task default -depends local
 task local -depends compile, test
-task ci -depends clean, release, local, benchmark
+task ci -depends clean, release, local
 
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
