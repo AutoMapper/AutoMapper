@@ -181,17 +181,36 @@ namespace AutoMapper.Internal
             return targetType;
         }
 
-        public static bool CanImplicitConvert(this Type convertFrom, Type convertTo)
+        public static bool CanImplicitConvert(this Type from, Type to)
         {
-            var simpleFromType = convertFrom.IsNullableType() ? convertFrom.GetTypeOfNullable() : convertFrom;
-            var simpleConvertToType = convertTo.IsNullableType() ? convertTo.GetTypeOfNullable() : convertTo;
+            if (to.IsNullableType())
+            {
+                from = from.IsNullableType() ? Nullable.GetUnderlyingType(from) : from;
+                to = to.IsNullableType() ? Nullable.GetUnderlyingType(to) : to;
+            }
 
-            return simpleFromType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
-                    && x.ReturnType == simpleConvertToType
-                    && x.GetParameters().First().ParameterType == simpleFromType)
-                || simpleConvertToType.GetDeclaredMethods().Any(x => (x.Name == "op_Explicit" || x.Name == "op_Implicit")
-                    && x.ReturnType == simpleConvertToType
-                    && x.GetParameters().First().ParameterType == simpleFromType);
+            bool CanConvert(Type type, Type typeToCheck) => valueTypeDict.ContainsKey(type) && valueTypeDict[type].Contains(typeToCheck);
+
+            bool HasImplicitOp(Type type) => type.GetDeclaredMethods().Any(x => x.Name == "op_Implicit" 
+                && x.ReturnType == to 
+                && (x.GetParameters().First().ParameterType == from 
+                    || CanConvert(x.GetParameters().First().ParameterType, from))
+            );
+
+            return to.IsAssignableFrom(from) || HasImplicitOp(from) || HasImplicitOp(to) || CanConvert(to, from);
         }
+
+        static Dictionary<Type, HashSet<Type>> valueTypeDict = new Dictionary<Type, HashSet<Type>>()
+        {
+            { typeof(decimal), new HashSet<Type> { typeof(byte), typeof(sbyte), typeof(char), typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong) } },
+            { typeof(double), new HashSet<Type> { typeof(byte), typeof(sbyte), typeof(char), typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float) } },
+            { typeof(float), new HashSet<Type> { typeof(byte), typeof(sbyte), typeof(char), typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong) } },
+            { typeof(ulong), new HashSet<Type> { typeof(byte), typeof(char), typeof(ushort), typeof(uint) } },
+            { typeof(long), new HashSet<Type> { typeof(byte), typeof(sbyte), typeof(char), typeof(short), typeof(ushort), typeof(int), typeof(uint) } },
+            { typeof(uint), new HashSet<Type> { typeof(byte), typeof(char), typeof(ushort) } },
+            { typeof(int), new HashSet<Type> { typeof(byte), typeof(sbyte), typeof(char), typeof(short), typeof(ushort) } },
+            { typeof(ushort), new HashSet<Type> { typeof(byte), typeof(char) } },
+            { typeof(short), new HashSet<Type> { typeof(byte), typeof(sbyte) } }
+        };
     }
 }

@@ -489,6 +489,33 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
+        public void Project_from_custom_struct_first()
+        {
+            // Arrange
+            var config = new MapperConfiguration(c =>
+            {
+                c.CreateMap<CustomMaster, MasterDto>()
+                    .ReverseMap();
+            });
+
+            config.AssertConfigurationIsValid();
+
+            var mapper = config.CreateMapper();
+
+            var source = new List<CustomMaster> {
+                new CustomMaster { Id = Guid.NewGuid(), Name = "Harry Marry" }
+            };
+
+            // Act
+            var masterDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
+                .For<MasterDto>()
+                .First(d => d.Name == "Harry Marry");
+
+            // Assert
+            masterDtoQuery.Name.ShouldBe("Harry Marry");
+        }
+
+        [Fact]
         public void Project_from_custom_struct_with_projection()
         {
             // Arrange
@@ -1091,6 +1118,7 @@ namespace AutoMapper.UnitTests.Query
         }
         public Guid Id { get; set; }
         public string Name { get; set; }
+        
         public ICollection<Detail> Details { get; set; }
     }
 
@@ -1105,6 +1133,8 @@ namespace AutoMapper.UnitTests.Query
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public int Number { get; set; }
+        public int? NullableNumber { get; set; }
     }
 
     public class DetailDto
@@ -1174,6 +1204,24 @@ namespace AutoMapper.UnitTests.Query
     {
         public Guid Id { get; set; }
         public CustomString Name { get; set; }
+        public CustomDigit Number { get; set; }
+        public CustomDigit? NullableNumber { get; set; }
+    }
+
+    public struct CustomDigit
+    {
+        public CustomDigit(int i) { val = i; }
+        public int val;
+
+        public static implicit operator int(CustomDigit i)
+        {
+            return i.val;
+        }
+
+        public static implicit operator CustomDigit(int i)
+        {
+            return new CustomDigit(i);
+        }
     }
 
     public struct CustomString : IComparable, IConvertible
