@@ -4,6 +4,7 @@
     <TargetFrameworks>net452;net40;netcoreapp2.0;</TargetFrameworks>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
+    <NoWarn>$(NoWarn);0649</NoWarn>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 

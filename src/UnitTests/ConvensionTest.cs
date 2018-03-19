@@ -87,6 +87,7 @@ namespace AutoMapper.UnitTests.Conventions
                 AddConditionalObjectMapper().Where((s, d) => d.Name == s.Name + "Dto");
             }
         }
+        [Fact]
         public void Fact2()
         {
             var config = new MapperConfiguration(cfg =>

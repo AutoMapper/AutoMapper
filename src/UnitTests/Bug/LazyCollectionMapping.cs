@@ -9,15 +9,6 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class LazyCollectionMapping
     {
-        public LazyCollectionMapping()
-        {
-            SetUp();
-        }
-        public void SetUp()
-        {
-            
-        }
-
         public class OneTimeEnumerator<T> : IEnumerable<T>
         {
             private readonly IEnumerable<T> inner;

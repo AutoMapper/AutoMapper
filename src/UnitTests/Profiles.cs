@@ -160,7 +160,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void When_using_profile_and_no_constructor_mapping()
             {
-                Assert.Equal("BLUEZ", _b.Value);
+                Assert.Equal("BLUEZ", _b.Value, StringComparer.Ordinal);
             }
         }
 
