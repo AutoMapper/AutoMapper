@@ -38,9 +38,7 @@ task compile -depends clean {
 	exec { dotnet --version }
 	exec { dotnet --info }
 
-	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
-
-	exec { dotnet restore $base_dir\AutoMapper.sln }
+	#exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
 
     exec { dotnet build $base_dir\AutoMapper.sln -c $config --version-suffix=$buildSuffix -v q /nologo }
 
@@ -48,7 +46,7 @@ task compile -depends clean {
 }
 
 task benchmark {
-    exec { & $source_dir\Benchmark\bin\$config\Benchmark.exe }
+    exec { & $source_dir\Benchmark\bin\$config\net452\Benchmark.exe }
 }
 
 task test {
