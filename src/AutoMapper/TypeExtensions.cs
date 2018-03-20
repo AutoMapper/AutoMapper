@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 
 namespace AutoMapper
 {
-#if NET45 || NET40
+#if NET45
     using System.Reflection.Emit;
 #endif
 
@@ -22,7 +22,7 @@ namespace AutoMapper
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if !NET40 && !NET45
+#if !NET45
         public static MethodInfo GetAddMethod(this EventInfo eventInfo) => eventInfo.AddMethod;
 
         public static MethodInfo GetRemoveMethod(this EventInfo eventInfo) => eventInfo.RemoveMethod;
@@ -30,11 +30,7 @@ namespace AutoMapper
 
         public static Type CreateType(this TypeBuilder type)
         {
-#if NET40
-            return type.CreateType();
-#else
             return type.CreateTypeInfo().AsType();
-#endif
         }
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
@@ -136,11 +132,6 @@ namespace AutoMapper
 
         public static PropertyInfo[] GetProperties(this Type type) => type.GetRuntimeProperties().ToArray();
 
-#if NET40
-        public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetGetMethod();
-
-        public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetSetMethod();
-#else
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetMethod;
 
         public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.SetMethod;
@@ -148,7 +139,6 @@ namespace AutoMapper
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo) => propertyInfo.GetMethod;
 
         public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo) => propertyInfo.SetMethod;
-#endif
 
         public static FieldInfo GetField(this Type type, string name) => type.GetRuntimeField(name);
     }

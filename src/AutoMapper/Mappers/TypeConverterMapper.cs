@@ -7,7 +7,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
-#if NETSTANDARD1_3 || NET45 || NET40
+#if NETSTANDARD1_3 || NET45
     public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
