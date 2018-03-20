@@ -52,18 +52,19 @@ task benchmark {
 }
 
 task test {
-
     Push-Location -Path $source_dir\UnitTests
 
-    exec { & dotnet xunit -configuration Release }
-
-    Pop-Location
+    try {
+        exec { & dotnet xunit -configuration Release }
+    } finally {
+        Pop-Location
+    }
 
     Push-Location -Path $source_dir\IntegrationTests
 
-    exec { & dotnet xunit -configuration Release }
-
-    Pop-Location
-
-    exec { & $env:USERPROFILE\.nuget\packages\xunit.runners\1.9.2\tools\xunit.console.clr4.exe $source_dir\UnitTests\bin\$config\net40\AutoMapper.UnitTests.dll }
+    try {
+        exec { & dotnet xunit -configuration Release }
+    } finally {
+        Pop-Location
+    }
 }

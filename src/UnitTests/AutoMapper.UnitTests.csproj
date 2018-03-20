@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp1.1;</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
     <NoWarn>$(NoWarn);0649</NoWarn>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <DefineConstants>NET45</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,12 +22,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
   </ItemGroup>
-
-  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-  </ItemGroup>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
@@ -34,10 +36,6 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Serialization" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
   </ItemGroup>
 
 </Project>
