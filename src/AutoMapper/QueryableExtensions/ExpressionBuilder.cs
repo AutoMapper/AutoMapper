@@ -25,22 +25,24 @@ namespace AutoMapper.QueryableExtensions
 
     public class ExpressionBuilder : IExpressionBuilder
     {
-        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
-        {
-            new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter()
-        };
+        internal static List<IExpressionResultConverter> DefaultResultConverters() =>
+            new List<IExpressionResultConverter>
+            {
+                new MemberResolverExpressionResultConverter(),
+                new MemberGetterExpressionResultConverter()
+            };
 
-        private static readonly IExpressionBinder[] Binders =
-        {
-            new CustomProjectionExpressionBinder(),
-            new NullableDestinationExpressionBinder(),
-            new NullableSourceExpressionBinder(),
-            new AssignableExpressionBinder(),
-            new EnumerableExpressionBinder(),
-            new MappedTypeExpressionBinder(),
-            new StringExpressionBinder()
-        };
+        internal static List<IExpressionBinder> DefaultBinders() =>
+            new List<IExpressionBinder>
+            {
+                new CustomProjectionExpressionBinder(),
+                new NullableDestinationExpressionBinder(),
+                new NullableSourceExpressionBinder(),
+                new AssignableExpressionBinder(),
+                new EnumerableExpressionBinder(),
+                new MappedTypeExpressionBinder(),
+                new StringExpressionBinder()
+            };
 
         private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
@@ -226,7 +228,7 @@ namespace AutoMapper.QueryableExtensions
                 {
                     return;
                 }
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+                var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
                 if(binder == null)
                 {
                     var message =
@@ -250,13 +252,11 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
-            Expression instanceParameter, LetPropertyMaps letPropertyMaps)
+        private ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
 
-            var matchingExpressionConverter =
-                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+            var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
             result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps) 
                 ?? throw new Exception("Can't resolve this to Queryable Expression");
 

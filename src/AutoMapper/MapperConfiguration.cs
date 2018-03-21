@@ -41,6 +41,8 @@ namespace AutoMapper
             ServiceCtor = configurationExpression.ServiceCtor;
             EnableNullPropagationForQueryMapping = configurationExpression.EnableNullPropagationForQueryMapping ?? false;
             MaxExecutionPlanDepth = configurationExpression.Advanced.MaxExecutionPlanDepth + 1;
+            ResultConverters = configurationExpression.Advanced.QueryableResultConverters.ToArray();
+            Binders = configurationExpression.Advanced.QueryableBinders.ToArray();
 
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
@@ -78,6 +80,10 @@ namespace AutoMapper
         private ProfileMap Configuration { get; }
 
         public IEnumerable<ProfileMap> Profiles { get; }
+
+        public IEnumerable<IExpressionResultConverter> ResultConverters { get; }
+
+        public IEnumerable<IExpressionBinder> Binders { get; }
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap)
         {

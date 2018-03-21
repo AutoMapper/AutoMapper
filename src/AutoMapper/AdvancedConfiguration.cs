@@ -1,3 +1,4 @@
+using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 
@@ -31,5 +32,9 @@ namespace AutoMapper
         public int MaxExecutionPlanDepth { get; set; } = 1;
 
         internal Validator[] GetValidators() => _validators.ToArray();
+
+        public List<IExpressionResultConverter> QueryableResultConverters { get; } = ExpressionBuilder.DefaultResultConverters();
+
+        public List<IExpressionBinder> QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
     }
 }
