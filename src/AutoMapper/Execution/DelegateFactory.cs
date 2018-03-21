@@ -4,6 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers.Internal;
+#if NET45 || NETSTANDARD1_3
+using FastExpressionCompiler;
+#endif
 
 namespace AutoMapper.Execution
 {
@@ -21,7 +24,7 @@ namespace AutoMapper.Execution
         {
             var ctorExpr = GenerateConstructorExpression(type);
 
-            return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
+            return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).CompileFast();
         }
 
         public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration) =>
