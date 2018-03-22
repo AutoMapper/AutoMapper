@@ -167,15 +167,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_not_have_any_configured_mapping_orders()
             {
-                Assert.All(_propertyMaps, pm => pm.MappingOrder = null);
+                Assert.True(_propertyMaps.All(pm => pm.MappingOrder == null));
             }
 
 
             [Fact]
             public void Should_perform_mapping_ordered_by_name()
             {
-                Assert.Equal(6, _propertyMaps.Length);
-
                 Assert.Equal("A", _propertyMaps.Skip(0).Select(p => p.DestinationProperty.Name).First());
                 Assert.Equal("B", _propertyMaps.Skip(1).Select(p => p.DestinationProperty.Name).First());
                 Assert.Equal("C", _propertyMaps.Skip(2).Select(p => p.DestinationProperty.Name).First());
