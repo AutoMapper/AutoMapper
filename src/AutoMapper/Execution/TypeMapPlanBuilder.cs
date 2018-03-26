@@ -85,7 +85,7 @@ namespace AutoMapper.Execution
             typeMapsPath.Push(_typeMap);
             var properties =
                 from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue()
-                let propertyTypeMap = ResolvePropertyTypeMap(pm)
+                let propertyTypeMap = ResolvePropertyTypeMap(pm, typeMapsPath)
                 where propertyTypeMap != null && !propertyTypeMap.PreserveReferences
                 select new { PropertyTypeMap = propertyTypeMap, PropertyMap = pm };
             foreach(var property in properties)
@@ -100,7 +100,7 @@ namespace AutoMapper.Execution
                 if(typeMapsPath.Contains(propertyTypeMap) && !propertyTypeMap.SourceType.IsValueType())
                 {
                     SetPreserveReferences(propertyTypeMap);
-                    foreach(var derivedTypeMap in propertyTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
+                    foreach(var derivedTypeMap in propertyTypeMap.IncludedDerivedTypes.Select(typePair=>ResolveTypeMap(typePair)))
                     {
                         SetPreserveReferences(derivedTypeMap);
                     }
@@ -119,22 +119,22 @@ namespace AutoMapper.Execution
             propertyTypeMap.PreserveReferences = true;
         }
 
-        private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
+        private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap, Stack<TypeMap> typeMapsPath)
         {
             if(propertyMap.SourceType == null)
             {
                 return null;
             }
             var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
-            return ResolveTypeMap(types);
+            return ResolveTypeMap(types, typeMapsPath);
         }
 
-        private TypeMap ResolveTypeMap(TypePair types)
+        private TypeMap ResolveTypeMap(TypePair types, Stack<TypeMap> typeMapsPath = null)
         {
             var typeMap = _configurationProvider.ResolveTypeMap(types);
             if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
             {
-                typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
+                typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types), typeMapsPath);
             }
             return typeMap;
         }

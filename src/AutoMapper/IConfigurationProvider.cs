@@ -61,15 +61,17 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <param name="inlineConfiguration">Inline type map configuration if exists</param>
+        /// <param name="typeMapsPath">internal, ignore it</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration);
+        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration, Stack<TypeMap> typeMapsPath = null);
 
         /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
         /// </summary>
         /// <param name="typePair">Type pair</param>
+        /// <param name="typeMapsPath">internal, ignore it</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair);
+        TypeMap ResolveTypeMap(TypePair typePair, Stack<TypeMap> typeMapsPath = null);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
