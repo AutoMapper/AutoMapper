@@ -1,6 +1,6 @@
 <img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
 
-[![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/develop?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/develop)
+[![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/master?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/master)
 [![NuGet](http://img.shields.io/nuget/v/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
 [![MyGet (dev)](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](http://myget.org/gallery/automapperdev)
 
