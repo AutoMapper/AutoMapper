@@ -47,7 +47,7 @@ namespace AutoMapper.Execution
 
         public ParameterExpression Context { get; }
 
-        public LambdaExpression CreateMapperLambda(Stack<TypeMap> typeMapsPath)
+        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() ||
                 _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
@@ -72,7 +72,7 @@ namespace AutoMapper.Execution
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
         }
 
-        public void CheckForCycles(Stack<TypeMap> typeMapsPath)
+        public void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
             if(_typeMap.ConstructorMappingTypes == null)
             {
@@ -80,9 +80,9 @@ namespace AutoMapper.Execution
             }
             if(typeMapsPath == null)
             {
-                typeMapsPath = new Stack<TypeMap>();
+                typeMapsPath = new HashSet<TypeMap>();
             }
-            typeMapsPath.Push(_typeMap);
+            typeMapsPath.Add(_typeMap);
             var defaultPropertyMap = new PropertyMap(default(MemberInfo), null);
             var properties = 
                 _typeMap.GetPropertyMaps().Where(pm=>pm.CanResolveValue()).Select(pm=>new { PropertyTypeMap = ResolvePropertyTypeMap(pm), PropertyMap = pm })
@@ -109,7 +109,7 @@ namespace AutoMapper.Execution
                 }
                 propertyTypeMap.CheckForCycles(_configurationProvider, typeMapsPath);
             }
-            typeMapsPath.Pop();
+            typeMapsPath.Remove(_typeMap);
             _typeMap.InlineWasChecked = true;
             return;
 

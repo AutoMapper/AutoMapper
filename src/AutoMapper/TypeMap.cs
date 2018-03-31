@@ -272,7 +272,7 @@ namespace AutoMapper
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
 
-        public void Seal(IConfigurationProvider configurationProvider, Stack<TypeMap> typeMapsPath = null)
+        public void Seal(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath = null)
         {
             if(_sealed)
             {
@@ -293,7 +293,7 @@ namespace AutoMapper
             MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
         }
 
-        internal void CheckForCycles(IConfigurationProvider configurationProvider, Stack<TypeMap> typeMapsPath)
+        internal void CheckForCycles(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath)
         {
             new TypeMapPlanBuilder(configurationProvider, this).CheckForCycles(typeMapsPath);
         }
