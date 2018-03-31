@@ -137,10 +137,10 @@ namespace AutoMapper.Execution
 
             TypeMap ResolveTypeMap(TypePair types)
             {
-                var typeMap = _configurationProvider.ResolveTypeMap(types, seal: false);
+                var typeMap = _configurationProvider.ResolveTypeMap(types);
                 if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
                 {
-                    typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types), seal: false);
+                    typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
                 }
                 return typeMap;
             }

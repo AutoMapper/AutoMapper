@@ -61,17 +61,15 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <param name="inlineConfiguration">Inline type map configuration if exists</param>
-        /// <param name="seal">internal, ignore it</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration, bool seal = true);
+        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration);
 
         /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
         /// </summary>
         /// <param name="typePair">Type pair</param>
-        /// <param name="seal">internal, ignore it</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair, bool seal = true);
+        TypeMap ResolveTypeMap(TypePair typePair);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
