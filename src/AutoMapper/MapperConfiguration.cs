@@ -204,10 +204,10 @@ namespace AutoMapper
             return ResolveTypeMap(typePair, inlineConfiguration);
         }
 
-        public TypeMap ResolveTypeMap(TypePair typePair, Stack<TypeMap> typeMapsPath)
-            => ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair), typeMapsPath);
+        public TypeMap ResolveTypeMap(TypePair typePair, bool seal)
+            => ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair), seal);
 
-        public TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration, Stack<TypeMap> typeMapsPath = null)
+        public TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration, bool seal = true)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
@@ -216,7 +216,10 @@ namespace AutoMapper
                 lock (typeMap)
                 {
                     inlineConfiguration.Configure(typeMap);
-                    typeMap.Seal(this, typeMapsPath);
+                    if(seal)
+                    {
+                        typeMap.Seal(this);
+                    }
                 }
             }
             return typeMap;

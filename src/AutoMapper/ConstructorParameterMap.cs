@@ -26,5 +26,11 @@ namespace AutoMapper
         public LambdaExpression CustomValueResolver { get; set; }
 
         public Type DestinationType => Parameter.ParameterType;
+
+        public Type SourceType => ResolvedExpression.Type;
+
+        public Expression ResolvedExpression { get; set; }
+
+        public TypePair Types => new TypePair(SourceType, DestinationType);
     }
 }
