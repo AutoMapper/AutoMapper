@@ -49,16 +49,22 @@ namespace AutoMapper.Execution
 
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
-            if (_typeMap.SourceType.IsGenericTypeDefinition() ||
-                _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
+            if(_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
+            {
                 return null;
-            var customExpression = TypeConverterMapper() ??
-                                   _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
-            if (customExpression != null)
-                return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source,
-                    _initialDestination, Context);
+            }
+            var customExpression = TypeConverterMapper() ?? _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
+            if(customExpression != null)
+            {
+                return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source, _initialDestination, Context);
+            }
 
             CheckForCycles(typeMapsPath);
+
+            if(typeMapsPath != null)
+            {
+                return null;
+            }
 
             var destinationFunc = CreateDestinationFunc();
 
@@ -72,7 +78,7 @@ namespace AutoMapper.Execution
             return Lambda(Block(new[] {_destination}, lambaBody), Source, _initialDestination, Context);
         }
 
-        public void CheckForCycles(HashSet<TypeMap> typeMapsPath)
+        private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
             if(_typeMap.ConstructorMappingTypes == null)
             {
