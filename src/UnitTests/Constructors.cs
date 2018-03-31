@@ -64,7 +64,8 @@ namespace AutoMapper.UnitTests.Constructors
             {
                 parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
             }
-            var mappedChildren = Mapper.Map<ParentModel>(parentDto);
+            var parentModel = Mapper.Map<ParentModel>(parentDto);
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
         }
     }
 
@@ -116,8 +117,8 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ParentDTO, ParentModel>();
             cfg.CreateMap<ChildDTO, ChildModel>().ForMember(c => c.Parent, o => o.Ignore());
+            cfg.CreateMap<ParentDTO, ParentModel>();
         });
 
         [Fact]

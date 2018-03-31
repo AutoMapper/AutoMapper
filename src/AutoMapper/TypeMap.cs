@@ -59,6 +59,10 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; set; }
 
+        public bool InlineWasChecked { get; set; }
+
+        public TypePair[] ConstructorMappingTypes { get; set; }
+
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
 
@@ -287,6 +291,11 @@ namespace AutoMapper
                     .OrderBy(map => map.MappingOrder).ToArray();
 
             MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
+        }
+
+        internal void CheckForCycles(IConfigurationProvider configurationProvider, Stack<TypeMap> typeMapsPath)
+        {
+            new TypeMapPlanBuilder(configurationProvider, this).CheckForCycles(typeMapsPath);
         }
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)
