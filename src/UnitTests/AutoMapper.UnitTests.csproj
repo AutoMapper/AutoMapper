@@ -38,14 +38,6 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="xunit" Version="1.9.2" />
-    <PackageReference Include="xunit.runners" Version="1.9.2" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Runtime.Serialization" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
   </ItemGroup>
