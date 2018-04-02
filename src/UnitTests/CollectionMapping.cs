@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using Xunit;
 using Shouldly;
 using System.Collections;
+using System.Reflection;
 
 namespace AutoMapper.UnitTests
 {
@@ -369,16 +370,6 @@ namespace AutoMapper.UnitTests
 
     public class CollectionMapping
     {
-        public CollectionMapping()
-        {
-            SetUp();
-        }
-        public void SetUp()
-        {
-            
-        }
-
-
         public class MasterWithList
         {
             private IList<Detail> _details = new List<Detail>();

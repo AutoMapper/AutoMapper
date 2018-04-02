@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Shouldly;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -43,7 +44,7 @@ namespace AutoMapper.UnitTests.Projection
                 Bind(propertyMap.DestinationProperty, Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
 
             public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-                propertyMap.SourceType.IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
+                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
         }
     }
 
@@ -75,7 +76,7 @@ namespace AutoMapper.UnitTests.Projection
         private class EnumToUnderlyingTypeResultConverter : IExpressionResultConverter
         {
             public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) =>
-                propertyMap.SourceType.IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
+                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
 
             public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
             {

@@ -18,15 +18,6 @@ namespace AutoMapper.UnitTests.Bug
             public string Bar;
         }
 
-        public When_configuring_all_members_and_some_do_not_match()
-        {
-            SetUp();
-        }
-        public void SetUp()
-        {
-            
-        }
-
         [Fact]
         public void Should_still_apply_configuration_to_missing_members()
         {

@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
 using System.Reflection;
 
-#if !NETSTANDARD1_1
 namespace AutoMapper.Mappers
 {
     public class NameValueCollectionMapper : IObjectMapper
@@ -26,4 +25,3 @@ namespace AutoMapper.Mappers
             Call(null, MapMethodInfo, sourceExpression);
     }
 }
-#endif

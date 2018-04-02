@@ -34,15 +34,10 @@ namespace AutoMapper.UnitTests
             public Destination Parent { get; set; }
         }
 
-        private Source _source;
+        private readonly Source _source;
 
         public MaxDepthTests()
         {
-            Initializer();
-        }
-        public void Initializer()
-        {
-            
             var nest = new Source(1);
 
             nest.AddChild(new Source(2));

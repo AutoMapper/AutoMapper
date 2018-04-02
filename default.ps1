@@ -1,5 +1,3 @@
-Framework '4.5.1x86'
-
 properties {
 	$base_dir = resolve-path .
 	$build_dir = "$base_dir\build"
@@ -39,31 +37,30 @@ task compile -depends clean {
 	exec { dotnet --info }
 
 	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
-
-	exec { dotnet restore $base_dir\AutoMapper.sln }
-
-    exec { dotnet build $base_dir\AutoMapper.sln -c $config --version-suffix=$buildSuffix -v q /nologo }
+	
+    exec { dotnet build -c $config --version-suffix=$buildSuffix }
 
 	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build $versionSuffix }
 }
 
 task benchmark {
-    exec { & $source_dir\Benchmark\bin\$config\Benchmark.exe }
+    exec { & $source_dir\Benchmark\bin\$config\net452\Benchmark.exe }
 }
 
 task test {
-
     Push-Location -Path $source_dir\UnitTests
 
-    exec { & dotnet xunit -configuration Release }
-
-    Pop-Location
+    try {
+        exec { & dotnet xunit -configuration Release }
+    } finally {
+        Pop-Location
+    }
 
     Push-Location -Path $source_dir\IntegrationTests
 
-    exec { & dotnet xunit -configuration Release }
-
-    Pop-Location
-
-    exec { & $env:USERPROFILE\.nuget\packages\xunit.runners\1.9.2\tools\xunit.console.clr4.exe $source_dir\UnitTests\bin\$config\net40\AutoMapper.UnitTests.dll }
+    try {
+        exec { & dotnet xunit -configuration Release }
+    } finally {
+        Pop-Location
+    }
 }
