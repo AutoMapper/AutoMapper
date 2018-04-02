@@ -80,9 +80,15 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
+            bool inlineWasChecked;
             if(_typeMap.ConstructorMappingTypes == null)
             {
                 _typeMap.ConstructorMappingTypes = GetConstructorMappingTypes();
+                inlineWasChecked = false;
+            }
+            else
+            {
+                inlineWasChecked = true;
             }
             if(typeMapsPath == null)
             {
@@ -93,10 +99,10 @@ namespace AutoMapper.Execution
             var properties = 
                 _typeMap.GetPropertyMaps().Where(pm=>pm.CanResolveValue()).Select(pm=>new { PropertyTypeMap = ResolvePropertyTypeMap(pm), PropertyMap = pm })
                 .Concat(_typeMap.ConstructorMappingTypes.Select(tp => new { PropertyTypeMap = ResolveTypeMap(tp), PropertyMap = defaultPropertyMap }))
-                .Where(p => p.PropertyTypeMap != null && !p.PropertyTypeMap.PreserveReferences);
+                .Where(p => p.PropertyTypeMap != null && !p.PropertyTypeMap.PreserveReferences && p.PropertyTypeMap.MapExpression == null);
             foreach(var property in properties)
             {
-                if(!_typeMap.InlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
+                if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
                     property.PropertyMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {property.PropertyMap.DestinationProperty} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
@@ -116,7 +122,6 @@ namespace AutoMapper.Execution
                 propertyTypeMap.CheckForCycles(_configurationProvider, typeMapsPath);
             }
             typeMapsPath.Remove(_typeMap);
-            _typeMap.InlineWasChecked = true;
             return;
 
             void SetPreserveReferences(TypeMap propertyTypeMap)
