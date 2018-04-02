@@ -110,7 +110,16 @@ namespace AutoMapper.Execution
                 var propertyTypeMap = property.PropertyTypeMap;
                 if(typeMapsPath.Contains(propertyTypeMap))
                 {
-                    if(!propertyTypeMap.SourceType.IsValueType())
+                    if(propertyTypeMap.SourceType.IsValueType())
+                    {
+                        if(propertyTypeMap.MaxDepth == 0)
+                        {
+                            propertyTypeMap.MaxDepth = 10;
+                        }
+                        typeMapsPath.Remove(_typeMap);
+                        return;
+                    }
+                    else
                     {
                         SetPreserveReferences(propertyTypeMap);
                         foreach(var derivedTypeMap in propertyTypeMap.IncludedDerivedTypes.Select(typePair => ResolveTypeMap(typePair)))

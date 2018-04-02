@@ -8,6 +8,76 @@ using Xunit;
 
 namespace AutoMapper.UnitTests. BidirectionalRelationships
 {
+    public class RecursiveMappingWithStruct : AutoMapperSpecBase
+    {
+        private ParentDto _dto;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => 
+        {
+            cfg.CreateMap<ParentModel, ParentDto>();
+            cfg.CreateMap<ChildModel, ChildDto>();
+            cfg.CreateMap<ChildrenStructModel, ChildrenStructDto>();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var parent = new ParentModel { ID = "PARENT_ONE" };
+            parent.ChildrenStruct = new ChildrenStructModel { Children = new List<ChildModel>() };
+
+            parent.AddChild(new ChildModel { ID = "CHILD_ONE" });
+
+            parent.AddChild(new ChildModel { ID = "CHILD_TWO" });
+
+            _dto = Mapper.Map<ParentModel, ParentDto>(parent);
+
+            _dto.ID.ShouldBe("PARENT_ONE");
+            _dto.ChildrenStruct.Children[0].ID.ShouldBe("CHILD_ONE");
+            _dto.ChildrenStruct.Children[1].ID.ShouldBe("CHILD_TWO");
+        }
+
+        public struct ParentModel
+        {
+            public string ID { get; set; }
+
+            public ChildrenStructModel ChildrenStruct { get; set; }
+
+            public void AddChild(ChildModel child)
+            {
+                child.Parent = this;
+                ChildrenStruct.Children.Add(child);
+            }
+        }
+
+        public struct ChildrenStructModel
+        {
+            public IList<ChildModel> Children { get; set; }
+        }
+
+        public struct ChildModel
+        {
+            public string ID { get; set; }
+            public ParentModel Parent { get; set; }
+        }
+
+        public struct ParentDto
+        {
+            public string ID { get; set; }
+            public ChildrenStructDto ChildrenStruct { get; set; }
+        }
+
+        public struct ChildrenStructDto
+        {
+            public IList<ChildDto> Children { get; set; }
+        }
+
+        public struct ChildDto
+        {
+            public string ID { get; set; }
+            public ParentDto Parent { get; set; }
+        }
+    }
+
     public class RecursiveDynamicMappingWithAnonymousType : AutoMapperSpecBase
     {
         public class Book
