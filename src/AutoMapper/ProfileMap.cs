@@ -10,10 +10,6 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-#if NETSTANDARD1_1
-    struct IConvertible{}
-#endif
-
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {

@@ -102,16 +102,6 @@ namespace AutoMapper.Tests
 
     public class EnumMappingFixture
     {
-        public EnumMappingFixture()
-        {
-            Cleanup();
-        }
-
-        public void Cleanup()
-        {
-            
-        }
-
         [Fact]
         public void ShouldMapSharedEnum()
         {

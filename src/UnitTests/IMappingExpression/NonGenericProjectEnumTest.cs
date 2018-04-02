@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿using System;
+
+namespace AutoMapper.UnitTests.Projection
 {
     using QueryableExtensions;
     using Shouldly;
@@ -25,7 +27,7 @@
 
             var projected = customers.ProjectTo<CustomerDto>(_config);
             projected.ShouldNotBeNull();
-            Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
+            customers.Single().CustomerType.ToString().ToUpper().ShouldBe(projected.Single().CustomerType);
         }
 
         public class Customer
@@ -74,7 +76,7 @@
 
             var projected = customers.ProjectTo<CustomerDto>(_mapper.ConfigurationProvider);
             projected.ShouldNotBeNull();
-            Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
+            Assert.Equal(customers.Single().CustomerType.ToString(), projected.Single().CustomerType, StringComparer.OrdinalIgnoreCase);
         }
 
         public class Customer

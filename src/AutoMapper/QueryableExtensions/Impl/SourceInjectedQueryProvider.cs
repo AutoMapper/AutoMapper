@@ -179,7 +179,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             // find replacement method that has no more predicates
                             replacementMethod = typeof(Queryable).GetAllMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-#if NET45 || NET40
+#if NET45
                                             && m.GetParameters().All(p => typeof(Queryable).IsAssignableFrom(p.Member.ReflectedType))
 #endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
