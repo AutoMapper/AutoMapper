@@ -59,6 +59,8 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; set; }
 
+        public TypePair[] ConstructorMappingTypes { get; set; }
+
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
 
@@ -268,7 +270,7 @@ namespace AutoMapper
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
 
-        public void Seal(IConfigurationProvider configurationProvider, Stack<TypeMap> typeMapsPath = null)
+        public void Seal(IConfigurationProvider configurationProvider)
         {
             if(_sealed)
             {
@@ -286,7 +288,12 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
+            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(null);
+        }
+
+        internal void CheckForCycles(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath)
+        {
+            new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
         }
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)

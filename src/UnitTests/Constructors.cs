@@ -8,6 +8,132 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class Dynamic_constructor_mapping : AutoMapperSpecBase
+    {
+        public class ParentDTO
+        {
+            public ChildDTO First => Children[0];
+            public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildDTO
+        {
+            public int IdChild { get; set; }
+            public ParentDTO Parent { get; set; }
+        }
+
+        public class ParentModel
+        {
+            public ChildModel First { get; set; }
+            public List<ChildModel> Children { get; set; } = new List<ChildModel>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildModel
+        {
+            int _idChild;
+
+            public ChildModel(ParentModel parent)
+            {
+                Parent = parent;
+            }
+
+            public int IdChild
+            {
+                get => _idChild;
+                set
+                {
+                    if(_idChild != 0)
+                    {
+                        throw new Exception("Set IdChild again.");
+                    }
+                    _idChild = value;
+                }
+            }
+            public ParentModel Parent { get; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(_=> { });
+
+        [Fact]
+        public void Should_work()
+        {
+            var parentDto = new ParentDTO { IdParent = 1 };
+            for(var i = 0; i < 5; i++)
+            {
+                parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
+            }
+            var parentModel = Mapper.Map<ParentModel>(parentDto);
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+        }
+    }
+
+    public class Constructor_mapping_without_preserve_references : AutoMapperSpecBase
+    {
+        public class ParentDTO
+        {
+            public ChildDTO First => Children[0];
+            public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildDTO
+        {
+            public int IdChild { get; set; }
+            public ParentDTO Parent { get; set; }
+        }
+
+        public class ParentModel
+        {
+            public ChildModel First { get; set; }
+            public List<ChildModel> Children { get; set; } = new List<ChildModel>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildModel
+        {
+            int _idChild;
+
+            public ChildModel(ParentModel parent)
+            {
+                Parent = parent;
+            }
+
+            public int IdChild
+            {
+                get => _idChild;
+                set
+                {
+                    if(_idChild != 0)
+                    {
+                        throw new Exception("Set IdChild again.");
+                    }
+                    _idChild = value;
+                }
+            }
+            public ParentModel Parent { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<ChildDTO, ChildModel>().ForMember(c => c.Parent, o => o.Ignore());
+            cfg.CreateMap<ParentDTO, ParentModel>();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var parentDto = new ParentDTO { IdParent = 1 };
+            for(var i = 0; i < 5; i++)
+            {
+                parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
+            }
+
+            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+        }
+    }
+
     public class Preserve_references_with_constructor_mapping : AutoMapperSpecBase
     {
         public class ParentDTO
