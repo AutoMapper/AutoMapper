@@ -286,7 +286,8 @@ namespace AutoMapper
             _orderedPropertyMaps =
                 _propertyMaps
                     .Union(_inheritedMaps)
-                    .OrderBy(map => map.MappingOrder).ToArray();
+                    .OrderBy(map => map.MappingOrder ?? int.MaxValue).ThenBy(map => map.DestinationProperty.Name)
+                    .ToArray();
 
             MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(null);
         }
