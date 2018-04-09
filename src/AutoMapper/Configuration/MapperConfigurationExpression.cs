@@ -10,7 +10,7 @@ namespace AutoMapper.Configuration
     {
         private readonly IList<Profile> _profiles = new List<Profile>();
 
-        public MapperConfigurationExpression() : base("")
+        public MapperConfigurationExpression() : base()
         {
             IncludeSourceExtensionMethods(typeof(Enumerable));
 
@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration
         public IEnumerable<IProfileConfiguration> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = Activator.CreateInstance;
 
-        public void CreateProfile(string profileName, Action<IProfileExpression> config) 
+        public void CreateProfile(string profileName, Action<IProfileExpression> config)
             => AddProfile(new NamedProfile(profileName, config));
 
         public IList<IObjectMapper> Mappers { get; }

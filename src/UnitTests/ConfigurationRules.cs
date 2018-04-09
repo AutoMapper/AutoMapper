@@ -1,4 +1,7 @@
-﻿using Xunit;
+﻿using System;
+using System.Linq;
+using Shouldly;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -72,5 +75,21 @@ namespace AutoMapper.UnitTests
 
             typeof(DuplicateTypeMapConfigurationException).ShouldNotBeThrownBy(() => config.AssertConfigurationIsValid());
         }
+
+        [Fact]
+        public void Should_throw_for_multiple_create_map_calls_in_configuration_expression_and_profile()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Dest>();
+                cfg.AddProfile<Profile1>();
+            });
+
+            new Action(() => config.AssertConfigurationIsValid()).ShouldThrowException<DuplicateTypeMapConfigurationException>(c =>
+            {
+                c.Errors.SelectMany(t => t.ProfileNames).ShouldNotContain(string.Empty);
+            });
+        }
+
     }
 }
