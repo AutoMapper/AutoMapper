@@ -107,14 +107,17 @@ namespace AutoMapper
             {
                 genericInterfaces = genericInterfaces.Union(new[] { Type });
             }
+
             return explicitExtensionMethods.Union
             (
-                from genericMethod in sourceExtensionMethodSearch
-                where genericMethod.IsGenericMethodDefinition
                 from genericInterface in genericInterfaces
                 let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
-                where genericMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
-                let methodMatch = genericMethod.MakeGenericMethod(genericInterfaceArguments)
+                from extensionMethod in sourceExtensionMethodSearch
+                where !extensionMethod.IsGenericMethodDefinition
+                    || extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
+                let methodMatch = extensionMethod.IsGenericMethodDefinition
+                    ? extensionMethod.MakeGenericMethod(genericInterfaceArguments)
+                    : extensionMethod
                 where methodMatch.GetParameters()[0].ParameterType.GetTypeInfo().IsAssignableFrom(genericInterface.GetTypeInfo())
                 select methodMatch
             ).ToArray();
