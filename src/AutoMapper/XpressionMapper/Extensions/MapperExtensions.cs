@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
 using System.Reflection;
 using AutoMapper.Mappers.Internal;
+using AutoMapper.Internal;
 
 namespace AutoMapper.XpressionMapper.Extensions
 {
@@ -34,8 +35,14 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda
+                                    (
+                                        typeDestFunc,
+                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
+                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
+                                    );
         }
+
 
         /// <summary>
         /// Maps an expression given a dictionary of types where the source type is the key and the destination type is the value.
@@ -74,7 +81,12 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda
+                                    (
+                                        typeDestFunc,
+                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
+                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
+                                    );
         }
 
         /// <summary>
