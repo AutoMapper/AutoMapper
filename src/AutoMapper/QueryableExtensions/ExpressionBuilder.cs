@@ -209,8 +209,10 @@ namespace AutoMapper.QueryableExtensions
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request, TypeMap typeMap, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => 
-                (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationProperty)) && pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty)))
+            foreach (var propertyMap in typeMap.GetPropertyMaps()
+                                               .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationProperty)) && 
+                                                            pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty))
+                                               .OrderBy(pm => pm.MappingOrder ?? int.MaxValue).ThenBy(pm => pm.DestinationProperty.Name))
             {
                 letPropertyMaps.Push(propertyMap);
 
@@ -218,6 +220,7 @@ namespace AutoMapper.QueryableExtensions
 
                 letPropertyMaps.Pop();
             }
+
             return bindings;
             void CreateMemberBinding(PropertyMap propertyMap)
             {
