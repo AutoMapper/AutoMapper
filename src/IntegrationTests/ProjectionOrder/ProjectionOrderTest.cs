@@ -14,8 +14,6 @@ namespace AutoMapper.IntegrationTests.ProjectionOrder
         {
             public int Count { get; set; }
             public DateTime Date { get; set; }
-
-            public IEnumerable<ChildDestination> Children { get; set; }
         }
 
         public class ChildDestination
