@@ -212,7 +212,7 @@ namespace AutoMapper.QueryableExtensions
             foreach (var propertyMap in typeMap.GetPropertyMaps()
                                                .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationProperty)) && 
                                                             pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty))
-                                               .OrderBy(pm => pm.MappingOrder ?? int.MaxValue).ThenBy(pm => pm.DestinationProperty.Name))
+                                               .OrderBy(pm => pm.DestinationProperty.Name))
             {
                 letPropertyMaps.Push(propertyMap);
 
