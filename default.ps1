@@ -36,6 +36,8 @@ task compile -depends clean {
 	exec { dotnet --version }
 	exec { dotnet --info }
 
+	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
+	
     exec { dotnet build -c $config --version-suffix=$buildSuffix }
 
 	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build $versionSuffix }
