@@ -5,8 +5,6 @@ branches:
   only:
   - master
 image: Visual Studio 2017
-install:
-  - appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/v4.0.0/nuget.exe
 nuget:
   disable_publish_on_pr: true
 build_script:
