@@ -4,9 +4,7 @@ pull_requests:
 branches:
   only:
   - master
-image: Visual Studio 2017 Preview
-install:
-  - appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/v4.0.0/nuget.exe
+image: Visual Studio 2017
 nuget:
   disable_publish_on_pr: true
 build_script:

@@ -11,6 +11,10 @@
     <DefineConstants>NET45</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <RuntimeFrameworkVersion>2.0.6</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\AutoMapper\ReflectionExtensions.cs" Link="ReflectionExtensions.cs" />
     <Compile Include="..\AutoMapper\TypeExtensions.cs" Link="TypeExtensions.cs" />
