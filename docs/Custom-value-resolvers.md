@@ -121,7 +121,7 @@ This is how to setup the mapping for this custom resolver
 
 ```c#
 Mapper.CreateMap<Source, Dest>()
-    .ForMember(d => d.Foo, opt => opt.ResolveUsing((src, dest, destMember, res) => res.Context.Options.Items["Foo"]));
+    .ForMember(dest => dest.Foo, opt => opt.ResolveUsing((src, dest, destMember, context) => context.Items["Foo"]));
 ```
 
 ### ForPath
