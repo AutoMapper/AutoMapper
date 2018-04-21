@@ -283,7 +283,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // apply null guards in case the feature is enabled
             if (_mapper.ConfigurationProvider.EnableNullPropagationForQueryMapping)
             {
-                var nullGuardVisitor = new ExpressionBuilder.NullsafeQueryRewriter();
+                var nullGuardVisitor = new NullsafeQueryRewriter();
                 sourceExpression = nullGuardVisitor.Visit(sourceExpression);
             }
             // call aftervisitors
