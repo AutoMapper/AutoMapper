@@ -110,9 +110,16 @@ Mapper.Initialize(cfg => {
 // Perform Mapping
 var order = new OnlineOrder { Referrer = "google" };
 var mapped = Mapper.Map(order, order.GetType(), typeof(OrderDto));
-Assert.Equals("google", mapped.Referrer);
+Assert.IsNull(mapped.Referrer);
 ```
 
 Notice that in our mapping configuration, we have ignored `Referrer` (because it doesn't exist in the order base class) and that has a higher priority than convention mapping, so the property doesn't get mapped.
+
+If you do want the `Referrer` property to be mapped in the mapping from `OnlineOrder` to `OrderDto` you should include an explicit mapping in the mapping like this:
+
+```
+    cfg.CreateMap<OnlineOrder, OrderDto>()
+        .ForMember(o=>o.Referrer, m=>m.MapFrom(x=>x.Referrer));
+```
 
 Overall this feature should make using AutoMapper with classes that leverage inheritance feel more natural.
