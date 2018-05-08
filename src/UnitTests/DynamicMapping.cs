@@ -347,7 +347,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         {
             new Action(() => Mapper.Map<Source, Dest>(new Source()))
                 .ShouldThrowException<AutoMapperConfigurationException>(
-                    ex=>ex.Message.ShouldContain("AutoMapper created this type map for you, but your types cannot be mapped using the default configuration.", Case.Sensitive));
+                    ex=>ex.Message.ShouldContain("AutoMapper created this type map for you, but your types cannot be mapped using the current configuration.", Case.Sensitive));
         }
     }
 

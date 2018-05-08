@@ -81,7 +81,7 @@ namespace AutoMapper
                         message.AppendLine(new string('=', len));
                         if(error.TypeMap.IsConventionMap)
                         {
-                            message.AppendLine("AutoMapper created this type map for you, but your types cannot be mapped using the default configuration.");
+                            message.AppendLine("AutoMapper created this type map for you, but your types cannot be mapped using the current configuration.");
                         }
                         message.AppendLine(error.TypeMap.SourceType.Name + " -> " + error.TypeMap.DestinationType.Name +
                                            " (" +
