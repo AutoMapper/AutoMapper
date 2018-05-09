@@ -6,6 +6,7 @@ using static System.Linq.Expressions.Expression;
 using System.Reflection;
 using AutoMapper.Mappers.Internal;
 using AutoMapper.Internal;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.XpressionMapper.Extensions
 {
@@ -24,23 +25,44 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (expression == null)
                 return default(TDestDelegate);
 
-            var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
-            var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
+            return mapper.MapExpression<TDestDelegate>
+            (
+                mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider,
+                expression,
+                expression.GetType().GetGenericArguments()[0],
+                typeof(TDestDelegate).GetGenericArguments()[0],
+                (config, mappings) => new XpressionMapperVisitor(mapper, config, mappings)
+            );
+        }
 
-            var typeMappings = new Dictionary<Type, Type>()
-                                            .AddTypeMappingsFromDelegates(typeSourceFunc, typeDestFunc);
+        private static TDestDelegate MapExpression<TDestDelegate>(this IMapper mapper,
+            IConfigurationProvider configurationProvider,
+            LambdaExpression expression,
+            Type typeSourceFunc,
+            Type typeDestFunc,
+            Func<IConfigurationProvider, Dictionary<Type, Type>, XpressionMapperVisitor> getVisitor)
+            where TDestDelegate : LambdaExpression
+        {
+            return CreateVisitor(new Dictionary<Type, Type>().AddTypeMappingsFromDelegates(configurationProvider, typeSourceFunc, typeDestFunc));
 
-            var visitor = new XpressionMapperVisitor(mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider, typeMappings);
-            var remappedBody = visitor.Visit(expression.Body);
-            if (remappedBody == null)
-                throw new InvalidOperationException(Resource.cantRemapExpression);
+            TDestDelegate CreateVisitor(Dictionary<Type, Type> typeMappings)
+                => MapBody(typeMappings, getVisitor(configurationProvider, typeMappings));
 
-            return (TDestDelegate)Lambda
-                                    (
-                                        typeDestFunc,
-                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
-                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
-                                    );
+            TDestDelegate MapBody(Dictionary<Type, Type> typeMappings, XpressionMapperVisitor visitor)
+                => GetLambda(typeMappings, visitor, visitor.Visit(expression.Body));
+
+            TDestDelegate GetLambda(Dictionary<Type, Type> typeMappings, XpressionMapperVisitor visitor, Expression remappedBody)
+            {
+                if (remappedBody == null)
+                    throw new InvalidOperationException(Resource.cantRemapExpression);
+
+                return (TDestDelegate)Lambda
+                (
+                    typeDestFunc,
+                    ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
+                    expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
+                );
+            }
         }
 
 
@@ -70,23 +92,14 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (expression == null)
                 return null;
 
-            var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
-            var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
-
-            var typeMappings = new Dictionary<Type, Type>()
-                                            .AddTypeMappingsFromDelegates(typeSourceFunc, typeDestFunc);
-
-            XpressionMapperVisitor visitor = new MapIncludesVisitor(mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider, typeMappings);
-            var remappedBody = visitor.Visit(expression.Body);
-            if (remappedBody == null)
-                throw new InvalidOperationException(Resource.cantRemapExpression);
-
-            return (TDestDelegate)Lambda
-                                    (
-                                        typeDestFunc,
-                                        ExpressionFactory.ToType(remappedBody, typeDestFunc.GetGenericArguments().Last()),
-                                        expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings)
-                                    );
+            return mapper.MapExpression<TDestDelegate>
+            (
+                mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider,
+                expression,
+                expression.GetType().GetGenericArguments()[0],
+                typeof(TDestDelegate).GetGenericArguments()[0],
+                (config, mappings) => new MapIncludesVisitor(mapper, config, mappings)
+            );
         }
 
         /// <summary>
@@ -173,18 +186,19 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TDest"></typeparam>
         /// <param name="typeMappings"></param>
+        /// <param name="configurationProvider"></param>
         /// <returns></returns>
-        public static Dictionary<Type, Type> AddTypeMapping<TSource, TDest>(this Dictionary<Type, Type> typeMappings)
+        public static Dictionary<Type, Type> AddTypeMapping<TSource, TDest>(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider)
             => typeMappings == null
                 ? throw new ArgumentException(Resource.typeMappingsDictionaryIsNull)
-                : typeMappings.AddTypeMapping(typeof(TSource), typeof(TDest));
+                : typeMappings.AddTypeMapping(configurationProvider, typeof(TSource), typeof(TDest));
 
         private static bool HasUnderlyingType(this Type type)
         {
             return (type.IsGenericType() && typeof(System.Collections.IEnumerable).IsAssignableFrom(type)) || type.IsArray;
         }
 
-        private static void AddUnderlyingTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        private static void AddUnderlyingTypes(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider, Type sourceType, Type destType)
         {
             var sourceArguments = !sourceType.HasUnderlyingType()
                                     ? new List<Type>()
@@ -197,23 +211,22 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (sourceArguments.Count != destArguments.Count)
                 throw new ArgumentException(Resource.invalidArgumentCount);
 
-            sourceArguments.Aggregate(typeMappings, (dic, next) =>
+            for (int i = 0; i < sourceArguments.Count; i++)
             {
-                if (!dic.ContainsKey(next) && next != destArguments[sourceArguments.IndexOf(next)])
-                    dic.AddTypeMapping(next, destArguments[sourceArguments.IndexOf(next)]);
-
-                return dic;
-            });
+                if (!typeMappings.ContainsKey(sourceArguments[i]) && sourceArguments[i] != destArguments[i])
+                    typeMappings.AddTypeMapping(configurationProvider, sourceArguments[i], destArguments[i]);
+            }
         }
 
         /// <summary>
         /// Adds a new source and destination key-value pair to a dictionary of type mappings based on the arguments.
         /// </summary>
         /// <param name="typeMappings"></param>
+        /// <param name="configurationProvider"></param>
         /// <param name="sourceType"></param>
         /// <param name="destType"></param>
         /// <returns></returns>
-        public static Dictionary<Type, Type> AddTypeMapping(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        public static Dictionary<Type, Type> AddTypeMapping(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider, Type sourceType, Type destType)
         {
             if (typeMappings == null)
                 throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
@@ -228,15 +241,18 @@ namespace AutoMapper.XpressionMapper.Extensions
             {
                 typeMappings.Add(sourceType, destType);
                 if (typeof(Delegate).IsAssignableFrom(sourceType))
-                    typeMappings.AddTypeMappingsFromDelegates(sourceType, destType);
+                    typeMappings.AddTypeMappingsFromDelegates(configurationProvider, sourceType, destType);
                 else
-                    typeMappings.AddUnderlyingTypes(sourceType, destType);
+                {
+                    typeMappings.AddUnderlyingTypes(configurationProvider, sourceType, destType);
+                    typeMappings.FindChildPropertyTypeMaps(configurationProvider, sourceType, destType);
+                }
             }
 
             return typeMappings;
         }
 
-        private static Dictionary<Type, Type> AddTypeMappingsFromDelegates(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
+        private static Dictionary<Type, Type> AddTypeMappingsFromDelegates(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider, Type sourceType, Type destType)
         {
             if (typeMappings == null)
                 throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
@@ -247,13 +263,46 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (sourceArguments.Count != destArguments.Count)
                 throw new ArgumentException(Resource.invalidArgumentCount);
 
-            return sourceArguments.Aggregate(typeMappings, (dic, next) =>
+            for (int i = 0; i < sourceArguments.Count; i++)
             {
-                if (!dic.ContainsKey(next) && next != destArguments[sourceArguments.IndexOf(next)])
-                    dic.AddTypeMapping(next, destArguments[sourceArguments.IndexOf(next)]);
+                if (!typeMappings.ContainsKey(sourceArguments[i]) && sourceArguments[i] != destArguments[i])
+                    typeMappings.AddTypeMapping(configurationProvider, sourceArguments[i], destArguments[i]);
+            }
 
-                return dic;
-            });
+            return typeMappings;
+        }
+
+        private static void FindChildPropertyTypeMaps(this Dictionary<Type, Type> typeMappings, IConfigurationProvider ConfigurationProvider, Type source, Type dest)
+        {
+            //The destination becomes the source because to map a source expression to a destination expression,
+            //we need the expressions used to create the source from the destination
+            var typeMap = ConfigurationProvider.ResolveTypeMap(sourceType: dest, destinationType: source);
+
+            if (typeMap == null)
+                return;
+
+            FindMaps(typeMap.GetPropertyMaps().ToList());
+            void FindMaps(List<PropertyMap> maps)
+            {
+                foreach (PropertyMap pm in maps)
+                {
+                    if (pm.SourceMember == null)
+                        continue;
+
+                    AddChildMappings
+                    (
+                        source.GetFieldOrProperty(pm.DestinationProperty.Name).GetMemberType(),
+                        pm.SourceMember.GetMemberType()
+                    );
+                    void AddChildMappings(Type sourcePropertyType, Type destPropertyType)
+                    {
+                        if (sourcePropertyType.IsLiteralType() || destPropertyType.IsLiteralType())
+                            return;
+
+                        typeMappings.AddTypeMapping(ConfigurationProvider, sourcePropertyType, destPropertyType);
+                    }
+                }
+            }
         }
     }
 }
