@@ -37,11 +37,7 @@ namespace AutoMapper.Execution
             name.SetPublicKey(privateKey);
             name.SetPublicKeyToken(privateKeyToken);
 
-#if NET40
-            AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-#else
             AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-#endif
 
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }

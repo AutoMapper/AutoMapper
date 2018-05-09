@@ -179,7 +179,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             // find replacement method that has no more predicates
                             replacementMethod = typeof(Queryable).GetAllMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-#if NET45 || NET40
+#if NET45
                                             && m.GetParameters().All(p => typeof(Queryable).IsAssignableFrom(p.Member.ReflectedType))
 #endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
@@ -283,7 +283,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // apply null guards in case the feature is enabled
             if (_mapper.ConfigurationProvider.EnableNullPropagationForQueryMapping)
             {
-                var nullGuardVisitor = new ExpressionBuilder.NullsafeQueryRewriter();
+                var nullGuardVisitor = new NullsafeQueryRewriter();
                 sourceExpression = nullGuardVisitor.Visit(sourceExpression);
             }
             // call aftervisitors

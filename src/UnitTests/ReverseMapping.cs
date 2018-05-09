@@ -3,6 +3,7 @@ using Shouldly;
 using System.Linq;
 using System;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace AutoMapper.UnitTests
 {

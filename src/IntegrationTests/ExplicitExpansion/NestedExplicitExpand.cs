@@ -69,7 +69,7 @@ namespace AutoMapper.IntegrationTests.Net4
             Check(dtos);
         }
 
-        public void Check(Class1DTO[] dtos)
+        private void Check(Class1DTO[] dtos)
         {
             dtos.Length.ShouldBe(3);
             dtos.Select(d => d.IdDTO).ShouldBe(new[] { 1, 2, 3 });

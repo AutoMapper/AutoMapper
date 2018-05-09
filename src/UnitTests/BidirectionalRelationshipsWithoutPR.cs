@@ -14,32 +14,41 @@ namespace AutoMapper.UnitTests
         {
             public InnerSource Inner;
             public OtherInnerSource OtherInner;
+            public Item Value1;
+            public Item Value2;
         }
 
         class InnerSource
         {
-            public int Value;
+            public Item Value;
         }
 
         class OtherInnerSource
         {
-            public int Value;
+            public Item Value;
         }
 
         class InnerDestination
         {
-            public int Value;
+            public Item Value;
         }
 
         class OtherInnerDestination
         {
-            public int Value;
+            public Item Value;
         }
 
         class Destination
         {
             public InnerDestination Inner;
             public OtherInnerDestination OtherInner;
+            public Item Value1;
+            public Item Value2;
+        }
+
+        class Item
+        {
+            public int Value;
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
@@ -47,13 +56,13 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<InnerSource, InnerDestination>();
             cfg.CreateMap<OtherInnerSource, OtherInnerDestination>();
-            cfg.CreateMap<int, int>();
+            cfg.CreateMap<Item, Item>();
         });
 
         [Fact]
         public void Should_not_set_preserve_references()
         {
-            Configuration.ResolveTypeMap(typeof(int), typeof(int)).PreserveReferences.ShouldBeFalse();
+            Configuration.ResolveTypeMap(typeof(Item), typeof(Item)).PreserveReferences.ShouldBeFalse();
         }
     }
 

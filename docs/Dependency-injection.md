@@ -104,11 +104,7 @@ public class MapperProvider
         var mce = new MapperConfigurationExpression();
         mce.ConstructServicesUsing(_container.GetInstance);
 
-        var profiles = typeof(SomeProfile).Assembly.GetTypes()
-            .Where(t => typeof(Profile).IsAssignableFrom(t))
-            .ToList();
-
-        mce.AddProfiles(profiles);
+        mce.AddProfiles(typeof(SomeProfile).Assembly);
 
         var mc = new MapperConfiguration(mce);
         mc.AssertConfigurationIsValid();

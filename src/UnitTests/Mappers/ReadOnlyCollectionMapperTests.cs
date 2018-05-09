@@ -10,14 +10,10 @@ namespace AutoMapper.UnitTests.Mappers
 {
     public class ReadOnlyCollectionMapperTests
     {
-        SourceAsEnumerable _sourceAsEnumerable;
-        private IMapper _mapper;
+        readonly SourceAsEnumerable _sourceAsEnumerable;
+        private readonly IMapper _mapper;
 
         public ReadOnlyCollectionMapperTests()
-        {
-            SetUp();
-        }
-        public void SetUp()
         {
             _sourceAsEnumerable = new SourceAsEnumerable()
             {

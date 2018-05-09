@@ -122,6 +122,10 @@ namespace AutoMapper
 
         IExpressionBuilder ExpressionBuilder { get; }
 
+        IEnumerable<IExpressionResultConverter> ResultConverters { get; }
+
+        IEnumerable<IExpressionBinder> Binders { get; }
+
         /// <summary>
         /// Create a mapper instance based on this configuration. Mapper instances are lightweight and can be created as needed.
         /// </summary>

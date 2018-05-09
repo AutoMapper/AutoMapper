@@ -5,16 +5,16 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
-using AutoMapper.Internal;
 using AutoMapper.Execution;
+using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
     using static ExpressionFactory;
-    using TypePairCount = IDictionary<ExpressionRequest, int>;
     using ParameterBag = IDictionary<string, object>;
+    using TypePairCount = IDictionary<ExpressionRequest, int>;
 
     public interface IExpressionBuilder
     {
@@ -25,22 +25,24 @@ namespace AutoMapper.QueryableExtensions
 
     public class ExpressionBuilder : IExpressionBuilder
     {
-        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
-        {
-            new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter()
-        };
+        internal static List<IExpressionResultConverter> DefaultResultConverters() =>
+            new List<IExpressionResultConverter>
+            {
+                new MemberResolverExpressionResultConverter(),
+                new MemberGetterExpressionResultConverter()
+            };
 
-        private static readonly IExpressionBinder[] Binders =
-        {
-            new CustomProjectionExpressionBinder(),
-            new NullableDestinationExpressionBinder(),
-            new NullableSourceExpressionBinder(),
-            new AssignableExpressionBinder(),
-            new EnumerableExpressionBinder(),
-            new MappedTypeExpressionBinder(),
-            new StringExpressionBinder()
-        };
+        internal static List<IExpressionBinder> DefaultBinders() =>
+            new List<IExpressionBinder>
+            {
+                new CustomProjectionExpressionBinder(),
+                new NullableDestinationExpressionBinder(),
+                new NullableSourceExpressionBinder(),
+                new AssignableExpressionBinder(),
+                new EnumerableExpressionBinder(),
+                new MappedTypeExpressionBinder(),
+                new StringExpressionBinder()
+            };
 
         private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
@@ -102,7 +104,7 @@ namespace AutoMapper.QueryableExtensions
         public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             // this is the input parameter of this expression with name <variableName>
-            var instanceParameter = Parameter(request.SourceType, "dto");
+            var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
             var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
             if(letPropertyMaps.Count > 0)
             {
@@ -207,8 +209,10 @@ namespace AutoMapper.QueryableExtensions
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request, TypeMap typeMap, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => 
-                (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationProperty)) && pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty)))
+            foreach (var propertyMap in typeMap.GetPropertyMaps()
+                                               .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationProperty)) && 
+                                                            pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationProperty))
+                                               .OrderBy(pm => pm.DestinationProperty.Name))
             {
                 letPropertyMaps.Push(propertyMap);
 
@@ -216,6 +220,7 @@ namespace AutoMapper.QueryableExtensions
 
                 letPropertyMaps.Pop();
             }
+
             return bindings;
             void CreateMemberBinding(PropertyMap propertyMap)
             {
@@ -226,7 +231,7 @@ namespace AutoMapper.QueryableExtensions
                 {
                     return;
                 }
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+                var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
                 if(binder == null)
                 {
                     var message =
@@ -250,13 +255,11 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
-            Expression instanceParameter, LetPropertyMaps letPropertyMaps)
+        private ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
 
-            var matchingExpressionConverter =
-                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+            var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
             result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps) 
                 ?? throw new Exception("Can't resolve this to Queryable Expression");
 
@@ -325,136 +328,6 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        /// <summary>
-        /// Expression visitor for making member access null-safe.
-        /// </summary>
-        /// <remarks>
-        /// Copied from NeinLinq (MIT License): https://github.com/axelheer/nein-linq/blob/master/src/NeinLinq/NullsafeQueryRewriter.cs
-        /// </remarks>
-        internal class NullsafeQueryRewriter : ExpressionVisitor
-        {
-            static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(Fallback);
-
-            /// <inheritdoc />
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node == null)
-                    throw new ArgumentNullException(nameof(node));
-
-                var target = Visit(node.Expression);
-
-                if (!IsSafe(target))
-                {
-                    // insert null-check before accessing property or field
-                    return BeSafe(target, node, node.Update);
-                }
-
-                return node.Update(target);
-            }
-
-            /// <inheritdoc />
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                if (node == null)
-                    throw new ArgumentNullException(nameof(node));
-
-                var target = Visit(node.Object);
-
-                if (!IsSafe(target))
-                {
-                    // insert null-check before invoking instance method
-                    return BeSafe(target, node, fallback => node.Update(fallback, node.Arguments));
-                }
-
-                var arguments = Visit(node.Arguments);
-
-                if (IsExtensionMethod(node.Method) && !IsSafe(arguments[0]))
-                {
-                    // insert null-check before invoking extension method
-                    return BeSafe(arguments[0], node.Update(null, arguments), fallback =>
-                    {
-                        var args = new Expression[arguments.Count];
-                        arguments.CopyTo(args, 0);
-                        args[0] = fallback;
-
-                        return node.Update(null, args);
-                    });
-                }
-
-                return node.Update(target, arguments);
-            }
-
-            static Expression BeSafe(Expression target, Expression expression, Func<Expression, Expression> update)
-            {
-                var fallback = Cache.GetOrAdd(target.Type);
-
-                if (fallback != null)
-                {
-                    // coalesce instead, a bit intrusive but fast...
-                    return update(Expression.Coalesce(target, fallback));
-                }
-
-                // target can be null, which is why we are actually here...
-                var targetFallback = Expression.Constant(null, target.Type);
-
-                // expression can be default or null, which is basically the same...
-                var expressionFallback = !IsNullableOrReferenceType(expression.Type)
-                    ? (Expression)Expression.Default(expression.Type) : Expression.Constant(null, expression.Type);
-
-                return Expression.Condition(Expression.Equal(target, targetFallback), expressionFallback, expression);
-            }
-
-            static bool IsSafe(Expression expression)
-            {
-                // in method call results and constant values we trust to avoid too much conditions...
-                return expression == null
-                    || expression.NodeType == ExpressionType.Call
-                    || expression.NodeType == ExpressionType.Constant
-                    || !IsNullableOrReferenceType(expression.Type);
-            }
-
-            static Expression Fallback(Type type)
-            {
-                // default values for generic collections
-                if (type.GetIsConstructedGenericType() && type.GetTypeInfo().GenericTypeArguments.Length == 1)
-                {
-                    return CollectionFallback(typeof(List<>), type)
-                        ?? CollectionFallback(typeof(HashSet<>), type);
-                }
-
-                // default value for arrays
-                if (type.IsArray)
-                {
-                    return Expression.NewArrayInit(type.GetElementType());
-                }
-
-                return null;
-            }
-
-            static Expression CollectionFallback(Type definition, Type type)
-            {
-                var collection = definition.MakeGenericType(type.GetTypeInfo().GenericTypeArguments);
-
-                // try if an instance of this collection would suffice
-                if (type.GetTypeInfo().IsAssignableFrom(collection.GetTypeInfo()))
-                {
-                    return Expression.Convert(Expression.New(collection), type);
-                }
-
-                return null;
-            }
-
-            static bool IsExtensionMethod(MethodInfo element)
-            {
-                return element.IsDefined(typeof(ExtensionAttribute), false);
-            }
-
-            static bool IsNullableOrReferenceType(Type type)
-            {
-                return !type.GetTypeInfo().IsValueType || Nullable.GetUnderlyingType(type) != null;
-            }
-        }
-
 
         public class FirstPassLetPropertyMaps : LetPropertyMaps
         {
@@ -474,7 +347,7 @@ namespace AutoMapper.QueryableExtensions
                     return null;
                 }
                 var type = mapFrom.Body.Type;
-                var marker = Parameter(type, "marker" + propertyMap.DestinationProperty.Name);
+                var marker = Constant(null, type);
                 _savedPaths.Add(new PropertyPath(_currentPath.Reverse().ToArray(), marker));
                 return marker;
                 bool IsSubQuery()
@@ -504,10 +377,10 @@ namespace AutoMapper.QueryableExtensions
                     MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccesses(instanceParameter),
                     Property = new PropertyDescription
                     (
-                        string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
+                        "__"+string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
                         path.Last.SourceType
                     ),
-                    Marker = path.Marker
+                    path.Marker
                 }).ToArray();
 
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
@@ -518,11 +391,11 @@ namespace AutoMapper.QueryableExtensions
                 {
                     firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
                 }
-                var secondParameter = Parameter(letType, "dto");
+                var secondParameter = Parameter(letType, "dtoLet");
 
                 ReplaceSubQueries();
 
-                var firstExpression = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap, LetPropertyMaps.Default);
+                var firstExpression = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap, Default);
                 return new QueryExpressions(firstExpression, projection, secondParameter);
 
                 void ReplaceSubQueries()
@@ -584,6 +457,15 @@ namespace AutoMapper.QueryableExtensions
                         return base.VisitMember(node);
                     }
                     return MakeMemberAccess(_newObject, _newObject.Type.GetFieldOrProperty(node.Member.Name));
+                }
+
+                protected override Expression VisitParameter(ParameterExpression node)
+                {
+                    if(node != _oldObject)
+                    {
+                        return base.VisitParameter(node);
+                    }
+                    return _newObject;
                 }
             }
         }

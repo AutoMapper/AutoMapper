@@ -1,0 +1,12 @@
+<Project>
+
+    <PropertyGroup>
+        <VersionPrefix>7.0.0-alpha-0001</VersionPrefix>
+        <Authors>Jimmy Bogard</Authors>
+        <LangVersion>latest</LangVersion>
+        <WarningsAsErrors>true</WarningsAsErrors>
+        <NoWarn>$(NoWarn);1701;1702;1591</NoWarn>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+</Project>

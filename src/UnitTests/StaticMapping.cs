@@ -6,9 +6,7 @@
     using QueryableExtensions;
     using System;
 
-#if !NET40
     [Collection(nameof(StaticMapping))]
-#endif
     public class StaticMapping
     {
         public class ModelObject
