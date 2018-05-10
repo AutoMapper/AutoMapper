@@ -25,8 +25,9 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (expression == null)
                 return default(TDestDelegate);
 
-            return mapper.MapExpression<TDestDelegate>
+            return MapExpression<TDestDelegate>
             (
+                mapper ?? Mapper.Instance,
                 mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider,
                 expression,
                 expression.GetType().GetGenericArguments()[0],
@@ -35,7 +36,7 @@ namespace AutoMapper.XpressionMapper.Extensions
             );
         }
 
-        private static TDestDelegate MapExpression<TDestDelegate>(this IMapper mapper,
+        private static TDestDelegate MapExpression<TDestDelegate>(IMapper mapper,
             IConfigurationProvider configurationProvider,
             LambdaExpression expression,
             Type typeSourceFunc,
@@ -90,10 +91,11 @@ namespace AutoMapper.XpressionMapper.Extensions
             where TDestDelegate : LambdaExpression
         {
             if (expression == null)
-                return null;
+                return default(TDestDelegate);
 
-            return mapper.MapExpression<TDestDelegate>
+            return MapExpression<TDestDelegate>
             (
+                mapper ?? Mapper.Instance,
                 mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider,
                 expression,
                 expression.GetType().GetGenericArguments()[0],
@@ -200,22 +202,12 @@ namespace AutoMapper.XpressionMapper.Extensions
 
         private static void AddUnderlyingTypes(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider, Type sourceType, Type destType)
         {
-            var sourceArguments = !sourceType.HasUnderlyingType()
-                                    ? new List<Type>()
-                                    : ElementTypeHelper.GetElementTypes(sourceType).ToList();
-
-            var destArguments = !destType.HasUnderlyingType()
-                                    ? new List<Type>()
-                                    : ElementTypeHelper.GetElementTypes(destType).ToList();
-
-            if (sourceArguments.Count != destArguments.Count)
-                throw new ArgumentException(Resource.invalidArgumentCount);
-
-            for (int i = 0; i < sourceArguments.Count; i++)
-            {
-                if (!typeMappings.ContainsKey(sourceArguments[i]) && sourceArguments[i] != destArguments[i])
-                    typeMappings.AddTypeMapping(configurationProvider, sourceArguments[i], destArguments[i]);
-            }
+            typeMappings.DoAddTypeMappings
+            (
+                configurationProvider,
+                !sourceType.HasUnderlyingType() ? new List<Type>() : ElementTypeHelper.GetElementTypes(sourceType).ToList(),
+                !destType.HasUnderlyingType() ? new List<Type>() : ElementTypeHelper.GetElementTypes(destType).ToList()
+            );
         }
 
         /// <summary>
@@ -257,9 +249,18 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (typeMappings == null)
                 throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
 
-            var sourceArguments = sourceType.GetGenericArguments().ToList();
-            var destArguments = destType.GetGenericArguments().ToList();
+            typeMappings.DoAddTypeMappings
+            (
+                configurationProvider, 
+                sourceType.GetGenericArguments().ToList(), 
+                destType.GetGenericArguments().ToList()
+            );
 
+            return typeMappings;
+        }
+
+        private static void DoAddTypeMappings(this Dictionary<Type, Type> typeMappings, IConfigurationProvider configurationProvider, List<Type> sourceArguments, List<Type> destArguments)
+        {
             if (sourceArguments.Count != destArguments.Count)
                 throw new ArgumentException(Resource.invalidArgumentCount);
 
@@ -268,8 +269,6 @@ namespace AutoMapper.XpressionMapper.Extensions
                 if (!typeMappings.ContainsKey(sourceArguments[i]) && sourceArguments[i] != destArguments[i])
                     typeMappings.AddTypeMapping(configurationProvider, sourceArguments[i], destArguments[i]);
             }
-
-            return typeMappings;
         }
 
         private static void FindChildPropertyTypeMaps(this Dictionary<Type, Type> typeMappings, IConfigurationProvider ConfigurationProvider, Type source, Type dest)

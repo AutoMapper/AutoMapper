@@ -106,18 +106,18 @@ namespace AutoMapper.XpressionMapper
                     switch (node.Operand.NodeType)
                     {
                         case ExpressionType.Constant:
-                            return ProcessConstant(node.Operand as ConstantExpression);
-                            Expression ProcessConstant(ConstantExpression operand)
-                                => this.TypeMappings.TryGetValue(operand.Type, out Type newType)
-                                    ? Expression.Constant(Mapper.Map(operand.Value, node.Type, newType), newType)
-                                    : base.VisitUnary(node);
-
+                            return ProcessConstant((ConstantExpression)node.Operand);
                         default:
                             return base.VisitUnary(node);
                     }
                 default:
                     return base.VisitUnary(node);
             }
+
+            Expression ProcessConstant(ConstantExpression operand)
+                                => this.TypeMappings.TryGetValue(operand.Type, out Type newType)
+                                    ? Expression.Constant(Mapper.Map(operand.Value, node.Type, newType), newType)
+                                    : base.VisitUnary(node);
         }
 
         protected override Expression VisitConstant(ConstantExpression node)

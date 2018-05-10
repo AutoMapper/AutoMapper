@@ -132,8 +132,12 @@ namespace AutoMapper
             if (PrimitiveHelper.IsNullableType(type))
                 type = Nullable.GetUnderlyingType(type);
 
-            return new HashSet<Type>
-            {
+            return LiteralTypes.Contains(type);
+        }
+
+        private static HashSet<Type> LiteralTypes => new HashSet<Type>(_literalTypes);
+
+        private static Type[] _literalTypes => new Type[] {
                 typeof(bool),
                 typeof(DateTime),
                 typeof(TimeSpan),
@@ -151,8 +155,7 @@ namespace AutoMapper
                 typeof(uint),
                 typeof(ulong),
                 typeof(string)
-            }.Contains(type);
-        }
+            };
 
         public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
 
