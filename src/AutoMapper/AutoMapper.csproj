@@ -14,7 +14,7 @@
     <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/AutoMApper/AutoMapper</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AutoMapper/AutoMapper</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
