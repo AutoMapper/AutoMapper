@@ -21,7 +21,9 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
         {
-            var member = Expression.MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
+            var member = (getter is MethodInfo method)
+                ? (Expression)Expression.Call(method, expressionResolutionResult.ResolutionExpression)
+                : Expression.MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
             return new ExpressionResolutionResult(member, member.Type);
         }
 
