@@ -9,6 +9,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         public string Foo { get; set; }
         public string Bar { get; set; }
+        public int Baz { get; set; }
     }
 
     public class When_mapping_to_StringDictionary : NonValidatingSpecBase
@@ -47,6 +48,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
+            _destination.Baz.ShouldBe(0);
         }
     }
 
@@ -93,6 +95,28 @@ namespace AutoMapper.UnitTests.Mappers
         {
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
+            _destination.Baz.ShouldBe(0);
+        }
+    }
+
+    public class When_mapping_from_StringDictionary_null_to_int : NonValidatingSpecBase
+    {
+        Destination _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+        protected override void Because_of()
+        {
+            var source = new StringDictionary() { { "Foo", "Foo" }, { "Baz", null } };
+            _destination = Mapper.Map<Destination>(source);
+        }
+
+        [Fact]
+        public void Should_map_to_zero()
+        {
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBeNull();
+            _destination.Baz.ShouldBe(0);
         }
     }
 
