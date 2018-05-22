@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
-        public void Should_map_nullable_decimal_with_ResolveUsing()
+        public void Should_map_nullable_decimal()
         {
             _destination.OddNumber.ShouldBe(12);
         }
