@@ -12,6 +12,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         public string Bar { get; set; }
         internal string Jack { get; set; }
         public int[] Data { get; set; }
+        public int Baz { get; set; }
     }
 
     public class DynamicDictionary : DynamicObject
@@ -63,10 +64,11 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             var config = new MapperConfiguration(cfg => { });
             var data = new[] { 1, 2, 3 };
-            _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar", Data = data });
-            ((int)_destination.Count).ShouldBe(3);
+            _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar", Data = data, Baz = 12 });
+            ((int)_destination.Count).ShouldBe(4);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
+            Assert.Equal(12, _destination.Baz);
             ((int[])_destination.Data).SequenceEqual(data).ShouldBeTrue();
         }
     }
@@ -129,6 +131,24 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
+        }
+    }
+
+    public class When_mapping_from_dynamic_null_to_int
+    {
+        Destination _destination;
+
+        [Fact]
+        public void Should_map_to_zero()
+        {
+            dynamic source = new DynamicDictionary();
+            source.Foo = "Foo";
+            source.Baz = null;
+            var config = new MapperConfiguration(cfg => { });
+            _destination = config.CreateMapper().Map<Destination>(source);
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBeNull();
+            _destination.Baz.ShouldBe(0);
         }
     }
 
