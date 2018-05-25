@@ -90,17 +90,3 @@ Mapper.Initialize(cfg =>
       });
 });
 ```
-
-### Case 3 - Implicit null checking
-
-When using the `MapFrom` method it is often not necessary to use either a `Condition` or a `PreCondition` as AutoMapper will perform null-checking along the way.
-
-```c#
-Mapper.Initialize(cfg =>
-{
-  cfg.CreateMap<Person, Dest>()
-      .ForMember(target => target.Address, opt =>
-      {
-        opt.MapFrom(source => string.Join("\r\n", source.Address.Lines));
-      });
-});```
