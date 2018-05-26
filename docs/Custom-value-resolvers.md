@@ -128,7 +128,7 @@ Mapper.CreateMap<Source, Dest>()
 
 For each property mapping, AutoMapper attempts to resolve the destination value **before** evaluating the condition. So it needs to be able to do that without throwing an exception even if the condition will prevent the resulting value from being used.
 
-As an example, here's sample output from [BuildExecutionPlan](Understanding-your-mapping.md) (processed using [ReadableExpressions](https://www.nuget.org/packages/AgileObjects.ReadableExpressions)) for a single property:
+As an example, here's sample output from [BuildExecutionPlan](Understanding-your-mapping.md) (displayed using [ReadableExpressions](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1232914.ReadableExpressionsVisualizers)) for a single property:
 
 ```c#
 try
