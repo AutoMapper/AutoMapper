@@ -25,3 +25,4 @@ Mapper.Initialize(cfg => {
 ## Preconditions
 
 Similarly, there is a precondition. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom or ResolveUsing). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned. You can [see the steps](Understanding-your-mapping.html) yourself.
+See [here](https://github.com/AutoMapper/AutoMapper/blob/a2ed909bcedd56ef414d3899e81c3fc7cee5bdf9/docs/Custom-value-resolvers.md#resolvers-and-conditions) for a concrete example.
