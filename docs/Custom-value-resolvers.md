@@ -124,6 +124,10 @@ Mapper.CreateMap<Source, Dest>()
     .ForMember(dest => dest.Foo, opt => opt.ResolveUsing((src, dest, destMember, context) => context.Items["Foo"]));
 ```
 
+### ForPath
+
+Similar to ForMember, from 6.1.0 there is ForPath. Check out [the tests](https://github.com/AutoMapper/AutoMapper/search?utf8=%E2%9C%93&q=ForPath&type=) for examples.
+
 ### Resolvers and conditions
 
 For each property mapping, AutoMapper attempts to resolve the destination value **before** evaluating the condition. So it needs to be able to do that without throwing an exception even if the condition will prevent the resulting value from being used.
@@ -195,7 +199,3 @@ Prevent this by using a [PreCondition](Conditional-mapping.md#preconditions) ins
 ```c#
 	.ForMember(d => d.ValueLength, o => o.MapFrom(s => s != null ? s.Value.Length : 0))
 ```
-
-### ForPath
-
-Similar to ForMember, from 6.1.0 there is ForPath. Check out [the tests](https://github.com/AutoMapper/AutoMapper/search?utf8=%E2%9C%93&q=ForPath&type=) for examples.
