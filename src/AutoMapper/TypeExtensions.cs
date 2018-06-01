@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 
 namespace AutoMapper
 {
+    using AutoMapper.Configuration.Internal;
 #if NET45
     using System.Reflection.Emit;
 #endif
@@ -126,7 +127,35 @@ namespace AutoMapper
 
         public static bool IsValueType(this Type type) => type.GetTypeInfo().IsValueType;
 
-        public static bool IsLiteralType(this Type type) => type == typeof(string) || type.GetTypeInfo().IsValueType;
+        public static bool IsLiteralType(this Type type)
+        {
+            if (PrimitiveHelper.IsNullableType(type))
+                type = Nullable.GetUnderlyingType(type);
+
+            return LiteralTypes.Contains(type);
+        }
+
+        private static HashSet<Type> LiteralTypes => new HashSet<Type>(_literalTypes);
+
+        private static Type[] _literalTypes => new Type[] {
+                typeof(bool),
+                typeof(DateTime),
+                typeof(TimeSpan),
+                typeof(Guid),
+                typeof(decimal),
+                typeof(byte),
+                typeof(short),
+                typeof(int),
+                typeof(long),
+                typeof(float),
+                typeof(double),
+                typeof(char),
+                typeof(sbyte),
+                typeof(ushort),
+                typeof(uint),
+                typeof(ulong),
+                typeof(string)
+            };
 
         public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
 

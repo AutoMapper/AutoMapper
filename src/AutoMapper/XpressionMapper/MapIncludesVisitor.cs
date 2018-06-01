@@ -11,8 +11,8 @@ namespace AutoMapper.XpressionMapper
 {
     public class MapIncludesVisitor : XpressionMapperVisitor
     {
-        public MapIncludesVisitor(IConfigurationProvider configurationProvider, Dictionary<Type, Type> typeMappings)
-            : base(configurationProvider, typeMappings)
+        public MapIncludesVisitor(IMapper mapper, IConfigurationProvider configurationProvider, Dictionary<Type, Type> typeMappings)
+            : base(mapper, configurationProvider, typeMappings)
         {
         }
 

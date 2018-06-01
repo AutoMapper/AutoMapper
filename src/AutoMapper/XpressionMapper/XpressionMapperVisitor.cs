@@ -16,8 +16,9 @@ namespace AutoMapper.XpressionMapper
 {
     public class XpressionMapperVisitor : ExpressionVisitor
     {
-        public XpressionMapperVisitor(IConfigurationProvider configurationProvider, Dictionary<Type, Type> typeMappings)
+        public XpressionMapperVisitor(IMapper mapper, IConfigurationProvider configurationProvider, Dictionary<Type, Type> typeMappings)
         {
+            Mapper = mapper;
             TypeMappings = typeMappings;
             InfoDictionary = new MapperInfoDictionary(new ParameterExpressionEqualityComparer());
             ConfigurationProvider = configurationProvider;
@@ -28,6 +29,8 @@ namespace AutoMapper.XpressionMapper
         public Dictionary<Type, Type> TypeMappings { get; }
 
         protected IConfigurationProvider ConfigurationProvider { get; }
+
+        protected IMapper Mapper { get; }
 
         protected override Expression VisitParameter(ParameterExpression parameterExpression)
         {
@@ -84,20 +87,43 @@ namespace AutoMapper.XpressionMapper
                     ? visitor.Visit(last.CustomExpression.Body.MemberAccesses(afterCustExpression))
                     : visitor.Visit(last.CustomExpression.Body);
 
-                this.TypeMappings.AddTypeMapping(node.Type, ex.Type);
+                this.TypeMappings.AddTypeMapping(ConfigurationProvider, node.Type, ex.Type);
                 return ex;
             }
             fullName = BuildFullName(propertyMapInfoList);
             var me = ExpressionFactory.MemberAccesses(fullName, InfoDictionary[parameterExpression].NewParameter);
 
-            this.TypeMappings.AddTypeMapping(node.Type, me.Type);
+            this.TypeMappings.AddTypeMapping(ConfigurationProvider, node.Type, me.Type);
             return me;
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            switch (node.NodeType)
+            {
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    switch (node.Operand.NodeType)
+                    {
+                        case ExpressionType.Constant:
+                            return ProcessConstant((ConstantExpression)node.Operand);
+                        default:
+                            return base.VisitUnary(node);
+                    }
+                default:
+                    return base.VisitUnary(node);
+            }
+
+            Expression ProcessConstant(ConstantExpression operand)
+                                => this.TypeMappings.TryGetValue(operand.Type, out Type newType)
+                                    ? Expression.Constant(Mapper.Map(operand.Value, node.Type, newType), newType)
+                                    : base.VisitUnary(node);
         }
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
             if (this.TypeMappings.TryGetValue(node.Type, out Type newType))
-                return base.VisitConstant(Expression.Constant(node.Value, newType));
+                return base.VisitConstant(Expression.Constant(Mapper.Map(node.Value, node.Type, newType), newType));
 
             return base.VisitConstant(node);
         }
@@ -113,7 +139,7 @@ namespace AutoMapper.XpressionMapper
             var listOfArgumentsForNewMethod = node.Arguments.Aggregate(new List<Expression>(), (lst, next) =>
             {
                 var mappedNext = ArgumentMapper.Create(this, next).MappedArgumentExpression;
-                TypeMappings.AddTypeMapping(next.Type, mappedNext.Type);
+                TypeMappings.AddTypeMapping(ConfigurationProvider, next.Type, mappedNext.Type);
 
                 lst.Add(mappedNext);
                 return lst;
@@ -124,23 +150,34 @@ namespace AutoMapper.XpressionMapper
                 ? node.Method.GetGenericArguments().Select(i => TypeMappings.ContainsKey(i) ? TypeMappings[i] : i).ToList()//not converting the type it is not in the typeMappings dictionary
                 : null;
 
-            MethodCallExpression resultExp;
-            if (!node.Method.IsStatic)
-            {
-                var instance = ArgumentMapper.Create(this, node.Object).MappedArgumentExpression;
+            ConvertTypesIfNecessary(node.Method.GetParameters(), listOfArgumentsForNewMethod, node.Method);
 
-                resultExp = node.Method.IsGenericMethod
+            return node.Method.IsStatic
+                    ? GetStaticExpression()
+                    : GetInstanceExpression(ArgumentMapper.Create(this, node.Object).MappedArgumentExpression);
+
+            MethodCallExpression GetInstanceExpression(Expression instance)
+                => node.Method.IsGenericMethod
                     ? Expression.Call(instance, node.Method.Name, typeArgsForNewMethod.ToArray(), listOfArgumentsForNewMethod.ToArray())
                     : Expression.Call(instance, node.Method, listOfArgumentsForNewMethod.ToArray());
-            }
-            else
-            {
-                resultExp = node.Method.IsGenericMethod
+
+            MethodCallExpression GetStaticExpression()
+                => node.Method.IsGenericMethod
                     ? Expression.Call(node.Method.DeclaringType, node.Method.Name, typeArgsForNewMethod.ToArray(), listOfArgumentsForNewMethod.ToArray())
                     : Expression.Call(node.Method, listOfArgumentsForNewMethod.ToArray());
-            }
+        }
 
-            return resultExp;
+        void ConvertTypesIfNecessary(ParameterInfo[] parameters, List<Expression> listOfArgumentsForNewMethod, MethodInfo mInfo)
+        {
+            if (mInfo.IsGenericMethod)
+                return;
+
+            for (int i = 0; i < listOfArgumentsForNewMethod.Count; i++)
+            {
+                if (listOfArgumentsForNewMethod[i].Type != parameters[i].ParameterType
+                    && parameters[i].ParameterType.IsAssignableFrom(listOfArgumentsForNewMethod[i].Type))
+                    listOfArgumentsForNewMethod[i] = Expression.Convert(listOfArgumentsForNewMethod[i], parameters[i].ParameterType);
+            }
         }
 
         protected string BuildFullName(List<PropertyMapInfo> propertyMapInfoList)
@@ -233,15 +270,22 @@ namespace AutoMapper.XpressionMapper
                 {
                     throw new InvalidOperationException(Resource.customResolversNotSupported);
                 }
-                if (propertyMap.CustomExpression != null)
+
+                if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, sourceFullName));
+
+                CompareSourceAndDestLiterals
+                (
+                    propertyMap.CustomExpression != null ? propertyMap.CustomExpression.ReturnType : propertyMap.SourceMember.GetMemberType(),
+                    propertyMap.CustomExpression != null ? propertyMap.CustomExpression.ToString() : propertyMap.SourceMember.Name,
+                    sourceMemberInfo.GetMemberType()
+                );
+
+                void CompareSourceAndDestLiterals(Type mappedPropertyType, string mappedPropertyDescription, Type sourceMemberType)
                 {
-                    if (propertyMap.CustomExpression.ReturnType.IsValueType() && sourceMemberInfo.GetMemberType() != propertyMap.CustomExpression.ReturnType)
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.expressionMapValueTypeMustMatchFormat, propertyMap.CustomExpression.ReturnType.Name, propertyMap.CustomExpression.ToString(), sourceMemberInfo.GetMemberType().Name, propertyMap.DestinationProperty.Name));
-                }
-                else
-                {
-                    if (propertyMap.SourceMember.GetMemberType().IsValueType() && sourceMemberInfo.GetMemberType() != propertyMap.SourceMember.GetMemberType())
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.expressionMapValueTypeMustMatchFormat, propertyMap.SourceMember.GetMemberType().Name, propertyMap.SourceMember.Name, sourceMemberInfo.GetMemberType().Name, propertyMap.DestinationProperty.Name));
+                    //switch from IsValueType to IsLiteralType because we do not want to throw an exception for all structs
+                    if ((mappedPropertyType.IsLiteralType() || sourceMemberType.IsLiteralType()) && sourceMemberType != mappedPropertyType)
+                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.expressionMapValueTypeMustMatchFormat, mappedPropertyType.Name, mappedPropertyDescription, sourceMemberType.Name, propertyMap.DestinationProperty.Name));
                 }
 
                 propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMembers.ToList()));
