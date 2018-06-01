@@ -16,8 +16,7 @@ namespace AutoMapper.Mappers
                 new TypePair(sourceExpression.Type, Nullable.GetUnderlyingType(destExpression.Type)),
                 sourceExpression,
                 contextExpression,
-                propertyMap,
-                Expression.Property(destExpression, destExpression.Type.GetDeclaredProperty("Value"))
+                propertyMap
             );
 
         public TypePair GetAssociatedTypes(TypePair initialTypes)
