@@ -1,6 +1,6 @@
 # Conditional Mapping
 
-AutoMapper allows you to add conditions to properties that must be met before that property will be mapped.
+AutoMapper allows you to add conditions to properties that must be met for that property to be mapped.
 
 This can be used in situations like the following where we are trying to map from an int to an unsigned int.
 ```c#
@@ -22,6 +22,71 @@ Mapper.Initialize(cfg => {
 });
 ```
 
-## Preconditions
+## Condition vs PreCondition
 
-Similarly, there is a precondition. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom or ResolveUsing). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned. You can [see the steps](Understanding-your-mapping.html) yourself.
+In addition to the `Condition` method there is also a `PreCondition` method.
+
+The difference is that `PreCondition` runs earlier in the mapping process.
+
+1. `Mapper.Map` is executed.
+2. `PreCondition` is executed. If it returns true then the mapping for the property continues.
+3. `Map` or `ResolveUsing` is executed and the value to assign to the Target is determined.
+4. `Condition` is executed. If it returns true then the result from step #3 is assigned to the target's property.
+
+Given the following source / target classes
+
+```c#
+public class Person {
+  public Address Address { get; set; }
+}
+
+public class Address {
+  public List<string> Lines { get; set; }
+}
+
+public class Dest {
+  public string Address { get; set; }
+}
+```
+
+And the following use of AutoMapper
+
+```c#
+var source = new Person { Address = null };
+Dest dest = Mapper.Instance.Map<Dest>(s);
+```
+
+We can expect the following
+
+
+### Case 1 - Using Condition (incorrect)
+
+The `Condition` will be executed after AutoMapper has attempted to determine the value to map to the target. Before `Condition` is executed, `ResolveUsing` will already have attempted to read the `Lines` property of a null reference (`source.Address`), and an exception would have been thrown. 
+
+```c#
+Mapper.Initialize(cfg =>
+{
+  cfg.CreateMap<Person, Dest>()
+      .ForMember(target => target.Address, opt =>
+      {
+        opt.Condition(source => source?.Address?.Lines != null);
+        opt.ResolveUsing(source => string.Join("\r\n", source.Address.Lines));
+      });
+});
+```
+
+### Case 2 - Using PreCondition (correct)
+
+The `PreCondition` will prevent the mapping to `dest.Address` from executing. `dest.Address` will be null, and no exception will be thrown.
+
+```c#
+Mapper.Initialize(cfg =>
+{
+  cfg.CreateMap<Person, Dest>()
+      .ForMember(target => target.Address, opt =>
+      {
+        opt.PreCondition(source => source?.Address?.Lines != null);
+        opt.ResolveUsing(source => string.Join("\r\n", source.Address.Lines));
+      });
+});
+```
