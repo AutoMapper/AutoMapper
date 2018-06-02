@@ -132,7 +132,7 @@ Similar to ForMember, from 6.1.0 there is ForPath. Check out [the tests](https:/
 
 For each property mapping, AutoMapper attempts to resolve the destination value **before** evaluating the condition. So it needs to be able to do that without throwing an exception even if the condition will prevent the resulting value from being used.
 
-As an example, here's sample output from [BuildExecutionPlan](Understanding-your-mapping.md) (displayed using [ReadableExpressions](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1232914.ReadableExpressionsVisualizers)) for a single property:
+As an example, here's sample output from [BuildExecutionPlan](Understanding-your-mapping.html) (displayed using [ReadableExpressions](https://marketplace.visualstudio.com/items?itemName=vs-publisher-1232914.ReadableExpressionsVisualizers)) for a single property:
 
 ```c#
 try
@@ -194,7 +194,7 @@ CreateMap<SourceClass, TargetClass>()
 ```
 The condition prevents the Value property from being mapped onto the target, but the custom member mapping would fail before that point because it calls Value.Length, and Value is null. 
 
-Prevent this by using a [PreCondition](Conditional-mapping.md#preconditions) instead or by ensuring the custom member mapping code can complete safely regardless of conditions:
+Prevent this by using a [PreCondition](Conditional-mapping.html#preconditions) instead or by ensuring the custom member mapping code can complete safely regardless of conditions:
 
 ```c#
 	.ForMember(d => d.ValueLength, o => o.MapFrom(s => s != null ? s.Value.Length : 0))
