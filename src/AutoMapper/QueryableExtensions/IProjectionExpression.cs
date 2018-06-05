@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions
 {
@@ -61,5 +62,7 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="parameters">Parameters for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
         IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters, params Expression<Func<TResult, object>>[] membersToExpand);
+
+        IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters, IEnumerable<IEnumerable<MemberInfo>> memberPathsToExpand);
     }
 }

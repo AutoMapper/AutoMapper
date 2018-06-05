@@ -34,16 +34,6 @@ namespace AutoMapper.QueryableExtensions
         public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config) 
             => QueryMapperVisitor.Map(sourceQuery, destQuery, config);
 
-        [Obsolete("Uses static API internally (Mapper.Configuration) - will be dropped in v5")]
-        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource)
-            => dataSource.UseAsDataSource(Mapper.Configuration?.CreateMapper());
-
-        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IConfigurationProvider config)
-            => dataSource.UseAsDataSource(config.CreateMapper());
-
-        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IMapper mapper)
-            => new QueryDataSourceInjection<TSource>(dataSource, mapper);
-
         /// <summary>
         /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>

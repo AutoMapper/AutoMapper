@@ -36,8 +36,6 @@ task compile -depends clean {
 	exec { dotnet --version }
 	exec { dotnet --info }
 
-	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
-	
     exec { dotnet build -c $config --version-suffix=$buildSuffix }
 
 	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build $versionSuffix }
@@ -51,7 +49,7 @@ task test {
     Push-Location -Path $source_dir\UnitTests
 
     try {
-        exec { & dotnet xunit -configuration Release }
+        exec { & dotnet test -c Release --no-build --no-restore }
     } finally {
         Pop-Location
     }
@@ -59,7 +57,7 @@ task test {
     Push-Location -Path $source_dir\IntegrationTests
 
     try {
-        exec { & dotnet xunit -configuration Release }
+        exec { & dotnet test -c Release --no-build --no-restore }
     } finally {
         Pop-Location
     }

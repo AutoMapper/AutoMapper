@@ -11,24 +11,19 @@
     <DefineConstants>NET45</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <RuntimeFrameworkVersion>2.0.6</RuntimeFrameworkVersion>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\AutoMapper\ReflectionExtensions.cs" Link="ReflectionExtensions.cs" />
     <Compile Include="..\AutoMapper\TypeExtensions.cs" Link="TypeExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Shouldly" Version="2.8.3" />
-    <PackageReference Include="FakeItEasy" Version="3.4.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
+    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="FakeItEasy" Version="4.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
   </ItemGroup>
 
