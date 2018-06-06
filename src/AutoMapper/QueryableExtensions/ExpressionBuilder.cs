@@ -458,15 +458,6 @@ namespace AutoMapper.QueryableExtensions
                     }
                     return MakeMemberAccess(_newObject, _newObject.Type.GetFieldOrProperty(node.Member.Name));
                 }
-
-                protected override Expression VisitParameter(ParameterExpression node)
-                {
-                    if(node != _oldObject)
-                    {
-                        return base.VisitParameter(node);
-                    }
-                    return _newObject;
-                }
             }
         }
     }
