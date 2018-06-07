@@ -52,7 +52,7 @@ public class SetTraceIdentifierAction : IMappingAction<SomeModel, SomeOtherModel
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public MyAfterMapAction(IHttpContextAccessor httpContextAccessor)
+    public SetTraceIdentifierAction(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
