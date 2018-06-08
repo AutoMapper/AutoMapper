@@ -36,18 +36,23 @@ namespace AutoMapper.UnitTests
         {
             public int Id { get; set; }
             public string Ignored { get; set; }
+            public string MappedFrom { get; set; }
         }
 
         public class BarModel<T> : BarModelBase
         {
             public T Value { get; set; }
+            public string DerivedMember { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<BarBase, BarModelBase>().ForMember(d=>d.Ignored, o=>o.Ignore()).Include(typeof(Bar<>), typeof(BarModel<>));
+            cfg.CreateMap<BarBase, BarModelBase>()
+                .ForMember(d=>d.Ignored, o=>o.Ignore())
+                .ForMember(d=>d.MappedFrom, o=>o.MapFrom(_=>""))
+                .Include(typeof(Bar<>), typeof(BarModel<>));
             cfg.CreateMap<Person, PersonModel>();
-            cfg.CreateMap(typeof(Bar<>), typeof(BarModel<>));
+            cfg.CreateMap(typeof(Bar<>), typeof(BarModel<>)).ForMember("DerivedMember", o=>o.MapFrom("Id"));
         });
 
         [Fact]
@@ -57,7 +62,9 @@ namespace AutoMapper.UnitTests
 
             var personMapped = Mapper.Map<PersonModel>(person);
 
-            ((BarModel<string>)personMapped.BarList[0]).Value.ShouldBe("One");
+            var barModel = (BarModel<string>)personMapped.BarList[0];
+            barModel.DerivedMember.ShouldBe("1");
+
         }
     }
 
@@ -89,6 +96,7 @@ namespace AutoMapper.UnitTests
         {
             public int Id { get; set; }
             public string Ignored { get; set; }
+            public string MappedFrom { get; set; }
         }
 
         public class BarModel<T> : BarModelBase
@@ -98,7 +106,9 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof(BarBase), typeof(BarModelBase)).ForMember("Ignored", o=>o.Ignore());
+            cfg.CreateMap(typeof(BarBase), typeof(BarModelBase))
+                .ForMember("Ignored", o=>o.Ignore())
+                .ForMember("MappedFrom", o=>o.MapFrom("Id"));
             cfg.CreateMap<Person, PersonModel>();
             cfg.CreateMap(typeof(Bar<>), typeof(BarModel<>)).IncludeBase(typeof(BarBase), typeof(BarModelBase));
         });

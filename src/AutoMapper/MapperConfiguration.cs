@@ -393,14 +393,15 @@ namespace AutoMapper
             ITypeMapConfiguration genericMap;
             ProfileMap profile;
             TypeMap cachedMap;
-            if(FindTypeMapFor(genericTypePair.Value) == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
+            var userMap = FindTypeMapFor(genericTypePair.Value);
+            if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
             {
                 genericTypePair = cachedMap.Types.GetOpenGenericTypePair();
                 if(genericTypePair == null)
                 {
                     return cachedMap;
                 }
-                (genericMap, profile, typePair) = (new DefaultTypeMapConfig(cachedMap.Types), cachedMap.Profile, CloseGenericTypes(cachedMap.Types, typePair));
+                (genericMap, profile, typePair) = (cachedMap.Profile.GetGenericMap(cachedMap.Types), cachedMap.Profile, CloseGenericTypes(cachedMap.Types, typePair));
             }
             else
             {
