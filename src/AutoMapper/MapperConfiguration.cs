@@ -405,7 +405,9 @@ namespace AutoMapper
             }
             else
             {
-                (genericMap, profile) = Profiles.Select(p => (GenericMap: p.GetGenericMap(typePair), p)).FirstOrDefault(p => p.GenericMap != null);
+                (genericMap, profile) = userMap == null ?
+                    Profiles.Select(p => (GenericMap: p.GetGenericMap(typePair), p)).FirstOrDefault(p => p.GenericMap != null) :
+                    (userMap.Profile.GetGenericMap(typePair), userMap.Profile);
             }
             if(genericMap == null)
             {
