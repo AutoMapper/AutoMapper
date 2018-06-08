@@ -35,6 +35,7 @@ namespace AutoMapper.UnitTests
         abstract public class BarModelBase
         {
             public int Id { get; set; }
+            public string Ignored { get; set; }
         }
 
         public class BarModel<T> : BarModelBase
@@ -44,7 +45,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<BarBase, BarModelBase>().Include(typeof(Bar<>), typeof(BarModel<>));
+            cfg.CreateMap<BarBase, BarModelBase>().ForMember(d=>d.Ignored, o=>o.Ignore()).Include(typeof(Bar<>), typeof(BarModel<>));
             cfg.CreateMap<Person, PersonModel>();
             cfg.CreateMap(typeof(Bar<>), typeof(BarModel<>));
         });
@@ -87,6 +88,7 @@ namespace AutoMapper.UnitTests
         abstract public class BarModelBase
         {
             public int Id { get; set; }
+            public string Ignored { get; set; }
         }
 
         public class BarModel<T> : BarModelBase
@@ -96,7 +98,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof(BarBase), typeof(BarModelBase));
+            cfg.CreateMap(typeof(BarBase), typeof(BarModelBase)).ForMember("Ignored", o=>o.Ignore());
             cfg.CreateMap<Person, PersonModel>();
             cfg.CreateMap(typeof(Bar<>), typeof(BarModel<>)).IncludeBase(typeof(BarBase), typeof(BarModelBase));
         });

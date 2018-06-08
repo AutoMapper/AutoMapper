@@ -228,19 +228,17 @@ namespace AutoMapper
 
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
-                if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
+                var typeMap = GetCachedMap(initialTypes, types);
+                if(typeMap != null)
                 {
-                    if (typeMap != null)
-                    {
-                        return typeMap;
-                    }
+                    return typeMap;
                 }
                 typeMap = FindTypeMapFor(types);
                 if (typeMap != null)
                 {
                     return typeMap;
                 }
-                typeMap = FindClosedGenericTypeMapFor(types);
+                typeMap = FindClosedGenericTypeMapFor(initialTypes, types);
                 if (typeMap != null)
                 {
                     return typeMap;
@@ -270,6 +268,8 @@ namespace AutoMapper
 
             return null;
         }
+
+        private TypeMap GetCachedMap(TypePair initialTypes, TypePair types) => (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap)) ? typeMap : null;
 
         public void AssertConfigurationIsValid(TypeMap typeMap)
         {
@@ -383,23 +383,56 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair initialTypes, TypePair typePair)
         {
-            if(typePair.GetOpenGenericTypePair() == null)
+            var genericTypePair = typePair.GetOpenGenericTypePair();
+            if(genericTypePair == null)
             {
                 return null;
             }
-            var mapInfo = Profiles.Select(p => new { GenericMap = p.GetGenericMap(typePair), Profile = p }).FirstOrDefault(p => p.GenericMap != null);
-            if(mapInfo == null)
+            ITypeMapConfiguration genericMap;
+            ProfileMap profile;
+            TypeMap cachedMap;
+            if(FindTypeMapFor(genericTypePair.Value) == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
+            {
+                genericTypePair = cachedMap.Types.GetOpenGenericTypePair();
+                if(genericTypePair == null)
+                {
+                    return cachedMap;
+                }
+                (genericMap, profile, typePair) = (new DefaultTypeMapConfig(cachedMap.Types), cachedMap.Profile, CloseGenericTypes(cachedMap.Types, typePair));
+            }
+            else
+            {
+                (genericMap, profile) = Profiles.Select(p => (GenericMap: p.GetGenericMap(typePair), p)).FirstOrDefault(p => p.GenericMap != null);
+            }
+            if(genericMap == null)
             {
                 return null;
             }
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, typePair, this);
+                typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
             }
             return typeMap;
+        }
+
+        private TypePair CloseGenericTypes(TypePair genericTypes, TypePair closedTypes)
+        {
+            var sourceArguments = closedTypes.SourceType.GetGenericArguments();
+            var destinationArguments = closedTypes.DestinationType.GetGenericArguments();
+            if(sourceArguments.Length == 0)
+            {
+                sourceArguments = destinationArguments;
+            }
+            else if(destinationArguments.Length == 0)
+            {
+                destinationArguments = sourceArguments;
+            }
+            var closedSourceType = genericTypes.SourceType.IsGenericTypeDefinition() ? genericTypes.SourceType.MakeGenericType(sourceArguments) : genericTypes.SourceType;
+            var closedDestinationType = genericTypes.DestinationType.IsGenericTypeDefinition() ? genericTypes.DestinationType.MakeGenericType(destinationArguments) : genericTypes.DestinationType;
+            return new TypePair(closedSourceType, closedDestinationType);
         }
 
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
