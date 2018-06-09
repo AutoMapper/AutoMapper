@@ -392,7 +392,7 @@ namespace AutoMapper
             }
             ITypeMapConfiguration genericMap;
             ProfileMap profile;
-            TypeMap cachedMap;
+            TypeMap cachedMap = null;
             var userMap = FindTypeMapFor(genericTypePair.Value);
             if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
             {
@@ -418,6 +418,7 @@ namespace AutoMapper
             {
                 typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
             }
+            cachedMap?.CopyInheritedMaps(typeMap);
             return typeMap;
         }
 

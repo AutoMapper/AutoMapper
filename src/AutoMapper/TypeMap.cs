@@ -28,7 +28,7 @@ namespace AutoMapper
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
-        private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private readonly List<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
@@ -391,5 +391,7 @@ namespace AutoMapper
                     baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath));
             _pathMaps.AddRange(notOverridenPathMaps);
         }
+
+        internal void CopyInheritedMaps(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
     }
 }
