@@ -286,13 +286,13 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(null);
+            MapExpression = CreateMapperLambda(configurationProvider, null);
         }
 
-        internal void CheckForCycles(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath)
-        {
-            new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
-        }
+        internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>
+            SourceType.IsGenericTypeDefinition() || DestinationTypeToUse.IsGenericTypeDefinition() ?
+                null :
+                new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)
         {
