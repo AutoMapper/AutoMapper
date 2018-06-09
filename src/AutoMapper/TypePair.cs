@@ -99,15 +99,31 @@ namespace AutoMapper
         public TypePair? GetOpenGenericTypePair()
         {
             var isGeneric = SourceType.IsGenericType() || DestinationType.IsGenericType();
-            if (!isGeneric)
+            if(!isGeneric)
+            {
                 return null;
-
+            }
             var sourceGenericDefinition = SourceType.IsGenericType() ? SourceType.GetGenericTypeDefinition() : SourceType;
-            var destGenericDefinition = DestinationType.IsGenericType() ? DestinationType.GetGenericTypeDefinition() : DestinationType;
+            var destinationGenericDefinition = DestinationType.IsGenericType() ? DestinationType.GetGenericTypeDefinition() : DestinationType;
 
-            var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
+            return new TypePair(sourceGenericDefinition, destinationGenericDefinition);
+        }
 
-            return genericTypePair;
+        public TypePair CloseGenericTypes(TypePair closedTypes)
+        {
+            var sourceArguments = closedTypes.SourceType.GetGenericArguments();
+            var destinationArguments = closedTypes.DestinationType.GetGenericArguments();
+            if(sourceArguments.Length == 0)
+            {
+                sourceArguments = destinationArguments;
+            }
+            else if(destinationArguments.Length == 0)
+            {
+                destinationArguments = sourceArguments;
+            }
+            var closedSourceType = SourceType.IsGenericTypeDefinition() ? SourceType.MakeGenericType(sourceArguments) : SourceType;
+            var closedDestinationType = DestinationType.IsGenericTypeDefinition() ? DestinationType.MakeGenericType(destinationArguments) : DestinationType;
+            return new TypePair(closedSourceType, closedDestinationType);
         }
 
         public IEnumerable<TypePair> GetRelatedTypePairs()

@@ -401,7 +401,7 @@ namespace AutoMapper
                 {
                     return cachedMap;
                 }
-                (genericMap, profile, typePair) = (cachedMap.Profile.GetGenericMap(cachedMap.Types), cachedMap.Profile, CloseGenericTypes(cachedMap.Types, typePair));
+                (genericMap, profile, typePair) = (cachedMap.Profile.GetGenericMap(cachedMap.Types), cachedMap.Profile, cachedMap.Types.CloseGenericTypes(typePair));
             }
             else
             {
@@ -420,23 +420,6 @@ namespace AutoMapper
             }
             cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
-        }
-
-        private TypePair CloseGenericTypes(TypePair genericTypes, TypePair closedTypes)
-        {
-            var sourceArguments = closedTypes.SourceType.GetGenericArguments();
-            var destinationArguments = closedTypes.DestinationType.GetGenericArguments();
-            if(sourceArguments.Length == 0)
-            {
-                sourceArguments = destinationArguments;
-            }
-            else if(destinationArguments.Length == 0)
-            {
-                destinationArguments = sourceArguments;
-            }
-            var closedSourceType = genericTypes.SourceType.IsGenericTypeDefinition() ? genericTypes.SourceType.MakeGenericType(sourceArguments) : genericTypes.SourceType;
-            var closedDestinationType = genericTypes.DestinationType.IsGenericTypeDefinition() ? genericTypes.DestinationType.MakeGenericType(destinationArguments) : genericTypes.DestinationType;
-            return new TypePair(closedSourceType, closedDestinationType);
         }
 
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
