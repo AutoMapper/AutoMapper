@@ -392,6 +392,6 @@ namespace AutoMapper
             _pathMaps.AddRange(notOverridenPathMaps);
         }
 
-        internal void CopyInheritedMaps(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
+        internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
     }
 }

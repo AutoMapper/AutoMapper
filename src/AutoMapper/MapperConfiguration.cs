@@ -418,7 +418,7 @@ namespace AutoMapper
             {
                 typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
             }
-            cachedMap?.CopyInheritedMaps(typeMap);
+            cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
         }
 
