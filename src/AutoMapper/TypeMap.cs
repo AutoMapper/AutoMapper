@@ -330,15 +330,6 @@ namespace AutoMapper
             return null;
         }
 
-        public void InheritTypes(TypeMap inheritedTypeMap)
-        {
-            foreach (var includedDerivedType in inheritedTypeMap._includedDerivedTypes
-                .Where(includedDerivedType => !_includedDerivedTypes.Contains(includedDerivedType)))
-            {
-                _includedDerivedTypes.Add(includedDerivedType);
-            }
-        }
-
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
             var config = _sourceMemberConfigs.FirstOrDefault(smc => Equals(smc.SourceMember, sourceMember));
