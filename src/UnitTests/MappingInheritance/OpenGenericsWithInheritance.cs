@@ -63,7 +63,12 @@ namespace AutoMapper.UnitTests
             var personMapped = Mapper.Map<PersonModel>(person);
 
             var barModel = (BarModel<string>)personMapped.BarList[0];
+            barModel.Value.ShouldBe("One");
             barModel.DerivedMember.ShouldBe("1");
+            barModel.MappedFrom.ShouldBe("mappedFrom");
+            barModel = (BarModel<string>)personMapped.BarList[1];
+            barModel.Value.ShouldBe("Two");
+            barModel.DerivedMember.ShouldBe("2");
             barModel.MappedFrom.ShouldBe("mappedFrom");
         }
     }
@@ -124,7 +129,12 @@ namespace AutoMapper.UnitTests
             var personMapped = Mapper.Map<PersonModel>(person);
 
             var barModel = (BarModel<string>)personMapped.BarList[0];
+            barModel.Value.ShouldBe("One");
             barModel.DerivedMember.ShouldBe("1");
+            barModel.MappedFrom.ShouldBe("mappedFrom");
+            barModel = (BarModel<string>)personMapped.BarList[1];
+            barModel.Value.ShouldBe("Two");
+            barModel.DerivedMember.ShouldBe("2");
             barModel.MappedFrom.ShouldBe("mappedFrom");
         }
     }
@@ -186,7 +196,12 @@ namespace AutoMapper.UnitTests
             var personMapped = Mapper.Map<PersonModel>(person);
 
             var barModel = (BarModel<string>)personMapped.BarList[0];
+            barModel.Value.ShouldBe("One");
             barModel.DerivedMember.ShouldBe("1");
+            barModel.MappedFrom.ShouldBe("mappedFrom");
+            barModel = (BarModel<string>)personMapped.BarList[1];
+            barModel.Value.ShouldBe("Two");
+            barModel.DerivedMember.ShouldBe("2");
             barModel.MappedFrom.ShouldBe("mappedFrom");
         }
     }
