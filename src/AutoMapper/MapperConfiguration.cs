@@ -228,19 +228,17 @@ namespace AutoMapper
 
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
-                if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
+                var typeMap = GetCachedMap(initialTypes, types);
+                if(typeMap != null)
                 {
-                    if (typeMap != null)
-                    {
-                        return typeMap;
-                    }
+                    return typeMap;
                 }
                 typeMap = FindTypeMapFor(types);
                 if (typeMap != null)
                 {
                     return typeMap;
                 }
-                typeMap = FindClosedGenericTypeMapFor(types);
+                typeMap = FindClosedGenericTypeMapFor(initialTypes, types);
                 if (typeMap != null)
                 {
                     return typeMap;
@@ -270,6 +268,8 @@ namespace AutoMapper
 
             return null;
         }
+
+        private TypeMap GetCachedMap(TypePair initialTypes, TypePair types) => (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap)) ? typeMap : null;
 
         public void AssertConfigurationIsValid(TypeMap typeMap)
         {
@@ -383,22 +383,42 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair initialTypes, TypePair typePair)
         {
-            if(typePair.GetOpenGenericTypePair() == null)
+            var genericTypePair = typePair.GetOpenGenericTypePair();
+            if(genericTypePair == null)
             {
                 return null;
             }
-            var mapInfo = Profiles.Select(p => new { GenericMap = p.GetGenericMap(typePair), Profile = p }).FirstOrDefault(p => p.GenericMap != null);
-            if(mapInfo == null)
+            ITypeMapConfiguration genericMap;
+            ProfileMap profile;
+            TypeMap cachedMap = null;
+            var userMap = FindTypeMapFor(genericTypePair.Value);
+            if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
+            {
+                genericTypePair = cachedMap.Types.GetOpenGenericTypePair();
+                if(genericTypePair == null)
+                {
+                    return cachedMap;
+                }
+                (genericMap, profile, typePair) = (cachedMap.Profile.GetGenericMap(cachedMap.Types), cachedMap.Profile, cachedMap.Types.CloseGenericTypes(typePair));
+            }
+            else
+            {
+                (genericMap, profile) = userMap == null ?
+                    Profiles.Select(p => (GenericMap: p.GetGenericMap(typePair), p)).FirstOrDefault(p => p.GenericMap != null) :
+                    (userMap.Profile.GetGenericMap(typePair), userMap.Profile);
+            }
+            if(genericMap == null)
             {
                 return null;
             }
             TypeMap typeMap;
             lock(this)
             {
-                typeMap = mapInfo.Profile.CreateClosedGenericTypeMap(mapInfo.GenericMap, typePair, this);
+                typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
             }
+            cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
         }
 

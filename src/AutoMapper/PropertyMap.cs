@@ -129,8 +129,14 @@ namespace AutoMapper
             Ignored = false;
         }
 
-        public void MapFrom(string propertyOrField) =>
+        public void MapFrom(string propertyOrField)
+        {
+            if(TypeMap.SourceType.IsGenericTypeDefinition())
+            {
+                return;
+            }
             MapFrom(MemberAccessLambda(TypeMap.SourceType, propertyOrField));
+        }
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {

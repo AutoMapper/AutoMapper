@@ -49,10 +49,6 @@ namespace AutoMapper.Execution
 
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
-            if(_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
-            {
-                return null;
-            }
             var customExpression = TypeConverterMapper() ?? _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
             if(customExpression != null)
             {
@@ -128,7 +124,7 @@ namespace AutoMapper.Execution
                         }
                     }
                 }
-                propertyTypeMap.CheckForCycles(_configurationProvider, typeMapsPath);
+                propertyTypeMap.CreateMapperLambda(_configurationProvider, typeMapsPath);
             }
             typeMapsPath.Remove(_typeMap);
             return;

@@ -100,7 +100,7 @@ namespace AutoMapper
 
         public void Register(IConfigurationProvider configurationProvider)
         {
-            foreach (var config in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
+            foreach (var config in _typeMapConfigs)
             {
                 BuildTypeMap(configurationProvider, config);
 
@@ -113,7 +113,7 @@ namespace AutoMapper
 
         public void Configure(IConfigurationProvider configurationProvider)
         {
-            foreach (var typeMapConfiguration in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
+            foreach (var typeMapConfiguration in _typeMapConfigs)
             {
                 Configure(typeMapConfiguration, configurationProvider);
                 if (typeMapConfiguration.ReverseTypeMap != null)
