@@ -1,6 +1,6 @@
 # Expression Translation (UseAsDataSource)
 
-Automapper supports translating Expressions from one object to another.
+Automapper supports translating Expressions from one object to another in a separate [package](https://www.nuget.org/packages/AutoMapper.Extensions.ExpressionMapping/).
 This is done by substituting the properties from the source class to what they map to in the destination class.
 
 Given the example classes:
