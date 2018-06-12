@@ -32,15 +32,6 @@ namespace AutoMapper.QueryableExtensions
 
         public IQueryable<TResult> To<TResult>(object parameters = null) => To<TResult>(parameters, new string[0]);
 
-        public IQueryable<TResult> To<TResult>(Expression<Func<object>> parameterExpression, params Expression<Func<TResult, object>>[] membersToExpand)
-        {
-            var memberPathsToExpand = GetMemberPaths(membersToExpand).SelectMany(m => m).Distinct().ToArray();
-
-            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameterExpression, memberPathsToExpand);
-
-            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
-        }
-
         public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
         {
             var paramValues = GetParameters(parameters);
@@ -62,8 +53,14 @@ namespace AutoMapper.QueryableExtensions
             return To<TResult>(parameters, members);
         }
 
-        public IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand) 
-            => To<TResult>(GetParameters(parameters), GetMemberPaths(membersToExpand));
+        public IQueryable<TResult> To<TResult>(object parameters, params Expression<Func<TResult, object>>[] membersToExpand)
+        {
+            var memberInfos = GetMemberPaths(membersToExpand).SelectMany(m => m).Distinct().ToArray();
+
+            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, memberInfos);
+
+            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
+        }
 
         public static MemberPaths GetMemberPaths(Type type, string[] membersToExpand) =>
             membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));

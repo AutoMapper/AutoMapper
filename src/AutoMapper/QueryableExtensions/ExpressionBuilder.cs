@@ -19,7 +19,7 @@ namespace AutoMapper.QueryableExtensions
     public interface IExpressionBuilder
     {
         LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
-        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, Expression<Func<object>> parameterExpression, MemberInfo[] membersToExpand);
+        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberInfo[] membersToExpand);
         LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
     }
@@ -79,7 +79,7 @@ namespace AutoMapper.QueryableExtensions
             return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
-        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, Expression<Func<object>> parameterExpression,
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters,
             MemberInfo[] membersToExpand)
         {
             if (sourceType == null)
@@ -90,10 +90,6 @@ namespace AutoMapper.QueryableExtensions
             {
                 throw new ArgumentNullException(nameof(destinationType));
             }
-            if (parameterExpression == null)
-            {
-                throw new ArgumentNullException(nameof(parameterExpression));
-            }
             if (membersToExpand == null)
             {
                 throw new ArgumentNullException(nameof(membersToExpand));
@@ -101,7 +97,7 @@ namespace AutoMapper.QueryableExtensions
 
             var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
-            return cachedExpressions.Select(e => Prepare(e, parameterExpression)).Cast<LambdaExpression>().ToArray();
+            return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
         private Expression Prepare(Expression cachedExpression, ParameterBag parameters)
@@ -125,11 +121,18 @@ namespace AutoMapper.QueryableExtensions
             return result;
         }
 
-        private Expression Prepare(Expression cachedExpression, Expression<Func<object>> parameterExpression)
+        private Expression Prepare(Expression cachedExpression, object parameters)
         {
-            var visitor = new MemberAccessExpressionReplacementVisitor(parameterExpression);
-            Expression result = visitor.Visit(cachedExpression);
-
+            Expression result;
+            if(parameters != null)
+            {
+                var visitor = new ObjectParameterExpressionReplacementVisitor(parameters);
+                result = visitor.Visit(cachedExpression);
+            }
+            else
+            {
+                result = cachedExpression;
+            }
             // perform null-propagation if this feature is enabled.
             if(_configurationProvider.EnableNullPropagationForQueryMapping)
             {
@@ -342,12 +345,11 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private class MemberAccessExpressionReplacementVisitor : ExpressionVisitor
+        private class ObjectParameterExpressionReplacementVisitor : ExpressionVisitor
         {
-            private readonly Expression<Func<object>> _parameterExpression;
+            private readonly object _parameters;
 
-            public MemberAccessExpressionReplacementVisitor(Expression<Func<object>> parameterExpression) 
-                => _parameterExpression = parameterExpression;
+            public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
 
             protected override Expression VisitMember(MemberExpression node)
             {
@@ -357,37 +359,18 @@ namespace AutoMapper.QueryableExtensions
                 }
                 var parameterName = node.Member.Name;
 
-                var memberFinderExpressionVisitor = new MemberFinderExpressionVisitor(parameterName);
-                memberFinderExpressionVisitor.Visit(_parameterExpression);
-                var matchingMember = memberFinderExpressionVisitor.MatchingMemberValue;
+                var matchingMember = _parameters.GetType().GetDeclaredProperty(parameterName);
 
-                return matchingMember ?? base.VisitMember(node);
-            }
-
-            private class MemberFinderExpressionVisitor : ExpressionVisitor
-            {
-                private readonly string _memberName;
-
-                public Expression MatchingMemberValue { get; private set; }
-
-                public MemberFinderExpressionVisitor(string memberName) => _memberName = memberName;
-
-                protected override Expression VisitNew(NewExpression node)
-                {
-                    var matchingMember = node.Members.Select((mi, i) => new { mi, i })
-                        .FirstOrDefault(t => string.Equals(t.mi.Name, _memberName, StringComparison.OrdinalIgnoreCase));
-
-                    if (matchingMember != null)
-                        MatchingMemberValue = node.Arguments[matchingMember.i];
-
-                    return base.VisitNew(node);
-                }
+                return matchingMember != null 
+                    ? Property(Constant(_parameters), matchingMember) 
+                    : base.VisitMember(node);
             }
         }
 
         private class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly ParameterBag _paramValues;
+            private static Expression<Func<ParameterBag, object>> _expr = bag => bag["dummy"];
 
             public ConstantExpressionReplacementVisitor(
                 ParameterBag paramValues) => _paramValues = paramValues;
@@ -407,6 +390,7 @@ namespace AutoMapper.QueryableExtensions
                         return base.VisitMember(node);
                     }
                 }
+                
                 return Convert(Constant(parameterValue), node.Member.GetMemberType());
             }
         }

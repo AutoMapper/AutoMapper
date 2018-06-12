@@ -65,28 +65,20 @@ namespace AutoMapper.IntegrationTests.Parameterization
             string username;
             using (var db = new ClientContext())
             {
-                username = "Joe";
-                var query = db.Entities.ProjectTo<EntityDto>(Configuration, () => new {username});
+                username = "Mary";
+                var query = db.Entities.ProjectTo<EntityDto>(Configuration, new { username });
+                dtos = await query.ToListAsync();
                 var constantVisitor = new ConstantVisitor();
                 constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeFalse();
-                dtos = await query.ToListAsync();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
-                username = "Bob";
-                query = db.Entities.ProjectTo<EntityDto>(Configuration, () => new {username = "Bob"});
-                constantVisitor = new ConstantVisitor();
-                constantVisitor.Visit(query.Expression);
-                constantVisitor.HasConstant.ShouldBeTrue();
-                dtos = await query.ToListAsync();
-                dtos.All(dto => dto.UserName == username).ShouldBeTrue();
-
-                username = "Mary";
-                query = db.Entities.ProjectTo<EntityDto>(Configuration, new { username });
+                username = "Joe";
+                query = db.Entities.ProjectTo<EntityDto>(Configuration, new Dictionary<string, object> { { "username", username }});
                 dtos = await query.ToListAsync();
                 constantVisitor = new ConstantVisitor();
                 constantVisitor.Visit(query.Expression);
-                constantVisitor.HasConstant.ShouldBeTrue();
+                constantVisitor.HasConstant.ShouldBeFalse();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
                 username = "Jane";
@@ -102,6 +94,14 @@ namespace AutoMapper.IntegrationTests.Parameterization
                 constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeFalse();
             }
+        }
+
+        [Fact]
+        public void ExpressionTester()
+        {
+            var dict = new Dictionary<string, object> {{"username", "joe"}};
+            Expression<Func<object>> expr = () => dict["username"];
+            expr.ShouldNotBeNull();
         }
 
         private class ConstantVisitor : ExpressionVisitor
