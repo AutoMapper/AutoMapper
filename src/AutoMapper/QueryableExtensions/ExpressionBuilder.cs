@@ -370,7 +370,6 @@ namespace AutoMapper.QueryableExtensions
         private class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly ParameterBag _paramValues;
-            private static Expression<Func<ParameterBag, object>> _expr = bag => bag["dummy"];
 
             public ConstantExpressionReplacementVisitor(
                 ParameterBag paramValues) => _paramValues = paramValues;
@@ -390,7 +389,6 @@ namespace AutoMapper.QueryableExtensions
                         return base.VisitMember(node);
                     }
                 }
-                
                 return Convert(Constant(parameterValue), node.Member.GetMemberType());
             }
         }

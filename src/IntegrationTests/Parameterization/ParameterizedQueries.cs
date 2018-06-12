@@ -78,7 +78,7 @@ namespace AutoMapper.IntegrationTests.Parameterization
                 dtos = await query.ToListAsync();
                 constantVisitor = new ConstantVisitor();
                 constantVisitor.Visit(query.Expression);
-                constantVisitor.HasConstant.ShouldBeFalse();
+                constantVisitor.HasConstant.ShouldBeTrue();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
                 username = "Jane";
@@ -94,14 +94,6 @@ namespace AutoMapper.IntegrationTests.Parameterization
                 constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeFalse();
             }
-        }
-
-        [Fact]
-        public void ExpressionTester()
-        {
-            var dict = new Dictionary<string, object> {{"username", "joe"}};
-            Expression<Func<object>> expr = () => dict["username"];
-            expr.ShouldNotBeNull();
         }
 
         private class ConstantVisitor : ExpressionVisitor
