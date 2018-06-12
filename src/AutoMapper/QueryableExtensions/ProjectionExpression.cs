@@ -32,6 +32,15 @@ namespace AutoMapper.QueryableExtensions
 
         public IQueryable<TResult> To<TResult>(object parameters = null) => To<TResult>(parameters, new string[0]);
 
+        public IQueryable<TResult> To<TResult>(Expression<Func<object>> parameterExpression, params Expression<Func<TResult, object>>[] membersToExpand)
+        {
+            var memberPathsToExpand = GetMemberPaths(membersToExpand).SelectMany(m => m).Distinct().ToArray();
+
+            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameterExpression, memberPathsToExpand);
+
+            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
+        }
+
         public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
         {
             var paramValues = GetParameters(parameters);
@@ -75,7 +84,7 @@ namespace AutoMapper.QueryableExtensions
             parameters = parameters ?? new Dictionary<string, object>();
             var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
-            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, (source, lambda)=>Select(source, lambda));
+            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda)

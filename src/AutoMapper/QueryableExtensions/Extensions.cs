@@ -60,6 +60,22 @@ namespace AutoMapper.QueryableExtensions
             => new ProjectionExpression(source, configuration.ExpressionBuilder).To(parameters, membersToExpand);
 
         /// <summary>
+        /// Extension method to project from a queryable using the provided mapping engine. This will result in a parameterized query.
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="configuration">Mapper configuration</param>
+        /// <param name="parameterExpression">Parameter expression for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Expression to project into</returns>
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, 
+            IConfigurationProvider configuration, 
+            Expression<Func<object>> parameterExpression, 
+            params Expression<Func<TDestination, object>>[] membersToExpand) 
+            => new ProjectionExpression(source, configuration.ExpressionBuilder).To(parameterExpression, membersToExpand);
+
+        /// <summary>
         /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>

@@ -23,6 +23,15 @@ namespace AutoMapper.QueryableExtensions
         /// Projects the source type to the destination type given the mapping configuration
         /// </summary>
         /// <typeparam name="TResult">Destination type to map to</typeparam>
+        /// <param name="parameterExpression">Parameter expression for parameterized mapping expressions. Will result in a parameterized query.</param>
+        /// <param name="membersToExpand">>Explicit members to expand</param>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
+        IQueryable<TResult> To<TResult>(Expression<Func<object>> parameterExpression, params Expression<Func<TResult, object>>[] membersToExpand);
+
+        /// <summary>
+        /// Projects the source type to the destination type given the mapping configuration
+        /// </summary>
+        /// <typeparam name="TResult">Destination type to map to</typeparam>
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
         IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters);
