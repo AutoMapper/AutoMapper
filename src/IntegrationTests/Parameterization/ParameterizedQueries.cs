@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -65,33 +66,40 @@ namespace AutoMapper.IntegrationTests.Parameterization
             using (var db = new ClientContext())
             {
                 username = "Joe";
-                var query1 = db.Entities.ProjectTo<EntityDto>(Configuration, () => new {username});
+                var query = db.Entities.ProjectTo<EntityDto>(Configuration, () => new {username});
                 var constantVisitor = new ConstantVisitor();
-                constantVisitor.Visit(query1.Expression);
+                constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeFalse();
-                dtos = await query1.ToListAsync();
+                dtos = await query.ToListAsync();
+                dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
+                username = "Bob";
+                query = db.Entities.ProjectTo<EntityDto>(Configuration, () => new {username = "Bob"});
+                constantVisitor = new ConstantVisitor();
+                constantVisitor.Visit(query.Expression);
+                constantVisitor.HasConstant.ShouldBeTrue();
+                dtos = await query.ToListAsync();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
                 username = "Mary";
-                var query2 = db.Entities.ProjectTo<EntityDto>(Configuration, new { username });
-                dtos = await query2.ToListAsync();
+                query = db.Entities.ProjectTo<EntityDto>(Configuration, new { username });
+                dtos = await query.ToListAsync();
                 constantVisitor = new ConstantVisitor();
-                constantVisitor.Visit(query2.Expression);
+                constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeTrue();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
 
                 username = "Jane";
-                var query3 = db.Entities.Select(e => new EntityDto
+                query = db.Entities.Select(e => new EntityDto
                 {
                     Id = e.Id,
                     Value = e.Value,
                     UserName = username
                 });
-                dtos = await query3.ToListAsync();
+                dtos = await query.ToListAsync();
                 dtos.All(dto => dto.UserName == username).ShouldBeTrue();
                 constantVisitor = new ConstantVisitor();
-                constantVisitor.Visit(query3.Expression);
+                constantVisitor.Visit(query.Expression);
                 constantVisitor.HasConstant.ShouldBeFalse();
             }
         }

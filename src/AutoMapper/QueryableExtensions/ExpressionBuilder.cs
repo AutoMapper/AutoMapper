@@ -359,7 +359,7 @@ namespace AutoMapper.QueryableExtensions
 
                 var memberFinderExpressionVisitor = new MemberFinderExpressionVisitor(parameterName);
                 memberFinderExpressionVisitor.Visit(_parameterExpression);
-                var matchingMember = memberFinderExpressionVisitor.MatchingMember;
+                var matchingMember = memberFinderExpressionVisitor.MatchingMemberValue;
 
                 return matchingMember ?? base.VisitMember(node);
             }
@@ -368,16 +368,19 @@ namespace AutoMapper.QueryableExtensions
             {
                 private readonly string _memberName;
 
-                public MemberExpression MatchingMember { get; private set; }
+                public Expression MatchingMemberValue { get; private set; }
 
                 public MemberFinderExpressionVisitor(string memberName) => _memberName = memberName;
 
-                protected override Expression VisitMember(MemberExpression node)
+                protected override Expression VisitNew(NewExpression node)
                 {
-                    if (string.Equals(node.Member.Name, _memberName, StringComparison.OrdinalIgnoreCase))
-                        MatchingMember = node;
+                    var matchingMember = node.Members.Select((mi, i) => new { mi, i })
+                        .FirstOrDefault(t => string.Equals(t.mi.Name, _memberName, StringComparison.OrdinalIgnoreCase));
 
-                    return base.VisitMember(node);
+                    if (matchingMember != null)
+                        MatchingMemberValue = node.Arguments[matchingMember.i];
+
+                    return base.VisitNew(node);
                 }
             }
         }
