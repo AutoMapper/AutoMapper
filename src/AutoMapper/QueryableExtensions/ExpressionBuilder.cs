@@ -19,6 +19,7 @@ namespace AutoMapper.QueryableExtensions
     public interface IExpressionBuilder
     {
         LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
+        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberInfo[] membersToExpand);
         LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
     }
@@ -78,12 +79,54 @@ namespace AutoMapper.QueryableExtensions
             return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters,
+            MemberInfo[] membersToExpand)
+        {
+            if (sourceType == null)
+            {
+                throw new ArgumentNullException(nameof(sourceType));
+            }
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+            if (membersToExpand == null)
+            {
+                throw new ArgumentNullException(nameof(membersToExpand));
+            }
+
+            var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
+
+            return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
+        }
+
         private Expression Prepare(Expression cachedExpression, ParameterBag parameters)
         {
             Expression result;
             if(parameters.Any())
             {
                 var visitor = new ConstantExpressionReplacementVisitor(parameters);
+                result = visitor.Visit(cachedExpression);
+            }
+            else
+            {
+                result = cachedExpression;
+            }
+            // perform null-propagation if this feature is enabled.
+            if(_configurationProvider.EnableNullPropagationForQueryMapping)
+            {
+                var nullVisitor = new NullsafeQueryRewriter();
+                return nullVisitor.Visit(result);
+            }
+            return result;
+        }
+
+        private Expression Prepare(Expression cachedExpression, object parameters)
+        {
+            Expression result;
+            if(parameters != null)
+            {
+                var visitor = new ObjectParameterExpressionReplacementVisitor(parameters);
                 result = visitor.Visit(cachedExpression);
             }
             else
@@ -302,7 +345,29 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        internal class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        private class ObjectParameterExpressionReplacementVisitor : ExpressionVisitor
+        {
+            private readonly object _parameters;
+
+            public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
+                {
+                    return base.VisitMember(node);
+                }
+                var parameterName = node.Member.Name;
+
+                var matchingMember = _parameters.GetType().GetDeclaredProperty(parameterName);
+
+                return matchingMember != null 
+                    ? Property(Constant(_parameters), matchingMember) 
+                    : base.VisitMember(node);
+            }
+        }
+
+        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly ParameterBag _paramValues;
 
