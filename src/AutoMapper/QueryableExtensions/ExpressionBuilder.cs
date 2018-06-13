@@ -142,7 +142,13 @@ namespace AutoMapper.QueryableExtensions
             return result;
         }
 
-        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
+        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(),
+#if DYNAMIC_METHODS
+            new FirstPassLetPropertyMaps(_configurationProvider)
+#else
+            LetPropertyMaps.Default
+#endif
+            );
 
         public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
@@ -547,7 +553,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual LetPropertyMaps New() => Default;
 
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
-            => throw new NotImplementedException("Cannot generate let expression on this platform to handle complex projections where an expression refers to a parameter in an outer scope.");
+            => new QueryExpressions(projection);
 
         public struct PropertyPath
         {
