@@ -306,6 +306,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         }
     }
 
+#if DYNAMIC_METHODS
     public class When_mapping_from_an_anonymous_type_to_an_interface : NonValidatingSpecBase
     {
         private IDestination _result;
@@ -328,6 +329,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
     }
+#endif
 
     public class When_dynamically_mapping_a_badly_configured_map : NonValidatingSpecBase
     {
