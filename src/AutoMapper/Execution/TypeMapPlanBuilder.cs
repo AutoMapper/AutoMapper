@@ -14,19 +14,19 @@ namespace AutoMapper.Execution
     public class TypeMapPlanBuilder
     {
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression =
-            () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
+            () => new AutoMapperMappingException(null, null, default, null, null);
 
         private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo =
-            ctxt => ctxt.IncrementTypeDepth(default(TypePair));
+            ctxt => ctxt.IncrementTypeDepth(default);
 
         private static readonly Expression<Action<ResolutionContext>> ValidateMap =
-            ctxt => ctxt.ValidateMap(default(TypeMap));
+            ctxt => ctxt.ValidateMap(default);
 
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
-            ctxt => ctxt.DecrementTypeDepth(default(TypePair));
+            ctxt => ctxt.DecrementTypeDepth(default);
 
         private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
-            ctxt => ctxt.GetTypeDepth(default(TypePair));
+            ctxt => ctxt.GetTypeDepth(default);
 
         private readonly IConfigurationProvider _configurationProvider;
         private readonly ParameterExpression _destination;
@@ -322,6 +322,7 @@ namespace AutoMapper.Execution
             {
                 return CreateNewDestinationExpression(_typeMap.ConstructorMap);
             }
+#if DYNAMIC_METHODS
             if(_typeMap.DestinationTypeToUse.IsInterface())
             {
                 var ctor = Call(null,
@@ -332,6 +333,7 @@ namespace AutoMapper.Execution
                 // We're invoking a delegate here to make it have the right accessibility
                 return Invoke(ctor);
             }
+#endif
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 

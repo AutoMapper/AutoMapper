@@ -24,7 +24,7 @@ namespace AutoMapper.Mappers
                 return (TDestination)typeConverter.ConvertFrom(source);
             }
 
-            return default(TDestination);
+            return default;
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetDeclaredMethod(nameof(Map));

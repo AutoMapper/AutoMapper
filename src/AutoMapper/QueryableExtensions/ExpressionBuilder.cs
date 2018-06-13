@@ -142,7 +142,13 @@ namespace AutoMapper.QueryableExtensions
             return result;
         }
 
-        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
+        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(),
+#if DYNAMIC_METHODS
+            new FirstPassLetPropertyMaps(_configurationProvider)
+#else
+            LetPropertyMaps.Default
+#endif
+            );
 
         public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
@@ -434,6 +440,7 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
+#if DYNAMIC_METHODS
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new
@@ -449,6 +456,7 @@ namespace AutoMapper.QueryableExtensions
                 }).ToArray();
 
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
+
                 var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
                 var typeMapFactory = new TypeMapFactory();
                 TypeMap firstTypeMap;
@@ -476,6 +484,7 @@ namespace AutoMapper.QueryableExtensions
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
+#endif
 
             class GetMemberAccessesVisitor : ExpressionVisitor
             {
@@ -544,7 +553,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual LetPropertyMaps New() => Default;
 
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
-            => throw new NotImplementedException();
+            => new QueryExpressions(projection);
 
         public struct PropertyPath
         {

@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 
 namespace AutoMapper
 {
-#if NET45
+#if DYNAMIC_METHODS
     using System.Reflection.Emit;
 #endif
 
@@ -22,16 +21,12 @@ namespace AutoMapper
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if !NET45
-        public static MethodInfo GetAddMethod(this EventInfo eventInfo) => eventInfo.AddMethod;
-
-        public static MethodInfo GetRemoveMethod(this EventInfo eventInfo) => eventInfo.RemoveMethod;
-#endif
-
+#if DYNAMIC_METHODS
         public static Type CreateType(this TypeBuilder type)
         {
             return type.CreateTypeInfo().AsType();
         }
+#endif
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 

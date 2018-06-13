@@ -200,7 +200,7 @@ namespace AutoMapper
         TDestination IMapper.Map<TDestination>(object source)
         {
             if (source == null)
-                return default(TDestination);
+                return default;
 
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
