@@ -583,6 +583,7 @@ namespace AutoMapper.IntegrationTests
         {
             public int CableId { get; set; }
             public CableEndModel AEnd { get; set; }
+            public CableEndModel AnotherEnd { get; set; }
         }
 
         public class CableEndModel
@@ -625,7 +626,9 @@ namespace AutoMapper.IntegrationTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
-            cfg.CreateMap<Cable, CableListModel>().ForMember(dest => dest.AEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "A")));
+            cfg.CreateMap<Cable, CableListModel>()
+                .ForMember(dest => dest.AEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "A")))
+                .ForMember(dest => dest.AnotherEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "B"))); ;
         });
 
         [Fact]
@@ -633,8 +636,10 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var result = context.Cables.ProjectTo<CableListModel>(Configuration).ToList();
-                result[0].AEnd.DataHallId.ShouldBe(10);
+                var projection = context.Cables.ProjectTo<CableListModel>(Configuration);
+                var result = projection.Single();
+                result.AEnd.DataHallId.ShouldBe(10);
+                result.AnotherEnd.DataHallId.ShouldBeNull();
             }
         }
     }
