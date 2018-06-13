@@ -8,6 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests
 {
+    using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq.Expressions;
     using QueryableExtensions;
@@ -537,6 +538,109 @@ namespace AutoMapper.IntegrationTests
 
             public DbSet<Product> Products { get; set; }
             public DbSet<ProductArticle> ProductArticles { get; set; }
+        }
+    }
+
+    public class SubQueryWithMapFromNullable : AutoMapperSpecBase
+    {
+        // Source Types
+        public class Cable
+        {
+            public int CableId { get; set; }
+            public ICollection<CableEnd> Ends { get; set; } = new List<CableEnd>();
+        }
+
+        public class CableEnd
+        {
+            [ForeignKey(nameof(CrossConnectId))]
+            public virtual Cable CrossConnect { get; set; }
+            [Column(Order = 0), Key]
+            public int CrossConnectId { get; set; }
+            [Column(Order = 1), Key]
+            public string Name { get; set; }
+            [ForeignKey(nameof(RackId))]
+            public virtual Rack Rack { get; set; }
+            public int? RackId { get; set; }
+        }
+
+        public class DataHall
+        {
+            public int DataHallId { get; set; }
+            public int DataCentreId { get; set; }
+            public ICollection<Rack> Racks { get; set; } = new List<Rack>();
+        }
+
+        public class Rack
+        {
+            public int RackId { get; set; }
+            [ForeignKey(nameof(DataHallId))]
+            public virtual DataHall DataHall { get; set; }
+            public int DataHallId { get; set; }
+        }
+
+        // Dest Types
+        public class CableListModel
+        {
+            public int CableId { get; set; }
+            public CableEndModel AEnd { get; set; }
+            public CableEndModel AnotherEnd { get; set; }
+        }
+
+        public class CableEndModel
+        {
+            public string Name { get; set; }
+            public int? DataHallId { get; set; }
+        }
+
+        class ClientContext : DbContext
+        {
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                Database.SetInitializer(new Initializer());
+            }
+
+            public DbSet<Cable> Cables { get; set; }
+            public DbSet<CableEnd> CableEnds { get; set; }
+            public DbSet<DataHall> DataHalls { get; set; }
+        }
+
+        class Initializer : DropCreateDatabaseAlways<ClientContext>
+        {
+            protected override void Seed(ClientContext context)
+            {
+                var rack = new Rack();
+                var dh = new DataHall { DataCentreId = 10, Racks = { rack } };
+                context.DataHalls.Add(dh);
+                var cable = new Cable
+                {
+                    Ends = new List<CableEnd>()
+                    {
+                        new CableEnd { Name = "A", Rack = rack},
+                        new CableEnd { Name = "B" },
+                    }
+                };
+                context.Cables.Add(cable);
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
+            cfg.CreateMap<Cable, CableListModel>()
+                .ForMember(dest => dest.AEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "A")))
+                .ForMember(dest => dest.AnotherEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "B")));
+        });
+
+        [Fact]
+        public void Should_project_ok()
+        {
+            using(var context = new ClientContext())
+            {
+                var projection = context.Cables.ProjectTo<CableListModel>(Configuration);
+                var result = projection.Single();
+                result.AEnd.DataHallId.ShouldBe(10);
+                result.AnotherEnd.DataHallId.ShouldBeNull();
+            }
         }
     }
 }
