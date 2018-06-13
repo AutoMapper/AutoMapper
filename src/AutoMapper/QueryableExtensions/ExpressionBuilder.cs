@@ -434,6 +434,7 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
+#if DYNAMIC_METHODS
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new
@@ -449,6 +450,7 @@ namespace AutoMapper.QueryableExtensions
                 }).ToArray();
 
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
+
                 var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
                 var typeMapFactory = new TypeMapFactory();
                 TypeMap firstTypeMap;
@@ -476,6 +478,7 @@ namespace AutoMapper.QueryableExtensions
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
+#endif
 
             class GetMemberAccessesVisitor : ExpressionVisitor
             {
@@ -544,7 +547,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual LetPropertyMaps New() => Default;
 
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
-            => throw new NotImplementedException();
+            => throw new NotImplementedException("Cannot generate let expression on this platform to handle complex projections where an expression refers to a parameter in an outer scope.");
 
         public struct PropertyPath
         {

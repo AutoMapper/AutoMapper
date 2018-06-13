@@ -8,7 +8,6 @@ namespace OmmitedDTOModel3WithCollections
 {
     public class EntityDTO20 : BaseEntity
     {
-        //TODO Remove comments
         public EntityDTO20()
         {
             this.Entities8 = new List<EntityDTO8>();
