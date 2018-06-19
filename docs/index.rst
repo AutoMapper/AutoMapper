@@ -28,7 +28,11 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 
    Getting-started
    5.0-Upgrade-Guide
+   Static-and-Instance-API
+   Migrating-from-static-API
    Conventions
+   Understanding-your-mapping
+   The-MyGet-build
 
 .. _feature-docs:
 
@@ -52,11 +56,13 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Mapping-inheritance
    Queryable-Extensions
    Configuration
+   Construction
    Conditional-mapping
    Editing-Resolvers-and-Conditions
    Open-Generics
-   Understanding-your-mapping
-
+   Dynamic-and-ExpandoObject-Mapping
+   Expression-Translation-(UseAsDataSource)
+      
 Samples
 =======
 
