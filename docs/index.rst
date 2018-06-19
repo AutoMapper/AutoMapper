@@ -58,7 +58,6 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Configuration
    Construction
    Conditional-mapping
-   Editing-Resolvers-and-Conditions
    Open-Generics
    Dynamic-and-ExpandoObject-Mapping
    Expression-Translation-(UseAsDataSource)
