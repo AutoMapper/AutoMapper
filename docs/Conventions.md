@@ -37,7 +37,11 @@ If you don't set anything AutoMapper will use DefaultMember, which will only che
 
 ### Recognizing pre/postfixes
 
-`AddMemberConfiguration().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get", "get").AddStrings(p => p.DestinationPostfixes, "Set"));`
+```
+AddMemberConfiguration()
+    .AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get", "get")
+    .AddStrings(p => p.DestinationPostfixes, "Set"));
+```
 
 ### Attribute Support
 
@@ -57,7 +61,11 @@ public class Foo
 
 ### Getting AutoMapper Defaults
 
-`AddMemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get"))`
+```
+AddMemberConfiguration()
+    .AddMember<NameSplitMember>()
+    .AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get"))
+```
 
 Is the default values set by [Configuration](Configuration.html) if you don't use AddMemberConfiguration().
 
