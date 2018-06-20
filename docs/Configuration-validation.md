@@ -45,9 +45,10 @@ By default, AutoMapper uses the destination type to validate members. It assumes
 
 ```c#
 Mapper.Initialize(cfg =>
+{
   cfg.CreateMap<Source, Destination>(MemberList.Source);
   cfg.CreateMap<Source2, Destination2>(MemberList.None);
-);
+});
 ```
 
 To skip validation altogether for this map, use `MemberList.None`.
