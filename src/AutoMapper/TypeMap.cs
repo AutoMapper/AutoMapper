@@ -184,7 +184,7 @@ namespace AutoMapper
 
             var constructors = DestinationTypeToUse
                 .GetDeclaredConstructors()
-                .Where(ci => !ci.IsStatic);
+                .Where(ci => !ci.IsStatic && Profile.ShouldMapCtor(ci));
 
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));

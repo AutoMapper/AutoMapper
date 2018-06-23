@@ -17,13 +17,13 @@ namespace AutoMapper
         public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
-            var membersToMap = MembersToMap(config.ShouldMapProperty, config.ShouldMapField);
+            var membersToMap = MembersToMap(config.ShouldMapProperty, config.ShouldMapField, config.ShouldMapCtor);
             var publicReadableMembers = GetAllPublicReadableMembers(membersToMap);
             var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
             PublicNoArgMethods = BuildPublicNoArgMethods();
-            Constructors = type.GetDeclaredConstructors().Where(ci => !ci.IsStatic).ToArray();
+            Constructors = GetAllConstructors(membersToMap);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods);
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
@@ -59,7 +59,10 @@ namespace AutoMapper
                     .Select(postfix => name.Remove(name.Length - postfix.Length));
         }
 
-        private static Func<MemberInfo, bool> MembersToMap(Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
+        private static Func<MemberInfo, bool> MembersToMap(
+            Func<PropertyInfo, bool> shouldMapProperty, 
+            Func<FieldInfo, bool> shouldMapField,
+            Func<ConstructorInfo, bool> shouldMapCtor)
         {
             return m =>
             {
@@ -69,8 +72,10 @@ namespace AutoMapper
                         return !property.IsStatic() && shouldMapProperty(property);
                     case FieldInfo field:
                         return !field.IsStatic && shouldMapField(field);
+                    case ConstructorInfo constructor:
+                        return !constructor.IsStatic && shouldMapCtor(constructor);
                     default:
-                        throw new ArgumentException("Should be a field or property.");
+                        throw new ArgumentException("Should be a field, property or constructor.");
                 }
             };
         }
@@ -163,6 +168,11 @@ namespace AutoMapper
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
+        
+        private IEnumerable<ConstructorInfo> GetAllConstructors(Func<MemberInfo, bool> membersToMap)
+        {
+            return Type.GetDeclaredConstructors().Where(ci => membersToMap(ci)).ToArray();
+        }
 
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
 

@@ -39,6 +39,12 @@ namespace AutoMapper.Configuration
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; }
 
+        /// <summary>
+        /// Specify which constructors should be mapped.
+        /// By default all non-static constructors are mapped.
+        /// </summary>
+        Func<ConstructorInfo, bool> ShouldMapCtor { get; }
+
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
         INamingConvention SourceMemberNamingConvention { get; }
