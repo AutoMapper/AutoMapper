@@ -1,20 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp2.0;netcoreapp1.1;</TargetFrameworks>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
     <NoWarn>$(NoWarn);0649</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <DefineConstants>NET45</DefineConstants>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' OR '$(TargetFramework)' == 'netcoreapp2.0'">
     <DefineConstants>DYNAMIC_METHODS</DefineConstants>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\AutoMapper\ReflectionExtensions.cs" Link="ReflectionExtensions.cs" />
     <Compile Include="..\AutoMapper\TypeExtensions.cs" Link="TypeExtensions.cs" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="FakeItEasy" Version="4.6.0" />
@@ -25,12 +30,15 @@
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
   </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
   </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
+
 </Project>
