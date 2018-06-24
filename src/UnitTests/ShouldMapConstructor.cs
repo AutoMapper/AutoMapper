@@ -4,7 +4,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class ShouldMapConstructorInternal : NonValidatingSpecBase
+    public class ShouldUseConstructorInternal : NonValidatingSpecBase
     {
         class Destination
         {
@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
             cfg =>
             {
-                cfg.ShouldMapConstructor = c => c.IsAssembly;
+                cfg.ShouldUseConstructor = c => c.IsAssembly;
                 cfg.CreateMap<Source, Destination>();
             });
 
@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class ShouldMapConstructorPrivate : NonValidatingSpecBase
+    public class ShouldUseConstructorPrivate : NonValidatingSpecBase
     {
 
         class Destination
@@ -77,7 +77,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
             cfg =>
             {
-                cfg.ShouldMapConstructor = c => c.IsPrivate;
+                cfg.ShouldUseConstructor = c => c.IsPrivate;
                 cfg.CreateMap<Source, Destination>();
             });
 
@@ -89,7 +89,7 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class ShouldMapConstructorPublic : NonValidatingSpecBase
+    public class ShouldUseConstructorPublic : NonValidatingSpecBase
     {
         class Destination
         {
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
             cfg =>
             {
-                cfg.ShouldMapConstructor = c => c.IsPublic;
+                cfg.ShouldUseConstructor = c => c.IsPublic;
                 cfg.CreateMap<Source, Destination>();
             });
 
@@ -132,7 +132,7 @@ namespace AutoMapper.UnitTests
     }
 
 
-    public class ShouldMapConstructorDefault : AutoMapperSpecBase
+    public class ShouldUseConstructorDefault : AutoMapperSpecBase
     {
         class Destination
         {

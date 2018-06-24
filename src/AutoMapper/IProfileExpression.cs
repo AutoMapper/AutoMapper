@@ -145,7 +145,7 @@ namespace AutoMapper
 
         Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
         Func<FieldInfo, bool> ShouldMapField { get; set; }
-        Func<ConstructorInfo, bool> ShouldMapConstructor { get; set; }
+        Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
         
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();

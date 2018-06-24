@@ -23,7 +23,7 @@ namespace AutoMapper
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
             PublicNoArgMethods = BuildPublicNoArgMethods();
-            Constructors = GetAllConstructors(config.ShouldMapConstructor);
+            Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods);
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
@@ -166,9 +166,9 @@ namespace AutoMapper
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
         
-        private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldMapConstructor)
+        private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
         {
-            return Type.GetDeclaredConstructors().Where(shouldMapConstructor).ToArray();
+            return Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
         }
 
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
