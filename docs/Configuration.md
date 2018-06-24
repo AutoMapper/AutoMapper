@@ -176,9 +176,9 @@ Mapper.Initialize(cfg => {
 });
 ```
 
-## Global property/field/constructor filtering
+## Global property/field filtering
 
-By default, AutoMapper tries to map every public property/field, and all non-static declared constructors. You can filter out properties/fields/constructors with the property/field/constructor filters:
+By default, AutoMapper tries to map every public property/field. You can filter out properties/fields with the property/field filters:
 
 ```c#
 Mapper.Initialize(cfg =>
@@ -189,9 +189,6 @@ Mapper.Initialize(cfg =>
 	// map properties with a public or private getter
 	cfg.ShouldMapProperty = pi =>
 		pi.GetMethod != null && (pi.GetMethod.IsPublic || pi.GetMethod.IsPrivate);
-        
-	// don't map private constructors
-	cfg.ShouldMapCtor = ci => !ci.IsPrivate;
 });
 ```
 

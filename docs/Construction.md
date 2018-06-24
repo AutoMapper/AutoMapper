@@ -46,3 +46,10 @@ You can also disable constructor mapping :
 ```c#
 Mapper.Initialize(cfg => cfg.DisableConstructorMapping());
 ```
+
+You can configure which constructors are mapped:
+
+```c#
+// don't map private constructors
+Mapper.Initialize(cfg => cfg.ShouldMapConstructor = ci => !ci.IsPrivate);
+```
