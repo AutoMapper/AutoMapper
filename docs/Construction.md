@@ -51,5 +51,5 @@ You can configure which constructors are considered for the destination object:
 
 ```c#
 // don't map private constructors
-Mapper.Initialize(cfg => cfg.ShouldMapConstructor = ci => !ci.IsPrivate);
+Mapper.Initialize(cfg => cfg.ShouldUseConstructor = ci => !ci.IsPrivate);
 ```
