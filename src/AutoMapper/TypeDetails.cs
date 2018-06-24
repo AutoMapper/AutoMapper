@@ -72,7 +72,7 @@ namespace AutoMapper
                     case FieldInfo field:
                         return !field.IsStatic && shouldMapField(field);
                     default:
-                        throw new ArgumentException("Should be a field, property or constructor.");
+                        throw new ArgumentException("Should be a field or a property.");
                 }
             };
         }
