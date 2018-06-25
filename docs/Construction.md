@@ -41,8 +41,15 @@ Mapper.Initialize(cfg =>
 
 This works for both LINQ projections and in-memory mapping.
 
-You can also disable constructor mapping :    
+You can also disable constructor mapping:    
 
 ```c#
 Mapper.Initialize(cfg => cfg.DisableConstructorMapping());
+```
+
+You can configure which constructors are considered for the destination object:
+
+```c#
+// don't map private constructors
+Mapper.Initialize(cfg => cfg.ShouldUseConstructor = ci => !ci.IsPrivate);
 ```

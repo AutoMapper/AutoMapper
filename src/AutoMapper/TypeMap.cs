@@ -182,10 +182,8 @@ namespace AutoMapper
             if (DestinationTypeToUse.IsValueType())
                 return true;
 
-            var constructors = DestinationTypeToUse
-                .GetDeclaredConstructors()
-                .Where(ci => !ci.IsStatic);
-
+            var constructors = DestinationTypeDetails.Constructors;
+            
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
 

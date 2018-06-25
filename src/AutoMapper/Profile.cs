@@ -74,6 +74,7 @@ namespace AutoMapper
         public bool? EnableNullPropagationForQueryMapping { get; set; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
         public Func<FieldInfo, bool> ShouldMapField { get; set; }
+        public Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
 
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
