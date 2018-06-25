@@ -29,7 +29,7 @@ namespace AutoMapper.Configuration
 
         /// <summary>
         /// Specify which properties should be mapped.
-        /// By default only public properties are mapped.e
+        /// By default only public properties are mapped.
         /// </summary>
         Func<PropertyInfo, bool> ShouldMapProperty { get; }
 
@@ -40,8 +40,8 @@ namespace AutoMapper.Configuration
         Func<FieldInfo, bool> ShouldMapField { get; }
 
         /// <summary>
-        /// Specify which constructors should be mapped.
-        /// By default all non-static constructors are mapped.
+        /// Specify which constructors should be considered for the destination objects.
+        /// By default all constructors are considered.
         /// </summary>
         Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
 
