@@ -73,6 +73,47 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         }
     }
 
+    public class When_mapping_a_primitive_array : AutoMapperSpecBase
+    {
+        int[] _source = Enumerable.Range(1, 10).ToArray();
+        long[] _destination;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>{});
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<long[]>(_source);
+        }
+
+        [Fact]
+        public void Should_return_a_copy()
+        {
+            _destination.ShouldNotBeSameAs(_source);
+        }
+    }
+
+    public class When_mapping_a_primitive_array_with_custom_mapping_function : AutoMapperSpecBase
+    {
+        int[] _source = Enumerable.Range(1, 10).ToArray();
+        long[] _destination;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<int, long>().ProjectUsing(i => i * 1000));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<long[]>(_source);
+        }
+
+        [Fact]
+        public void Should_map_each_item()
+        {
+            for (var i = 0; i < _source.Length; i++)
+            {
+                _destination[i].ShouldBe((i+1) * 1000);
+            }
+        }
+    }
+
     public class When_mapping_null_list_to_array: AutoMapperSpecBase
     {
         Destination _destination;

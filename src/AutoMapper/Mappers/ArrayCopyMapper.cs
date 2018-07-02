@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     using static ExpressionFactory;
     using static CollectionMapperExpressionFactory;
 
-    public class ArrayCopyMapper : EnumerableMapperBase
+    public class ArrayCopyMapper : ArrayMapper
     {
 #if NETSTANDARD1_3
         private static readonly Expression<Action> ArrayCopyExpression = () => Array.Copy(default, default, default(int));
@@ -34,7 +34,11 @@ namespace AutoMapper.Mappers
 
         public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            Type destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
+            var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
+            var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
+
+            if (configurationProvider.FindTypeMapFor(sourceElementType, destElementType) != null)
+                return base.MapExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression);
 
             var valueIfNullExpr = profileMap.AllowNullCollections
                 ? (Expression) Constant(null, destExpression.Type)
