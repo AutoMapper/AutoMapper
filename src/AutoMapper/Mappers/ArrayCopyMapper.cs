@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
         public override bool IsMatch(TypePair context) =>
             context.DestinationType.IsArray
             && context.SourceType.IsArray
-            && ElementTypeHelper.GetElementType(context.DestinationType).IsAssignableFrom(ElementTypeHelper.GetElementType(context.SourceType))
+            && ElementTypeHelper.GetElementType(context.DestinationType) == ElementTypeHelper.GetElementType(context.SourceType)
             && ElementTypeHelper.GetElementType(context.SourceType).IsPrimitive();
 
         public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
