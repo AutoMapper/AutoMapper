@@ -15,6 +15,7 @@ namespace AutoMapper.Mappers
             new EnumToUnderlyingTypeMapper(),
             new UnderlyingTypeToEnumMapper(),
             new MultidimensionalArrayMapper(),
+            new ArrayCopyMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
             new NameValueCollectionMapper(),

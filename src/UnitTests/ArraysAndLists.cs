@@ -7,6 +7,7 @@ using Xunit;
 using Shouldly;
 using System.Linq;
 using System.Dynamic;
+using System.Linq.Expressions;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
@@ -70,6 +71,85 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         public void Should_return_a_copy()
         {
             _destination.ShouldNotBeSameAs(_source);
+        }
+    }
+
+    public class When_mapping_a_primitive_array : AutoMapperSpecBase
+    {
+        int[] _source = Enumerable.Range(1, 10).ToArray();
+        long[] _destination;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>{});
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<long[]>(_source);
+        }
+
+        [Fact]
+        public void Should_return_a_copy()
+        {
+            var source = new int[] {1, 2, 3, 4};
+            var dest = new long[4];
+            Array.Copy(source, dest, 4);
+            dest[3].ShouldBe(4L);
+
+            var plan = Configuration.BuildExecutionPlan(typeof(int[]), typeof(long[]));
+            _destination.ShouldNotBeSameAs(_source);
+        }
+    }
+
+    public class When_mapping_a_primitive_array_with_custom_mapping_function : AutoMapperSpecBase
+    {
+        int[] _source = Enumerable.Range(1, 10).ToArray();
+        int[] _destination;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<int, int>().ProjectUsing(i => i * 1000));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<int[]>(_source);
+        }
+
+        [Fact]
+        public void Should_map_each_item()
+        {
+            for (var i = 0; i < _source.Length; i++)
+            {
+                _destination[i].ShouldBe((i+1) * 1000);
+            }
+        }
+    }
+
+    public class When_mapping_a_primitive_array_with_custom_object_mapper : AutoMapperSpecBase
+    {
+        int[] _source = Enumerable.Range(1, 10).ToArray();
+        int[] _destination;
+
+        private class IntToIntMapper : IObjectMapper
+        {
+            public bool IsMatch(TypePair context)
+                => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
+
+            public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap,
+                Expression sourceExpression, Expression destExpression, Expression contextExpression)
+                => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Mappers.Insert(0, new IntToIntMapper()));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<int[]>(_source);
+        }
+
+        [Fact]
+        public void Should_not_use_custom_mapper_but_probably_should()
+        {
+            for (var i = 0; i < _source.Length; i++)
+            {
+                _destination[i].ShouldBe(i + 1);
+            }
         }
     }
 
