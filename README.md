@@ -14,6 +14,7 @@ This is the main repository for AutoMapper, but there's more:
 * [IDataReader/Record Extensions](https://github.com/AutoMapper/AutoMapper.Data)
 * [Collection Extensions](https://github.com/AutoMapper/AutoMapper.Collection)
 * [Microsoft DI Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection)
+* [Expression Mapping](https://github.com/AutoMapper/AutoMapper.Extensions.ExpressionMapping)
 
 ### How do I get started?
 
