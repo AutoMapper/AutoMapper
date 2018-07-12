@@ -1,6 +1,6 @@
 # Inline Mapping
 
-AutoMapper creates type maps on the fly (new in 6.2.0). When you call `Mapper.Map` for the first time, AutoMapper will create the type map configuration and compile the mapping plan. Subsequent mapping calls will use the compiled map.
+AutoMapper creates type maps on the fly (new in atleast* 6.1.1). When you call `Mapper.Map` for the first time, AutoMapper will create the type map configuration and compile the mapping plan. Subsequent mapping calls will use the compiled map.
 
 ## Inline configuration
 
