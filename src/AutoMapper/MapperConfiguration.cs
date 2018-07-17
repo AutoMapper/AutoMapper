@@ -27,9 +27,12 @@ namespace AutoMapper
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
         private readonly MapperConfigurationExpressionValidator _expressionValidator;
+        private readonly List<ProfileMap> _profiles;
+        private readonly IConfiguration _configuration;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
+            _configuration = configurationExpression;
             _mappers = configurationExpression.Mappers.ToArray();
             _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
@@ -45,7 +48,7 @@ namespace AutoMapper
             Binders = configurationExpression.Advanced.QueryableBinders.ToArray();
 
             Configuration = new ProfileMap(configurationExpression);
-            Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
+            _profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToList();
 
             foreach (var beforeSealAction in configurationExpression.Advanced.BeforeSealActions)
                 beforeSealAction?.Invoke(this);
@@ -58,6 +61,16 @@ namespace AutoMapper
         {
         }
 
+        public void Apply(MapperConfigurationExpression configurationExpression)
+        {
+            Configuration.Apply(configurationExpression);
+
+            var profileNames = Profiles.Select(p => p.Name).ToArray();
+
+            _profiles.AddRange(configurationExpression.Profiles.Where(p => !profileNames.Contains(p.ProfileName)).Select(p => new ProfileMap(p, _configuration)));
+
+            Seal();
+        }
 
         public void Validate(ValidationContext context)
         {
@@ -79,7 +92,7 @@ namespace AutoMapper
 
         private ProfileMap Configuration { get; }
 
-        public IEnumerable<ProfileMap> Profiles { get; }
+        public IEnumerable<ProfileMap> Profiles => _profiles;
 
         public IEnumerable<IExpressionResultConverter> ResultConverters { get; }
 
@@ -322,7 +335,7 @@ namespace AutoMapper
                 profile.Configure(this);
             }
 
-            foreach (var typeMap in _typeMapRegistry.Values)
+            foreach (var typeMap in _typeMapRegistry.Values.Where(tm => !tm.IsSealed))
             {
                 _typeMapPlanCache[typeMap.Types] = typeMap;
 
@@ -422,7 +435,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
+        public IObjectMapper FindMapper(TypePair types) => _mappers.FirstOrDefault(m => m.IsMatch(types));
 
         public void RegisterTypeMap(TypeMap typeMap) => _typeMapRegistry[typeMap.Types] = typeMap;
 

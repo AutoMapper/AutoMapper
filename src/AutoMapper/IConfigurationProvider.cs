@@ -172,5 +172,11 @@ namespace AutoMapper
         /// <param name="mapRequest">The source/destination map request</param>
         /// <returns>the execution plan</returns>
         LambdaExpression BuildExecutionPlan(MapRequest mapRequest);
+
+        /// <summary>
+        /// Apply another set of configuration. Only adds new base type maps and new profiles, ignores all other configuration.
+        /// </summary>
+        /// <param name="configurationExpression">Configuration expression</param>
+        void Apply(MapperConfigurationExpression configurationExpression);
     }
 }
