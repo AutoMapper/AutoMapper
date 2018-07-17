@@ -27,7 +27,6 @@ namespace AutoMapper
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
-        private bool _sealed;
         private readonly List<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
@@ -101,6 +100,7 @@ namespace AutoMapper
         public IEnumerable<PathMap> PathMaps => _pathMaps;
         public bool IsConventionMap { get; set; }
         public bool? IsValid { get; set; }
+        public bool IsSealed { get; private set; }
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
@@ -268,11 +268,11 @@ namespace AutoMapper
 
         public void Seal(IConfigurationProvider configurationProvider)
         {
-            if(_sealed)
+            if(IsSealed)
             {
                 return;
             }
-            _sealed = true;
+            IsSealed = true;
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {

@@ -8,12 +8,12 @@ namespace AutoMapper
     public class Mapper : IRuntimeMapper
     {
         private const string InvalidOperationMessage = "Mapper not initialized. Call Initialize with appropriate configuration. If you are trying to use mapper instances through a container or otherwise, make sure you do not have any calls to the static Mapper.Map methods, and if you're using ProjectTo or UseAsDataSource extension methods, make sure you pass in the appropriate IConfigurationProvider instance.";
-        private const string AlreadyInitialized = "Mapper already initialized. You must call Initialize once per application domain/process.";
 
         #region Static API
 
         private static IConfigurationProvider _configuration;
         private static IMapper _instance;
+        private static readonly object _lock = new object();
 
         /// <summary>
         /// Configuration provider for performing maps
@@ -21,7 +21,7 @@ namespace AutoMapper
         public static IConfigurationProvider Configuration
         {
             get => _configuration ?? throw new InvalidOperationException(InvalidOperationMessage);
-            private set => _configuration = (_configuration == null) ? value : throw new InvalidOperationException(AlreadyInitialized);
+            private set => _configuration = value;
         }
 
         /// <summary>
@@ -39,8 +39,20 @@ namespace AutoMapper
         /// <param name="config">Configuration action</param>
         public static void Initialize(Action<IMapperConfigurationExpression> config)
         {
-            Configuration = new MapperConfiguration(config);
-            Instance = new Mapper(Configuration);
+            lock (_lock)
+            {
+                if (_configuration == null)
+                {
+                    Configuration = new MapperConfiguration(config);
+                    Instance = new Mapper(Configuration);
+                }
+                else
+                {
+                    var mapperExpression = new MapperConfigurationExpression();
+                    config(mapperExpression);
+                    Configuration.Apply(mapperExpression);
+                }
+            }
         }
 
         /// <summary>
@@ -49,8 +61,18 @@ namespace AutoMapper
         /// <param name="config">Configuration action</param>
         public static void Initialize(MapperConfigurationExpression config)
         {
-            Configuration = new MapperConfiguration(config);
-            Instance = new Mapper(Configuration);
+            lock (_lock)
+            {
+                if (_configuration == null)
+                {
+                    Configuration = new MapperConfiguration(config);
+                    Instance = new Mapper(Configuration);
+                }
+                else
+                {
+                    Configuration.Apply(config);
+                }
+            }
         }
 
         /// <summary>
@@ -58,8 +80,11 @@ namespace AutoMapper
         /// </summary>
         public static void Reset()
         {
-            _configuration = null;
-            _instance = null;
+            lock (_lock)
+            {
+                _configuration = null;
+                _instance = null;
+            }
         }
 
         /// <summary>

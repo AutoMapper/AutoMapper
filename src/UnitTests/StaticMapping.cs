@@ -63,19 +63,25 @@
             public int Value { get; set; }
         }
 
+        public class OtherSource
+        {
+            public int Value { get; set; }
+        }
+
+        public class OtherDest
+        {
+            public int Value { get; set; }
+        }
+
         private void InitializeMapping()
         {
-            lock (this)
+            Mapper.Initialize(cfg =>
             {
-                Mapper.Reset();
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Dest>();
-                    cfg.CreateMap<ModelObject, ModelDto>();
-                    cfg.CreateMap<ModelObject2, ModelDto2>();
-                    cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
-                });
-            }
+                cfg.CreateMap<Source, Dest>();
+                cfg.CreateMap<ModelObject, ModelDto>();
+                cfg.CreateMap<ModelObject2, ModelDto2>();
+                cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
+            });
         }
 
         [Fact]
@@ -113,13 +119,28 @@
         }
 
         [Fact]
-        public void Should_throw_when_initializing_twice()
+        public void Should_combine_mappings()
         {
-            typeof(InvalidOperationException).ShouldBeThrownBy(() =>
+            InitializeMapping();
+
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<OtherSource, OtherDest>();
+            });
+
+            Mapper.Configuration.GetAllTypeMaps().Length.ShouldBe(5);
+        }
+
+        [Fact]
+        public void Should_not_throw_when_initializing_twice()
+        {
+            var init = new Action(() =>
             {
                 Mapper.Initialize(_ => { });
                 Mapper.Initialize(_ => { });
             });
+
+            init.ShouldNotThrow();
         }
 
         [Fact]

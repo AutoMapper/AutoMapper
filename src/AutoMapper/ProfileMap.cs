@@ -14,8 +14,8 @@ namespace AutoMapper
     public class ProfileMap
     {
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
-        private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
-        private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
+        private readonly List<ITypeMapConfiguration> _typeMapConfigs;
+        private readonly List<ITypeMapConfiguration> _openTypeMapConfigs;
         private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
 
         public ProfileMap(IProfileConfiguration profile)
@@ -70,10 +70,20 @@ namespace AutoMapper
                     .SelectMany(m => m.Postfixes)
                     .ToArray();
 
-            _typeMapConfigs = profile.TypeMapConfigs.ToArray();
-            _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
+            _typeMapConfigs = profile.TypeMapConfigs.ToList();
+            _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToList();
         }
 
+        public void Apply(IProfileConfiguration profile)
+        {
+            var types = new HashSet<TypePair>(_typeMapConfigs.Select(tm => tm.Types));
+
+            _typeMapConfigs.AddRange(profile.TypeMapConfigs.Where(tmc => !types.Contains(tmc.Types)));
+
+            var openTypes = new HashSet<TypePair>(_openTypeMapConfigs.Select(tm => tm.Types));
+
+            _openTypeMapConfigs.AddRange(profile.OpenTypeMapConfigs.Where(tmc => !openTypes.Contains(tmc.Types)));
+        }
 
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
@@ -127,6 +137,9 @@ namespace AutoMapper
 
         private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
         {
+            if (configurationProvider.FindTypeMapFor(config.Types) != null)
+                return;
+
             var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
 
             config.Configure(typeMap);
@@ -137,11 +150,17 @@ namespace AutoMapper
         private void Configure(ITypeMapConfiguration typeMapConfiguration, IConfigurationProvider configurationProvider)
         {
             var typeMap = configurationProvider.FindTypeMapFor(typeMapConfiguration.Types);
+
             Configure(typeMap, configurationProvider);
         }
 
         private void Configure(TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
+            if (typeMap.IsSealed)
+            {
+                return;
+            }
+
             foreach (var action in AllTypeMapActions)
             {
                 var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
@@ -203,7 +222,7 @@ namespace AutoMapper
 
             Configure(closedMap, configurationProvider);
 
-            if(closedMap.TypeConverterType != null)
+            if (closedMap.TypeConverterType != null)
             {
                 var typeParams =
                     (openMapConfig.SourceType.IsGenericTypeDefinition() ? closedTypes.SourceType.GetGenericArguments() : new Type[0])
@@ -213,7 +232,7 @@ namespace AutoMapper
                 var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
                 closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
             }
-            if(closedMap.DestinationTypeOverride?.IsGenericTypeDefinition() == true)
+            if (closedMap.DestinationTypeOverride?.IsGenericTypeDefinition() == true)
             {
                 var neededParameters = closedMap.DestinationTypeOverride.GetGenericParameters().Length;
                 closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GetGenericArguments().Take(neededParameters).ToArray());
@@ -255,16 +274,16 @@ namespace AutoMapper
 
         private static IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes, IConfigurationProvider configurationProvider)
         {
-            foreach(var pair in includedTypes)
+            foreach (var pair in includedTypes)
             {
                 var typeMap = configurationProvider.FindTypeMapFor(pair);
-                if(typeMap != null)
+                if (typeMap != null)
                 {
                     yield return typeMap;
                 }
                 typeMap = configurationProvider.ResolveTypeMap(pair);
                 // we want the exact map the user included, but we could instantiate an open generic
-                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                if (typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
                 {
                     throw QueryMapperHelper.MissingMapException(pair);
                 }
