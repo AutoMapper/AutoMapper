@@ -207,7 +207,8 @@
         {
             Value1 = 0,
             Value2 = 1,
-            Value3 = 2
+            Value3 = 2,
+            Value4 = 3
         }
 
         public class Source
@@ -216,7 +217,8 @@
             {
                 {Property.Value1, false},
                 {Property.Value2, false},
-                {Property.Value3, false}
+                {Property.Value3, false},
+                {Property.Value4, false}
             };
 
             public int Value1
@@ -245,6 +247,15 @@
                     return 15;
                 }
             }
+
+            public int Value4
+            {
+                get
+                {
+                    Accessed[Property.Value4] = true;
+                    return 20;
+                }
+            }
         }
 
         public class Dest
@@ -254,6 +265,10 @@
             public int Value2 { get; set; }
 
             public int Value3 { get; set; }
+
+            public int Value4 { get; set; }
+
+            public bool MarkerBool { get; set; }
         }
 
         public class ConditionTests : NonValidatingSpecBase
@@ -263,7 +278,12 @@
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value1, opt => opt.PreCondition((Source src) => false))
                     .ForMember(d => d.Value2, opt => opt.PreCondition((ResolutionContext rc) => false))
-                    .ForMember(d => d.Value3, opt => opt.PreCondition((src, rc) => false));
+                    .ForMember(d => d.Value3, opt => opt.PreCondition((src, rc) => false))//;
+                    .ForMember(d => d.Value4, opt => opt.PreCondition((src, dest, rc) =>
+                    {
+                        dest.MarkerBool = true;
+                        return false;
+                    }));
             });
 
             [Fact]
@@ -288,6 +308,15 @@
                 var source = new Source();
                 Mapper.Map<Source, Dest>(source);
                 source.Accessed[Property.Value3].ShouldBeFalse();
+            }
+
+            [Fact]
+            public void Should_not_map_and_should_produce_sideeffect_when_precondition_with_source_and_desc_parameters_is_false()
+            {
+                var source = new Source();
+                var dest = Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value4].ShouldBeFalse();
+                dest.MarkerBool.ShouldBeTrue();
             }
 
         }
