@@ -486,7 +486,11 @@ namespace AutoMapper.Execution
 
             if (propertyMap.PreCondition != null)
                 mapperExpr = IfThen(
-                    propertyMap.PreCondition.ConvertReplaceParameters(Source, Context),
+                    propertyMap.PreCondition.ConvertReplaceParameters(
+                        Source,
+                        _destination,
+                        Context
+                    ),
                     mapperExpr
                 );
 
