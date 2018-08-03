@@ -81,7 +81,7 @@ namespace AutoMapper
 
         public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type)
         {
-            return type.GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
+            return type.GetRuntimeProperties().Where(pm => pm.HasAnInaccessibleSetter());
         }
 
         public static bool HasAnInaccessibleSetter(this PropertyInfo property)
