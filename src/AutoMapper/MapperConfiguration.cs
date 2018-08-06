@@ -353,18 +353,32 @@ namespace AutoMapper
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
         {
-            foreach (var derivedTypes in typeMap.IncludedDerivedTypes)
+            foreach (var derivedMap in GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
-                var derivedMap = FindTypeMapFor(derivedTypes);
-                if (derivedMap == null)
-                {
-                    throw QueryMapperHelper.MissingMapException(derivedTypes.SourceType, derivedTypes.DestinationType);
-                }
                 yield return derivedMap;
                 foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
                 {
                     yield return derivedTypeMap;
                 }
+            }
+        }
+
+        public IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes)
+        {
+            foreach(var pair in includedTypes)
+            {
+                var typeMap = FindTypeMapFor(pair);
+                if(typeMap != null)
+                {
+                    yield return typeMap;
+                }
+                typeMap = ResolveTypeMap(pair);
+                // we want the exact map the user included, but we could instantiate an open generic
+                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                {
+                    throw QueryMapperHelper.MissingMapException(pair);
+                }
+                yield return typeMap;
             }
         }
 
