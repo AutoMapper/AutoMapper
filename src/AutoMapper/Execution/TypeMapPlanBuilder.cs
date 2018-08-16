@@ -28,6 +28,9 @@ namespace AutoMapper.Execution
         private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
             ctxt => ctxt.GetTypeDepth(default);
 
+        private static readonly Expression<Func<ResolutionContext, object>> MapInfo =
+            ctxt => ctxt.Map(default, default, default, default, default);
+
         private readonly IConfigurationProvider _configurationProvider;
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
@@ -49,7 +52,26 @@ namespace AutoMapper.Execution
 
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
-            var customExpression = TypeConverterMapper() ?? _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
+            if (_typeMap.Substitution != null)
+            {
+                // (src, dest, ctxt) => ctxt.Map(substitution(src, dest, ctxt), dest, typeof(TSubstitute), typeof(TDestination), default(PropertyMap))
+                var substitutionExpression = _typeMap.Substitution.ReplaceParameters(Source, _initialDestination, Context);
+
+                return Lambda(
+                    Call(
+                        Context,
+                        ((MethodCallExpression)MapInfo.Body).Method,
+                        substitutionExpression,
+                        _initialDestination,
+                        Constant(substitutionExpression.Type),
+                        Constant(_typeMap.DestinationType),
+                        Default(typeof(PropertyMap))),
+                    Source,
+                    _initialDestination,
+                    Context);
+            }
+
+            var customExpression = TypeConverterMapper() ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
             if(customExpression != null)
             {
                 return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source, _initialDestination, Context);
