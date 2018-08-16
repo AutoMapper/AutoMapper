@@ -154,6 +154,8 @@ namespace AutoMapper
 
         void RegisterTypeMap(TypeMap typeMap);
 
+        IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes);
+
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.

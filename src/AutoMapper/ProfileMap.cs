@@ -235,7 +235,7 @@ namespace AutoMapper
 
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IConfigurationProvider configurationProvider)
         {
-            foreach (var baseMap in GetIncludedTypeMaps(currentMap.IncludedBaseTypes, configurationProvider))
+            foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))
             {
                 baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
                 derivedMap.AddInheritedMap(baseMap);
@@ -245,30 +245,11 @@ namespace AutoMapper
 
         private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
-            foreach (var inheritedTypeMap in GetIncludedTypeMaps(typeMap.IncludedDerivedTypes, configurationProvider))
+            foreach (var inheritedTypeMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
                 inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
                 inheritedTypeMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(baseMap, inheritedTypeMap, configurationProvider);
-            }
-        }
-
-        private static IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes, IConfigurationProvider configurationProvider)
-        {
-            foreach(var pair in includedTypes)
-            {
-                var typeMap = configurationProvider.FindTypeMapFor(pair);
-                if(typeMap != null)
-                {
-                    yield return typeMap;
-                }
-                typeMap = configurationProvider.ResolveTypeMap(pair);
-                // we want the exact map the user included, but we could instantiate an open generic
-                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
-                {
-                    throw QueryMapperHelper.MissingMapException(pair);
-                }
-                yield return typeMap;
             }
         }
     }
