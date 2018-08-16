@@ -408,6 +408,15 @@ namespace AutoMapper
             ProfileMap profile;
             TypeMap cachedMap = null;
             var userMap = FindTypeMapFor(genericTypePair.Value);
+            if(userMap?.DestinationTypeOverride != null)
+            {
+                genericTypePair = new TypePair(genericTypePair.Value.SourceType, userMap.DestinationTypeOverride).GetOpenGenericTypePair();
+                if(genericTypePair == null)
+                {
+                    return null;
+                }
+                userMap = null;
+            }
             if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
             {
                 genericTypePair = cachedMap.Types.GetOpenGenericTypePair();

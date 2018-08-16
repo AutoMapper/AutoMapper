@@ -8,6 +8,37 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class OpenGenericsWithAs : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public object Value { get; set; }
+        }
+
+        public interface ITarget<T>
+        {
+            T Value { get; }
+        }
+
+        public class Target<T> : ITarget<T>
+        {
+            public T Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap(typeof(Source), typeof(Target<>));
+            cfg.CreateMap(typeof(Source), typeof(ITarget<>)).As(typeof(Target<>));
+        });
+
+        [Fact]
+        public void Should_use_the_redirected_map()
+        {
+            var source = new Source { Value = "value" };
+            Mapper.Map<ITarget<string>>(source).Value.ShouldBe(source.Value);
+        }
+    }
+
     public class OpenGenericsWithInclude : AutoMapperSpecBase
     {
         public class Person
