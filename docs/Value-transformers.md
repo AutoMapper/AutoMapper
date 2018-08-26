@@ -1,6 +1,6 @@
 # Value Transformers
 
-Value transformers apply an additional transormation to a single type. Before assigning the value, AutoMapper will check to see if the value to be set has any value transformations associated, and will apply them before setting.
+Value transformers apply an additional transformation to a single type. Before assigning the value, AutoMapper will check to see if the value to be set has any value transformations associated, and will apply them before setting.
 
 You can create value transformers at several different levels:
 
