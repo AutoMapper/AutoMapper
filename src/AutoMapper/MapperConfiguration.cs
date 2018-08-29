@@ -278,14 +278,13 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            var typeMaps = _typeMapRegistry.Values.Where(typeMap => typeMap.Profile.Name == profileName);
 
-            if (!typeMaps.Any())
+            if (!Profiles.Any(x => x.Name == profileName))
             {
-                throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any types for {profileName}.");
+                throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
             }
 
-            _validator.AssertConfigurationIsValid(typeMaps);
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
