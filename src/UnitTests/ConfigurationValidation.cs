@@ -575,6 +575,12 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid("Good"));
         }
+
+        [Fact]
+        public void Should_throw_when_profile_name_does_not_exist()
+        {
+            typeof(ArgumentOutOfRangeException).ShouldBeThrownBy(() => Configuration.AssertConfigurationIsValid("Does not exist"));
+        }
     }
 
     public class When_testing_a_dto_with_mismatched_custom_member_mapping : NonValidatingSpecBase
