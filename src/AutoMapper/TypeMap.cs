@@ -92,7 +92,6 @@ namespace AutoMapper
 
         public int MaxDepth { get; set; }
 
-        public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }

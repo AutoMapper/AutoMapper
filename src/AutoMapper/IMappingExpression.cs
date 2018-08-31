@@ -28,14 +28,6 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression ReverseMap();
-
-        /// <summary>
-        /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
-        /// The returned source object will be mapped instead of what was supplied in the original source object.
-        /// </summary>
-        /// <param name="substituteFunc">Substitution function</param>
-        /// <returns>New source object to map.</returns>
-        IMappingExpression Substitute(Func<object, object> substituteFunc);
         
         /// <summary>
         /// Construct the destination object using the service locator
@@ -427,14 +419,6 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName,
             Action<ISourceMemberConfigurationExpression> memberOptions);
-
-        /// <summary>
-        /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
-        /// The returned source object will be mapped instead of what was supplied in the original source object.
-        /// </summary>
-        /// <param name="substituteFunc">Substitution function</param>
-        /// <returns>New source object to map.</returns>
-        IMappingExpression<TSource, TDestination> Substitute<TSubstitute>(Func<TSource, TSubstitute> substituteFunc);
 
         /// <summary>
         /// Customize configuration for individual constructor parameter
