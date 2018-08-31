@@ -49,7 +49,7 @@ namespace AutoMapper.Execution
 
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
-            var customExpression = TypeConverterMapper() ?? _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
+            var customExpression = TypeConverterMapper() ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
             if(customExpression != null)
             {
                 return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source, _initialDestination, Context);

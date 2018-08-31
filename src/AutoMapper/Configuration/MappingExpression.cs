@@ -19,9 +19,6 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression ReverseMap() => (IMappingExpression) base.ReverseMap();
 
-        public IMappingExpression Substitute(Func<object, object> substituteFunc)
-            => (IMappingExpression) base.Substitute(substituteFunc);
-
         public new IMappingExpression ConstructUsingServiceLocator() 
             => (IMappingExpression)base.ConstructUsingServiceLocator();
 
@@ -325,18 +322,6 @@ namespace AutoMapper.Configuration
             memberOptions(srcConfig);
 
             _sourceMemberConfigurations.Add(srcConfig);
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> Substitute<TSubstitute>(Func<TSource, TSubstitute> substituteFunc)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TSubstitute>> expr = (src, dest, ctxt) => substituteFunc(src);
-
-                tm.Substitution = expr;
-            });
 
             return this;
         }
