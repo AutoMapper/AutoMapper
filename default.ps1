@@ -49,7 +49,7 @@ task test {
     Push-Location -Path $source_dir\UnitTests
 
     try {
-        exec { & dotnet test -c Release --no-build --no-restore }
+        exec { & dotnet test -c $config --no-build --no-restore }
     } finally {
         Pop-Location
     }
@@ -57,7 +57,7 @@ task test {
     Push-Location -Path $source_dir\IntegrationTests
 
     try {
-        exec { & dotnet test -c Release --no-build --no-restore }
+        exec { & dotnet test -c $config --no-build --no-restore }
     } finally {
         Pop-Location
     }

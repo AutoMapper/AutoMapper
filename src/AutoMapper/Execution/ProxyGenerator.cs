@@ -1,4 +1,3 @@
-#if DYNAMIC_METHODS
 namespace AutoMapper.Execution
 {
     using System;
@@ -161,4 +160,3 @@ namespace AutoMapper.Execution
         }
     }
 }
-#endif

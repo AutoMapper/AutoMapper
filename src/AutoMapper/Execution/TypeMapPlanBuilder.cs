@@ -322,7 +322,6 @@ namespace AutoMapper.Execution
             {
                 return CreateNewDestinationExpression(_typeMap.ConstructorMap);
             }
-#if DYNAMIC_METHODS
             if(_typeMap.DestinationTypeToUse.IsInterface())
             {
                 var ctor = Call(null,
@@ -333,7 +332,6 @@ namespace AutoMapper.Execution
                 // We're invoking a delegate here to make it have the right accessibility
                 return Invoke(ctor);
             }
-#endif
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 

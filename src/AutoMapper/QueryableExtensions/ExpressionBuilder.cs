@@ -143,11 +143,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(),
-#if DYNAMIC_METHODS
             new FirstPassLetPropertyMaps(_configurationProvider)
-#else
-            LetPropertyMaps.Default
-#endif
             );
 
         public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
@@ -440,7 +436,6 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
-#if DYNAMIC_METHODS
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new
@@ -484,7 +479,6 @@ namespace AutoMapper.QueryableExtensions
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
-#endif
 
             class GetMemberAccessesVisitor : ExpressionVisitor
             {
