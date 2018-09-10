@@ -13,6 +13,122 @@ namespace AutoMapper.IntegrationTests
     using System.Linq.Expressions;
     using QueryableExtensions;
 
+    public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Product, ProductModel>()
+                .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
+            cfg.CreateMap<Article, PriceModel>()
+                .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
+        });
+
+        [Fact]
+        public void Should_cache_the_subquery()
+        {
+            using(var context = new ClientContext())
+            {
+                var projection = context.Products.ProjectTo<ProductModel>(Configuration);
+                var counter = new FirstOrDefaultCounter();
+                counter.Visit(projection.Expression);
+                counter.Count.ShouldBe(1);
+                var productModel = projection.First();
+                productModel.Price.RegionId.ShouldBe((short)1);
+                productModel.Price.IsDefault.ShouldBeTrue();
+                productModel.Price.Id.ShouldBe(1);
+                productModel.Id.ShouldBe(1);
+            }
+        }
+
+        class FirstOrDefaultCounter : ExpressionVisitor
+        {
+            public int Count;
+
+            protected override Expression VisitMethodCall(MethodCallExpression node)
+            {
+                if(node.Method.Name == "FirstOrDefault")
+                {
+                    Count++;
+                }
+                return base.VisitMethodCall(node);
+            }
+        }
+
+        public partial class Article
+        {
+            public int Id { get; set; }
+            public int ProductId { get; set; }
+            public bool IsDefault { get; set; }
+            public short NationId { get; set; }
+            public virtual Product Product { get; set; }
+        }
+
+        public partial class Product
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public bool ECommercePublished { get; set; }
+            public virtual ICollection<Article> Articles { get; set; }
+            public int Value { get; }
+            [NotMapped]
+            public int NotMappedValue { get; set; }
+            public virtual List<Article> OtherArticles { get; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName1 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName2 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName3 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName4 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName5 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName6 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName7 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName8 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName9 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName10 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName11 { get; set; }
+        }
+
+        public class PriceModel
+        {
+            public int Id { get; set; }
+            public short RegionId { get; set; }
+            public bool IsDefault { get; set; }
+        }
+
+        public class ProductModel
+        {
+            public int Id { get; set; }
+            public PriceModel Price { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName1 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName2 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName3 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName4 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName5 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName6 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName7 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName8 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName9 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName10 { get; set; }
+            public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName11 { get; set; }
+        }
+
+        class Initializer : DropCreateDatabaseAlways<ClientContext>
+        {
+            protected override void Seed(ClientContext context)
+            {
+                context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
+            }
+        }
+
+        class ClientContext : DbContext
+        {
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                Database.SetInitializer(new Initializer());
+            }
+
+            public DbSet<Product> Products { get; set; }
+        }
+    }
+
     public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>

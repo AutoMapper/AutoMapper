@@ -48,7 +48,9 @@ namespace AutoMapper.Execution
             var interfaceType = typeDescription.Type;
             var additionalProperties = typeDescription.AdditionalProperties;
             var propertyNames = string.Join("_", additionalProperties.Select(p => p.Name));
-            var typeName = $"Proxy_{interfaceType.FullName}_{propertyNames}_{typeDescription.GetHashCode()}";
+            var typeName = $"Proxy_{interfaceType.FullName}_{typeDescription.GetHashCode()}_{propertyNames}";
+            const int MaxTypeNameLength = 1023;
+            typeName = typeName.Substring(0, Math.Min(MaxTypeNameLength, typeName.Length));
             var allInterfaces = new List<Type> { interfaceType };
             allInterfaces.AddRange(interfaceType.GetTypeInfo().ImplementedInterfaces);
             Debug.WriteLine(typeName, "Emitting proxy type");
