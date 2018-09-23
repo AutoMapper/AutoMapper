@@ -42,7 +42,7 @@ task compile -depends clean {
 }
 
 task benchmark {
-    exec { & $source_dir\Benchmark\bin\$config\net452\Benchmark.exe }
+    exec { & $source_dir\Benchmark\bin\$config\net461\Benchmark.exe }
 }
 
 task test {
