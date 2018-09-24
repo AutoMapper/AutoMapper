@@ -58,6 +58,7 @@ namespace AutoMapper
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
+        public ValueConverterConfiguration ValueConverterConfig { get; set; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public MemberInfo SourceMember
@@ -94,6 +95,7 @@ namespace AutoMapper
         }
 
 
+
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
             var getters = members as IList<MemberInfo> ?? members.ToList();
@@ -113,6 +115,7 @@ namespace AutoMapper
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
+            ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
         }
 
         public bool IsMapped() => HasSource() || Ignored;

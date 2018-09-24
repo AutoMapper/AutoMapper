@@ -284,6 +284,18 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.MappingOrder = mappingOrder);
         }
 
+        public void ConvertUsing<TValueConverter, TSourceMember>()
+            where TValueConverter : IValueConverter<TSourceMember, TMember>
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(typeof(TValueConverter),
+                    typeof(IValueConverter<TSourceMember, TMember>));
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
         public void Configure(TypeMap typeMap)
         {
             var destMember = _destinationMember;

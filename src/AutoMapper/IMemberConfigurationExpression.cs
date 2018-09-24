@@ -211,6 +211,9 @@ namespace AutoMapper
         /// </summary>
         /// <param name="transformer">Transformation expression</param>
         void AddTransform(Expression<Func<TMember, TMember>> transformer);
+
+        void ConvertUsing<TValueConverter, TSourceMember>()
+            where TValueConverter : IValueConverter<TSourceMember, TMember>;
     }
 
     /// <summary>
