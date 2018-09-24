@@ -217,6 +217,11 @@ namespace AutoMapper
 
         void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueConverter : IValueConverter<TSourceMember, TMember>;
+
+        void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter);
+
+        void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, Expression<Func<TSource, TSourceMember>> sourceMember);
+
     }
 
     /// <summary>

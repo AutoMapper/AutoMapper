@@ -614,10 +614,19 @@ namespace AutoMapper.Execution
             var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(Source) ??
                                (valueConverterConfig.SourceMemberName != null
                                    ? PropertyOrField(Source, valueConverterConfig.SourceMemberName)
-                                   : Chain(propertyMap.SourceMembers, iResolverTypeArgs[1]));
+                                   : propertyMap.SourceMembers.Any()
+                                       ? Chain(propertyMap.SourceMembers, iResolverTypeArgs[1])
+                                       : Block(
+                                           Throw(Constant(BuildExceptionMessage())),
+                                           Default(iResolverTypeArgs[0])
+                                       )
+                               );
 
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Convert"),
                 ToType(sourceMember, iResolverTypeArgs[0]), Context);
+
+            AutoMapperConfigurationException BuildExceptionMessage() 
+                => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
         }
     }
 }

@@ -20,6 +20,7 @@ namespace AutoMapper
         public ValueConverterConfiguration(object instance, Type interfaceType)
         {
             Instance = instance;
+            ConcreteType = instance.GetType();
             InterfaceType = interfaceType;
         }
     }

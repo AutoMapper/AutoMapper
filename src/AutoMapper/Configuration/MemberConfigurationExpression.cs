@@ -310,6 +310,30 @@ namespace AutoMapper.Configuration
             });
         }
 
+        public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(valueConverter,
+                    typeof(IValueConverter<TSourceMember, TMember>));
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
+        public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, Expression<Func<TSource, TSourceMember>> sourceMember)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
+                {
+                    SourceMember = sourceMember
+                };
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
         public void Configure(TypeMap typeMap)
         {
             var destMember = DestinationMember;
