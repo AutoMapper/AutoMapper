@@ -11,18 +11,17 @@ namespace AutoMapper.Configuration
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
-        private readonly MemberInfo _destinationMember;
         private LambdaExpression _sourceMember;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
         public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
         {
-            _destinationMember = destinationMember;
+            DestinationMember = destinationMember;
             _sourceType = sourceType;
         }
 
-        public MemberInfo DestinationMember => _destinationMember;
+        public MemberInfo DestinationMember { get; }
 
         public void MapAtRuntime()
         {
@@ -296,9 +295,24 @@ namespace AutoMapper.Configuration
             });
         }
 
+        public void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
+            where TValueConverter : IValueConverter<TSourceMember, TMember>
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(typeof(TValueConverter),
+                    typeof(IValueConverter<TSourceMember, TMember>))
+                {
+                    SourceMember = sourceMember
+                };
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
         public void Configure(TypeMap typeMap)
         {
-            var destMember = _destinationMember;
+            var destMember = DestinationMember;
 
             if(destMember.DeclaringType.IsGenericType())
             {
@@ -320,7 +334,7 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            var newSourceExpression = MemberAccessLambda(_destinationMember);
+            var newSourceExpression = MemberAccessLambda(DestinationMember);
             return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, newSourceExpression);
         }
     }

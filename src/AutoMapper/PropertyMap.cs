@@ -80,21 +80,11 @@ namespace AutoMapper
             }
         }
 
-        public Type SourceType
-        {
-            get
-            {
-                if (CustomExpression != null)
-                    return CustomExpression.ReturnType;
-                if (CustomResolver != null)
-                    return CustomResolver.ReturnType;
-                if(ValueResolverConfig != null)
-                    return typeof(object);
-                return SourceMember?.GetMemberType();
-            }
-        }
-
-
+        public Type SourceType => CustomExpression?.ReturnType
+                                  ?? CustomResolver?.ReturnType
+                                  ?? ValueResolverConfig?.SourceMember?.ReturnType
+                                  ?? ValueConverterConfig?.SourceMember?.ReturnType
+                                  ?? SourceMember?.GetMemberType();
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
@@ -124,7 +114,7 @@ namespace AutoMapper
 
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
-        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null;
+        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || ValueConverterConfig != null;
 
         public void MapFrom(LambdaExpression sourceMember)
         {
