@@ -1,5 +1,4 @@
-﻿#if !NETCOREAPP1_1 // this is broken in .NET Core 1.1 see https://github.com/dotnet/corefx/issues/7596
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.Execution;
 using Xunit;
@@ -70,4 +69,3 @@ namespace AutoMapper.UnitTests
         }
     }
 }
-#endif

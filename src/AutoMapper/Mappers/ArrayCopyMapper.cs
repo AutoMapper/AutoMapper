@@ -15,13 +15,8 @@ namespace AutoMapper.Mappers
 
     public class ArrayCopyMapper : ArrayMapper
     {
-#if NETSTANDARD1_3
-        private static readonly Expression<Action> ArrayCopyExpression = () => Array.Copy(default, default, default(int));
-        private static readonly Expression<Func<Array, int>> ArrayLengthExpression = arr => arr.Length;
-#else
         private static readonly Expression<Action> ArrayCopyExpression = () => Array.Copy(default, default, default(long));
         private static readonly Expression<Func<Array, long>> ArrayLengthExpression = arr => arr.LongLength;
-#endif
 
         private static readonly MethodInfo ArrayCopyMethod = ((MethodCallExpression)ArrayCopyExpression.Body).Method;
         private static readonly PropertyInfo ArrayLengthProperty = (PropertyInfo) ((MemberExpression)ArrayLengthExpression.Body).Member;

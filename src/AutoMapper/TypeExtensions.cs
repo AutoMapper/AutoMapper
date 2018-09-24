@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace AutoMapper
 {
-#if DYNAMIC_METHODS
-    using System.Reflection.Emit;
-#endif
 
     internal static class TypeExtensions
     {
@@ -21,12 +19,7 @@ namespace AutoMapper
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if DYNAMIC_METHODS
-        public static Type CreateType(this TypeBuilder type)
-        {
-            return type.CreateTypeInfo().AsType();
-        }
-#endif
+        public static Type CreateType(this TypeBuilder type) => type.CreateTypeInfo().AsType();
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
 
