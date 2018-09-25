@@ -49,6 +49,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Nested-mappings
    Custom-type-converters
    Custom-value-resolvers
+   Value-converters
    Value-transformers
    Null-substitution
    Before-and-after-map-actions
