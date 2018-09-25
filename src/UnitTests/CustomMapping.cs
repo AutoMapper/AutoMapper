@@ -970,7 +970,7 @@ namespace AutoMapper.UnitTests
         public void Should_use_the_custom_translator()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
-                .ProjectUsing(s => new Destination { Value = s.Value + 10 }));
+                .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
             _dest = config.CreateMapper().Map<Source, Destination>(_source);
             _dest.Value.ShouldBe(20);
@@ -981,7 +981,7 @@ namespace AutoMapper.UnitTests
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                .ProjectUsing(s => new Destination { Value = s.Value + 10 }));
+                .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
             _dest = config.CreateMapper().Map<Source, Destination>(_source);
             _dest.Value.ShouldBe(20);

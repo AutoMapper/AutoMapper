@@ -17,8 +17,8 @@ namespace AutoMapper.IntegrationTests.Net4
             public MyProfile()
             {
                 CreateMap<MyTable, MyTableModel>();
-                CreateMap<int, MyEnum>().ProjectUsing(x => (MyEnum)x);
-                CreateMap<int?, MyEnum>().ProjectUsing(x => x.HasValue ? (MyEnum)x.Value : MyEnum.Value1);
+                CreateMap<int, MyEnum>().ConvertUsing(x => (MyEnum)x);
+                CreateMap<int?, MyEnum>().ConvertUsing(x => x.HasValue ? (MyEnum)x.Value : MyEnum.Value1);
             }
         }
 
@@ -126,7 +126,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             cfg.CreateMap<Parent, ParentVM>();
             cfg.CreateMap<Children, int>()
-                .ProjectUsing(c => c.ID);
+                .ConvertUsing(c => c.ID);
         });
 
         [Fact]
