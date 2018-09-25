@@ -310,6 +310,21 @@ namespace AutoMapper.Configuration
             });
         }
 
+        public void ConvertUsing<TValueConverter, TSourceMember>(string sourceMemberName)
+            where TValueConverter : IValueConverter<TSourceMember, TMember>
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(typeof(TValueConverter),
+                    typeof(IValueConverter<TSourceMember, TMember>))
+                {
+                    SourceMemberName = sourceMemberName
+                };
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
         public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter)
         {
             PropertyMapActions.Add(pm =>
@@ -328,6 +343,19 @@ namespace AutoMapper.Configuration
                 var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
                 {
                     SourceMember = sourceMember
+                };
+
+                pm.ValueConverterConfig = config;
+            });
+        }
+
+        public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, string sourceMemberName)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
+                {
+                    SourceMemberName = sourceMemberName
                 };
 
                 pm.ValueConverterConfig = config;

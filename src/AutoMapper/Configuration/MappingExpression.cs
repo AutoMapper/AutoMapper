@@ -127,6 +127,42 @@ namespace AutoMapper.Configuration
 
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
+
+            public void ConvertUsing(Type valueConverterType)
+            {
+                PropertyMapActions.Add(pm =>
+                {
+                    var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)));
+
+                    pm.ValueConverterConfig = config;
+                });
+            }
+
+            public void ConvertUsing(Type valueConverterType, string sourceMemberName)
+            {
+                PropertyMapActions.Add(pm =>
+                {
+                    var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                    {
+                        SourceMemberName = sourceMemberName
+                    };
+
+                    pm.ValueConverterConfig = config;
+                });
+            }
+
+            public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName)
+            {
+                PropertyMapActions.Add(pm =>
+                {
+                    var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
+                    {
+                        SourceMemberName = sourceMemberName
+                    };
+
+                    pm.ValueConverterConfig = config;
+                });
+            }
         }
 
     }

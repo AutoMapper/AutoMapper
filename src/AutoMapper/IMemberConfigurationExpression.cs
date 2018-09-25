@@ -212,16 +212,17 @@ namespace AutoMapper
         /// <param name="transformer">Transformation expression</param>
         void AddTransform(Expression<Func<TMember, TMember>> transformer);
 
-        void ConvertUsing<TValueConverter, TSourceMember>()
-            where TValueConverter : IValueConverter<TSourceMember, TMember>;
+        void ConvertUsing<TValueConverter, TSourceMember>() where TValueConverter : IValueConverter<TSourceMember, TMember>;
 
-        void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
-            where TValueConverter : IValueConverter<TSourceMember, TMember>;
+        void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember) where TValueConverter : IValueConverter<TSourceMember, TMember>;
+
+        void ConvertUsing<TValueConverter, TSourceMember>(string sourceMemberName) where TValueConverter : IValueConverter<TSourceMember, TMember>;
 
         void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter);
 
         void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, Expression<Func<TSource, TSourceMember>> sourceMember);
 
+        void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, string sourceMemberName);
     }
 
     /// <summary>
@@ -251,5 +252,9 @@ namespace AutoMapper
         /// <param name="memberName">Source member to supply to value resolver</param>
         /// <returns>Resolution expression</returns>
         void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> valueResolver, string memberName);
+
+        void ConvertUsing(Type valueConverterType);
+        void ConvertUsing(Type valueConverterType, string sourceMemberName);
+        void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName);
     }
 }
