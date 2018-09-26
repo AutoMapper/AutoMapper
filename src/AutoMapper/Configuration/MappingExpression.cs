@@ -101,21 +101,21 @@ namespace AutoMapper.Configuration
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void MapFrom(Type valueResolverType, string memberName)
+            public void MapFrom(Type valueResolverType, string sourceMemberName)
             {
                 var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
                 {
-                    SourceMemberName = memberName
+                    SourceMemberName = sourceMemberName
                 };
 
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
+            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName)
             {
                 var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
                 {
-                    SourceMemberName = memberName
+                    SourceMemberName = sourceMemberName
                 };
 
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
