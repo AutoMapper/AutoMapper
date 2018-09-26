@@ -13,8 +13,7 @@ domain and application layer.
 
 AutoMapper supports the following platforms:
 
-* .NET 4.5+
-* `.NET Standard 1.3+ <https://docs.microsoft.com/en-us/dotnet/standard/net-standard>` 
+* .NET 4.6.1+
 * `.NET Standard 2.0+ https://docs.microsoft.com/en-us/dotnet/standard/net-standard`
 
 New to AutoMapper? Check out the :doc:`Getting-started` page first.
@@ -28,6 +27,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 
    Getting-started
    5.0-Upgrade-Guide
+   8.0-Upgrade-Guide
    Static-and-Instance-API
    Migrating-from-static-API
    Conventions
