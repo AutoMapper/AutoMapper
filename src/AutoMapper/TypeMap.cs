@@ -155,39 +155,17 @@ namespace AutoMapper
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
         }
 
-        public bool PassesCtorValidation()
-        {
-            if (DisableConstructorValidation)
-                return true;
-
-            if (DestinationCtor != null)
-                return true;
-
-            if (ConstructDestinationUsingServiceLocator)
-                return true;
-
-            if (ConstructorMap?.CanResolve == true)
-                return true;
-
-            if (DestinationTypeToUse.IsInterface())
-                return true;
-
-            if (DestinationTypeToUse.IsAbstract())
-                return true;
-
-            if (DestinationTypeToUse.IsGenericTypeDefinition())
-                return true;
-
-            if (DestinationTypeToUse.IsValueType())
-                return true;
-
-            var constructors = DestinationTypeDetails.Constructors;
-            
-            //find a ctor with only optional args
-            var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
-
-            return ctorWithOptionalArgs != null;
-        }
+        public bool PassesCtorValidation() =>
+            DisableConstructorValidation
+            || ConstructExpression != null
+            || DestinationCtor != null
+            || ConstructDestinationUsingServiceLocator
+            || ConstructorMap?.CanResolve == true
+            || DestinationTypeToUse.IsInterface()
+            || DestinationTypeToUse.IsAbstract()
+            || DestinationTypeToUse.IsGenericTypeDefinition()
+            || DestinationTypeToUse.IsValueType()
+            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
         {

@@ -310,6 +310,10 @@ namespace AutoMapper.Execution
 
         private Expression CreateNewDestinationFunc()
         {
+            if(_typeMap.ConstructExpression != null)
+            {
+                return _typeMap.ConstructExpression.ReplaceParameters(Source);
+            }
             if(_typeMap.DestinationCtor != null)
             {
                 return _typeMap.DestinationCtor.ReplaceParameters(Source, Context);
@@ -348,7 +352,10 @@ namespace AutoMapper.Execution
 
         private TypePair[] GetConstructorMappingTypes()
         {
-            if(_typeMap.DestinationCtor != null || _typeMap.ConstructDestinationUsingServiceLocator || _typeMap.ConstructorMap?.CanResolve != true)
+            if(_typeMap.ConstructExpression != null 
+               || _typeMap.DestinationCtor != null 
+               || _typeMap.ConstructDestinationUsingServiceLocator 
+               || _typeMap.ConstructorMap?.CanResolve != true)
             {
                 return new TypePair[0];
             }

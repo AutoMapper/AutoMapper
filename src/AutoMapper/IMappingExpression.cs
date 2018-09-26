@@ -44,25 +44,19 @@ namespace AutoMapper
         IMappingExpression MaxDepth(int depth);
 
         /// <summary>
-        /// Supply a custom instantiation expression for the destination type for LINQ projection
+        /// Supply a custom instantiation expression for the destination type
         /// </summary>
-        /// <param name="ctor">Callback to create the destination type given the source object</param>
+        /// <param name="ctor">Expression to create the destination type given the source object</param>
         /// <returns>Itself</returns>
-        IMappingExpression ConstructProjectionUsing(LambdaExpression ctor);
+        IMappingExpression ConstructUsing(Expression<Func<object, object>> ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="ctor">Callback to create the destination type given the source object and current resolution context</param>
         /// <returns>Itself</returns>
         IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor);
-
-        /// <summary>
-        /// Supply a custom instantiation function for the destination type
-        /// </summary>
-        /// <param name="ctor">Callback to create the destination type given the source object</param>
-        /// <returns>Itself</returns>
-        IMappingExpression ConstructUsing(Func<object, object> ctor);
 
         /// <summary>
         /// Customize configuration for all members
@@ -360,22 +354,16 @@ namespace AutoMapper
             where TMappingAction : IMappingAction<TSource, TDestination>;
 
         /// <summary>
-        /// Supply a custom instantiation function for the destination type
+        /// Supply a custom instantiation expression for the destination type
         /// </summary>
-        /// <param name="ctor">Callback to create the destination type given the source object</param>
+        /// <param name="ctor">Expression to create the destination type given the source object</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
-
-        /// <summary>
-        /// Supply a custom instantiation expression for the destination type for LINQ projection
-        /// </summary>
-        /// <param name="ctor">Callback to create the destination type given the source object</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ConstructProjectionUsing(Expression<Func<TSource, TDestination>> ctor);
+        IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="ctor">Callback to create the destination type given the current resolution context</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, ResolutionContext, TDestination> ctor);

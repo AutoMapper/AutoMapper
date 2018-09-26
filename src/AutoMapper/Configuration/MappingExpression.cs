@@ -64,18 +64,11 @@ namespace AutoMapper.Configuration
         public new IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object> 
             => (IMappingExpression)base.AfterMap<TMappingAction>();
 
-        public new IMappingExpression ConstructUsing(Func<object, object> ctor)
+        public new IMappingExpression ConstructUsing(Expression<Func<object, object>> ctor)
             => (IMappingExpression)base.ConstructUsing(ctor);
 
         public new IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor)
             => (IMappingExpression)base.ConstructUsing(ctor);
-
-        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
-        {
-            TypeMapActions.Add(tm => tm.ConstructExpression = ctor);
-
-            return this;
-        }
 
         public new IMappingExpression ValidateMemberList(MemberList memberList)
             => (IMappingExpression) base.ValidateMemberList(memberList);
@@ -455,14 +448,9 @@ namespace AutoMapper.Configuration
             return AfterMap(AfterFunction);
         }
 
-        public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
+        public IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
         {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src);
-
-                tm.DestinationCtor = expr;
-            });
+            TypeMapActions.Add(tm => tm.ConstructExpression = ctor);
 
             return this;
         }
@@ -474,23 +462,6 @@ namespace AutoMapper.Configuration
                 Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
 
                 tm.DestinationCtor = expr;
-            });
-
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> ConstructProjectionUsing(Expression<Func<TSource, TDestination>> ctor)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                tm.ConstructExpression = ctor;
-
-                var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
-                var srcParam = Parameter(typeof (TSource), "src");
-
-                var body = ctor.ReplaceParameters(srcParam);
-
-                tm.DestinationCtor = Lambda(body, srcParam, ctxtParam);
             });
 
             return this;
