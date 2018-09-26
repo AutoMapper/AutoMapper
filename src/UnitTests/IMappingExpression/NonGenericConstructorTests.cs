@@ -34,8 +34,8 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Expression<Func<Source, Dest>> constructor = src => new Dest(src.Value + 10);
-            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructProjectionUsing(constructor);
+            Expression<Func<object, object>> constructor = src => new Dest(((Source) src).Value + 10);
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructUsing(constructor);
         });
 
         protected override void Because_of()

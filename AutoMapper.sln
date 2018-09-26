@@ -12,10 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C1930F52-C66E-4E56-B7DB-FD42E497FFF0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1BCC7A00-6382-4891-936A-F164614D26A4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "src\Benchmark\Benchmark.csproj", "{B8051389-CB47-46FB-B234-9D49506704AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper", "src\AutoMapper\AutoMapper.csproj", "{35888286-1428-4BF3-BB0C-D8BC092D0A5D}"
@@ -97,12 +93,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B8051389-CB47-46FB-B234-9D49506704AA} = {1BCC7A00-6382-4891-936A-F164614D26A4}
-		{35888286-1428-4BF3-BB0C-D8BC092D0A5D} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
-		{4F96C184-FF4B-4256-B8BC-C51D1167C489} = {1BCC7A00-6382-4891-936A-F164614D26A4}
-		{24B47F4C-0035-4F29-AAD9-4C47E1AAD98E} = {1BCC7A00-6382-4891-936A-F164614D26A4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D8272EE-D8E3-4B7E-A063-B334CBF8C42F}
