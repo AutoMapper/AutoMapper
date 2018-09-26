@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof(Source), typeof(Destination)).ForMember("Value", o => o.ResolveUsing((src, dest, member, ctx) => 10));
+            cfg.CreateMap(typeof(Source), typeof(Destination)).ForMember("Value", o => o.MapFrom((src, dest, member, ctx) => 10));
         });
 
         protected override void Because_of()

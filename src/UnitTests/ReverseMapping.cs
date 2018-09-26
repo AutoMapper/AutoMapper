@@ -68,7 +68,7 @@ namespace AutoMapper.UnitTests
             c.CreateMap<Destination, Source>()
              .ForMember(dest => dest.Total, opt => opt.MapFrom(x => x.Total))
              .ReverseMap()
-             .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>());
+             .ForMember(dest => dest.Total, opt => opt.MapFrom<CustomResolver>());
         });
 
         public class CustomResolver : IValueResolver<Source, Destination, int>
@@ -476,7 +476,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>(MemberList.Source)
-                .ForMember(dest => dest.Value3, opt => opt.ResolveUsing(src => src.Value2))
+                .ForMember(dest => dest.Value3, opt => opt.MapFrom(src => src.Value2))
                 .ForSourceMember(src => src.Value2, opt => opt.Ignore());
         });
 

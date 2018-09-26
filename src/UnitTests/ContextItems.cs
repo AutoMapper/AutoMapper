@@ -31,7 +31,7 @@
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Dest>()
-                        .ForMember(d => d.Value, opt => opt.ResolveUsing<ContextResolver, int>(src => src.Value));
+                        .ForMember(d => d.Value, opt => opt.MapFrom<ContextResolver, int>(src => src.Value));
                 });
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => { opt.Items["Item"] = 10; });
@@ -58,7 +58,7 @@
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Dest>()
-                        .ForMember(d => d.Value, opt => opt.ResolveUsing((src, d, member, ctxt) => (int)ctxt.Items["Item"] + 5));
+                        .ForMember(d => d.Value, opt => opt.MapFrom((src, d, member, ctxt) => (int)ctxt.Items["Item"] + 5));
                 });
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => opt.Items["Item"] = 10);
@@ -85,7 +85,7 @@
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Dest>()
-                        .ForMember(d => d.Value1, opt => opt.ResolveUsing((source, d, dMember, context) => (int)context.Options.Items["Item"] + source.Value1));
+                        .ForMember(d => d.Value1, opt => opt.MapFrom((source, d, dMember, context) => (int)context.Options.Items["Item"] + source.Value1));
                 });
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value1 = 5 }, opt => { opt.Items["Item"] = 10; });

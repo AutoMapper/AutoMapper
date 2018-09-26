@@ -15,16 +15,11 @@ namespace AutoMapper
         void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
 
         /// <summary>
-        /// Map constructor parameter from custom func
-        /// </summary>
-        /// <param name="resolver">Custom func</param>
-        void ResolveUsing<TMember>(Func<TSource, TMember> resolver);
-
-        /// <summary>
         /// Map constructor parameter from custom func that has access to <see cref="ResolutionContext"/>
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="resolver">Custom func</param>
-        void ResolveUsing<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
+        void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
     }
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
@@ -39,13 +34,7 @@ namespace AutoMapper
             _ctorParamActions.Add(cpm => cpm.CustomExpression = sourceMember);
         }
 
-        public void ResolveUsing<TMember>(Func<TSource, TMember> resolver)
-        {
-            Expression<Func<TSource, ResolutionContext, TMember>> resolverExpression = (src, ctxt) => resolver(src);
-            _ctorParamActions.Add(cpm => cpm.CustomValueResolver = resolverExpression);
-        }
-
-        public void ResolveUsing<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
+        public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
             Expression<Func<TSource, ResolutionContext, TMember>> resolverExpression = (src, ctxt) => resolver(src, ctxt);
             _ctorParamActions.Add(cpm => cpm.CustomValueResolver = resolverExpression);

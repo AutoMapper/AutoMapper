@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<BaseEntity, ViewModel>()
-                .ForMember(vm => vm.Property2, opt => opt.ResolveUsing(e => e.Property1));
+                .ForMember(vm => vm.Property2, opt => opt.MapFrom(e => e.Property1));
 
             cfg.CreateMap<SubBaseEntity, ViewModel>()
                 .IncludeBase<BaseEntity, ViewModel>();

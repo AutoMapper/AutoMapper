@@ -116,10 +116,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
                 .ForMember(dest => dest.Value, opt =>
                 {
                     opt.Condition(src => src.Value > 0);
-                    opt.ResolveUsing((Source src) =>
-                    {
-                        return 10;
-                    });
+                    opt.MapFrom(src => 10);
                 });
         });
 

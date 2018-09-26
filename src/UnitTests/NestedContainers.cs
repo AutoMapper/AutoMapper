@@ -53,8 +53,8 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(x => x.Value, opt => opt.ResolveUsing<FooResolver, int>(x => x.Value))
-                    .ForMember(x => x.Value2, opt => opt.ResolveUsing<BarResolver, int>(x => x.Value2));
+                    .ForMember(x => x.Value, opt => opt.MapFrom<FooResolver, int>(x => x.Value))
+                    .ForMember(x => x.Value2, opt => opt.MapFrom<BarResolver, int>(x => x.Value2));
             });
 
             protected override void Because_of()

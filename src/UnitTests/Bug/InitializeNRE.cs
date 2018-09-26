@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.ConstructServicesUsing(t => new Res());
-            cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing<IRes>());
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom<IRes>());
         });
     }
 

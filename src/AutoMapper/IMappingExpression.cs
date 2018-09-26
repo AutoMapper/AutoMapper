@@ -189,7 +189,7 @@ namespace AutoMapper
         /// <summary>
         /// Customize configuration for a path inside the destination object.
         /// </summary>
-        /// <param name="destinationMember">Expression to the destination subobject</param>
+        /// <param name="destinationMember">Expression to the destination sub object</param>
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
@@ -385,6 +385,7 @@ namespace AutoMapper
         /// <summary>
         /// Construct the destination object using the service locator
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator();
 

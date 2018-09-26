@@ -33,7 +33,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
         }
 
-        public void ResolveUsing<TValueResolver>() 
+        public void MapFrom<TValueResolver>() 
             where TValueResolver : IValueResolver<TSource, TDestination, TMember>
         {
             var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>));
@@ -41,7 +41,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
+        public void MapFrom<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
             var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
@@ -52,7 +52,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TValueResolver, TSourceMember>(string sourceMemberName)
+        public void MapFrom<TValueResolver, TSourceMember>(string sourceMemberName)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
             var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
@@ -63,14 +63,14 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing(IValueResolver<TSource, TDestination, TMember> valueResolver)
+        public void MapFrom(IValueResolver<TSource, TDestination, TMember> valueResolver)
         {
             var config = new ValueResolverConfiguration(valueResolver, typeof(IValueResolver<TSource, TDestination, TMember>));
 
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember)
+        public void MapFrom<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember)
         {
             var config = new ValueResolverConfiguration(valueResolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
@@ -80,17 +80,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TResult>(Func<TSource, TResult> resolver)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => resolver(src);
-
-                pm.CustomResolver = expr;
-            });
-        }
-
-        public void ResolveUsing<TResult>(Func<TSource, TDestination, TResult> resolver)
+        public void MapFrom<TResult>(Func<TSource, TDestination, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
@@ -100,7 +90,7 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, TResult> resolver)
+        public void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
@@ -110,7 +100,7 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> resolver)
+        public void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {

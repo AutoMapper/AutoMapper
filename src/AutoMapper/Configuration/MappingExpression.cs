@@ -94,14 +94,14 @@ namespace AutoMapper.Configuration
             {
             }
 
-            public void ResolveUsing(Type valueResolverType)
+            public void MapFrom(Type valueResolverType)
             {
                 var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
 
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void ResolveUsing(Type valueResolverType, string memberName)
+            public void MapFrom(Type valueResolverType, string memberName)
             {
                 var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
                 {
@@ -111,7 +111,7 @@ namespace AutoMapper.Configuration
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
+            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
             {
                 var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
                 {
