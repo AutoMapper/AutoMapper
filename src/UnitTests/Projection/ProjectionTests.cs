@@ -75,7 +75,7 @@
         public void Direct_assignability_shouldnt_trump_custom_projection() {
             var config = new MapperConfiguration(x => {
                 x.CreateMap<string, string>()
-                    .ProjectUsing(s => _niceGreeting);
+                    .ConvertUsing(s => _niceGreeting);
 
                 x.CreateMap<Source, Target>();
                 x.CreateMap<SourceChild, TargetChild>();
@@ -94,7 +94,7 @@
         public void Root_is_subject_to_custom_projection() {
             var config = new MapperConfiguration(x => {
                 x.CreateMap<Source, Target>()
-                    .ProjectUsing(s => new Target() { Greeting = _niceGreeting });
+                    .ConvertUsing(s => new Target() { Greeting = _niceGreeting });
             });
 
             var target = new[] { new Source() }
@@ -110,7 +110,7 @@
         public void Child_nodes_are_subject_to_custom_projection() {
             var config = new MapperConfiguration(x => {
                 x.CreateMap<SourceChild, TargetChild>()
-                    .ProjectUsing(s => new TargetChild() { Greeting = _niceGreeting });
+                    .ConvertUsing(s => new TargetChild() { Greeting = _niceGreeting });
 
                 x.CreateMap<Source, Target>();
             });

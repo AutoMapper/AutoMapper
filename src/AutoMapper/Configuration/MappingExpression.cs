@@ -67,7 +67,7 @@ namespace AutoMapper.Configuration
         public new IMappingExpression ConstructUsing(Func<object, object> ctor)
             => (IMappingExpression)base.ConstructUsing(ctor);
 
-        public new IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor) 
+        public new IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor)
             => (IMappingExpression)base.ConstructUsing(ctor);
 
         public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
@@ -303,11 +303,6 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
-        {
-            TypeMapActions.Add(tm => tm.CustomProjection = projectionExpression);
-        }
-
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
             TypeMapActions.Add(tm => tm.MaxDepth = depth);
@@ -355,15 +350,9 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
+        public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction)
         {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
-                    (src, dest, ctxt) => mappingFunction(src);
-
-                tm.CustomMapper = expr;
-            });
+            TypeMapActions.Add(tm => tm.CustomProjection = mappingFunction);
         }
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)

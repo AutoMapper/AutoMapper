@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<string, DummyTypes?>().ProjectUsing(s => (DummyTypes)System.Enum.Parse(typeof(DummyTypes),s));
+                cfg.CreateMap<string, DummyTypes?>().ConvertUsing(s => (DummyTypes)System.Enum.Parse(typeof(DummyTypes),s));
                 cfg.CreateMap<DummySource, DummyDestination>();
             });
 

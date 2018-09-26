@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Projection
             _config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap(typeof(Customer), typeof(CustomerDto));
-                cfg.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
+                cfg.CreateMap(typeof(CustomerType), typeof(string)).ConvertUsing(ct => ct.ToString().ToUpper());
             });
         }
 
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests.Projection
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap(typeof (Customer), typeof (CustomerDto));
-                cfg.CreateMap(typeof (CustomerType), typeof (string)).ProjectUsing(ct => ct.ToString().ToUpper());
+                cfg.CreateMap(typeof (CustomerType), typeof (string)).ConvertUsing(ct => ct.ToString().ToUpper());
             });
             _mapper = config.CreateMapper();
         }
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof (Source), typeof (Dest)).ProjectUsing(src => new Dest {Value = 10});
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ConvertUsing(src => new Dest {Value = 10});
         });
 
         [Fact]

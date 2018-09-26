@@ -42,7 +42,7 @@ namespace AutoMapper
         /// <param name="depth">Number of levels to limit to</param>
         /// <returns>Itself</returns>
         IMappingExpression MaxDepth(int depth);
-        
+
         /// <summary>
         /// Supply a custom instantiation expression for the destination type for LINQ projection
         /// </summary>
@@ -65,12 +65,6 @@ namespace AutoMapper
         IMappingExpression ConstructUsing(Func<object, object> ctor);
 
         /// <summary>
-        /// Skip member mapping and use a custom expression during LINQ projection
-        /// </summary>
-        /// <param name="projectionExpression">Projection expression</param>
-        void ProjectUsing(Expression<Func<object, object>> projectionExpression);
-
-        /// <summary>
         /// Customize configuration for all members
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
@@ -89,7 +83,13 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);
-        
+
+        /// <summary>
+        /// Skip member mapping and use a custom expression to convert to the destination type
+        /// </summary>
+        /// <param name="mappingExpression">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Expression<Func<object, object>> mappingExpression);
+
         /// <summary>
         /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
         /// </summary>
@@ -204,7 +204,7 @@ namespace AutoMapper
         /// <summary>
         /// Preserve object identity. Useful for circular references.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> PreserveReferences();
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="name">Destination member name</param>
         /// <param name="memberOptions">Callback for member options</param>
-        /// <returns></returns>
+        /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForMember(string name,
             Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
 
@@ -276,44 +276,43 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> Include(Type derivedSourceType, Type derivedDestinationType);
 
         /// <summary>
-        /// Skip member mapping and use a custom expression during LINQ projection
+        /// Skip member mapping and use a custom expression to convert to the destination type
         /// </summary>
-        /// <param name="projectionExpression">Projection expression</param>
-        void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression);
+        /// <param name="mappingExpression">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Expression<Func<TSource, TDestination>> mappingExpression);
 
         /// <summary>
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
-        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
-        void ConvertUsing(Func<TSource, TDestination> mappingFunction);
-
-        /// <summary>
-        /// Skip member mapping and use a custom function to convert to the destination type
-        /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Callback to convert from source type to destination type, including destination object</param>
         void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction);
 
         /// <summary>
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Callback to convert from source type to destination type, with source, destination and context</param>
         void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction);
 
         /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="converter">Type converter instance</param>
         void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
 
         /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <typeparam name="TTypeConverter">Type converter type</typeparam>
         void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 
         /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="beforeFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
@@ -321,6 +320,7 @@ namespace AutoMapper
         /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="beforeFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction);
@@ -328,6 +328,7 @@ namespace AutoMapper
         /// <summary>
         /// Execute a custom mapping action before member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>()
@@ -336,6 +337,7 @@ namespace AutoMapper
         /// <summary>
         /// Execute a custom function to the source and/or destination types after member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
@@ -343,6 +345,7 @@ namespace AutoMapper
         /// <summary>
         /// Execute a custom function to the source and/or destination types after member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction);
@@ -350,6 +353,7 @@ namespace AutoMapper
         /// <summary>
         /// Execute a custom mapping action after member mapping
         /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>()

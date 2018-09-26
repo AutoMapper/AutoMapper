@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Projection
             _config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Customer, CustomerDto>();
-                cfg.CreateMap<CustomerType, string>().ProjectUsing(ct => ct.ToString().ToUpper());
+                cfg.CreateMap<CustomerType, string>().ConvertUsing(ct => ct.ToString().ToUpper());
             });
         }
 
@@ -70,7 +70,7 @@ namespace AutoMapper.UnitTests.Projection
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
-                .ProjectUsing(src => new Dest {Value = 10});
+                .ConvertUsing(src => new Dest {Value = 10});
         });
 
         [Fact]

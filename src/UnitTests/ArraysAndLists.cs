@@ -104,7 +104,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         int[] _source = Enumerable.Range(1, 10).ToArray();
         int[] _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<int, int>().ProjectUsing(i => i * 1000));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<int, int>().ConstructUsing(i => i * 1000));
 
         protected override void Because_of()
         {
