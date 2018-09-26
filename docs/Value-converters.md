@@ -1,6 +1,6 @@
 # Value Converters
 
-Value converters are a cross between [Type Converters](Custom-type-converters.html) and [Value Resolvers](Custom-value-resolvers.html). Type converters are globally scoped, so that any time you map from type `Foo` to type `Bar` in any mapping, the type converter will be used. Value resolvers are scoped to a single map, and receive the source and destination objects to resolve to a value to map to the destination member. Optionally value resolvers can receive the source member as well.
+Value converters are a cross between [Type Converters](Custom-type-converters.html) and [Value Resolvers](Custom-value-resolvers.html). Type converters are globally scoped, so that any time you map from type `Foo` to type `Bar` in any mapping, the type converter will be used. Value converters are scoped to a single map, and receive the source and destination objects to resolve to a value to map to the destination member. Optionally value converters can receive the source member as well.
 
 In simplified syntax:
 
