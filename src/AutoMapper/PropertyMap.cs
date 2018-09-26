@@ -58,6 +58,7 @@ namespace AutoMapper
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
+        public ValueConverterConfiguration ValueConverterConfig { get; set; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
         public MemberInfo SourceMember
@@ -79,20 +80,11 @@ namespace AutoMapper
             }
         }
 
-        public Type SourceType
-        {
-            get
-            {
-                if (CustomExpression != null)
-                    return CustomExpression.ReturnType;
-                if (CustomResolver != null)
-                    return CustomResolver.ReturnType;
-                if(ValueResolverConfig != null)
-                    return typeof(object);
-                return SourceMember?.GetMemberType();
-            }
-        }
-
+        public Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
+                                  ?? ValueResolverConfig?.SourceMember?.ReturnType
+                                  ?? CustomResolver?.ReturnType
+                                  ?? CustomExpression?.ReturnType
+                                  ?? SourceMember?.GetMemberType();
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
@@ -113,6 +105,7 @@ namespace AutoMapper
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
+            ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
         }
 
         public bool IsMapped() => HasSource() || Ignored;
@@ -121,7 +114,7 @@ namespace AutoMapper
 
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
-        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null;
+        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || ValueConverterConfig != null;
 
         public void MapFrom(LambdaExpression sourceMember)
         {
@@ -141,6 +134,11 @@ namespace AutoMapper
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
+        }
+
+        public void ApplyValueConverter()
+        {
+
         }
 
         private class MemberFinderVisitor : ExpressionVisitor

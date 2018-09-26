@@ -499,12 +499,15 @@ namespace AutoMapper.Execution
         {
             Expression valueResolverFunc;
             var destinationPropertyType = propertyMap.DestinationPropertyType;
-            var valueResolverConfig = propertyMap.ValueResolverConfig;
-            var typeMap = propertyMap.TypeMap;
 
-            if (valueResolverConfig != null)
+            if (propertyMap.ValueConverterConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, valueResolverConfig),
+                valueResolverFunc = ToType(BuildConvertCall(propertyMap),
+                    destinationPropertyType);
+            }
+            else if (propertyMap.ValueResolverConfig != null)
+            {
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, propertyMap.ValueResolverConfig),
                     destinationPropertyType);
             }
             else if (propertyMap.CustomResolver != null)
@@ -550,7 +553,7 @@ namespace AutoMapper.Execution
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
                 valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
-            else if (!typeMap.Profile.AllowNullDestinationValues)
+            else if (!propertyMap.TypeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = propertyMap.SourceType ?? destinationPropertyType;
                 if (!toCreate.IsAbstract() && toCreate.IsClass())
@@ -594,6 +597,34 @@ namespace AutoMapper.Execution
                 .Concat(new[] {Context});
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"),
                 parameters);
+        }
+
+        private Expression BuildConvertCall(PropertyMap propertyMap)
+        {
+            var valueConverterConfig = propertyMap.ValueConverterConfig;
+            var iResolverType = valueConverterConfig.InterfaceType;
+            var iResolverTypeArgs = iResolverType.GetGenericArguments();
+
+            var resolverInstance = valueConverterConfig.Instance != null
+                ? Constant(valueConverterConfig.Instance)
+                : CreateInstance(valueConverterConfig.ConcreteType);
+
+            var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(Source) ??
+                               (valueConverterConfig.SourceMemberName != null
+                                   ? PropertyOrField(Source, valueConverterConfig.SourceMemberName)
+                                   : propertyMap.SourceMembers.Any()
+                                       ? Chain(propertyMap.SourceMembers, iResolverTypeArgs[1])
+                                       : Block(
+                                           Throw(Constant(BuildExceptionMessage())),
+                                           Default(iResolverTypeArgs[0])
+                                       )
+                               );
+
+            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Convert"),
+                ToType(sourceMember, iResolverTypeArgs[0]), Context);
+
+            AutoMapperConfigurationException BuildExceptionMessage() 
+                => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
         }
     }
 }
