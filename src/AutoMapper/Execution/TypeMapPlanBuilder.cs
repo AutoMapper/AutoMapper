@@ -499,17 +499,15 @@ namespace AutoMapper.Execution
         {
             Expression valueResolverFunc;
             var destinationPropertyType = propertyMap.DestinationPropertyType;
-            var valueResolverConfig = propertyMap.ValueResolverConfig;
-            var typeMap = propertyMap.TypeMap;
 
             if (propertyMap.ValueConverterConfig != null)
             {
                 valueResolverFunc = ToType(BuildConvertCall(propertyMap),
                     destinationPropertyType);
             }
-            else if (valueResolverConfig != null)
+            else if (propertyMap.ValueResolverConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, valueResolverConfig),
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, propertyMap.ValueResolverConfig),
                     destinationPropertyType);
             }
             else if (propertyMap.CustomResolver != null)
@@ -555,7 +553,7 @@ namespace AutoMapper.Execution
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
                 valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
-            else if (!typeMap.Profile.AllowNullDestinationValues)
+            else if (!propertyMap.TypeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = propertyMap.SourceType ?? destinationPropertyType;
                 if (!toCreate.IsAbstract() && toCreate.IsClass())

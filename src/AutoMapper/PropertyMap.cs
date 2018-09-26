@@ -80,10 +80,10 @@ namespace AutoMapper
             }
         }
 
-        public Type SourceType => CustomExpression?.ReturnType
-                                  ?? CustomResolver?.ReturnType
+        public Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
                                   ?? ValueResolverConfig?.SourceMember?.ReturnType
-                                  ?? ValueConverterConfig?.SourceMember?.ReturnType
+                                  ?? CustomResolver?.ReturnType
+                                  ?? CustomExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
