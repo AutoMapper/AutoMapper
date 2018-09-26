@@ -136,6 +136,11 @@ namespace AutoMapper
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
 
+        public void ApplyValueConverter()
+        {
+
+        }
+
         private class MemberFinderVisitor : ExpressionVisitor
         {
             public MemberExpression Member { get; private set; }

@@ -128,28 +128,11 @@ namespace AutoMapper.Configuration
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void ConvertUsing(Type valueConverterType)
-            {
-                PropertyMapActions.Add(pm =>
-                {
-                    var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)));
+            public void ConvertUsing(Type valueConverterType) 
+                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType));
 
-                    pm.ValueConverterConfig = config;
-                });
-            }
-
-            public void ConvertUsing(Type valueConverterType, string sourceMemberName)
-            {
-                PropertyMapActions.Add(pm =>
-                {
-                    var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
-                    {
-                        SourceMemberName = sourceMemberName
-                    };
-
-                    pm.ValueConverterConfig = config;
-                });
-            }
+            public void ConvertUsing(Type valueConverterType, string sourceMemberName) 
+                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType, sourceMemberName));
 
             public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName)
             {
@@ -162,6 +145,16 @@ namespace AutoMapper.Configuration
 
                     pm.ValueConverterConfig = config;
                 });
+            }
+
+            private static void ConvertUsing(PropertyMap propertyMap, Type valueConverterType, string sourceMemberName = null)
+            {
+                var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                {
+                    SourceMemberName = sourceMemberName
+                };
+
+                propertyMap.ValueConverterConfig = config;
             }
         }
 

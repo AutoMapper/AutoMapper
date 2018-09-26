@@ -285,81 +285,50 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing<TValueConverter, TSourceMember>()
             where TValueConverter : IValueConverter<TSourceMember, TMember>
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueConverterConfiguration(typeof(TValueConverter),
-                    typeof(IValueConverter<TSourceMember, TMember>));
-
-                pm.ValueConverterConfig = config;
-            });
-        }
+            => PropertyMapActions.Add(pm => ConvertUsing<TValueConverter, TSourceMember>(pm));
 
         public void ConvertUsing<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueConverter : IValueConverter<TSourceMember, TMember>
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueConverterConfiguration(typeof(TValueConverter),
-                    typeof(IValueConverter<TSourceMember, TMember>))
-                {
-                    SourceMember = sourceMember
-                };
-
-                pm.ValueConverterConfig = config;
-            });
-        }
+            => PropertyMapActions.Add(pm => ConvertUsing<TValueConverter, TSourceMember>(pm, sourceMember));
 
         public void ConvertUsing<TValueConverter, TSourceMember>(string sourceMemberName)
             where TValueConverter : IValueConverter<TSourceMember, TMember>
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueConverterConfiguration(typeof(TValueConverter),
-                    typeof(IValueConverter<TSourceMember, TMember>))
-                {
-                    SourceMemberName = sourceMemberName
-                };
-
-                pm.ValueConverterConfig = config;
-            });
-        }
+            => PropertyMapActions.Add(pm => ConvertUsing<TValueConverter, TSourceMember>(pm, sourceMemberName: sourceMemberName));
 
         public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueConverterConfiguration(valueConverter,
-                    typeof(IValueConverter<TSourceMember, TMember>));
-
-                pm.ValueConverterConfig = config;
-            });
-        }
+            => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverter));
 
         public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, Expression<Func<TSource, TSourceMember>> sourceMember)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
-                {
-                    SourceMember = sourceMember
-                };
+            => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverter, sourceMember));
 
-                pm.ValueConverterConfig = config;
-            });
+        public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, string sourceMemberName) 
+            => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverter, sourceMemberName: sourceMemberName));
+
+        private static void ConvertUsing<TValueConverter, TSourceMember>(PropertyMap propertyMap,
+            Expression<Func<TSource, TSourceMember>> sourceMember = null,
+            string sourceMemberName = null)
+        {
+            var config = new ValueConverterConfiguration(typeof(TValueConverter),
+                typeof(IValueConverter<TSourceMember, TMember>))
+            {
+                SourceMember = sourceMember,
+                SourceMemberName = sourceMemberName
+            };
+
+            propertyMap.ValueConverterConfig = config;
         }
 
-        public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, string sourceMemberName)
+        private static void ConvertUsing<TSourceMember>(PropertyMap propertyMap, IValueConverter<TSourceMember, TMember> valueConverter,
+            Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null)
         {
-            PropertyMapActions.Add(pm =>
+            var config = new ValueConverterConfiguration(valueConverter,
+                typeof(IValueConverter<TSourceMember, TMember>))
             {
-                var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
-                {
-                    SourceMemberName = sourceMemberName
-                };
+                SourceMember = sourceMember,
+                SourceMemberName = sourceMemberName
+            };
 
-                pm.ValueConverterConfig = config;
-            });
+            propertyMap.ValueConverterConfig = config;
         }
 
         public void Configure(TypeMap typeMap)
