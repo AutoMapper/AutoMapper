@@ -584,5 +584,61 @@ namespace AutoMapper.UnitTests
                 dest.ValueFoo4.ShouldBe("0004");
             }
         }
+
+        public class When_specifying_value_converter_for_all_members : AutoMapperSpecBase
+        {
+            public class EightDigitIntToStringConverter : IValueConverter<int, string>
+            {
+                public string Convert(int sourceMember, ResolutionContext context)
+                    => sourceMember.ToString("d8");
+            }
+
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public class OtherSource
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public string Value { get; set; }
+            }
+
+            public class OtherDest
+            {
+                public string Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.ForAllPropertyMaps
+                    (pm => pm.SourceType == typeof(int) && pm.DestinationPropertyType == typeof(string), 
+                    (pm, opt) => opt.ConvertUsing(new EightDigitIntToStringConverter()));
+            });
+
+            [Fact]
+            public void Should_apply_converters()
+            {
+                var source = new Source
+                {
+                    Value = 1,
+                };
+                var otherSource = new OtherSource
+                {
+                    Value = 2,
+                };
+
+                var dest = Mapper.Map<Source, Dest>(source);
+                var otherDest = Mapper.Map<OtherSource, OtherDest>(otherSource);
+
+                dest.Value.ShouldBe("00000001");
+                otherDest.Value.ShouldBe("00000002");
+            }
+        }
+
     }
 }
