@@ -24,7 +24,7 @@ Mapper.Initialize(cfg => {
 
 ## Preconditions
 
-Similarly, there is a PreCondition method. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom or ResolveUsing). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned.
+Similarly, there is a PreCondition method. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned.
 
 You can [see the steps](Understanding-your-mapping.html) yourself.
 

@@ -1555,7 +1555,7 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.ResolveUsing(src => src.Value));
+            cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
         });
 
         [Fact]

@@ -627,7 +627,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             object i = 7;
             cfg.CreateMap<Source, Destination>()
-                .ForMember(dest => dest.Value, opt => opt.UseValue(i));
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => i));
         });
 
         [Fact]

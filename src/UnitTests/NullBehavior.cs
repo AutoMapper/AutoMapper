@@ -539,7 +539,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver, string>(src => src.MyName));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom<NullResolver, string>(src => src.MyName));
             _source = new Source();
         });
 

@@ -120,7 +120,7 @@ public class SomeProfile : Profile
     public SomeProfile()
     {
         var map = CreateMap<MySourceType, MyDestinationType>();
-        map.ForMember(d => d.PropertyThatDependsOnIoc, opt => opt.ResolveUsing<PropertyThatDependsOnIocValueResolver>());
+        map.ForMember(d => d.PropertyThatDependsOnIoc, opt => opt.MapFrom<PropertyThatDependsOnIocValueResolver>());
     }
 }
 

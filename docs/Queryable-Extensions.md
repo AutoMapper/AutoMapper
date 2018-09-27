@@ -87,7 +87,7 @@ This map through AutoMapper will result in a SELECT N+1 problem, as each child `
 
 ### Custom projection
 
-In the case where members names don't line up, or you want to create calculated property, you can use MapFrom (and not ResolveUsing) to supply a custom expression for a destination member:
+In the case where members names don't line up, or you want to create calculated property, you can use MapFrom (the expression-based overload) to supply a custom expression for a destination member:
 
 ```c#
 Mapper.Initialize(cfg => cfg.CreateMap<Customer, CustomerDto>()
@@ -101,21 +101,21 @@ If the expression is rejected from your query provider (Entity Framework, NHiber
 
 ### Custom Type Conversion
 
-Occasionally, you need to completely replace a type conversion from a source to a destination type. In normal runtime mapping, this is accomplished via the ConvertUsing method. To perform the analog in LINQ projection, use the ProjectUsing method:
+Occasionally, you need to completely replace a type conversion from a source to a destination type. In normal runtime mapping, this is accomplished via the ConvertUsing method. To perform the analog in LINQ projection, use the ConvertUsing method:
 
 ```c#
-cfg.CreateMap<Source, Dest>().ProjectUsing(src => new Dest { Value = 10 });
+cfg.CreateMap<Source, Dest>().ConvertUsing(src => new Dest { Value = 10 });
 ```
 
-`ProjectUsing` is slightly more limited than `ConvertUsing` as only what is allowed in an Expression and the underlying LINQ provider will work.
+The expression-based `ConvertUsing` is slightly more limited than Func-based `ConvertUsing` overloads as only what is allowed in an Expression and the underlying LINQ provider will work.
 
 ### Custom destination type constructors
 
-If your destination type has a custom constructor but you don't want to override the entire mapping, use the ConstructProjectionUsing method:
+If your destination type has a custom constructor but you don't want to override the entire mapping, use the ConstructUsing expression-based method overload:
 
 ```c#
 cfg.CreateMap<Source, Dest>()
-    .ConstructProjectionUsing(src => new Dest(src.Value + 10));
+    .ConstructUsing(src => new Dest(src.Value + 10));
 ```
 
 AutoMapper will automatically match up destination constructor parameters to source members based on matching names, so only use this method if AutoMapper can't match up the destination constructor properly, or if you need extra customization during construction.
@@ -194,17 +194,15 @@ However, using a dictionary will result in hard-coded values in the query instea
 ### Supported mapping options
 
 Not all mapping options can be supported, as the expression generated must be interpreted by a LINQ provider. Only what is supported by LINQ providers is supported by AutoMapper:
-* MapFrom
+* MapFrom (Expression-based)
 * Ignore
-* UseValue
 * NullSubstitute
 
 Not supported:
 * Condition
-* DoNotUseDestinationValue
 * SetMappingOrder
 * UseDestinationValue
-* ResolveUsing
+* MapFrom (Func-based)
 * Before/AfterMap
 * Custom resolvers
 * Custom type converters

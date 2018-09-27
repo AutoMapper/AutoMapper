@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
-                .ForMember(d => d.Json, o => o.ResolveUsing(s => new JObject(s.JsonString)));
+                .ForMember(d => d.Json, o => o.MapFrom(s => new JObject(s.JsonString)));
         });
 
         protected override void Because_of()

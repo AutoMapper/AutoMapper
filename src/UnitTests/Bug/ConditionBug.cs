@@ -34,7 +34,7 @@
                     .ForMember(dest => dest.Value, opt =>
                     {
                         opt.PreCondition(src => src.Value.Count > 1);
-                        opt.ResolveUsing(src => src.Value[1].SubValue);
+                        opt.MapFrom(src => src.Value[1].SubValue);
                     });
             });
 

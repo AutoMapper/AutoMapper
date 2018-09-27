@@ -135,7 +135,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Original, Target>()
-                .ForMember(t => t.Child, o => o.ResolveUsing<TargetResolver>());
+                .ForMember(t => t.Child, o => o.MapFrom<TargetResolver>());
         });
 
         [Fact]

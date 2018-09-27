@@ -38,16 +38,16 @@ public class CustomResolver : IValueResolver<Source, Destination, int>
 
 Once we have our IValueResolver implementation, we'll need to tell AutoMapper to use this custom value resolver when resolving a specific destination member.  We have several options in telling AutoMapper a custom value resolver to use, including:
 
-* ResolveUsing\<TValueResolver\>
-* ResolveUsing(typeof(CustomValueResolver))
-* ResolveUsing(aValueResolverInstance)
+* MapFrom\<TValueResolver\>
+* MapFrom(typeof(CustomValueResolver))
+* MapFrom(aValueResolverInstance)
 
 In the below example, we'll use the first option, telling AutoMapper the custom resolver type through generics:
 
 ```c#
 Mapper.Initialize(cfg =>
    cfg.CreateMap<Source, Destination>()
-	 .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>()));
+	 .ForMember(dest => dest.Total, opt => opt.MapFrom<CustomResolver>()));
 Mapper.AssertConfigurationIsValid();
 
 var source = new Source
@@ -82,7 +82,7 @@ If we don't want AutoMapper to use reflection to create the instance, we can sup
 ```c#
 Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
 	.ForMember(dest => dest.Total,
-		opt => opt.ResolveUsing(new CustomResolver())
+		opt => opt.MapFrom(new CustomResolver())
 	));
 ```
 
@@ -96,10 +96,10 @@ By default, AutoMapper passes the source object to the resolver. This limits the
 Mapper.Initialize(cfg => {
 cfg.CreateMap<Source, Destination>()
     .ForMember(dest => dest.Total,
-        opt => opt.ResolveUsing<CustomResolver, decimal>(src => src.SubTotal));
+        opt => opt.MapFrom<CustomResolver, decimal>(src => src.SubTotal));
 cfg.CreateMap<OtherSource, OtherDest>()
     .ForMember(dest => dest.OtherTotal,
-        opt => opt.ResolveUsing<CustomResolver, decimal>(src => src.OtherSubTotal));
+        opt => opt.MapFrom<CustomResolver, decimal>(src => src.OtherSubTotal));
 });
 
 public class CustomResolver : IMemberValueResolver<object, object, decimal, decimal> {
@@ -120,8 +120,8 @@ Mapper.Map<Source, Dest>(src, opt => opt.Items["Foo"] = "Bar");
 This is how to setup the mapping for this custom resolver
 
 ```c#
-Mapper.CreateMap<Source, Dest>()
-    .ForMember(dest => dest.Foo, opt => opt.ResolveUsing((src, dest, destMember, context) => context.Items["Foo"]));
+cfg.CreateMap<Source, Dest>()
+    .ForMember(dest => dest.Foo, opt => opt.MapFrom((src, dest, destMember, context) => context.Items["Foo"]));
 ```
 
 ### ForPath

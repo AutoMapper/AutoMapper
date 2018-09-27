@@ -50,7 +50,7 @@ namespace AutoMapper.UnitTests.Bug
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<Source1, Destination1>();
             cfg.CreateMap<Source2, Destination2>();
-            cfg.ForAllMaps((tm, map) => map.ForMember("Number", o => o.ResolveUsing<MinusOneResolver>()));
+            cfg.ForAllMaps((tm, map) => map.ForMember("Number", o => o.MapFrom<MinusOneResolver>()));
         });
 
         protected override void Because_of()

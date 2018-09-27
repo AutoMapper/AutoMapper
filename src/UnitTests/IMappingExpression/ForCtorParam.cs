@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests
         public void Should_resolve_using_custom_func()
         {
             var mapper = new MapperConfiguration(
-                cfg => cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.ResolveUsing(src =>
+                cfg => cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom((src, ctxt) =>
                 {
                     var rev = src.Value + 3;
                     return rev;
@@ -62,7 +62,7 @@ namespace AutoMapper.UnitTests
             const string itemKey = "key";
             var mapper = new MapperConfiguration(
                 cfg => cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt =>
-                    opt.ResolveUsing((src, ctx) => ctx.Items[itemKey])
+                    opt.MapFrom((src, ctx) => ctx.Items[itemKey])
                 ))
                 .CreateMapper();
 

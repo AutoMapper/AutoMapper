@@ -1008,9 +1008,9 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap(typeof (Order), typeof (OrderDTO))
                     .ForMember("CurrentState", map => map.MapFrom("Status"))
-                    .ForMember("Contact", map => map.ResolveUsing(new StringCAPS(), "Customer"))
-                    .ForMember("Tracking", map => map.ResolveUsing(typeof (StringLower), "ShippingCode"))
-                    .ForMember("Postal", map => map.ResolveUsing(new StringPadder(6), "Zip"));
+                    .ForMember("Contact", map => map.MapFrom(new StringCAPS(), "Customer"))
+                    .ForMember("Tracking", map => map.MapFrom(typeof (StringLower), "ShippingCode"))
+                    .ForMember("Postal", map => map.MapFrom(new StringPadder(6), "Zip"));
 
             });
 

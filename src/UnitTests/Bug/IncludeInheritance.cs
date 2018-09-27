@@ -43,14 +43,14 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<SourceLevel0, DestinationLevel0>()
                 .Include<SourceLevel1, DestinationLevel1>()
-                .ForMember(dest => dest.DPropertyLevel0, o => o.ResolveUsing(src => src.SPropertyLevel0));
+                .ForMember(dest => dest.DPropertyLevel0, o => o.MapFrom(src => src.SPropertyLevel0));
 
             cfg.CreateMap<SourceLevel1, DestinationLevel1>()
                 .Include<SourceLevel2, DestinationLevel2>()
-                .ForMember(dest => dest.DPropertyLevel1, o => o.ResolveUsing(src => src.SPropertyLevel1));
+                .ForMember(dest => dest.DPropertyLevel1, o => o.MapFrom(src => src.SPropertyLevel1));
 
             cfg.CreateMap<SourceLevel2, DestinationLevel2>()
-                .ForMember(dest => dest.DPropertyLevel2, o => o.ResolveUsing(src => src.SPropertyLevel2));
+                .ForMember(dest => dest.DPropertyLevel2, o => o.MapFrom(src => src.SPropertyLevel2));
         });
 
         protected override void Because_of()

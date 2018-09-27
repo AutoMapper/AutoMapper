@@ -13,7 +13,6 @@ namespace AutoMapper
     {
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
-        /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
         /// </summary>
         /// <typeparam name="TSourceMember">Member type of the source member to use</typeparam>
