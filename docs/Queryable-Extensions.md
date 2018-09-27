@@ -201,7 +201,6 @@ Not all mapping options can be supported, as the expression generated must be in
 
 Not supported:
 * Condition
-* DoNotUseDestinationValue
 * SetMappingOrder
 * UseDestinationValue
 * MapFrom (Func-based)
