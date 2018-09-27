@@ -63,7 +63,7 @@ namespace AutoMapper.IntegrationTests.ProjectionOrder
 
                                                                                             cfg.CreateMap<Source2, Destination>()
                                                                                                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Items.Count()))
-                                                                                               .ForMember(dest => dest.Date, opt => opt.UseValue(DateTime.MinValue));
+                                                                                               .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.MinValue));
                                                                                         });
 
         [Fact]

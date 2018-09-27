@@ -122,13 +122,6 @@ namespace AutoMapper
         void UseDestinationValue();
         
         /// <summary>
-        /// Use a custom value
-        /// </summary>
-        /// <typeparam name="TValue">Value type</typeparam>
-        /// <param name="value">Value to use</param>
-        void UseValue<TValue>(TValue value);
-
-        /// <summary>
         /// Conditionally map this member against the source, destination, source and destination members
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>

@@ -299,7 +299,7 @@ namespace AutoMapper.UnitTests
             {
                 return new MapperConfiguration(c =>
                 {
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(_guid));
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => _guid));
                 });
             }
         }
@@ -398,7 +398,7 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class When_mapping_different_types_with_UseValue : AutoMapperSpecBase
+    public class When_mapping_different_types_with_explicit_value : AutoMapperSpecBase
     {
         Destination _destination;
 
@@ -428,7 +428,7 @@ namespace AutoMapper.UnitTests
                 return new MapperConfiguration(c =>
                 {
                     c.CreateMap<InnerSource, InnerDestination>();
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(new InnerSource { IntValue = 15 }));
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new InnerSource { IntValue = 15 }));
                 });
             }
         }
@@ -510,7 +510,7 @@ namespace AutoMapper.UnitTests
         {
             get
             {
-                return new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(new object())));
+                return new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new object())));
             }
         }
 
@@ -1655,7 +1655,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.UseValue(5));
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 5));
         });
 
         protected override void Because_of()
@@ -1690,7 +1690,7 @@ namespace AutoMapper.UnitTests
             try
             {
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest, opt => opt.UseValue(5)));
+                    .ForMember(dest => dest, opt => opt.MapFrom(src => 5)));
             }
             catch (Exception e)
             {

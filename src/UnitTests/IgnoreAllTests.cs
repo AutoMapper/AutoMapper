@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.AddGlobalIgnore("ShouldBeMapped");
-            cfg.CreateMap<Source, Destination>().ForMember(d => d.ShouldBeMapped, o => o.UseValue(12));
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.ShouldBeMapped, o => o.MapFrom(src => 12));
         });
 
         protected override void Because_of()

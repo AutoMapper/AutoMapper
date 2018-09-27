@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests
                 .Include<TextBoxControl2, FormElementDTO2>();
 
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
-                .ForMember(dto => dto.ElementType, opt => opt.UseValue(0));
+                .ForMember(dto => dto.ElementType, opt => opt.MapFrom(src => 0));
         });
     }
 
@@ -116,7 +116,7 @@ namespace AutoMapper.UnitTests
                 .Include<TextBoxControl2, FormElementDTO2>();
 
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
-                .ForMember(dto => dto.ElementType, opt => opt.UseValue(0));
+                .ForMember(dto => dto.ElementType, opt => opt.MapFrom(src => 0));
         });
     }
 

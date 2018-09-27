@@ -150,7 +150,7 @@ namespace AutoMapper.UnitTests.Bug
                     ;
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .IncludeBase<ModelObject, DtoObject>()
-                    .ForMember(d => d.BaseString, m => m.UseValue("789"));
+                    .ForMember(d => d.BaseString, m => m.MapFrom(src => "789"));
             });
             config.AssertConfigurationIsValid();
         }
@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests.Bug
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString));
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .IncludeBase<ModelObject, DtoObject>()
-                    .ForMember(d => d.BaseString, m => m.UseValue("789"));
+                    .ForMember(d => d.BaseString, m => m.MapFrom(src => "789"));
             });
             var mapper = config.CreateMapper();
             var dto = mapper.Map<DtoSubObject>(new ModelSubObject
@@ -186,7 +186,7 @@ namespace AutoMapper.UnitTests.Bug
                     ;
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .IncludeBase<ModelObject, DtoObject>()
-                    .ForMember(d => d.BaseString, m => m.UseValue("789"));
+                    .ForMember(d => d.BaseString, m => m.MapFrom(src => "789"));
             });
             var mapper = config.CreateMapper();
             var dto = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject

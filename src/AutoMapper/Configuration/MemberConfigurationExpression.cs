@@ -127,11 +127,6 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.MapFrom(sourceMemberName));
         }
 
-        public void UseValue<TValue>(TValue value)
-        {
-            MapFrom(s => value);
-        }
-
         public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
         {
             PropertyMapActions.Add(pm =>
