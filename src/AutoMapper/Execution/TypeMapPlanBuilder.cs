@@ -93,8 +93,9 @@ namespace AutoMapper.Execution
             typeMapsPath.Add(_typeMap);
             var defaultPropertyMap = new PropertyMap(default(MemberInfo), null);
             var properties = 
-                _typeMap.GetPropertyMaps().Where(pm=>pm.CanResolveValue()).Select(pm=>new { PropertyTypeMap = ResolvePropertyTypeMap(pm), PropertyMap = pm })
-                .Concat(_typeMap.ConstructorMappingTypes.Select(tp => new { PropertyTypeMap = ResolveTypeMap(tp), PropertyMap = defaultPropertyMap }))
+                _typeMap.GetPropertyMaps().Concat(_typeMap.PathMaps.Select(pm => new PropertyMap(pm))).Where(pm=>pm.CanResolveValue())
+                .Select(pm=>(PropertyTypeMap: ResolvePropertyTypeMap(pm), PropertyMap: pm))
+                .Concat(_typeMap.ConstructorMappingTypes.Select(tp => (PropertyTypeMap: ResolveTypeMap(tp), PropertyMap: defaultPropertyMap)))
                 .Where(p => p.PropertyTypeMap != null && !p.PropertyTypeMap.PreserveReferences && p.PropertyTypeMap.MapExpression == null);
             foreach(var property in properties)
             {
