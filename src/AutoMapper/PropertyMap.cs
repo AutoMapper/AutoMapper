@@ -4,34 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
-    using static Expression;
     using static Internal.ExpressionFactory;
-
-    public interface IMemberMap
-    {
-        TypeMap TypeMap { get; }
-        Type SourceType { get; }
-        IEnumerable<MemberInfo> SourceMembers { get; }
-        MemberInfo DestinationMember { get; }
-        Type DestinationMemberType { get; }
-        TypePair Types { get; }
-        bool CanResolveValue();
-        bool Ignored { get; }
-        bool Inline { get; set; }
-        bool UseDestinationValue { get; }
-        object NullSubstitute { get; }
-        LambdaExpression PreCondition { get; }
-        LambdaExpression Condition { get; }
-        LambdaExpression CustomMapExpression { get; }
-        LambdaExpression CustomMapFunction { get; }
-        ValueResolverConfiguration ValueResolverConfig { get; }
-        ValueConverterConfiguration ValueConverterConfig { get; }
-        IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
-    }
 
     [DebuggerDisplay("{DestinationMember.Name}")]
     public class PropertyMap : IMemberMap
