@@ -76,26 +76,16 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
-            bool inlineWasChecked;
-            if(_typeMap.ConstructorMappingTypes == null)
-            {
-                _typeMap.ConstructorMappingTypes = GetConstructorMappingTypes();
-                inlineWasChecked = false;
-            }
-            else
-            {
-                inlineWasChecked = true;
-            }
+            var inlineWasChecked = _typeMap.WasInlineChecked;
+            _typeMap.WasInlineChecked = true;
             if(typeMapsPath == null)
             {
                 typeMapsPath = new HashSet<TypeMap>();
             }
             typeMapsPath.Add(_typeMap);
-            IMemberMap defaultPropertyMap = new PropertyMap(default(MemberInfo), null);
             var members = 
                 _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue())
                 .Select(pm=>(MemberTypeMap: ResolveMemberTypeMap(pm), MemberMap: pm))
-                .Concat(_typeMap.ConstructorMappingTypes.Select(tp => (MemberTypeMap: ResolveTypeMap(tp), MemberMap: defaultPropertyMap)))
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
             foreach(var (memberTypeMap, memberMap) in members)
             {
@@ -348,31 +338,16 @@ namespace AutoMapper.Execution
             return Block(variables, body);
         }
 
-        private TypePair[] GetConstructorMappingTypes()
-        {
-            if(_typeMap.CustomCtorExpression != null 
-               || _typeMap.CustomCtorFunction != null 
-               || _typeMap.ConstructDestinationUsingServiceLocator 
-               || _typeMap.ConstructorMap?.CanResolve != true)
-            {
-                return new TypePair[0];
-            }
-            return _typeMap.ConstructorMap.CtorParams.Select(p => new TypePair(ResolveSource(p).Type, p.DestinationType)).ToArray();
-        }
-
         private Expression ResolveSource(ConstructorParameterMap ctorParamMap)
         {
-            if(ctorParamMap.CustomExpression != null)
-                return ctorParamMap.CustomExpression.ConvertReplaceParameters(Source)
-                    .NullCheck(ctorParamMap.DestinationType);
-            if(ctorParamMap.CustomValueResolver != null)
-                return ctorParamMap.CustomValueResolver.ConvertReplaceParameters(Source, Context);
-            if(ctorParamMap.Parameter.IsOptional)
-            {
-                ctorParamMap.DefaultValue = true;
+            if(ctorParamMap.CustomMapExpression != null)
+                return ctorParamMap.CustomMapExpression.ConvertReplaceParameters(Source)
+                    .NullCheck(ctorParamMap.DestinationMemberType);
+            if(ctorParamMap.CustomMapFunction != null)
+                return ctorParamMap.CustomMapFunction.ConvertReplaceParameters(Source, Context);
+            if (ctorParamMap.HasDefaultValue)
                 return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
-            }
-            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);
+            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationMemberType);
         }
 
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -381,7 +356,7 @@ namespace AutoMapper.Execution
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
             return Block(new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
-                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue, Context));
+                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationMemberType), resolvedValue, Context));
         }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)

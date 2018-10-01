@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -6,25 +8,49 @@ namespace AutoMapper
 {
     public class ConstructorParameterMap : IMemberMap
     {
-        public ConstructorParameterMap(ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolve)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,
+            bool canResolve)
         {
+            TypeMap = typeMap;
             Parameter = parameter;
-            SourceMembers = sourceMembers;
+            SourceMembers = sourceMembers.ToList();
             CanResolve = canResolve;
         }
 
         public ParameterInfo Parameter { get; }
 
-        public MemberInfo[] SourceMembers { get; }
+        public TypeMap TypeMap { get; }
+
+        public Type SourceType =>
+            CustomMapExpression?.Type
+            ?? CustomMapFunction?.Type
+            ?? (Parameter.IsOptional 
+                ? Parameter.ParameterType 
+                : SourceMembers.Last().GetMemberType());
+
+        public TypePair Types => new TypePair(SourceType, DestinationMemberType);
+
+        public IEnumerable<MemberInfo> SourceMembers { get; }
+        public MemberInfo DestinationMember => null;
 
         public bool CanResolve { get; set; }
 
-        public bool DefaultValue { get; set; }
+        public bool HasDefaultValue  => Parameter.IsOptional;
 
-        public LambdaExpression CustomExpression { get; set; }
+        public LambdaExpression Condition => null;
+        public LambdaExpression PreCondition => null;
+        public LambdaExpression CustomMapExpression { get; set; }
+        public LambdaExpression CustomMapFunction { get; set; }
+        public ValueResolverConfiguration ValueResolverConfig => null;
+        public ValueConverterConfiguration ValueConverterConfig => null;
+        public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } = Enumerable.Empty<ValueTransformerConfiguration>();
 
-        public LambdaExpression CustomValueResolver { get; set; }
+        public Type DestinationMemberType => Parameter.ParameterType;
+        public bool CanResolveValue() => CanResolve;
 
-        public Type DestinationType => Parameter.ParameterType;
+        public bool Ignored => false;
+        public bool Inline { get; set; }
+        public bool UseDestinationValue => false;
+        public object NullSubstitute => null;
     }
 }

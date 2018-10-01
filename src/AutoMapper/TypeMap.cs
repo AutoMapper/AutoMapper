@@ -98,13 +98,14 @@ namespace AutoMapper
 
         public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         public IEnumerable<PathMap> PathMaps => _pathMaps;
-        public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>());
+        public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
         public bool IsConventionMap { get; set; }
         public bool? IsValid { get; set; }
+        internal bool WasInlineChecked { get; set; }
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
-            ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+            ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
 
         public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
         {
@@ -370,5 +371,13 @@ namespace AutoMapper
         }
 
         internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
+
+        private IEnumerable<IMemberMap> GetConstructorMemberMaps()
+            => CustomCtorExpression != null
+               || CustomCtorFunction != null
+               || ConstructDestinationUsingServiceLocator
+               || ConstructorMap?.CanResolve != true
+                ? Enumerable.Empty<IMemberMap>()
+                : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
     }
 }

@@ -605,7 +605,7 @@ namespace AutoMapper.Configuration
 
         private void ReverseSourceMembers(TypeMap typeMap)
         {
-            foreach(var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Count > 1 && !p.SourceMembers.Any(s=>s is MethodInfo)))
+            foreach(var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Count() > 1 && !p.SourceMembers.Any(s=>s is MethodInfo)))
             {
                 _reverseMap.TypeMapActions.Add(reverseTypeMap =>
                 {
@@ -616,7 +616,7 @@ namespace AutoMapper.Configuration
 
                     var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
 
-                    pathMap.SourceExpression = MemberAccessLambda(propertyMap.DestinationMember);
+                    pathMap.CustomMapExpression = MemberAccessLambda(propertyMap.DestinationMember);
                 });
             }
         }

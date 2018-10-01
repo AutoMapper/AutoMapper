@@ -354,20 +354,22 @@ namespace AutoMapper
             return destination;
         }
 
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context, PropertyMap propertyMap)
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType,
+            ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, propertyMap));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, memberMap));
 
             return func(source, destination, context);
         }
 
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, PropertyMap propertyMap)
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
+            ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
 
-            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types, propertyMap);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types, memberMap);
 
             return func(source, destination, context);
         }

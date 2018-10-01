@@ -31,13 +31,13 @@ namespace AutoMapper
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            _ctorParamActions.Add(cpm => cpm.CustomExpression = sourceMember);
+            _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
         }
 
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
             Expression<Func<TSource, ResolutionContext, TMember>> resolverExpression = (src, ctxt) => resolver(src, ctxt);
-            _ctorParamActions.Add(cpm => cpm.CustomValueResolver = resolverExpression);
+            _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
         }
 
         public void Configure(TypeMap typeMap)

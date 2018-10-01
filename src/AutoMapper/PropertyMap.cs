@@ -18,6 +18,7 @@ namespace AutoMapper
         IEnumerable<MemberInfo> SourceMembers { get; }
         MemberInfo DestinationMember { get; }
         Type DestinationMemberType { get; }
+        TypePair Types { get; }
         bool CanResolveValue();
         bool Ignored { get; }
         bool Inline { get; set; }
@@ -38,13 +39,11 @@ namespace AutoMapper
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        internal static PropertyMap Default { get; } = new PropertyMap(default(MemberInfo), default);
-        
         public PropertyMap(PathMap pathMap)
         {
             Condition = pathMap.Condition;
             DestinationMember = pathMap.DestinationMember;
-            CustomMapExpression = pathMap.SourceExpression;
+            CustomMapExpression = pathMap.CustomMapExpression;
             TypeMap = pathMap.TypeMap;
             Ignored = pathMap.Ignored;
         }
@@ -107,6 +106,8 @@ namespace AutoMapper
                                   ?? CustomMapFunction?.ReturnType
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
+
+        public TypePair Types => IsMapped() ? new TypePair(SourceType, DestinationMemberType) : default;
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
