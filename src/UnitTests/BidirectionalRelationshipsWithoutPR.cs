@@ -190,6 +190,56 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_the_source_has_cyclical_references_with_ignored_ForPath : AutoMapperSpecBase
+    {
+        public class Supplier
+        {
+            public int Id { get; set; }
+
+            public virtual Contact Contact { get; set; }
+        }
+
+        public class Contact
+        {
+            public int Id { get; set; }
+
+            public Supplier Supplier { get; set; }
+        }
+
+        public class SupplierViewModel
+        {
+            public int Id { get; set; }
+
+            public ContactViewModel Contact { get; set; }
+
+        }
+
+        public class ContactViewModel
+        {
+            public int Id { get; set; }
+
+            public SupplierViewModel Supplier1 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Supplier, SupplierViewModel>().ForPath(d=>d.Contact.Supplier1, o=>
+            {
+                o.MapFrom(s => s.Contact.Supplier);
+                o.Ignore();
+            });
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var supplier = new Supplier();
+            supplier.Contact = new Contact { Supplier = supplier };
+            Mapper.Map<SupplierViewModel>(supplier);
+            ConfigProvider.GetAllTypeMaps().All(tm => tm.PreserveReferences).ShouldBeFalse();
+        }
+    }
+
     public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
     {
         private ParentDto _dto;
