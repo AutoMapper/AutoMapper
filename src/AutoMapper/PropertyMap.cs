@@ -25,6 +25,7 @@ namespace AutoMapper
             DestinationProperty = pathMap.DestinationMember;
             CustomExpression = pathMap.SourceExpression;
             TypeMap = pathMap.TypeMap;
+            Ignored = pathMap.Ignored;
         }
 
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
