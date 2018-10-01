@@ -48,7 +48,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),

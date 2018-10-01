@@ -20,7 +20,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 var propertyMap = _config.GetPropertyMap(node.Member, parentExpr.Type);
                
-                var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationProperty);
+                var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationMember);
 
                 return newMember;
             }

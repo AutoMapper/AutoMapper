@@ -8,7 +8,7 @@ namespace AutoMapper
     using Internal;
 
     [DebuggerDisplay("{DestinationExpression}")]
-    public class PathMap
+    public class PathMap : IMemberMap
     {
         public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
         {

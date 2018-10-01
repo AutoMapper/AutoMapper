@@ -345,7 +345,7 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction)
         {
-            TypeMapActions.Add(tm => tm.CustomProjection = mappingFunction);
+            TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);
         }
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
@@ -355,7 +355,7 @@ namespace AutoMapper.Configuration
                 Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
                     (src, dest, ctxt) => mappingFunction(src, dest);
 
-                tm.CustomMapper = expr;
+                tm.CustomMapFunction = expr;
             });
         }
 
@@ -366,7 +366,7 @@ namespace AutoMapper.Configuration
                 Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
                     (src, dest, ctxt) => mappingFunction(src, dest, ctxt);
 
-                tm.CustomMapper = expr;
+                tm.CustomMapFunction = expr;
             });
         }
 
@@ -450,7 +450,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
         {
-            TypeMapActions.Add(tm => tm.ConstructExpression = ctor);
+            TypeMapActions.Add(tm => tm.CustomCtorExpression = ctor);
 
             return this;
         }
@@ -461,7 +461,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
 
-                tm.DestinationCtor = expr;
+                tm.CustomCtorFunction = expr;
             });
 
             return this;
@@ -588,9 +588,9 @@ namespace AutoMapper.Configuration
             if (_reverseMap != null)
             {
                 ReverseSourceMembers(typeMap);
-                foreach(var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.Ignored))
+                foreach(var destProperty in typeMap.PropertyMaps.Where(pm => pm.Ignored))
                 {
-                    _reverseMap.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+                    _reverseMap.ForSourceMember(destProperty.DestinationMember.Name, opt => opt.Ignore());
                 }
                 foreach(var includedDerivedType in typeMap.IncludedDerivedTypes)
                 {
@@ -605,7 +605,7 @@ namespace AutoMapper.Configuration
 
         private void ReverseSourceMembers(TypeMap typeMap)
         {
-            foreach(var propertyMap in typeMap.GetPropertyMaps().Where(p => p.SourceMembers.Count > 1 && !p.SourceMembers.Any(s=>s is MethodInfo)))
+            foreach(var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Count > 1 && !p.SourceMembers.Any(s=>s is MethodInfo)))
             {
                 _reverseMap.TypeMapActions.Add(reverseTypeMap =>
                 {
@@ -616,7 +616,7 @@ namespace AutoMapper.Configuration
 
                     var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
 
-                    pathMap.SourceExpression = MemberAccessLambda(propertyMap.DestinationProperty);
+                    pathMap.SourceExpression = MemberAccessLambda(propertyMap.DestinationMember);
                 });
             }
         }

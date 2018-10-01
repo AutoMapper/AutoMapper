@@ -11,8 +11,29 @@ namespace AutoMapper
     using static Expression;
     using static Internal.ExpressionFactory;
 
-    [DebuggerDisplay("{DestinationProperty.Name}")]
-    public class PropertyMap
+    public interface IMemberMap
+    {
+        TypeMap TypeMap { get; }
+        Type SourceType { get; }
+        IEnumerable<MemberInfo> SourceMembers { get; }
+        MemberInfo DestinationMember { get; }
+        Type DestinationMemberType { get; }
+        bool CanResolveValue();
+        bool Ignored { get; }
+        bool Inline { get; set; }
+        bool UseDestinationValue { get; }
+        object NullSubstitute { get; }
+        LambdaExpression PreCondition { get; }
+        LambdaExpression Condition { get; }
+        LambdaExpression CustomMapExpression { get; }
+        LambdaExpression CustomMapFunction { get; }
+        ValueResolverConfiguration ValueResolverConfig { get; }
+        ValueConverterConfiguration ValueConverterConfig { get; }
+        IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
+    }
+
+    [DebuggerDisplay("{DestinationMember.Name}")]
+    public class PropertyMap : IMemberMap
     {
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
@@ -22,39 +43,39 @@ namespace AutoMapper
         public PropertyMap(PathMap pathMap)
         {
             Condition = pathMap.Condition;
-            DestinationProperty = pathMap.DestinationMember;
-            CustomExpression = pathMap.SourceExpression;
+            DestinationMember = pathMap.DestinationMember;
+            CustomMapExpression = pathMap.SourceExpression;
             TypeMap = pathMap.TypeMap;
             Ignored = pathMap.Ignored;
         }
 
-        public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
+        public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
         {
             TypeMap = typeMap;
-            DestinationProperty = destinationProperty;
+            DestinationMember = destinationMember;
         }
 
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
-            : this(inheritedMappedProperty.DestinationProperty, typeMap)
+            : this(inheritedMappedProperty.DestinationMember, typeMap)
         {
             ApplyInheritedPropertyMap(inheritedMappedProperty);
         }
 
         public TypeMap TypeMap { get; }
-        public MemberInfo DestinationProperty { get; }
+        public MemberInfo DestinationMember { get; }
 
-        public Type DestinationPropertyType => DestinationProperty.GetMemberType();
+        public Type DestinationMemberType => DestinationMember.GetMemberType();
 
-        public ICollection<MemberInfo> SourceMembers => _memberChain;
+        public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
-        public LambdaExpression CustomResolver { get; set; }
+        public LambdaExpression CustomMapFunction { get; set; }
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
-        public LambdaExpression CustomExpression { get; set; }
+        public LambdaExpression CustomMapExpression { get; set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
@@ -66,10 +87,10 @@ namespace AutoMapper
         {
             get
             {
-                if (CustomExpression != null)
+                if (CustomMapExpression != null)
                 {
                     var finder = new MemberFinderVisitor();
-                    finder.Visit(CustomExpression);
+                    finder.Visit(CustomMapExpression);
 
                     if (finder.Member != null)
                     {
@@ -83,8 +104,8 @@ namespace AutoMapper
 
         public Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
                                   ?? ValueResolverConfig?.SourceMember?.ReturnType
-                                  ?? CustomResolver?.ReturnType
-                                  ?? CustomExpression?.ReturnType
+                                  ?? CustomMapFunction?.ReturnType
+                                  ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
@@ -99,8 +120,8 @@ namespace AutoMapper
             {
                 Ignored = true;
             }
-            CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
-            CustomResolver = CustomResolver ?? inheritedMappedProperty.CustomResolver;
+            CustomMapExpression = CustomMapExpression ?? inheritedMappedProperty.CustomMapExpression;
+            CustomMapFunction = CustomMapFunction ?? inheritedMappedProperty.CustomMapFunction;
             Condition = Condition ?? inheritedMappedProperty.Condition;
             PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
@@ -115,11 +136,11 @@ namespace AutoMapper
 
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
-        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || ValueConverterConfig != null;
+        public bool ResolveConfigured() => ValueResolverConfig != null || CustomMapFunction != null || CustomMapExpression != null || ValueConverterConfig != null;
 
         public void MapFrom(LambdaExpression sourceMember)
         {
-            CustomExpression = sourceMember;
+            CustomMapExpression = sourceMember;
             Ignored = false;
         }
 

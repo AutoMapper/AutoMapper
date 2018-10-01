@@ -616,7 +616,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.ForAllPropertyMaps
-                    (pm => pm.SourceType == typeof(int) && pm.DestinationPropertyType == typeof(string), 
+                    (pm => pm.SourceType == typeof(int) && pm.DestinationMemberType == typeof(string), 
                     (pm, opt) => opt.ConvertUsing(new EightDigitIntToStringConverter()));
             });
 

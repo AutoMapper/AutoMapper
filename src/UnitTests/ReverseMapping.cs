@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
             new Action(() => Configuration.AssertConfigurationIsValid())
                 .ShouldThrowException<AutoMapperConfigurationException>(ex =>
                 {
-                    ex.PropertyMap.DestinationProperty.ShouldBe(typeof(Two).GetProperty("Three"));
+                    ex.PropertyMap.DestinationMember.ShouldBe(typeof(Two).GetProperty("Three"));
                     ex.Types.ShouldBe(new TypePair(typeof(One), typeof(Two)));
                 });
         }
@@ -400,7 +400,7 @@ namespace AutoMapper.UnitTests
         {
             var typeMap = ConfigProvider.FindTypeMapFor<Source, Destination>();
 
-            typeMap.GetPropertyMaps().Count().ShouldBe(1);
+            typeMap.PropertyMaps.Count().ShouldBe(1);
         }
 
         [Fact]

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-    public class ConstructorParameterMap
+    public class ConstructorParameterMap : IMemberMap
     {
         public ConstructorParameterMap(ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolve)
         {

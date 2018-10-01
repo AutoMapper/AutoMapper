@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class NullableDestinationExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            propertyMap.DestinationPropertyType.IsNullableType() && !result.Type.IsNullableType();
+            propertyMap.DestinationMemberType.IsNullableType() && !result.Type.IsNullableType();
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
             => BindNullableExpression(propertyMap, result);
@@ -18,12 +18,12 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static MemberAssignment BindNullableExpression(PropertyMap propertyMap,
             ExpressionResolutionResult result)
         {
-            var destinationType = propertyMap.DestinationPropertyType;
+            var destinationType = propertyMap.DestinationMemberType;
             var expressionToBind =
                 result.ResolutionExpression.GetMembers().Aggregate(
                     ExpressionFactory.ToType(result.ResolutionExpression, destinationType),
                     (accumulator, current) => current.IfNullElse(Constant(null, destinationType), accumulator));
-            return Bind(propertyMap.DestinationProperty, expressionToBind);
+            return Bind(propertyMap.DestinationMember, expressionToBind);
         }
     }
 }

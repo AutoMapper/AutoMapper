@@ -24,7 +24,7 @@ namespace AutoMapper.Execution
             TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
-            PropertyMap propertyMap = null, Expression destinationParameter = null)
+            IMemberMap propertyMap = null, Expression destinationParameter = null)
         {
             if (destinationParameter == null)
                 destinationParameter = Default(typePair.DestinationType);
@@ -52,14 +52,14 @@ namespace AutoMapper.Execution
             Expression sourceParameter,
             Expression destinationParameter,
             Expression objectMapperExpression,
-            PropertyMap propertyMap)
+            IMemberMap memberMap)
         {
             var declaredDestinationType = destinationParameter.Type;
             var destinationType = objectMapperExpression.Type;
             var defaultDestination = DefaultDestination(destinationType, declaredDestinationType, profileMap);
-            var destination = propertyMap == null
+            var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
-                : (propertyMap.UseDestinationValue ? destinationParameter : defaultDestination);
+                : memberMap.UseDestinationValue ? destinationParameter : defaultDestination;
             var ifSourceNull = destinationParameter.Type.IsCollectionType() ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
             Expression ClearDestinationCollection()
@@ -92,7 +92,7 @@ namespace AutoMapper.Execution
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            PropertyMap propertyMap, Expression destinationParameter)
+            IMemberMap propertyMap, Expression destinationParameter)
         {
             var match = configurationProvider.FindMapper(typePair);
             if (match != null)
@@ -105,7 +105,7 @@ namespace AutoMapper.Execution
         }
 
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            Expression destinationParameter, PropertyMap propertyMap)
+            Expression destinationParameter, IMemberMap propertyMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(propertyMap, typeof(PropertyMap)));

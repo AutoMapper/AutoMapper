@@ -11,11 +11,11 @@ namespace AutoMapper.QueryableExtensions
     {
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
-            var defaultDestination = Activator.CreateInstance(propertyMap.DestinationPropertyType);
-            return Bind(propertyMap.DestinationProperty, Coalesce(result.ResolutionExpression, Constant(defaultDestination)));
+            var defaultDestination = Activator.CreateInstance(propertyMap.DestinationMemberType);
+            return Bind(propertyMap.DestinationMember, Coalesce(result.ResolutionExpression, Constant(defaultDestination)));
         }
 
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            result.Type.IsNullableType() && !propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.IsValueType();
+            result.Type.IsNullableType() && !propertyMap.DestinationMemberType.IsNullableType() && propertyMap.DestinationMemberType.IsValueType();
     }
 }

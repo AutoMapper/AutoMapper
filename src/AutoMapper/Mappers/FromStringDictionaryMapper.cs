@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type),

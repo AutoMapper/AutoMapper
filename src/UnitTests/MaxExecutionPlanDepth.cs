@@ -93,17 +93,17 @@ namespace AutoMapper.UnitTests
             });
             TypeMap map;
             map = configuration.FindTypeMapFor<Source, Destination>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeTrue();
+            map.PropertyMaps[0].Inline.ShouldBeTrue();
             map = configuration.FindTypeMapFor<Source1, Destination1>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeTrue();
+            map.PropertyMaps[0].Inline.ShouldBeTrue();
             map = configuration.FindTypeMapFor<Source2, Destination2>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeFalse();
+            map.PropertyMaps[0].Inline.ShouldBeFalse();
             map = configuration.FindTypeMapFor<Source3, Destination3>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeTrue();
+            map.PropertyMaps[0].Inline.ShouldBeTrue();
             map = configuration.FindTypeMapFor<Source4, Destination4>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeTrue();
+            map.PropertyMaps[0].Inline.ShouldBeTrue();
             map = configuration.FindTypeMapFor<Source5, Destination5>();
-            map.GetPropertyMaps()[0].Inline.ShouldBeFalse();
+            map.PropertyMaps[0].Inline.ShouldBeFalse();
         }
     }
 }

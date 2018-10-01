@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.Tests
 
             var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), profile);
 
-            var propertyMaps = typeMap.GetPropertyMaps();
+            var propertyMaps = typeMap.PropertyMaps;
 
             propertyMaps.Count().ShouldBe(2);
         }
@@ -122,7 +122,7 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_split_using_naming_convention_rules()
         {
-            _map.GetPropertyMaps().Count().ShouldBe(1);
+            _map.PropertyMaps.Count().ShouldBe(1);
         }
     }
 
@@ -175,7 +175,7 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_split_using_naming_convention_rules()
         {
-            _map.GetPropertyMaps().Count().ShouldBe(1);
+            _map.PropertyMaps.Count().ShouldBe(1);
         }
     }
 

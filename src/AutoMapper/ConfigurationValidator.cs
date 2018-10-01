@@ -66,7 +66,7 @@ namespace AutoMapper
                     return;
                 }
                 typeMapsChecked.Add(typeMap);
-                if(typeMap.CustomMapper != null || typeMap.TypeConverterType != null)
+                if(typeMap.CustomMapFunction != null || typeMap.TypeConverterType != null)
                 {
                     return;
                 }
@@ -98,7 +98,7 @@ namespace AutoMapper
 
         private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
         {
-            foreach (var propertyMap in typeMap.GetPropertyMaps())
+            foreach (var propertyMap in typeMap.PropertyMaps)
             {
                 if (propertyMap.Ignored) continue;
 
@@ -110,7 +110,7 @@ namespace AutoMapper
                 if (sourceType.IsGenericParameter || sourceType == typeof (object))
                     return;
 
-                var destinationType = propertyMap.DestinationProperty.GetMemberType();
+                var destinationType = propertyMap.DestinationMember.GetMemberType();
                 DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, propertyMap);
             }
         }
