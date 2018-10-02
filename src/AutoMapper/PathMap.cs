@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -39,6 +40,6 @@ namespace AutoMapper
         public LambdaExpression CustomMapFunction => null;
         public ValueResolverConfiguration ValueResolverConfig => null;
         public ValueConverterConfiguration ValueConverterConfig => null;
-        public IEnumerable<ValueTransformerConfiguration> ValueTransformers => null;
+        public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } = Enumerable.Empty<ValueTransformerConfiguration>();
     }
 }

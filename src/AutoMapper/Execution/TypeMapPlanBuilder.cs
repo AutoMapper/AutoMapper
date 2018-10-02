@@ -64,7 +64,7 @@ namespace AutoMapper.Execution
 
             var destinationFunc = CreateDestinationFunc();
 
-            var assignmentFunc = CreateAssignmentFunc(destinationFunc, _typeMap.ConstructorMappingTypes.Length > 0);
+            var assignmentFunc = CreateAssignmentFunc(destinationFunc);
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
@@ -192,13 +192,14 @@ namespace AutoMapper.Execution
             return destinationFunc;
         }
 
-        private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
+        private Expression CreateAssignmentFunc(Expression destinationFunc)
         {
+            var isConstructorMapping = IsConstructorMapping();
             var actions = new List<Expression>();
             foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue()))
             {
                 var property = TryPropertyMap(propertyMap);
-                if (constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationMember.Name))
+                if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationMember.Name))
                     property = _initialDestination.IfNullElse(Empty(), property);
                 actions.Add(property);
             }
@@ -228,6 +229,12 @@ namespace AutoMapper.Execution
 
             return Block(actions);
         }
+
+        private bool IsConstructorMapping()
+            => _typeMap.CustomCtorExpression == null
+               && _typeMap.CustomCtorFunction == null
+               && !_typeMap.ConstructDestinationUsingServiceLocator
+               && (_typeMap.ConstructorMap?.CanResolve ?? false);
 
         private Expression HandlePath(PathMap pathMap)
         {

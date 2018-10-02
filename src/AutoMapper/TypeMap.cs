@@ -59,8 +59,6 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; set; }
 
-        public TypePair[] ConstructorMappingTypes { get; set; }
-
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
 

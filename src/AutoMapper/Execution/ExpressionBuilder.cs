@@ -105,10 +105,10 @@ namespace AutoMapper.Execution
         }
 
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            Expression destinationParameter, IMemberMap propertyMap)
+            Expression destinationParameter, IMemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(propertyMap, typeof(PropertyMap)));
+            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(IMemberMap)));
         }
 
         public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
