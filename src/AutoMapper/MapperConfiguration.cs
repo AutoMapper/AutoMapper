@@ -93,6 +93,14 @@ namespace AutoMapper
             return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
 
+        public Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource,
+            TDestination>()
+        {
+            var key = new TypePair(typeof(TSource), typeof(TDestination));
+            var mapRequest = new MapRequest(key, key);
+            return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>) _mapPlanCache.GetOrAdd(mapRequest).TypedExpression;
+        }
+
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest) 
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
 
@@ -279,8 +287,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-
-            if (!Profiles.Any(x => x.Name == profileName))
+            if (Profiles.All(x => x.Name != profileName))
             {
                 throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
             }
@@ -460,12 +467,19 @@ namespace AutoMapper
         {
             public Delegate Typed { get; }
 
+            public LambdaExpression TypedExpression { get; }
+
             public UntypedMapperFunc Untyped { get; }
+
+            public LambdaExpression UntypedExpression { get; }
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
+                TypedExpression = typedExpression;
                 Typed = typedExpression.Compile();
-                Untyped = Wrap(mapRequest, Typed).Compile();
+                var expression = Wrap(mapRequest, Typed);
+                Untyped = expression.Compile();
+                UntypedExpression = expression;
             }
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, Delegate typedDelegate)
