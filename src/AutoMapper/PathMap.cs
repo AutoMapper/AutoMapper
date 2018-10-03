@@ -20,8 +20,10 @@ namespace AutoMapper
         }
 
         public TypeMap TypeMap { get; }
-        public Type SourceType => MemberPath.Last.GetMemberType();
-        public IEnumerable<MemberInfo> SourceMembers => MemberPath.Members;
+
+        public Type SourceType => CustomMapExpression.ReturnType;
+
+        public IEnumerable<MemberInfo> SourceMembers { get; } = Enumerable.Empty<MemberInfo>();
         public LambdaExpression DestinationExpression { get; }
         public LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }
