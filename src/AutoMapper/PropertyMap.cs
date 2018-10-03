@@ -15,15 +15,6 @@ namespace AutoMapper
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        public PropertyMap(PathMap pathMap)
-        {
-            Condition = pathMap.Condition;
-            DestinationMember = pathMap.DestinationMember;
-            CustomMapExpression = pathMap.CustomMapExpression;
-            TypeMap = pathMap.TypeMap;
-            Ignored = pathMap.Ignored;
-        }
-
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
         {
             TypeMap = typeMap;
