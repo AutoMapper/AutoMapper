@@ -9,12 +9,12 @@ namespace AutoMapper
     public class ConstructorParameterMap //: IMemberMap
     {
         public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,
-            bool canResolve)
+            bool canResolveValue)
         {
             TypeMap = typeMap;
             Parameter = parameter;
             SourceMembers = sourceMembers.ToList();
-            CanResolve = canResolve;
+            CanResolveValue = canResolveValue;
         }
 
         public ParameterInfo Parameter { get; }
@@ -33,9 +33,7 @@ namespace AutoMapper
         public IEnumerable<MemberInfo> SourceMembers { get; }
         public MemberInfo DestinationMember => null;
 
-        public bool CanResolve { get; set; }
-
-        public bool HasDefaultValue  => Parameter.IsOptional;
+        public bool HasDefaultValue => Parameter.IsOptional;
 
         public LambdaExpression Condition => null;
         public LambdaExpression PreCondition => null;
@@ -46,7 +44,7 @@ namespace AutoMapper
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } = Enumerable.Empty<ValueTransformerConfiguration>();
 
         public Type DestinationMemberType => Parameter.ParameterType;
-        public bool CanResolveValue => CanResolve;
+        public bool CanResolveValue { get; set; }
 
         public bool Ignored => false;
         public bool Inline { get; set; }

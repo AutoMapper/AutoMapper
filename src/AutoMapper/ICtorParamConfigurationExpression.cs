@@ -53,7 +53,7 @@ namespace AutoMapper
             {
                 throw new AutoMapperConfigurationException($"{typeMap.Types.DestinationType.Name} does not have a constructor with a parameter named '{_ctorParamName}'.\n{typeMap.Types.DestinationType.FullName}");
             }
-            parameter.CanResolve = true;
+            parameter.CanResolveValue = true;
 
             foreach (var action in _ctorParamActions)
             {

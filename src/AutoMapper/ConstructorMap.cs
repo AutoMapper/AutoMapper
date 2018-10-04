@@ -31,7 +31,7 @@ namespace AutoMapper
             new MemberGetterExpressionResultConverter()
         };
 
-        public bool CanResolve => CtorParams.All(param => param.CanResolve);
+        public bool CanResolve => CtorParams.All(param => param.CanResolveValue);
 
         public Expression NewExpression(Expression instanceParameter)
         {
