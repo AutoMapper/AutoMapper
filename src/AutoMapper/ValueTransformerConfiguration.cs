@@ -16,7 +16,7 @@ namespace AutoMapper
         public LambdaExpression TransformerExpression { get; }
 
         public bool IsMatch(IMemberMap memberMap) 
-            => memberMap.DestinationMemberType.IsAssignableFrom(ValueType);
+            => memberMap.DestinationType.IsAssignableFrom(ValueType);
     }
 
     public static class ValueTransformerConfigurationExtensions

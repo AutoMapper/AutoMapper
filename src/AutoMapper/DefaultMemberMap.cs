@@ -19,8 +19,8 @@ namespace AutoMapper
         public Type SourceType => default;
         public IEnumerable<MemberInfo> SourceMembers { get; } 
             = Enumerable.Empty<MemberInfo>();
-        public MemberInfo DestinationMember => default;
-        public Type DestinationMemberType => default;
+        public string DestinationName => default;
+        public Type DestinationType => default;
         public TypePair Types => default;
         public bool CanResolveValue => default;
 

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-    public class ConstructorParameterMap //: IMemberMap
+    public class ConstructorParameterMap : IMemberMap
     {
         public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,
             bool canResolveValue)
@@ -28,10 +28,11 @@ namespace AutoMapper
                 ? Parameter.ParameterType 
                 : SourceMembers.Last().GetMemberType());
 
-        public TypePair Types => new TypePair(SourceType, DestinationMemberType);
+        public Type DestinationType => Parameter.ParameterType;
+        public TypePair Types => new TypePair(SourceType, DestinationType);
 
         public IEnumerable<MemberInfo> SourceMembers { get; }
-        public MemberInfo DestinationMember => null;
+        public string DestinationName => Parameter.Name;
 
         public bool HasDefaultValue => Parameter.IsOptional;
 
@@ -43,7 +44,6 @@ namespace AutoMapper
         public ValueConverterConfiguration ValueConverterConfig => null;
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } = Enumerable.Empty<ValueTransformerConfiguration>();
 
-        public Type DestinationMemberType => Parameter.ParameterType;
         public bool CanResolveValue { get; set; }
 
         public bool Ignored => false;

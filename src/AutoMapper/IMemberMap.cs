@@ -10,8 +10,8 @@ namespace AutoMapper
         TypeMap TypeMap { get; }
         Type SourceType { get; }
         IEnumerable<MemberInfo> SourceMembers { get; }
-        MemberInfo DestinationMember { get; }
-        Type DestinationMemberType { get; }
+        Type DestinationType { get; }
+        string DestinationName { get; }
         TypePair Types { get; }
         bool CanResolveValue { get; }
         bool Ignored { get; }

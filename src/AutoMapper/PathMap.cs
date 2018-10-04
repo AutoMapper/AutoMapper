@@ -27,9 +27,9 @@ namespace AutoMapper
         public LambdaExpression DestinationExpression { get; }
         public LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }
-        public MemberInfo DestinationMember => MemberPath.Last;
-        public Type DestinationMemberType => DestinationMember.GetMemberType();
-        public TypePair Types => new TypePair(SourceType, DestinationMemberType);
+        public Type DestinationType => MemberPath.Last.GetMemberType();
+        public string DestinationName => MemberPath.ToString();
+        public TypePair Types => new TypePair(SourceType, DestinationType);
 
         public bool CanResolveValue => !Ignored;
 

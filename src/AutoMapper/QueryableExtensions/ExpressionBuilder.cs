@@ -270,8 +270,8 @@ namespace AutoMapper.QueryableExtensions
             void CreateMemberBinding(PropertyMap propertyMap)
             {
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter, letPropertyMaps);
-                var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type, propertyMap.DestinationMemberType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationMemberType, request.MembersToExpand, request);
+                var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type, propertyMap.DestinationType);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationType, request.MembersToExpand, request);
                 if(propertyRequest.AlreadyExists)
                 {
                     return;
@@ -280,7 +280,7 @@ namespace AutoMapper.QueryableExtensions
                 if(binder == null)
                 {
                     var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationMember.Name} ({propertyMap.DestinationMemberType})";
+                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationMember.Name} ({propertyMap.DestinationType})";
                     throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
                 }
                 var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
@@ -292,7 +292,7 @@ namespace AutoMapper.QueryableExtensions
                     .Concat(typeMap.ValueTransformers)
                     .Concat(typeMap.Profile.ValueTransformers)
                     .Where(vt => vt.IsMatch(propertyMap))
-                    .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationMemberType));
+                    .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
 
                 bindExpression = bindExpression.Update(rhs);
 
@@ -409,7 +409,7 @@ namespace AutoMapper.QueryableExtensions
             {
                 var propertyMap = _currentPath.Peek();
                 var mapFrom = propertyMap.CustomMapExpression;
-                if(!IsSubQuery() || _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationMemberType) == null)
+                if(!IsSubQuery() || _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationType) == null)
                 {
                     return null;
                 }

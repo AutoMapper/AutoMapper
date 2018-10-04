@@ -10,14 +10,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class EnumerableExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            propertyMap.DestinationMemberType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
+            propertyMap.DestinationType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
             => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
 
         private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
-            var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationMemberType);
+            var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
             var expression = result.ResolutionExpression;
 
@@ -32,7 +32,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 expression = transformedExpressions.Aggregate(expression, (source, lambda) => Select(source, lambda));
             }
 
-            expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationMemberType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
+            expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
 
             return Expression.Bind(propertyMap.DestinationMember, expression);
         }

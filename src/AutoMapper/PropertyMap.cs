@@ -29,8 +29,9 @@ namespace AutoMapper
 
         public TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
+        public string DestinationName => DestinationMember.Name;
 
-        public Type DestinationMemberType => DestinationMember.GetMemberType();
+        public Type DestinationType => DestinationMember.GetMemberType();
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
@@ -74,7 +75,7 @@ namespace AutoMapper
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
-        public TypePair Types => IsMapped ? new TypePair(SourceType, DestinationMemberType) : default;
+        public TypePair Types => IsMapped ? new TypePair(SourceType, DestinationType) : default;
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {

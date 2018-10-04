@@ -92,7 +92,7 @@ namespace AutoMapper.Execution
                 if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
                     memberMap.Inline = false;
-                    Debug.WriteLine($"Resetting Inline: {memberMap.DestinationMember} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
+                    Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
                 }
                 if(typeMapsPath.Contains(memberTypeMap))
                 {
@@ -129,7 +129,7 @@ namespace AutoMapper.Execution
                 {
                     return null;
                 }
-                var types = new TypePair(memberMap.SourceType, memberMap.DestinationMemberType);
+                var types = new TypePair(memberMap.SourceType, memberMap.DestinationType);
                 return ResolveTypeMap(types);
             }
 
@@ -238,10 +238,9 @@ namespace AutoMapper.Execution
 
         private Expression HandlePath(PathMap pathMap)
         {
-            var destination = ((MemberExpression) pathMap.DestinationExpression.ConvertReplaceParameters(_destination))
-                .Expression;
+            var destination = ((MemberExpression) pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
             var createInnerObjects = CreateInnerObjects(destination);
-            var setFinalValue = CreatePropertyMapFunc(pathMap, destination);
+            var setFinalValue = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
             return Block(createInnerObjects, setFinalValue);
         }
 
@@ -349,12 +348,12 @@ namespace AutoMapper.Execution
         {
             if(ctorParamMap.CustomMapExpression != null)
                 return ctorParamMap.CustomMapExpression.ConvertReplaceParameters(Source)
-                    .NullCheck(ctorParamMap.DestinationMemberType);
+                    .NullCheck(ctorParamMap.DestinationType);
             if(ctorParamMap.CustomMapFunction != null)
                 return ctorParamMap.CustomMapFunction.ConvertReplaceParameters(Source, Context);
             if (ctorParamMap.HasDefaultValue)
                 return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
-            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationMemberType);
+            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);
         }
 
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -363,12 +362,12 @@ namespace AutoMapper.Execution
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
             return Block(new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
-                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationMemberType), resolvedValue, Context));
+                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue, Context));
         }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
-            var pmExpression = CreatePropertyMapFunc(propertyMap, _destination);
+            var pmExpression = CreatePropertyMapFunc(propertyMap, _destination, propertyMap.DestinationMember);
 
             if (pmExpression == null)
                 return null;
@@ -384,14 +383,14 @@ namespace AutoMapper.Execution
                     null));
         }
 
-        private Expression CreatePropertyMapFunc(IMemberMap memberMap, Expression destination)
+        private Expression CreatePropertyMapFunc(IMemberMap memberMap, Expression destination, MemberInfo destinationMember)
         {
-            var destMember = MakeMemberAccess(destination, memberMap.DestinationMember);
+            var destMember = MakeMemberAccess(destination, destinationMember);
 
             Expression getter;
 
-            if (memberMap.DestinationMember is PropertyInfo pi && pi.GetGetMethod(true) == null)
-                getter = Default(memberMap.DestinationMemberType);
+            if (destinationMember is PropertyInfo pi && pi.GetGetMethod(true) == null)
+                getter = Default(memberMap.DestinationType);
             else
                 getter = destMember;
 
@@ -403,10 +402,10 @@ namespace AutoMapper.Execution
             else
             {
                 if (_initialDestination.Type.IsValueType())
-                    destValueExpr = Default(memberMap.DestinationMemberType);
+                    destValueExpr = Default(memberMap.DestinationType);
                 else
                     destValueExpr = Condition(Equal(_initialDestination, Constant(null)),
-                        Default(memberMap.DestinationMemberType), getter);
+                        Default(memberMap.DestinationType), getter);
             }
 
             var valueResolverExpr = BuildValueResolverFunc(memberMap, getter);
@@ -414,7 +413,7 @@ namespace AutoMapper.Execution
             var setResolvedValue = Assign(resolvedValue, valueResolverExpr);
             valueResolverExpr = resolvedValue;
 
-            var typePair = new TypePair(valueResolverExpr.Type, memberMap.DestinationMemberType);
+            var typePair = new TypePair(valueResolverExpr.Type, memberMap.DestinationType);
             valueResolverExpr = memberMap.Inline
                 ? MapExpression(_configurationProvider, _typeMap.Profile, typePair, valueResolverExpr, Context,
                     memberMap, destValueExpr)
@@ -424,7 +423,7 @@ namespace AutoMapper.Execution
                 .Concat(_typeMap.ValueTransformers)
                 .Concat(_typeMap.Profile.ValueTransformers)
                 .Where(vt => vt.IsMatch(memberMap))
-                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationMemberType));
+                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
@@ -440,19 +439,19 @@ namespace AutoMapper.Execution
             }
 
             Expression mapperExpr;
-            if (memberMap.DestinationMember is FieldInfo)
+            if (destinationMember is FieldInfo)
             {
-                mapperExpr = memberMap.SourceType != memberMap.DestinationMemberType
-                    ? Assign(destMember, ToType(propertyValue, memberMap.DestinationMemberType))
+                mapperExpr = memberMap.SourceType != memberMap.DestinationType
+                    ? Assign(destMember, ToType(propertyValue, memberMap.DestinationType))
                     : Assign(getter, propertyValue);
             }
             else
             {
-                var setter = ((PropertyInfo) memberMap.DestinationMember).GetSetMethod(true);
+                var setter = ((PropertyInfo)destinationMember).GetSetMethod(true);
                 if (setter == null)
                     mapperExpr = propertyValue;
                 else
-                    mapperExpr = Assign(destMember, ToType(propertyValue, memberMap.DestinationMemberType));
+                    mapperExpr = Assign(destMember, ToType(propertyValue, memberMap.DestinationType));
             }
 
             if (memberMap.Condition != null)
@@ -485,7 +484,7 @@ namespace AutoMapper.Execution
         private Expression BuildValueResolverFunc(IMemberMap memberMap, Expression destValueExpr)
         {
             Expression valueResolverFunc;
-            var destinationPropertyType = memberMap.DestinationMemberType;
+            var destinationPropertyType = memberMap.DestinationType;
 
             if (memberMap.ValueConverterConfig != null)
             {
