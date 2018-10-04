@@ -205,8 +205,6 @@ namespace AutoMapper.UnitTests.Mappers
 
             Mapper.Map(source, destination);
 
-            var expression = Configuration.GetMapperExpression<StringDictionary, Destination>();
-
             destination.Int.ShouldBe(10);
             destination.NullableInt.ShouldBeNull();
             destination.NullableDate.ShouldBeNull();
