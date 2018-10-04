@@ -121,7 +121,7 @@ namespace AutoMapper
                 : pm.SourceMember != null
                     ? pm.SourceMember.Name
                     : pm.DestinationMember.Name;
-            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped()).Select(GetPropertyName).ToArray();
+            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
 
             var autoMappedProperties = GetPropertyNames(_propertyMaps);
             var inheritedProperties = GetPropertyNames(_inheritedMaps);
@@ -138,7 +138,7 @@ namespace AutoMapper
             else
             {
                 var redirectedSourceMembers = _propertyMaps
-                    .Where(pm => pm.IsMapped() && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationMember.Name)
+                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationMember.Name)
                     .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
@@ -330,7 +330,7 @@ namespace AutoMapper
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
-            foreach (var inheritedMappedProperty in inheritedTypeMap.PropertyMaps.Where(m => m.IsMapped()))
+            foreach (var inheritedMappedProperty in inheritedTypeMap.PropertyMaps.Where(m => m.IsMapped))
             {
                 var conventionPropertyMap = PropertyMaps
                     .SingleOrDefault(m =>
@@ -376,6 +376,7 @@ namespace AutoMapper
                || ConstructDestinationUsingServiceLocator
                || ConstructorMap?.CanResolve != true
                 ? Enumerable.Empty<IMemberMap>()
-                : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
+                : Enumerable.Empty<IMemberMap>();
+                //: ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
     }
 }

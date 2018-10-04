@@ -11,7 +11,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
             var propertyMap = typeMap.PropertyMaps
-                .FirstOrDefault(pm => pm.CanResolveValue() &&
+                .FirstOrDefault(pm => pm.CanResolveValue &&
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)

@@ -93,14 +93,6 @@ namespace AutoMapper
             return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
 
-        public Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource,
-            TDestination>()
-        {
-            var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, key);
-            return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>) _mapPlanCache.GetOrAdd(mapRequest).TypedExpression;
-        }
-
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest) 
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
 
@@ -466,20 +458,12 @@ namespace AutoMapper
         internal struct MapperFuncs
         {
             public Delegate Typed { get; }
-
-            public LambdaExpression TypedExpression { get; }
-
             public UntypedMapperFunc Untyped { get; }
-
-            public LambdaExpression UntypedExpression { get; }
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                TypedExpression = typedExpression;
                 Typed = typedExpression.Compile();
-                var expression = Wrap(mapRequest, Typed);
-                Untyped = expression.Compile();
-                UntypedExpression = expression;
+                Untyped = Wrap(mapRequest, Typed).Compile();
             }
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, Delegate typedDelegate)

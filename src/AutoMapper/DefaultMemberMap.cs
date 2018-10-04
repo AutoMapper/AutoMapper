@@ -22,7 +22,7 @@ namespace AutoMapper
         public MemberInfo DestinationMember => default;
         public Type DestinationMemberType => default;
         public TypePair Types => default;
-        public bool CanResolveValue() => default;
+        public bool CanResolveValue => default;
 
         public bool Ignored => default;
         public bool Inline { get; set; } = true;

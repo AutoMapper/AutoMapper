@@ -31,7 +31,7 @@ namespace AutoMapper
         public Type DestinationMemberType => DestinationMember.GetMemberType();
         public TypePair Types => new TypePair(SourceType, DestinationMemberType);
 
-        public bool CanResolveValue() => !Ignored;
+        public bool CanResolveValue => !Ignored;
 
         public bool Ignored { get; set; }
         public bool Inline { get; set; } = true;

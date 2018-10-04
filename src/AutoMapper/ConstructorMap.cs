@@ -17,7 +17,7 @@ namespace AutoMapper
 
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
-        internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+        public IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
 
         public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {

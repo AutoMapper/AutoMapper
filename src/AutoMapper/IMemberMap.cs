@@ -13,7 +13,7 @@ namespace AutoMapper
         MemberInfo DestinationMember { get; }
         Type DestinationMemberType { get; }
         TypePair Types { get; }
-        bool CanResolveValue();
+        bool CanResolveValue { get; }
         bool Ignored { get; }
         bool Inline { get; set; }
         bool UseDestinationValue { get; }

@@ -256,7 +256,7 @@ namespace AutoMapper.QueryableExtensions
             var bindings = new List<MemberBinding>();
             foreach (var propertyMap in typeMap.PropertyMaps
                                                .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationMember)) && 
-                                                            pm.CanResolveValue() && ReflectionHelper.CanBeSet(pm.DestinationMember))
+                                                            pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
                                                .OrderBy(pm => pm.DestinationMember.Name))
             {
                 letPropertyMaps.Push(propertyMap);

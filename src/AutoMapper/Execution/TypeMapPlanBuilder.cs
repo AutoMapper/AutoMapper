@@ -84,7 +84,7 @@ namespace AutoMapper.Execution
             }
             typeMapsPath.Add(_typeMap);
             var members = 
-                _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue())
+                _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue)
                 .Select(pm=>(MemberTypeMap: ResolveMemberTypeMap(pm), MemberMap: pm))
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
             foreach(var (memberTypeMap, memberMap) in members)
@@ -196,7 +196,7 @@ namespace AutoMapper.Execution
         {
             var isConstructorMapping = IsConstructorMapping();
             var actions = new List<Expression>();
-            foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue()))
+            foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue))
             {
                 var property = TryPropertyMap(propertyMap);
                 if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationMember.Name))

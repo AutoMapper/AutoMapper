@@ -140,14 +140,6 @@ namespace AutoMapper
         IMapper CreateMapper(Func<Type, object> serviceCtor);
 
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, IMemberMap memberMap = null);
-
-        /// <summary>
-        /// Gets the original lambda expression used to compile the map plan between two types
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TDestination">Destination type</typeparam>
-        /// <returns>Map plan expression before compilation</returns>
-        Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource, TDestination>();
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest);
 
         /// <summary>

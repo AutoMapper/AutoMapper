@@ -74,7 +74,7 @@ namespace AutoMapper
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
-        public TypePair Types => IsMapped() ? new TypePair(SourceType, DestinationMemberType) : default;
+        public TypePair Types => IsMapped ? new TypePair(SourceType, DestinationMemberType) : default;
 
         public void ChainMembers(IEnumerable<MemberInfo> members)
         {
@@ -84,7 +84,7 @@ namespace AutoMapper
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            if(inheritedMappedProperty.Ignored && !ResolveConfigured())
+            if(inheritedMappedProperty.Ignored && !IsResolveConfigured)
             {
                 Ignored = true;
             }
@@ -98,13 +98,14 @@ namespace AutoMapper
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
         }
 
-        public bool IsMapped() => HasSource() || Ignored;
+        public bool IsMapped => HasSource || Ignored;
 
-        public bool CanResolveValue() => HasSource() && !Ignored;
+        public bool CanResolveValue => HasSource && !Ignored;
 
-        public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
+        public bool HasSource => _memberChain.Count > 0 || IsResolveConfigured;
 
-        public bool ResolveConfigured() => ValueResolverConfig != null || CustomMapFunction != null || CustomMapExpression != null || ValueConverterConfig != null;
+        public bool IsResolveConfigured => ValueResolverConfig != null || CustomMapFunction != null ||
+                                         CustomMapExpression != null || ValueConverterConfig != null;
 
         public void MapFrom(LambdaExpression sourceMember)
         {
