@@ -204,7 +204,7 @@ namespace AutoMapper.Execution
                 actions.Add(property);
             }
             foreach (var pathMap in _typeMap.PathMaps.Where(pm => !pm.Ignored))
-                actions.Add(HandlePath(pathMap));
+                actions.Add(TryPathMap(pathMap));
             foreach (var beforeMapAction in _typeMap.BeforeMapActions)
                 actions.Insert(0, beforeMapAction.ReplaceParameters(Source, _destination, Context));
             actions.Insert(0, destinationFunc);
@@ -230,12 +230,15 @@ namespace AutoMapper.Execution
             return Block(actions);
         }
 
-        private Expression HandlePath(PathMap pathMap)
+        private Expression TryPathMap(PathMap pathMap)
         {
             var destination = ((MemberExpression) pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
             var createInnerObjects = CreateInnerObjects(destination);
             var setFinalValue = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
-            return Block(createInnerObjects, setFinalValue);
+
+            var pathMapExpression = Block(createInnerObjects, setFinalValue);
+
+            return TryMemberMap(pathMap, pathMapExpression);
         }
 
         private Expression CreateInnerObjects(Expression destination) => Block(destination.GetMembers()
@@ -366,14 +369,19 @@ namespace AutoMapper.Execution
             if (pmExpression == null)
                 return null;
 
+            return TryMemberMap(propertyMap, pmExpression);
+        }
+
+        private static Expression TryMemberMap(IMemberMap memberMap, Expression memberMapExpression)
+        {
             var exception = Parameter(typeof(Exception), "ex");
 
             var mappingExceptionCtor = ((NewExpression) CtorExpression.Body).Constructor;
 
-            return TryCatch(Block(typeof(void), pmExpression),
+            return TryCatch(Block(typeof(void), memberMapExpression),
                 MakeCatchBlock(typeof(Exception), exception,
                     Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
-                        Constant(propertyMap.TypeMap.Types), Constant(propertyMap.TypeMap), Constant(propertyMap))),
+                        Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap))),
                     null));
         }
 
