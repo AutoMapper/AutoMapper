@@ -376,7 +376,6 @@ namespace AutoMapper
                || ConstructDestinationUsingServiceLocator
                || ConstructorMap?.CanResolve != true
                 ? Enumerable.Empty<IMemberMap>()
-                : Enumerable.Empty<IMemberMap>();
-                //: ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
+                : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
     }
 }
