@@ -17,7 +17,7 @@ namespace AutoMapper
 
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
-        internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+        public IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
 
         public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
@@ -31,7 +31,7 @@ namespace AutoMapper
             new MemberGetterExpressionResultConverter()
         };
 
-        public bool CanResolve => CtorParams.All(param => param.CanResolve);
+        public bool CanResolve => CtorParams.All(param => param.CanResolveValue);
 
         public Expression NewExpression(Expression instanceParameter)
         {
@@ -52,7 +52,7 @@ namespace AutoMapper
 
         public void AddParameter(ParameterInfo parameter, MemberInfo[] resolvers, bool canResolve)
         {
-            _ctorParams.Add(new ConstructorParameterMap(parameter, resolvers, canResolve));
+            _ctorParams.Add(new ConstructorParameterMap(TypeMap, parameter, resolvers, canResolve));
         }
     }
 }

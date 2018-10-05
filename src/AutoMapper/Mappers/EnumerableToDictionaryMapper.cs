@@ -13,9 +13,10 @@ namespace AutoMapper.Mappers
                                                  && context.SourceType.IsEnumerableType()
                                                  && !context.SourceType.IsDictionaryType();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             =>
-            MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression,
+            MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression,
                 contextExpression, typeof(Dictionary<,>), MapItemExpr);
     }
 }

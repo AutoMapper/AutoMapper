@@ -16,7 +16,8 @@ namespace AutoMapper.Mappers
     {
         public override bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
 
-        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);

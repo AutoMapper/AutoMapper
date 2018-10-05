@@ -38,7 +38,7 @@ namespace AutoMapper.Configuration
             _sourceExpression = sourceExpression;
             PathMapActions.Add(pm =>
             {
-                pm.SourceExpression = sourceExpression;
+                pm.CustomMapExpression = sourceExpression;
                 pm.Ignored = false;
             });
         }

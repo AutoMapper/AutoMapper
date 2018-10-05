@@ -27,13 +27,14 @@ namespace AutoMapper.Mappers
             && ElementTypeHelper.GetElementType(context.DestinationType) == ElementTypeHelper.GetElementType(context.SourceType)
             && ElementTypeHelper.GetElementType(context.SourceType).IsPrimitive();
 
-        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
 
             if (configurationProvider.FindTypeMapFor(sourceElementType, destElementType) != null)
-                return base.MapExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression);
+                return base.MapExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression);
 
             var valueIfNullExpr = profileMap.AllowNullCollections
                 ? (Expression) Constant(null, destExpression.Type)

@@ -59,8 +59,6 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; set; }
 
-        public TypePair[] ConstructorMappingTypes { get; set; }
-
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
 
@@ -69,9 +67,10 @@ namespace AutoMapper
 
         public ProfileMap Profile { get; }
 
-        public LambdaExpression CustomMapper { get; set; }
-        public LambdaExpression CustomProjection { get; set; }
-        public LambdaExpression DestinationCtor { get; set; }
+        public LambdaExpression CustomMapFunction { get; set; }
+        public LambdaExpression CustomMapExpression { get; set; }
+        public LambdaExpression CustomCtorFunction { get; set; }
+        public LambdaExpression CustomCtorExpression { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
@@ -92,17 +91,45 @@ namespace AutoMapper
 
         public int MaxDepth { get; set; }
 
-        public LambdaExpression ConstructExpression { get; set; }
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
 
-        public PropertyMap[] GetPropertyMaps() => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
+        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps);
         public IEnumerable<PathMap> PathMaps => _pathMaps;
+        public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
+
         public bool IsConventionMap { get; set; }
         public bool? IsValid { get; set; }
+        internal bool WasInlineChecked { get; set; }
+
+        public bool PassesCtorValidation =>
+            DisableConstructorValidation
+            || CustomCtorExpression != null
+            || CustomCtorFunction != null
+            || ConstructDestinationUsingServiceLocator
+            || ConstructorMap?.CanResolve == true
+            || DestinationTypeToUse.IsInterface()
+            || DestinationTypeToUse.IsAbstract()
+            || DestinationTypeToUse.IsGenericTypeDefinition()
+            || DestinationTypeToUse.IsValueType()
+            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
+
+        public bool IsConstructorMapping =>
+            CustomCtorExpression == null
+            && CustomCtorFunction == null
+            && !ConstructDestinationUsingServiceLocator
+            && (ConstructorMap?.CanResolve ?? false);
+
+        public bool ShouldCheckForValid =>
+            CustomMapFunction == null
+            && CustomMapExpression == null
+            && TypeConverterType == null
+            && DestinationTypeOverride == null
+            && ConfiguredMemberList != MemberList.None
+            && !(IsValid ?? false);
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
-            ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+            ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
 
         public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
         {
@@ -116,11 +143,11 @@ namespace AutoMapper
         public string[] GetUnmappedPropertyNames()
         {
             string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
-                ? pm.DestinationProperty.Name
+                ? pm.DestinationMember.Name
                 : pm.SourceMember != null
                     ? pm.SourceMember.Name
-                    : pm.DestinationProperty.Name;
-            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped()).Select(GetPropertyName).ToArray();
+                    : pm.DestinationMember.Name;
+            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
 
             var autoMappedProperties = GetPropertyNames(_propertyMaps);
             var inheritedProperties = GetPropertyNames(_inheritedMaps);
@@ -137,7 +164,7 @@ namespace AutoMapper
             else
             {
                 var redirectedSourceMembers = _propertyMaps
-                    .Where(pm => pm.IsMapped() && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationProperty.Name)
+                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationMember.Name)
                     .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
@@ -154,18 +181,6 @@ namespace AutoMapper
 
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
         }
-
-        public bool PassesCtorValidation() =>
-            DisableConstructorValidation
-            || ConstructExpression != null
-            || DestinationCtor != null
-            || ConstructDestinationUsingServiceLocator
-            || ConstructorMap?.CanResolve == true
-            || DestinationTypeToUse.IsInterface()
-            || DestinationTypeToUse.IsAbstract()
-            || DestinationTypeToUse.IsGenericTypeDefinition()
-            || DestinationTypeToUse.IsValueType()
-            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
         {
@@ -274,18 +289,18 @@ namespace AutoMapper
             if (!destinationProperty.DeclaringType.IsAssignableFrom(DestinationType))
                 return null;
             var propertyMap =
-                _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+                _propertyMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
 
             if (propertyMap != null)
                 return propertyMap;
 
             propertyMap =
-                _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+                _inheritedMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
 
             if (propertyMap == null)
                 return null;
 
-            var propertyInfo = propertyMap.DestinationProperty as PropertyInfo;
+            var propertyInfo = propertyMap.DestinationMember as PropertyInfo;
 
             if (propertyInfo == null)
                 return propertyMap;
@@ -320,20 +335,13 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
-        public bool ShouldCheckForValid() => CustomMapper == null
-                                             && CustomProjection == null
-                                             && TypeConverterType == null
-                                             && DestinationTypeOverride == null
-                                             && ConfiguredMemberList != MemberList.None
-                                             && !(IsValid ?? false);
-
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
-            foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+            foreach (var inheritedMappedProperty in inheritedTypeMap.PropertyMaps.Where(m => m.IsMapped))
             {
-                var conventionPropertyMap = GetPropertyMaps()
+                var conventionPropertyMap = PropertyMaps
                     .SingleOrDefault(m =>
-                        m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
+                        m.DestinationMember.Name == inheritedMappedProperty.DestinationMember.Name);
 
                 if (conventionPropertyMap != null)
                 {
@@ -368,5 +376,14 @@ namespace AutoMapper
         }
 
         internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
+
+        private IEnumerable<IMemberMap> GetConstructorMemberMaps()
+            => CustomCtorExpression != null
+               || CustomCtorFunction != null
+               || ConstructDestinationUsingServiceLocator
+               || ConstructorMap?.CanResolve != true
+                ? Enumerable.Empty<IMemberMap>()
+                : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
+
     }
 }

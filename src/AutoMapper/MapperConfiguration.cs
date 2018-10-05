@@ -85,10 +85,11 @@ namespace AutoMapper
 
         public IEnumerable<IExpressionBinder> Binders { get; }
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, PropertyMap propertyMap)
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
+            TypePair types, IMemberMap memberMap = null)
         {
             var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, types, propertyMap);
+            var mapRequest = new MapRequest(key, types, memberMap);
             return GetMapperFunc<TSource, TDestination>(mapRequest);
         }
 
@@ -166,7 +167,7 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(this, Configuration, mapRequest.PropertyMap, 
+                var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap, 
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType), 
                                                                         ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
@@ -177,8 +178,8 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var profileMap = mapRequest.PropertyMap?.TypeMap?.Profile ?? Configuration;
-            var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.PropertyMap);
+            var profileMap = mapRequest.MemberMap?.TypeMap?.Profile ?? Configuration;
+            var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, context);
         }
 
@@ -278,8 +279,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-
-            if (!Profiles.Any(x => x.Name == profileName))
+            if (Profiles.All(x => x.Name != profileName))
             {
                 throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
             }
@@ -458,7 +458,6 @@ namespace AutoMapper
         internal struct MapperFuncs
         {
             public Delegate Typed { get; }
-
             public UntypedMapperFunc Untyped { get; }
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)

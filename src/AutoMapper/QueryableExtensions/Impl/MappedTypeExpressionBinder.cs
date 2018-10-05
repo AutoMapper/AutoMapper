@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => 
-            propertyTypeMap != null && propertyTypeMap.CustomProjection == null;
+            propertyTypeMap != null && propertyTypeMap.CustomMapExpression == null;
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
             => BindMappedTypeExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
@@ -27,7 +27,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }
 
-            return Bind(propertyMap.DestinationProperty, transformedExpression);
+            return Bind(propertyMap.DestinationMember, transformedExpression);
         }
     }
 }

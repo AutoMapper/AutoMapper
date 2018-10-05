@@ -10,8 +10,8 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
-            var propertyMap = typeMap.GetPropertyMaps()
-                .FirstOrDefault(pm => pm.CanResolveValue() &&
+            var propertyMap = typeMap.PropertyMaps
+                .FirstOrDefault(pm => pm.CanResolveValue &&
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)
@@ -22,7 +22,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
         {
-            var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == destinationPropertyName);
+            var propertyMap = typeMap.PropertyMaps.SingleOrDefault(item => item.DestinationMember.Name == destinationPropertyName);
             if (propertyMap == null)
                 throw PropertyConfigurationException(typeMap, destinationPropertyName);
 

@@ -19,7 +19,9 @@ namespace AutoMapper.Mappers.Internal
             Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
 
-        public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression, Type ifInterfaceType, MapItem mapItem)
+        public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider,
+            ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
@@ -49,7 +51,7 @@ namespace AutoMapper.Mappers.Internal
                     Call(destination, clearMethod),
                     mapExpr
                 );
-            if (propertyMap != null)
+            if (memberMap != null)
                 return checkNull;
             var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
             if (elementTypeMap == null)
@@ -60,7 +62,7 @@ namespace AutoMapper.Mappers.Internal
             return Block(checkContext, checkNull);
             void UseDestinationValue()
             {
-                if(propertyMap?.UseDestinationValue == true)
+                if(memberMap?.UseDestinationValue == true)
                 {
                     destination = passedDestination;
                     assignNewExpression = Empty();

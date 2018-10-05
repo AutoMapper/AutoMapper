@@ -86,7 +86,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest);
 
-                pm.CustomResolver = expr;
+                pm.CustomMapFunction = expr;
             });
         }
 
@@ -96,7 +96,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember);
 
-                pm.CustomResolver = expr;
+                pm.CustomMapFunction = expr;
             });
         }
 
@@ -106,7 +106,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt);
 
-                pm.CustomResolver = expr;
+                pm.CustomMapFunction = expr;
             });
         }
 

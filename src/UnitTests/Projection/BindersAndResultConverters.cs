@@ -41,10 +41,10 @@ namespace AutoMapper.UnitTests.Projection
         private class EnumToUnderlyingTypeBinder : IExpressionBinder
         {
             public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
-                Bind(propertyMap.DestinationProperty, Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
+                Bind(propertyMap.DestinationMember, Convert(result.ResolutionExpression, propertyMap.DestinationType));
 
             public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
+                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationType;
         }
     }
 
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Projection
         private class EnumToUnderlyingTypeResultConverter : IExpressionResultConverter
         {
             public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) =>
-                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationPropertyType;
+                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationType;
 
             public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
             {
@@ -85,8 +85,8 @@ namespace AutoMapper.UnitTests.Projection
 
             public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps) =>
                 new ExpressionResolutionResult(
-                    Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, propertyMap.SourceMember), propertyMap.DestinationPropertyType), 
-                    propertyMap.DestinationPropertyType);
+                    Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, propertyMap.SourceMember), propertyMap.DestinationType), 
+                    propertyMap.DestinationType);
 
             public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
             {

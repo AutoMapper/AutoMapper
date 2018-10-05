@@ -22,7 +22,7 @@ namespace AutoMapper.Mappers
         }
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
                 ToType(
                     Call(ChangeTypeMethod, ToObject(sourceExpression),

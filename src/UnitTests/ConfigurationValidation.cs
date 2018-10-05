@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
             else
             {
                 context.PropertyMap.SourceMember.Name.ShouldBe("Values");
-                context.PropertyMap.DestinationProperty.Name.ShouldBe("Values");
+                context.PropertyMap.DestinationMember.Name.ShouldBe("Values");
                 if(context.Types.Equals(new TypePair(typeof(int), typeof(int))))
                 {
                     _calledForInt = true;
