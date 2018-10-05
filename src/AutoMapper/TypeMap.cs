@@ -168,6 +168,12 @@ namespace AutoMapper
             || DestinationTypeToUse.IsValueType()
             || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
+        public bool IsConstructorMapping =>
+            CustomCtorExpression == null
+            && CustomCtorFunction == null
+            && !ConstructDestinationUsingServiceLocator
+            && (ConstructorMap?.CanResolve ?? false);
+
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
         {
             var propertyMap = GetExistingPropertyMapFor(destinationProperty);
@@ -377,5 +383,6 @@ namespace AutoMapper
                || ConstructorMap?.CanResolve != true
                 ? Enumerable.Empty<IMemberMap>()
                 : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
+
     }
 }

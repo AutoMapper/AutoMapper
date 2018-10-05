@@ -194,7 +194,7 @@ namespace AutoMapper.Execution
 
         private Expression CreateAssignmentFunc(Expression destinationFunc)
         {
-            var isConstructorMapping = IsConstructorMapping();
+            var isConstructorMapping = _typeMap.IsConstructorMapping;
             var actions = new List<Expression>();
             foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue))
             {
@@ -229,12 +229,6 @@ namespace AutoMapper.Execution
 
             return Block(actions);
         }
-
-        private bool IsConstructorMapping()
-            => _typeMap.CustomCtorExpression == null
-               && _typeMap.CustomCtorFunction == null
-               && !_typeMap.ConstructDestinationUsingServiceLocator
-               && (_typeMap.ConstructorMap?.CanResolve ?? false);
 
         private Expression HandlePath(PathMap pathMap)
         {
