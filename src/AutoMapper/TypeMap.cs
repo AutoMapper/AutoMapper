@@ -94,7 +94,7 @@ namespace AutoMapper
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
 
-        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
+        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps);
         public IEnumerable<PathMap> PathMaps => _pathMaps;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
