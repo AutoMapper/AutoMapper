@@ -102,6 +102,32 @@ namespace AutoMapper
         public bool? IsValid { get; set; }
         internal bool WasInlineChecked { get; set; }
 
+        public bool PassesCtorValidation =>
+            DisableConstructorValidation
+            || CustomCtorExpression != null
+            || CustomCtorFunction != null
+            || ConstructDestinationUsingServiceLocator
+            || ConstructorMap?.CanResolve == true
+            || DestinationTypeToUse.IsInterface()
+            || DestinationTypeToUse.IsAbstract()
+            || DestinationTypeToUse.IsGenericTypeDefinition()
+            || DestinationTypeToUse.IsValueType()
+            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
+
+        public bool IsConstructorMapping =>
+            CustomCtorExpression == null
+            && CustomCtorFunction == null
+            && !ConstructDestinationUsingServiceLocator
+            && (ConstructorMap?.CanResolve ?? false);
+
+        public bool ShouldCheckForValid =>
+            CustomMapFunction == null
+            && CustomMapExpression == null
+            && TypeConverterType == null
+            && DestinationTypeOverride == null
+            && ConfiguredMemberList != MemberList.None
+            && !(IsValid ?? false);
+
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
 
@@ -155,24 +181,6 @@ namespace AutoMapper
 
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
         }
-
-        public bool PassesCtorValidation() =>
-            DisableConstructorValidation
-            || CustomCtorExpression != null
-            || CustomCtorFunction != null
-            || ConstructDestinationUsingServiceLocator
-            || ConstructorMap?.CanResolve == true
-            || DestinationTypeToUse.IsInterface()
-            || DestinationTypeToUse.IsAbstract()
-            || DestinationTypeToUse.IsGenericTypeDefinition()
-            || DestinationTypeToUse.IsValueType()
-            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
-
-        public bool IsConstructorMapping =>
-            CustomCtorExpression == null
-            && CustomCtorFunction == null
-            && !ConstructDestinationUsingServiceLocator
-            && (ConstructorMap?.CanResolve ?? false);
 
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
         {
@@ -281,13 +289,13 @@ namespace AutoMapper
             if (!destinationProperty.DeclaringType.IsAssignableFrom(DestinationType))
                 return null;
             var propertyMap =
-                _propertyMaps.FirstOrDefault(pm => pm.DestinationMember.Name.Equals(destinationProperty.Name));
+                _propertyMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
 
             if (propertyMap != null)
                 return propertyMap;
 
             propertyMap =
-                _inheritedMaps.FirstOrDefault(pm => pm.DestinationMember.Name.Equals(destinationProperty.Name));
+                _inheritedMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
 
             if (propertyMap == null)
                 return null;
@@ -326,13 +334,6 @@ namespace AutoMapper
         {
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
-
-        public bool ShouldCheckForValid() => CustomMapFunction == null
-                                             && CustomMapExpression == null
-                                             && TypeConverterType == null
-                                             && DestinationTypeOverride == null
-                                             && ConfiguredMemberList != MemberList.None
-                                             && !(IsValid ?? false);
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {

@@ -16,9 +16,9 @@ namespace AutoMapper
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
                 (from typeMap in maps
-                    where typeMap.ShouldCheckForValid()
+                    where typeMap.ShouldCheckForValid
                     let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
-                    let canConstruct = typeMap.PassesCtorValidation()
+                    let canConstruct = typeMap.PassesCtorValidation
                     where unmappedPropertyNames.Length > 0 || !canConstruct
                     select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, canConstruct)
                     ).ToArray();
