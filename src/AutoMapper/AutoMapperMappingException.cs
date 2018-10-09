@@ -32,12 +32,12 @@ namespace AutoMapper
         public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
             : this(message, innerException, types) => TypeMap = typeMap;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, PropertyMap propertyMap)
-            : this(message, innerException, types, typeMap) => PropertyMap = propertyMap;
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, IMemberMap memberMap)
+            : this(message, innerException, types, typeMap) => MemberMap = memberMap;
 
         public TypePair? Types { get; set; }
         public TypeMap TypeMap { get; set; }
-        public PropertyMap PropertyMap { get; set; }
+        public IMemberMap MemberMap { get; set; }
 
         public override string Message
         {
@@ -48,24 +48,19 @@ namespace AutoMapper
                 if (Types?.SourceType != null && Types?.DestinationType != null)
                 {
                     message = message + newLine + newLine + "Mapping types:";
-                    message += newLine +
-                               $"{Types?.SourceType.Name} -> {Types?.DestinationType.Name}";
-                    message += newLine +
-                               $"{Types?.SourceType.FullName} -> {Types?.DestinationType.FullName}";
+                    message += newLine + $"{Types?.SourceType.Name} -> {Types?.DestinationType.Name}";
+                    message += newLine + $"{Types?.SourceType.FullName} -> {Types?.DestinationType.FullName}";
                 }
                 if (TypeMap != null)
                 {
                     message = message + newLine + newLine + "Type Map configuration:";
-                    message += newLine +
-                               $"{TypeMap.SourceType.Name} -> {TypeMap.DestinationType.Name}";
-                    message += newLine +
-                               $"{TypeMap.SourceType.FullName} -> {TypeMap.DestinationType.FullName}";
+                    message += newLine + $"{TypeMap.SourceType.Name} -> {TypeMap.DestinationType.Name}";
+                    message += newLine + $"{TypeMap.SourceType.FullName} -> {TypeMap.DestinationType.FullName}";
                 }
-                if (PropertyMap != null)
+                if (MemberMap != null)
                 {
-                    message = message + newLine + newLine + "Property:";
-                    message += newLine +
-                               $"{PropertyMap.DestinationMember.Name}";
+                    message = message + newLine + newLine + "Destination Member:";
+                    message += newLine + $"{MemberMap.DestinationName}" + newLine;
                 }
 
                 return message;
