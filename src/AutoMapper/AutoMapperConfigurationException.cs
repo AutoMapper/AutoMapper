@@ -48,7 +48,7 @@ namespace AutoMapper
                         string.Format(
                             "The following property on {0} cannot be mapped: \n\t{2} \nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
                             Types?.DestinationType.FullName, Types?.DestinationType.FullName,
-                            PropertyMap?.DestinationMember.Name);
+                            PropertyMap?.DestinationName);
 
                     message += "\nContext:";
 
@@ -59,7 +59,7 @@ namespace AutoMapper
                         {
                             message += configExc.PropertyMap == null
                               ? $"\n\tMapping from type {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}"
-                              : $"\n\tMapping to property {configExc.PropertyMap.DestinationMember.Name} from {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}";
+                              : $"\n\tMapping to property {configExc.PropertyMap.DestinationName} from {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}";
                         }
 
                         exToUse = exToUse.InnerException;

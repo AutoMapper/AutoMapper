@@ -22,7 +22,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
         {
-            var propertyMap = typeMap.PropertyMaps.SingleOrDefault(item => item.DestinationMember.Name == destinationPropertyName);
+            var propertyMap = typeMap.PropertyMaps.SingleOrDefault(item => item.DestinationName == destinationPropertyName);
             if (propertyMap == null)
                 throw PropertyConfigurationException(typeMap, destinationPropertyName);
 

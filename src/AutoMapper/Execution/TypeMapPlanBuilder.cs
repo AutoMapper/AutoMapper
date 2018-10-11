@@ -199,7 +199,7 @@ namespace AutoMapper.Execution
             foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue))
             {
                 var property = TryPropertyMap(propertyMap);
-                if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationMember.Name))
+                if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
                     property = _initialDestination.IfNullElse(Empty(), property);
                 actions.Add(property);
             }
