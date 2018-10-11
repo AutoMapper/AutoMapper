@@ -6,8 +6,9 @@ namespace AutoMapper
     public interface ISourceMemberConfigurationExpression
     {
         /// <summary>
-        /// Ignore this member for configuration validation and skip during mapping
+        /// Ignore this member when validating source members, MemberList.Source.
+        /// Does not affect validation for the default case, MemberList.Destination.
         /// </summary>
-        void Ignore();
+        void DoNotValidate();
     }
 }

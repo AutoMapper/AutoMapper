@@ -11,7 +11,7 @@ namespace AutoMapper.Configuration
 
         public SourceMappingExpression(MemberInfo sourceMember) => _sourceMember = sourceMember;
 
-        public void Ignore() => _sourceMemberActions.Add(smc => smc.Ignore());
+        public void DoNotValidate() => _sourceMemberActions.Add(smc => smc.Ignore());
 
         public void Configure(TypeMap typeMap)
         {

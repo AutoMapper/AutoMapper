@@ -262,7 +262,7 @@ namespace AutoMapper.Configuration
         {
             foreach(var property in SourceType.PropertiesWithAnInaccessibleSetter())
             {
-                ForSourceMember(property.Name, options => options.Ignore());
+                ForSourceMember(property.Name, options => options.DoNotValidate());
             }
             return this;
         }

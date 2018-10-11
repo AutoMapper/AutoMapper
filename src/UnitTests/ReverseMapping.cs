@@ -477,7 +477,7 @@ namespace AutoMapper.UnitTests
         {
             cfg.CreateMap<Source, Destination>(MemberList.Source)
                 .ForMember(dest => dest.Value3, opt => opt.MapFrom(src => src.Value2))
-                .ForSourceMember(src => src.Value2, opt => opt.Ignore());
+                .ForSourceMember(src => src.Value2, opt => opt.DoNotValidate());
         });
 
         [Fact]
