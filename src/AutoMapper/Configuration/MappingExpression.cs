@@ -590,7 +590,7 @@ namespace AutoMapper.Configuration
                 ReverseSourceMembers(typeMap);
                 foreach(var destProperty in typeMap.PropertyMaps.Where(pm => pm.Ignored))
                 {
-                    _reverseMap.ForSourceMember(destProperty.DestinationName, opt => opt.Ignore());
+                    _reverseMap.ForSourceMember(destProperty.DestinationName, opt => opt.DoNotValidate());
                 }
                 foreach(var includedDerivedType in typeMap.IncludedDerivedTypes)
                 {
