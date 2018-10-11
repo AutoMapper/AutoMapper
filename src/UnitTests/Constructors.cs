@@ -893,6 +893,45 @@ namespace AutoMapper.UnitTests.Constructors
         }
     }
 
+    public class When_mapping_constructor_argument_fails : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Foo { get; set; }
+            public int Bar { get; set; }
+        }
+
+        public class Dest
+        {
+            private readonly int _foo;
+
+            public int Foo
+            {
+                get { return _foo; }
+            }
+
+            public int Bar { get; set; }
+
+            public Dest(DateTime foo)
+            {
+                _foo = foo.Day;
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMissingTypeMaps = false;
+            cfg.CreateMap<Source, Dest>();
+        });
+
+        [Fact]
+        public void Should_say_what_parameter_fails()
+        {
+            new Action(() => Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 })).ShouldThrowException<AutoMapperMappingException>(ex =>
+                  ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
+        }
+    }
+
     public class When_mapping_to_an_object_with_a_constructor_with_a_matching_argument : AutoMapperSpecBase
     {
         private Dest _dest;

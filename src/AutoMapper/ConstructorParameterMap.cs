@@ -32,7 +32,7 @@ namespace AutoMapper
         public TypePair Types => new TypePair(SourceType, DestinationType);
 
         public IEnumerable<MemberInfo> SourceMembers { get; }
-        public string DestinationName => Parameter.Name;
+        public string DestinationName => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
 
         public bool HasDefaultValue => Parameter.IsOptional;
 

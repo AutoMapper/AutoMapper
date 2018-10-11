@@ -143,10 +143,10 @@ namespace AutoMapper
         public string[] GetUnmappedPropertyNames()
         {
             string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
-                ? pm.DestinationMember.Name
+                ? pm.DestinationName
                 : pm.SourceMember != null
                     ? pm.SourceMember.Name
-                    : pm.DestinationMember.Name;
+                    : pm.DestinationName;
             string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
 
             var autoMappedProperties = GetPropertyNames(_propertyMaps);
@@ -164,7 +164,7 @@ namespace AutoMapper
             else
             {
                 var redirectedSourceMembers = _propertyMaps
-                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationMember.Name)
+                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
@@ -289,13 +289,13 @@ namespace AutoMapper
             if (!destinationProperty.DeclaringType.IsAssignableFrom(DestinationType))
                 return null;
             var propertyMap =
-                _propertyMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
+                _propertyMaps.FirstOrDefault(pm => pm.DestinationName == destinationProperty.Name);
 
             if (propertyMap != null)
                 return propertyMap;
 
             propertyMap =
-                _inheritedMaps.FirstOrDefault(pm => pm.DestinationMember.Name == destinationProperty.Name);
+                _inheritedMaps.FirstOrDefault(pm => pm.DestinationName == destinationProperty.Name);
 
             if (propertyMap == null)
                 return null;
@@ -341,7 +341,7 @@ namespace AutoMapper
             {
                 var conventionPropertyMap = PropertyMaps
                     .SingleOrDefault(m =>
-                        m.DestinationMember.Name == inheritedMappedProperty.DestinationMember.Name);
+                        m.DestinationName == inheritedMappedProperty.DestinationName);
 
                 if (conventionPropertyMap != null)
                 {

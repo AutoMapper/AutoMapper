@@ -199,8 +199,8 @@ namespace AutoMapper.Execution
             foreach (var propertyMap in _typeMap.PropertyMaps.Where(pm => pm.CanResolveValue))
             {
                 var property = TryPropertyMap(propertyMap);
-                if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationMember.Name))
-                    property = _initialDestination.IfNullElse(Empty(), property);
+                if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                    property = _initialDestination.IfNullElse(Default(property.Type), property);
                 actions.Add(property);
             }
             foreach (var pathMap in _typeMap.PathMaps.Where(pm => !pm.Ignored))
@@ -357,9 +357,10 @@ namespace AutoMapper.Execution
         {
             var resolvedExpression = ResolveSource(ctorParamMap);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
-            return Block(new[] {resolvedValue},
+            var tryMap = Block(new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
                 MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue, Context));
+            return TryMemberMap(ctorParamMap, tryMap);
         }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
@@ -378,11 +379,13 @@ namespace AutoMapper.Execution
 
             var mappingExceptionCtor = ((NewExpression) CtorExpression.Body).Constructor;
 
-            return TryCatch(Block(typeof(void), memberMapExpression),
-                MakeCatchBlock(typeof(Exception), exception,
-                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
-                        Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap))),
-                    null));
+            return TryCatch(memberMapExpression,
+                        MakeCatchBlock(typeof(Exception), exception,
+                            Block(
+                                Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
+                                    Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap))),
+                                Default(memberMapExpression.Type))
+                            , null));
         }
 
         private Expression CreatePropertyMapFunc(IMemberMap memberMap, Expression destination, MemberInfo destinationMember)

@@ -257,7 +257,7 @@ namespace AutoMapper.QueryableExtensions
             foreach (var propertyMap in typeMap.PropertyMaps
                                                .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationMember)) && 
                                                             pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
-                                               .OrderBy(pm => pm.DestinationMember.Name))
+                                               .OrderBy(pm => pm.DestinationName))
             {
                 letPropertyMaps.Push(propertyMap);
 
@@ -280,7 +280,7 @@ namespace AutoMapper.QueryableExtensions
                 if(binder == null)
                 {
                     var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationMember.Name} ({propertyMap.DestinationType})";
+                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationName} ({propertyMap.DestinationType})";
                     throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
                 }
                 var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
@@ -444,7 +444,7 @@ namespace AutoMapper.QueryableExtensions
                     MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Select(pm=>pm.SourceMember).MemberAccesses(instanceParameter),
                     Property = new PropertyDescription
                     (
-                        "__"+string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationMember.Name)),
+                        "__"+string.Join("#", path.PropertyMaps.Select(pm => pm.DestinationName)),
                         path.Last.SourceType
                     ),
                     path.Marker
