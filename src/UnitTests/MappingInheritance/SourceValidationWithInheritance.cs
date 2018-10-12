@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
                 .Include<FieldControl2, FormElementDTO2>();
 
             cfg.CreateMap<FieldControl2, FormElementDTO2>(MemberList.Source)
-                .ForSourceMember(src => src.Misspelled, o=>o.Ignore())
+                .ForSourceMember(src => src.Misspelled, o=>o.DoNotValidate())
                 .Include<TextBoxControl2, FormElementDTO2>();
 
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)

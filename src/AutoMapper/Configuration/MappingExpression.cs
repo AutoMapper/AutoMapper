@@ -262,7 +262,7 @@ namespace AutoMapper.Configuration
         {
             foreach(var property in SourceType.PropertiesWithAnInaccessibleSetter())
             {
-                ForSourceMember(property.Name, options => options.Ignore());
+                ForSourceMember(property.Name, options => options.DoNotValidate());
             }
             return this;
         }
@@ -590,7 +590,7 @@ namespace AutoMapper.Configuration
                 ReverseSourceMembers(typeMap);
                 foreach(var destProperty in typeMap.PropertyMaps.Where(pm => pm.Ignored))
                 {
-                    _reverseMap.ForSourceMember(destProperty.DestinationName, opt => opt.Ignore());
+                    _reverseMap.ForSourceMember(destProperty.DestinationName, opt => opt.DoNotValidate());
                 }
                 foreach(var includedDerivedType in typeMap.IncludedDerivedTypes)
                 {
