@@ -38,7 +38,7 @@ task compile -depends clean {
 }
 
 task pack -depends compile {
-	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build $versionSuffix }
+	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --no-build $versionSuffix }
 }
 
 task benchmark {
