@@ -35,5 +35,11 @@ namespace AutoMapper.UnitTests.Bug
         {
             _destination.Items.SetEquals(_items).ShouldBeTrue();
         }
+
+        [Fact]
+        public void Should_map_null_to_empty()
+        {
+            Mapper.Map<Destination>(new Source()).ShouldNotBeNull();
+        }
     }
 }
