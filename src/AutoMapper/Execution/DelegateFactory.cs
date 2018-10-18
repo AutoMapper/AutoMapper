@@ -50,11 +50,14 @@ namespace AutoMapper.Execution
 
             if (type.IsInterface())
             {
-                return type.ImplementsGenericInterface(typeof(IDictionary<,>))
-                    ? CreateCollection(type, typeof(Dictionary<,>))
-                    : (type.IsEnumerableType()
-                        ? CreateCollection(type, typeof(List<>))
-                        : InvalidType(type, $"Cannot create an instance of interface type {type}."));
+                return 
+                    type.IsDictionaryType() ? 
+                        CreateCollection(type, typeof(Dictionary<,>))
+                        : type.IsSetType() ?
+                              CreateCollection(type, typeof(HashSet<>))
+                              : type.IsEnumerableType() ? 
+                                    CreateCollection(type, typeof(List<>))
+                                    : InvalidType(type, $"Cannot create an instance of interface type {type}.");
             }
 
             if (type.IsAbstract())
