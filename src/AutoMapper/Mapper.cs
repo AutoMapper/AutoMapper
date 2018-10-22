@@ -186,6 +186,11 @@ namespace AutoMapper
 
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
+            if(configurationProvider == null)
+            {
+                throw new ArgumentNullException(nameof(configurationProvider));
+            }
+            
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
@@ -203,11 +208,6 @@ namespace AutoMapper
                 return default;
 
             var types = new TypePair(source.GetType(), typeof(TDestination));
-
-            if(_configurationProvider == null)
-            {
-                throw new Exception("Mapping configuration not provided.");
-            }
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
