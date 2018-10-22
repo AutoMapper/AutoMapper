@@ -204,6 +204,11 @@ namespace AutoMapper
 
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
+            if(_configurationProvider == null)
+            {
+                throw new Exception("Mapping configuration not provided.");
+            }
+
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
             return (TDestination) func(source, null, DefaultContext);
