@@ -61,7 +61,12 @@ namespace AutoMapper
             }
             if (typeMap != null)
             {
-                if(typeMapsChecked.Contains(typeMap))
+                // dynamic maps get mapped at runtime yolo
+                if (typeMap.IsConventionMap)
+                {
+                    return;
+                }
+                if (typeMapsChecked.Contains(typeMap))
                 {
                     return;
                 }
@@ -80,10 +85,6 @@ namespace AutoMapper
                 var mapperToUse = _config.FindMapper(types);
                 if (mapperToUse == null)
                 {
-                    // Maps with no match get mapped at runtime yolo
-                    if (propertyMap.TypeMap.Profile.CreateMissingTypeMaps)
-                        return;
-
                     throw new AutoMapperConfigurationException(propertyMap.TypeMap.Types) { PropertyMap = propertyMap };
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);
