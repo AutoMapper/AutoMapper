@@ -62,7 +62,7 @@ namespace AutoMapper
             if (typeMap != null)
             {
                 // dynamic maps get mapped at runtime yolo
-                if (typeMap.IsConventionMap)
+                if (typeMap.IsConventionMap && typeMap.Profile.CreateMissingTypeMaps)
                 {
                     return;
                 }
