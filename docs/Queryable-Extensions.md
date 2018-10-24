@@ -206,6 +206,7 @@ Not supported:
 * Before/AfterMap
 * Custom resolvers
 * Custom type converters
+* ForPath
 * **Any calculated property on your domain object**
 
 Additionally, recursive or self-referencing destination types are not supported as LINQ providers do not support this. Typically hierarchical relational data models require common table expressions (CTEs) to correctly resolve a recursive join.
