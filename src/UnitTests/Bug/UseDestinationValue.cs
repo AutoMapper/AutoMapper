@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<OrganizationDTO, Organization>().ForMember(d=>d.BranchCollection, o=>o.UseDestinationValue());
             cfg.CreateMap<BranchDTO, Branch>();
-            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>));
+            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
         });
 
         protected override void Because_of()
@@ -178,7 +178,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<OrganizationDTO, Organization>();
             cfg.CreateMap<BranchDTO, Branch>();
-            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>));
+            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
         });
 
         [Fact]

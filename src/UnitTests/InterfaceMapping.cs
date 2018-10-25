@@ -101,7 +101,8 @@ namespace AutoMapper.UnitTests.InterfaceMapping
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
             cfg.CreateMap(typeof(IList<>), typeof(IDestinationBase<>))
-                    .ForMember(nameof(IDestinationBase<Object>.Items), p_Expression => p_Expression.MapFrom(p_Source => p_Source)));
+                    .ForMember(nameof(IDestinationBase<Object>.Items), p_Expression => p_Expression.MapFrom(p_Source => p_Source))
+                    .ForMember("PropertyToMap", o=>o.Ignore()));
 
         [Fact]
         public void Should_work()

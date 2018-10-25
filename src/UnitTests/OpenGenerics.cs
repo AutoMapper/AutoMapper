@@ -2,6 +2,8 @@
 {
     using MappingInheritance;
     using Shouldly;
+    using System;
+    using System.Linq;
     using Xunit;
 
     public class RecursiveOpenGenerics : AutoMapperSpecBase
@@ -40,6 +42,85 @@
             var source = new SourceTree<string>("value", new SourceTree<string>[0]);
             Mapper.Map<DestinationTree<string>>(source).Value.ShouldBe("value");
         }
+    }
+
+    public class OpenGenericsValidation : NonValidatingSpecBase
+    {
+        public class Source<T>
+        {
+            public T Value { get; set; }
+        }
+
+        public class Dest<T>
+        {
+            public int A { get; set; }
+            public T Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
+
+        [Fact]
+        public void Should_report_unmapped_property()
+        {
+            new Action(()=>Mapper.Map<Dest<int>>(new Source<int>{ Value = 5 }))
+                .ShouldThrow<AutoMapperConfigurationException>()
+                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A");
+        }
+    }
+
+    public class OpenGenericsProfileValidationNonGenericMembers : NonValidatingSpecBase
+    {
+        public class Source<T>
+        {
+            public T[] Value { get; set; }
+        }
+
+        public class Dest<T>
+        {
+            public int A { get; set; }
+            public T[] Value { get; set; }
+        }
+
+        class MyProfile : Profile
+        {
+            public MyProfile()
+            {
+                CreateMap(typeof(Source<>), typeof(Dest<>));
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+
+        [Fact]
+        public void Should_report_unmapped_property()
+        {
+            new Action(()=>Configuration.AssertConfigurationIsValid<MyProfile>())
+                .ShouldThrow<AutoMapperConfigurationException>()
+                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A"); ;
+        }
+    }
+
+    public class OpenGenericsProfileValidation : AutoMapperSpecBase
+    {
+        public class Source<T>
+        {
+            public T[] Value { get; set; }
+        }
+
+        public class Dest<T>
+        {
+            public T[] Value { get; set; }
+        }
+
+        class MyProfile : Profile
+        {
+            public MyProfile()
+            {
+                CreateMap(typeof(Source<>), typeof(Dest<>));
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
     }
 
     public class OpenGenerics
