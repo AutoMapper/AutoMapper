@@ -25,7 +25,7 @@ When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to
 When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
 ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
 
-Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed in an Expression and the underlying LINQ provider is supported.
+Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed in an Expression and the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with Map.
 
 ## Examples
 
