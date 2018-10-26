@@ -21,9 +21,11 @@ var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 
 #### QueryableExtensions
 
-When using DI with QueryableExtensions, remember to install the IConfigurationProvider in the the IoC container.
+When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to install the IConfigurationProvider in the the IoC container.
 When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
 ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
+
+Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed in an Expression and the underlying LINQ provider is supported.
 
 #### ASP.NET Core
 
