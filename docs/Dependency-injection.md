@@ -19,7 +19,7 @@ var mapper = new Mapper(Mapper.Configuration, childContainer.GetInstance);
 var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 ```
 
-#### QueryableExtensions
+### QueryableExtensions
 
 When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to install the IConfigurationProvider in the the IoC container.
 When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
@@ -27,11 +27,13 @@ When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the c
 
 Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed in an Expression and the underlying LINQ provider is supported.
 
-#### ASP.NET Core
+## Examples
+
+### ASP.NET Core
 
 There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.Microsoft.DependencyInjection/) to be used with the default injection mechanism described [here](https://lostechies.com/jimmybogard/2016/07/20/integrating-automapper-with-asp-net-core-di/).
 
-#### Ninject
+### Ninject
 
 For those using Ninject here is an example of a Ninject module for AutoMapper
 
@@ -64,7 +66,7 @@ public class AutoMapperModule : NinjectModule
 }
 ```
 
-#### Simple Injector
+### Simple Injector
 
 The workflow is as follows:
 
@@ -144,7 +146,7 @@ public class PropertyThatDependsOnIocValueResolver : IValueResolver<MySourceType
 }
 ```
 
-#### Castle Windsor
+### Castle Windsor
 
 For those using Castle Windsor here is an example of an installer for AutoMapper
 
