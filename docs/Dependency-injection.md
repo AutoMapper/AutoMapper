@@ -19,7 +19,7 @@ var mapper = new Mapper(Mapper.Configuration, childContainer.GetInstance);
 var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 ```
 
-### QueryableExtensions
+### Queryable Extensions
 
 When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to install the IConfigurationProvider in the IoC container.
 When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
