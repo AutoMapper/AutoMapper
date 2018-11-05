@@ -8,6 +8,7 @@ using System.Reflection;
 namespace AutoMapper
 {
     using static Internal.ExpressionFactory;
+    using static Expression;
 
     [DebuggerDisplay("{DestinationMember.Name}")]
     public class PropertyMap : IMemberMap
@@ -116,11 +117,11 @@ namespace AutoMapper
 
         public void MapFrom(string propertyOrField)
         {
-            if(TypeMap.SourceType.IsGenericTypeDefinition())
-            {
-                return;
-            }
-            MapFrom(MemberAccessLambda(TypeMap.SourceType, propertyOrField));
+            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition() ?
+                                                // just a placeholder so the member is mapped
+                                                Lambda(Default(DestinationType)) :
+                                                MemberAccessLambda(TypeMap.SourceType, propertyOrField);
+            MapFrom(mapExpression);
         }
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)

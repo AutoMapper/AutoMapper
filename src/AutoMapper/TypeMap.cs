@@ -128,6 +128,8 @@ namespace AutoMapper
             && ConfiguredMemberList != MemberList.None
             && !(IsValid ?? false);
 
+        public bool IsClosedGeneric { get; internal set; }
+
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
 

@@ -57,10 +57,19 @@ namespace AutoMapper
         {
             if(typeMap == null)
             {
+                if (types.SourceType.IsGenericParameter || types.DestinationType.IsGenericParameter)
+                {
+                    return;
+                }
                 typeMap = _config.ResolveTypeMap(types.SourceType, types.DestinationType);
             }
             if (typeMap != null)
             {
+                if (typeMap.IsClosedGeneric)
+                {
+                    // it was already validated
+                    return;
+                }
                 // dynamic maps get mapped at runtime yolo
                 if (typeMap.IsConventionMap && typeMap.Profile.CreateMissingTypeMaps)
                 {

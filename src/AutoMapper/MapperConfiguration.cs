@@ -218,6 +218,10 @@ namespace AutoMapper
                 {
                     inlineConfiguration.Configure(typeMap);
                     typeMap.Seal(this);
+                    if (typeMap.IsClosedGeneric)
+                    {
+                        AssertConfigurationIsValid(typeMap);
+                    }
                 }
             }
             return typeMap;
@@ -297,7 +301,7 @@ namespace AutoMapper
         {
             _expressionValidator.AssertConfigurationExpressionIsValid();
 
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.Values.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.Values);
         }
 
         public IMapper CreateMapper() => new Mapper(this);

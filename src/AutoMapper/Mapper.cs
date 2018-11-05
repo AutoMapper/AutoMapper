@@ -186,8 +186,8 @@ namespace AutoMapper
 
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
-            _configurationProvider = configurationProvider;
-            _serviceCtor = serviceCtor;
+            _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
+            _serviceCtor = serviceCtor ?? throw new ArgumentNullException(nameof(serviceCtor));
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
 
