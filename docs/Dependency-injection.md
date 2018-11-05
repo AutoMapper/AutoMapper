@@ -19,15 +19,21 @@ var mapper = new Mapper(Mapper.Configuration, childContainer.GetInstance);
 var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 ```
 
-#### Gotchas
+### Queryable Extensions
 
-Using DI is effectively mutually exclusive with using the IQueryable.ProjectTo extension method.  Use ``` IEnumerable.Select(_mapper.Map<DestinationType>).ToList() ``` instead.
+When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to install the IConfigurationProvider in the IoC container.
+When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
+``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
 
-#### ASP.NET Core
+Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with Map.
+
+## Examples
+
+### ASP.NET Core
 
 There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.Microsoft.DependencyInjection/) to be used with the default injection mechanism described [here](https://lostechies.com/jimmybogard/2016/07/20/integrating-automapper-with-asp-net-core-di/).
 
-#### Ninject
+### Ninject
 
 For those using Ninject here is an example of a Ninject module for AutoMapper
 
@@ -60,7 +66,7 @@ public class AutoMapperModule : NinjectModule
 }
 ```
 
-#### Simple Injector
+### Simple Injector
 
 The workflow is as follows:
 
@@ -137,5 +143,36 @@ public class PropertyThatDependsOnIocValueResolver : IValueResolver<MySourceType
     {
         return _service.MyMethod(source);
     }
+}
+```
+
+### Castle Windsor
+
+For those using Castle Windsor here is an example of an installer for AutoMapper
+
+```c#
+public class AutoMapperInstaller : IWindsorInstaller
+{
+    public void Install(IWindsorContainer container, IConfigurationStore store)
+        {
+            // Register all mapper profiles
+            container.Register(
+                Classes.FromAssemblyInThisApplication(GetType().Assembly)
+                .BasedOn<Profile>().WithServiceBase());
+                
+            // Register IConfigurationProvider with all registered profiles
+            container.Register(Component.For<IConfigurationProvider>().UsingFactoryMethod(kernel =>
+            {
+                return new MapperConfiguration(configuration =>
+                {
+                    kernel.ResolveAll<Profile>().ToList().ForEach(configuration.AddProfile);
+                });
+            }).LifestyleSingleton());
+            
+            // Register IMapper with registered IConfigurationProvider
+            container.Register(
+                Component.For<IMapper>().UsingFactoryMethod(kernel =>
+                    new Mapper(kernel.Resolve<IConfigurationProvider>(), kernel.Resolve)));
+        }
 }
 ```
