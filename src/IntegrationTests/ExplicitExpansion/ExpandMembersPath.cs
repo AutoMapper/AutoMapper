@@ -51,7 +51,7 @@ namespace AutoMapper.IntegrationTests.Net4
             using(TestContext context = new TestContext())
             {
                 context.Database.Log = s => Debug.WriteLine(s);
-                dtos = context.Class1Set.ProjectTo<Class1DTO>(Configuration, r => r.Class2DTO.Class3DTO).ToArray();                
+                dtos = ProjectTo<Class1DTO>(context.Class1Set, null, r => r.Class2DTO.Class3DTO).ToArray();                
             }
             Check(dtos);
         }
@@ -63,7 +63,7 @@ namespace AutoMapper.IntegrationTests.Net4
             using(TestContext context = new TestContext())
             {
                 context.Database.Log = s => Debug.WriteLine(s);
-                dtos = context.Class1Set.ProjectTo<Class1DTO>(Configuration, null, "Class2DTO.Class3DTO").ToArray();
+                dtos = ProjectTo<Class1DTO>(context.Class1Set, null, "Class2DTO.Class3DTO").ToArray();
             }
             Check(dtos);
         }

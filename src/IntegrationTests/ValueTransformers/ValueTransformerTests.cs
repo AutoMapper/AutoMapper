@@ -56,7 +56,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy is straight up dope");
                 }
@@ -110,7 +110,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy is straight up dope! No joke!");
                 }
@@ -164,7 +164,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy is straight up dope");
                 }
@@ -220,7 +220,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy is straight up dope! No joke!");
                 }
@@ -276,7 +276,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe((5 + 3) * 2);
                 }
@@ -334,7 +334,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy, for real, is straight up dope! No joke!");
                 }
@@ -392,7 +392,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
             {
                 using (var context = new Context())
                 {
-                    var dest = await context.Sources.ProjectTo<Dest>(Configuration).SingleAsync();
+                    var dest = await ProjectTo<Dest>(context.Sources).SingleAsync();
 
                     dest.Value.ShouldBe("Jimmy, seriously, for real, is straight up dope! No joke!");
                 }

@@ -66,7 +66,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new Context())
             {
-                _destinations = context.EntityA.ProjectTo<ITypeA>(Configuration).ToArray();
+                _destinations = ProjectTo<ITypeA>(context.EntityA).ToArray();
             }
             _destinations.Length.ShouldBe(3);
             _destinations[2].Name.ShouldBe("Bill Gates");
@@ -323,7 +323,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new Context())
             {
-                var domainCalendars = context.Calendars.ProjectTo<ICalendar>(Configuration).ToList();
+                var domainCalendars = ProjectTo<ICalendar>(context.Calendars).ToList();
                 domainCalendars.Count.ShouldBe(2);
             }
         }

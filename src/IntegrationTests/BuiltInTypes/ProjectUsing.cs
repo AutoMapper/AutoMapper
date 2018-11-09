@@ -69,7 +69,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new TestContext())
             {
-                var results = context.MyTable.ProjectTo<MyTableModel>(Configuration).ToList();
+                var results = ProjectTo<MyTableModel>(context.MyTable).ToList();
                 results[0].Id.ShouldBe(1);
                 results[0].EnumValue.ShouldBe(MyEnum.Value2);
                 results[0].EnumValueNullable.ShouldBe(MyEnum.Value1);
@@ -134,7 +134,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using (var db = new ApplicationDBContext())
             {
-                var result = db.Parents.ProjectTo<ParentVM>(Configuration);
+                var result = ProjectTo<ParentVM>(db.Parents);
             }
         }
     }

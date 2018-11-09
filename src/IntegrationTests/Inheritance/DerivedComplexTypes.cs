@@ -80,7 +80,7 @@ namespace AutoMapper.IntegrationTests
         {
             using (var context = new Context())
             {
-                var customerVm = context.Customers.ProjectTo<CustomerViewModel>(Configuration).First();
+                var customerVm = ProjectTo<CustomerViewModel>(context.Customers).First();
                 customerVm.Address.ShouldBe("home");
             }
         }

@@ -24,7 +24,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new ClientContext())
             {
-                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(Configuration).FirstOrDefault(n => n.CourseName == "Course 1");
+                _course = ProjectTo<TrainingCourseDto>(context.TrainingCourses).FirstOrDefault(n => n.CourseName == "Course 1");
             }
         }
 
