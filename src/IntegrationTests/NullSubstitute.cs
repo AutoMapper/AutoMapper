@@ -63,7 +63,7 @@ namespace AutoMapper.IntegrationTests
         {
             using (var context = new Context())
             {
-                context.Customers.ProjectTo<CustomerViewModel>(Configuration).ToList()[0].Value.ShouldBe(5);
+                ProjectTo<CustomerViewModel>(context.Customers).ToList()[0].Value.ShouldBe(5);
             }
         }
     }

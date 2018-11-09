@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace AutoMapper
 {
@@ -115,6 +118,27 @@ namespace AutoMapper
         /// Factory method for creating runtime instances of converters, resolvers etc.
         /// </summary>
         Func<Type, object> ServiceCtor { get; }
+
+        /// <summary>
+        /// Project the input queryable.
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
+        IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand);
+
+        /// <summary>
+        /// Project the input queryable.
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to map to</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
+        IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand);
     }
 
     public interface IRuntimeMapper : IMapper

@@ -28,7 +28,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.Products.ProjectTo<ProductModel>(Configuration);
+                var projection = ProjectTo<ProductModel>(context.Products);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(1);
@@ -148,7 +148,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.Products.ProjectTo<ProductModel>(Configuration);
+                var projection = ProjectTo<ProductModel>(context.Products);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(0);
@@ -238,7 +238,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.Products.ProjectTo<ProductModel>(Configuration);
+                var projection = ProjectTo<ProductModel>(context.Products);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(1);
@@ -333,7 +333,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
+                var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(2);
@@ -447,7 +447,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
+                var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(1);
@@ -553,7 +553,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
+                var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
                 counter.Count.ShouldBe(1);
@@ -752,7 +752,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                var projection = context.Cables.ProjectTo<CableListModel>(Configuration);
+                var projection = ProjectTo<CableListModel>(context.Cables);
                 var result = projection.Single();
                 result.AEnd.DataHallId.ShouldBe(10);
                 result.AnotherEnd.DataHallId.ShouldBeNull();

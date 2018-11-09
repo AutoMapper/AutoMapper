@@ -61,7 +61,7 @@ namespace AutoMapper.IntegrationTests
         {
             using (var context = new Context())
             {
-                var model = context.Customers.ProjectTo<CustomerViewModel>(Configuration).Single();
+                var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
                 model.Id.ShouldBe(1);
                 model.FirstName.ShouldBe("Bob");
                 model.LastName.ShouldBe("Smith");
@@ -121,7 +121,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new Context())
             {
-                var model = context.Customers.ProjectTo<CustomerViewModel>(Configuration).Single();
+                var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
                 model.Id.ShouldBe(1);
                 model.FirstName.ShouldBe("Bob");
                 model.LastName.ShouldBe("Smith");

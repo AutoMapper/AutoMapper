@@ -52,7 +52,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new ClientContext())
             {
-                _result = context.Entities.ProjectTo<QueryableDto>(ConfigProvider).ToArray();
+                _result = ProjectTo<QueryableDto>(context.Entities).ToArray();
             }
         }
 

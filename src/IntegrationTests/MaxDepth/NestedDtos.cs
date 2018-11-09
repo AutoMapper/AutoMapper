@@ -81,7 +81,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new TestContext())
             {
-                _destination = context.Arts.ProjectTo<ArtDto>(Configuration).FirstOrDefault();
+                _destination = ProjectTo<ArtDto>(context.Arts).FirstOrDefault();
             }
         }
 

@@ -99,7 +99,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new Context())
             {
-                _destination = context.Customers.ProjectTo<CustomerDTO>(Configuration).Single();
+                _destination = ProjectTo<CustomerDTO>(context.Customers).Single();
                 _destination.Id.ShouldBe(1);
                 _destination.Name1.SequenceEqual("Bob");
                 _destination.Cust.CustomerID.ShouldBe(1);

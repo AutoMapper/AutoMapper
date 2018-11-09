@@ -69,7 +69,7 @@ namespace AutoMapper.IntegrationTests
         {
             using(var context = new Context())
             {
-                var customer = context.Customers.ProjectTo<CustomerViewModel>(Configuration).Single();
+                var customer = ProjectTo<CustomerViewModel>(context.Customers).Single();
                 customer.ItemsIds.SequenceEqual(new int[] { 1, 2, 3 }).ShouldBeTrue();
             }
         }

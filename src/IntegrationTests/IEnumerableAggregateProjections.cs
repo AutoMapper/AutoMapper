@@ -68,10 +68,10 @@ namespace AutoMapper.IntegrationTests
         {
             using (var context = new Context())
             {
-                var result = context.Customers.Select(customer => new
+                var result = ProjectTo<CustomerViewModel>(context.Customers.Select(customer => new
                 {
                     ItemCodes = customer.Items.Select(item => item.Code)
-                }).ProjectTo<CustomerViewModel>(Configuration).Single();
+                })).Single();
 
                 result.ItemCodesCount.ShouldBe(3);
                 result.ItemCodesMin.ShouldBe(1);

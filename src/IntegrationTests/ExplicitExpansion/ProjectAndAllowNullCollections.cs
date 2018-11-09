@@ -138,7 +138,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             using(var context = new MyContext())
             {
-                var foos = context.Foos.AsNoTracking().ProjectTo<FooDto>(Configuration, m => m.Bars).ToList();
+                var foos = ProjectTo<FooDto>(context.Foos.AsNoTracking(), null, m => m.Bars).ToList();
 
                 foos[0].Bars.ShouldNotBeNull();
                 foos[0].Bazs.ShouldBeNull();

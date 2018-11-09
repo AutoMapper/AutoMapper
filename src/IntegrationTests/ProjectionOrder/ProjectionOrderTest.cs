@@ -71,7 +71,7 @@ namespace AutoMapper.IntegrationTests.ProjectionOrder
         {
             using (var context = new ClientContext())
             {
-                context.Source1.ProjectTo<Destination>(Configuration).Union(context.Source2.ProjectTo<Destination>(Configuration)).ToString();
+                ProjectTo<Destination>(context.Source1).Union(ProjectTo<Destination>(context.Source2)).ToString();
             }
         }
     }
