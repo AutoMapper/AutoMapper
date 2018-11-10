@@ -21,9 +21,7 @@ var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 
 ### Queryable Extensions
 
-When using DI with [QueryableExtensions](Queryable-Extensions.html), remember to install the IConfigurationProvider in the IoC container.
-When calling IQueryable.ProjectTo, resolve the IConfigurationProvider from the container and pass it as an argument
-``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
+Starting with 8.0 you can use IMapper.ProjectTo. For older version you need to pass the configuration to the extension method ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
 
 Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with Map.
 
