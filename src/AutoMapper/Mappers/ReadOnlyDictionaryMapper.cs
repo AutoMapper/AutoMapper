@@ -3,11 +3,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
+    using static ExpressionFactory;
     using static CollectionMapperExpressionFactory;
 
     public class ReadOnlyDictionaryMapper : IObjectMapper
@@ -19,17 +21,26 @@ namespace AutoMapper.Mappers
 
             var genericType = context.DestinationType.GetGenericTypeDefinition();
 
-            return genericType == typeof(ReadOnlyDictionary<,>);
+            return genericType == typeof(ReadOnlyDictionary<,>) || genericType == typeof(IReadOnlyDictionary<,>);
         }
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            var dictType = typeof(Dictionary<,>).MakeGenericType(ElementTypeHelper.GetElementTypes(destExpression.Type, ElementTypeFlags.BreakKeyValuePair));
+            var dictionaryTypes = ElementTypeHelper.GetElementTypes(destExpression.Type, ElementTypeFlags.BreakKeyValuePair);
+            var dictType = typeof(Dictionary<,>).MakeGenericType(dictionaryTypes);
             var dict = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(dictType), contextExpression, typeof(Dictionary<,>), MapKeyPairValueExpr);
             var dest = Variable(dictType, "dest");
 
-            return Block(new[] { dest }, Assign(dest, dict), Condition(NotEqual(dest, Default(dictType)), New(destExpression.Type.GetDeclaredConstructors().First(), dest), Default(destExpression.Type)));
+            var readOnlyDictType = destExpression.Type.IsInterface
+                ? typeof(ReadOnlyDictionary<,>).MakeGenericType(dictionaryTypes)
+                : destExpression.Type;
+
+            return Block(new[] { dest }, 
+                Assign(dest, dict), 
+                Condition(NotEqual(dest, Default(dictType)), 
+                    ToType(New(readOnlyDictType.GetDeclaredConstructors().First(), dest), destExpression.Type), 
+                    Default(destExpression.Type)));
         }
     }
 }

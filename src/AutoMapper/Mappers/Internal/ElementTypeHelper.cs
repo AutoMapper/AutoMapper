@@ -30,6 +30,12 @@ namespace AutoMapper.Mappers.Internal
                 return idictionaryType.GetTypeInfo().GenericTypeArguments;
             }
 
+            var ireadonlydictionaryType = enumerableType.GetReadOnlyDictionaryType();
+            if (ireadonlydictionaryType != null && flags.HasFlag(ElementTypeFlags.BreakKeyValuePair))
+            {
+                return ireadonlydictionaryType.GetTypeInfo().GenericTypeArguments;
+            }
+
             var ienumerableType = enumerableType.GetIEnumerableType();
             if (ienumerableType != null)
             {
