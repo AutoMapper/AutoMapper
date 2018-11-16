@@ -327,6 +327,19 @@ namespace AutoMapper
                 profile.Register(this);
             }
 
+            foreach (var typeMap in _typeMapRegistry.Values.Where(tm => tm.IncludeAllDerivedTypes))
+            {
+                foreach (var derivedMap in _typeMapRegistry
+                    .Where(tm =>
+                        typeMap.SourceType.IsAssignableFrom(tm.Key.SourceType) &&
+                        typeMap.DestinationType.IsAssignableFrom(tm.Key.DestinationType) &&
+                        typeMap != tm.Value)
+                    .Select(tm => tm.Value))
+                {
+                    typeMap.IncludeDerivedTypes(derivedMap.SourceType, derivedMap.DestinationType);
+                }
+            }
+
             foreach (var profile in Profiles)
             {
                 profile.Configure(this);

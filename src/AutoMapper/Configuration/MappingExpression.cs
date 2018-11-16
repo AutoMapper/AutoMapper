@@ -81,6 +81,8 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
+        public new IMappingExpression IncludeAllDerived() => (IMappingExpression) base.IncludeAllDerived();
+
         protected override IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
@@ -530,6 +532,12 @@ namespace AutoMapper.Configuration
             {
                 tm.ConfiguredMemberList = memberList;
             });
+            return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> IncludeAllDerived()
+        {
+            TypeMapActions.Add(tm => tm.IncludeAllDerivedTypes = true);
             return this;
         }
 

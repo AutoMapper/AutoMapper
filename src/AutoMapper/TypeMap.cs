@@ -77,6 +77,8 @@ namespace AutoMapper
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
+        public bool IncludeAllDerivedTypes { get; set; }
+
         public MemberList ConfiguredMemberList { get; set; }
 
         public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;

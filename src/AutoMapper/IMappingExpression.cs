@@ -177,6 +177,12 @@ namespace AutoMapper
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Itself</returns>
         IMappingExpression ValidateMemberList(MemberList memberList);
+
+        /// <summary>
+        /// Include this configuration in all derived types' maps
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression IncludeAllDerived();
     }
 
     /// <summary>
@@ -444,5 +450,10 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ValidateMemberList(MemberList memberList);
 
+        /// <summary>
+        /// Include this configuration in all derived types' maps
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IncludeAllDerived();
     }
 }
