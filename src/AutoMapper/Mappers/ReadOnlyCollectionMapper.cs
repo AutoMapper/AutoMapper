@@ -29,7 +29,14 @@ namespace AutoMapper.Mappers
             var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType), contextExpression, typeof(List<>), MapItemExpr);
             var dest = Variable(listType, "dest");
 
-            return Block(new[] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetDeclaredConstructors().First(), dest), Default(destExpression.Type)));
+            var ctor = destExpression.Type.GetDeclaredConstructors()
+                .First(ci => ci.GetParameters().Length == 1 && ci.GetParameters()[0].ParameterType.IsAssignableFrom(dest.Type));
+
+            return Block(new[] { dest }, 
+                Assign(dest, list), 
+                Condition(NotEqual(dest, Default(listType)), 
+                    New(ctor, dest), 
+                    Default(destExpression.Type)));
         }
     }
 }

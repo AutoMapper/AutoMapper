@@ -19,6 +19,7 @@ namespace AutoMapper.Mappers
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
             new NameValueCollectionMapper(),
+            new ReadOnlyDictionaryMapper(),
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new HashSetMapper(),
