@@ -179,7 +179,7 @@ namespace AutoMapper
         IMappingExpression ValidateMemberList(MemberList memberList);
 
         /// <summary>
-        /// Include this configuration in all derived types' maps
+        /// Include this configuration in all derived types' maps. Works by scanning all type maps for matches during configuration.
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression IncludeAllDerived();
@@ -451,7 +451,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> ValidateMemberList(MemberList memberList);
 
         /// <summary>
-        /// Include this configuration in all derived types' maps
+        /// Include this configuration in all derived types' maps. Works by scanning all type maps for matches during configuration.
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> IncludeAllDerived();
