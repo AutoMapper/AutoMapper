@@ -1,3 +1,6 @@
+<!-- 
+   If you've just upgraded to 8.0, please read the upgrade guide first (http://docs.automapper.org/en/latest/8.0-Upgrade-Guide.html).
+-->
 <!-- For feature requests, just clear out the below 
 Try to provide [a minimal, complete, and verifiable example](https://stackoverflow.com/help/mcve), preferably a [gist](https://gist.github.com/lbargaoanu/9c7233441c3a3413cc2b9b9ebb5964a9) that we can execute and see fail. [Here](https://gist.github.com/lbargaoanu/0cbc531306223f7ffc5468becf2642d6) is an example for ProjectTo.
 -->
