@@ -25,20 +25,21 @@ namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper
         [Fact]
         public void Should_map_readonly_values()
         {
+            var values = new Dictionary<int, int>
+            {
+                {1, 1},
+                {2, 2},
+                {3, 3},
+                {4, 4},
+            };
             var source = new Source
             {
-                Values = new Dictionary<int, int>
-                {
-                    {1, 1},
-                    {2, 2},
-                    {3, 3},
-                    {4, 4},
-                }
+                Values = values
             };
 
             var dest = Mapper.Map<Destination>(source);
 
-            dest.Values.Count.ShouldBe(4);
+            dest.Values.ShouldBe(values);
         }
     }
     public class When_mapping_to_concrete_readonly_dictionary : AutoMapperSpecBase
@@ -61,20 +62,21 @@ namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper
         [Fact]
         public void Should_map_readonly_values()
         {
+            var values = new Dictionary<int, int>
+            {
+                {1, 1},
+                {2, 2},
+                {3, 3},
+                {4, 4},
+            };
             var source = new Source
             {
-                Values = new ReadOnlyDictionary<int, int>(new Dictionary<int, int>
-                {
-                    {1, 1},
-                    {2, 2},
-                    {3, 3},
-                    {4, 4},
-                })
+                Values = new ReadOnlyDictionary<int, int>(values)
             };
 
             var dest = Mapper.Map<Destination>(source);
 
-            dest.Values.Count.ShouldBe(4);
+            dest.Values.ShouldBe(values);
         }
     }
 }
