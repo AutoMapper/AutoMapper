@@ -27,6 +27,15 @@ CreateMap<DerivedEntity, DerivedDto>()
 
 In each case above, the derived mapping inherits the custom mapping configuration from the base mapping configuration.
 
+To include all derived maps, from the base type map configuration:
+
+```c#
+CreateMap<BaseEntity, BaseDto>()
+    .IncludeAllDerived();
+
+CreateMap<DerivedEntity, DerivedDto>();
+```
+
 ### Runtime polymorphism
 
 Take:
