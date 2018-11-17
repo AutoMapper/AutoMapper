@@ -36,10 +36,13 @@ namespace AutoMapper.Mappers
                 ? typeof(ReadOnlyDictionary<,>).MakeGenericType(dictionaryTypes)
                 : destExpression.Type;
 
+            var ctor = readOnlyDictType.GetDeclaredConstructors()
+                .First(ci => ci.GetParameters().Length == 1 && ci.GetParameters()[0].ParameterType.IsAssignableFrom(dest.Type));
+
             return Block(new[] { dest }, 
                 Assign(dest, dict), 
                 Condition(NotEqual(dest, Default(dictType)), 
-                    ToType(New(readOnlyDictType.GetDeclaredConstructors().First(), dest), destExpression.Type), 
+                    ToType(New(ctor, dest), destExpression.Type), 
                     Default(destExpression.Type)));
         }
     }

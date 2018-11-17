@@ -95,8 +95,8 @@ namespace AutoMapper.Execution
         private static Expression CreateReadOnlyCollection(Type type, Type collectionType)
         {
             var listType = collectionType.MakeGenericType(GetElementTypes(type, ElementTypeFlags.BreakKeyValuePair));
-            var ctor = listType.GetConstructors().First();
-            var innerType = ctor.GetParameters().First().ParameterType;
+            var ctor = listType.GetConstructors()[0];
+            var innerType = ctor.GetParameters()[0].ParameterType;
             if (type.IsAssignableFrom(listType))
                 return ToType(New(ctor, GenerateConstructorExpression(innerType)), type);
 
