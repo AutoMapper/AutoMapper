@@ -44,7 +44,7 @@ IMapper mapper = new Mapper(mapperConfig);
 
 ## LINQ projections
 
-For the instance method of using AutoMapper, LINQ now requires us to pass in the MapperConfiguration instance:
+For the instance API, you can use IMapper.ProjectTo. If you prefer to keep using the IQueryable extension methods, you have to pass in the MapperConfiguration instance:
 
 ```c#
 public class ProductsController : Controller {
