@@ -13,7 +13,7 @@ In simplified syntax:
 
  ```c#
  public class CurrencyFormatter : IValueConverter<decimal, string> {
-     public decimal Convert(decimal source)
+     public string Convert(decimal source)
          => source.ToString("c");
  }
 
@@ -29,7 +29,7 @@ You can customize the source member when the source member name does not match:
 
  ```c#
  public class CurrencyFormatter : IValueConverter<decimal, string> {
-     public decimal Convert(decimal source)
+     public string Convert(decimal source)
          => source.ToString("c");
  }
 
@@ -45,7 +45,7 @@ If you need the value converters instantiated by the [service locator](Dependenc
 
  ```c#
  public class CurrencyFormatter : IValueConverter<decimal, string> {
-     public decimal Convert(decimal source)
+     public string Convert(decimal source)
          => source.ToString("c");
  }
 
@@ -61,7 +61,7 @@ If you do not know the types or member names at runtime, use the various overloa
 
  ```c#
  public class CurrencyFormatter : IValueConverter<decimal, string> {
-     public decimal Convert(decimal source)
+     public string Convert(decimal source)
          => source.ToString("c");
  }
 
