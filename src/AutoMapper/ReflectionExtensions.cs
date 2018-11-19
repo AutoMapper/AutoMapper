@@ -53,9 +53,6 @@ namespace AutoMapper
         public static IEnumerable<TypeInfo> GetDefinedTypes(this Assembly assembly) =>
             assembly.DefinedTypes;
 
-        public static bool GetHasDefaultValue(this ParameterInfo info) =>
-            info.HasDefaultValue;
-
         public static bool GetIsConstructedGenericType(this Type type) =>
             type.IsConstructedGenericType;
     }
