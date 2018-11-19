@@ -12,8 +12,6 @@ namespace AutoMapper.Configuration.Conventions
 
         public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
         {
-            if (string.IsNullOrEmpty(nameToSearch))
-                return true;
             var matchingMemberInfo = NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, nameToSearch);
 
             if (matchingMemberInfo != null)
