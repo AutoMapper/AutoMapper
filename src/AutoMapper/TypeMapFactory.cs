@@ -39,6 +39,10 @@ namespace AutoMapper
 
         private bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
+            if(string.IsNullOrEmpty(destMemberInfo))
+            {
+                return false;
+            }
             return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
         }
 
@@ -56,11 +60,10 @@ namespace AutoMapper
                 var resolvers = new LinkedList<MemberInfo>();
 
                 var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
-                if(!canResolve && parameter.GetHasDefaultValue())
+                if(!canResolve && parameter.IsOptional)
                 {
                     canResolve = true;
                 }
-
                 ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
             }
 
