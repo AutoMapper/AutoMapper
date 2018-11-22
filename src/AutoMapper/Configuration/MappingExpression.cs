@@ -55,10 +55,16 @@ namespace AutoMapper.Configuration
         public new IMappingExpression BeforeMap(Action<object, object> beforeFunction) 
             => (IMappingExpression)base.BeforeMap(beforeFunction);
 
+        public new IMappingExpression BeforeMap(Action<object, object, ResolutionContext> beforeFunction)
+            => (IMappingExpression)base.BeforeMap(beforeFunction);
+
         public new IMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<object, object> 
             => (IMappingExpression)base.BeforeMap<TMappingAction>();
 
         public new IMappingExpression AfterMap(Action<object, object> afterFunction) 
+            => (IMappingExpression)base.AfterMap(afterFunction);
+
+        public new IMappingExpression AfterMap(Action<object, object, ResolutionContext> afterFunction)
             => (IMappingExpression)base.AfterMap(afterFunction);
 
         public new IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object> 
