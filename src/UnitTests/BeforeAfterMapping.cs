@@ -33,6 +33,30 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             afterMapCalled.ShouldBeTrue();
         }
 
+        [Fact]
+        public void Before_and_After_overrides_should_be_called()
+        {
+            var beforeMapCalled = false;
+            var afterMapCalled = false;
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+                cfg.ForAllMaps((map, expression) =>
+                {
+                    expression.BeforeMap((src, dest, context) => beforeMapCalled = true);
+                    expression.AfterMap((src, dest, context) => afterMapCalled = true);
+                });
+            });
+
+            var mapper = config.CreateMapper();
+
+            mapper.Map<Source, Destination>(new Source());
+
+            beforeMapCalled.ShouldBeTrue();
+            afterMapCalled.ShouldBeTrue();
+        }
+
     }
 
     public class When_configuring_before_and_after_methods_multiple_times
@@ -57,6 +81,32 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                     .BeforeMap((src, dest) => beforeMapCount++)
                     .AfterMap((src, dest) => afterMapCount++)
                     .AfterMap((src, dest) => afterMapCount++);
+            });
+
+            var mapper = config.CreateMapper();
+
+            mapper.Map<Source, Destination>(new Source());
+
+            beforeMapCount.ShouldBe(2);
+            afterMapCount.ShouldBe(2);
+        }
+
+        [Fact]
+        public void Before_and_After_overrides_should_be_called()
+        {
+            var beforeMapCount = 0;
+            var afterMapCount = 0;
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+                cfg.ForAllMaps((map, expression) =>
+                {
+                    expression.BeforeMap((src, dest, context) => beforeMapCount++)
+                        .BeforeMap((src, dest, context) => beforeMapCount++);
+                    expression.AfterMap((src, dest, context) => afterMapCount++)
+                        .AfterMap((src, dest, context) => afterMapCount++);
+                });
             });
 
             var mapper = config.CreateMapper();
