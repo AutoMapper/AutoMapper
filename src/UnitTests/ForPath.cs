@@ -242,6 +242,32 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class ForPathWithNullExpressionShouldFail
+    {
+        public class DestinationModel
+        {
+            public string Name { get; set; }
+        }
+
+        public class SourceModel
+        {
+            public string Name { get; set; }
+        }
+        
+        [Fact]
+        public void Should_throw_exception()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                var configuration = new MapperConfiguration(config =>
+                {
+                    config.CreateMap<SourceModel, DestinationModel>()
+                        .ForPath(sourceModel => sourceModel.Name, opts => opts.MapFrom<string>(null));
+                });
+            });
+        }
+    }
+
     public class ForPathWithPrivateSetters : AutoMapperSpecBase
     {
         public class Order

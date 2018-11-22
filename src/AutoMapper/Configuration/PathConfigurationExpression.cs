@@ -35,7 +35,7 @@ namespace AutoMapper.Configuration
 
         public void MapFromUntyped(LambdaExpression sourceExpression)
         {
-            _sourceExpression = sourceExpression ?? throw new ArgumentNullException($"{nameof(sourceExpression)} may not be null when mapping {DestinationMember.Name} from {typeof(TSource)} to {typeof(TDestination)}.");
+            _sourceExpression = sourceExpression ?? throw new ArgumentNullException(nameof(sourceExpression), $"{nameof(sourceExpression)} may not be null when mapping {DestinationMember.Name} from {typeof(TSource)} to {typeof(TDestination)}.");
             PathMapActions.Add(pm =>
             {
                 pm.CustomMapExpression = sourceExpression;
