@@ -22,15 +22,10 @@ namespace AutoMapper.Configuration
         public MemberPath MemberPath { get; }
 
         public MemberInfo DestinationMember => MemberPath.Last;
-
-        private Exception ThrowNullExpressionException(string paramName)
-        {
-            return new ArgumentNullException($"{paramName} may not be null when mapping {DestinationMember.Name} from {typeof(TSource)} to {typeof(TDestination)}.");
-        }
-
+        
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceExpression)
         {
-            MapFromUntyped(sourceExpression ?? throw ThrowNullExpressionException(nameof(sourceExpression)));
+            MapFromUntyped(sourceExpression);
         }
 
         public void Ignore()
@@ -40,7 +35,7 @@ namespace AutoMapper.Configuration
 
         public void MapFromUntyped(LambdaExpression sourceExpression)
         {
-            _sourceExpression = sourceExpression ?? throw ThrowNullExpressionException(nameof(sourceExpression));
+            _sourceExpression = sourceExpression ?? throw new ArgumentNullException($"{nameof(sourceExpression)} may not be null when mapping {DestinationMember.Name} from {typeof(TSource)} to {typeof(TDestination)}.");
             PathMapActions.Add(pm =>
             {
                 pm.CustomMapExpression = sourceExpression;
