@@ -257,9 +257,9 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_throw_exception()
         {
-            Assert.Throws<ArgumentNullException>(() => 
+            var configuration = new MapperConfiguration(config =>
             {
-                var configuration = new MapperConfiguration(config =>
+                Assert.Throws<ArgumentNullException>(() => 
                 {
                     config.CreateMap<SourceModel, DestinationModel>()
                         .ForPath(sourceModel => sourceModel.Name, opts => opts.MapFrom<string>(null));
