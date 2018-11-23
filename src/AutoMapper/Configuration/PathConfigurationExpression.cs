@@ -22,7 +22,7 @@ namespace AutoMapper.Configuration
         public MemberPath MemberPath { get; }
 
         public MemberInfo DestinationMember => MemberPath.Last;
-
+        
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceExpression)
         {
             MapFromUntyped(sourceExpression);
@@ -35,7 +35,7 @@ namespace AutoMapper.Configuration
 
         public void MapFromUntyped(LambdaExpression sourceExpression)
         {
-            _sourceExpression = sourceExpression;
+            _sourceExpression = sourceExpression ?? throw new ArgumentNullException(nameof(sourceExpression), $"{nameof(sourceExpression)} may not be null when mapping {DestinationMember.Name} from {typeof(TSource)} to {typeof(TDestination)}.");
             PathMapActions.Add(pm =>
             {
                 pm.CustomMapExpression = sourceExpression;
@@ -52,7 +52,7 @@ namespace AutoMapper.Configuration
 
         private void Apply(PathMap pathMap)
         {
-            foreach(var action in PathMapActions)
+            foreach (var action in PathMapActions)
             {
                 action(pathMap);
             }
@@ -60,12 +60,12 @@ namespace AutoMapper.Configuration
 
         internal static IPropertyMapConfiguration Create(LambdaExpression destination, LambdaExpression source)
         {
-            if(destination == null || !destination.IsMemberPath())
+            if (destination == null || !destination.IsMemberPath())
             {
                 return null;
             }
             var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
-            if(reversed.MemberPath.Length == 1)
+            if (reversed.MemberPath.Length == 1)
             {
                 var reversedMemberExpression = new MemberConfigurationExpression<TSource, TDestination, object>(reversed.DestinationMember, typeof(TSource));
                 reversedMemberExpression.MapFromUntyped(source);
@@ -85,7 +85,7 @@ namespace AutoMapper.Configuration
             PathMapActions.Add(pm =>
             {
                 Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => 
+                    (src, dest, srcMember, destMember, ctxt) =>
                         condition(new ConditionParameters<TSource, TDestination, TMember>(src, dest, srcMember, destMember, ctxt));
                 pm.Condition = expr;
             });
