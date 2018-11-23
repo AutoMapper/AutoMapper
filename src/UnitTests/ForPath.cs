@@ -257,12 +257,17 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_throw_exception()
         {
-            void CreateMap() => new MapperConfiguration(config =>
+            Assert.Throws<NullReferenceException>(() =>
             {
-                config.CreateMap<SourceModel, DestinationModel>()
-                    .ForPath(sourceModel => sourceModel.Name, opts => opts.MapFrom<string>(null));
+                var cfg = new MapperConfiguration(config =>
+                {
+                    Assert.Throws<ArgumentNullException>(() =>
+                    {
+                        config.CreateMap<SourceModel, DestinationModel>()
+                            .ForPath(sourceModel => sourceModel.Name, opts => opts.MapFrom<string>(null));
+                    });
+                });
             });
-            Assert.Throws<ArgumentNullException>(CreateMap);
         }
     }
 
