@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper.Mappers;
 using Shouldly;
 using Xunit;
@@ -715,6 +716,33 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         interface IAbstractDest
         {
             string DifferentName { get; set; }
+        }
+    }
+
+    public class When_configuring_a_resolver : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMissingTypeMaps = false;
+            cfg.CreateMap<Query, Command>().ForMember(d => d.Details, o => o.MapFrom<DetailsValueResolver>());
+        });
+        public class DetailsValueResolver : IValueResolver<Query, Command, List<KeyValuePair<string, string>>>
+        {
+            public List<KeyValuePair<string, string>> Resolve(Query source, Command destination, List<KeyValuePair<string, string>> destMember, ResolutionContext context)
+            {
+                return source.Details
+                    .Select(d => new KeyValuePair<string, string>(d.ToString(), d.ToString()))
+                    .ToList();
+            }
+        }
+        public class Query
+        {
+            public List<int> Details { get; set; }
+        }
+
+        public class Command
+        {
+            public List<KeyValuePair<string, string>> Details { get; private set; }
         }
     }
 }
