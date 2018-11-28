@@ -110,7 +110,10 @@ namespace AutoMapper
         {
             foreach (var propertyMap in typeMap.PropertyMaps)
             {
-                if (propertyMap.Ignored) continue;
+                if(propertyMap.Ignored || propertyMap.ValueConverterConfig != null || propertyMap.ValueResolverConfig != null)
+                {
+                    continue;
+                }
 
                 var sourceType = propertyMap.SourceType;
 
