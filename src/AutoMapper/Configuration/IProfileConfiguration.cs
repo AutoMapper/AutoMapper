@@ -17,7 +17,6 @@ namespace AutoMapper.Configuration
         bool? AllowNullDestinationValues { get; }
         bool? AllowNullCollections { get; }
         bool? EnableNullPropagationForQueryMapping { get; }
-        bool? CreateMissingTypeMaps { get; }
         bool? ValidateInlineMaps { get; }
         IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }

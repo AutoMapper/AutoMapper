@@ -26,6 +26,7 @@ namespace AutoMapper.Configuration
         public IList<IObjectMapper> Mappers { get; }
 
         public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
+        public bool? CreateMissingTypeMaps { get ; set; }
 
         private class NamedProfile : Profile
         {

@@ -21,7 +21,7 @@ namespace AutoMapper
         private static readonly Type[] ExcludedTypes = { typeof(object), typeof(ValueType), typeof(Enum) };
         private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetDeclaredConstructors().Single(c => c.GetParameters().Length == 3);
 
-        private readonly IEnumerable<IObjectMapper> _mappers;
+        private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _typeMapRegistry = new Dictionary<TypePair, TypeMap>();
         private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;

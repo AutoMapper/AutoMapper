@@ -7,5 +7,6 @@ namespace AutoMapper.Configuration
     {
         Func<Type, object> ServiceCtor { get; }
         IEnumerable<IProfileConfiguration> Profiles { get; }
+        bool? CreateMissingTypeMaps { get; }
     }
 }

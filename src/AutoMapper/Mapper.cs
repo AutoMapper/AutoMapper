@@ -180,7 +180,7 @@ namespace AutoMapper
 
         #endregion
 
-        private readonly IConfigurationProvider _configurationProvider;
+        private readonly MapperConfiguration _configurationProvider;
         private readonly Func<Type, object> _serviceCtor;
 
         public Mapper(IConfigurationProvider configurationProvider)
@@ -190,7 +190,7 @@ namespace AutoMapper
 
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
-            _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
+            _configurationProvider = (MapperConfiguration) configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
             _serviceCtor = serviceCtor ?? throw new ArgumentNullException(nameof(serviceCtor));
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
