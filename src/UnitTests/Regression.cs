@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Shouldly;
 using Xunit;
-using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
@@ -113,11 +111,11 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void MapsEnumerableTypes()
             {
-                Person[] personArr = new[] {new Person() {Name = "Name"}};
+                Person[] personArr = new[] { new Person() { Name = "Name" } };
                 People people = new People(personArr);
-                
+
                 var pmc = Mapper.Map<People, List<PersonModel>>(people);
-                
+
                 pmc.ShouldNotBeNull();
                 (pmc.Count == 1).ShouldBeTrue();
             }
@@ -149,5 +147,33 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class automapper_fails_when_single_destination_and_array_destination_configuration_exist : AutoMapperSpecBase
+        {
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<TestDomainItem, TestDtoItem>()
+                        .ForMember(x => x.Id, exp => exp.MapFrom(y => y.ItemId));
+
+                    cfg.CreateMap<TestDomainItem, TestDtoItem[]>()
+                        .AfterMap((request, dtoItems, context) =>
+                        {
+                            Array.ForEach(dtoItems, published => context.Mapper.Map(request, published));
+                        });
+                });
+
+            [Fact]
+            public void should_map_single_to_array()
+            {
+                var testDtoItems = new[]
+                {
+                    new TestDtoItem(),
+                    new TestDtoItem()
+                };
+
+                var request = new TestDomainItem();
+
+                testDtoItems = Mapper.Map(request, testDtoItems);
+            }
+        }
     }
 }
