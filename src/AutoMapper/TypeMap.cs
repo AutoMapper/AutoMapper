@@ -110,6 +110,7 @@ namespace AutoMapper
             || CustomCtorFunction != null
             || ConstructDestinationUsingServiceLocator
             || ConstructorMap?.CanResolve == true
+            || DestinationTypeToUse.IsArray
             || DestinationTypeToUse.IsInterface()
             || DestinationTypeToUse.IsAbstract()
             || DestinationTypeToUse.IsGenericTypeDefinition()
