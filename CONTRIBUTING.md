@@ -32,11 +32,11 @@ The best way to get your bug fixed is to be as detailed as you can be about the 
 Providing a minimal project with steps to reproduce the problem is ideal.
 Here are questions you can answer before you file a bug to make sure you're not missing any important information.
 
-1. Did you read the [documentation](http://automapper.readthedocs.io/en/latest/)?
+1. Did you read the [documentation](https://automapper.readthedocs.io/en/latest/)?
 2. Did you include the snippet of broken code in the issue?
 3. What are the *EXACT* steps to reproduce this problem (including source/destination types, mapping configuration and execution)?
 
-GitHub supports [markdown](http://github.github.com/github-flavored-markdown/), so when filing bugs make sure you check the formatting before clicking submit.
+GitHub supports [markdown](https://github.github.com/github-flavored-markdown/), so when filing bugs make sure you check the formatting before clicking submit.
 
 ## Contributing code and content
 You will need to sign a [Contributor License Agreement](https://cla.dotnetfoundation.org/) before submitting your pull request.
