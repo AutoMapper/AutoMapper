@@ -33,7 +33,7 @@ var fooDto = Mapper.Map<FooDto>(foo);
 var barDto = Mapper.Map<BarDto>(bar);
 ```
 
-Check out the [getting started guide](http://automapper.readthedocs.io/en/latest/Getting-started.html). When you're done there, the [wiki](http://automapper.readthedocs.io/en/latest/) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](http://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
+Check out the [getting started guide](https://automapper.readthedocs.io/en/latest/Getting-started.html). When you're done there, the [wiki](https://automapper.readthedocs.io/en/latest/) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](https://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
 
 ### Where can I get it?
 
@@ -45,9 +45,9 @@ PM> Install-Package AutoMapper
 
 ### Do you have an issue?
 
-First check if it's already fixed by trying the [MyGet build](http://automapper.readthedocs.io/en/latest/The-MyGet-build.html).
+First check if it's already fixed by trying the [MyGet build](https://automapper.readthedocs.io/en/latest/The-MyGet-build.html).
 
-You might want to know exactly what [your mapping does](http://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html) at runtime.
+You might want to know exactly what [your mapping does](https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html) at runtime.
 
 If you're still running into problems, file an issue above.
 
