@@ -21,10 +21,6 @@ namespace AutoMapper
         {
             TypeMap = typeMap;
             DestinationMember = destinationMember;
-            if(!ReflectionHelper.CanBeSet(destinationMember))
-            {
-                UseDestinationValue = true;
-            }
         }
 
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
@@ -148,6 +144,14 @@ namespace AutoMapper
                 Member = node;
 
                 return base.VisitMember(node);
+            }
+        }
+
+        internal void CheckMappedReadonly()
+        {
+            if(IsResolveConfigured && !ReflectionHelper.CanBeSet(DestinationMember))
+            {
+                UseDestinationValue = true;
             }
         }
     }
