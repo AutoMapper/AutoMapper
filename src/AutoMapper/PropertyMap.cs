@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -20,6 +21,10 @@ namespace AutoMapper
         {
             TypeMap = typeMap;
             DestinationMember = destinationMember;
+            if(!ReflectionHelper.CanBeSet(destinationMember))
+            {
+                UseDestinationValue = true;
+            }
         }
 
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)

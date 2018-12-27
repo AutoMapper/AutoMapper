@@ -127,6 +127,35 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_mapping_to_readonly_property_UseDestinationValue : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            private readonly List<string> _myCollection = new List<string> { "one", "two" };
+
+            public string[] MyCollection => _myCollection.ToArray();
+        }
+
+        public class Destination
+        {
+            private IList<string> _myCollection = new List<string>();
+            public IEnumerable<string> MyCollection => _myCollection;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            cfg.CreateMap<Source, Destination>().ForMember(m => m.MyCollection, opt =>
+            {
+                opt.MapFrom(src => src.MyCollection);
+            }));
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            Mapper.Map<Destination>(new Source())
+                .MyCollection.SequenceEqual(new[] { "one", "two" }).ShouldBeTrue();
+        }
+    }
+
     public class When_mapping_to_readonly_property_as_IEnumerable : AutoMapperSpecBase
     {
         public class Source
