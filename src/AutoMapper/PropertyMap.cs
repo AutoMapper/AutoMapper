@@ -119,7 +119,7 @@ namespace AutoMapper
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition() ?
                                                 // just a placeholder so the member is mapped
-                                                Lambda(Default(DestinationType)) :
+                                                Lambda(Constant(null)) :
                                                 MemberAccessLambda(TypeMap.SourceType, propertyOrField);
             MapFrom(mapExpression);
         }

@@ -221,4 +221,52 @@
             dest.D.ShouldBe(10);
         }
     }
+
+    public class OpenGenerics_With_UntypedMapFrom : AutoMapperSpecBase
+    {
+        public class Foo<T>
+        {
+            public T Value1 { get; set; }
+        }
+
+        public class Bar<T>
+        {
+            public T Value2 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapper => {
+            mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1"));
+        });
+
+        [Fact]
+        public void Can_remap_explicit_members()
+        {
+            var dest = Mapper.Map<Bar<int>>(new Foo<int> { Value1 = 5 });
+            dest.Value2.ShouldBe(5);
+        }
+    }
+
+    public class OpenGenerics_With_UntypedMapFromStructs : AutoMapperSpecBase
+    {
+        public class Foo<T> where T : struct
+        {
+            public T Value1 { get; set; }
+        }
+
+        public class Bar<T> where T : struct
+        {
+            public T Value2 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapper => {
+            mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1"));
+        });
+
+        [Fact]
+        public void Can_remap_explicit_members()
+        {
+            var dest = Mapper.Map<Bar<int>>(new Foo<int> { Value1 = 5 });
+            dest.Value2.ShouldBe(5);
+        }
+    }
 }
