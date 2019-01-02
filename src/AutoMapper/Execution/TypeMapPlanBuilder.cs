@@ -365,7 +365,6 @@ namespace AutoMapper.Execution
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
-            propertyMap.CheckMappedReadonly();
             var pmExpression = CreatePropertyMapFunc(propertyMap, _destination, propertyMap.DestinationMember);
 
             if (pmExpression == null)
