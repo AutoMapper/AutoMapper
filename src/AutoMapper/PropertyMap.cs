@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -143,6 +144,14 @@ namespace AutoMapper
                 Member = node;
 
                 return base.VisitMember(node);
+            }
+        }
+
+        internal void CheckMappedReadonly()
+        {
+            if(IsResolveConfigured && !ReflectionHelper.CanBeSet(DestinationMember))
+            {
+                UseDestinationValue = true;
             }
         }
     }

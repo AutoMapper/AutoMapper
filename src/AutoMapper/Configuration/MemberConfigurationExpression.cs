@@ -336,6 +336,7 @@ namespace AutoMapper.Configuration
             {
                 action(propertyMap);
             }
+            propertyMap.CheckMappedReadonly();
         }
 
         public IPropertyMapConfiguration Reverse()
