@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests
 {
     namespace AttributeBasedMaps
     {
-        public class When_specifying_map_with_attribute : AutoMapperSpecBase
+        public class When_specifying_map_with_attribute : NonValidatingSpecBase
         {
             public class Source
             {
@@ -31,6 +31,12 @@ namespace AutoMapper.UnitTests
                 var dest = Mapper.Map<Dest>(source);
 
                 dest.Value.ShouldBe(5);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid("AutoMapAttributeProfile"));
             }
         }
     }
