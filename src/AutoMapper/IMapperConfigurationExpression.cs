@@ -66,6 +66,42 @@ namespace AutoMapper
         void AddProfiles(params Type[] typesFromAssembliesContainingProfiles);
 
         /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="assembliesToScan">Assemblies containing mapping definitions</param>
+        void AddMaps(IEnumerable<Assembly> assembliesToScan);
+
+        /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="assembliesToScan">Assemblies containing mapping definitions</param>
+        void AddMaps(params Assembly[] assembliesToScan);
+
+        /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="assemblyNamesToScan">Assembly names to load and scan containing mapping definitions</param>
+        void AddMaps(IEnumerable<string> assemblyNamesToScan);
+
+        /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="assemblyNamesToScan">Assembly names to load and scan containing mapping definitions</param>
+        void AddMaps(params string[] assemblyNamesToScan);
+
+        /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="typesFromAssembliesContainingMappingDefinitions">Types from assemblies containing mapping definitions</param>
+        void AddMaps(IEnumerable<Type> typesFromAssembliesContainingMappingDefinitions);
+
+        /// <summary>
+        /// Add mapping definitions contained in assemblies
+        /// </summary>
+        /// <param name="typesFromAssembliesContainingMappingDefinitions">Types from assemblies containing mapping definitions</param>
+        void AddMaps(params Type[] typesFromAssembliesContainingMappingDefinitions);
+
+        /// <summary>
         /// Supply a factory method callback for creating resolvers and type converters
         /// </summary>
         /// <param name="constructor">Factory method</param>
