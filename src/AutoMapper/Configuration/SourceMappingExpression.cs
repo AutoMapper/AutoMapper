@@ -4,11 +4,6 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
-    public interface ISourceMemberConfiguration
-    {
-        void Configure(TypeMap typeMap);
-    }
-
     public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
     {
         private readonly MemberInfo _sourceMember;
