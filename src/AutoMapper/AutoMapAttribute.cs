@@ -8,6 +8,15 @@ namespace AutoMapper
         public AutoMapAttribute(Type sourceType) 
             => SourceType = sourceType;
 
-        public Type SourceType { get; set; }
+        public Type SourceType { get; }
+        public bool ReverseMap { get; set; }
+
+        public void ApplyConfiguration(IMappingExpression mappingExpression)
+        {
+            if (ReverseMap)
+            {
+                mappingExpression.ReverseMap();
+            }
+        }
     }
 }

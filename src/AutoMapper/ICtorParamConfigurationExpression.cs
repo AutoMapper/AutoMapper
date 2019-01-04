@@ -22,7 +22,12 @@ namespace AutoMapper
         void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
     }
 
-    public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
+    public interface ICtorParameterConfiguration
+    {
+        void Configure(TypeMap typeMap);
+    }
+
+    public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
     {
         private readonly string _ctorParamName;
         private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();

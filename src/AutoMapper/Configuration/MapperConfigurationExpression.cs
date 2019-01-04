@@ -103,7 +103,8 @@ namespace AutoMapper.Configuration
             {
                 foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
                 {
-                    autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                    var mappingExpression = autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                    autoMapAttribute.ApplyConfiguration(mappingExpression);
                 }
             }
 
