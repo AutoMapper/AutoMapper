@@ -4,6 +4,12 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Common mapping configuration options between generic and non-generic mapping configuration
+    /// </summary>
+    /// <typeparam name="TSource">Source type</typeparam>
+    /// <typeparam name="TDestination">Destination type</typeparam>
+    /// <typeparam name="TMappingExpression">Concrete return type for fluent interface</typeparam>
     public interface IMappingExpressionBase<TSource, TDestination, out TMappingExpression> 
         where TMappingExpression : IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
