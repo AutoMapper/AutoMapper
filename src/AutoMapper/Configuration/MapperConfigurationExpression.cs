@@ -86,7 +86,7 @@ namespace AutoMapper.Configuration
         private void AddMapsCore(IEnumerable<Assembly> assembliesToScan)
         {
             var allTypes = assembliesToScan.Where(a => !a.IsDynamic).SelectMany(a => a.GetDefinedTypes()).ToArray();
-            var autoMapAttributeProfile = new NamedProfile("AutoMapAttributeProfile");
+            var autoMapAttributeProfile = new NamedProfile(nameof(AutoMapAttribute));
 
             foreach (var type in allTypes)
             {
