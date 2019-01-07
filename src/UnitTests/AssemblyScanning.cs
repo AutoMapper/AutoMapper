@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { typeof(When_scanning_by_assembly).Assembly() });
+                cfg.AddMaps(new[] { typeof(When_scanning_by_assembly).Assembly() });
             });
 
             [Fact]
@@ -40,7 +40,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { typeof(When_scanning_by_assembly) });
+                cfg.AddMaps(new[] { typeof(When_scanning_by_assembly) });
             });
 
             [Fact]
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { typeof(When_scanning_by_name).Assembly().FullName });
+                cfg.AddMaps(new[] { typeof(When_scanning_by_name).Assembly().FullName });
             });
 
             [Fact]

@@ -6,7 +6,6 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
-    using static Expression;
     using static AutoMapper.Internal.ExpressionFactory;
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
