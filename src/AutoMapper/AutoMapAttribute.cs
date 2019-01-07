@@ -2,6 +2,10 @@
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Auto map to this destination type from the specified source type.
+    /// Discovered during scanning assembly scanning for configuration when calling <see cref="O:AutoMapper.IMapperConfigurationExpression.AddMaps"/>
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public sealed class AutoMapAttribute : Attribute
     {
