@@ -63,16 +63,16 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Dynamic-and-ExpandoObject-Mapping
    Expression-Translation-(UseAsDataSource)
       
-Samples
-=======
+Examples
+========
 
-The source code contains unit tests and samples for all of the features listed above. To view the samples, browse the `source code <https://github.com/AutoMapper/AutoMapper/tree/master/src/AutoMapperSamples>`_.
+The source code contains unit tests for all of the features listed above. Use the GitHub search to find relevant examples.
 
 Housekeeping
 ============
 
 The latest builds can be found at `NuGet <http://www.nuget.org/packages/automapper>`_
 
-The dev builds can be found at `MyGet <https://www.myget.org/F/automapperdev/api/v2>`_
+The dev builds can be found at `MyGet <https://myget.org/feed/automapperdev/package/nuget/AutoMapper>`_
 
 The discussion group is hosted on `Google Groups <http://groups.google.com/group/automapper-users>`_
