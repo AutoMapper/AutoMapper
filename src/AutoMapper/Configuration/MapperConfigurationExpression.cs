@@ -94,7 +94,9 @@ namespace AutoMapper.Configuration
                 {
                     AddProfile(type.AsType());
                 }
-                foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
+
+                var autoMapAttribute = type.GetCustomAttribute<AutoMapAttribute>();
+                if (autoMapAttribute != null)
                 {
                     var mappingExpression = autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
                     autoMapAttribute.ApplyConfiguration(mappingExpression);
