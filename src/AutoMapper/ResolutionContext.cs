@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper.Execution;
 
 namespace AutoMapper
 {
@@ -105,7 +106,7 @@ namespace AutoMapper
         public ResolutionContext(IMappingOperationOptions options, IRuntimeMapper mapper)
         {
             Options = options;
-            Mapper = mapper;
+            Mapper = new RuntimeMapper(this, mapper);
         }
 
         internal bool IsDefault => this == Mapper.DefaultContext;
