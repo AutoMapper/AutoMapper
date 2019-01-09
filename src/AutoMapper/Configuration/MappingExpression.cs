@@ -29,7 +29,7 @@ namespace AutoMapper.Configuration
             {
                 foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors)
                 {
-                    ForDestinationMember(accessor, memberOptions);
+                    ForMember(accessor, memberOptions);
                 }
             });
         }
@@ -41,7 +41,7 @@ namespace AutoMapper.Configuration
                 foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Where(m =>
                     GetDestinationMemberConfiguration(m) == null))
                 {
-                    ForDestinationMember(accessor, memberOptions);
+                    ForMember(accessor, memberOptions);
                 }
             });
         }
@@ -49,22 +49,24 @@ namespace AutoMapper.Configuration
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
             var member = DestinationType.GetFieldOrProperty(name);
-            ForDestinationMember(member, memberOptions);
+            ForMember(member, memberOptions);
             return this;
         }
 
         protected override void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true)
         {
-            ForDestinationMember(property, options => options.Ignore(ignorePaths));
+            ForMember(property, _ => {}).Ignore(ignorePaths);
         }
 
-        private void ForDestinationMember(MemberInfo destinationProperty, Action<MemberConfigurationExpression> memberOptions)
+        internal MemberConfigurationExpression ForMember(MemberInfo destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
         {
             var expression = new MemberConfigurationExpression(destinationProperty, Types.SourceType);
 
             MemberConfigurations.Add(expression);
 
             memberOptions(expression);
+
+            return expression;
         }
 
         internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression

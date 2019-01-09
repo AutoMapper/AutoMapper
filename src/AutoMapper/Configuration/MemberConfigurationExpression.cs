@@ -242,7 +242,7 @@ namespace AutoMapper.Configuration
 
         public void Ignore() => Ignore(ignorePaths: true);
 
-        internal void Ignore(bool ignorePaths) =>
+        public void Ignore(bool ignorePaths) =>
             PropertyMapActions.Add(pm =>
             {
                 pm.Ignored = true;

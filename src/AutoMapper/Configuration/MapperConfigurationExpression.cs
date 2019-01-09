@@ -98,8 +98,16 @@ namespace AutoMapper.Configuration
                 var autoMapAttribute = type.GetCustomAttribute<AutoMapAttribute>();
                 if (autoMapAttribute != null)
                 {
-                    var mappingExpression = autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                    var mappingExpression = (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
                     autoMapAttribute.ApplyConfiguration(mappingExpression);
+
+                    foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes().OfType<IMemberConfigurationProvider>())
+                        {
+                            mappingExpression.ForMember(memberInfo, cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
+                        }
+                    }
                 }
             }
 
