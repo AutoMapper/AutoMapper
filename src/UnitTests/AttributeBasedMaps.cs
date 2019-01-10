@@ -273,6 +273,55 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_specifying_member_value_resolver_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                [ValueResolver(typeof(MyMemberValueResolver))]
+                [SourceMember(nameof(Source.Value))]
+                public int Value { get; set; }
+            }
+
+            public class MyMemberValueResolver : IMemberValueResolver<Source, Dest, int, int>
+            {
+                public int Resolve(Source source, Dest destination, int sourceMember, int destMember, ResolutionContext context)
+                {
+                    return sourceMember + 5;
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = 6
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.Value.ShouldBe(11);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
+
         public class When_specifying_value_converter_via_attribute : NonValidatingSpecBase
         {
             public class Source
@@ -312,6 +361,56 @@ namespace AutoMapper.UnitTests
                 var dest = Mapper.Map<Dest>(source);
 
                 dest.Value.ShouldBe(11);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
+
+
+        public class When_specifying_value_converter_with_different_member_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                [ValueConverter(typeof(MyValueConverter))]
+                [SourceMember(nameof(Source.Value))]
+                public int OtherValue { get; set; }
+            }
+
+            public class MyValueConverter : IValueConverter<int, int>
+            {
+                public int Convert(int sourceMember, ResolutionContext context)
+                {
+                    return sourceMember + 5;
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = 6
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.OtherValue.ShouldBe(11);
             }
 
             [Fact]

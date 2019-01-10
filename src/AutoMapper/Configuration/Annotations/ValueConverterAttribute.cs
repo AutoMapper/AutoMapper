@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace AutoMapper.Configuration.Annotations
 {
@@ -16,7 +17,16 @@ namespace AutoMapper.Configuration.Annotations
 
         public void ApplyConfiguration(IMemberConfigurationExpression memberConfigurationExpression)
         {
-            memberConfigurationExpression.ConvertUsing(Type);
+            var sourceMemberAttribute = memberConfigurationExpression.DestinationMember.GetCustomAttribute<SourceMemberAttribute>();
+
+            if (sourceMemberAttribute != null)
+            {
+                memberConfigurationExpression.ConvertUsing(Type, sourceMemberAttribute.Name);
+            }
+            else
+            {
+                memberConfigurationExpression.ConvertUsing(Type);
+            }
         }
     }
 }
