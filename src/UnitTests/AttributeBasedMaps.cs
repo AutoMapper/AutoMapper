@@ -224,5 +224,53 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
             }
         }
+
+        public class When_specifying_value_resolver_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                [ValueResolver(typeof(MyValueResolver))]
+                public int OtherValue { get; set; }
+            }
+
+            public class MyValueResolver : IValueResolver<Source, Dest, int>
+            {
+                public int Resolve(Source source, Dest destination, int destMember, ResolutionContext context)
+                {
+                    return source.Value + 5;
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = 6
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.OtherValue.ShouldBe(11);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
     }
 }
