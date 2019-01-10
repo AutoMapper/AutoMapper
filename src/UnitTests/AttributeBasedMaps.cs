@@ -183,5 +183,46 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
             }
         }
+
+        public class When_specifying_null_substitute_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public string Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                [NullSubstitute("Value")]
+                [SourceMember(nameof(Source.Value))]
+                public string OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = null
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.OtherValue.ShouldBe("Value");
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
     }
 }
