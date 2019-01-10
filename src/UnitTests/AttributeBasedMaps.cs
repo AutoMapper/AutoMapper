@@ -370,7 +370,6 @@ namespace AutoMapper.UnitTests
             }
         }
 
-
         public class When_specifying_value_converter_with_different_member_via_attribute : NonValidatingSpecBase
         {
             public class Source
@@ -411,6 +410,91 @@ namespace AutoMapper.UnitTests
                 var dest = Mapper.Map<Dest>(source);
 
                 dest.OtherValue.ShouldBe(11);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
+
+        public class When_ignoring_members_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                [Ignore]
+                public int Value { get; set; }
+
+                [Ignore]
+                public int OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source
+                {
+                    Value = 6
+                };
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.Value.ShouldBe(default);
+                dest.OtherValue.ShouldBe(default);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
+
+        public class When_allowing_null_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public Inner InnerValue { get; set; }
+
+                public class Inner { }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Dest
+            {
+                public Inner InnerValue { get; set; }
+
+                [AutoMap(typeof(Source.Inner))]
+                public class Inner { }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
+            });
+
+            [Fact]
+            public void Should_map_attribute_value()
+            {
+                var source = new Source();
+
+                var dest = Mapper.Map<Dest>(source);
+
+                dest.InnerValue.ShouldBeNull();
             }
 
             [Fact]
