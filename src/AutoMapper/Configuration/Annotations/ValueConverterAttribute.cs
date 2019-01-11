@@ -3,7 +3,14 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration.Annotations
 {
-    public class ValueConverterAttribute : Attribute, IMemberConfigurationProvider
+    /// <summary>
+    /// Specify a value converter type to convert from the matching source member to the destination member
+    /// Use with <see cref="SourceMemberAttribute" /> to specify a separate source member to supply to the value converter
+    /// </summary>
+    /// <remarks>
+    /// Must be used in combination with <see cref="AutoMapAttribute" />
+    /// </remarks>
+    public sealed class ValueConverterAttribute : Attribute, IMemberConfigurationProvider
     {
         /// <summary>
         /// <see cref="IValueConverter{TSourceMember,TDestinationMember}" /> type

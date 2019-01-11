@@ -2,6 +2,12 @@
 
 namespace AutoMapper.Configuration.Annotations
 {
+    /// <summary>
+    /// Substitute a custom value when the source member resolves as null
+    /// </summary>
+    /// <remarks>
+    /// Must be used in combination with <see cref="AutoMapAttribute" />
+    /// </remarks>
     public sealed class NullSubstituteAttribute : Attribute, IMemberConfigurationProvider
     {
         /// <summary>

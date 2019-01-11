@@ -2,6 +2,12 @@
 
 namespace AutoMapper.Configuration.Annotations
 {
+    /// <summary>
+    /// Specify the source member to map from. Can only reference a member on the <see cref="AutoMapAttribute.SourceType" /> type
+    /// </summary>
+    /// <remarks>
+    /// Must be used in combination with <see cref="AutoMapAttribute" />
+    /// </remarks>
     public sealed class SourceMemberAttribute : Attribute, IMemberConfigurationProvider
     {
         public string Name { get; }
