@@ -463,22 +463,39 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_allowing_null_via_attribute : NonValidatingSpecBase
+        public class When_using_existing_value_via_attribute : NonValidatingSpecBase
         {
+            private Source _source;
+            private Destination _originalDest;
+            private Destination _dest;
+
             public class Source
             {
-                public Inner InnerValue { get; set; }
-
-                public class Inner { }
+                public int Value { get; set; }
+                public ChildSource Child { get; set; }
             }
 
             [AutoMap(typeof(Source))]
-            public class Dest
+            public class Destination
             {
-                public Inner InnerValue { get; set; }
+                public int Value { get; set; }
+                [Ignore]
+                public string Name { get; set; }
+                [UseExistingValue]
+                public ChildDestination Child { get; set; }
+            }
 
-                [AutoMap(typeof(Source.Inner))]
-                public class Inner { }
+            public class ChildSource
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(ChildSource))]
+            public class ChildDestination
+            {
+                public int Value { get; set; }
+                [Ignore]
+                public string Name { get; set; }
             }
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
@@ -487,14 +504,40 @@ namespace AutoMapper.UnitTests
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
 
-            [Fact]
-            public void Should_map_attribute_value()
+            protected override void Because_of()
             {
-                var source = new Source();
+                _source = new Source
+                {
+                    Value = 10,
+                    Child = new ChildSource
+                    {
+                        Value = 20
+                    }
+                };
+                _originalDest = new Destination
+                {
+                    Value = 1111,
+                    Name = "foo",
+                    Child = new ChildDestination
+                    {
+                        Name = "bar"
+                    }
+                };
+                _dest = Mapper.Map(_source, _originalDest);
+            }
 
-                var dest = Mapper.Map<Dest>(source);
+            [Fact]
+            public void Should_do_the_translation()
+            {
+                _dest.Value.ShouldBe(10);
+                _dest.Child.Value.ShouldBe(20);
+            }
 
-                dest.InnerValue.ShouldBeNull();
+            [Fact]
+            public void Should_return_the_destination_object_that_was_passed_in()
+            {
+                _dest.Name.ShouldBe("foo");
+                _dest.Child.Name.ShouldBe("bar");
             }
 
             [Fact]
