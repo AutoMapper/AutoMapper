@@ -546,5 +546,65 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
             }
         }
+
+        public class When_specifying_a_mapping_order_with_attributes : NonValidatingSpecBase
+        {
+            private Destination _result;
+
+            public class Source
+            {
+                private int _startValue;
+
+                public Source(int startValue)
+                {
+                    _startValue = startValue;
+                }
+
+                public int GetValue1()
+                {
+                    _startValue += 10;
+                    return _startValue;
+                }
+
+                public int GetValue2()
+                {
+                    _startValue += 5;
+                    return _startValue;
+                }
+            }
+
+            [AutoMap(typeof(Source))]
+            public class Destination
+            {
+                [MappingOrder(2)]
+                public int Value1 { get; set; }
+                [MappingOrder(1)]
+                public int Value2 { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
+            });
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Source, Destination>(new Source(10));
+            }
+
+            [Fact]
+            public void Should_perform_the_mapping_in_the_order_specified()
+            {
+                _result.Value2.ShouldBe(15);
+                _result.Value1.ShouldBe(25);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
     }
 }
