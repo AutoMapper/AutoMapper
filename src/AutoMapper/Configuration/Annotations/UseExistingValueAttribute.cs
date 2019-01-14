@@ -8,6 +8,7 @@ namespace AutoMapper.Configuration.Annotations
     /// <remarks>
     /// Must be used in combination with <see cref="AutoMapAttribute" />
     /// </remarks>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public sealed class UseExistingValueAttribute : Attribute, IMemberConfigurationProvider
     {
         public void ApplyConfiguration(IMemberConfigurationExpression memberConfigurationExpression)
