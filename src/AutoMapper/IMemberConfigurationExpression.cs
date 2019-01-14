@@ -74,14 +74,14 @@ namespace AutoMapper
         void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction);
 
         /// <summary>
-        /// Map destination member using a custom function. Access the source, destination object, and source member.
+        /// Map destination member using a custom function. Access the source, destination object, and destination member.
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Function to map to destination member</param>
         void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> mappingFunction);
 
         /// <summary>
-        /// Map destination member using a custom function. Access the source, destination object, source member, and context.
+        /// Map destination member using a custom function. Access the source, destination object, destination member, and context.
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Function to map to destination member</param>
