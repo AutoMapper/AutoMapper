@@ -71,6 +71,12 @@ namespace AutoMapper
         void AddProfiles(params Type[] typesFromAssembliesContainingProfiles);
 
         /// <summary>
+        /// Add profiles contained in an IEnumerable
+        /// </summary>
+        /// <param name="enumerableOfProfiles">IEnumerable of Profile</param>
+        void AddProfiles(IEnumerable<Profile> enumerableOfProfiles);
+
+        /// <summary>
         /// Add mapping definitions contained in assemblies.
         /// Looks for <see cref="Profile" /> definitions and classes decorated with <see cref="AutoMapAttribute" />
         /// </summary>
