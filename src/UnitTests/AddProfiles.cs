@@ -34,6 +34,8 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg => cfg.AddProfiles(profiles));
 
             config.AssertConfigurationIsValid();
+            int result = config.Profiles.Count();
+            result.ShouldBe(3); // default plus two specifically added.
         }
 
     }
