@@ -65,6 +65,14 @@ namespace AutoMapper.Configuration
         public void AddProfiles(params Type[] typesFromAssembliesContainingProfiles)
             => AddMaps(typesFromAssembliesContainingProfiles.Select(t => t.GetTypeInfo().Assembly));
 
+        public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
+        {
+            foreach (var profile in enumerableOfProfiles)
+            {
+                AddProfile(profile);
+            }
+        }
+
         public void AddMaps(IEnumerable<Assembly> assembliesToScan)
             => AddMapsCore(assembliesToScan);
 
