@@ -4,7 +4,7 @@ using System;
 
 namespace AutoMapper.UnitTests
 {
-    public class ShouldMapMethod : NonValidatingSpecBase
+    public class ShouldMapMethodInstanceMethods : NonValidatingSpecBase
     {
         public int SomeValue = 2354;
         public int AnotherValue = 6798;
@@ -70,4 +70,72 @@ namespace AutoMapper.UnitTests
             _destination.AnotherNumber.ShouldNotBe(AnotherValue);
         }
     }
+
+
+    static class SourceExtensions 
+    {
+        public static int SomeNumber(this ShouldMapMethodExtensionMethods.Source source) 
+        {
+            return source.SomeValue;
+        }
+
+        public static int AnotherNumber(this ShouldMapMethodExtensionMethods.Source source) 
+        {
+            return source.AnotherValue;
+        }
+    }
+
+    public class ShouldMapMethodExtensionMethods : NonValidatingSpecBase 
+    {
+        public int SomeValue = 4698;
+        public int AnotherValue = 2374;
+
+        private Destination _destination;
+
+        public class Source 
+        {
+            public int SomeValue { get; set; }
+            public int AnotherValue { get; set; }
+        }
+
+        public class Destination 
+        {
+            public int SomeNumber { get; set; }
+            public int AnotherNumber { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+        {
+            cfg.IncludeSourceExtensionMethods(typeof(SourceExtensions));
+            cfg.ShouldMapMethod = (m => m.Name != nameof(SourceExtensions.AnotherNumber));
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        protected override void Because_of() 
+        {
+            _destination = Mapper.Map<Source, Destination>(new Source { SomeValue = SomeValue, AnotherValue = AnotherValue });
+        }
+
+        [Fact]
+        public void Should_report_unmapped_property() 
+        {
+            new Action(() => Configuration.AssertConfigurationIsValid())
+                .ShouldThrowException<AutoMapperConfigurationException>(ex => 
+                {
+                    ex.Errors.ShouldNotBeNull();
+                    ex.Errors.ShouldNotBeEmpty();
+                    ex.Errors[0].UnmappedPropertyNames.ShouldNotBeNull();
+                    ex.Errors[0].UnmappedPropertyNames.ShouldNotBeEmpty();
+                    ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Destination.AnotherNumber));
+                });
+        }
+
+        [Fact]
+        public void Should_not_map_another_number_method() 
+        {
+            _destination.SomeNumber.ShouldBe(SomeValue);
+            _destination.AnotherNumber.ShouldNotBe(AnotherValue);
+        }
+    }
+
 }
