@@ -22,9 +22,9 @@ namespace AutoMapper
             var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
-            PublicNoArgMethods = BuildPublicNoArgMethods();
+            PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
-            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods);
+            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods, config.ShouldMapMethod);
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
         }
@@ -99,9 +99,9 @@ namespace AutoMapper
 
         public IEnumerable<DestinationMemberName> DestinationMemberNames { get; set; }
 
-        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch, Func<MethodInfo, bool> shouldMapMethod)
         {
-            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType == Type);
+            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(shouldMapMethod).Where(method => method.GetParameters()[0].ParameterType == Type);
 
             var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
 
@@ -116,11 +116,11 @@ namespace AutoMapper
                 let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
                 let matchedMethods = (
                     from extensionMethod in sourceExtensionMethodSearch
-                    where !extensionMethod.IsGenericMethodDefinition
+                    where !extensionMethod.IsGenericMethodDefinition && shouldMapMethod(extensionMethod)
                     select extensionMethod
                 ).Concat(
                     from extensionMethod in sourceExtensionMethodSearch
-                    where extensionMethod.IsGenericMethodDefinition
+                    where extensionMethod.IsGenericMethodDefinition && shouldMapMethod(extensionMethod)
                         && extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
                     select extensionMethod.MakeGenericMethod(genericInterfaceArguments)
                 )
@@ -211,9 +211,10 @@ namespace AutoMapper
                 );
         }
 
-        private MethodInfo[] BuildPublicNoArgMethods()
+        private MethodInfo[] BuildPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod)
         {
             return Type.GetAllMethods()
+                .Where(shouldMapMethod)
                 .Where(mi => mi.IsPublic && !mi.IsStatic && mi.DeclaringType != typeof(object))
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
