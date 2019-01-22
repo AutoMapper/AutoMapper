@@ -58,7 +58,7 @@ namespace AutoMapper.UnitTests
                     ex.Errors.ShouldNotBeNull();
                     ex.Errors.ShouldNotBeEmpty();
                     ex.Errors[0].UnmappedPropertyNames.ShouldNotBeNull();
-                    ex.Errors[0].UnmappedPropertyNames.ShouldNotBeNull();
+                    ex.Errors[0].UnmappedPropertyNames.ShouldNotBeEmpty();
                     ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Destination.AnotherNumber));
                 });
         }
