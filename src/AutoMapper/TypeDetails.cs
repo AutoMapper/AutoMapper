@@ -24,7 +24,7 @@ namespace AutoMapper
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
             PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
-            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods, config.ShouldMapMethod);
+            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
         }
@@ -99,9 +99,9 @@ namespace AutoMapper
 
         public IEnumerable<DestinationMemberName> DestinationMemberNames { get; set; }
 
-        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch, Func<MethodInfo, bool> shouldMapMethod)
+        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
-            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(shouldMapMethod).Where(method => method.GetParameters()[0].ParameterType == Type);
+            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType == Type);
 
             var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
 
@@ -116,11 +116,11 @@ namespace AutoMapper
                 let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
                 let matchedMethods = (
                     from extensionMethod in sourceExtensionMethodSearch
-                    where !extensionMethod.IsGenericMethodDefinition && shouldMapMethod(extensionMethod)
+                    where !extensionMethod.IsGenericMethodDefinition
                     select extensionMethod
                 ).Concat(
                     from extensionMethod in sourceExtensionMethodSearch
-                    where extensionMethod.IsGenericMethodDefinition && shouldMapMethod(extensionMethod)
+                    where extensionMethod.IsGenericMethodDefinition
                         && extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
                     select extensionMethod.MakeGenericMethod(genericInterfaceArguments)
                 )
