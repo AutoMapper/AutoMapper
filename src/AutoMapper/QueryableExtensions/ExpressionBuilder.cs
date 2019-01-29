@@ -361,6 +361,12 @@ namespace AutoMapper.QueryableExtensions
                 }
                 var parameterName = node.Member.Name;
 
+                const string vbPrefix = "$VB$Local_";
+                if (parameterName.StartsWith(vbPrefix, StringComparison.Ordinal))
+                {
+                    parameterName = parameterName.Substring(vbPrefix.Length);
+                }
+
                 var matchingMember = _parameters.GetType().GetDeclaredProperty(parameterName);
 
                 return matchingMember != null 
