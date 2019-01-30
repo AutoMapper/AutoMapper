@@ -558,13 +558,7 @@ namespace AutoMapper.Execution
         }
 
         private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>
-            members
-                .Aggregate(
-                        (Expression) Source,
-                        (inner, getter) => getter is MethodInfo method ? 
-                            (getter.IsStatic() ? Call(null, method, inner) : (Expression) Call(inner, method)) : 
-                            MakeMemberAccess(getter.IsStatic() ? null : inner, getter))
-                .NullCheck(destinationType);
+                members.MemberAccesses(Source).NullCheck(destinationType);
 
         private Expression CreateInstance(Type type)
             => Call(Property(Context, nameof(ResolutionContext.Options)),
