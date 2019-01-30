@@ -824,7 +824,10 @@ namespace AutoMapper.IntegrationTests
         {
             protected override void Seed(ClientContext context)
             {
-                context.ProductReviews.Add(new ProductReview { Product = new Product { Brand = new Brand{ Owners = { new Owner{ Name = "Owner" } } } } });
+                context.ProductReviews.AddRange(new[]{
+                    new ProductReview { Product = new Product { Brand = new Brand{ Owners = { new Owner{ Name = "Owner" } } } } },
+                    new ProductReview { Product = new Product { Brand = new Brand { } } },
+                    new ProductReview { Product = new Product { } } });
             }
         }
 
@@ -834,8 +837,10 @@ namespace AutoMapper.IntegrationTests
             using(var context = new ClientContext())
             {
                 var projection = ProjectTo<ProductReviewDto>(context.ProductReviews);
-                var result = projection.Single();
-                result.Brand.Owner.Name.ShouldBe("Owner");
+                var results = projection.ToArray();
+                results[0].Brand.Owner.Name.ShouldBe("Owner");
+                results[1].Brand.Owner.ShouldBeNull();
+                results[2].Brand.ShouldBeNull();
             }
         }
     }
