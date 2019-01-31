@@ -12,7 +12,12 @@ namespace AutoMapper
     internal static class ExpressionExtensions
     {
         public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
-            members.Aggregate(obj, MakeMemberAccess);
+            members
+                .Aggregate(
+                        obj,
+                        (inner, getter) => getter is MethodInfo method ?
+                            (getter.IsStatic() ? Call(null, method, inner) : (Expression)Call(inner, method)) :
+                            MakeMemberAccess(getter.IsStatic() ? null : inner, getter));
 
         public static IEnumerable<MemberExpression> GetMembers(this Expression expression)
         {

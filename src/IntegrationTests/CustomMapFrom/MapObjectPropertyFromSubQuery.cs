@@ -759,4 +759,89 @@ namespace AutoMapper.IntegrationTests
             }
         }
     }
+
+    public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Owner, OwnerDto>();
+            cfg.CreateMap<Brand, BrandDto>()
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owners.FirstOrDefault()));
+            cfg.CreateMap<ProductReview, ProductReviewDto>()
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Product.Brand));
+        });
+
+        public class Owner
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+        public class Brand
+        {
+            public int Id { get; set; }
+            public List<Owner> Owners { get; set; } = new List<Owner>();
+        }
+        public class Product
+        {
+            public int Id { get; set; }
+            public Brand Brand { get; set; }
+        }
+        public class ProductReview
+        {
+            public int Id { get; set; }
+            public Product Product { get; set; }
+        }
+        /* Destination types */
+        public class ProductReviewDto
+        {
+            public int Id { get; set; }
+            public BrandDto Brand { get; set; }
+        }
+        public class BrandDto
+        {
+            public int Id { get; set; }
+            public OwnerDto Owner { get; set; }
+        }
+        public class OwnerDto
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        class ClientContext : DbContext
+        {
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                Database.SetInitializer(new Initializer());
+            }
+            public DbSet<Owner> Owners { get; set; }
+            public DbSet<Product> Products { get; set; }
+            public DbSet<Brand> Brands { get; set; }
+            public DbSet<ProductReview> ProductReviews { get; set; }
+        }
+
+        class Initializer : DropCreateDatabaseAlways<ClientContext>
+        {
+            protected override void Seed(ClientContext context)
+            {
+                context.ProductReviews.AddRange(new[]{
+                    new ProductReview { Product = new Product { Brand = new Brand{ Owners = { new Owner{ Name = "Owner" } } } } },
+                    new ProductReview { Product = new Product { Brand = new Brand { } } },
+                    new ProductReview { Product = new Product { } } });
+            }
+        }
+
+        [Fact]
+        public void Should_project_ok()
+        {
+            using(var context = new ClientContext())
+            {
+                var projection = ProjectTo<ProductReviewDto>(context.ProductReviews);
+                var results = projection.ToArray();
+                results[0].Brand.Owner.Name.ShouldBe("Owner");
+                results[1].Brand.Owner.ShouldBeNull();
+                results[2].Brand.ShouldBeNull();
+            }
+        }
+    }
 }
