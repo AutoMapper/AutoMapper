@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions
 {
     using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
 
-    public class ProjectionExpression : IProjectionExpression
+    public class ProjectionExpression
     {
         private static readonly MethodInfo QueryableSelectMethod = FindQueryableSelectMethod();
 
@@ -30,28 +30,8 @@ namespace AutoMapper.QueryableExtensions
             return method;
         }
 
-        public IQueryable<TResult> To<TResult>(object parameters = null) => To<TResult>(parameters, new string[0]);
-
-        public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
-        {
-            var paramValues = GetParameters(parameters);
-            return To<TResult>(paramValues, membersToExpand);
-        }
-
-        private static IObjectDictionary GetParameters(object parameters)
-        {
-            return (parameters ?? new object()).GetType()
-                .GetDeclaredProperties()
-                .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
-        }
-
-        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters) => To<TResult>(parameters, new string[0]);
-
-        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params string[] membersToExpand)
-        {
-            var members = GetMemberPaths(typeof(TResult), membersToExpand);
-            return To<TResult>(parameters, members);
-        }
+        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params string[] membersToExpand) =>
+            To<TResult>(parameters, GetMemberPaths(typeof(TResult), membersToExpand));
 
         public IQueryable<TResult> To<TResult>(object parameters, params Expression<Func<TResult, object>>[] membersToExpand)
         {
@@ -68,11 +48,8 @@ namespace AutoMapper.QueryableExtensions
         public static MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand) =>
             membersToExpand.Select(expr => MemberVisitor.GetMemberPath(expr));
 
-        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand)
-        {
-            var members = GetMemberPaths(membersToExpand);
-            return To<TResult>(parameters, members);
-        }
+        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
+            To<TResult>(parameters, GetMemberPaths(membersToExpand));
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
         {
@@ -84,15 +61,12 @@ namespace AutoMapper.QueryableExtensions
             return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
         }
 
-        private static IQueryable Select(IQueryable source, LambdaExpression lambda)
-        {
-            return source.Provider.CreateQuery(
+        private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
                 Expression.Call(
                     null,
                     QueryableSelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType),
                     new[] { source.Expression, Expression.Quote(lambda) }
                     )
                 );
-        }
     }
 }
