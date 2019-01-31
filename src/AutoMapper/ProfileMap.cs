@@ -34,6 +34,7 @@ namespace AutoMapper
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
+            ShouldMapMethod = profile.ShouldMapMethod ?? configuration?.ShouldMapMethod ?? (p => true);
             ShouldUseConstructor = profile.ShouldUseConstructor ?? configuration?.ShouldUseConstructor ?? (c => true);
             CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? true;
             ValidateInlineMaps = profile.ValidateInlineMaps ?? configuration?.ValidateInlineMaps ?? true;
@@ -84,6 +85,7 @@ namespace AutoMapper
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; }
+        public Func<MethodInfo, bool> ShouldMapMethod { get; }
         public Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
 
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }

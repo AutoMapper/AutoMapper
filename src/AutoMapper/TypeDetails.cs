@@ -22,9 +22,9 @@ namespace AutoMapper
             var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
-            PublicNoArgMethods = BuildPublicNoArgMethods();
+            PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
-            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods);
+            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
         }
@@ -211,9 +211,10 @@ namespace AutoMapper
                 );
         }
 
-        private MethodInfo[] BuildPublicNoArgMethods()
+        private MethodInfo[] BuildPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod)
         {
             return Type.GetAllMethods()
+                .Where(shouldMapMethod)
                 .Where(mi => mi.IsPublic && !mi.IsStatic && mi.DeclaringType != typeof(object))
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
