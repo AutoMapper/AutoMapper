@@ -18,7 +18,6 @@ namespace AutoMapper.QueryableExtensions
 
     public interface IExpressionBuilder
     {
-        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
         LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberInfo[] membersToExpand);
         LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
@@ -54,31 +53,6 @@ namespace AutoMapper.QueryableExtensions
             _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]>(CreateMapExpression);
         }
 
-        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters,
-            MemberInfo[] membersToExpand)
-        {
-            if (sourceType == null)
-            {
-                throw new ArgumentNullException(nameof(sourceType));
-            }
-            if (destinationType == null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
-            if (parameters == null)
-            {
-                throw new ArgumentNullException(nameof(parameters));
-            }
-            if (membersToExpand == null)
-            {
-                throw new ArgumentNullException(nameof(membersToExpand));
-            }
-
-            var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
-
-            return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
-        }
-
         public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters,
             MemberInfo[] membersToExpand)
         {
@@ -100,33 +74,12 @@ namespace AutoMapper.QueryableExtensions
             return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
-        private Expression Prepare(Expression cachedExpression, ParameterBag parameters)
-        {
-            Expression result;
-            if(parameters.Any())
-            {
-                var visitor = new ConstantExpressionReplacementVisitor(parameters);
-                result = visitor.Visit(cachedExpression);
-            }
-            else
-            {
-                result = cachedExpression;
-            }
-            // perform null-propagation if this feature is enabled.
-            if(_configurationProvider.EnableNullPropagationForQueryMapping)
-            {
-                var nullVisitor = new NullsafeQueryRewriter();
-                return nullVisitor.Visit(result);
-            }
-            return result;
-        }
-
         private Expression Prepare(Expression cachedExpression, object parameters)
         {
             Expression result;
             if(parameters != null)
             {
-                var visitor = new ObjectParameterExpressionReplacementVisitor(parameters);
+                var visitor = ParameterExpressionVisitor.Create(parameters);
                 result = visitor.Visit(cachedExpression);
             }
             else
@@ -349,54 +302,54 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private class ObjectParameterExpressionReplacementVisitor : ExpressionVisitor
+        private abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
-            private readonly object _parameters;
+            public static ParameterExpressionVisitor Create(object parameters) =>
+                parameters is ParameterBag dictionary ? (ParameterExpressionVisitor) new ConstantExpressionReplacementVisitor(dictionary) : new ObjectParameterExpressionReplacementVisitor(parameters);
 
-            public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
+            protected abstract Expression GetValue(string name);
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
+                if(!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
                 {
                     return base.VisitMember(node);
                 }
                 var parameterName = node.Member.Name;
-
-                var matchingMember = _parameters.GetType().GetDeclaredProperty(parameterName);
-
-                return matchingMember != null 
-                    ? Property(Constant(_parameters), matchingMember) 
-                    : base.VisitMember(node);
-            }
-        }
-
-        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
-        {
-            private readonly ParameterBag _paramValues;
-
-            public ConstantExpressionReplacementVisitor(
-                ParameterBag paramValues) => _paramValues = paramValues;
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
-                {
-                    return base.VisitMember(node);
-                }
-                var parameterName = node.Member.Name;
-                if (!_paramValues.TryGetValue(parameterName, out object parameterValue))
+                var parameterValue = GetValue(parameterName);
+                if(parameterValue == null)
                 {
                     const string vbPrefix = "$VB$Local_";
-                    if (!parameterName.StartsWith(vbPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(vbPrefix.Length), out parameterValue))
+                    if(!parameterName.StartsWith(vbPrefix, StringComparison.Ordinal) || (parameterValue = GetValue(parameterName.Substring(vbPrefix.Length))) == null)
                     {
                         return base.VisitMember(node);
                     }
                 }
-                return Convert(Constant(parameterValue), node.Member.GetMemberType());
+                return ToType(parameterValue, node.Member.GetMemberType());
+            }
+
+            private class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
+            {
+                private readonly object _parameters;
+
+                public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
+
+                protected override Expression GetValue(string name)
+                {
+                    var matchingMember = _parameters.GetType().GetDeclaredProperty(name);
+                    return matchingMember != null ? Property(Constant(_parameters), matchingMember) : null;
+                }
+            }
+            private class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
+            {
+                private readonly ParameterBag _paramValues;
+
+                public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;
+
+                protected override Expression GetValue(string name) =>
+                    _paramValues.TryGetValue(name, out object parameterValue) ? Constant(parameterValue) : null;
             }
         }
-
 
         public class FirstPassLetPropertyMaps : LetPropertyMaps
         {
