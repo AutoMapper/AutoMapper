@@ -43,7 +43,7 @@ namespace AutoMapper.QueryableExtensions
             membersToExpand.Select(expr => MemberVisitor.GetMemberPath(expr));
 
         public static MemberInfo[] GetMembers(MemberPaths memberPathsToExpand) =>
-           memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
+            memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
             To<TResult>(parameters, GetMemberPaths(membersToExpand));
