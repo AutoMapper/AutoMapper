@@ -536,7 +536,7 @@ namespace AutoMapper.QueryableExtensions
             this IExpressionBuilder expressionBuilder)
         {
             return (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource),
-                typeof(TDestination), new Dictionary<string, object>(), new MemberInfo[0])[0];
+                typeof(TDestination), null, new MemberInfo[0])[0];
         }
     }
 

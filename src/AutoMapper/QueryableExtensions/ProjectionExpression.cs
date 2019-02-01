@@ -33,14 +33,8 @@ namespace AutoMapper.QueryableExtensions
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params string[] membersToExpand) =>
             To<TResult>(parameters, GetMemberPaths(typeof(TResult), membersToExpand));
 
-        public IQueryable<TResult> To<TResult>(object parameters, params Expression<Func<TResult, object>>[] membersToExpand)
-        {
-            var memberInfos = GetMemberPaths(membersToExpand).SelectMany(m => m).Distinct().ToArray();
-
-            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, memberInfos);
-
-            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
-        }
+        public IQueryable<TResult> To<TResult>(object parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
+            (IQueryable<TResult>)_builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, GetMembers(GetMemberPaths(membersToExpand))).Aggregate(_source, Select);
 
         public static MemberPaths GetMemberPaths(Type type, string[] membersToExpand) =>
             membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
@@ -48,18 +42,14 @@ namespace AutoMapper.QueryableExtensions
         public static MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand) =>
             membersToExpand.Select(expr => MemberVisitor.GetMemberPath(expr));
 
+        public static MemberInfo[] GetMembers(MemberPaths memberPathsToExpand) =>
+                memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
+
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
             To<TResult>(parameters, GetMemberPaths(membersToExpand));
 
-        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
-        {
-            var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
-
-            parameters = parameters ?? new Dictionary<string, object>();
-            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
-
-            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, Select);
-        }
+        public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand) =>
+            (IQueryable<TResult>) _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, GetMembers(memberPathsToExpand)).Aggregate(_source, Select);
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
                 Expression.Call(
