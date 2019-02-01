@@ -34,7 +34,7 @@ namespace AutoMapper.QueryableExtensions
             To<TResult>(parameters, GetMemberPaths(typeof(TResult), membersToExpand));
 
         public IQueryable<TResult> To<TResult>(object parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
-            (IQueryable<TResult>)_builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, GetMembers(GetMemberPaths(membersToExpand))).Aggregate(_source, Select);
+            ToCore<TResult>(parameters, GetMembers(GetMemberPaths(membersToExpand)));
 
         public static MemberPaths GetMemberPaths(Type type, string[] membersToExpand) =>
             membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
@@ -43,13 +43,16 @@ namespace AutoMapper.QueryableExtensions
             membersToExpand.Select(expr => MemberVisitor.GetMemberPath(expr));
 
         public static MemberInfo[] GetMembers(MemberPaths memberPathsToExpand) =>
-                memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
+           memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand) =>
             To<TResult>(parameters, GetMemberPaths(membersToExpand));
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand) =>
-            (IQueryable<TResult>) _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, GetMembers(memberPathsToExpand)).Aggregate(_source, Select);
+            ToCore<TResult>(parameters, GetMembers(memberPathsToExpand));
+
+        private IQueryable<TResult> ToCore<TResult>(object parameters, MemberInfo[] members)=>
+            (IQueryable<TResult>)_builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, members).Aggregate(_source, Select);
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
                 Expression.Call(
