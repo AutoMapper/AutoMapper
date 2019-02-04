@@ -44,6 +44,7 @@ namespace AutoMapper
             {
                 CustomMapExpression = Lambda(includedMemberMap.CustomMapExpression.ReplaceParameters(expression.Body), expression.Parameters);
             }
+            NullSubstitute = includedMemberMap.NullSubstitute;
         }
 
         public TypeMap TypeMap { get; }

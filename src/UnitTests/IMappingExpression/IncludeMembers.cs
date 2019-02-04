@@ -50,7 +50,7 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
     }
 
-    public class IncludeMembersWithMapFrom : AutoMapperSpecBase
+    public class IncludeMembersWithMapFromExpression : AutoMapperSpecBase
     {
         class Source
         {
