@@ -30,7 +30,7 @@ namespace AutoMapper
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly List<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
-        private readonly List<(TypeMap,Expression)> _includedMembersTypeMaps = new List<(TypeMap, Expression)>();
+        private readonly List<(TypeMap, LambdaExpression)> _includedMembersTypeMaps = new List<(TypeMap, LambdaExpression)>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
@@ -133,7 +133,7 @@ namespace AutoMapper
             && !(IsValid ?? false);
 
         public bool IsClosedGeneric { get; internal set; }
-        public Expression[] IncludedMembers { get; internal set; } = Array.Empty<Expression>();
+        public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
@@ -329,7 +329,7 @@ namespace AutoMapper
             return null;
         }
 
-        public void AddMemberMap((TypeMap, Expression) includedMember) => _includedMembersTypeMaps.Add(includedMember);
+        public void AddMemberMap((TypeMap, LambdaExpression) includedMember) => _includedMembersTypeMaps.Add(includedMember);
 
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
@@ -348,16 +348,11 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
-        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, Expression expression) includedMember)
-        {
-            foreach(var memberMap in includedMember.typeMap.PropertyMaps.Where(m => m.IsMapped && !Contains(PropertyMaps, m) && !Contains(_inheritedMaps, m)))
-            {
-                if(!Contains(_includedMembersMaps, memberMap))
-                {
-                    _includedMembersMaps.Add(new PropertyMap(memberMap, this, includedMember.expression));
-                }
-            }
-        }
+        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, LambdaExpression expression) includedMember) =>
+            _includedMembersMaps.AddRange(
+                includedMember.typeMap.PropertyMaps.
+                Where(m => m.CanResolveValue && !Contains(PropertyMaps, m) && !Contains(_inheritedMaps, m) && !Contains(_includedMembersMaps, m))
+                .Select(p => new PropertyMap(p, this, includedMember.expression)));
 
         private static bool Contains(IEnumerable<PropertyMap> propertyMaps, PropertyMap propertyMap) =>
             propertyMaps.Any(pm => pm.DestinationName == propertyMap.DestinationName);

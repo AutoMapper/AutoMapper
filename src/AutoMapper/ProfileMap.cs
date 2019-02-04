@@ -248,7 +248,7 @@ namespace AutoMapper
 
         private void ApplyMemberMaps(TypeMap mainMap, IConfigurationProvider configurationProvider)
         {
-            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(mainMap.IncludedMembers.Select(m=>new TypePair(m.Type, mainMap.DestinationType))).Zip(mainMap.IncludedMembers, (memberMap, expression)=>(memberMap, expression)))
+            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(mainMap.IncludedMembers.Select(m=>new TypePair(m.Body.Type, mainMap.DestinationType))).Zip(mainMap.IncludedMembers, (memberMap, expression)=>(memberMap, expression)))
             {
                 mainMap.AddMemberMap(includedMember);
             }

@@ -369,8 +369,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {
-            var untypedMembers = memberExpressions.Select(e => e.Body).ToArray();
-            TypeMapActions.Add(tm => tm.IncludedMembers = untypedMembers);
+            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
             return this as TMappingExpression;
         }
     }
