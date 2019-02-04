@@ -395,13 +395,16 @@ namespace AutoMapper
                 {
                     yield return typeMap;
                 }
-                typeMap = ResolveTypeMap(pair);
-                // we want the exact map the user included, but we could instantiate an open generic
-                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                else
                 {
-                    throw QueryMapperHelper.MissingMapException(pair);
+                    typeMap = ResolveTypeMap(pair);
+                    // we want the exact map the user included, but we could instantiate an open generic
+                    if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                    {
+                        throw QueryMapperHelper.MissingMapException(pair);
+                    }
+                    yield return typeMap;
                 }
-                yield return typeMap;
             }
         }
 

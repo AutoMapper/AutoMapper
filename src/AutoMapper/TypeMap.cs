@@ -25,10 +25,12 @@ namespace AutoMapper
         private readonly List<PropertyMap> _propertyMaps = new List<PropertyMap>();
         private readonly List<PathMap> _pathMaps = new List<PathMap>();
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
-        private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
+        private readonly List<PropertyMap> _inheritedMaps = new List<PropertyMap>();
+        private readonly List<PropertyMap> _includedMembersMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly List<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private readonly List<(TypeMap,Expression)> _includedMembersTypeMaps = new List<(TypeMap, Expression)>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
@@ -96,7 +98,7 @@ namespace AutoMapper
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
 
-        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps);
+        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).Concat(_includedMembersMaps);
         public IEnumerable<PathMap> PathMaps => _pathMaps;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
@@ -131,6 +133,7 @@ namespace AutoMapper
             && !(IsValid ?? false);
 
         public bool IsClosedGeneric { get; internal set; }
+        public Expression[] IncludedMembers { get; internal set; } = Array.Empty<Expression>();
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
@@ -146,15 +149,8 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
-                ? pm.DestinationName
-                : pm.SourceMember != null
-                    ? pm.SourceMember.Name
-                    : pm.DestinationName;
-            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
-
             var autoMappedProperties = GetPropertyNames(_propertyMaps);
-            var inheritedProperties = GetPropertyNames(_inheritedMaps);
+            var inheritedProperties = GetPropertyNames(_inheritedMaps).Concat(GetPropertyNames(_includedMembersMaps)).ToArray();
 
             IEnumerable<string> properties;
 
@@ -184,6 +180,12 @@ namespace AutoMapper
             }
 
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
+            string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
+                ? pm.DestinationName
+                : pm.SourceMember != null
+                    ? pm.SourceMember.Name
+                    : pm.DestinationName;
+            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
         }
 
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
@@ -274,10 +276,15 @@ namespace AutoMapper
             {
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
+            foreach(var includedMemberTypeMap in _includedMembersTypeMaps)
+            {
+                ApplyIncludedMemberTypeMap(includedMemberTypeMap);
+            }
 
             _orderedPropertyMaps =
                 _propertyMaps
                     .Union(_inheritedMaps)
+                    .Union(_includedMembersMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
@@ -322,6 +329,8 @@ namespace AutoMapper
             return null;
         }
 
+        public void AddMemberMap((TypeMap, Expression) includedMember) => _includedMembersTypeMaps.Add(includedMember);
+
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
             var config = _sourceMemberConfigs.FirstOrDefault(smc => Equals(smc.SourceMember, sourceMember));
@@ -338,6 +347,20 @@ namespace AutoMapper
         {
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
+
+        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, Expression expression) includedMember)
+        {
+            foreach(var memberMap in includedMember.typeMap.PropertyMaps.Where(m => m.IsMapped && !Contains(PropertyMaps, m) && !Contains(_inheritedMaps, m)))
+            {
+                if(!Contains(_includedMembersMaps, memberMap))
+                {
+                    _includedMembersMaps.Add(new PropertyMap(memberMap, this, includedMember.expression));
+                }
+            }
+        }
+
+        private static bool Contains(IEnumerable<PropertyMap> propertyMaps, PropertyMap propertyMap) =>
+            propertyMaps.Any(pm => pm.DestinationName == propertyMap.DestinationName);
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {

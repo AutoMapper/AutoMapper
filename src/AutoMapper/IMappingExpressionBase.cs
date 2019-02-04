@@ -13,6 +13,8 @@ namespace AutoMapper
     public interface IMappingExpressionBase<TSource, TDestination, out TMappingExpression> 
         where TMappingExpression : IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
+        TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions);
+
         /// <summary>
         /// Construct the destination object using the service locator
         /// </summary>

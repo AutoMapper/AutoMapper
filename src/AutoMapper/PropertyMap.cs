@@ -29,6 +29,16 @@ namespace AutoMapper
             ApplyInheritedPropertyMap(inheritedMappedProperty);
         }
 
+        public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap, Expression expression) : this(inheritedMappedProperty.DestinationMember, typeMap)
+        {
+            ApplyIncludedMemberMap(inheritedMappedProperty, expression);
+        }
+
+        private void ApplyIncludedMemberMap(PropertyMap inheritedMappedProperty, Expression expression)
+        {
+            ChainMembers(expression.GetMembers().Select(e=>e.Member).Concat(inheritedMappedProperty._memberChain));
+        }
+
         public TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
         public string DestinationName => DestinationMember.Name;

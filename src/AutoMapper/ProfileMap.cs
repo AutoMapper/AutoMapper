@@ -167,6 +167,7 @@ namespace AutoMapper
 
             ApplyBaseMaps(typeMap, typeMap, configurationProvider);
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
+            ApplyMemberMaps(typeMap, configurationProvider);
         }
 
         public bool IsConventionMap(TypePair types) => TypeConfigurations.Any(c => c.IsMatch(types));
@@ -242,6 +243,14 @@ namespace AutoMapper
                 baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
                 derivedMap.AddInheritedMap(baseMap);
                 ApplyBaseMaps(derivedMap, baseMap, configurationProvider);
+            }
+        }
+
+        private void ApplyMemberMaps(TypeMap mainMap, IConfigurationProvider configurationProvider)
+        {
+            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(mainMap.IncludedMembers.Select(m=>new TypePair(m.Type, mainMap.DestinationType))).Zip(mainMap.IncludedMembers, (memberMap, expression)=>(memberMap, expression)))
+            {
+                mainMap.AddMemberMap(includedMember);
             }
         }
 

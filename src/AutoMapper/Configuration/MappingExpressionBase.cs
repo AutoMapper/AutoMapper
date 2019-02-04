@@ -364,7 +364,14 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction)
         {
-            TypeMapActions.Add(tm => tm.CustomMapExpression = (LambdaExpression) mappingFunction);
+            TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);
+        }
+
+        public TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
+        {
+            var untypedMembers = memberExpressions.Select(e => e.Body).ToArray();
+            TypeMapActions.Add(tm => tm.IncludedMembers = untypedMembers);
+            return this as TMappingExpression;
         }
     }
 }
