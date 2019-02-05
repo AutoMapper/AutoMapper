@@ -16,7 +16,7 @@ namespace AutoMapper.Configuration
         public PathConfigurationExpression(LambdaExpression destinationExpression)
         {
             _destinationExpression = destinationExpression;
-            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression).Reverse());
+            MemberPath = new MemberPath(destinationExpression);
         }
 
         public MemberPath MemberPath { get; }

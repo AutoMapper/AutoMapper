@@ -8,6 +8,8 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
+    using static Expression;
+
     public abstract class MappingExpressionBase : ITypeMapConfiguration
     {
         protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType)
@@ -90,6 +92,18 @@ namespace AutoMapper.Configuration
                 {
                     ReverseMapExpression.IncludeBaseCore(includedBaseType.DestinationType, includedBaseType.SourceType);
                 }
+                ReverseIncludedMembers(typeMap);
+            }
+        }
+
+        private void ReverseIncludedMembers(TypeMap typeMap)
+        {
+            foreach(var includedMember in typeMap.IncludedMembers)
+            {
+                var memberPath = new MemberPath(includedMember);
+                var newSource = Parameter(typeMap.DestinationType, "source");
+                var customExpression = Lambda(newSource, newSource);
+                ReverseSourceMembers(memberPath, customExpression);
             }
         }
 
@@ -97,18 +111,24 @@ namespace AutoMapper.Configuration
         {
             foreach (var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Count() > 1 && !p.SourceMembers.Any(s => s is MethodInfo)))
             {
-                ReverseMapExpression.TypeMapActions.Add(reverseTypeMap =>
-                {
-                    var memberPath = new MemberPath(propertyMap.SourceMembers);
-                    var newDestination = Expression.Parameter(reverseTypeMap.DestinationType, "destination");
-                    var path = propertyMap.SourceMembers.MemberAccesses(newDestination);
-                    var forPathLambda = Expression.Lambda(path, newDestination);
-
-                    var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
-
-                    pathMap.CustomMapExpression = ExpressionFactory.MemberAccessLambda(propertyMap.DestinationMember);
-                });
+                var memberPath = new MemberPath(propertyMap.SourceMembers);
+                var customExpression = ExpressionFactory.MemberAccessLambda(propertyMap.DestinationMember);
+                ReverseSourceMembers(memberPath, customExpression);
             }
+        }
+
+        private void ReverseSourceMembers(MemberPath memberPath, LambdaExpression customExpression)
+        {
+            ReverseMapExpression.TypeMapActions.Add(reverseTypeMap =>
+            {
+                var newDestination = Parameter(reverseTypeMap.DestinationType, "destination");
+                var path = memberPath.Members.MemberAccesses(newDestination);
+                var forPathLambda = Lambda(path, newDestination);
+
+                var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
+
+                pathMap.CustomMapExpression = customExpression;
+            });
         }
 
         protected void ForSourceMemberCore(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
