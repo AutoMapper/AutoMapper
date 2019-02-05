@@ -13,6 +13,12 @@ namespace AutoMapper
     public interface IMappingExpressionBase<TSource, TDestination, out TMappingExpression> 
         where TMappingExpression : IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
+        /// <summary>
+        /// Add extra configuration to the current map by also mapping the specified child objects to the destination object.
+        /// The maps from the child types to the destination need to be created explicitly.
+        /// </summary>
+        /// <param name="memberExpressions">the child objects to map to the destination</param>
+        /// <returns></returns>
         TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions);
 
         /// <summary>
