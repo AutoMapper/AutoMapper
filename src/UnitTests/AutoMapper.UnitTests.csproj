@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\AutoMapper\ReflectionExtensions.cs" Link="ReflectionExtensions.cs" />
     <Compile Include="..\AutoMapper\TypeExtensions.cs" Link="TypeExtensions.cs" />
   </ItemGroup>
 
