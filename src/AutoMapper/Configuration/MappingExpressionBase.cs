@@ -36,6 +36,8 @@ namespace AutoMapper.Configuration
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations { get; } = new List<ISourceMemberConfiguration>();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations { get; } = new List<ICtorParameterConfiguration>();
 
+        protected void IncludeMembersCore(LambdaExpression[] memberExpressions) => TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+
         public void Configure(TypeMap typeMap)
         {
             foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
@@ -93,8 +95,16 @@ namespace AutoMapper.Configuration
                     ReverseMapExpression.IncludeBaseCore(includedBaseType.DestinationType, includedBaseType.SourceType);
                 }
                 ReverseIncludedMembers(typeMap);
+                ReverseToIncludedMembers(typeMap);
             }
         }
+
+        private void ReverseToIncludedMembers(TypeMap typeMap) =>
+            ReverseMapExpression.IncludeMembersCore(
+                MemberConfigurations
+                .Where(m => m.SourceExpression != null && m.SourceExpression.Body == m.SourceExpression.Parameters[0])
+                .Select(m=>m.GetDestinationExpression())
+                .ToArray());
 
         private void ReverseIncludedMembers(TypeMap typeMap)
         {
@@ -389,7 +399,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {
-            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+            IncludeMembersCore(memberExpressions);
             return this as TMappingExpression;
         }
     }
