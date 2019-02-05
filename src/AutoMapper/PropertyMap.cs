@@ -29,14 +29,13 @@ namespace AutoMapper
             ApplyInheritedPropertyMap(inheritedMappedProperty);
         }
 
-        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, LambdaExpression expression) : this(includedMemberMap.DestinationMember, typeMap)
+        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, LambdaExpression expression) : this(includedMemberMap, typeMap)
         {
             ApplyIncludedMemberMap(includedMemberMap, expression);
         }
 
         private void ApplyIncludedMemberMap(PropertyMap includedMemberMap, LambdaExpression expression)
         {
-            ApplyInheritedPropertyMap(includedMemberMap);
             if(includedMemberMap._memberChain.Count > 0)
             {
                 ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
