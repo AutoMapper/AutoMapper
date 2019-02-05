@@ -498,7 +498,7 @@ namespace AutoMapper.Execution
             }
             else if (memberMap.ValueResolverConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap.ValueResolverConfig),
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap),
                     destinationPropertyType);
             }
             else if (memberMap.CustomMapFunction != null)
@@ -557,14 +557,19 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        public Expression ReplaceExpressionParameters(IMemberMap memberMap, LambdaExpression lambda, params Expression[] replace)
+        private Expression ReplaceExpressionParameters(IMemberMap memberMap, LambdaExpression lambda, params Expression[] parameters)
+        {
+            CheckCustomSource(memberMap, parameters);
+            return lambda.ConvertReplaceParameters(parameters);
+        }
+
+        private void CheckCustomSource(IMemberMap memberMap, params Expression[] parameters)
         {
             var customSource = memberMap.CustomSource;
             if(customSource != null)
             {
-                replace[0] = customSource.ConvertReplaceParameters(replace[0]);
+                parameters[0] = customSource.ConvertReplaceParameters(parameters[0]);
             }
-            return lambda.ConvertReplaceParameters(replace);
         }
 
         private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>
@@ -574,8 +579,9 @@ namespace AutoMapper.Execution
             => Call(Property(Context, nameof(ResolutionContext.Options)),
                 nameof(IMappingOperationOptions.CreateInstance), new[] {type});
 
-        private Expression BuildResolveCall(Expression destValueExpr, ValueResolverConfiguration valueResolverConfig)
+        private Expression BuildResolveCall(Expression destValueExpr, IMemberMap memberMap)
         {
+            var valueResolverConfig = memberMap.ValueResolverConfig;
             var resolverInstance = valueResolverConfig.Instance != null
                 ? Constant(valueResolverConfig.Instance)
                 : CreateInstance(valueResolverConfig.ConcreteType);
@@ -586,12 +592,10 @@ namespace AutoMapper.Execution
                                    : null);
 
             var iResolverType = valueResolverConfig.InterfaceType;
-
-            var parameters = new[] {Source, _destination, sourceMember, destValueExpr}.Where(p => p != null)
-                .Zip(iResolverType.GetGenericArguments(), ToType)
-                .Concat(new[] {Context});
-            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"),
-                parameters);
+            var parameters = new[] { Source, _destination, sourceMember, destValueExpr }.Where(p => p != null).ToArray();
+            CheckCustomSource(memberMap, parameters);
+            parameters = parameters.Zip(iResolverType.GetGenericArguments(), ToType).Concat(new[] {Context}).ToArray();
+            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
 
         private Expression BuildConvertCall(IMemberMap memberMap)
