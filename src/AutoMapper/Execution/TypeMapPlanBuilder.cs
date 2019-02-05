@@ -504,7 +504,7 @@ namespace AutoMapper.Execution
             else if (memberMap.CustomMapFunction != null)
             {
                 valueResolverFunc =
-                    memberMap.CustomMapFunction.ConvertReplaceParameters(Source, _destination, destValueExpr, Context);
+                    ReplaceExpressionParameters(memberMap, memberMap.CustomMapFunction, Source, _destination, destValueExpr, Context);
             }
             else if (memberMap.CustomMapExpression != null)
             {
@@ -555,6 +555,16 @@ namespace AutoMapper.Execution
             }
 
             return valueResolverFunc;
+        }
+
+        public Expression ReplaceExpressionParameters(IMemberMap memberMap, LambdaExpression lambda, params Expression[] replace)
+        {
+            var customSource = memberMap.CustomSource;
+            if(customSource != null)
+            {
+                replace[0] = customSource.ReplaceParameters(replace[0]);
+            }
+            return lambda.ReplaceParameters(replace);
         }
 
         private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>

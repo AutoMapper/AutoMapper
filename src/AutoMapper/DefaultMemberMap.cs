@@ -19,6 +19,7 @@ namespace AutoMapper
         public virtual Type SourceType => default;
         public virtual IEnumerable<MemberInfo> SourceMembers { get; } 
             = Enumerable.Empty<MemberInfo>();
+        public virtual LambdaExpression CustomSource => null;
         public virtual string DestinationName => default;
         public virtual Type DestinationType => default;
         public virtual TypePair Types => new TypePair(SourceType, DestinationType);

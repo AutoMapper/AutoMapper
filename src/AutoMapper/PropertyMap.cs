@@ -36,6 +36,7 @@ namespace AutoMapper
 
         private void ApplyIncludedMemberMap(PropertyMap includedMemberMap, LambdaExpression expression)
         {
+            CustomSource = expression;
             if(includedMemberMap._memberChain.Count > 0)
             {
                 ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
@@ -53,7 +54,7 @@ namespace AutoMapper
         public Type DestinationType => DestinationMember.GetMemberType();
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
-
+        public LambdaExpression CustomSource { get; set; }
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
