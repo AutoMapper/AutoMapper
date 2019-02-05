@@ -493,13 +493,11 @@ namespace AutoMapper.Execution
 
             if (memberMap.ValueConverterConfig != null)
             {
-                valueResolverFunc = ToType(BuildConvertCall(memberMap),
-                    destinationPropertyType);
+                valueResolverFunc = ToType(BuildConvertCall(memberMap), destinationPropertyType);
             }
             else if (memberMap.ValueResolverConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap),
-                    destinationPropertyType);
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap), destinationPropertyType);
             }
             else if (memberMap.CustomMapFunction != null)
             {
