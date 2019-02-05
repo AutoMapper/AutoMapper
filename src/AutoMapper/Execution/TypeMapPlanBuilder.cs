@@ -458,11 +458,11 @@ namespace AutoMapper.Execution
                 else
                     mapperExpr = Assign(destMember, ToType(propertyValue, memberMap.DestinationType));
             }
-
+            var source = GetCustomSource(memberMap);
             if (memberMap.Condition != null)
                 mapperExpr = IfThen(
                     memberMap.Condition.ConvertReplaceParameters(
-                        Source,
+                        source,
                         _destination,
                         ToType(propertyValue, memberMap.Condition.Parameters[2].Type),
                         ToType(getter, memberMap.Condition.Parameters[2].Type),
@@ -476,7 +476,7 @@ namespace AutoMapper.Execution
             if (memberMap.PreCondition != null)
                 mapperExpr = IfThen(
                     memberMap.PreCondition.ConvertReplaceParameters(
-                        Source,
+                        source,
                         _destination,
                         Context
                     ),
