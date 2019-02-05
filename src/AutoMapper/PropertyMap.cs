@@ -36,15 +36,15 @@ namespace AutoMapper
 
         private void ApplyIncludedMemberMap(PropertyMap includedMemberMap, LambdaExpression expression)
         {
+            ApplyInheritedPropertyMap(includedMemberMap);
             if(includedMemberMap._memberChain.Count > 0)
             {
                 ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
             }
-            if(includedMemberMap.CustomMapExpression != null)
+            if(CustomMapExpression != null)
             {
-                CustomMapExpression = Lambda(includedMemberMap.CustomMapExpression.ReplaceParameters(expression.Body), expression.Parameters);
+                CustomMapExpression = Lambda(CustomMapExpression.ReplaceParameters(expression.Body), expression.Parameters);
             }
-            NullSubstitute = includedMemberMap.NullSubstitute;
         }
 
         public TypeMap TypeMap { get; }
