@@ -144,4 +144,72 @@ namespace AutoMapper.IntegrationTests
             }
         }
     }
+
+    public class IncludeMembersWithNullSubstitute : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public InnerSource InnerSource { get; set; }
+            public OtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public int? Code { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public int? Code { get; set; }
+            public int? OtherCode { get; set; }
+        }
+        class Destination
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public int Code { get; set; }
+            public int OtherCode { get; set; }
+        }
+        class Context : DbContext
+        {
+            public Context()
+            {
+                Database.SetInitializer(new DatabaseInitializer());
+            }
+
+            public DbSet<Source> Sources { get; set; }
+        }
+
+        class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+        {
+            protected override void Seed(Context context)
+            {
+                var source = new Source { Name = "name" };
+                context.Sources.Add(source);
+                base.Seed(context);
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Code, o => o.NullSubstitute(5));
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.OtherCode, o => o.NullSubstitute(7));
+        });
+        [Fact]
+        public void Should_flatten()
+        {
+            using(var context = new Context())
+            {
+                var result = ProjectTo<Destination>(context.Sources).Single();
+                result.Name.ShouldBe("name");
+                result.Code.ShouldBe(5);
+                result.OtherCode.ShouldBe(7);
+            }
+        }
+    }
 }
