@@ -562,9 +562,9 @@ namespace AutoMapper.Execution
             var customSource = memberMap.CustomSource;
             if(customSource != null)
             {
-                replace[0] = customSource.ReplaceParameters(replace[0]);
+                replace[0] = customSource.ConvertReplaceParameters(replace[0]);
             }
-            return lambda.ReplaceParameters(replace);
+            return lambda.ConvertReplaceParameters(replace);
         }
 
         private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>
