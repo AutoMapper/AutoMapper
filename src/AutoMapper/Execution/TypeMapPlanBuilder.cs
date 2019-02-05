@@ -504,7 +504,7 @@ namespace AutoMapper.Execution
             else if (memberMap.CustomMapFunction != null)
             {
                 valueResolverFunc =
-                    ReplaceExpressionParameters(memberMap, memberMap.CustomMapFunction, Source, _destination, destValueExpr, Context);
+                    memberMap.CustomMapFunction.ConvertReplaceParameters(GetCustomSource(memberMap), _destination, destValueExpr, Context);
             }
             else if (memberMap.CustomMapExpression != null)
             {
@@ -557,20 +557,8 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        private Expression ReplaceExpressionParameters(IMemberMap memberMap, LambdaExpression lambda, params Expression[] parameters)
-        {
-            CheckCustomSource(memberMap, parameters);
-            return lambda.ConvertReplaceParameters(parameters);
-        }
-
-        private void CheckCustomSource(IMemberMap memberMap, params Expression[] parameters)
-        {
-            var customSource = memberMap.CustomSource;
-            if(customSource != null)
-            {
-                parameters[0] = customSource.ConvertReplaceParameters(parameters[0]);
-            }
-        }
+        private Expression GetCustomSource(IMemberMap memberMap) =>
+            memberMap.CustomSource?.ConvertReplaceParameters(Source) ?? Source;
 
         private Expression Chain(IEnumerable<MemberInfo> members, Type destinationType) =>
                 members.MemberAccesses(Source).NullCheck(destinationType);
@@ -585,16 +573,17 @@ namespace AutoMapper.Execution
             var resolverInstance = valueResolverConfig.Instance != null
                 ? Constant(valueResolverConfig.Instance)
                 : CreateInstance(valueResolverConfig.ConcreteType);
-
-            var sourceMember = valueResolverConfig.SourceMember?.ReplaceParameters(Source) ??
+            var source = GetCustomSource(memberMap);
+            var sourceMember = valueResolverConfig.SourceMember?.ReplaceParameters(source) ??
                                (valueResolverConfig.SourceMemberName != null
-                                   ? PropertyOrField(Source, valueResolverConfig.SourceMemberName)
+                                   ? PropertyOrField(source, valueResolverConfig.SourceMemberName)
                                    : null);
 
             var iResolverType = valueResolverConfig.InterfaceType;
-            var parameters = new[] { Source, _destination, sourceMember, destValueExpr }.Where(p => p != null).ToArray();
-            CheckCustomSource(memberMap, parameters);
-            parameters = parameters.Zip(iResolverType.GetGenericArguments(), ToType).Concat(new[] {Context}).ToArray();
+            var parameters = 
+                new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
+                .Zip(iResolverType.GetGenericArguments(), ToType)
+                .Concat(new[] {Context});
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
 
@@ -607,10 +596,10 @@ namespace AutoMapper.Execution
             var resolverInstance = valueConverterConfig.Instance != null
                 ? Constant(valueConverterConfig.Instance)
                 : CreateInstance(valueConverterConfig.ConcreteType);
-
-            var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(Source) ??
+            var source = GetCustomSource(memberMap);
+            var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(source) ??
                                (valueConverterConfig.SourceMemberName != null
-                                   ? PropertyOrField(Source, valueConverterConfig.SourceMemberName)
+                                   ? PropertyOrField(source, valueConverterConfig.SourceMemberName)
                                    : memberMap.SourceMembers.Any()
                                        ? Chain(memberMap.SourceMembers, iResolverTypeArgs[1])
                                        : Block(
