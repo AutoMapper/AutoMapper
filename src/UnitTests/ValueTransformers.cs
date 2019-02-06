@@ -242,6 +242,82 @@ namespace AutoMapper.UnitTests
                 dest.Value.ShouldBe("Jimmy, seriously, for real, is straight up dope! No joke!");
             }
         }
+    }
+    public class TransformingInheritance : AutoMapperSpecBase
+    {
+        public class SourceBase
+        {
+            public string Value { get; set; }
+        }
 
+        public class DestBase
+        {
+            public string Value { get; set; }
+        }
+
+        public class Source : SourceBase
+        {
+        }
+
+        public class Dest : DestBase
+        {
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<SourceBase, DestBase>().Include<Source, Dest>().AddTransform<string>(dest => dest + " was cool");
+            cfg.CreateMap<Source, Dest>().AddTransform<string>(dest => dest + " and now is straight up dope");
+        });
+
+        [Fact]
+        public void Should_transform_value()
+        {
+            var source = new Source
+            {
+                Value = "Jimmy"
+            };
+            var dest = Mapper.Map<Source, Dest>(source);
+
+            dest.Value.ShouldBe("Jimmy was cool and now is straight up dope");
+        }
+    }
+
+    public class TransformingInheritanceForMember : AutoMapperSpecBase
+    {
+        public class SourceBase
+        {
+            public string Value { get; set; }
+        }
+
+        public class DestBase
+        {
+            public string Value { get; set; }
+        }
+
+        public class Source : SourceBase
+        {
+        }
+
+        public class Dest : DestBase
+        {
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<SourceBase, DestBase>().Include<Source, Dest>().ForMember(d => d.Value, o => o.AddTransform(dest => dest + " was cool"));
+            cfg.CreateMap<Source, Dest>().ForMember(d=>d.Value, o=>o.AddTransform(dest => dest + " and now is straight up dope"));
+        });
+
+        [Fact]
+        public void Should_transform_value()
+        {
+            var source = new Source
+            {
+                Value = "Jimmy"
+            };
+            var dest = Mapper.Map<Source, Dest>(source);
+
+            dest.Value.ShouldBe("Jimmy was cool and now is straight up dope");
+        }
     }
 }

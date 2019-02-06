@@ -125,6 +125,7 @@ namespace AutoMapper
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
+            _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
         }
 
         public bool IsMapped => HasSource || Ignored;

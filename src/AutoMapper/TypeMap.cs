@@ -327,9 +327,7 @@ namespace AutoMapper
             _pathMaps.AddRange(notOverridenPathMaps.Select(p=>new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
             return;
             LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
-        }
-
-
+        }       
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
@@ -363,6 +361,7 @@ namespace AutoMapper
             _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
             var notOverridenPathMaps = NotOverridenPathMaps(inheritedTypeMap);
             _pathMaps.AddRange(notOverridenPathMaps);
+            _valueTransformerConfigs.InsertRange(0, inheritedTypeMap._valueTransformerConfigs);
         }
 
         private PathMap[] NotOverridenPathMaps(TypeMap inheritedTypeMap) =>
