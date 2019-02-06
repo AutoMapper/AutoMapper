@@ -41,17 +41,14 @@ namespace AutoMapper
             {
                 ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
             }
-            if(CustomMapExpression != null)
-            {
-                CustomMapExpression = CheckCustomSource(CustomMapExpression);
-            }
+            CustomMapExpression = CheckCustomSource(CustomMapExpression);
         }
 
         private LambdaExpression CheckCustomSource(LambdaExpression lambda) => CheckCustomSource(lambda, CustomSource);
 
         public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource)
         {
-            if(customSource == null)
+            if(lambda == null || customSource == null)
             {
                 return lambda;
             }
