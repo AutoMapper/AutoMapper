@@ -587,4 +587,58 @@ namespace AutoMapper.UnitTests.IMappingExpression
             beforeMap.ShouldBeTrue();
         }
     }
+
+    public class IncludeMembersWithForPath : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Name { get; set; }
+            public InnerSource InnerSource { get; set; }
+            public OtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public InnerDestination InnerDestination { get; set; }
+        }
+        class InnerDestination
+        {
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForPath(d=>d.InnerDestination.Description, o=>
+            {
+                o.MapFrom(s => s.Description);
+                o.Condition(c => true);
+            });
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForPath(d=>d.InnerDestination.Title, o=>
+            {
+                o.MapFrom(s => s.Title);
+                o.Condition(c => true);
+            });
+        });
+        [Fact]
+        public void Should_flatten()
+        {
+            var source = new Source { Name = "name", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Name.ShouldBe("name");
+            destination.InnerDestination.Description.ShouldBe("description");
+            destination.InnerDestination.Title.ShouldBe("title");
+        }
+    }
 }

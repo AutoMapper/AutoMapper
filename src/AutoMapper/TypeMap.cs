@@ -158,7 +158,8 @@ namespace AutoMapper
                 properties = DestinationTypeDetails.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
-                    .Except(inheritedProperties);
+                    .Except(inheritedProperties)
+                    .Except(_pathMaps.Select(p => p.MemberPath.First.Name));
             }
             else
             {
@@ -347,19 +348,24 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
-        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, LambdaExpression expression) includedMember)
+        private void ApplyIncludedMemberTypeMap((TypeMap, LambdaExpression) includedMember)
         {
-            var memberMaps = includedMember.typeMap.PropertyMaps.
+            var (typeMap, expression) = includedMember;
+            var memberMaps = typeMap.PropertyMaps.
                 Where(m => m.CanResolveValue && !Contains(PropertyMaps, m) && !Contains(_inheritedMaps, m) && !Contains(_includedMembersMaps, m))
-                .Select(p => new PropertyMap(p, this, includedMember.expression))
+                .Select(p => new PropertyMap(p, this, expression))
                 .ToArray();
-            if(memberMaps.Length == 0)
+            var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
+            if(memberMaps.Length == 0 && notOverridenPathMaps.Length == 0)
             {
                 return;
             }
             _includedMembersMaps.AddRange(memberMaps);
-            _beforeMapActions.AddRange(includedMember.typeMap._beforeMapActions.Select(a => PropertyMap.CheckCustomSource(a, includedMember.expression)));
-            _afterMapActions.AddRange(includedMember.typeMap._afterMapActions.Select(a => PropertyMap.CheckCustomSource(a, includedMember.expression)));
+            _beforeMapActions.AddRange(typeMap._beforeMapActions.Select(CheckCustomSource));
+            _afterMapActions.AddRange(typeMap._afterMapActions.Select(CheckCustomSource));
+            _pathMaps.AddRange(notOverridenPathMaps.Select(p=>new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
+            return;
+            LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
         }
 
         private static bool Contains(IEnumerable<PropertyMap> propertyMaps, PropertyMap propertyMap) =>
@@ -367,13 +373,13 @@ namespace AutoMapper
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
-            foreach (var inheritedMappedProperty in inheritedTypeMap.PropertyMaps.Where(m => m.IsMapped))
+            foreach(var inheritedMappedProperty in inheritedTypeMap.PropertyMaps.Where(m => m.IsMapped))
             {
                 var conventionPropertyMap = PropertyMaps
                     .SingleOrDefault(m =>
                         m.DestinationName == inheritedMappedProperty.DestinationName);
 
-                if (conventionPropertyMap != null)
+                if(conventionPropertyMap != null)
                 {
                     conventionPropertyMap.ApplyInheritedPropertyMap(inheritedMappedProperty);
                 }
@@ -386,12 +392,12 @@ namespace AutoMapper
             }
 
             //Include BeforeMap
-            foreach (var beforeMapAction in inheritedTypeMap._beforeMapActions)
+            foreach(var beforeMapAction in inheritedTypeMap._beforeMapActions)
             {
                 AddBeforeMapAction(beforeMapAction);
             }
             //Include AfterMap
-            foreach (var afterMapAction in inheritedTypeMap._afterMapActions)
+            foreach(var afterMapAction in inheritedTypeMap._afterMapActions)
             {
                 AddAfterMapAction(afterMapAction);
             }
@@ -399,11 +405,13 @@ namespace AutoMapper
                 inheritedTypeMap._sourceMemberConfigs.Where(
                     baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
             _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
-            var notOverridenPathMaps =
-                inheritedTypeMap.PathMaps.Where(
-                    baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath));
+            var notOverridenPathMaps = NotOverridenPathMaps(inheritedTypeMap);
             _pathMaps.AddRange(notOverridenPathMaps);
         }
+
+        private PathMap[] NotOverridenPathMaps(TypeMap inheritedTypeMap) =>
+            inheritedTypeMap.PathMaps.Where(
+                    baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath)).ToArray();
 
         internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
 

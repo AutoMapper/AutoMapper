@@ -12,6 +12,14 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationExpression}")]
     public class PathMap : DefaultMemberMap
     {
+        public PathMap(PathMap pathMap, TypeMap typeMap, LambdaExpression customSource) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
+        {
+            CustomSource = customSource;
+            CustomMapExpression = pathMap.CustomMapExpression;
+            Condition = pathMap.Condition;
+            Ignored = pathMap.Ignored;
+        }
+
         public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
         {
             MemberPath = memberPath;
@@ -22,7 +30,7 @@ namespace AutoMapper
         public override TypeMap TypeMap { get; }
 
         public override Type SourceType => CustomMapExpression.ReturnType;
-
+        public override LambdaExpression CustomSource { get; }
         public LambdaExpression DestinationExpression { get; }
         public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }
