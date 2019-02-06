@@ -43,8 +43,19 @@ namespace AutoMapper
             }
             if(CustomMapExpression != null)
             {
-                CustomMapExpression = Lambda(CustomMapExpression.ReplaceParameters(expression.Body), expression.Parameters);
+                CustomMapExpression = CheckCustomSource(CustomMapExpression);
             }
+        }
+
+        private LambdaExpression CheckCustomSource(LambdaExpression lambda) => CheckCustomSource(lambda, CustomSource);
+
+        public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource)
+        {
+            if(customSource == null)
+            {
+                return lambda;
+            }
+            return Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters.Concat(lambda.Parameters.Skip(1)));
         }
 
         public TypeMap TypeMap { get; }
@@ -146,11 +157,6 @@ namespace AutoMapper
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
-        }
-
-        public void ApplyValueConverter()
-        {
-
         }
 
         private class MemberFinderVisitor : ExpressionVisitor

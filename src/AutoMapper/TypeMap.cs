@@ -347,11 +347,20 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
-        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, LambdaExpression expression) includedMember) =>
-            _includedMembersMaps.AddRange(
-                includedMember.typeMap.PropertyMaps.
+        private void ApplyIncludedMemberTypeMap((TypeMap typeMap, LambdaExpression expression) includedMember)
+        {
+            var memberMaps = includedMember.typeMap.PropertyMaps.
                 Where(m => m.CanResolveValue && !Contains(PropertyMaps, m) && !Contains(_inheritedMaps, m) && !Contains(_includedMembersMaps, m))
-                .Select(p => new PropertyMap(p, this, includedMember.expression)));
+                .Select(p => new PropertyMap(p, this, includedMember.expression))
+                .ToArray();
+            if(memberMaps.Length == 0)
+            {
+                return;
+            }
+            _includedMembersMaps.AddRange(memberMaps);
+            _beforeMapActions.AddRange(includedMember.typeMap._beforeMapActions.Select(a => PropertyMap.CheckCustomSource(a, includedMember.expression)));
+            _afterMapActions.AddRange(includedMember.typeMap._afterMapActions.Select(a => PropertyMap.CheckCustomSource(a, includedMember.expression)));
+        }
 
         private static bool Contains(IEnumerable<PropertyMap> propertyMaps, PropertyMap propertyMap) =>
             propertyMaps.Any(pm => pm.DestinationName == propertyMap.DestinationName);
