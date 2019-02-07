@@ -21,7 +21,7 @@ namespace AutoMapper
         private readonly HashSet<LambdaExpression> _beforeMapActions = new HashSet<LambdaExpression>();
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
-        private readonly List<PropertyMap> _propertyMaps = new List<PropertyMap>();
+        private readonly Dictionary<string, PropertyMap> _propertyMaps = new Dictionary<string, PropertyMap>();
         private readonly List<PathMap> _pathMaps = new List<PathMap>();
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
@@ -95,7 +95,7 @@ namespace AutoMapper
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
 
-        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (IEnumerable<PropertyMap>)_propertyMaps;
+        public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (IEnumerable<PropertyMap>)_propertyMaps.Values;
         public IEnumerable<PathMap> PathMaps => _pathMaps;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
@@ -141,12 +141,14 @@ namespace AutoMapper
 
             propertyMap.ChainMembers(resolvers);
 
-            _propertyMaps.Add(propertyMap);
+            AddPropertyMap(propertyMap);
         }
+
+        private void AddPropertyMap(PropertyMap propertyMap) => _propertyMaps.Add(propertyMap.DestinationName, propertyMap);
 
         public string[] GetUnmappedPropertyNames()
         {
-            var autoMappedProperties = GetPropertyNames(_propertyMaps);
+            var autoMappedProperties = GetPropertyNames(PropertyMaps);
 
             IEnumerable<string> properties;
 
@@ -159,7 +161,7 @@ namespace AutoMapper
             }
             else
             {
-                var redirectedSourceMembers = _propertyMaps
+                var redirectedSourceMembers = PropertyMaps
                     .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
@@ -191,7 +193,7 @@ namespace AutoMapper
 
             propertyMap = new PropertyMap(destinationProperty, this);
 
-            _propertyMaps.Add(propertyMap);
+            AddPropertyMap(propertyMap);
 
             return propertyMap;
         }
@@ -264,7 +266,7 @@ namespace AutoMapper
                 ApplyIncludedMemberTypeMap(includedMemberTypeMap);
             }
 
-            _orderedPropertyMaps = _propertyMaps.OrderBy(map => map.MappingOrder).ToArray();
+            _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
         }
@@ -274,7 +276,7 @@ namespace AutoMapper
                 null :
                 new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
-        public PropertyMap GetPropertyMap(string name) => _propertyMaps.FirstOrDefault(pm => pm.DestinationName == name);
+        public PropertyMap GetPropertyMap(string name) => _propertyMaps.GetOrDefault(name);
 
         public PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
 
@@ -300,13 +302,13 @@ namespace AutoMapper
             var memberMaps = typeMap.PropertyMaps.
                 Where(m => m.CanResolveValue && GetPropertyMap(m)==null)
                 .Select(p => new PropertyMap(p, this, expression))
-                .ToArray();
+                .ToList();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            if(memberMaps.Length == 0 && notOverridenPathMaps.Length == 0)
+            if(memberMaps.Count == 0 && notOverridenPathMaps.Length == 0)
             {
                 return;
             }
-            _propertyMaps.AddRange(memberMaps);
+            memberMaps.ForEach(AddPropertyMap);
             _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(CheckCustomSource));
             _afterMapActions.UnionWith(typeMap._afterMapActions.Select(CheckCustomSource));
             _pathMaps.AddRange(notOverridenPathMaps.Select(p=>new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
@@ -326,7 +328,7 @@ namespace AutoMapper
                 }
                 else
                 {
-                    _propertyMaps.Add(new PropertyMap(inheritedMappedProperty, this));
+                    AddPropertyMap(new PropertyMap(inheritedMappedProperty, this));
                 }
             }
 
