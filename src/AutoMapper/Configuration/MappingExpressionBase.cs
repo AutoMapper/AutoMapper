@@ -36,7 +36,14 @@ namespace AutoMapper.Configuration
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations { get; } = new List<ISourceMemberConfiguration>();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations { get; } = new List<ICtorParameterConfiguration>();
 
-        protected void IncludeMembersCore(LambdaExpression[] memberExpressions) => TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+        protected void IncludeMembersCore(LambdaExpression[] memberExpressions)
+        {
+            foreach(var member in memberExpressions)
+            {
+                member.EnsureMemberPath(nameof(memberExpressions));
+            }
+            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+        }
 
         public void Configure(TypeMap typeMap)
         {

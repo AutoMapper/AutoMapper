@@ -157,10 +157,7 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            if(!destinationMember.IsMemberPath())
-            {
-                throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
-            }
+            destinationMember.EnsureMemberPath(nameof(destinationMember));
             var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
             var firstMember = expression.MemberPath.First;
             var firstMemberConfig = GetDestinationMemberConfiguration(firstMember);
