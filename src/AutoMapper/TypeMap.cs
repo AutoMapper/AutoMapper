@@ -22,7 +22,7 @@ namespace AutoMapper
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private readonly Dictionary<string, PropertyMap> _propertyMaps = new Dictionary<string, PropertyMap>();
-        private readonly List<PathMap> _pathMaps = new List<PathMap>();
+        private readonly Dictionary<MemberPath, PathMap> _pathMaps = new Dictionary<MemberPath, PathMap>();
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
@@ -40,14 +40,16 @@ namespace AutoMapper
 
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
         {
-            var pathMap = _pathMaps.SingleOrDefault(p => p.MemberPath == path);
+            var pathMap = _pathMaps.GetOrDefault(path);
             if(pathMap == null)
             {
                 pathMap = new PathMap(destinationExpression, path, typeMap);
-                _pathMaps.Add(pathMap);
+                AddPathMap(pathMap);
             }
             return pathMap;
         }
+
+        private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
 
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
@@ -96,7 +98,7 @@ namespace AutoMapper
         public bool DisableConstructorValidation { get; set; }
 
         public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (IEnumerable<PropertyMap>)_propertyMaps.Values;
-        public IEnumerable<PathMap> PathMaps => _pathMaps;
+        public IEnumerable<PathMap> PathMaps => _pathMaps.Values;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
         public bool IsConventionMap { get; set; }
@@ -157,7 +159,7 @@ namespace AutoMapper
                 properties = DestinationTypeDetails.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
-                    .Except(_pathMaps.Select(p => p.MemberPath.First.Name));
+                    .Except(PathMaps.Select(p => p.MemberPath.First.Name));
             }
             else
             {
@@ -220,7 +222,7 @@ namespace AutoMapper
 
         internal void IgnorePaths(MemberInfo destinationMember)
         {
-            foreach(var pathMap in _pathMaps.Where(pm => pm.MemberPath.First == destinationMember))
+            foreach(var pathMap in PathMaps.Where(pm => pm.MemberPath.First == destinationMember))
             {
                 pathMap.Ignored = true;
             }
@@ -304,14 +306,14 @@ namespace AutoMapper
                 .Select(p => new PropertyMap(p, this, expression))
                 .ToList();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            if(memberMaps.Count == 0 && notOverridenPathMaps.Length == 0)
+            if(memberMaps.Count == 0 && notOverridenPathMaps.Count == 0)
             {
                 return;
             }
             memberMaps.ForEach(AddPropertyMap);
             _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(CheckCustomSource));
             _afterMapActions.UnionWith(typeMap._afterMapActions.Select(CheckCustomSource));
-            _pathMaps.AddRange(notOverridenPathMaps.Select(p=>new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
+            notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
             return;
             LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
         }       
@@ -347,13 +349,13 @@ namespace AutoMapper
                     baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
             _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
             var notOverridenPathMaps = NotOverridenPathMaps(inheritedTypeMap);
-            _pathMaps.AddRange(notOverridenPathMaps);
+            notOverridenPathMaps.ForEach(AddPathMap);
             _valueTransformerConfigs.InsertRange(0, inheritedTypeMap._valueTransformerConfigs);
         }
 
-        private PathMap[] NotOverridenPathMaps(TypeMap inheritedTypeMap) =>
+        private List<PathMap> NotOverridenPathMaps(TypeMap inheritedTypeMap) =>
             inheritedTypeMap.PathMaps.Where(
-                    baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath)).ToArray();
+                    baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath)).ToList();
 
         internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
 
