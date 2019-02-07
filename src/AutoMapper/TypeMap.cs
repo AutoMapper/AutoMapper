@@ -17,8 +17,8 @@ namespace AutoMapper
     [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
-        private readonly List<LambdaExpression> _afterMapActions = new List<LambdaExpression>();
-        private readonly List<LambdaExpression> _beforeMapActions = new List<LambdaExpression>();
+        private readonly HashSet<LambdaExpression> _afterMapActions = new HashSet<LambdaExpression>();
+        private readonly HashSet<LambdaExpression> _beforeMapActions = new HashSet<LambdaExpression>();
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private readonly List<PropertyMap> _propertyMaps = new List<PropertyMap>();
@@ -238,21 +238,9 @@ namespace AutoMapper
 
         public bool HasDerivedTypesToInclude() => _includedDerivedTypes.Any() || DestinationTypeOverride != null;
 
-        public void AddBeforeMapAction(LambdaExpression beforeMap)
-        {
-            if(!_beforeMapActions.Contains(beforeMap))
-            {
-                _beforeMapActions.Add(beforeMap);
-            }
-        }
+        public void AddBeforeMapAction(LambdaExpression beforeMap) => _beforeMapActions.Add(beforeMap);
 
-        public void AddAfterMapAction(LambdaExpression afterMap)
-        {
-            if(!_afterMapActions.Contains(afterMap))
-            {
-                _afterMapActions.Add(afterMap);
-            }
-        }
+        public void AddAfterMapAction(LambdaExpression afterMap) => _afterMapActions.Add(afterMap);
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
@@ -319,8 +307,8 @@ namespace AutoMapper
                 return;
             }
             _propertyMaps.AddRange(memberMaps);
-            _beforeMapActions.AddRange(typeMap._beforeMapActions.Select(CheckCustomSource));
-            _afterMapActions.AddRange(typeMap._afterMapActions.Select(CheckCustomSource));
+            _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(CheckCustomSource));
+            _afterMapActions.UnionWith(typeMap._afterMapActions.Select(CheckCustomSource));
             _pathMaps.AddRange(notOverridenPathMaps.Select(p=>new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
             return;
             LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
