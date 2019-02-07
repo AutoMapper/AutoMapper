@@ -271,6 +271,7 @@ namespace AutoMapper
             }
 
             _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
+            _propertyMaps.Clear();
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
         }
