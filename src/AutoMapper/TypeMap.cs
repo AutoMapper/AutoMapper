@@ -23,7 +23,7 @@ namespace AutoMapper
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private readonly Dictionary<string, PropertyMap> _propertyMaps = new Dictionary<string, PropertyMap>();
         private readonly Dictionary<MemberPath, PathMap> _pathMaps = new Dictionary<MemberPath, PathMap>();
-        private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
+        private readonly Dictionary<MemberInfo, SourceMemberConfig> _sourceMemberConfigs = new Dictionary<MemberInfo, SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly HashSet<TypeMap> _inheritedTypeMaps = new HashSet<TypeMap>();
@@ -37,6 +37,8 @@ namespace AutoMapper
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
         }
+
+        private IEnumerable<SourceMemberConfig> SourceMemberConfigs => _sourceMemberConfigs.Values;
 
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
         {
@@ -167,7 +169,7 @@ namespace AutoMapper
                     .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
-                var ignoredSourceMembers = _sourceMemberConfigs
+                var ignoredSourceMembers = SourceMemberConfigs
                     .Where(smc => smc.IsIgnored())
                     .Select(pm => pm.SourceMember.Name).ToList();
 
@@ -286,15 +288,16 @@ namespace AutoMapper
 
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
-            var config = _sourceMemberConfigs.FirstOrDefault(smc => Equals(smc.SourceMember, sourceMember));
+            var config = _sourceMemberConfigs.GetOrDefault(sourceMember);
 
-            if (config != null) return config;
+            if(config != null) return config;
 
             config = new SourceMemberConfig(sourceMember);
-            _sourceMemberConfigs.Add(config);
-
+            AddSourceMemberConfig(config);
             return config;
         }
+
+        private void AddSourceMemberConfig(SourceMemberConfig config) => _sourceMemberConfigs.Add(config.SourceMember, config);
 
         public bool AddInheritedMap(TypeMap inheritedTypeMap) => _inheritedTypeMaps.Add(inheritedTypeMap);
 
@@ -345,9 +348,9 @@ namespace AutoMapper
                 AddAfterMapAction(afterMapAction);
             }
             var notOverridenSourceConfigs =
-                inheritedTypeMap._sourceMemberConfigs.Where(
-                    baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
-            _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
+                inheritedTypeMap.SourceMemberConfigs.Where(
+                    baseConfig => SourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember)).ToList();
+            notOverridenSourceConfigs.ForEach(AddSourceMemberConfig);
             var notOverridenPathMaps = NotOverridenPathMaps(inheritedTypeMap);
             notOverridenPathMaps.ForEach(AddPathMap);
             _valueTransformerConfigs.InsertRange(0, inheritedTypeMap._valueTransformerConfigs);
