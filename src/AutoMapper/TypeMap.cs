@@ -281,9 +281,9 @@ namespace AutoMapper
                 null :
                 new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
-        public PropertyMap GetPropertyMap(string name) => _propertyMaps.GetOrDefault(name);
+        private PropertyMap GetPropertyMap(string name) => _propertyMaps.GetOrDefault(name);
 
-        public PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
+        private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
 
         public void AddMemberMap((TypeMap, LambdaExpression) includedMember) => _includedMembersTypeMaps.Add(includedMember);
 
