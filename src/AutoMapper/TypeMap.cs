@@ -26,7 +26,7 @@ namespace AutoMapper
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
-        private readonly List<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private readonly HashSet<TypeMap> _inheritedTypeMaps = new HashSet<TypeMap>();
         private readonly List<(TypeMap, LambdaExpression)> _includedMembersTypeMaps = new List<(TypeMap, LambdaExpression)>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
@@ -304,10 +304,7 @@ namespace AutoMapper
             return config;
         }
 
-        public void AddInheritedMap(TypeMap inheritedTypeMap)
-        {
-            _inheritedTypeMaps.Add(inheritedTypeMap);
-        }
+        public bool AddInheritedMap(TypeMap inheritedTypeMap) => _inheritedTypeMaps.Add(inheritedTypeMap);
 
         private void ApplyIncludedMemberTypeMap((TypeMap, LambdaExpression) includedMember)
         {
@@ -368,7 +365,7 @@ namespace AutoMapper
             inheritedTypeMap.PathMaps.Where(
                     baseConfig => PathMaps.All(derivedConfig => derivedConfig.MemberPath != baseConfig.MemberPath)).ToArray();
 
-        internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.AddRange(_inheritedTypeMaps);
+        internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
 
         private IEnumerable<IMemberMap> GetConstructorMemberMaps()
             => CustomCtorExpression != null
