@@ -14,7 +14,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression ReverseMap()
         {
-            var reverseMap = new MappingExpression(new TypePair(Types.DestinationType, Types.SourceType), MemberList.Source);
+            var reverseMap = new MappingExpression(new TypePair(Types.DestinationType, Types.SourceType), MemberList.None);
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             return reverseMap;
