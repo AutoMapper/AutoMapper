@@ -758,5 +758,44 @@ namespace AutoMapper.UnitTests
                 dto.Children[1].Parent.ShouldBeSameAs(dto);
             }
         }
+
+        public class When_specifying_type_of_converter_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), TypeConverter = typeof(CustomConverter))]
+            public class Dest
+            {
+                public int OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_type_of_converter_via_attribute));
+            });
+
+            public class CustomConverter : ITypeConverter<Source, Dest>
+            {
+                public Dest Convert(Source source, Dest destination, ResolutionContext context)
+                {
+                    return new Dest
+                    {
+                        OtherValue = source.Value + 10
+                    };
+                }
+            }
+
+            [Fact]
+            public void Should_convert_using_custom_converter()
+            {
+                var source = new Source { Value = 15 };
+                var dest = Mapper.Map<Dest>(source);
+                dest.OtherValue.ShouldBe(25);
+            }
+        }
     }
 }

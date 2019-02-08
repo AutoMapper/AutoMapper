@@ -36,6 +36,11 @@ namespace AutoMapper
         /// </summary>
         public bool DisableCtorValidation { get; set; }
 
+        /// <summary>
+        /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping.
+        /// </summary>
+        public Type TypeConverter { get; set; }
+
         public void ApplyConfiguration(IMappingExpression mappingExpression)
         {
             if (ReverseMap)
@@ -61,6 +66,11 @@ namespace AutoMapper
             if (DisableCtorValidation)
             {
                 mappingExpression.DisableCtorValidation();
+            }
+
+            if (TypeConverter != null)
+            {
+                mappingExpression.ConvertUsing(TypeConverter);
             }
         }
     }
