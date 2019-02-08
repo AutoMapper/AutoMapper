@@ -445,8 +445,7 @@ namespace AutoMapper
             }
             if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
             {
-                genericTypePair = cachedMap.Types.GetOpenGenericTypePair();
-                if(genericTypePair == null)
+                if(!cachedMap.Types.IsGeneric)
                 {
                     return cachedMap;
                 }

@@ -96,10 +96,11 @@ namespace AutoMapper
 
         public override int GetHashCode() => HashCodeCombiner.Combine(SourceType, DestinationType);
 
+        public bool IsGeneric => SourceType.IsGenericType || DestinationType.IsGenericType;
+
         public TypePair? GetOpenGenericTypePair()
         {
-            var isGeneric = SourceType.IsGenericType() || DestinationType.IsGenericType();
-            if(!isGeneric)
+            if(!IsGeneric)
             {
                 return null;
             }
