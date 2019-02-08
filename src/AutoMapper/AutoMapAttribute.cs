@@ -31,6 +31,11 @@ namespace AutoMapper
         /// </summary>
         public bool PreserveReferences { get; set; }
 
+        /// <summary>
+        /// If set to true, disable constructor validation.
+        /// </summary>
+        public bool DisableCtorValidation { get; set; }
+
         public void ApplyConfiguration(IMappingExpression mappingExpression)
         {
             if (ReverseMap)
@@ -51,6 +56,11 @@ namespace AutoMapper
             if (PreserveReferences)
             {
                 mappingExpression.PreserveReferences();
+            }
+
+            if (DisableCtorValidation)
+            {
+                mappingExpression.DisableCtorValidation();
             }
         }
     }
