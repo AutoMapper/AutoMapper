@@ -1,5 +1,6 @@
 ﻿using AutoMapper.Configuration.Annotations;
 using Shouldly;
+using System.Collections.Generic;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -607,7 +608,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_constructing_using_service_locator_with_attribute : NonValidatingSpecBase
+        public class When_specifying_to_construct_using_service_locator_via_attribute : NonValidatingSpecBase
         {
             public class Source
             {
@@ -639,7 +640,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMissingTypeMaps = false;
-                cfg.AddMaps(typeof(When_constructing_using_service_locator_with_attribute));
+                cfg.AddMaps(typeof(When_specifying_to_construct_using_service_locator_via_attribute));
                 cfg.ConstructServicesUsing(t => new Dest(10));
             });
 
@@ -649,6 +650,59 @@ namespace AutoMapper.UnitTests
                 var source = new Source { Value = 6 };
                 var dest = Mapper.Map<Dest>(source);
                 dest.Value.ShouldBe(16);
+            }
+        }
+
+        public class When_specifying_max_depth_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Level { get; set; }
+                public IList<Source> Children { get; set; }
+                public Source Parent { get; set; }
+
+                public Source(int level)
+                {
+                    Children = new List<Source>();
+                    Level = level;
+                }
+
+                public void AddChild(Source child)
+                {
+                    Children.Add(child);
+                    child.Parent = this;
+                }
+            }
+
+            [AutoMap(typeof(Source), MaxDepth = 2)]
+            public class Dest
+            {
+                public int Level { get; set; }
+                public IList<Dest> Children { get; set; }
+                public Dest Parent { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_max_depth_via_attribute));
+            });
+
+            [Fact]
+            public void Third_level_children_are_null_with_max_depth_2()
+            {
+                var source = new Source(1);
+                source.AddChild(new Source(2));
+                source.AddChild(new Source(3));
+                source.Children[0].AddChild(new Source(4));
+                source.Children[1].AddChild(new Source(5));
+
+                var dest = Mapper.Map<Dest>(source);
+                dest.Level.ShouldBe(1);
+                dest.Children[0].Level.ShouldBe(2);
+                dest.Children[0].Children.ShouldAllBe(d => d == null);
+                dest.Children[1].Level.ShouldBe(3);
+                dest.Children[1].Children.ShouldAllBe(d => d == null);
             }
         }
     }

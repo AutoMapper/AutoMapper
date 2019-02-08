@@ -15,6 +15,7 @@ namespace AutoMapper
         public Type SourceType { get; }
         public bool ReverseMap { get; set; }
         public bool ConstructUsingServiceLocator { get; set; }
+        public int MaxDepth { get; set; }
 
         public void ApplyConfiguration(IMappingExpression mappingExpression)
         {
@@ -26,6 +27,11 @@ namespace AutoMapper
             if (ConstructUsingServiceLocator)
             {
                 mappingExpression.ConstructUsingServiceLocator();
+            }
+
+            if (MaxDepth > 0)
+            {
+                mappingExpression.MaxDepth(MaxDepth);
             }
         }
     }
