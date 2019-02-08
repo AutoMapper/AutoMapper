@@ -138,15 +138,10 @@ namespace AutoMapper
         public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 
-        public LambdaExpression[] GetUntypedIncludedMembers()
-        {
-            if(SourceType.ContainsGenericParameters)
-            {
-                return Array.Empty<LambdaExpression>();
-            }
-            var sourceParameter = Parameter(SourceType, "source");
-            return IncludedMembersNames.Select(name => ReflectionHelper.GetMemberPath(SourceType, name).MemberAccesses(sourceParameter)).Select(e => Lambda(e, sourceParameter)).ToArray();
-        }
+        public LambdaExpression[] GetUntypedIncludedMembers() =>
+            SourceType.ContainsGenericParameters ?
+                Array.Empty<LambdaExpression>() :
+                IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name)).ToArray();
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;

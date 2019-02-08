@@ -14,10 +14,35 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression ReverseMap()
         {
-            var reverseMap = new MappingExpression(new TypePair(Types.DestinationType, Types.SourceType), MemberList.None);
-            reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
+            var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
+            var reverseMap = new MappingExpression(reversedTypes, MemberList.None);
+            if(reversedTypes.GetOpenGenericTypePair() == null)
+            {
+                reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
+            }
             ReverseMapExpression = reverseMap;
             return reverseMap;
+        }
+        
+        public IMappingExpression IncludeMembers(params string[] memberNames)
+        {
+            memberNames.Select(name => SourceType.GetFieldOrProperty(name)).LastOrDefault();
+            TypeMapActions.Add(tm => tm.IncludedMembersNames = memberNames);
+            return this;
+        }
+
+        public override void Configure(TypeMap typeMap)
+        {
+            base.Configure(typeMap);
+            if(ReverseMapExpression != null)
+            {
+                var reverseMap = (MappingExpression)ReverseMapExpression;
+                foreach(var includedMemberName in typeMap.IncludedMembersNames)
+                {
+                    reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
+                }
+                reverseMap.IncludeMembers(MapToSourceMembers().Select(m => m.DestinationMember.Name).ToArray());
+            }
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions)
@@ -172,6 +197,33 @@ namespace AutoMapper.Configuration
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
             return ForDestinationMember(memberInfo, memberOptions);
         }
+
+        public override void Configure(TypeMap typeMap)
+        {
+            base.Configure(typeMap);
+            if(ReverseMapExpression != null)
+            {
+                ReverseToIncludedMembers(typeMap);
+            }
+        }
+
+        private void IncludeMembersCore(LambdaExpression[] memberExpressions)
+        {
+            foreach(var member in memberExpressions)
+            {
+                member.EnsureMemberPath(nameof(memberExpressions));
+            }
+            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+        }
+
+        public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
+        {
+            IncludeMembersCore(memberExpressions);
+            return this;
+        }
+
+        protected void ReverseToIncludedMembers(TypeMap typeMap) =>
+            ((MappingExpression<TDestination, TSource>)ReverseMapExpression).IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
 
         public IMappingExpression<TSource, TDestination> ForMember(string name, Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
         {

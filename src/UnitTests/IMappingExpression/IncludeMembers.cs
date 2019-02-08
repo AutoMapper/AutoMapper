@@ -784,4 +784,92 @@ namespace AutoMapper.UnitTests.IMappingExpression
             });
         }
     }
+
+    public class IncludeMembersReverseMapGenerics : AutoMapperSpecBase
+    {
+        class Source<TInnerSource, TOtherInnerSource>
+        {
+            public string Name { get; set; }
+            public TInnerSource InnerSource { get; set; }
+            public TOtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource").ReverseMap();
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        });
+        [Fact]
+        public void Should_unflatten()
+        {
+            var source = Mapper.Map<Source<InnerSource, OtherInnerSource>>(new Destination { Description = "description", Name = "name", Title = "title" });
+            source.Name.ShouldBe("name");
+            source.InnerSource.Name.ShouldBe("name");
+            source.OtherInnerSource.Name.ShouldBe("name");
+            source.InnerSource.Description.ShouldBe("description");
+            source.OtherInnerSource.Description.ShouldBe("description");
+            source.OtherInnerSource.Title.ShouldBe("title");
+        }
+    }
+    public class ReverseMapToIncludeMembersGenerics : AutoMapperSpecBase
+    {
+        class Source<TInnerSource, TOtherInnerSource>
+        {
+            public string Name { get; set; }
+            public TInnerSource InnerSource { get; set; }
+            public TOtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Destination), typeof(Source<,>))
+                .ForMember("InnerSource", o => o.MapFrom(s => s))
+                .ForMember("OtherInnerSource", o => o.MapFrom(s => s))
+                .ReverseMap();
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        });
+        [Fact]
+        public void Should_flatten()
+        {
+            var source = new Source<InnerSource, OtherInnerSource> { Name = "name", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Name.ShouldBe("name");
+            destination.Description.ShouldBe("description");
+            destination.Title.ShouldBe("title");
+        }
+    }
 }

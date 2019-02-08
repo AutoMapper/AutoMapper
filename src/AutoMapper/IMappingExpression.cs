@@ -9,6 +9,14 @@ namespace AutoMapper
     public interface IMappingExpression : IMappingExpressionBase<object, object, IMappingExpression>
     {
         /// <summary>
+        /// Add extra configuration to the current map by also mapping the specified child objects to the destination object.
+        /// The maps from the child types to the destination need to be created explicitly.
+        /// </summary>
+        /// <param name="memberNames">the names of child object properties to map to the destination</param>
+        /// <returns></returns>
+        IMappingExpression IncludeMembers(params string[] memberNames);
+
+        /// <summary>
         /// Create a type mapping from the destination to the source type, using the destination members as validation.
         /// </summary>
         /// <returns>Itself</returns>
@@ -42,6 +50,14 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
     public interface IMappingExpression<TSource, TDestination> : IMappingExpressionBase<TSource, TDestination, IMappingExpression<TSource, TDestination>>
     {
+        /// <summary>
+        /// Add extra configuration to the current map by also mapping the specified child objects to the destination object.
+        /// The maps from the child types to the destination need to be created explicitly.
+        /// </summary>
+        /// <param name="memberExpressions">the child objects to map to the destination</param>
+        /// <returns></returns>
+        IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions);
+
         /// <summary>
         /// Customize configuration for a path inside the destination object.
         /// </summary>
