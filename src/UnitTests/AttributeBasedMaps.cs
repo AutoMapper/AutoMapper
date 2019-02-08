@@ -606,5 +606,50 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
             }
         }
+
+        public class When_constructing_using_service_locator_with_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), ConstructUsingServiceLocator = true)]
+            public class Dest
+            {
+                private int _value;
+                private readonly int _addend;
+
+                public int Value
+                {
+                    get { return _value + _addend; }
+                    set { _value = value; }
+                }
+
+                public Dest(int addend)
+                {
+                    _addend = addend;
+                }
+
+                public Dest() : this(0)
+                {
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_constructing_using_service_locator_with_attribute));
+                cfg.ConstructServicesUsing(t => new Dest(10));
+            });
+
+            [Fact]
+            public void Should_map_with_the_custom_constructor()
+            {
+                var source = new Source { Value = 6 };
+                var dest = Mapper.Map<Dest>(source);
+                dest.Value.ShouldBe(16);
+            }
+        }
     }
 }

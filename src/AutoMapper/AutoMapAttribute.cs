@@ -14,12 +14,18 @@ namespace AutoMapper
 
         public Type SourceType { get; }
         public bool ReverseMap { get; set; }
+        public bool ConstructUsingServiceLocator { get; set; }
 
         public void ApplyConfiguration(IMappingExpression mappingExpression)
         {
             if (ReverseMap)
             {
                 mappingExpression.ReverseMap();
+            }
+
+            if (ConstructUsingServiceLocator)
+            {
+                mappingExpression.ConstructUsingServiceLocator();
             }
         }
     }
