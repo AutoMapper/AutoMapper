@@ -760,4 +760,28 @@ namespace AutoMapper.UnitTests.IMappingExpression
             destination.Title.ShouldBe("title");
         }
     }
+
+    public class IncludeMembersWithGenericsInvalidStrings
+    {
+        class Source<TInnerSource, TOtherInnerSource>
+        {
+            public string Name { get; set; }
+            public TInnerSource InnerSource { get; set; }
+            public TOtherInnerSource OtherInnerSource { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        [Fact]
+        public void Should_throw()
+        {
+            new MapperConfiguration(cfg =>
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("dInnerSource", "fOtherInnerSource"));
+            });
+        }
+    }
 }
