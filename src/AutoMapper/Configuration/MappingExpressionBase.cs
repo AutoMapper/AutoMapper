@@ -36,6 +36,8 @@ namespace AutoMapper.Configuration
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations { get; } = new List<ISourceMemberConfiguration>();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations { get; } = new List<ICtorParameterConfiguration>();
 
+        protected void IncludeMembersUntyped(params string[] memberNames) => TypeMapActions.Add(tm => tm.IncludedMembersNames = memberNames);
+
         protected void IncludeMembersCore(LambdaExpression[] memberExpressions)
         {
             foreach(var member in memberExpressions)
@@ -437,6 +439,12 @@ namespace AutoMapper.Configuration
         public TMappingExpression IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {
             IncludeMembersCore(memberExpressions);
+            return this as TMappingExpression;
+        }
+
+        public TMappingExpression IncludeMembers(params string[] memberNames)
+        {
+            IncludeMembersUntyped(memberNames);
             return this as TMappingExpression;
         }
     }
