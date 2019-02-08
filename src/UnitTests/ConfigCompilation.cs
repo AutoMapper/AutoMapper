@@ -1,5 +1,6 @@
 ﻿namespace AutoMapper.UnitTests
 {
+    using System.Collections.Generic;
     using Shouldly;
     using Xunit;
 
@@ -14,6 +15,7 @@
         {
             cfg.CreateMap<Source, Dest>();
             cfg.CreateMap<Source2, Dest2>();
+            cfg.CreateMap(typeof(IEnumerable<>), typeof(IEnumerable<>)).ConvertUsing(s => s);
         });
 
         [Fact]
