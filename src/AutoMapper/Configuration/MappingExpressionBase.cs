@@ -370,6 +370,38 @@ namespace AutoMapper.Configuration
         public void ConvertUsing(Type typeConverterType) 
             => TypeMapActions.Add(tm => tm.TypeConverterType = typeConverterType);
 
+        public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
+        {
+            TypeMapActions.Add(tm =>
+            {
+                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
+                    (src, dest, ctxt) => mappingFunction(src, dest);
+
+                tm.CustomMapFunction = expr;
+            });
+        }
+
+        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction)
+        {
+            TypeMapActions.Add(tm =>
+            {
+                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
+                    (src, dest, ctxt) => mappingFunction(src, dest, ctxt);
+
+                tm.CustomMapFunction = expr;
+            });
+        }
+
+        public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
+        {
+            ConvertUsing(converter.Convert);
+        }
+
+        public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
+        {
+            TypeMapActions.Add(tm => tm.TypeConverterType = typeof(TTypeConverter));
+        }
+
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
             var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(ctorParamName);

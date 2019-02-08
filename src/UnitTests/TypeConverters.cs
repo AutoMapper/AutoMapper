@@ -397,7 +397,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof (Source), typeof (Destination)).ConvertUsing<CustomConverter>();
+            cfg.CreateMap<Source, Destination>().ConvertUsing<CustomConverter>();
         });
 
         protected override void Because_of()
