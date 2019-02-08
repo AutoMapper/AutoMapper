@@ -705,5 +705,58 @@ namespace AutoMapper.UnitTests
                 dest.Children[1].Children.ShouldAllBe(d => d == null);
             }
         }
+
+        public class When_specifying_to_preserve_references_via_attribute : NonValidatingSpecBase
+        {
+            public class ParentModel
+            {
+                public string ID { get; set; }
+
+                public IList<ChildModel> Children { get; } = new List<ChildModel>();
+
+                public void AddChild(ChildModel child)
+                {
+                    child.Parent = this;
+                    Children.Add(child);
+                }
+            }
+
+            public class ChildModel
+            {
+                public string ID { get; set; }
+                public ParentModel Parent { get; set; }
+            }
+
+            [AutoMap(typeof(ParentModel), PreserveReferences = true)]
+            public class ParentDto
+            {
+                public string ID { get; set; }
+                public IList<ChildDto> Children { get; set; }
+            }
+
+            [AutoMap(typeof(ChildModel), PreserveReferences = true)]
+            public class ChildDto
+            {
+                public string ID { get; set; }
+                public ParentDto Parent { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
+            });
+
+            [Fact]
+            public void Should_preserve_parent_relationship()
+            {
+                var parent = new ParentModel { ID = "P1" };
+                parent.AddChild(new ChildModel { ID = "C1" });
+                parent.AddChild(new ChildModel { ID = "C2" });
+                var dto = Mapper.Map<ParentDto>(parent);
+                dto.Children[0].Parent.ShouldBeSameAs(dto);
+                dto.Children[1].Parent.ShouldBeSameAs(dto);
+            }
+        }
     }
 }
