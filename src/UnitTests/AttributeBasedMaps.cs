@@ -1,5 +1,6 @@
 ﻿using AutoMapper.Configuration.Annotations;
 using Shouldly;
+using System.Collections.Generic;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -604,6 +605,196 @@ namespace AutoMapper.UnitTests
             public void Should_validate_successfully()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
+
+        public class When_specifying_to_construct_using_service_locator_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), ConstructUsingServiceLocator = true)]
+            public class Dest
+            {
+                private int _value;
+                private readonly int _addend;
+
+                public int Value
+                {
+                    get { return _value + _addend; }
+                    set { _value = value; }
+                }
+
+                public Dest(int addend)
+                {
+                    _addend = addend;
+                }
+
+                public Dest() : this(0)
+                {
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_to_construct_using_service_locator_via_attribute));
+                cfg.ConstructServicesUsing(t => new Dest(10));
+            });
+
+            [Fact]
+            public void Should_map_with_the_custom_constructor()
+            {
+                var source = new Source { Value = 6 };
+                var dest = Mapper.Map<Dest>(source);
+                dest.Value.ShouldBe(16);
+            }
+        }
+
+        public class When_specifying_max_depth_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Level { get; set; }
+                public IList<Source> Children { get; set; }
+                public Source Parent { get; set; }
+
+                public Source(int level)
+                {
+                    Children = new List<Source>();
+                    Level = level;
+                }
+
+                public void AddChild(Source child)
+                {
+                    Children.Add(child);
+                    child.Parent = this;
+                }
+            }
+
+            [AutoMap(typeof(Source), MaxDepth = 2)]
+            public class Dest
+            {
+                public int Level { get; set; }
+                public IList<Dest> Children { get; set; }
+                public Dest Parent { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_max_depth_via_attribute));
+            });
+
+            [Fact]
+            public void Third_level_children_are_null_with_max_depth_2()
+            {
+                var source = new Source(1);
+                source.AddChild(new Source(2));
+                source.AddChild(new Source(3));
+                source.Children[0].AddChild(new Source(4));
+                source.Children[1].AddChild(new Source(5));
+
+                var dest = Mapper.Map<Dest>(source);
+                dest.Level.ShouldBe(1);
+                dest.Children[0].Level.ShouldBe(2);
+                dest.Children[0].Children.ShouldAllBe(d => d == null);
+                dest.Children[1].Level.ShouldBe(3);
+                dest.Children[1].Children.ShouldAllBe(d => d == null);
+            }
+        }
+
+        public class When_specifying_to_preserve_references_via_attribute : NonValidatingSpecBase
+        {
+            public class ParentModel
+            {
+                public string ID { get; set; }
+
+                public IList<ChildModel> Children { get; } = new List<ChildModel>();
+
+                public void AddChild(ChildModel child)
+                {
+                    child.Parent = this;
+                    Children.Add(child);
+                }
+            }
+
+            public class ChildModel
+            {
+                public string ID { get; set; }
+                public ParentModel Parent { get; set; }
+            }
+
+            [AutoMap(typeof(ParentModel), PreserveReferences = true)]
+            public class ParentDto
+            {
+                public string ID { get; set; }
+                public IList<ChildDto> Children { get; set; }
+            }
+
+            [AutoMap(typeof(ChildModel), PreserveReferences = true)]
+            public class ChildDto
+            {
+                public string ID { get; set; }
+                public ParentDto Parent { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
+            });
+
+            [Fact]
+            public void Should_preserve_parent_relationship()
+            {
+                var parent = new ParentModel { ID = "P1" };
+                parent.AddChild(new ChildModel { ID = "C1" });
+                parent.AddChild(new ChildModel { ID = "C2" });
+                var dto = Mapper.Map<ParentDto>(parent);
+                dto.Children[0].Parent.ShouldBeSameAs(dto);
+                dto.Children[1].Parent.ShouldBeSameAs(dto);
+            }
+        }
+
+        public class When_specifying_type_of_converter_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), TypeConverter = typeof(CustomConverter))]
+            public class Dest
+            {
+                public int OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_type_of_converter_via_attribute));
+            });
+
+            public class CustomConverter : ITypeConverter<Source, Dest>
+            {
+                public Dest Convert(Source source, Dest destination, ResolutionContext context)
+                {
+                    return new Dest
+                    {
+                        OtherValue = source.Value + 10
+                    };
+                }
+            }
+
+            [Fact]
+            public void Should_convert_using_custom_converter()
+            {
+                var source = new Source { Value = 15 };
+                var dest = Mapper.Map<Dest>(source);
+                dest.OtherValue.ShouldBe(25);
             }
         }
     }
