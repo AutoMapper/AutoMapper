@@ -759,6 +759,32 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_specifying_to_include_all_derived_via_attribute : NonValidatingSpecBase
+        {
+            public class Foo { }
+            public class FooBar : Foo { }
+
+            [AutoMap(typeof(Foo), IncludeAllDerived = true)]
+            public class FooDto { }
+
+            [AutoMap(typeof(FooBar))]
+            public class FooBarDto : FooDto { }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_to_include_all_derived_via_attribute));
+            });
+
+            [Fact]
+            public void Should_convert_to_derived_correctly()
+            {
+                var source = new FooBar();
+                var dest = Mapper.Map(source, source.GetType(), typeof(FooDto));
+                dest.ShouldBeOfType<FooBarDto>();
+            }
+        }
+
         public class When_specifying_type_of_converter_via_attribute : NonValidatingSpecBase
         {
             public class Source

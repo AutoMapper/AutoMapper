@@ -37,6 +37,11 @@ namespace AutoMapper
         public bool DisableCtorValidation { get; set; }
 
         /// <summary>
+        /// If set to true, include this configuration in all derived types' maps.
+        /// </summary>
+        public bool IncludeAllDerived { get; set; }
+
+        /// <summary>
         /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping.
         /// </summary>
         public Type TypeConverter { get; set; }
@@ -66,6 +71,11 @@ namespace AutoMapper
             if (DisableCtorValidation)
             {
                 mappingExpression.DisableCtorValidation();
+            }
+
+            if (IncludeAllDerived)
+            {
+                mappingExpression.IncludeAllDerived();
             }
 
             if (TypeConverter != null)
