@@ -22,7 +22,6 @@ namespace AutoMapper
 
         /// <summary>
         /// For self-referential types, limit recurse depth.
-        /// Enables PreserveReferences.
         /// </summary>
         public int MaxDepth { get; set; }
 
