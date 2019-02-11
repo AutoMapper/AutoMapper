@@ -36,7 +36,7 @@ namespace AutoMapper.Configuration
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations { get; } = new List<ISourceMemberConfiguration>();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations { get; } = new List<ICtorParameterConfiguration>();
 
-        public virtual void Configure(TypeMap typeMap)
+        public void Configure(TypeMap typeMap)
         {
             foreach(var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
             {
