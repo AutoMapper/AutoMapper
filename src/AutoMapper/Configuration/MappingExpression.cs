@@ -18,7 +18,7 @@ namespace AutoMapper.Configuration
         {
             var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
             var reverseMap = new MappingExpression(reversedTypes, MemberList.None);
-            if(!reversedTypes.IsGeneric)
+            if(!reversedTypes.IsGenericTypeDefinition)
             {
                 reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             }

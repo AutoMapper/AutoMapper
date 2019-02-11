@@ -98,6 +98,8 @@ namespace AutoMapper
 
         public bool IsGeneric => SourceType.IsGenericType || DestinationType.IsGenericType;
 
+        public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
+
         public TypePair? GetOpenGenericTypePair()
         {
             if(!IsGeneric)

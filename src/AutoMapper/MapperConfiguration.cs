@@ -98,7 +98,7 @@ namespace AutoMapper
 
         public void CompileMappings()
         {
-            foreach (var request in _typeMapPlanCache.Keys.Where(t=>!t.IsGeneric).Select(types => new MapRequest(types, types)).ToArray())
+            foreach (var request in _typeMapPlanCache.Keys.Where(t=>!t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types)).ToArray())
             {
                 GetMapperFunc(request);
             }

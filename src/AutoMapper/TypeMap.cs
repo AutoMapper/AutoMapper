@@ -139,7 +139,7 @@ namespace AutoMapper
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 
         public LambdaExpression[] GetUntypedIncludedMembers() =>
-            SourceType.ContainsGenericParameters ?
+            SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
                 IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name)).ToArray();
 
@@ -284,9 +284,7 @@ namespace AutoMapper
         }
 
         internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>
-            SourceType.IsGenericTypeDefinition() || DestinationTypeToUse.IsGenericTypeDefinition() ?
-                null :
-                new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
+            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
         private PropertyMap GetPropertyMap(string name) => _propertyMaps.GetOrDefault(name);
 
