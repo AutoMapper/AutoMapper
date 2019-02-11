@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddMaps(new[] { typeof(When_scanning_by_assembly).Assembly() });
+                cfg.AddMaps(new[] { typeof(When_scanning_by_assembly).Assembly(), typeof(Mapper).Assembly });
             });
 
             [Fact]
