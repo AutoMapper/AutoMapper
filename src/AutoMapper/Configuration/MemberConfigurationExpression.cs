@@ -319,7 +319,7 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericType())
+            if(destMember.DeclaringType.IsGenericTypeDefinition())
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
