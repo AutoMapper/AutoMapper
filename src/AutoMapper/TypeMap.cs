@@ -319,7 +319,14 @@ namespace AutoMapper
             {
                 return;
             }
-            memberMaps.ForEach(AddPropertyMap);
+            memberMaps.ForEach(p=>
+            {
+                AddPropertyMap(p);
+                foreach(var transformer in typeMap.ValueTransformers)
+                {
+                    p.AddValueTransformation(transformer);
+                }
+            });
             _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(CheckCustomSource));
             _afterMapActions.UnionWith(typeMap._afterMapActions.Select(CheckCustomSource));
             notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
