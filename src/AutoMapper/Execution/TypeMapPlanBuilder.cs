@@ -135,6 +135,11 @@ namespace AutoMapper.Execution
 
             TypeMap ResolveTypeMap(TypePair types)
             {
+                if (((MapperConfiguration)_configurationProvider)._circularCreation.ContainsKey(types))
+                {
+                    return null;
+                }
+
                 var typeMap = _configurationProvider.ResolveTypeMap(types);
                 if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)
                 {

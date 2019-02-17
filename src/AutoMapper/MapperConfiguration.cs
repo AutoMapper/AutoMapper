@@ -15,6 +15,7 @@ namespace AutoMapper
     using static Execution.ExpressionBuilder;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
     using Validator = Action<ValidationContext>;
+    using System.Collections.Concurrent;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -27,11 +28,12 @@ namespace AutoMapper
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
         private readonly MapperConfigurationExpressionValidator _expressionValidator;
+        internal readonly ConcurrentDictionary<TypePair, byte> _circularCreation = new ConcurrentDictionary<TypePair, byte>();
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             _mappers = configurationExpression.Mappers.ToArray();
-            _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
+            _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMapCirculareRegistration);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             Validators = configurationExpression.Advanced.GetValidators();
             _validator = new ConfigurationValidator(this);
@@ -225,6 +227,19 @@ namespace AutoMapper
                 }
             }
             return typeMap;
+        }
+
+        private TypeMap GetTypeMapCirculareRegistration(TypePair initialTypes)
+        {
+            _circularCreation.TryAdd(initialTypes, 0);
+            try
+            {
+                return GetTypeMap(initialTypes);
+            }
+            finally
+            {
+                _circularCreation.TryRemove(initialTypes, out var _);
+            }
         }
 
         private TypeMap GetTypeMap(TypePair initialTypes)
