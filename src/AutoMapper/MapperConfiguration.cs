@@ -47,6 +47,11 @@ namespace AutoMapper
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
 
+            foreach(var feature in configurationExpression.Advanced.Features)
+            {
+                feature.Value.Configure(this);
+            }
+
             foreach (var beforeSealAction in configurationExpression.Advanced.BeforeSealActions)
                 beforeSealAction?.Invoke(this);
             Seal();
@@ -373,6 +378,11 @@ namespace AutoMapper
             foreach (var typeMap in _typeMapRegistry.Values)
             {
                 typeMap.Seal(this);
+            }
+
+            foreach (var feature in Features)
+            {
+                feature.Value.Seal(this);
             }
         }
 
