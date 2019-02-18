@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,12 @@ namespace AutoMapper
         /// Add Action called against the IConfigurationProvider before it gets sealed
         /// </summary>
         public void BeforeSeal(Action<IConfigurationProvider> action) => _beforeSealActions.Add(action);
+
+        /// <summary>
+        /// Gets the feature configuration collection.
+        /// </summary>
+        /// <value>The feature configuration collection.</value>
+        public IMapperConfigurationExpressionFeatureCollection Features { get; } = new MapperConfigurationExpressionFeatureCollection();
 
         /// <summary>
         /// Add an action to be called when validating the configuration.
