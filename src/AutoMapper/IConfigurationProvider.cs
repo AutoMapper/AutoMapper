@@ -101,6 +101,12 @@ namespace AutoMapper
         IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
+        /// Gets the features collection.
+        /// </summary>
+        /// <value>The feature colection.</value>
+        IFeatureCollection Features { get; }
+
+        /// <summary>
         /// Find a matching object mapper.
         /// </summary>
         /// <param name="types">the types to match</param>
