@@ -27,6 +27,7 @@ namespace AutoMapper.Configuration
         public bool IsOpenGeneric { get; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
+        public IMappingExpressionFeatureCollection Features { get; } = new MappingExpressionFeatureCollection();
         public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
         public IList<ValueTransformerConfiguration> ValueTransformers { get; } = new List<ValueTransformerConfiguration>();
 
@@ -75,6 +76,10 @@ namespace AutoMapper.Configuration
             foreach(var valueTransformer in ValueTransformers)
             {
                 typeMap.AddValueTransformation(valueTransformer);
+            }
+            foreach(var feature in Features)
+            {
+                feature.Value.Configure(typeMap);
             }
 
             if(ReverseMapExpression != null)

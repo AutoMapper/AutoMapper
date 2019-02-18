@@ -40,6 +40,12 @@ namespace AutoMapper
         TMappingExpression DisableCtorValidation();
 
         /// <summary>
+        /// Gets the feature mapping collection.
+        /// </summary>
+        /// <value>The feature mapping collection.</value>
+        IMappingExpressionFeatureCollection Features { get; }
+
+        /// <summary>
         /// Value transformers, typically configured through explicit or extenstion methods.
         /// </summary>
         IList<ValueTransformerConfiguration> ValueTransformers { get; }
