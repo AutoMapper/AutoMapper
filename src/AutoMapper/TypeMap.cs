@@ -54,6 +54,8 @@ namespace AutoMapper
 
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
 
+        public IFeatureCollection Features { get; } = new FeatureCollection();
+
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
 
@@ -281,6 +283,8 @@ namespace AutoMapper
             _propertyMaps.Clear();
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
+
+            ((FeatureCollection)Features).Seal(configurationProvider);
         }
 
         internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>
