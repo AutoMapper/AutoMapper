@@ -41,6 +41,8 @@ AutoMapper also has non-generic versions of these methods, for those cases where
 
 If you're using the static Mapper method, configuration should only happen once per AppDomain.  That means the best place to put the configuration code is in application startup, such as the Global.asax file for ASP.NET applications.  Typically, the configuration bootstrapper class is in its own class, and this bootstrapper class is called from the startup method. The bootstrapper class should call Mapper.Initialize to configure the type maps.
 
+For ASP.NET Core see the [Dependency Injection](http://docs.automapper.org/en/latest/Dependency-injection.html#asp-net-core) article to see how to configure AutoMapper in your application.
+
 ## How do I test my mappings?
 
 To test your mappings, you need to create a test that does two things:
