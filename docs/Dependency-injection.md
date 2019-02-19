@@ -31,6 +31,26 @@ Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#suppo
 
 There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.Microsoft.DependencyInjection/) to be used with the default injection mechanism described [here](https://lostechies.com/jimmybogard/2016/07/20/integrating-automapper-with-asp-net-core-di/).
 
+Once the nuget package is downloaded, simply add AutoMapper to your IServiceCollection in your startup.cs class:
+```c#
+services.AddAutoMapper(assembly1, assembly2 /*, ...*/);
+```
+or marker types:
+```c#
+services.AddAutoMapper(type1, type2 /*, ...*/);
+```
+Now you can inject AutoMapper at runtime into your services/controllers:
+```c#
+public class EmployeesController {
+	private readonly IMapper _mapper;
+
+	public EmployeesController(IMapper mapper)
+		=> _mapper = mapper;
+
+	// use _mapper.Map to map
+}
+```
+
 ### Ninject
 
 For those using Ninject here is an example of a Ninject module for AutoMapper
