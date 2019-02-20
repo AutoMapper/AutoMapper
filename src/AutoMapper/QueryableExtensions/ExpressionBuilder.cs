@@ -394,12 +394,12 @@ namespace AutoMapper.QueryableExtensions
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path =>
-                (
-                    MapFrom: path.Last.CustomMapExpression,
-                    MapFromSource: path.GetSourceExpression(instanceParameter),
-                    Property: path.GetPropertyDescription(),
+                new {
+                    MapFrom = path.Last.CustomMapExpression,
+                    MapFromSource = path.GetSourceExpression(instanceParameter),
+                    Property = path.GetPropertyDescription(),
                     path.Marker
-                )).ToArray();
+                }).ToArray();
 
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
 
