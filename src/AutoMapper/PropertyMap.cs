@@ -24,10 +24,27 @@ namespace AutoMapper
         }
 
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
-            : this(inheritedMappedProperty.DestinationMember, typeMap)
+            : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
+
+        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, LambdaExpression expression) 
+            : this(includedMemberMap, typeMap) => ApplyIncludedMemberMap(includedMemberMap, expression);
+
+        private void ApplyIncludedMemberMap(PropertyMap includedMemberMap, LambdaExpression expression)
         {
-            ApplyInheritedPropertyMap(inheritedMappedProperty);
+            CustomSource = expression;
+            if(includedMemberMap._memberChain.Count > 0)
+            {
+                ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
+            }
+            CustomMapExpression = CheckCustomSource(CustomMapExpression);
         }
+
+        private LambdaExpression CheckCustomSource(LambdaExpression lambda) => CheckCustomSource(lambda, CustomSource);
+
+        public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource) =>
+            (lambda == null || customSource == null) ?
+                lambda :
+                Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters.Concat(lambda.Parameters.Skip(1)));
 
         public TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
@@ -36,7 +53,7 @@ namespace AutoMapper
         public Type DestinationType => DestinationMember.GetMemberType();
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
-
+        public LambdaExpression CustomSource { get; set; }
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
@@ -79,11 +96,8 @@ namespace AutoMapper
 
         public TypePair Types => IsMapped ? new TypePair(SourceType, DestinationType) : default;
 
-        public void ChainMembers(IEnumerable<MemberInfo> members)
-        {
-            var getters = members as IList<MemberInfo> ?? members.ToList();
-            _memberChain.AddRange(getters);
-        }
+        public void ChainMembers(IEnumerable<MemberInfo> members) =>
+            _memberChain.AddRange(members as IList<MemberInfo> ?? members.ToList());
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
@@ -99,6 +113,7 @@ namespace AutoMapper
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
+            _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
         }
 
         public bool IsMapped => HasSource || Ignored;
@@ -125,15 +140,8 @@ namespace AutoMapper
             MapFrom(mapExpression);
         }
 
-        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
-        {
+        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
-        }
-
-        public void ApplyValueConverter()
-        {
-
-        }
 
         private class MemberFinderVisitor : ExpressionVisitor
         {
@@ -142,7 +150,6 @@ namespace AutoMapper
             protected override Expression VisitMember(MemberExpression node)
             {
                 Member = node;
-
                 return base.VisitMember(node);
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -6,12 +7,19 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-    using System;
     using Internal;
 
     [DebuggerDisplay("{DestinationExpression}")]
-    public class PathMap : IMemberMap
+    public class PathMap : DefaultMemberMap
     {
+        public PathMap(PathMap pathMap, TypeMap typeMap, LambdaExpression customSource) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
+        {
+            CustomSource = customSource;
+            CustomMapExpression = pathMap.CustomMapExpression;
+            Condition = pathMap.Condition;
+            Ignored = pathMap.Ignored;
+        }
+
         public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
         {
             MemberPath = memberPath;
@@ -19,29 +27,19 @@ namespace AutoMapper
             DestinationExpression = destinationExpression;
         }
 
-        public TypeMap TypeMap { get; }
+        public override TypeMap TypeMap { get; }
 
-        public Type SourceType => CustomMapExpression.ReturnType;
-
-        public IEnumerable<MemberInfo> SourceMembers { get; } = Enumerable.Empty<MemberInfo>();
+        public override Type SourceType => CustomMapExpression.ReturnType;
+        public override LambdaExpression CustomSource { get; }
         public LambdaExpression DestinationExpression { get; }
-        public LambdaExpression CustomMapExpression { get; set; }
+        public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }
-        public Type DestinationType => MemberPath.Last.GetMemberType();
-        public string DestinationName => MemberPath.ToString();
-        public TypePair Types => new TypePair(SourceType, DestinationType);
+        public override Type DestinationType => MemberPath.Last.GetMemberType();
+        public override string DestinationName => MemberPath.ToString();
 
-        public bool CanResolveValue => !Ignored;
+        public override bool CanResolveValue => !Ignored;
 
-        public bool Ignored { get; set; }
-        public bool Inline { get; set; } = true;
-        public bool UseDestinationValue => false;
-        public object NullSubstitute => null;
-        public LambdaExpression PreCondition => null;
-        public LambdaExpression Condition { get; set; }
-        public LambdaExpression CustomMapFunction => null;
-        public ValueResolverConfiguration ValueResolverConfig => null;
-        public ValueConverterConfiguration ValueConverterConfig => null;
-        public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } = Enumerable.Empty<ValueTransformerConfiguration>();
+        public override bool Ignored { get; set; }
+        public override LambdaExpression Condition { get; set; }
     }
 }

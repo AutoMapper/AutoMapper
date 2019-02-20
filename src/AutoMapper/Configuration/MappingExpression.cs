@@ -12,15 +12,31 @@ namespace AutoMapper.Configuration
         {
         }
 
-        public void ConvertUsing<TTypeConverter>() 
-            => ConvertUsing(typeof(TTypeConverter));
+        public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 
         public IMappingExpression ReverseMap()
         {
-            var reverseMap = new MappingExpression(new TypePair(Types.DestinationType, Types.SourceType), MemberList.Source);
-            reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
+            var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
+            var reverseMap = new MappingExpression(reversedTypes, MemberList.None);
+            if(!reversedTypes.IsGenericTypeDefinition)
+            {
+                reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
+            }
             ReverseMapExpression = reverseMap;
+            reverseMap.IncludeMembers(MapToSourceMembers().Select(m => m.DestinationMember.Name).ToArray());
+            foreach(var includedMemberName in IncludedMembersNames)
+            {
+                reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
+            }
             return reverseMap;
+        }
+        
+        public IMappingExpression IncludeMembers(params string[] memberNames)
+        {
+            IncludedMembersNames = memberNames;
+            memberNames.Select(name => SourceType.GetFieldOrProperty(name)).LastOrDefault();
+            TypeMapActions.Add(tm => tm.IncludedMembersNames = memberNames);
+            return this;
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions)
@@ -157,10 +173,7 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            if(!destinationMember.IsMemberPath())
-            {
-                throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
-            }
+            destinationMember.EnsureMemberPath(nameof(destinationMember));
             var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
             var firstMember = expression.MemberPath.First;
             var firstMemberConfig = GetDestinationMemberConfiguration(firstMember);
@@ -177,6 +190,21 @@ namespace AutoMapper.Configuration
         {
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
             return ForDestinationMember(memberInfo, memberOptions);
+        }
+
+        private void IncludeMembersCore(LambdaExpression[] memberExpressions)
+        {
+            foreach(var member in memberExpressions)
+            {
+                member.EnsureMemberPath(nameof(memberExpressions));
+            }
+            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
+        }
+
+        public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
+        {
+            IncludeMembersCore(memberExpressions);
+            return this;
         }
 
         public IMappingExpression<TSource, TDestination> ForMember(string name, Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
@@ -233,38 +261,6 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
-                    (src, dest, ctxt) => mappingFunction(src, dest);
-
-                tm.CustomMapFunction = expr;
-            });
-        }
-
-        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
-                    (src, dest, ctxt) => mappingFunction(src, dest, ctxt);
-
-                tm.CustomMapFunction = expr;
-            });
-        }
-
-        public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
-        {
-            ConvertUsing(converter.Convert);
-        }
-
-        public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
-        {
-            TypeMapActions.Add(tm => tm.TypeConverterType = typeof (TTypeConverter));
-        }
-
         public void As<T>() where T : TDestination => As(typeof(T));
 
         public IMappingExpression<TSource, TDestination> AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer)
@@ -281,6 +277,7 @@ namespace AutoMapper.Configuration
             var reverseMap = new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType);
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
+            reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
             return reverseMap;
         }
 
@@ -299,4 +296,3 @@ namespace AutoMapper.Configuration
             => ForDestinationMember<object>(property, options => options.Ignore(ignorePaths));
     }
 }
-

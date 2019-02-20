@@ -319,7 +319,7 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericType())
+            if(destMember.DeclaringType.IsGenericTypeDefinition())
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
@@ -338,10 +338,10 @@ namespace AutoMapper.Configuration
             propertyMap.CheckMappedReadonly();
         }
 
-        public IPropertyMapConfiguration Reverse()
-        {
-            var newSourceExpression = MemberAccessLambda(DestinationMember);
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, newSourceExpression);
-        }
+        public LambdaExpression SourceExpression => _sourceMember;
+        public LambdaExpression GetDestinationExpression() => MemberAccessLambda(DestinationMember);
+
+        public IPropertyMapConfiguration Reverse() =>
+            PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, GetDestinationExpression());
     }
 }

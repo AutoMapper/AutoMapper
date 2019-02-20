@@ -9,6 +9,14 @@ namespace AutoMapper
     public interface IMappingExpression : IMappingExpressionBase<object, object, IMappingExpression>
     {
         /// <summary>
+        /// Add extra configuration to the current map by also mapping the specified child objects to the destination object.
+        /// The maps from the child types to the destination need to be created explicitly.
+        /// </summary>
+        /// <param name="memberNames">the names of child object properties to map to the destination</param>
+        /// <returns></returns>
+        IMappingExpression IncludeMembers(params string[] memberNames);
+
+        /// <summary>
         /// Create a type mapping from the destination to the source type, using the destination members as validation.
         /// </summary>
         /// <returns>Itself</returns>
@@ -27,12 +35,6 @@ namespace AutoMapper
         void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
 
         /// <summary>
-        /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
-        /// </summary>
-        /// <typeparam name="TTypeConverter">Type converter type</typeparam>
-        void ConvertUsing<TTypeConverter>();
-
-        /// <summary>
         /// Customize individual members
         /// </summary>
         /// <param name="name">Name of the member</param>
@@ -48,6 +50,14 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
     public interface IMappingExpression<TSource, TDestination> : IMappingExpressionBase<TSource, TDestination, IMappingExpression<TSource, TDestination>>
     {
+        /// <summary>
+        /// Add extra configuration to the current map by also mapping the specified child objects to the destination object.
+        /// The maps from the child types to the destination need to be created explicitly.
+        /// </summary>
+        /// <param name="memberExpressions">the child objects to map to the destination</param>
+        /// <returns></returns>
+        IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions);
+
         /// <summary>
         /// Customize configuration for a path inside the destination object.
         /// </summary>
@@ -104,35 +114,6 @@ namespace AutoMapper
         /// <typeparam name="TDestinationBase">Base destination type</typeparam>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>();
-
-        /// <summary>
-        /// Skip member mapping and use a custom function to convert to the destination type
-        /// </summary>
-        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
-        /// <param name="mappingFunction">Callback to convert from source type to destination type, including destination object</param>
-        void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction);
-
-        /// <summary>
-        /// Skip member mapping and use a custom function to convert to the destination type
-        /// </summary>
-        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
-        /// <param name="mappingFunction">Callback to convert from source type to destination type, with source, destination and context</param>
-        void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction);
-
-        /// <summary>
-        /// Skip member mapping and use a custom type converter instance to convert to the destination type
-        /// </summary>
-        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
-        /// <param name="converter">Type converter instance</param>
-        void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
-
-        /// <summary>
-        /// Skip member mapping and use a custom type converter instance to convert to the destination type
-        /// </summary>
-        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
-        /// <typeparam name="TTypeConverter">Type converter type</typeparam>
-        void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
-
 
         /// <summary>
         /// Override the destination type mapping for looking up configuration and instantiation

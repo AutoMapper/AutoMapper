@@ -38,10 +38,15 @@ namespace AutoMapper
             }
         }
 
-        public static bool IsMemberPath(this LambdaExpression exp)
+        public static void EnsureMemberPath(this LambdaExpression exp, string name)
         {
-            return exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
+            if(!exp.IsMemberPath())
+            {
+                throw new ArgumentOutOfRangeException(name, "Only member accesses are allowed. "+exp);
+            }
         }
+
+        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
             => ExpressionFactory.ReplaceParameters(exp, replace);

@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
         {
             cfg.CreateMissingTypeMaps = false;
             cfg.CreateMap<One, Two>()
-                .ForMember(d => d.Name, o => o.MapFrom(s => s))
+                .ForMember(d => d.Name, o => o.MapFrom(s => "name"))
                 .ForMember(d => d.Three, o => o.MapFrom(s => s.Three2))
                 .ReverseMap();
             cfg.CreateMap<Three, Three2>();

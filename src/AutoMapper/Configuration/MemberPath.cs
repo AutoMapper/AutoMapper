@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.Internal
@@ -9,6 +10,10 @@ namespace AutoMapper.Internal
     {
         private readonly MemberInfo[] _members;
         public IEnumerable<MemberInfo> Members => _members;
+
+        public MemberPath(Expression destinationExpression) : this(MemberVisitor.GetMemberPath(destinationExpression).Reverse())
+        {
+        }
 
         public MemberPath(IEnumerable<MemberInfo> members)
         {

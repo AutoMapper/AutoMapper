@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
@@ -167,6 +168,7 @@ namespace AutoMapper
 
             ApplyBaseMaps(typeMap, typeMap, configurationProvider);
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
+            ApplyMemberMaps(typeMap, configurationProvider);
         }
 
         public bool IsConventionMap(TypePair types) => TypeConfigurations.Any(c => c.IsMatch(types));
@@ -245,12 +247,25 @@ namespace AutoMapper
             }
         }
 
+        private void ApplyMemberMaps(TypeMap mainMap, IConfigurationProvider configurationProvider)
+        {
+            AddMemberMaps(mainMap.IncludedMembers, mainMap, configurationProvider);
+            AddMemberMaps(mainMap.GetUntypedIncludedMembers(), mainMap, configurationProvider);
+        }
+
+        private void AddMemberMaps(LambdaExpression[] includedMembers, TypeMap mainMap, IConfigurationProvider configurationProvider)
+        {
+            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(includedMembers.Select(m => new TypePair(m.Body.Type, mainMap.DestinationType))).Zip(includedMembers, (memberMap, expression) => (memberMap, expression)))
+            {
+                mainMap.AddMemberMap(includedMember);
+            }
+        }
+
         private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
             foreach (var inheritedTypeMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
                 inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
-                inheritedTypeMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(baseMap, inheritedTypeMap, configurationProvider);
             }
         }

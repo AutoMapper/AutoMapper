@@ -98,7 +98,7 @@ namespace AutoMapper
 
         public void CompileMappings()
         {
-            foreach (var request in _typeMapPlanCache.Keys.Where(t=>t.GetOpenGenericTypePair() == null).Select(types => new MapRequest(types, types)).ToArray())
+            foreach (var request in _typeMapPlanCache.Keys.Where(t=>!t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types)).ToArray())
             {
                 GetMapperFunc(request);
             }
@@ -395,13 +395,16 @@ namespace AutoMapper
                 {
                     yield return typeMap;
                 }
-                typeMap = ResolveTypeMap(pair);
-                // we want the exact map the user included, but we could instantiate an open generic
-                if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                else
                 {
-                    throw QueryMapperHelper.MissingMapException(pair);
+                    typeMap = ResolveTypeMap(pair);
+                    // we want the exact map the user included, but we could instantiate an open generic
+                    if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                    {
+                        throw QueryMapperHelper.MissingMapException(pair);
+                    }
+                    yield return typeMap;
                 }
-                yield return typeMap;
             }
         }
 
@@ -442,8 +445,7 @@ namespace AutoMapper
             }
             if(userMap == null && (cachedMap = GetCachedMap(initialTypes, genericTypePair.Value)) != null)
             {
-                genericTypePair = cachedMap.Types.GetOpenGenericTypePair();
-                if(genericTypePair == null)
+                if(!cachedMap.Types.IsGeneric)
                 {
                     return cachedMap;
                 }

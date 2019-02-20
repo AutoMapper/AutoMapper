@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.Configuration
@@ -6,6 +7,8 @@ namespace AutoMapper.Configuration
     {
         void Configure(TypeMap typeMap);
         MemberInfo DestinationMember { get; }
+        LambdaExpression SourceExpression { get; }
+        LambdaExpression GetDestinationExpression();
         IPropertyMapConfiguration Reverse();
     }
 }

@@ -16,7 +16,7 @@ namespace AutoMapper.Configuration
         public PathConfigurationExpression(LambdaExpression destinationExpression)
         {
             _destinationExpression = destinationExpression;
-            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression).Reverse());
+            MemberPath = new MemberPath(destinationExpression);
         }
 
         public MemberPath MemberPath { get; }
@@ -75,10 +75,9 @@ namespace AutoMapper.Configuration
             return reversed;
         }
 
-        public IPropertyMapConfiguration Reverse()
-        {
-            return Create(_sourceExpression, _destinationExpression);
-        }
+        public LambdaExpression SourceExpression => _sourceExpression;
+        public LambdaExpression GetDestinationExpression() => _destinationExpression;
+        public IPropertyMapConfiguration Reverse() => Create(_sourceExpression, _destinationExpression);
 
         public void Condition(Func<ConditionParameters<TSource, TDestination, TMember>, bool> condition)
         {

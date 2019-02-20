@@ -512,7 +512,7 @@ namespace AutoMapper.QueryableExtensions
             public Expression Marker { get; }
             public PropertyMap Last => _properties[_properties.Length - 1].PropertyMap;
             public Expression GetSourceExpression(Expression parameter) =>
-                _properties.Take(_properties.Length - 1).SelectMany(p=>MemberVisitor.GetMemberPath(p.Expression).Reverse()).MemberAccesses(parameter);
+                _properties.Take(_properties.Length - 1).SelectMany(p=>new MemberPath(p.Expression).Members).MemberAccesses(parameter);
             public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", _properties.Select(p => p.PropertyMap.DestinationName)), Last.SourceType);
         }
     }
