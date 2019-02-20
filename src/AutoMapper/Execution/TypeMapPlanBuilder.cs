@@ -85,34 +85,34 @@ namespace AutoMapper.Execution
             typeMapsPath.Add(_typeMap);
             var members = 
                 _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue)
-                .Select(pm=>(MemberTypeMap: ResolveMemberTypeMap(pm), MemberMap: pm))
+                .Select(pm=> new { MemberTypeMap = ResolveMemberTypeMap(pm), MemberMap = pm })
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
-            foreach(var (memberTypeMap, memberMap) in members)
+            foreach(var item in members)
             {
                 if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
-                    memberMap.Inline = false;
-                    Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
+                    item.MemberMap.Inline = false;
+                    Debug.WriteLine($"Resetting Inline: {item.MemberMap.DestinationName} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
                 }
-                if(typeMapsPath.Contains(memberTypeMap))
+                if(typeMapsPath.Contains(item.MemberTypeMap))
                 {
-                    if(memberTypeMap.SourceType.IsValueType())
+                    if(item.MemberTypeMap.SourceType.IsValueType())
                     {
-                        if(memberTypeMap.MaxDepth == 0)
+                        if(item.MemberTypeMap.MaxDepth == 0)
                         {
-                            memberTypeMap.MaxDepth = 10;
+                            item.MemberTypeMap.MaxDepth = 10;
                         }
                         typeMapsPath.Remove(_typeMap);
                         return;
                     }
 
-                    SetPreserveReferences(memberTypeMap);
-                    foreach(var derivedTypeMap in memberTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
+                    SetPreserveReferences(item.MemberTypeMap);
+                    foreach(var derivedTypeMap in item.MemberTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
                     {
                         SetPreserveReferences(derivedTypeMap);
                     }
                 }
-                memberTypeMap.CreateMapperLambda(_configurationProvider, typeMapsPath);
+                item.MemberTypeMap.CreateMapperLambda(_configurationProvider, typeMapsPath);
             }
             typeMapsPath.Remove(_typeMap);
             return;
