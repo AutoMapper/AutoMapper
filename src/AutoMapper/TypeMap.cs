@@ -350,17 +350,8 @@ namespace AutoMapper
                     AddPropertyMap(new PropertyMap(inheritedMappedProperty, this));
                 }
             }
-
-            //Include BeforeMap
-            foreach(var beforeMapAction in inheritedTypeMap._beforeMapActions)
-            {
-                AddBeforeMapAction(beforeMapAction);
-            }
-            //Include AfterMap
-            foreach(var afterMapAction in inheritedTypeMap._afterMapActions)
-            {
-                AddAfterMapAction(afterMapAction);
-            }
+            _beforeMapActions.UnionWith(inheritedTypeMap._beforeMapActions);
+            _afterMapActions.UnionWith(inheritedTypeMap._afterMapActions);
             var notOverridenSourceConfigs =
                 inheritedTypeMap.SourceMemberConfigs.Where(
                     baseConfig => SourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember)).ToList();
