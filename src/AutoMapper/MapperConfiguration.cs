@@ -449,14 +449,25 @@ namespace AutoMapper
                 {
                     return cachedMap;
                 }
-                (genericMap, profile, typePair) = (cachedMap.Profile.GetGenericMap(cachedMap.Types), cachedMap.Profile, cachedMap.Types.CloseGenericTypes(typePair));
+
+                genericMap = cachedMap.Profile.GetGenericMap(cachedMap.Types);
+                profile = cachedMap.Profile;
+                typePair = cachedMap.Types.CloseGenericTypes(typePair);
+            }
+            else if (userMap == null)
+            {
+                var item = Profiles
+                    .Select(p => new {GenericMap = p.GetGenericMap(typePair), Profile = p})
+                    .FirstOrDefault(p => p.GenericMap != null);
+                genericMap = item?.GenericMap;
+                profile = item?.Profile;
             }
             else
             {
-                (genericMap, profile) = userMap == null ?
-                    Profiles.Select(p => (GenericMap: p.GetGenericMap(typePair), p)).FirstOrDefault(p => p.GenericMap != null) :
-                    (userMap.Profile.GetGenericMap(typePair), userMap.Profile);
+                genericMap = userMap.Profile.GetGenericMap(typePair);
+                profile = userMap.Profile;
             }
+
             if(genericMap == null)
             {
                 return null;

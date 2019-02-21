@@ -255,7 +255,7 @@ namespace AutoMapper
 
         private void AddMemberMaps(LambdaExpression[] includedMembers, TypeMap mainMap, IConfigurationProvider configurationProvider)
         {
-            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(includedMembers.Select(m => new TypePair(m.Body.Type, mainMap.DestinationType))).Zip(includedMembers, (memberMap, expression) => (memberMap, expression)))
+            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(includedMembers.Select(m => new TypePair(m.Body.Type, mainMap.DestinationType))).Zip(includedMembers, (memberMap, expression) => new IncludedMember(memberMap, expression)))
             {
                 mainMap.AddMemberMap(includedMember);
             }
@@ -269,5 +269,16 @@ namespace AutoMapper
                 ApplyDerivedMaps(baseMap, inheritedTypeMap, configurationProvider);
             }
         }
+    }
+
+    public readonly struct IncludedMember
+    {
+        public IncludedMember(TypeMap typeMap, LambdaExpression memberExpression)
+        {
+            TypeMap = typeMap;
+            MemberExpression = memberExpression;
+        }
+        public TypeMap TypeMap { get; }
+        public LambdaExpression MemberExpression { get; }
     }
 }

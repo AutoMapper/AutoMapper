@@ -85,10 +85,12 @@ namespace AutoMapper.Execution
             typeMapsPath.Add(_typeMap);
             var members = 
                 _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue)
-                .Select(pm=>(MemberTypeMap: ResolveMemberTypeMap(pm), MemberMap: pm))
+                .Select(pm=> new { MemberTypeMap = ResolveMemberTypeMap(pm), MemberMap = pm })
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
-            foreach(var (memberTypeMap, memberMap) in members)
+            foreach(var item in members)
             {
+                var memberMap = item.MemberMap;
+                var memberTypeMap = item.MemberTypeMap;
                 if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
                     memberMap.Inline = false;
