@@ -28,7 +28,7 @@ namespace AutoMapper
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly HashSet<TypeMap> _inheritedTypeMaps = new HashSet<TypeMap>();
-        private readonly List<(TypeMap, LambdaExpression)> _includedMembersTypeMaps = new List<(TypeMap, LambdaExpression)>();
+        private readonly List<IncludedMember> _includedMembersTypeMaps = new List<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
@@ -290,7 +290,7 @@ namespace AutoMapper
 
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
 
-        public void AddMemberMap((TypeMap, LambdaExpression) includedMember) => _includedMembersTypeMaps.Add(includedMember);
+        public void AddMemberMap(IncludedMember includedMember) => _includedMembersTypeMaps.Add(includedMember);
 
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
@@ -307,9 +307,10 @@ namespace AutoMapper
 
         public bool AddInheritedMap(TypeMap inheritedTypeMap) => _inheritedTypeMaps.Add(inheritedTypeMap);
 
-        private void ApplyIncludedMemberTypeMap((TypeMap, LambdaExpression) includedMember)
+        private void ApplyIncludedMemberTypeMap(IncludedMember includedMember)
         {
-            var (typeMap, expression) = includedMember;
+            var typeMap = includedMember.TypeMap;
+            var expression = includedMember.MemberExpression;
             var memberMaps = typeMap.PropertyMaps.
                 Where(m => m.CanResolveValue && GetPropertyMap(m)==null)
                 .Select(p => new PropertyMap(p, this, expression))
