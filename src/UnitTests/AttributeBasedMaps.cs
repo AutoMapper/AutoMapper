@@ -1,6 +1,7 @@
 ﻿using AutoMapper.Configuration.Annotations;
 using Shouldly;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -708,54 +709,83 @@ namespace AutoMapper.UnitTests
 
         public class When_specifying_to_preserve_references_via_attribute : NonValidatingSpecBase
         {
-            public class ParentModel
+            public class Parent
             {
-                public string ID { get; set; }
-
-                public IList<ChildModel> Children { get; } = new List<ChildModel>();
-
-                public void AddChild(ChildModel child)
-                {
-                    child.Parent = this;
-                    Children.Add(child);
-                }
+                public int Id { get; set; }
             }
 
-            public class ChildModel
+            public class Child
             {
-                public string ID { get; set; }
-                public ParentModel Parent { get; set; }
+                public int Id { get; set; }
+                public Parent Parent { get; set; }
             }
 
-            [AutoMap(typeof(ParentModel), PreserveReferences = true)]
+            [AutoMap(typeof(Parent), PreserveReferences = true)]
             public class ParentDto
             {
-                public string ID { get; set; }
-                public IList<ChildDto> Children { get; set; }
+                public int Id { get; set; }
+
+                [SourceMember(nameof(Parent.Id))]
+                public List<ChildDto> Children { get; set; }
             }
 
-            [AutoMap(typeof(ChildModel), PreserveReferences = true)]
+            [AutoMap(typeof(Child))]
             public class ChildDto
             {
-                public string ID { get; set; }
+                public int Id { get; set; }
+
                 public ParentDto Parent { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
             {
-                cfg.CreateMissingTypeMaps = false;
-                cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
-            });
+                private readonly IList<Child> _childModels;
+
+                public ParentIdToChildDtoListConverter(IList<Child> childModels)
+                {
+                    _childModels = childModels;
+                }
+
+                public List<ChildDto> Convert(int source, List<ChildDto> destination, ResolutionContext resolutionContext)
+                {
+                    var childModels = _childModels.Where(x => x.Parent.Id == source).ToList();
+                    return (List<ChildDto>)resolutionContext.Mapper.Map(childModels, destination, typeof(List<Child>), typeof(List<ChildDto>), resolutionContext);
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; }
+
+            private static Parent _parent;
+
+            public When_specifying_to_preserve_references_via_attribute()
+            {
+                _parent = new Parent
+                {
+                    Id = 2
+                };
+
+                var childModels = new List<Child>
+                {
+                    new Child
+                    {
+                        Id = 1,
+                        Parent = _parent
+                    }
+                };
+
+                Configuration = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMissingTypeMaps = false;
+                    cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
+                    cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+                });
+            }
 
             [Fact]
             public void Should_preserve_parent_relationship()
             {
-                var parent = new ParentModel { ID = "P1" };
-                parent.AddChild(new ChildModel { ID = "C1" });
-                parent.AddChild(new ChildModel { ID = "C2" });
-                var dto = Mapper.Map<ParentDto>(parent);
-                dto.Children[0].Parent.ShouldBeSameAs(dto);
-                dto.Children[1].Parent.ShouldBeSameAs(dto);
+                var dto = Mapper.Map<Parent, ParentDto>(_parent);
+                dto.Children[0].Parent.Id.ShouldBe(dto.Id);
             }
         }
 
