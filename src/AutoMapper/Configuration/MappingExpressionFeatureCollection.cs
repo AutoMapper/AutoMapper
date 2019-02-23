@@ -4,7 +4,7 @@ namespace AutoMapper.Configuration
 {
     public class MappingExpressionFeatureCollection : FeatureCollectionBase<IMappingExpressionFeature>
     {
-        internal MappingExpressionFeatureCollection ReverseMap()
+        internal MappingExpressionFeatureCollection CreateReverseCollection()
         {
             var reverse = new MappingExpressionFeatureCollection();
             foreach (var feature in this)
@@ -12,6 +12,14 @@ namespace AutoMapper.Configuration
                 reverse[feature.Key] = feature.Value.Reverse();
             }
             return reverse;
+        }
+
+        internal void Configure(TypeMap typeMap)
+        {
+            foreach (var item in this)
+            {
+                item.Value.Configure(typeMap);
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ namespace AutoMapper.Configuration
                 reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
             }
 
-            Features = Features.ReverseMap();
+            Features = Features.CreateReverseCollection();
 
             return reverseMap;
         }
