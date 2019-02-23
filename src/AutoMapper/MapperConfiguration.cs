@@ -380,10 +380,7 @@ namespace AutoMapper
                 typeMap.Seal(this);
             }
 
-            foreach (var feature in Features)
-            {
-                feature.Value.Seal(this);
-            }
+            Features.Seal(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
