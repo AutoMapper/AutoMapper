@@ -77,10 +77,8 @@ namespace AutoMapper.Configuration
             {
                 typeMap.AddValueTransformation(valueTransformer);
             }
-            foreach(var feature in Features)
-            {
-                feature.Value.Configure(typeMap);
-            }
+
+            Features.Configure(typeMap);
 
             if(ReverseMapExpression != null)
             {
