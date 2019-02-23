@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
@@ -130,6 +131,12 @@ namespace AutoMapper
         /// <param name="profileName">Profile name, must be unique</param>
         /// <param name="config">Profile configuration</param>
         void CreateProfile(string profileName, Action<IProfileExpression> config);
+
+        /// <summary>
+        /// Gets the feature configuration collection.
+        /// </summary>
+        /// <value>The feature configuration collection.</value>
+        MapperConfigurationExpressionFeatureCollection Features { get; }
 
         /// <summary>
         /// Object mappers

@@ -27,6 +27,8 @@ namespace AutoMapper.Configuration
 
         public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
 
+        public MapperConfigurationExpressionFeatureCollection Features { get; } = new MapperConfigurationExpressionFeatureCollection();
+
         private class NamedProfile : Profile
         {
             public NamedProfile(string profileName) : base(profileName)
