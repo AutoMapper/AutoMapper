@@ -104,7 +104,7 @@ namespace AutoMapper
         /// Gets the features collection.
         /// </summary>
         /// <value>The feature colection.</value>
-        IFeatureCollection Features { get; }
+        FeatureCollection Features { get; }
 
         /// <summary>
         /// Find a matching object mapper.

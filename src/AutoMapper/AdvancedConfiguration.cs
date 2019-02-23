@@ -22,7 +22,7 @@ namespace AutoMapper
         /// Gets the feature configuration collection.
         /// </summary>
         /// <value>The feature configuration collection.</value>
-        public IMapperConfigurationExpressionFeatureCollection Features { get; } = new MapperConfigurationExpressionFeatureCollection();
+        public MapperConfigurationExpressionFeatureCollection Features { get; } = new MapperConfigurationExpressionFeatureCollection();
 
         /// <summary>
         /// Add an action to be called when validating the configuration.
