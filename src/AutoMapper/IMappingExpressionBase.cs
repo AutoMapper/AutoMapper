@@ -43,7 +43,7 @@ namespace AutoMapper
         /// Gets the feature mapping collection.
         /// </summary>
         /// <value>The feature mapping collection.</value>
-        IMappingExpressionFeatureCollection Features { get; }
+        MappingExpressionFeatureCollection Features { get; }
 
         /// <summary>
         /// Value transformers, typically configured through explicit or extenstion methods.
