@@ -29,10 +29,7 @@ namespace AutoMapper.Configuration
                 reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
             }
 
-            foreach (var feature in Features)
-            {
-                reverseMap.Features[feature.Key] = feature.Value.Reverse();
-            }
+            Features = Features.ReverseMap();
 
             return reverseMap;
         }

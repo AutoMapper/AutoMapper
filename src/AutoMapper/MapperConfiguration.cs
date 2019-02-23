@@ -47,10 +47,7 @@ namespace AutoMapper
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
 
-            foreach(var feature in configurationExpression.Advanced.Features)
-            {
-                feature.Value.Configure(this);
-            }
+            configurationExpression.Features.Configure(this);
 
             foreach (var beforeSealAction in configurationExpression.Advanced.BeforeSealActions)
                 beforeSealAction?.Invoke(this);
@@ -380,7 +377,7 @@ namespace AutoMapper
                 typeMap.Seal(this);
             }
 
-            Features.Seal(this);
+            ((IFeature)Features).Seal(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
