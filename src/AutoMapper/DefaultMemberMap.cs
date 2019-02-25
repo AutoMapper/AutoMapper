@@ -38,5 +38,25 @@ namespace AutoMapper
 
         public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } 
             = Enumerable.Empty<ValueTransformerConfiguration>();
+
+        public MemberInfo SourceMember
+        {
+            get
+            {
+                if (CustomMapExpression != null)
+                {
+                    var finder = new MemberFinderVisitor();
+                    finder.Visit(CustomMapExpression);
+
+                    if (finder.Member != null)
+                    {
+                        return finder.Member.Member;
+                    }
+                }
+
+                return SourceMembers.LastOrDefault();
+            }
+        }
+
     }
 }
