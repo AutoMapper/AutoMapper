@@ -180,11 +180,18 @@ namespace AutoMapper
                     .Where(smc => smc.IsIgnored())
                     .Select(pm => pm.SourceMember.Name).ToList();
 
+                var redirectedPathMembers = PathMaps
+                    .Select(pm => pm.CustomMapExpression)
+                    .Select(me => me.Body)
+                    .SelectMany(body => body.GetMembers())
+                    .Select(m => m.Member.Name);
+
                 properties = SourceTypeDetails.PublicReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(redirectedSourceMembers)
-                    .Except(ignoredSourceMembers);
+                    .Except(ignoredSourceMembers)
+                    .Except(redirectedPathMembers);
             }
 
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
