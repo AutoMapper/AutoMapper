@@ -18,6 +18,7 @@ namespace AutoMapper
             CustomMapExpression = pathMap.CustomMapExpression;
             Condition = pathMap.Condition;
             Ignored = pathMap.Ignored;
+            SourceMembers = CustomMapExpression.Body.GetMembers().Select(x => x.Member);
         }
 
         public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
