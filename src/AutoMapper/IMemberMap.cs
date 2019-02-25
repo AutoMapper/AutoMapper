@@ -26,5 +26,6 @@ namespace AutoMapper
         ValueResolverConfiguration ValueResolverConfig { get; }
         ValueConverterConfiguration ValueConverterConfig { get; }
         IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
+        MemberInfo SourceMember { get; }
     }
 }
