@@ -172,26 +172,19 @@ namespace AutoMapper
             }
             else
             {
-                var redirectedSourceMembers = PropertyMaps
-                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
+               var redirectedSourceMembers = MemberMaps
+                    .Where(pm => !pm.Ignored && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
-                var ignoredSourceMembers = SourceMemberConfigs
-                    .Where(smc => smc.IsIgnored())
-                    .Select(pm => pm.SourceMember.Name).ToList();
-
-                var redirectedPathMembers = PathMaps
-                    .Select(pm => pm.CustomMapExpression)
-                    .Select(me => me.Body)
-                    .SelectMany(body => body.GetMembers())
-                    .Select(m => m.Member.Name);
+               var ignoredSourceMembers = SourceMemberConfigs
+                   .Where(smc => smc.IsIgnored())
+                   .Select(pm => pm.SourceMember.Name);
 
                 properties = SourceTypeDetails.PublicReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(redirectedSourceMembers)
-                    .Except(ignoredSourceMembers)
-                    .Except(redirectedPathMembers);
+                    .Except(ignoredSourceMembers);
             }
 
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
@@ -340,7 +333,7 @@ namespace AutoMapper
             notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
             return;
             LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
-        }       
+        }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
