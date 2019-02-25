@@ -785,7 +785,7 @@ namespace AutoMapper.UnitTests
             public void Should_preserve_parent_relationship()
             {
                 var dto = Mapper.Map<Parent, ParentDto>(_parent);
-                dto.Children[0].Parent.Id.ShouldBe(dto.Id);
+                dto.Children[0].Parent.ShouldBe(dto);
             }
         }
 
