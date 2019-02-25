@@ -143,17 +143,6 @@ namespace AutoMapper
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
 
-        private class MemberFinderVisitor : ExpressionVisitor
-        {
-            public MemberExpression Member { get; private set; }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                Member = node;
-                return base.VisitMember(node);
-            }
-        }
-
         internal void CheckMappedReadonly()
         {
             if(IsResolveConfigured && !ReflectionHelper.CanBeSet(DestinationMember))
