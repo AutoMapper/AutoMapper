@@ -138,6 +138,11 @@ namespace AutoMapper.Configuration
         {
             var memberInfo = Types.SourceType.GetFieldOrProperty(sourceMemberName);
 
+            ForSourceMemberCore(memberInfo, memberOptions);
+        }
+
+        protected void ForSourceMemberCore(MemberInfo memberInfo, Action<ISourceMemberConfigurationExpression> memberOptions)
+        {
             var srcConfig = new SourceMappingExpression(memberInfo);
 
             memberOptions(srcConfig);

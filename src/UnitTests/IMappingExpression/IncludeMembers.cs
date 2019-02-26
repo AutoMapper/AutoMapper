@@ -1086,4 +1086,68 @@ namespace AutoMapper.UnitTests.IMappingExpression
             destination.Title.ShouldBeNull();
         }
     }
+    public class IncludeMembersSourceValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Name { get; set; }
+            public InnerSource InnerSource { get; set; }
+            public OtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>(MemberList.Source).IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        });
+    }
+    public class IncludeMembersWithGenericsSourceValidation : AutoMapperSpecBase
+    {
+        class Source<TInnerSource, TOtherInnerSource>
+        {
+            public string Name { get; set; }
+            public TInnerSource InnerSource { get; set; }
+            public TOtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.Source).IncludeMembers("InnerSource", "OtherInnerSource");
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        });
+    }
 }
