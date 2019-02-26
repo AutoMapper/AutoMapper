@@ -80,7 +80,7 @@ namespace AutoMapper.Configuration
             => AddMapsCore(assembliesToScan);
 
         public void AddMaps(IEnumerable<string> assemblyNamesToScan)
-            => AddMapsCore(assemblyNamesToScan.Select(name => Assembly.Load(name)));
+            => AddMapsCore(assemblyNamesToScan.Select(Assembly.Load));
 
         public void AddMaps(params string[] assemblyNamesToScan)
             => AddMaps((IEnumerable<string>)assemblyNamesToScan);

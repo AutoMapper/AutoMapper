@@ -75,8 +75,6 @@ namespace AutoMapper
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
-        public override TypePair Types => IsMapped ? new TypePair(SourceType, DestinationType) : default;
-
         public void ChainMembers(IEnumerable<MemberInfo> members) =>
             _memberChain.AddRange(members as IList<MemberInfo> ?? members.ToList());
 
