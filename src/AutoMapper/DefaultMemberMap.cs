@@ -17,8 +17,7 @@ namespace AutoMapper
 
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType => default;
-        public virtual IEnumerable<MemberInfo> SourceMembers { get; }
-            = Enumerable.Empty<MemberInfo>();
+        public virtual IEnumerable<MemberInfo> SourceMembers => Enumerable.Empty<MemberInfo>();
         public virtual LambdaExpression CustomSource => null;
         public virtual string DestinationName => default;
         public virtual Type DestinationType => default;
@@ -26,7 +25,7 @@ namespace AutoMapper
         public virtual bool CanResolveValue { get => default; set { } }
 
         public virtual bool Ignored { get => default; set { } }
-        public virtual bool Inline { get; set; } = true;
+        public virtual bool Inline { get => true; set { } }
         public virtual bool UseDestinationValue => default;
         public virtual object NullSubstitute => default;
         public virtual LambdaExpression PreCondition => default;
@@ -36,8 +35,7 @@ namespace AutoMapper
         public virtual ValueResolverConfiguration ValueResolverConfig => default;
         public virtual ValueConverterConfiguration ValueConverterConfig => default;
 
-        public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } 
-            = Enumerable.Empty<ValueTransformerConfiguration>();
+        public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers => Enumerable.Empty<ValueTransformerConfiguration>();
 
         public MemberInfo SourceMember
         {
@@ -53,10 +51,8 @@ namespace AutoMapper
                         return finder.Member.Member;
                     }
                 }
-
                 return SourceMembers.LastOrDefault();
             }
         }
-
     }
 }
