@@ -173,7 +173,7 @@ namespace AutoMapper
             else
             {
                var redirectedSourceMembers = MemberMaps
-                    .Where(pm => !pm.Ignored && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
+                    .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
                var ignoredSourceMembers = SourceMemberConfigs
