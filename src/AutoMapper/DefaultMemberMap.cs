@@ -17,26 +17,42 @@ namespace AutoMapper
 
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType => default;
-        public virtual IEnumerable<MemberInfo> SourceMembers { get; } 
-            = Enumerable.Empty<MemberInfo>();
-        public virtual LambdaExpression CustomSource => null;
+        public virtual IEnumerable<MemberInfo> SourceMembers => Enumerable.Empty<MemberInfo>();
+        public virtual LambdaExpression CustomSource { get => default; set { } }
         public virtual string DestinationName => default;
         public virtual Type DestinationType => default;
         public virtual TypePair Types => new TypePair(SourceType, DestinationType);
         public virtual bool CanResolveValue { get => default; set { } }
-
+        public virtual bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
-        public virtual bool Inline { get; set; } = true;
-        public virtual bool UseDestinationValue => default;
-        public virtual object NullSubstitute => default;
-        public virtual LambdaExpression PreCondition => default;
+        public virtual bool Inline { get => true; set { } }
+        public virtual bool UseDestinationValue { get => default; set { } }
+        public virtual object NullSubstitute { get => default; set { } }
+        public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
         public virtual LambdaExpression CustomMapExpression { get => default; set { } }
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
-        public virtual ValueResolverConfiguration ValueResolverConfig => default;
-        public virtual ValueConverterConfiguration ValueConverterConfig => default;
+        public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
+        public virtual ValueConverterConfiguration ValueConverterConfig { get => default; set { } }
 
-        public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; } 
-            = Enumerable.Empty<ValueTransformerConfiguration>();
+        public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers => Enumerable.Empty<ValueTransformerConfiguration>();
+
+        public MemberInfo SourceMember
+        {
+            get
+            {
+                if (CustomMapExpression != null)
+                {
+                    var finder = new MemberFinderVisitor();
+                    finder.Visit(CustomMapExpression);
+
+                    if (finder.Member != null)
+                    {
+                        return finder.Member.Member;
+                    }
+                }
+                return SourceMembers.LastOrDefault();
+            }
+        }
     }
 }

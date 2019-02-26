@@ -12,7 +12,7 @@ namespace AutoMapper
     using static Expression;
 
     [DebuggerDisplay("{DestinationMember.Name}")]
-    public class PropertyMap : IMemberMap
+    public class PropertyMap : DefaultMemberMap
     {
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
@@ -46,55 +46,34 @@ namespace AutoMapper
                 lambda :
                 Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters.Concat(lambda.Parameters.Skip(1)));
 
-        public TypeMap TypeMap { get; }
+        public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
-        public string DestinationName => DestinationMember.Name;
+        public override string DestinationName => DestinationMember.Name;
 
-        public Type DestinationType => DestinationMember.GetMemberType();
+        public override Type DestinationType => DestinationMember.GetMemberType();
 
-        public IEnumerable<MemberInfo> SourceMembers => _memberChain;
-        public LambdaExpression CustomSource { get; set; }
-        public bool Inline { get; set; } = true;
-        public bool Ignored { get; set; }
+        public override IEnumerable<MemberInfo> SourceMembers => _memberChain;
+        public override LambdaExpression CustomSource { get; set; }
+        public override bool Inline { get; set; } = true;
+        public override bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
-        public LambdaExpression CustomMapFunction { get; set; }
-        public LambdaExpression Condition { get; set; }
-        public LambdaExpression PreCondition { get; set; }
-        public LambdaExpression CustomMapExpression { get; set; }
-        public bool UseDestinationValue { get; set; }
+        public override LambdaExpression CustomMapFunction { get; set; }
+        public override LambdaExpression Condition { get; set; }
+        public override LambdaExpression PreCondition { get; set; }
+        public override LambdaExpression CustomMapExpression { get; set; }
+        public override bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
-        public object NullSubstitute { get; set; }
-        public ValueResolverConfiguration ValueResolverConfig { get; set; }
-        public ValueConverterConfiguration ValueConverterConfig { get; set; }
-        public IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
+        public override object NullSubstitute { get; set; }
+        public override ValueResolverConfiguration ValueResolverConfig { get; set; }
+        public override ValueConverterConfiguration ValueConverterConfig { get; set; }
+        public override IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
 
-        public MemberInfo SourceMember
-        {
-            get
-            {
-                if (CustomMapExpression != null)
-                {
-                    var finder = new MemberFinderVisitor();
-                    finder.Visit(CustomMapExpression);
-
-                    if (finder.Member != null)
-                    {
-                        return finder.Member.Member;
-                    }
-                }
-
-                return _memberChain.LastOrDefault();
-            }
-        }
-
-        public Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
+        public override Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
                                   ?? ValueResolverConfig?.SourceMember?.ReturnType
                                   ?? CustomMapFunction?.ReturnType
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
-
-        public TypePair Types => IsMapped ? new TypePair(SourceType, DestinationType) : default;
 
         public void ChainMembers(IEnumerable<MemberInfo> members) =>
             _memberChain.AddRange(members as IList<MemberInfo> ?? members.ToList());
@@ -116,9 +95,7 @@ namespace AutoMapper
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
         }
 
-        public bool IsMapped => HasSource || Ignored;
-
-        public bool CanResolveValue => HasSource && !Ignored;
+        public override bool CanResolveValue => HasSource && !Ignored;
 
         public bool HasSource => _memberChain.Count > 0 || IsResolveConfigured;
 
@@ -142,17 +119,6 @@ namespace AutoMapper
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
-
-        private class MemberFinderVisitor : ExpressionVisitor
-        {
-            public MemberExpression Member { get; private set; }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                Member = node;
-                return base.VisitMember(node);
-            }
-        }
 
         internal void CheckMappedReadonly()
         {

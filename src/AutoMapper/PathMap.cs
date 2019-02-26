@@ -30,7 +30,7 @@ namespace AutoMapper
         public override TypeMap TypeMap { get; }
 
         public override Type SourceType => CustomMapExpression.ReturnType;
-        public override LambdaExpression CustomSource { get; }
+        public override LambdaExpression CustomSource { get; set; }
         public LambdaExpression DestinationExpression { get; }
         public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }

@@ -172,13 +172,13 @@ namespace AutoMapper
             }
             else
             {
-                var redirectedSourceMembers = PropertyMaps
+               var redirectedSourceMembers = MemberMaps
                     .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
                     .Select(pm => pm.SourceMember.Name);
 
-                var ignoredSourceMembers = SourceMemberConfigs
-                    .Where(smc => smc.IsIgnored())
-                    .Select(pm => pm.SourceMember.Name).ToList();
+               var ignoredSourceMembers = SourceMemberConfigs
+                   .Where(smc => smc.IsIgnored())
+                   .Select(pm => pm.SourceMember.Name);
 
                 properties = SourceTypeDetails.PublicReadAccessors
                     .Select(p => p.Name)
@@ -333,7 +333,7 @@ namespace AutoMapper
             notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, expression) { CustomMapExpression = CheckCustomSource(p.CustomMapExpression) }));
             return;
             LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
-        }       
+        }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {

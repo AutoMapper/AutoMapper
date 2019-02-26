@@ -54,16 +54,16 @@ namespace AutoMapper.Configuration
             => AddMaps(assembliesToScan);
 
         public void AddProfiles(IEnumerable<string> assemblyNamesToScan)
-            => AddMaps(assemblyNamesToScan.Select(name => Assembly.Load(new AssemblyName(name))));
+            => AddMaps(assemblyNamesToScan);
 
         public void AddProfiles(params string[] assemblyNamesToScan)
-            => AddMaps(assemblyNamesToScan.Select(name => Assembly.Load(new AssemblyName(name))));
+            => AddMaps(assemblyNamesToScan);
 
         public void AddProfiles(IEnumerable<Type> typesFromAssembliesContainingProfiles)
-            => AddMaps(typesFromAssembliesContainingProfiles.Select(t => t.GetTypeInfo().Assembly));
+            => AddMaps(typesFromAssembliesContainingProfiles);
 
         public void AddProfiles(params Type[] typesFromAssembliesContainingProfiles)
-            => AddMaps(typesFromAssembliesContainingProfiles.Select(t => t.GetTypeInfo().Assembly));
+            => AddMaps(typesFromAssembliesContainingProfiles);
 
         public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
         {
@@ -80,16 +80,16 @@ namespace AutoMapper.Configuration
             => AddMapsCore(assembliesToScan);
 
         public void AddMaps(IEnumerable<string> assemblyNamesToScan)
-            => AddMapsCore(assemblyNamesToScan.Select(name => Assembly.Load(new AssemblyName(name))));
+            => AddMapsCore(assemblyNamesToScan.Select(Assembly.Load));
 
         public void AddMaps(params string[] assemblyNamesToScan)
-            => AddMapsCore(assemblyNamesToScan.Select(name => Assembly.Load(new AssemblyName(name))));
+            => AddMaps((IEnumerable<string>)assemblyNamesToScan);
 
         public void AddMaps(IEnumerable<Type> typesFromAssembliesContainingMappingDefinitions)
             => AddMapsCore(typesFromAssembliesContainingMappingDefinitions.Select(t => t.GetTypeInfo().Assembly));
 
         public void AddMaps(params Type[] typesFromAssembliesContainingMappingDefinitions)
-            => AddMapsCore(typesFromAssembliesContainingMappingDefinitions.Select(t => t.GetTypeInfo().Assembly));
+            => AddMaps((IEnumerable<Type>)typesFromAssembliesContainingMappingDefinitions);
 
         private void AddMapsCore(IEnumerable<Assembly> assembliesToScan)
         {
