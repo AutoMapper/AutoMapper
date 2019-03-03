@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper.Configuration;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,12 +12,7 @@ namespace AutoMapper.Internal
 
         public TValue this[Type key]
         {
-            get
-            {
-                return _features.TryGetValue(key, out var feature)
-                    ? feature
-                    : default(TValue);
-            }
+            get => _features.GetOrDefault(key);
             set
             {
                 if (value == null)
@@ -35,39 +31,19 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <typeparam name="TFeature">The type of the feature.</typeparam>
         /// <returns>The feature or null if feature not exists.</returns>
-        public TFeature Get<TFeature>()
-            where TFeature : TValue
-        {
-            return (TFeature)this[typeof(TFeature)];
-        }
+        public TFeature Get<TFeature>() where TFeature : TValue => (TFeature)this[typeof(TFeature)];
 
         /// <summary>
         /// Sets the feature for type <typeparamref name="TFeature"/>.
         /// </summary>
         /// <typeparam name="TFeature">The type of the t feature.</typeparam>
         /// <param name="feature">The feature. To remove a feature, pass null value.</param>
-        public void Set<TFeature>(TFeature feature)
-            where TFeature : TValue
-        {
-            this[typeof(TFeature)] = feature;
-        }
+        public void Set<TFeature>(TFeature feature)  where TFeature : TValue => this[typeof(TFeature)] = feature;
 
-        public IEnumerator<KeyValuePair<Type, TValue>> GetEnumerator()
-        {
-            foreach (var feature in _features)
-            {
-                yield return feature;
-            }
-        }
+        public IEnumerator<KeyValuePair<Type, TValue>> GetEnumerator() => _features.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected void MakeReadOnly()
-        {
-            _features = new ReadOnlyDictionary<Type, TValue>(_features);
-        }
+        protected void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TValue>(_features);
     }
 }

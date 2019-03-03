@@ -284,7 +284,7 @@ namespace AutoMapper
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
 
-            ((IFeature)Features).Seal(configurationProvider);
+            Features.Seal(configurationProvider);
         }
 
         internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>

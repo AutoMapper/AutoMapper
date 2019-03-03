@@ -2,9 +2,9 @@
 
 namespace AutoMapper
 {
-    public class FeatureCollection : FeatureCollectionBase<IFeature>, IFeature
+    public class FeatureCollection : FeatureCollectionBase<IFeature>
     {
-        void IFeature.Seal(IConfigurationProvider configurationProvider)
+        internal void Seal(IConfigurationProvider configurationProvider)
         {
             foreach (var feature in this)
             {
