@@ -125,5 +125,10 @@ namespace AutoMapper.Configuration
         }
 
         public void ConstructServicesUsing(Func<Type, object> constructor) => ServiceCtor = constructor;
+
+        public void AddFeature<TFeature>(TFeature feature) where TFeature : IMapperConfigurationExpressionFeature
+        {
+            Features.Set(feature);
+        }
     }
 }
