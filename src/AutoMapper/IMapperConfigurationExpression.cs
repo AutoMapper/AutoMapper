@@ -139,6 +139,11 @@ namespace AutoMapper
             where TFeature : IMapperConfigurationExpressionFeature;
 
         /// <summary>
+        /// Get the features collection.
+        /// </summary>
+        MapperConfigurationExpressionFeatureCollection Features { get; }
+
+        /// <summary>
         /// Object mappers
         /// </summary>
         IList<IObjectMapper> Mappers { get; }
