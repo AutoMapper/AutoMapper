@@ -133,10 +133,10 @@ namespace AutoMapper
         void CreateProfile(string profileName, Action<IProfileExpression> config);
 
         /// <summary>
-        /// Gets the feature configuration collection.
+        /// Extend with custom feature for the configuration.
         /// </summary>
-        /// <value>The feature configuration collection.</value>
-        MapperConfigurationExpressionFeatureCollection Features { get; }
+        void AddFeature<TFeature>(TFeature feature)
+            where TFeature : IMapperConfigurationExpressionFeature;
 
         /// <summary>
         /// Object mappers
