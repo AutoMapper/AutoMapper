@@ -377,7 +377,7 @@ namespace AutoMapper
                 typeMap.Seal(this);
             }
 
-            ((IFeature)Features).Seal(this);
+            Features.Seal(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
