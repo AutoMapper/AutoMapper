@@ -41,10 +41,10 @@ namespace AutoMapper
         TMappingExpression DisableCtorValidation();
 
         /// <summary>
-        /// Gets the feature mapping collection.
+        /// Extend with custom feature for the mapping.
         /// </summary>
-        /// <value>The feature mapping collection.</value>
-        MappingExpressionFeatureCollection Features { get; }
+        TMappingExpression AddFeature<TFeature>(TFeature feature)
+            where TFeature : IMappingExpressionFeature;
 
         /// <summary>
         /// Value transformers, typically configured through explicit or extenstion methods.

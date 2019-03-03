@@ -427,5 +427,12 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>
             TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);
+
+        public TMappingExpression AddFeature<TFeature>(TFeature feature)
+            where TFeature : IMappingExpressionFeature
+        {
+            Features.Set(feature);
+            return this as TMappingExpression;
+        }
     }
 }

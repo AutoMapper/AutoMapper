@@ -286,6 +286,7 @@ namespace AutoMapper.Configuration
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
+            reverseMap.Features = Features.CreateReverseCollection();
             return reverseMap;
         }
 
