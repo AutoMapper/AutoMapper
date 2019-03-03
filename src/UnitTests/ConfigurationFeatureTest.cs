@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests
             public override void Configure(IConfigurationProvider configurationProvider)
             {
                 ConfigurationProviders.Add(configurationProvider);
-                configurationProvider.Features.Set(_feature);
+                configurationProvider.Features.Add(_feature);
             }
         }
 

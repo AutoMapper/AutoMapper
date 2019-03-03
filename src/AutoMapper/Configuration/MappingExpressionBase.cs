@@ -431,7 +431,7 @@ namespace AutoMapper.Configuration
         public TMappingExpression AddFeature<TFeature>(TFeature feature)
             where TFeature : IMappingExpressionFeature
         {
-            Features.Set(feature);
+            Features.Add(feature);
             return this as TMappingExpression;
         }
     }
