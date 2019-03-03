@@ -128,7 +128,7 @@ namespace AutoMapper.Configuration
 
         public void AddFeature<TFeature>(TFeature feature) where TFeature : IMapperConfigurationExpressionFeature
         {
-            Features.Set(feature);
+            Features.Add(feature);
         }
     }
 }
