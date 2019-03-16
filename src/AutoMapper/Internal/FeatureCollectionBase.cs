@@ -34,11 +34,11 @@ namespace AutoMapper.Internal
         public TFeature Get<TFeature>() where TFeature : TValue => (TFeature)this[typeof(TFeature)];
 
         /// <summary>
-        /// Add the feature for type <typeparamref name="TFeature"/>. Existing feature of the same type will be replaces.
+        /// Add or update the feature for type <typeparamref name="TFeature"/>. Existing feature of the same type will be replaces.
         /// </summary>
         /// <typeparam name="TFeature">The type of the feature.</typeparam>
         /// <param name="feature">The feature.</param>
-        public void Add<TFeature>(TFeature feature)  where TFeature : TValue => this[typeof(TFeature)] = feature;
+        public void AddOrUpdate<TFeature>(TFeature feature)  where TFeature : TValue => this[typeof(TFeature)] = feature;
 
         public IEnumerator<KeyValuePair<Type, TValue>> GetEnumerator() => _features.GetEnumerator();
 
