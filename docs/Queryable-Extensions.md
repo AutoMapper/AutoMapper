@@ -152,6 +152,10 @@ dbContext.Orders.ProjectTo<OrderDto>(
     null,
     "Customer",
     "LineItems");
+// for collections
+dbContext.Orders.ProjectTo<OrderDto>(
+    null,
+    dest => dest.LineItems.Select(item => item.Product));
 ```
 For more information, see [the tests](https://github.com/AutoMapper/AutoMapper/search?p=1&q=ExplicitExpansion&utf8=%E2%9C%93).
 
