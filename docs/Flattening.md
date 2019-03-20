@@ -150,6 +150,6 @@ IncludeMembers integrates with `ReverseMap`. An included member will be reversed
 ```c#
 ForMember(destination => destination.IncludedMember, member => member.MapFrom(source => source))
 ```
-and the other way around.
+and the other way around. If that's not what you want, you can avoid `ReverseMap` (explicitly create the reverse map) or you can override the default settings (using `Ignore` or `IncludeMembers` without parameters respectively).
 
 For details, check [the tests](https://github.com/AutoMapper/AutoMapper/blob/master/src/UnitTests/IMappingExpression/IncludeMembers.cs).
