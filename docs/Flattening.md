@@ -146,7 +146,7 @@ So this allows you to reuse the configuration in the existing maps for the child
 
 When you map multiple child objects, the order in the `IncludeMembers` call becomes relevant. When mapping a destination member, the first match wins, starting with the source object itself and then with the included child objects in the order you specified. So in the example above, `Name` is mapped from the source object itself and `Description` from `InnerSource` because it's the first match.
 
-IncludeMembers integrates with ReverseMap. An included member will be reversed to 
+IncludeMembers integrates with `ReverseMap`. An included member will be reversed to 
 ```c#
 ForMember(destination => destination.IncludedMember, member => member.MapFrom(source=>source))
 ```
