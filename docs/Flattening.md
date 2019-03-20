@@ -148,7 +148,7 @@ When you map multiple child objects, the order in the `IncludeMembers` call beco
 
 IncludeMembers integrates with `ReverseMap`. An included member will be reversed to 
 ```c#
-ForMember(destination => destination.IncludedMember, member => member.MapFrom(source=>source))
+ForMember(destination => destination.IncludedMember, member => member.MapFrom(source => source))
 ```
 and the other way around.
 
