@@ -144,7 +144,7 @@ destination.Title.ShouldBe("title");
 ```
 So this allows you to reuse the configuration in the existing maps for the child types `InnerSource` and `OtherInnerSource` when mapping the parent types `Source` and `Destination`. It works in a similar way to [mapping inheritance](Mapping-inheritance.html), but it uses composition, not inheritance.
 
-When you map multiple child objects, the order in the `IncludeMembers` call becomes relevant. When mapping a destination member, the first match wins, starting with the source object itself and then with the included child objects in the order you specified. So in the example above, `Name` is mapped from the source object itself and `Description` from `InnerSource` because it's the first match.
+When you map multiple child objects, the order of the parameters in the `IncludeMembers` call becomes relevant. When mapping a destination member, the first match wins, starting with the source object itself and then with the included child objects in the order you specified. So in the example above, `Name` is mapped from the source object itself and `Description` from `InnerSource` because it's the first match.
 
 IncludeMembers integrates with `ReverseMap`. An included member will be reversed to 
 ```c#
