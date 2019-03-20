@@ -99,3 +99,57 @@ dto.Total.ShouldEqual(74.85m);
 We configured the type map in AutoMapper with the CreateMap method.  AutoMapper can only map type pairs it knows about, so we have explicitly register the source/destination type pair with CreateMap.  To perform the mapping, we use the Map method.
 
 On the OrderDto type, the Total property matched to the GetTotal() method on Order.  The CustomerName property matched to the Customer.Name property on Order.  As long as we name our destination properties appropriately, we do not need to configure individual property matching.
+
+# IncludeMembers
+
+If you need more control when flattening, you can use IncludeMembers. You can map members of a child object to the destination object when you already have a map from the child type to the destination type (unlike the classic flattening that doesn't require a map for the child type).
+
+```c#
+class Source
+{
+    public string Name { get; set; }
+    public InnerSource InnerSource { get; set; }
+    public OtherInnerSource OtherInnerSource { get; set; }
+}
+class InnerSource
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+}
+class OtherInnerSource
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string Title { get; set; }
+}
+class Destination
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string Title { get; set; }
+}
+var configuration => new MapperConfiguration(cfg=>
+{
+    cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
+    cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+    cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+};
+configuration.AssertConfigurationIsValid();
+var mapper = configuration.CreateMapper();
+var source = new Source { Name = "name", InnerSource = new InnerSource{ Description = "description" }, OtherInnerSource = new OtherInnerSource{ Title = "title" } };
+var destination = Mapper.Map<Destination>(source);
+destination.Name.ShouldBe("name");
+destination.Description.ShouldBe("description");
+destination.Title.ShouldBe("title");
+```
+So this allows you to reuse the configuration in the existing maps for the child types `InnerSource` and `OtherInnerSource` when mapping the parent types `Source` and `Destination`. It works in a similar way to [mapping inheritance](Mapping-inheritance.html), but it uses composition, not inheritance.
+
+When you map multiple child objects, the order in the `IncludeMembers` call becomes relevant. When mapping a destination member, the first match wins, starting with the source object itself and then with the included child objects in the order you specified. So in the example above, `Name` is mapped from the source object itself and `Description` from `InnerSource` because it's the first match.
+
+IncludeMembers integrates with ReverseMap. An included member will be reversed to 
+```c#
+ForMember(destination => destination.IncludedMember, member => member.MapFrom(source=>source))
+```
+and the other way around.
+
+For details, check [the tests](https://github.com/AutoMapper/AutoMapper/blob/master/src/UnitTests/IMappingExpression/IncludeMembers.cs).
