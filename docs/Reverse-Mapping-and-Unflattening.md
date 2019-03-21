@@ -85,6 +85,8 @@ cfg.CreateMap<Order, OrderDto>()
   .ReverseMap()
   .ForPath(s => s.Customer.Name, opt => opt.Ignore());
 ```
+### IncludeMembers
+
 `ReverseMap` also integrates with [`IncludeMembers`](Flattening.html#includemembers) and configuration like 
 ```c#
 ForMember(destination => destination.IncludedMember, member => member.MapFrom(source => source))
