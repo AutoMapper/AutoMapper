@@ -128,16 +128,12 @@ class Destination
     public string Description { get; set; }
     public string Title { get; set; }
 }
-var configuration => new MapperConfiguration(cfg=>
-{
-    cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
-    cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-    cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
-};
-configuration.AssertConfigurationIsValid();
-var mapper = configuration.CreateMapper();
+cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
+cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+
 var source = new Source { Name = "name", InnerSource = new InnerSource{ Description = "description" }, OtherInnerSource = new OtherInnerSource{ Title = "title" } };
-var destination = Mapper.Map<Destination>(source);
+var destination = mapper.Map<Destination>(source);
 destination.Name.ShouldBe("name");
 destination.Description.ShouldBe("description");
 destination.Title.ShouldBe("title");
