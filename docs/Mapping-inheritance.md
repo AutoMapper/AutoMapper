@@ -85,7 +85,9 @@ Mapper.Initialize(cfg => {
 For simple cases, you can use `As` to redirect a base map to an existing derived map:
 
 ```c#
+    cfg.CreateMap<Order, OnlineOrderDto>();
     cfg.CreateMap<Order, OrderDto>().As<OnlineOrderDto>();
+    mapper.Map<OrderDto>(new Order()).ShouldBeOfType<OnlineOrderDto>();
 ```
 
 ### Inheritance Mapping Priorities
