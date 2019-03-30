@@ -2,7 +2,7 @@
 
 AutoMapper uses MyGet to publish development builds based on the master branch. This means that the MyGet build sometimes contains fixes that are not available in the current NuGet package. Please try the latest MyGet build before reporting issues, in case your issue has already been fixed but not released.
 
-The AutoMapper MyGet gallery is available at http://myget.org/gallery/automapperdev. Be sure to include prereleases.
+The AutoMapper MyGet gallery is available [here](https://myget.org/feed/automapperdev/package/nuget/AutoMapper). Be sure to include prereleases.
 
 ## Installing the Package
 
