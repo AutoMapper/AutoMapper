@@ -80,6 +80,17 @@ Mapper.Initialize(cfg => {
 });
 ```
 
+## As
+
+For simple cases, you can use `As` to redirect a base map to an existing derived map:
+
+```c#
+    cfg.CreateMap<Order, OnlineOrderDto>();
+    cfg.CreateMap<Order, OrderDto>().As<OnlineOrderDto>();
+    
+    mapper.Map<OrderDto>(new Order()).ShouldBeOfType<OnlineOrderDto>();
+```
+
 ### Inheritance Mapping Priorities
 
 This introduces additional complexity because there are multiple ways a property can be mapped. The priority of these sources are as follows

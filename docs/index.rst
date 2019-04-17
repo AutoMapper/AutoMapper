@@ -29,7 +29,6 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    5.0-Upgrade-Guide
    8.0-Upgrade-Guide
    Static-and-Instance-API
-   Migrating-from-static-API
    Conventions
    Understanding-your-mapping
    The-MyGet-build
