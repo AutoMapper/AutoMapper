@@ -1,4 +1,4 @@
-﻿namespace AutoMapper
+﻿namespace AutoMapper.Features
 {
     public interface IMappingFeature
     {
