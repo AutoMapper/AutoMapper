@@ -1,20 +1,11 @@
-﻿namespace AutoMapper.Features
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace AutoMapper.Features
 {
     public class MappingExpressionFeatureCollection : FeatureCollectionBase<IMappingFeature>
     {
-        internal MappingExpressionFeatureCollection CreateReverseCollection()
-        {
-            var reverseFeatures = new MappingExpressionFeatureCollection();
-            ForAll(feature =>
-            {
-                var reverse = feature.Reverse();
-                if (reverse != null)
-                {
-                    reverseFeatures.AddOrUpdate(reverse);
-                }
-            });
-            return reverseFeatures;
-        }
+        internal IEnumerable<IMappingFeature> CreateReverseCollection() => this.Select(f => f.Reverse()).Where(f => f != null);
 
         internal void Configure(TypeMap typeMap) => ForAll(feature => feature.Configure(typeMap));
     }

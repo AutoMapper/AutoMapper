@@ -29,7 +29,7 @@ namespace AutoMapper.Configuration
                 reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
             }
 
-            Features = Features.CreateReverseCollection();
+            reverseMap.Features.AddOrUpdateRange(Features.CreateReverseCollection());
 
             return reverseMap;
         }
@@ -286,7 +286,7 @@ namespace AutoMapper.Configuration
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
-            reverseMap.Features = Features.CreateReverseCollection();
+            reverseMap.Features.AddOrUpdateRange(Features.CreateReverseCollection());
             return reverseMap;
         }
 
