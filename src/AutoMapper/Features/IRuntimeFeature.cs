@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.Features
 {
-    public interface IFeature
+    public interface IRuntimeFeature
     {
         void Seal(IConfigurationProvider configurationProvider);
     }

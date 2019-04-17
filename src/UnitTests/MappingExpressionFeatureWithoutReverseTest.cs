@@ -227,7 +227,7 @@ namespace AutoMapper.UnitTests
         }
 
         public abstract class MappingExpressionFeatureBase<TFeature> : MappingExpressionFeatureBase
-           where TFeature : IFeature
+           where TFeature : IRuntimeFeature
         {
             private readonly TFeature _feature;
 
@@ -278,7 +278,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public abstract class TypeMapFeatureBase : IFeature
+        public abstract class TypeMapFeatureBase : IRuntimeFeature
         {
             public int SealedCount { get; private set; }
             public int Value { get; }
@@ -288,7 +288,7 @@ namespace AutoMapper.UnitTests
                 Value = value;
             }
 
-            void IFeature.Seal(IConfigurationProvider configurationProvider)
+            void IRuntimeFeature.Seal(IConfigurationProvider configurationProvider)
             {
                 SealedCount++;
             }

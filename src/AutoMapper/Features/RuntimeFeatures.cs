@@ -2,7 +2,7 @@
 
 namespace AutoMapper.Features
 {
-    public class RuntimeFeatures : Features<IFeature>
+    public class RuntimeFeatures : Features<IRuntimeFeature>
     {
         internal void Seal(IConfigurationProvider configurationProvider)
         {
