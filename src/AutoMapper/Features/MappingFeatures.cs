@@ -7,7 +7,7 @@
             var reverse = feature.Reverse();
             if (reverse != null)
             {
-                features.AddOrUpdate(reverse);
+                features.Set(reverse);
             }
         });
 

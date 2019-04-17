@@ -21,7 +21,7 @@ namespace AutoMapper.Features
         /// Add or update the feature. Existing feature of the same type will be replaced.
         /// </summary>
         /// <param name="feature">The feature.</param>
-        public void AddOrUpdate(TFeature feature) => _features[feature.GetType()] = feature;
+        public void Set(TFeature feature) => _features[feature.GetType()] = feature;
 
         public IEnumerator<TFeature> GetEnumerator() => _features.Values.GetEnumerator();
 
