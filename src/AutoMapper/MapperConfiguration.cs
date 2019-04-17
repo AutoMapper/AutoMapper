@@ -88,7 +88,7 @@ namespace AutoMapper
 
         public IEnumerable<IExpressionBinder> Binders { get; }
 
-        public FeatureCollection Features { get; } = new FeatureCollection();
+        public RuntimeFeatureCollection Features { get; } = new RuntimeFeatureCollection();
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
             TypePair types, IMemberMap memberMap = null)

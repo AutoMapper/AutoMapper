@@ -55,7 +55,7 @@ namespace AutoMapper
 
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
 
-        public FeatureCollection Features { get; } = new FeatureCollection();
+        public RuntimeFeatureCollection Features { get; } = new RuntimeFeatureCollection();
 
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);

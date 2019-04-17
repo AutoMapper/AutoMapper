@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AutoMapper.Features
 {
-    public class MappingExpressionFeatureCollection : FeatureCollectionBase<IMappingFeature>
+    public class MappingFeatureCollection : FeatureCollectionBase<IMappingFeature>
     {
         internal IEnumerable<IMappingFeature> CreateReverseCollection() => this.Select(f => f.Reverse()).Where(f => f != null);
 
