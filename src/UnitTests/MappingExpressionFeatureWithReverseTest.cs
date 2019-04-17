@@ -186,7 +186,7 @@ namespace AutoMapper.UnitTests
             public override void Configure(TypeMap typeMap)
             {
                 ConfigureTypeMaps.Add(typeMap);
-                typeMap.Features.Add(_feature);
+                typeMap.Features.AddOrUpdate(_feature);
             }
         }
 

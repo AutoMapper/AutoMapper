@@ -4,12 +4,6 @@ namespace AutoMapper.Configuration
 {
     public class MapperConfigurationExpressionFeatureCollection : FeatureCollectionBase<IMapperConfigurationExpressionFeature>
     {
-        internal void Configure(MapperConfiguration mapperConfiguration)
-        {
-            foreach(var item in this)
-            {
-                item.Value.Configure(mapperConfiguration);
-            }
-        }
+        internal void Configure(MapperConfiguration mapperConfiguration) => ForAll(feature => feature.Configure(mapperConfiguration));
     }
 }

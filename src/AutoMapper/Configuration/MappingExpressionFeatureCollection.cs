@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Internal;
+using System.Linq;
 
 namespace AutoMapper.Configuration
 {
@@ -6,20 +7,14 @@ namespace AutoMapper.Configuration
     {
         internal MappingExpressionFeatureCollection CreateReverseCollection()
         {
-            var reverse = new MappingExpressionFeatureCollection();
-            foreach (var feature in this)
+            var reverseFeatures = new MappingExpressionFeatureCollection();
+            foreach (var reverse in this.Select(f=>f.Reverse()).Where(f=>f!=null))
             {
-                reverse[feature.Key] = feature.Value.Reverse();
+                reverseFeatures.AddOrUpdate(reverse);
             }
-            return reverse;
+            return reverseFeatures;
         }
 
-        internal void Configure(TypeMap typeMap)
-        {
-            foreach (var item in this)
-            {
-                item.Value.Configure(typeMap);
-            }
-        }
+        internal void Configure(TypeMap typeMap) => ForAll(feature => feature.Configure(typeMap));
     }
 }

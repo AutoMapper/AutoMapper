@@ -6,10 +6,7 @@ namespace AutoMapper
     {
         internal void Seal(IConfigurationProvider configurationProvider)
         {
-            foreach (var feature in this)
-            {
-                feature.Value.Seal(configurationProvider);
-            }
+            ForAll(feature => feature.Seal(configurationProvider));
             MakeReadOnly();
         }
     }

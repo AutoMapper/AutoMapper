@@ -6,44 +6,35 @@ using System.Collections.ObjectModel;
 
 namespace AutoMapper.Internal
 {
-    public class FeatureCollectionBase<TValue> : IEnumerable<KeyValuePair<Type, TValue>>
+    public class FeatureCollectionBase<TValue> : IEnumerable<TValue>
     {
         private IDictionary<Type, TValue> _features = new Dictionary<Type, TValue>();
-
-        public TValue this[Type key]
-        {
-            get => _features.GetOrDefault(key);
-            set
-            {
-                if (value == null)
-                {
-                    _features.Remove(key);
-                }
-                else
-                {
-                    _features[key] = value;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the feature of type <typeparamref name="TFeature"/>.
         /// </summary>
         /// <typeparam name="TFeature">The type of the feature.</typeparam>
         /// <returns>The feature or null if feature not exists.</returns>
-        public TFeature Get<TFeature>() where TFeature : TValue => (TFeature)this[typeof(TFeature)];
+        public TFeature Get<TFeature>() where TFeature : TValue => (TFeature)_features.GetOrDefault(typeof(TFeature));
 
         /// <summary>
-        /// Add or update the feature for type <typeparamref name="TFeature"/>. Existing feature of the same type will be replaces.
+        /// Add or update the feature. Existing feature of the same type will be replaced.
         /// </summary>
-        /// <typeparam name="TFeature">The type of the feature.</typeparam>
         /// <param name="feature">The feature.</param>
-        public void AddOrUpdate<TFeature>(TFeature feature)  where TFeature : TValue => this[typeof(TFeature)] = feature;
+        public void AddOrUpdate(TValue feature) => _features[feature.GetType()] = feature;
 
-        public IEnumerator<KeyValuePair<Type, TValue>> GetEnumerator() => _features.GetEnumerator();
+        public IEnumerator<TValue> GetEnumerator() => _features.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         protected void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TValue>(_features);
+
+        public void ForAll(Action<TValue> action)
+        {
+            foreach (var feature in this)
+            {
+                action(feature);
+            }
+        }
     }
 }
