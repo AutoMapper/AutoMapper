@@ -23,14 +23,6 @@ namespace AutoMapper.Features
         /// <param name="feature">The feature.</param>
         public void AddOrUpdate(TValue feature) => _features[feature.GetType()] = feature;
 
-        public void AddOrUpdateRange(IEnumerable<TValue> features)
-        {
-            foreach (var feature in features)
-            {
-                AddOrUpdate(feature);
-            }
-        }
-
         public IEnumerator<TValue> GetEnumerator() => _features.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
