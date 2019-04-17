@@ -43,7 +43,7 @@ namespace AutoMapper
         /// <summary>
         /// Extend with custom feature for the mapping.
         /// </summary>
-        TMappingExpression AddFeature<TFeature>(TFeature feature)
+        TMappingExpression AddOrUpdateFeature<TFeature>(TFeature feature)
             where TFeature : IMappingExpressionFeature;
 
         /// <summary>

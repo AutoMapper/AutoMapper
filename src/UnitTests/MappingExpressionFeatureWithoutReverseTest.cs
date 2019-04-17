@@ -15,12 +15,12 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(new MappingExpressionFeatureA(3))
-                    .AddFeature(new MappingExpressionFeatureA(2))
-                    .AddFeature(featureA)
-                    .AddFeature(new MappingExpressionFeatureB(3))
-                    .AddFeature(new MappingExpressionFeatureB(2))
-                    .AddFeature(featureB);
+                    .AddOrUpdateFeature(new MappingExpressionFeatureA(3))
+                    .AddOrUpdateFeature(new MappingExpressionFeatureA(2))
+                    .AddOrUpdateFeature(featureA)
+                    .AddOrUpdateFeature(new MappingExpressionFeatureB(3))
+                    .AddOrUpdateFeature(new MappingExpressionFeatureB(2))
+                    .AddOrUpdateFeature(featureB);
             });
 
 
@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(featureA);
+                    .AddOrUpdateFeature(featureA);
             });
 
             var typeMap = config.FindTypeMapFor<Source, Dest>();
@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(featureA)
+                    .AddOrUpdateFeature(featureA)
                     .ReverseMap();
             });
 
@@ -111,8 +111,8 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(featureA)
-                    .AddFeature(featureB);
+                    .AddOrUpdateFeature(featureA)
+                    .AddOrUpdateFeature(featureB);
             });
 
 
@@ -146,8 +146,8 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(featureA)
-                    .AddFeature(featureB)
+                    .AddOrUpdateFeature(featureA)
+                    .AddOrUpdateFeature(featureB)
                     .ReverseMap();
             });
 
@@ -182,10 +182,10 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .AddFeature(featureA)
-                    .AddFeature(featureB)
+                    .AddOrUpdateFeature(featureA)
+                    .AddOrUpdateFeature(featureB)
                     .ReverseMap()
-                    .AddFeature(overridenFeatureB);
+                    .AddOrUpdateFeature(overridenFeatureB);
             });
 
             var typeMap = config.FindTypeMapFor<Source, Dest>();

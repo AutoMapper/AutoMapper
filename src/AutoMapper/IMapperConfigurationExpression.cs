@@ -135,7 +135,7 @@ namespace AutoMapper
         /// <summary>
         /// Extend with custom feature for the configuration.
         /// </summary>
-        void AddFeature<TFeature>(TFeature feature)
+        void AddOrUpdateFeature<TFeature>(TFeature feature)
             where TFeature : IMapperConfigurationExpressionFeature;
 
         /// <summary>

@@ -8,10 +8,14 @@ namespace AutoMapper.Configuration
         internal MappingExpressionFeatureCollection CreateReverseCollection()
         {
             var reverseFeatures = new MappingExpressionFeatureCollection();
-            foreach (var reverse in this.Select(f=>f.Reverse()).Where(f=>f!=null))
+            ForAll(feature =>
             {
-                reverseFeatures.AddOrUpdate(reverse);
-            }
+                var reverse = feature.Reverse();
+                if (reverse != null)
+                {
+                    reverseFeatures.AddOrUpdate(reverse);
+                }
+            });
             return reverseFeatures;
         }
 
