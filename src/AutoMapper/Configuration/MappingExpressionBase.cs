@@ -209,6 +209,8 @@ namespace AutoMapper.Configuration
             return this as TMappingExpression;
         }
 
+        protected void ReverseFeatures() => Features.ReverseTo(ReverseMapExpression.Features);
+
         public TMappingExpression ConstructUsingServiceLocator()
         {
             TypeMapActions.Add(tm => tm.ConstructDestinationUsingServiceLocator = true);

@@ -5,7 +5,9 @@ namespace AutoMapper.Features
 {
     public class MappingFeatureCollection : FeatureCollectionBase<IMappingFeature>
     {
-        internal IEnumerable<IMappingFeature> CreateReverseCollection() => this.Select(f => f.Reverse()).Where(f => f != null);
+        public void ReverseTo(MappingFeatureCollection features) => features.AddOrUpdateRange(CreateReverseCollection());
+
+        private IEnumerable<IMappingFeature> CreateReverseCollection() => this.Select(f => f.Reverse()).Where(f => f != null);
 
         internal void Configure(TypeMap typeMap) => ForAll(feature => feature.Configure(typeMap));
     }
