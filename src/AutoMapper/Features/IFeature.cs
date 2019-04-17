@@ -5,7 +5,7 @@
         void Seal(IConfigurationProvider configurationProvider);
     }
 
-    public static class FeatureExtesions
+    public static class FeatureExtensions
     {
         public static IMapperConfigurationExpression AddOrUpdateFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
         {
