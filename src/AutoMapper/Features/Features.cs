@@ -6,30 +6,30 @@ using System.Collections.ObjectModel;
 
 namespace AutoMapper.Features
 {
-    public class Features<TValue> : IEnumerable<TValue>
+    public class Features<TFeature> : IEnumerable<TFeature>
     {
-        private IDictionary<Type, TValue> _features = new Dictionary<Type, TValue>();
+        private IDictionary<Type, TFeature> _features = new Dictionary<Type, TFeature>();
 
         /// <summary>
-        /// Gets the feature of type <typeparamref name="TFeature"/>.
+        /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
         /// </summary>
-        /// <typeparam name="TFeature">The type of the feature.</typeparam>
+        /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
         /// <returns>The feature or null if feature not exists.</returns>
-        public TFeature Get<TFeature>() where TFeature : TValue => (TFeature)_features.GetOrDefault(typeof(TFeature));
+        public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature => (TFeatureToFind)_features.GetOrDefault(typeof(TFeatureToFind));
 
         /// <summary>
         /// Add or update the feature. Existing feature of the same type will be replaced.
         /// </summary>
         /// <param name="feature">The feature.</param>
-        public void AddOrUpdate(TValue feature) => _features[feature.GetType()] = feature;
+        public void AddOrUpdate(TFeature feature) => _features[feature.GetType()] = feature;
 
-        public IEnumerator<TValue> GetEnumerator() => _features.Values.GetEnumerator();
+        public IEnumerator<TFeature> GetEnumerator() => _features.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TValue>(_features);
+        protected void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TFeature>(_features);
 
-        public void ForAll(Action<TValue> action)
+        public void ForAll(Action<TFeature> action)
         {
             foreach (var feature in this)
             {
