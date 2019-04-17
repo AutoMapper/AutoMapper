@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Features;
 using AutoMapper.Mappers;
 
 namespace AutoMapper.Configuration
@@ -26,6 +27,8 @@ namespace AutoMapper.Configuration
         public IList<IObjectMapper> Mappers { get; }
 
         public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
+
+        public GlobalFeatures Features { get; } = new GlobalFeatures();
 
         private class NamedProfile : Profile
         {

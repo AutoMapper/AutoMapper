@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
+using AutoMapper.Features;
 using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper
@@ -99,6 +100,12 @@ namespace AutoMapper
         /// </summary>
         /// <returns>List of mappers</returns>
         IEnumerable<IObjectMapper> GetMappers();
+
+        /// <summary>
+        /// Gets the features collection.
+        /// </summary>
+        /// <value>The feature colection.</value>
+        RuntimeFeatures Features { get; }
 
         /// <summary>
         /// Find a matching object mapper.

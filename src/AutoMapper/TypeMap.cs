@@ -9,6 +9,7 @@ using AutoMapper.Execution;
 
 namespace AutoMapper
 {
+    using AutoMapper.Features;
     using Internal;
     using static Expression;
 
@@ -53,6 +54,8 @@ namespace AutoMapper
         }
 
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
+
+        public RuntimeFeatures Features { get; } = new RuntimeFeatures();
 
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
@@ -281,6 +284,8 @@ namespace AutoMapper
             _propertyMaps.Clear();
 
             MapExpression = CreateMapperLambda(configurationProvider, null);
+
+            Features.Seal(configurationProvider);
         }
 
         internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>

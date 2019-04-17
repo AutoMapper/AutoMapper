@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration.Internal;
+using AutoMapper.Features;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
@@ -27,6 +28,7 @@ namespace AutoMapper.Configuration
         public bool IsOpenGeneric { get; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
+        public MappingFeatures Features { get; } = new MappingFeatures();
         public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
         public IList<ValueTransformerConfiguration> ValueTransformers { get; } = new List<ValueTransformerConfiguration>();
 
@@ -76,6 +78,8 @@ namespace AutoMapper.Configuration
             {
                 typeMap.AddValueTransformation(valueTransformer);
             }
+
+            Features.Configure(typeMap);
 
             if(ReverseMapExpression != null)
             {
@@ -204,6 +208,8 @@ namespace AutoMapper.Configuration
 
             return this as TMappingExpression;
         }
+
+        protected void ReverseFeatures() => Features.ReverseTo(ReverseMapExpression.Features);
 
         public TMappingExpression ConstructUsingServiceLocator()
         {

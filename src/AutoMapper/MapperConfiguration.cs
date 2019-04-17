@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Features;
 using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
@@ -47,6 +48,8 @@ namespace AutoMapper
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
 
+            configurationExpression.Features.Configure(this);
+
             foreach (var beforeSealAction in configurationExpression.Advanced.BeforeSealActions)
                 beforeSealAction?.Invoke(this);
             Seal();
@@ -84,6 +87,8 @@ namespace AutoMapper
         public IEnumerable<IExpressionResultConverter> ResultConverters { get; }
 
         public IEnumerable<IExpressionBinder> Binders { get; }
+
+        public RuntimeFeatures Features { get; } = new RuntimeFeatures();
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
             TypePair types, IMemberMap memberMap = null)
@@ -372,6 +377,8 @@ namespace AutoMapper
             {
                 typeMap.Seal(this);
             }
+
+            Features.Seal(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)

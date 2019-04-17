@@ -28,9 +28,12 @@ namespace AutoMapper.Configuration
             {
                 reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
             }
+
+            ReverseFeatures();
+
             return reverseMap;
         }
-        
+
         public IMappingExpression IncludeMembers(params string[] memberNames)
         {
             IncludedMembersNames = memberNames;
@@ -283,6 +286,7 @@ namespace AutoMapper.Configuration
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
+            ReverseFeatures();
             return reverseMap;
         }
 

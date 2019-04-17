@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
+using AutoMapper.Features;
 
 namespace AutoMapper
 {
@@ -13,6 +15,8 @@ namespace AutoMapper
     public interface IMappingExpressionBase<TSource, TDestination, out TMappingExpression> 
         where TMappingExpression : IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
+        MappingFeatures Features { get; }
+
         /// <summary>
         /// Construct the destination object using the service locator
         /// </summary>
