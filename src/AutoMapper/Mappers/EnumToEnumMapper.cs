@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
                 return (TDestination)Enum.ToObject(destEnumType, source);
             }
 
-            if (!Enum.GetNames(destEnumType).Contains(source.ToString()))
+            if (!Enum.GetNames(destEnumType).Contains(source.ToString(), StringComparer.OrdinalIgnoreCase))
             {
                 var underlyingSourceType = Enum.GetUnderlyingType(sourceEnumType);
                 var underlyingSourceValue = System.Convert.ChangeType(source, underlyingSourceType);
