@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using AutoMapper.Features;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,7 +178,7 @@ namespace AutoMapper.UnitTests
         {
             private readonly TFeature _feature;
 
-            protected MappingExpressionFeatureBase(int value, TFeature feature, Func<IMappingExpressionFeature> reverseMappingExpressionFeature)
+            protected MappingExpressionFeatureBase(int value, TFeature feature, Func<IMappingFeature> reverseMappingExpressionFeature)
                 : base(value, reverseMappingExpressionFeature)
             {
                 _feature = feature;
@@ -190,15 +191,15 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public abstract class MappingExpressionFeatureBase : IMappingExpressionFeature
+        public abstract class MappingExpressionFeatureBase : IMappingFeature
         {
             public int Value { get; }
             public List<TypeMap> ConfigureTypeMaps { get; } = new List<TypeMap>();
-            public List<IMappingExpressionFeature> ReverseMaps { get; } = new List<IMappingExpressionFeature>();
+            public List<IMappingFeature> ReverseMaps { get; } = new List<IMappingFeature>();
 
-            private readonly Func<IMappingExpressionFeature> _reverseMappingExpressionFeature;
+            private readonly Func<IMappingFeature> _reverseMappingExpressionFeature;
 
-            protected MappingExpressionFeatureBase(int value, Func<IMappingExpressionFeature> reverseMappingExpressionFeature)
+            protected MappingExpressionFeatureBase(int value, Func<IMappingFeature> reverseMappingExpressionFeature)
             {
                 Value = value;
                 _reverseMappingExpressionFeature = reverseMappingExpressionFeature;
@@ -206,7 +207,7 @@ namespace AutoMapper.UnitTests
 
             public abstract void Configure(TypeMap typeMap);
 
-            public IMappingExpressionFeature Reverse()
+            public IMappingFeature Reverse()
             {
                 var reverse = _reverseMappingExpressionFeature();
                 ReverseMaps.Add(reverse);

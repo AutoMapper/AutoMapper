@@ -1,8 +1,8 @@
 ﻿namespace AutoMapper
 {
-    public interface IMappingExpressionFeature
+    public interface IMappingFeature
     {
         void Configure(TypeMap typeMap);
-        IMappingExpressionFeature Reverse();
+        IMappingFeature Reverse();
     }
 }

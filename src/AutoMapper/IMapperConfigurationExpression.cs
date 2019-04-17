@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Features;
 
 namespace AutoMapper
 {
@@ -131,12 +132,6 @@ namespace AutoMapper
         /// <param name="profileName">Profile name, must be unique</param>
         /// <param name="config">Profile configuration</param>
         void CreateProfile(string profileName, Action<IProfileExpression> config);
-
-        /// <summary>
-        /// Extend with custom feature for the configuration.
-        /// </summary>
-        void AddOrUpdateFeature<TFeature>(TFeature feature)
-            where TFeature : IMapperConfigurationExpressionFeature;
 
         /// <summary>
         /// Get the features collection.

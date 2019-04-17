@@ -1,6 +1,6 @@
-﻿namespace AutoMapper
+﻿namespace AutoMapper.Features
 {
-    public interface IMapperConfigurationExpressionFeature
+    public interface IGlobalFeature
     {
         void Configure(IConfigurationProvider configurationProvider);
     }

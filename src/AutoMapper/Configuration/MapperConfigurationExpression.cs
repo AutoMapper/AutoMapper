@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Features;
 using AutoMapper.Mappers;
 
 namespace AutoMapper.Configuration
@@ -125,7 +126,5 @@ namespace AutoMapper.Configuration
         }
 
         public void ConstructServicesUsing(Func<Type, object> constructor) => ServiceCtor = constructor;
-
-        public void AddOrUpdateFeature<TFeature>(TFeature feature) where TFeature : IMapperConfigurationExpressionFeature => Features.AddOrUpdate(feature);
     }
 }

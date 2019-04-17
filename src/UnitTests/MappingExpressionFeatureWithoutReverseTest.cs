@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using AutoMapper.Features;
+using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -243,7 +244,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public abstract class MappingExpressionFeatureBase : IMappingExpressionFeature
+        public abstract class MappingExpressionFeatureBase : IMappingFeature
         {
             public int Value { get; }
             public List<TypeMap> ConfigureTypeMaps { get; } = new List<TypeMap>();
@@ -256,7 +257,7 @@ namespace AutoMapper.UnitTests
 
             public abstract void Configure(TypeMap typeMap);
 
-            public IMappingExpressionFeature Reverse()
+            public IMappingFeature Reverse()
             {
                 ReverseExecutedCount++;
                 return null;

@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using AutoMapper.Features;
+using Shouldly;
 using System.Collections.Generic;
 using Xunit;
 
@@ -95,7 +96,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public abstract class ConfigurationExpressionFeatureBase : IMapperConfigurationExpressionFeature
+        public abstract class ConfigurationExpressionFeatureBase : IGlobalFeature
         {
             public int Value { get; }
             public List<IConfigurationProvider> ConfigurationProviders { get; } = new List<IConfigurationProvider>();

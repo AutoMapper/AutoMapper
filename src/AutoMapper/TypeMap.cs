@@ -9,6 +9,7 @@ using AutoMapper.Execution;
 
 namespace AutoMapper
 {
+    using AutoMapper.Features;
     using Internal;
     using static Expression;
 

@@ -1,9 +1,6 @@
-﻿using AutoMapper.Internal;
-using System.Linq;
-
-namespace AutoMapper.Configuration
+﻿namespace AutoMapper.Features
 {
-    public class MappingExpressionFeatureCollection : FeatureCollectionBase<IMappingExpressionFeature>
+    public class MappingExpressionFeatureCollection : FeatureCollectionBase<IMappingFeature>
     {
         internal MappingExpressionFeatureCollection CreateReverseCollection()
         {

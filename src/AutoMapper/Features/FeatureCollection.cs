@@ -1,6 +1,6 @@
 ﻿using AutoMapper.Internal;
 
-namespace AutoMapper
+namespace AutoMapper.Features
 {
     public class FeatureCollection : FeatureCollectionBase<IFeature>
     {

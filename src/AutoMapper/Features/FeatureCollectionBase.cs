@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Features
 {
     public class FeatureCollectionBase<TValue> : IEnumerable<TValue>
     {
