@@ -15,7 +15,7 @@ namespace AutoMapper
     public interface IMappingExpressionBase<TSource, TDestination, out TMappingExpression> 
         where TMappingExpression : IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
-        MappingFeatureCollection Features { get; }
+        MappingFeatures Features { get; }
 
         /// <summary>
         /// Construct the destination object using the service locator

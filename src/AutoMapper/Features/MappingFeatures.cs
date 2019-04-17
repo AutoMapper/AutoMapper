@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace AutoMapper.Features
 {
-    public class MappingFeatureCollection : FeatureCollectionBase<IMappingFeature>
+    public class MappingFeatures : Features<IMappingFeature>
     {
-        public void ReverseTo(MappingFeatureCollection features) => features.AddOrUpdateRange(CreateReverseCollection());
+        public void ReverseTo(MappingFeatures features) => features.AddOrUpdateRange(CreateReverseCollection());
 
         private IEnumerable<IMappingFeature> CreateReverseCollection() => this.Select(f => f.Reverse()).Where(f => f != null);
 

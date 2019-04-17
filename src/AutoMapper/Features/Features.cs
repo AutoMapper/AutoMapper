@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace AutoMapper.Features
 {
-    public class FeatureCollectionBase<TValue> : IEnumerable<TValue>
+    public class Features<TValue> : IEnumerable<TValue>
     {
         private IDictionary<Type, TValue> _features = new Dictionary<Type, TValue>();
 

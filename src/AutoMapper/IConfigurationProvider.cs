@@ -105,7 +105,7 @@ namespace AutoMapper
         /// Gets the features collection.
         /// </summary>
         /// <value>The feature colection.</value>
-        RuntimeFeatureCollection Features { get; }
+        RuntimeFeatures Features { get; }
 
         /// <summary>
         /// Find a matching object mapper.
