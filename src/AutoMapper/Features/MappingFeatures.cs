@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace AutoMapper.Features
+﻿namespace AutoMapper.Features
 {
     public class MappingFeatures : Features<IMappingFeature>
     {

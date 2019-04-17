@@ -1,6 +1,4 @@
-﻿using AutoMapper.Internal;
-
-namespace AutoMapper.Features
+﻿namespace AutoMapper.Features
 {
     public class RuntimeFeatures : Features<IRuntimeFeature>
     {
