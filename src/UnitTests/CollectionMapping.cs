@@ -293,6 +293,94 @@ namespace AutoMapper.UnitTests
         } 
     }
 
+    public class When_mapping_to_custom_readonly_typed_generic_list_type : AutoMapperSpecBase
+    {
+        public class MyCustomTypeCollection<T> : IList<T>
+        {
+            private List<T> _collection = new List<T>();
+
+            public T this[int index] { get => ((IList<T>)_collection)[index]; set => ((IList<T>)_collection)[index] = value; }
+
+            public int Count => ((IList<T>)_collection).Count;
+
+            public bool IsReadOnly => ((IList<T>)_collection).IsReadOnly;
+
+            public void Add(T item)
+            {
+                ((IList<T>)_collection).Add(item);
+            }
+
+            public void Clear()
+            {
+                ((IList<T>)_collection).Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                return ((IList<T>)_collection).Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                ((IList<T>)_collection).CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return ((IList<T>)_collection).GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return ((IList<T>)_collection).IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                ((IList<T>)_collection).Insert(index, item);
+            }
+
+            public bool Remove(T item)
+            {
+                return ((IList<T>)_collection).Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                ((IList<T>)_collection).RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IList<T>)_collection).GetEnumerator();
+            }
+        }
+
+        public class SourceItem
+        {
+            public string Name { get; set; }
+            public List<string> ShipsTo { get; set; }
+        }
+
+        public class DestItem
+        {
+            public string Name { get; set; }
+            public MyCustomTypeCollection<string> ShipsTo { get; } = new MyCustomTypeCollection<string>();
+        }
+
+        protected override MapperConfiguration Configuration =>
+            new MapperConfiguration(cfg => cfg.CreateMap<SourceItem, DestItem>()
+            .ForMember(d => d.ShipsTo, m => m.UseDestinationValue()));
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var items = Enumerable.Range(1, 5).Select(i => i.ToString()).ToArray();
+            Mapper.Map<DestItem>(new SourceItem { ShipsTo = new List<string>(items) })
+                .ShipsTo.Cast<string>().SequenceEqual(items).ShouldBeTrue();
+        }
+    }
+
     public class When_mapping_collections_with_inheritance : AutoMapperSpecBase
     {
         public class Source

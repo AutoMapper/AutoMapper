@@ -24,6 +24,67 @@ namespace AutoMapper.UnitTests
             public int PublicProperty { get; set; }
         }
 
+        class CustomCollection<T> : IList<T>
+        {
+            private List<T> _collection = new List<T>();
+
+            public T this[int index] { get => ((IList<T>)_collection)[index]; set => ((IList<T>)_collection)[index] = value; }
+
+            public int Count => ((IList<T>)_collection).Count;
+
+            public bool IsReadOnly => ((IList<T>)_collection).IsReadOnly;
+
+            public void Add(T item)
+            {
+                ((IList<T>)_collection).Add(item);
+            }
+
+            public void Clear()
+            {
+                ((IList<T>)_collection).Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                return ((IList<T>)_collection).Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                ((IList<T>)_collection).CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return ((IList<T>)_collection).GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return ((IList<T>)_collection).IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                ((IList<T>)_collection).Insert(index, item);
+            }
+
+            public bool Remove(T item)
+            {
+                return ((IList<T>)_collection).Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                ((IList<T>)_collection).RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IList<T>)_collection).GetEnumerator();
+            }
+        }
+
         [Fact]
         public void Should_find_explicitly_implemented_member()
         {
@@ -52,6 +113,12 @@ namespace AutoMapper.UnitTests
         public void Should_flag_dictionary_as_writeable_collection()
         {
             PrimitiveHelper.IsListOrDictionaryType(typeof(Dictionary<string, int>)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Should_flag_custom_generic_list_type_as_writeable_collection()
+        {
+            PrimitiveHelper.IsListOrDictionaryType(typeof(CustomCollection<int>)).ShouldBeTrue();
         }
     }
 }

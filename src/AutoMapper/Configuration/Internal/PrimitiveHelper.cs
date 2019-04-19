@@ -41,7 +41,7 @@ namespace AutoMapper.Configuration.Internal
             => typeof(IQueryable).IsAssignableFrom(type);
 
         public static bool IsListType(Type type)
-            => typeof(IList).IsAssignableFrom(type);
+            => typeof(IList).IsAssignableFrom(type) || type.ImplementsGenericInterface(typeof(IList<>));
 
         public static bool IsListOrDictionaryType(Type type)
             => type.IsListType() || type.IsDictionaryType();
