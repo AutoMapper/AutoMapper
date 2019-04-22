@@ -14,12 +14,12 @@ namespace AutoMapper.UnitTests
             var featureB = new ConfigurationExpressionFeatureB(1);
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddOrUpdateFeature(new ConfigurationExpressionFeatureA(3));
-                cfg.AddOrUpdateFeature(new ConfigurationExpressionFeatureA(2));
-                cfg.AddOrUpdateFeature(featureA);
-                cfg.AddOrUpdateFeature(new ConfigurationExpressionFeatureB(3));
-                cfg.AddOrUpdateFeature(new ConfigurationExpressionFeatureB(2));
-                cfg.AddOrUpdateFeature(featureB);
+                cfg.SetFeature(new ConfigurationExpressionFeatureA(3));
+                cfg.SetFeature(new ConfigurationExpressionFeatureA(2));
+                cfg.SetFeature(featureA);
+                cfg.SetFeature(new ConfigurationExpressionFeatureB(3));
+                cfg.SetFeature(new ConfigurationExpressionFeatureB(2));
+                cfg.SetFeature(featureB);
             });
 
             Validate<ConfigurationFeatureA>(featureA, config);
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
             var featureA = new ConfigurationExpressionFeatureA(1);
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddOrUpdateFeature(featureA);
+                cfg.SetFeature(featureA);
             });
 
             Validate<ConfigurationFeatureA>(featureA, config);
@@ -45,8 +45,8 @@ namespace AutoMapper.UnitTests
             var featureB = new ConfigurationExpressionFeatureB(2);
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddOrUpdateFeature(featureA);
-                cfg.AddOrUpdateFeature(featureB);
+                cfg.SetFeature(featureA);
+                cfg.SetFeature(featureB);
             });
 
             Validate<ConfigurationFeatureA>(featureA, config);
