@@ -136,7 +136,7 @@ namespace AutoMapper
         /// <summary>
         /// Get the features collection.
         /// </summary>
-        GlobalFeatures Features { get; }
+        Features<IGlobalFeature> Features { get; }
 
         /// <summary>
         /// Object mappers

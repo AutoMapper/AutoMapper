@@ -28,7 +28,7 @@ namespace AutoMapper.Configuration
 
         public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
 
-        public GlobalFeatures Features { get; } = new GlobalFeatures();
+        public Features<IGlobalFeature> Features { get; } = new Features<IGlobalFeature>();
 
         private class NamedProfile : Profile
         {
