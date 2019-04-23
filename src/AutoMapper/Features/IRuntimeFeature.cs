@@ -1,4 +1,8 @@
-﻿namespace AutoMapper.Features
+﻿using AutoMapper.Configuration;
+using System;
+using System.Collections.Generic;
+
+namespace AutoMapper.Features
 {
     public interface IRuntimeFeature
     {
@@ -17,6 +21,25 @@
         {
             mapping.Features.Set(feature);
             return mapping;
+        }
+
+        internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration) => features.ForAll(feature => feature.Configure(mapperConfiguration));
+
+        public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures) => features.ForAll(feature =>
+        {
+            var reverse = feature.Reverse();
+            if (reverse != null)
+            {
+                reversedFeatures.Set(reverse);
+            }
+        });
+
+        internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap) => features.ForAll(feature => feature.Configure(typeMap));
+
+        internal static void Seal(this Features<IRuntimeFeature> features, IConfigurationProvider configurationProvider)
+        {
+            features.ForAll(feature => feature.Seal(configurationProvider));
+            features.MakeReadOnly();
         }
     }
 }

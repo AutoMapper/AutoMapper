@@ -7,6 +7,14 @@ namespace AutoMapper.Configuration
 {
     internal static class PrimitiveExtensions
     {
+        public static void ForAll<T>(this IEnumerable<T> enumerable, Action<T> action)
+        {
+            foreach (var feature in enumerable)
+            {
+                action(feature);
+            }
+        }
+
         public static bool IsSetType(this Type type)
             => type.ImplementsGenericInterface(typeof(ISet<>));
 

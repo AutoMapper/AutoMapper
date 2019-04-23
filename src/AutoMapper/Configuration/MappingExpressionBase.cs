@@ -28,7 +28,7 @@ namespace AutoMapper.Configuration
         public bool IsOpenGeneric { get; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
-        public MappingFeatures Features { get; } = new MappingFeatures();
+        public Features<IMappingFeature> Features { get; } = new Features<IMappingFeature>();
         public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
         public IList<ValueTransformerConfiguration> ValueTransformers { get; } = new List<ValueTransformerConfiguration>();
 

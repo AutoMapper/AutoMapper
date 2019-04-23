@@ -27,14 +27,6 @@ namespace AutoMapper.Features
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TFeature>(_features);
-
-        public void ForAll(Action<TFeature> action)
-        {
-            foreach (var feature in this)
-            {
-                action(feature);
-            }
-        }
+        internal void MakeReadOnly() => _features = new ReadOnlyDictionary<Type, TFeature>(_features);
     }
 }
