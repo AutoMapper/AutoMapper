@@ -91,7 +91,7 @@ For simple cases, you can use `As` to redirect a base map to an existing derived
     mapper.Map<OrderDto>(new Order()).ShouldBeOfType<OnlineOrderDto>();
 ```
 
-### Inheritance Mapping Priorities
+## Inheritance Mapping Priorities
 
 This introduces additional complexity because there are multiple ways a property can be mapped. The priority of these sources are as follows
 
