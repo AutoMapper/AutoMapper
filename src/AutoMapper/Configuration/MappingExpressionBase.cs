@@ -177,7 +177,7 @@ namespace AutoMapper.Configuration
         }
 
         protected IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
-            MemberConfigurations.FirstOrDefault(m => m.DestinationMember == destinationMember);
+            MemberConfigurations.FirstOrDefault(m => m.DestinationMember.Name == destinationMember.Name);
 
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
     }

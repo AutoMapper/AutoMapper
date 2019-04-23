@@ -225,8 +225,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Where(m =>
-                    GetDestinationMemberConfiguration(m) == null))
+                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Where(m => GetDestinationMemberConfiguration(m) == null))
                 {
                     ForDestinationMember(accessor, memberOptions);
                 }
