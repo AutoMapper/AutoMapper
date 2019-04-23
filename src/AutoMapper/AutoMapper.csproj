@@ -11,7 +11,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>AutoMapper</PackageId>
     <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
-    <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
+    <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/AutoMapper/AutoMapper</RepositoryUrl>
