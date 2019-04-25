@@ -21,16 +21,21 @@ This is the main repository for AutoMapper, but there's more:
 First, configure AutoMapper to know what types you want to map, in the startup of your application:
 
 ```csharp
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => 
+{
     cfg.CreateMap<Foo, FooDto>();
     cfg.CreateMap<Bar, BarDto>();
 });
+// only during development, validate your mappings; remove it before release
+configuration.AssertConfigurationIsValid();
+// use DI (http://docs.automapper.org/en/latest/Dependency-injection.html) or create the mapper yourself
+var mapper = configuration.CreateMapper();
 ```
 Then in your application code, execute the mappings:
 
 ```csharp
-var fooDto = Mapper.Map<FooDto>(foo);
-var barDto = Mapper.Map<BarDto>(bar);
+var fooDto = mapper.Map<FooDto>(foo);
+var barDto = mapper.Map<BarDto>(bar);
 ```
 
 Check out the [getting started guide](https://automapper.readthedocs.io/en/latest/Getting-started.html). When you're done there, the [wiki](https://automapper.readthedocs.io/en/latest/) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](https://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
