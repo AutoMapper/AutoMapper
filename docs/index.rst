@@ -56,6 +56,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Mapping-inheritance
    Queryable-Extensions
    Configuration
+   Attribute-mapping
    Construction
    Conditional-mapping
    Open-Generics

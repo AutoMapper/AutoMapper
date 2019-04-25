@@ -65,14 +65,14 @@ or by automatically scanning for profiles:
 // Scan for all profiles in an assembly
 // ... using instance approach:
 var config = new MapperConfiguration(cfg => {
-    cfg.AddProfiles(myAssembly);
+    cfg.AddMaps(myAssembly);
 });
 // ... or static approach:
 Mapper.Initialize(cfg => cfg.AddProfiles(myAssembly));
 
 // Can also use assembly names:
 Mapper.Initialize(cfg =>
-    cfg.AddProfiles(new [] {
+    cfg.AddMaps(new [] {
         "Foo.UI",
         "Foo.Core"
     });
@@ -80,7 +80,7 @@ Mapper.Initialize(cfg =>
 
 // Or marker types for assemblies:
 Mapper.Initialize(cfg =>
-    cfg.AddProfiles(new [] {
+    cfg.AddMaps(new [] {
         typeof(HomeController),
         typeof(Entity)
     });
