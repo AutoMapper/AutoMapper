@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -186,7 +186,7 @@ namespace AutoMapper.UnitTests.Tests
         public class Source
         {
             public int Value { get; set; }
-            public int Ävíator { get; set; }
+            public int è†™éŸ†tor { get; set; }
             public int SubAirlinaFlight { get; set; }
         }
 
@@ -207,14 +207,14 @@ namespace AutoMapper.UnitTests.Tests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.ReplaceMemberName("A", "?");
-                cfg.ReplaceMemberName("i", "?");
+                cfg.ReplaceMemberName("A", "Ã„");
+                cfg.ReplaceMemberName("i", "Ã­");
                 cfg.ReplaceMemberName("Airline", "Airlina");
                 cfg.CreateMap<Source, Destination>();
             });
 
             var mapper = config.CreateMapper();
-            var dest = mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
+            var dest = mapper.Map<Destination>(new Source {è†™éŸ†tor = 3, SubAirlinaFlight = 4, Value = 5});
             dest.Aviator.ShouldBe(3);
             dest.SubAirlineFlight.ShouldBe(4);
             dest.Value.ShouldBe(5);
