@@ -24,6 +24,7 @@ namespace AutoMapper
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private readonly Dictionary<string, PropertyMap> _propertyMaps = new Dictionary<string, PropertyMap>();
+        private readonly Dictionary<string, PropertyMap> _excludeMaps = new Dictionary<string, PropertyMap>();
         private readonly Dictionary<MemberPath, PathMap> _pathMaps = new Dictionary<MemberPath, PathMap>();
         private readonly Dictionary<MemberInfo, SourceMemberConfig> _sourceMemberConfigs = new Dictionary<MemberInfo, SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
@@ -104,6 +105,9 @@ namespace AutoMapper
         public bool DisableConstructorValidation { get; set; }
 
         public IEnumerable<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (IEnumerable<PropertyMap>)_propertyMaps.Values;
+
+        public IEnumerable<PropertyMap> ExcludeMaps => _excludeMaps.Values;
+
         public IEnumerable<PathMap> PathMaps => _pathMaps.Values;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
@@ -158,7 +162,18 @@ namespace AutoMapper
             AddPropertyMap(propertyMap);
         }
 
+        public void AddExcludeMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
+        {
+            var propertyMap = new PropertyMap(destProperty, this);
+
+            propertyMap.ChainMembers(resolvers);
+
+            AddExcludeMap(propertyMap);
+        }
+
         private void AddPropertyMap(PropertyMap propertyMap) => _propertyMaps.Add(propertyMap.DestinationName, propertyMap);
+
+        private void AddExcludeMap(PropertyMap propertyMap) => _excludeMaps.Add(propertyMap.DestinationName, propertyMap);
 
         public string[] GetUnmappedPropertyNames()
         {

@@ -1,6 +1,7 @@
 using Xunit;
 using Shouldly;
 
+
 namespace AutoMapper.UnitTests
 {
     namespace Internationalization
@@ -9,37 +10,44 @@ namespace AutoMapper.UnitTests
         {
             private OrderDto _result;
 
+
             public class Order
             {
                 public Customer Customer { get; set; }
             }
 
+
             public class Customer
             {
-                public string Æøå { get; set; }
+                public string Ã†Ã¸Ã¥ { get; set; }
             }
+
 
             public class OrderDto
             {
-                public string CustomerÆøå { get; set; }
+                public string CustomerÃ†Ã¸Ã¥ { get; set; }
             }
+
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Order, OrderDto>();
             });
 
+
             protected override void Because_of()
             {
-                _result = Mapper.Map<Order, OrderDto>(new Order {Customer = new Customer {Æøå = "Bob"}});
+                _result = Mapper.Map<Order, OrderDto>(new Order { Customer = new Customer { Ã†Ã¸Ã¥ = "Bob" } });
             }
+
 
             [Fact]
             public void Should_match_to_identical_property_name_on_destination()
             {
-                _result.CustomerÆøå.ShouldBe("Bob");
+                _result.CustomerÃ†Ã¸Ã¥.ShouldBe("Bob");
             }
         }
+
 
     }
 }

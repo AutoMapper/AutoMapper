@@ -23,6 +23,10 @@ namespace AutoMapper
                 {
                     typeMap.AddPropertyMap(destProperty, resolvers);
                 }
+                else
+                {
+                    typeMap.AddExcludeMap(destProperty, resolvers);
+                }
             }
             if (!destinationType.IsAbstract())
             {

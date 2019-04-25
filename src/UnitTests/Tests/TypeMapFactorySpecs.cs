@@ -207,8 +207,8 @@ namespace AutoMapper.UnitTests.Tests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.ReplaceMemberName("A", "Ä");
-                cfg.ReplaceMemberName("i", "í");
+                cfg.ReplaceMemberName("A", "?");
+                cfg.ReplaceMemberName("i", "?");
                 cfg.ReplaceMemberName("Airline", "Airlina");
                 cfg.CreateMap<Source, Destination>();
             });
