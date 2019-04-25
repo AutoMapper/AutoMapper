@@ -29,7 +29,7 @@ var configuration = new MapperConfiguration(cfg =>
 // only during development, validate your mappings; remove it before release
 configuration.AssertConfigurationIsValid();
 // use DI (http://docs.automapper.org/en/latest/Dependency-injection.html) or create the mapper yourself
-var mapper = config.CreateMapper();
+var mapper = configuration.CreateMapper();
 ```
 Then in your application code, execute the mappings:
 
