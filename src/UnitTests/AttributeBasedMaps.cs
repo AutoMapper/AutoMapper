@@ -853,5 +853,52 @@ namespace AutoMapper.UnitTests
                 dest.OtherValue.ShouldBe(25);
             }
         }
+
+        public class When_specifying_map_with__multiple_attribute_sources : NonValidatingSpecBase
+        {
+            public class FirstSource
+            {
+                public int Value { get; set; }
+            }
+
+            public class SecondSource
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(FirstSource))]
+            [AutoMap(typeof(SecondSource))]
+            public class Dest
+            {
+                public int Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMissingTypeMaps = false;
+                cfg.AddMaps(typeof(When_specifying_map_with_attribute));
+            });
+
+            [Fact]
+            public void Should_map_from_both_sources()
+            {
+                Dest dest;
+                var firstSource = new FirstSource { Value = 5 };
+                dest = Mapper.Map<Dest>(firstSource);
+
+                dest.Value.ShouldBe(5);
+
+                var secondSource = new SecondSource { Value = 10 };
+                dest = Mapper.Map<Dest>(secondSource);
+
+                dest.Value.ShouldBe(10);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
+            }
+        }
     }
 }
