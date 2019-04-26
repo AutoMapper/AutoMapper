@@ -106,17 +106,23 @@ namespace AutoMapper.Configuration
                     AddProfile(type.AsType());
                 }
 
-                var autoMapAttribute = type.GetCustomAttribute<AutoMapAttribute>();
-                if (autoMapAttribute != null)
+                var autoMapAttributes = type.GetCustomAttributes<AutoMapAttribute>();
+                foreach (var autoMapAttribute in autoMapAttributes)
                 {
-                    var mappingExpression = (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
-                    autoMapAttribute.ApplyConfiguration(mappingExpression);
-
-                    foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+                    if (autoMapAttribute != null)
                     {
-                        foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes().OfType<IMemberConfigurationProvider>())
+                        var mappingExpression =
+                            (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                        autoMapAttribute.ApplyConfiguration(mappingExpression);
+
+                        foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
                         {
-                            mappingExpression.ForMember(memberInfo, cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
+                            foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes()
+                                .OfType<IMemberConfigurationProvider>())
+                            {
+                                mappingExpression.ForMember(memberInfo,
+                                    cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
+                            }
                         }
                     }
                 }

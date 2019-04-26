@@ -6,7 +6,7 @@ namespace AutoMapper
     /// Auto map to this destination type from the specified source type.
     /// Discovered during scanning assembly scanning for configuration when calling <see cref="O:AutoMapper.IMapperConfigurationExpression.AddMaps"/>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple = true)]
     public sealed class AutoMapAttribute : Attribute
     {
         public AutoMapAttribute(Type sourceType) 
