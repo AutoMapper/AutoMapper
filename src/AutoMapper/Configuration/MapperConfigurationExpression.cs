@@ -105,21 +105,16 @@ namespace AutoMapper.Configuration
                 {
                     AddProfile(type.AsType());
                 }
-
-                var autoMapAttributes = type.GetCustomAttributes<AutoMapAttribute>();
-                foreach (var autoMapAttribute in autoMapAttributes)
+                foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
                 {
-                    var mappingExpression =
-                        (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                    var mappingExpression = (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
                     autoMapAttribute.ApplyConfiguration(mappingExpression);
 
                     foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
                     {
-                        foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes()
-                            .OfType<IMemberConfigurationProvider>())
+                        foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes().OfType<IMemberConfigurationProvider>())
                         {
-                            mappingExpression.ForMember(memberInfo,
-                                cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
+                            mappingExpression.ForMember(memberInfo, cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
                         }
                     }
                 }
