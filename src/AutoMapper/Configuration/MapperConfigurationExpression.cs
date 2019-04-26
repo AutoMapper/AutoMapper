@@ -109,20 +109,17 @@ namespace AutoMapper.Configuration
                 var autoMapAttributes = type.GetCustomAttributes<AutoMapAttribute>();
                 foreach (var autoMapAttribute in autoMapAttributes)
                 {
-                    if (autoMapAttribute != null)
-                    {
-                        var mappingExpression =
-                            (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
-                        autoMapAttribute.ApplyConfiguration(mappingExpression);
+                    var mappingExpression =
+                        (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
+                    autoMapAttribute.ApplyConfiguration(mappingExpression);
 
-                        foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+                    foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes()
+                            .OfType<IMemberConfigurationProvider>())
                         {
-                            foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes()
-                                .OfType<IMemberConfigurationProvider>())
-                            {
-                                mappingExpression.ForMember(memberInfo,
-                                    cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
-                            }
+                            mappingExpression.ForMember(memberInfo,
+                                cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
                         }
                     }
                 }
