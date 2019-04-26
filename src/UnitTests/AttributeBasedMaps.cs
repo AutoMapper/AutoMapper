@@ -854,7 +854,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_specifying_map_with__multiple_attribute_sources : AutoMapperSpecBase
+        public class When_specifying_map_with__multiple_attribute_sources : NonValidatingSpecBase
         {
             public class FirstSource
             {
@@ -892,6 +892,12 @@ namespace AutoMapper.UnitTests
                 dest = Mapper.Map<Dest>(secondSource);
 
                 dest.Value.ShouldBe(10);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(nameof(AutoMapAttribute)));
             }
         }
     }
