@@ -77,7 +77,7 @@ namespace AutoMapper
         }
 
         TDestination IMapper.Map<TDestination>(object source)
-            => (TDestination)_inner.Map(source, null, source.GetType(), typeof(TDestination), this);
+            => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
