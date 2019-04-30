@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
 
 namespace AutoMapper.Internal
@@ -131,9 +132,22 @@ namespace AutoMapper.Internal
                     target = member.Expression;
                     NullCheck();
                 }
-                else if(target is MethodCallExpression method)
+                else if(target is MethodCallExpression methodCall)
                 {
-                    target = method.Method.IsStatic() ? method.Arguments.FirstOrDefault() : method.Object;
+                    var isStatic = methodCall.Method.IsStatic;
+                    if (isStatic)
+                    {
+                        var parameters = methodCall.Method.GetParameters();
+                        if (parameters.Length == 0 || !methodCall.Method.Has<ExtensionAttribute>())
+                        {
+                            return expression;
+                        }
+                        target = methodCall.Arguments[0];
+                    }
+                    else
+                    {
+                        target = methodCall.Object;
+                    }
                     NullCheck();
                 }
                 else if(target?.NodeType == ExpressionType.Parameter)
