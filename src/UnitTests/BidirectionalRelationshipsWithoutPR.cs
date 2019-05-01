@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests
         public class CFieldDefinitionDTO
         {
             public string Name { get; set; }
-            public CDataTypeModel DataType { get; set; }
+            public CDataTypeDTO DataType { get; set; }
             public CComponentDefinitionDTO ComponentDefinition { get; set; }
         }
         public class CComponentDefinitionModel
@@ -45,6 +45,18 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<CDataTypeDTO, CDataTypeModel>();
             cfg.CreateMap<CFieldDefinitionDTO, CFieldDefinitionModel>();
         });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var component = new CComponentDefinitionDTO();
+            var type = new CDataTypeDTO();
+            var field = new CFieldDefinitionDTO { ComponentDefinition = component, DataType = type };
+            type.FieldDefinitionList  = component.FieldDefinitionList = new List<CFieldDefinitionDTO> { field };
+            var fieldModel = Mapper.Map<CFieldDefinitionModel>(field);
+            fieldModel.ShouldBeSameAs(fieldModel.ComponentDefinition.FieldDefinitionList[0]);
+            fieldModel.ShouldBeSameAs(fieldModel.DataType.FieldDefinitionList[0]);
+        }
     }
 
     public class When_the_same_map_is_used_again : AutoMapperSpecBase
