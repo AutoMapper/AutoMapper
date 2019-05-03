@@ -85,6 +85,7 @@ namespace AutoMapper.Execution
             typeMapsPath.Add(_typeMap);
             var members = 
                 _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue)
+                .ToArray()
                 .Select(pm=> new { MemberTypeMap = ResolveMemberTypeMap(pm), MemberMap = pm })
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
             foreach(var item in members)
