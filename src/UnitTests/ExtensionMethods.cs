@@ -173,4 +173,47 @@ namespace AutoMapper.UnitTests
             _destination.ValuesCount.ShouldBe(10);
         }
     }
+
+    public class When_a_static_method_has_first_parameter_null : AutoMapperSpecBase
+    {
+        class FirstName
+        {
+            public string Name;
+        }
+
+        class LastName
+        {
+            public string Name;
+        }
+
+        class FullName
+        {
+            public string Name;
+        }
+
+        class CombinedNames
+        {
+            public FirstName First;
+
+            public LastName Last;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<CombinedNames, FullName>()
+                .ForMember(dst => dst.Name, o => o.MapFrom(src => string.Concat(src.First.Name, src.Last.Name)));
+        });
+
+        [Fact]
+        public void It_should_not_be_null_checked()
+        {
+            var combinedNames = new CombinedNames
+            {
+                First = new FirstName { Name = null },
+                Last = new LastName { Name = "Doe" }
+            };
+            var fullName = Mapper.Map<FullName>(combinedNames);
+            fullName.Name.ShouldBe("Doe");
+        }
+    }
 }
