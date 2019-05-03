@@ -46,4 +46,22 @@
             _dest.Child.Foo.ShouldBe(5);
         }
     }
+
+    public class When_mapping_null_with_context_mapper : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+            cfg.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom((s,d,dm, context)=>context.Mapper.Map<string>(null))));
+
+        [Fact]
+        public void Should_return_null() => Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
+    }
 }
