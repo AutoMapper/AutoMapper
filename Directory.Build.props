@@ -1,7 +1,7 @@
 <Project>
 
     <PropertyGroup>
-        <VersionPrefix>8.1.0</VersionPrefix>
+        <VersionPrefix>8.1.1</VersionPrefix>
         <Authors>Jimmy Bogard</Authors>
         <LangVersion>latest</LangVersion>
         <WarningsAsErrors>true</WarningsAsErrors>
