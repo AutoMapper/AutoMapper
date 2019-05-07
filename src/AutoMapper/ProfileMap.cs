@@ -266,6 +266,7 @@ namespace AutoMapper
             foreach (var inheritedTypeMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
                 inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
+                inheritedTypeMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(baseMap, inheritedTypeMap, configurationProvider);
             }
         }
