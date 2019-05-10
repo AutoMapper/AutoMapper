@@ -162,7 +162,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             public Dest(int value, int blarg)
             {
-                Value = blarg;
+                Value = value;
             }
 
             public int Value { get; }
