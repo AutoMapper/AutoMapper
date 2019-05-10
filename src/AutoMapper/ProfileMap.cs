@@ -263,10 +263,11 @@ namespace AutoMapper
 
         private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
-            foreach (var inheritedTypeMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
+            foreach (var derivedMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
-                inheritedTypeMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
-                ApplyDerivedMaps(baseMap, inheritedTypeMap, configurationProvider);
+                derivedMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
+                derivedMap.AddInheritedMap(baseMap);
+                ApplyDerivedMaps(baseMap, derivedMap, configurationProvider);
             }
         }
     }
