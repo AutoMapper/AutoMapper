@@ -25,23 +25,6 @@
             {
 //                typeof(Foo).GetProperties().Length.ShouldBe(4);
             }
-        }
-
-        public class GetDeclaredMethod_order
-        {
-            public class MethodOrderTest
-            {
-                public void M1(object arg1) { }
-                public void M1() { }
-                public void M1(object arg1, object arg2) { }
-            }
-
-            [Fact]
-            public void Should_return_first_ordered_by_parameters_count()
-            {
-                var result = typeof(MethodOrderTest).GetDeclaredMethod(nameof(MethodOrderTest.M1));
-                result.GetParameters().ShouldBeEmpty();
-            }
-        }
+        } 
     }
 }
