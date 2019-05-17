@@ -1,4 +1,5 @@
-﻿namespace AutoMapper.UnitTests
+﻿#pragma warning disable 618
+namespace AutoMapper.UnitTests
 {
     using System.Linq;
     using Shouldly;
@@ -137,3 +138,4 @@
 
     }
 }
+#pragma warning restore 618
