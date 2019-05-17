@@ -26,11 +26,6 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<FlagEnumSource, FlagEnumDest>());
 
         [Fact]
-        public void Should_not_throw_exception()
-        {
-            IMapper mapper = new Mapper(Configuration);
-
-            mapper.Map<FlagEnumDest>(new FlagEnumSource { F = FlagEnum.B }).F.ShouldBe(FlagEnum.B);
-        }
+        public void Should_map() => Mapper.Map<FlagEnumDest>(new FlagEnumSource { F = FlagEnum.B }).F.ShouldBe(FlagEnum.B);
     }
 }
