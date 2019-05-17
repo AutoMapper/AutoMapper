@@ -37,7 +37,7 @@ namespace AutoMapper
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
+        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetAllMethods().SingleOrDefault(mi => mi.Name == name);
 
         public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters) =>
             type.GetAllMethods().Where(mi => mi.Name == name).MatchParameters(parameters);
