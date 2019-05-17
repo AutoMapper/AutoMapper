@@ -46,7 +46,7 @@ namespace AutoMapper
             type.GetDeclaredConstructors().MatchParameters(parameters);
 
         private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
-            methods.FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
+            methods.SingleOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type) => type.GetRuntimeMethods();
 
