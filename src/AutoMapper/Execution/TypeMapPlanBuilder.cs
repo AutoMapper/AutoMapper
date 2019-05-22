@@ -548,7 +548,7 @@ namespace AutoMapper.Execution
             else if (!memberMap.TypeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = memberMap.SourceType ?? destinationPropertyType;
-                if (!toCreate.IsAbstract() && toCreate.IsClass())
+                if (!toCreate.IsAbstract() && toCreate.IsClass() && !toCreate.IsArray)
                     valueResolverFunc = Coalesce(
                         valueResolverFunc,
                         ToType(DelegateFactory.GenerateNonNullConstructorExpression(toCreate), memberMap.SourceType)

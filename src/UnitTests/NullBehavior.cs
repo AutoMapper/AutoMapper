@@ -8,6 +8,28 @@ using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_mappping_null_array_with_AllowNullDestinationValues_false : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int[] Collection { get; set; }
+        }
+
+        class Destination
+        {
+            public int[] Collection { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.AllowNullDestinationValues = false;
+        });
+
+        [Fact]
+        public void Should_map_to_non_null() => Mapper.Map<Destination>(new Source()).Collection.ShouldNotBeNull();
+    }
+
     public class When_mappping_null_array_to_IEnumerable_with_MapAtRuntime : AutoMapperSpecBase
     {
         class Source
