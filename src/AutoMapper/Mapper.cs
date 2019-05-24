@@ -41,6 +41,7 @@ namespace AutoMapper
         /// Initialize static configuration instance
         /// </summary>
         /// <param name="config">Configuration action</param>
+        [Obsolete("Switch to the instance based API, preferably using dependency injection. See http://docs.automapper.org/en/latest/Static-and-Instance-API.html and http://docs.automapper.org/en/latest/Dependency-injection.html.")]
         public static void Initialize(Action<IMapperConfigurationExpression> config)
         {
             Configuration = new MapperConfiguration(config);
