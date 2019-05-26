@@ -31,7 +31,7 @@ namespace AutoMapper.Mappers
                 ToType(
                     Call(EnumParseMethod,
                         Constant(destExpression.Type),
-                        Call(sourceExpression, sourceExpression.Type.GetDeclaredMethod("ToString", new Type[0])),
+                        Call(sourceExpression, sourceExpression.Type.GetDeclaredMethod("ToString", Type.EmptyTypes)),
                         Constant(true)
                     ),
                     destExpression.Type

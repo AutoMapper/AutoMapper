@@ -23,7 +23,7 @@ namespace AutoMapper.Execution
             _propertyBuilder = owner.DefineProperty(name, PropertyAttributes.None, propertyType, null);
             _getterBuilder = owner.DefineMethod($"get_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
-                MethodAttributes.SpecialName, propertyType, new Type[0]);
+                MethodAttributes.SpecialName, propertyType, Type.EmptyTypes);
             ILGenerator getterIl = _getterBuilder.GetILGenerator();
             getterIl.Emit(OpCodes.Ldarg_0);
             getterIl.Emit(OpCodes.Ldfld, _fieldBuilder);
