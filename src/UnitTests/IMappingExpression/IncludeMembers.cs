@@ -1150,4 +1150,34 @@ namespace AutoMapper.UnitTests.IMappingExpression
             cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
         });
     }
+    public class IncludeMembersWithInclude : AutoMapperSpecBase
+    {
+        public class ParentOfSource
+        {
+            public Source InnerSource { get; set; }
+        }
+
+        public class Source : SourceBase
+        {
+
+        }
+
+        public class SourceBase
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+
+        public class Destination
+        {
+            public string FullName { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<SourceBase, Destination>().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName)).IncludeAllDerived();
+            cfg.CreateMap<ParentOfSource, Destination>().IncludeMembers(src => src.InnerSource); // Swap this with the next like to make Assertion succeed.
+            cfg.CreateMap<Source, Destination>();
+        });
+    }
 }
