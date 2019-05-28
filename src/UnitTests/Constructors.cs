@@ -893,7 +893,7 @@ namespace AutoMapper.UnitTests.Constructors
         }
     }
 
-    public class When_mapping_constructor_argument_fails : AutoMapperSpecBase
+    public class When_mapping_constructor_argument_fails : NonValidatingSpecBase
     {
         public class Source
         {
@@ -927,7 +927,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_say_what_parameter_fails()
         {
-            new Action(() => Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 })).ShouldThrowException<AutoMapperMappingException>(ex =>
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
                   ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
         }
     }
