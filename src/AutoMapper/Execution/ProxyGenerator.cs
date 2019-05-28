@@ -25,7 +25,7 @@ namespace AutoMapper.Execution
             typeof(INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof(ProxyBase).GetDeclaredConstructor(new Type[0]);
+            typeof(ProxyBase).GetDeclaredConstructor(Type.EmptyTypes);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
@@ -55,9 +55,9 @@ namespace AutoMapper.Execution
             Debug.WriteLine(typeName, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(typeName,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
-                interfaceType.IsInterface() ? new[] { interfaceType } : new Type[0]);
+                interfaceType.IsInterface() ? new[] { interfaceType } : Type.EmptyTypes);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
-                CallingConventions.Standard, new Type[0]);
+                CallingConventions.Standard, Type.EmptyTypes);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
             ctorIl.Emit(OpCodes.Ldarg_0);
             ctorIl.Emit(OpCodes.Call, proxyBase_ctor);
