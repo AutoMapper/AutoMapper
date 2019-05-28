@@ -277,6 +277,7 @@ namespace AutoMapper
             }
             foreach(var includedMemberTypeMap in _includedMembersTypeMaps)
             {
+                includedMemberTypeMap.TypeMap.Seal(configurationProvider);
                 ApplyIncludedMemberTypeMap(includedMemberTypeMap);
             }
 
