@@ -5,10 +5,7 @@
     <AssemblyName>AutoMapper.IntegrationTests</AssemblyName>
     <PackageId>AutoMapper.IntegrationTests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
-    <NoWarn>;1701;1702;1591;0618</NoWarn>
+    <NoWarn>$(NoWarn);618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
