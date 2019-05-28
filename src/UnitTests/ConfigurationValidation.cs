@@ -7,6 +7,39 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.ConfigurationValidation
 {
+    public class ConstructorMappingValidation : NonValidatingSpecBase
+    {
+        public class Destination
+        {
+            public Destination(ComplexType myComplexMember)
+            {
+                MyComplexMember = myComplexMember;
+            }
+            public ComplexType MyComplexMember { get; }
+        }
+        public class Source
+        {
+            public string MyComplexMember { get; set; }
+        }
+        public class ComplexType
+        {
+            public string SomeMember { get; }
+            private ComplexType(string someMember)
+            {
+                SomeMember = someMember;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMissingTypeMaps = false;
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        [Fact]
+        public void Should_fail_validation() => new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex=>
+            ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.ConfigurationValidation.ConstructorMappingValidation+Destination.Void .ctor(ComplexType).parameter myComplexMember"));
+    }
+
     public class When_using_custom_validation
     {
         bool _calledForRoot = false;
@@ -48,12 +81,12 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
                 context.Types.SourceType.ShouldBe(typeof(Source));
                 context.Types.DestinationType.ShouldBe(typeof(Dest));
                 context.ObjectMapper.ShouldBeNull();
-                context.PropertyMap.ShouldBeNull();
+                context.MemberMap.ShouldBeNull();
             }
             else
             {
-                context.PropertyMap.SourceMember.Name.ShouldBe("Values");
-                context.PropertyMap.DestinationName.ShouldBe("Values");
+                context.MemberMap.SourceMember.Name.ShouldBe("Values");
+                context.MemberMap.DestinationName.ShouldBe("Values");
                 if(context.Types.Equals(new TypePair(typeof(int), typeof(int))))
                 {
                     _calledForInt = true;

@@ -287,7 +287,7 @@ namespace AutoMapper.UnitTests
         {
             new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
             {
-                ex.PropertyMap.SourceMember.ShouldBe(typeof(SourceItem).GetProperty("ShipsTo"));
+                ex.MemberMap.SourceMember.ShouldBe(typeof(SourceItem).GetProperty("ShipsTo"));
                 ex.Types.Value.ShouldBe(new TypePair(typeof(SourceItem), typeof(DestItem)));
             });
         } 

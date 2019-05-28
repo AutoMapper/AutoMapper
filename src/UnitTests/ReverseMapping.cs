@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
             new Action(() => Configuration.AssertConfigurationIsValid())
                 .ShouldThrowException<AutoMapperConfigurationException>(ex =>
                 {
-                    ex.PropertyMap.DestinationMember.ShouldBe(typeof(Two).GetProperty("Three"));
+                    ex.MemberMap.DestinationName.ShouldBe("Three");
                     ex.Types.ShouldBe(new TypePair(typeof(One), typeof(Two)));
                 });
         }
