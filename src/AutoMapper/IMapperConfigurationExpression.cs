@@ -11,7 +11,7 @@ namespace AutoMapper
         /// <summary>
         /// Create missing type maps during mapping, if necessary
         /// </summary>
-        [Obsolete("Support for dynamic mapping will be removed.")]
+        [Obsolete("Support automatically created maps will be removed.")]
         bool ? CreateMissingTypeMaps { get; set; }
 
         /// <summary>
