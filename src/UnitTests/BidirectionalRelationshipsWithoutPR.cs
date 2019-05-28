@@ -42,6 +42,7 @@ namespace AutoMapper.UnitTests
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<CDataTypeDTO, CDataTypeModel>();
             cfg.CreateMap<CFieldDefinitionDTO, CFieldDefinitionModel>();
         });

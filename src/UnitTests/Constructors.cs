@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.Constructors
             public ParentModel Parent { get; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(_=> { });
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         [Fact]
         public void Should_work()
@@ -373,6 +373,7 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
         {
+            c.CreateMissingTypeMaps = true;
             c.CreateMap<Source, Destination>().ForCtorParam("inner", o=>o.MapFrom(s=>s.InnerSource));
             c.CreateMap<InnerSource, InnerDestination>();
         });
@@ -833,6 +834,7 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Destination>().ForCtorParam("foo", opt => opt.MapFrom(s => s.Nested.Foo));
         });
 
@@ -1564,6 +1566,7 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
         });
 
@@ -1595,6 +1598,7 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
         });
 

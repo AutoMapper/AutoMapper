@@ -9,6 +9,7 @@ namespace AutoMapper.UnitTests.Bug
     {
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<BU, BUVM>(); 
             cfg.CreateMap<BUVM, BU>()
                 .ForMember(d => d.CostCenters, opt => opt.Ignore());

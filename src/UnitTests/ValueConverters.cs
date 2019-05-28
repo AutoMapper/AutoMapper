@@ -615,6 +615,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.ForAllPropertyMaps
                     (pm => pm.SourceType == typeof(int) && pm.DestinationType == typeof(string), 
                     (pm, opt) => opt.ConvertUsing(new EightDigitIntToStringConverter()));

@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_project_icollection_to_aggregate_sum_destination()
         {
             // arrange
-            var config = new MapperConfiguration(_ => { });
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
             var source = new DummySource() { DummyCollection = new[] { 1, 4, 5 } };
 
             // act

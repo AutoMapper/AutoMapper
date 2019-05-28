@@ -129,9 +129,9 @@ namespace AutoMapper.UnitTests
             var action = new Action(() =>
             {
                 Mapper.Reset();
-                Mapper.Initialize(cfg => { });
+                Mapper.Initialize(cfg => cfg.CreateMissingTypeMaps = true);
                 Mapper.Reset();
-                Mapper.Initialize(cfg => { });
+                Mapper.Initialize(cfg => cfg.CreateMissingTypeMaps = true);
             });
             action.ShouldNotThrow();
         }

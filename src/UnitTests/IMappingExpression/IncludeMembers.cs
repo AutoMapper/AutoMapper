@@ -482,6 +482,7 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource).ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
             cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
@@ -568,6 +569,7 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Destination, Source>()
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
                 .ForMember(d => d.OtherInnerSource, o => o.MapFrom(s => s))
@@ -612,6 +614,7 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Destination, Source>()
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
                 .ForMember(d => d.OtherInnerSource, o => o.MapFrom(s => s))
@@ -939,6 +942,7 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource").ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
             cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);

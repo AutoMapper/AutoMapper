@@ -229,6 +229,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>()
                 .ForCtorParam("blarg", opt => opt.MapFrom(src => src.Value));
         });

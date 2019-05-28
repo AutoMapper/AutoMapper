@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_project_ienumerable_to_aggregate_destinations()
         {
             // arrange
-            var config = new MapperConfiguration(_ => { });
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
             var source = new DummySource() { DummyEnumerable = new[] { 1, 4, 5 } };
 
             // act

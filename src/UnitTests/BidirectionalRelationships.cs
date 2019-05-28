@@ -114,6 +114,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Book, BookViewModel>()
                 .ForMember(b => b.Authors, opt => opt.MapFrom(b => b.BookAuthors.Select(ba => ba.Author)))
                 .ReverseMap()
@@ -169,7 +170,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private ParentDto _dto;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         protected override void Because_of()
         {
