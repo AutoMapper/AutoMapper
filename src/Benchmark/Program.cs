@@ -11,10 +11,7 @@ namespace Benchmark
     {
         public static void Main(string[] args)
         {
-            BenchmarkRunner.Run<FlatteningMapper>();
-            BenchmarkRunner.Run<CtorMapper>();
-            BenchmarkRunner.Run<ComplexTypeMapper>();
-            BenchmarkRunner.Run<DeepTypeMapper>();
+            BenchmarkRunner.Run(typeof(Program).Assembly);
         }
     }
 }

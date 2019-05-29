@@ -8,9 +8,7 @@ using AutoMapper.Features;
 using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
-#if NET45 || NETSTANDARD1_3
 using FastExpressionCompiler;
-#endif
 
 namespace AutoMapper
 {

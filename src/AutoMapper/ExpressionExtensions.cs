@@ -65,17 +65,5 @@ namespace AutoMapper
 
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
             => ExpressionFactory.IfNullElse(expression, then, @else);
-
-#if NET40 || NETSTANDARD1_1
-        public static TDelegate CompileFast<TDelegate>(this Expression<TDelegate> expression)
-        {
-            return expression.Compile();
-        }
-
-        public static Delegate CompileFast(this LambdaExpression expression)
-        {
-            return expression.Compile();
-        }
-#endif
     }
 }

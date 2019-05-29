@@ -1,7 +1,6 @@
 using System;
 using AutoMapper;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
 
 
 namespace Benchmark
@@ -13,6 +12,62 @@ namespace Benchmark
     {
         public abstract object AutoMap();
         public abstract object ManualMap();
+    }
+
+    [ClrJob, CoreJob]
+    public class ExpressionCompilationBenchmark
+    {
+        public class Address
+        {
+            public int Id { get; set; }
+            public string Street { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+        }
+
+        public class AddressDTO
+        {
+            public int Id { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+        }
+
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public decimal? Credit { get; set; }
+            public Address Address { get; set; }
+            public Address HomeAddress { get; set; }
+            public Address[] Addresses { get; set; }
+            public List<Address> WorkAddresses { get; set; }
+        }
+
+        public class CustomerDTO
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+            public AddressDTO HomeAddress { get; set; }
+            public AddressDTO[] Addresses { get; set; }
+            public List<AddressDTO> WorkAddresses { get; set; }
+            public string AddressCity { get; set; }
+        }
+
+        [Benchmark]
+        public IConfigurationProvider ConfigureAndCompile()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Address, Address>();
+                cfg.CreateMap<Address, AddressDTO>();
+                cfg.CreateMap<Customer, CustomerDTO>();
+            });
+
+            config.CompileMappings();
+
+            return config;
+        }
     }
 
     [ClrJob, CoreJob]
@@ -57,7 +112,7 @@ namespace Benchmark
             return _mapper.Map<Customer, CustomerDTO>(_customer);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public override object ManualMap()
         {
             var dto = new CustomerDTO();
@@ -150,7 +205,7 @@ namespace Benchmark
             return dest;
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public override object ManualMap()
         {
             var dest = new FooDest
@@ -299,7 +354,7 @@ namespace Benchmark
             return _mapper.Map<Model11, Dto11>(_model);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public override object ManualMap()
         {
             return new Dto11(_model.Value);
@@ -374,7 +429,7 @@ namespace Benchmark
             return _mapper.Map<ModelObject, ModelDto>(_source);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public override object ManualMap()
         {
             return new ModelDto

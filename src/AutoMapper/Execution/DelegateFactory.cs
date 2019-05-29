@@ -5,9 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers.Internal;
-#if NET45 || NETSTANDARD1_3
 using FastExpressionCompiler;
-#endif
 
 namespace AutoMapper.Execution
 {
