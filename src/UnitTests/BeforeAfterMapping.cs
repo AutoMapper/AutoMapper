@@ -142,7 +142,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                 _decrement = decrement;
             }
 
-            public void Process(Source source, Destination destination)
+            public void Process(Source source, Destination destination, ResolutionContext context)
             {
                 source.Value -= _decrement * 2;
             }
@@ -157,7 +157,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                 _increment = increment;
             }
 
-            public void Process(Source source, Destination destination)
+            public void Process(Source source, Destination destination, ResolutionContext context)
             {
                 destination.Value += _increment * 5;
             }
