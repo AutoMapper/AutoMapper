@@ -15,6 +15,7 @@ namespace AutoMapper.UnitTests
             var featureB = new MappingExpressionFeatureB(2);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(new MappingExpressionFeatureA(3))
                     .SetFeature(new MappingExpressionFeatureA(2))
@@ -47,6 +48,7 @@ namespace AutoMapper.UnitTests
             var featureA = new MappingExpressionFeatureA(1);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA);
             });
@@ -78,6 +80,7 @@ namespace AutoMapper.UnitTests
             var featureA = new MappingExpressionFeatureA(1);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA)
                     .ReverseMap();
@@ -111,6 +114,7 @@ namespace AutoMapper.UnitTests
             var featureB = new MappingExpressionFeatureB(2);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA)
                     .SetFeature(featureB);
@@ -146,6 +150,7 @@ namespace AutoMapper.UnitTests
             var featureB = new MappingExpressionFeatureB(2);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA)
                     .SetFeature(featureB)
@@ -182,6 +187,7 @@ namespace AutoMapper.UnitTests
             var overridenFeatureB = new MappingExpressionFeatureB(10);
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA)
                     .SetFeature(featureB)

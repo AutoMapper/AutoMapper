@@ -4,7 +4,7 @@
     <TargetFrameworks>net461;netcoreapp2.0;</TargetFrameworks>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <PackageId>AutoMapper.UnitTests</PackageId>
-    <NoWarn>$(NoWarn);0649</NoWarn>
+    <NoWarn>$(NoWarn);649;618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

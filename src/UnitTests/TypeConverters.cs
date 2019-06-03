@@ -300,7 +300,7 @@ namespace AutoMapper.UnitTests.CustomMapping
     }
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 #if NET461
         public When_specifying_mapping_with_the_BCL_type_converter_class()
         {

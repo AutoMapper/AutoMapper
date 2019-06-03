@@ -5,6 +5,7 @@
     <AssemblyName>AutoMapper.IntegrationTests</AssemblyName>
     <PackageId>AutoMapper.IntegrationTests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <NoWarn>$(NoWarn);618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -73,6 +73,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
+            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<SourceA, DestA>();
             cfg.CreateMap<SourceB, DestB>();
         });
@@ -668,7 +669,7 @@ namespace AutoMapper.UnitTests
             // ----> System.InvalidCastException : Unable to cast object of type 'System.Collections.Specialized.NameValueCollection' to type 'System.Collections.IList'.
             // this was fixed by adding NameValueCollectionMapper to the MapperRegistry.
             var c = new NameValueCollection();
-            var config = new MapperConfiguration(cfg => { });
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
             var mappedCollection = config.CreateMapper().Map<NameValueCollection, NameValueCollection>(c);
 
             mappedCollection.ShouldNotBeNull();

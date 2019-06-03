@@ -230,7 +230,7 @@ namespace AutoMapper.UnitTests
             Three
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
 
         protected override void Because_of()

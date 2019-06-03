@@ -568,7 +568,7 @@ namespace AutoMapper.Tests
             Eight = 8
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         protected override void Because_of()
         {
@@ -591,7 +591,7 @@ namespace AutoMapper.Tests
             One
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         [Fact]
         public void Should_return_the_enum_from_defined_enummemberattribute_value()
@@ -653,7 +653,7 @@ namespace AutoMapper.Tests
             One
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         [Fact]
         public void Should_return_the_defined_enummemberattribute_value()

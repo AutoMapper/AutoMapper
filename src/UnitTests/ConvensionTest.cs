@@ -114,6 +114,7 @@ namespace AutoMapper.UnitTests.Conventions
         {
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.AddProfile<ToDTO>();
                 cfg.AddProfile<FromDTO>();
             });
@@ -137,6 +138,7 @@ namespace AutoMapper.UnitTests.Conventions
         {
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMissingTypeMaps = true;
                 cfg.AddProfile<ToDTO>();
                 cfg.AddProfile<FromDTO>();
             });
