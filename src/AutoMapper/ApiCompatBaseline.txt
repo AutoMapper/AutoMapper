@@ -1,0 +1,110 @@
+Compat issues with assembly AutoMapper:
+MembersMustExist : Member 'AutoMapper.AutoMapperConfigurationException.PropertyMap.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.AutoMapperConfigurationException.PropertyMap.set(AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.CtorParamConfigurationExpression<TSource>' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IConfigurationProvider.Features' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IConfigurationProvider.Features.get()' is present in the implementation but not in the contract.
+CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.IgnoreMapAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.Features' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Collections.Generic.IEnumerable<System.Reflection.Assembly>)' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Collections.Generic.IEnumerable<System.String>)' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Collections.Generic.IEnumerable<System.Type>)' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Reflection.Assembly[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.String[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Type[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddProfiles(System.Collections.Generic.IEnumerable<AutoMapper.Profile>)' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.Features.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ValueTransformers' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.AfterMap(System.Action<System.Object, System.Object>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.AfterMap<TMappingAction>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.As(System.Type)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.BeforeMap(System.Action<System.Object, System.Object>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.BeforeMap<TMappingAction>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConstructUsing(System.Func<System.Object, AutoMapper.ResolutionContext, System.Object>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConstructUsing(System.Linq.Expressions.Expression<System.Func<System.Object, System.Object>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConstructUsingServiceLocator()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConvertUsing(System.Linq.Expressions.Expression<System.Func<System.Object, System.Object>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConvertUsing(System.Type)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ConvertUsing<TTypeConverter>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ForCtorParam(System.String, System.Action<AutoMapper.ICtorParamConfigurationExpression<System.Object>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ForSourceMember(System.String, System.Action<AutoMapper.ISourceMemberConfigurationExpression>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.IgnoreAllPropertiesWithAnInaccessibleSetter()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.IgnoreAllSourcePropertiesWithAnInaccessibleSetter()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.Include(System.Type, System.Type)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.IncludeAllDerived()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.IncludeBase(System.Type, System.Type)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.IncludeMembers(System.String[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.MaxDepth(System.Int32)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.PreserveReferences()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ValidateMemberList(AutoMapper.MemberList)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ValueTransformers.get()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ValueTransformers' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.AfterMap(System.Action<TSource, TDestination, AutoMapper.ResolutionContext>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.AfterMap(System.Action<TSource, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.AfterMap<TMappingAction>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.BeforeMap(System.Action<TSource, TDestination, AutoMapper.ResolutionContext>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.BeforeMap(System.Action<TSource, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.BeforeMap<TMappingAction>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConstructUsing(System.Func<TSource, AutoMapper.ResolutionContext, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConstructUsing(System.Linq.Expressions.Expression<System.Func<TSource, TDestination>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConstructUsingServiceLocator()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConvertUsing(AutoMapper.ITypeConverter<TSource, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConvertUsing(System.Func<TSource, TDestination, AutoMapper.ResolutionContext, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConvertUsing(System.Func<TSource, TDestination, TDestination>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConvertUsing(System.Linq.Expressions.Expression<System.Func<TSource, TDestination>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ConvertUsing<TTypeConverter>()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.DisableCtorValidation()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ForCtorParam(System.String, System.Action<AutoMapper.ICtorParamConfigurationExpression<TSource>>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ForSourceMember(System.String, System.Action<AutoMapper.ISourceMemberConfigurationExpression>)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.IgnoreAllPropertiesWithAnInaccessibleSetter()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.IgnoreAllSourcePropertiesWithAnInaccessibleSetter()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.Include(System.Type, System.Type)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.IncludeAllDerived()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.IncludeMembers(System.Linq.Expressions.Expression<System.Func<TSource, System.Object>>[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.MaxDepth(System.Int32)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.PreserveReferences()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ValidateMemberList(AutoMapper.MemberList)' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression<TSource, TDestination>.ValueTransformers.get()' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.CustomSource' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.IsMapped' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMember' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.CustomSource.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.IsMapped.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMember.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IProfileExpression.ShouldMapMethod' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IProfileExpression.ShouldMapMethod.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IProfileExpression.ShouldMapMethod.set(System.Func<System.Reflection.MethodInfo, System.Boolean>)' is present in the implementation but not in the contract.
+MembersMustExist : Member 'AutoMapper.PropertyMap.ApplyValueConverter()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.TypeMap.AddInheritedMap(AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.TypeMap.GetExistingPropertyMapFor(System.Reflection.MemberInfo)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.ValidationContext..ctor(AutoMapper.TypePair, AutoMapper.PropertyMap, AutoMapper.IObjectMapper)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.ValidationContext..ctor(AutoMapper.TypePair, AutoMapper.PropertyMap, AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.ValidationContext.PropertyMap.get()' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IProfileConfiguration.ShouldMapMethod' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IProfileConfiguration.ShouldMapMethod.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.SourceExpression' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.GetDestinationExpression()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.SourceExpression.get()' is present in the implementation but not in the contract.
+CannotRemoveBaseTypeOrInterface : Type 'AutoMapper.Configuration.MappingExpression' does not inherit from base type 'AutoMapper.Configuration.MappingExpression<System.Object, System.Object>' in the implementation but it does in the contract.
+MembersMustExist : Member 'AutoMapper.Configuration.MappingExpression.CreateMemberConfigurationExpression<TMember>(System.Reflection.MemberInfo, System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Configuration.MappingExpression.CreateReverseMapExpression()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Configuration.MappingExpression<TSource, TDestination>.CreateMemberConfigurationExpression<TMember>(System.Reflection.MemberInfo, System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Configuration.MappingExpression<TSource, TDestination>.CreateReverseMapExpression()' does not exist in the implementation but it does exist in the contract.
+CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Conventions.MapToAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ExpressionBuilder.FirstPassLetPropertyMaps.Push(AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' is present in the contract but not in the implementation.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.IProjectionExpression' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.LetPropertyMaps.Push(AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.LetPropertyMaps.PropertyPath..ctor(AutoMapper.PropertyMap[], System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.LetPropertyMaps.PropertyPath.PropertyMaps.get()' does not exist in the implementation but it does exist in the contract.
+CannotRemoveBaseTypeOrInterface : Type 'AutoMapper.QueryableExtensions.ProjectionExpression' does not implement interface 'AutoMapper.QueryableExtensions.IProjectionExpression' in the implementation but it does in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.GetMemberPaths(System.Type, System.String[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.GetMemberPaths<TResult>(System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo>>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object, System.String[])' does not exist in the implementation but it does exist in the contract.
+Total Issues: 108
