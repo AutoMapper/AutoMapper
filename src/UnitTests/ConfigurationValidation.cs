@@ -184,6 +184,26 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class When_constructor_does_not_match_ForCtorParam : AutoMapperSpecBase
+    {
+        public class Source
+        {
+        }
+        public class Dest
+        {
+            public Dest(int value)
+            {
+                Value = value;
+            }
+            public int Value { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForCtorParam("value", o=>o.MapFrom(s=>4)));
+
+        [Fact]
+        public void Should_map() => Mapper.Map<Dest>(new Source()).Value.ShouldBe(4);
+    }
+
     public class When_constructor_partially_matches : NonValidatingSpecBase
     {
         public class Source

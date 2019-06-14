@@ -22,8 +22,8 @@ namespace AutoMapper
         public override TypeMap TypeMap { get; }
 
         public override Type SourceType =>
-            CustomMapExpression?.Type
-            ?? CustomMapFunction?.Type
+            CustomMapExpression?.ReturnType
+            ?? CustomMapFunction?.ReturnType
             ?? (Parameter.IsOptional 
                 ? Parameter.ParameterType 
                 : SourceMembers.Last().GetMemberType());
