@@ -57,7 +57,3 @@ var config = AutoMapperConfiguration.Configure();
 
 config.AssertConfigurationIsValid();
 ```
-
-## Can I see a demo?
-
-Check out the [dnrTV episode on AutoMapper](http://www.dnrtv.com/default.aspx?showNum=155).
