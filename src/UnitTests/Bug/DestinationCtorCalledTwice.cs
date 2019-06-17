@@ -40,7 +40,7 @@ namespace AutoMapper.UnitTests.Bug
                 var source = new Source {Value = 5};
                 var dest = new Destination {Value = 7};
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
                 config.CreateMapper().Map(source, dest);
 
                 Destination.CallCount.ShouldBe(1);

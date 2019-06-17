@@ -107,7 +107,6 @@ namespace AutoMapper
         public IEnumerable<PathMap> PathMaps => _pathMaps.Values;
         public IEnumerable<IMemberMap> MemberMaps => PropertyMaps.Cast<IMemberMap>().Concat(PathMaps).Concat(GetConstructorMemberMaps());
 
-        public bool IsConventionMap { get; set; }
         public bool? IsValid { get; set; }
         internal bool WasInlineChecked { get; set; }
 

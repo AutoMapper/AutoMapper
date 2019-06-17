@@ -6,8 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Mappers;
-using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
@@ -37,12 +35,6 @@ namespace AutoMapper
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
             ShouldMapMethod = profile.ShouldMapMethod ?? configuration?.ShouldMapMethod ?? (p => true);
             ShouldUseConstructor = profile.ShouldUseConstructor ?? configuration?.ShouldUseConstructor ?? (c => true);
-            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? false;
-            ValidateInlineMaps = profile.ValidateInlineMaps ?? configuration?.ValidateInlineMaps ?? true;
-
-            TypeConfigurations = profile.TypeConfigurations
-                .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
-                .ToArray();
 
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
 
@@ -80,8 +72,6 @@ namespace AutoMapper
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
-        public bool CreateMissingTypeMaps { get; }
-        public bool ValidateInlineMaps { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
@@ -94,7 +84,6 @@ namespace AutoMapper
         public IEnumerable<string> GlobalIgnores { get; }
         public IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
-        public IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         public IEnumerable<string> Prefixes { get; }
         public IEnumerable<string> Postfixes { get; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
@@ -169,34 +158,6 @@ namespace AutoMapper
             ApplyBaseMaps(typeMap, typeMap, configurationProvider);
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
             ApplyMemberMaps(typeMap, configurationProvider);
-        }
-
-        public bool IsConventionMap(TypePair types) => TypeConfigurations.Any(c => c.IsMatch(types));
-
-        public TypeMap CreateConventionTypeMap(TypePair types, IConfigurationProvider configurationProvider)
-        {
-            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
-
-            typeMap.IsConventionMap = true;
-
-            var config = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
-
-            config.Configure(typeMap);
-
-            Configure(typeMap, configurationProvider);
-
-            return typeMap;
-        }
-
-        public TypeMap CreateInlineMap(TypePair types, IConfigurationProvider configurationProvider)
-        {
-            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this);
-
-            typeMap.IsConventionMap = true;
-
-            Configure(typeMap, configurationProvider);
-
-            return typeMap;
         }
 
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IConfigurationProvider configurationProvider)

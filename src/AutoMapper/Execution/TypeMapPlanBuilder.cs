@@ -19,9 +19,6 @@ namespace AutoMapper.Execution
         private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo =
             ctxt => ctxt.IncrementTypeDepth(default);
 
-        private static readonly Expression<Action<ResolutionContext>> ValidateMap =
-            ctxt => ctxt.ValidateMap(default);
-
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
             ctxt => ctxt.DecrementTypeDepth(default);
 
@@ -76,8 +73,6 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
-            var inlineWasChecked = _typeMap.WasInlineChecked;
-            _typeMap.WasInlineChecked = true;
             if(typeMapsPath == null)
             {
                 typeMapsPath = new HashSet<TypeMap>();
@@ -92,7 +87,7 @@ namespace AutoMapper.Execution
             {
                 var memberMap = item.MemberMap;
                 var memberTypeMap = item.MemberTypeMap;
-                if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
+                if(typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
                     memberMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
@@ -215,10 +210,6 @@ namespace AutoMapper.Execution
             {
                 actions.Insert(0,
                     Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
-            }
-            if (_typeMap.IsConventionMap && _typeMap.Profile.ValidateInlineMaps)
-            {
-                actions.Insert(0, Call(Context, ((MethodCallExpression)ValidateMap.Body).Method, Constant(_typeMap)));
             }
             actions.AddRange(
                 _typeMap.AfterMapActions.Select(

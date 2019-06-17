@@ -12,13 +12,10 @@ namespace AutoMapper.Configuration
     public interface IProfileConfiguration
     {
         IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
-        IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         bool? ConstructorMappingEnabled { get; }
         bool? AllowNullDestinationValues { get; }
         bool? AllowNullCollections { get; }
         bool? EnableNullPropagationForQueryMapping { get; }
-        bool? CreateMissingTypeMaps { get; }
-        bool? ValidateInlineMaps { get; }
         IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
 

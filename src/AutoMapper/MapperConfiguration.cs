@@ -123,7 +123,7 @@ namespace AutoMapper
 
         public LambdaExpression BuildExecutionPlan(MapRequest mapRequest)
         {
-            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes, mapRequest.InlineConfig) ?? ResolveTypeMap(mapRequest.RequestedTypes, mapRequest.InlineConfig);
+            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
             if (typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
@@ -200,20 +200,10 @@ namespace AutoMapper
         {
             var typePair = new TypePair(sourceType, destinationType);
 
-            return ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair));
-        }
-
-        public TypeMap ResolveTypeMap(Type sourceType, Type destinationType, ITypeMapConfiguration inlineConfiguration)
-        {
-            var typePair = new TypePair(sourceType, destinationType);
-
-            return ResolveTypeMap(typePair, inlineConfiguration);
+            return ResolveTypeMap(typePair);
         }
 
         public TypeMap ResolveTypeMap(TypePair typePair)
-            => ResolveTypeMap(typePair, new DefaultTypeMapConfig(typePair));
-
-        public TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
@@ -221,7 +211,6 @@ namespace AutoMapper
             {
                 lock (typeMap)
                 {
-                    inlineConfiguration.Configure(typeMap);
                     typeMap.Seal(this);
                     if (typeMap.IsClosedGeneric)
                     {
@@ -234,8 +223,6 @@ namespace AutoMapper
 
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
-            var doesNotHaveMapper = FindMapper(initialTypes) == null;
-
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
                 var typeMap = GetCachedMap(initialTypes, types);
@@ -252,27 +239,6 @@ namespace AutoMapper
                 if (typeMap != null)
                 {
                     return typeMap;
-                }
-                if (doesNotHaveMapper)
-                {
-                    typeMap = FindConventionTypeMapFor(types);
-                    if (typeMap != null)
-                    {
-                        return typeMap;
-                    }
-                }
-            }
-
-            if (doesNotHaveMapper
-                && Configuration.CreateMissingTypeMaps
-                && !(initialTypes.SourceType.IsAbstract() && initialTypes.SourceType.IsClass())
-                && !(initialTypes.DestinationType.IsAbstract() && initialTypes.DestinationType.IsClass())
-                && !ExcludedTypes.Contains(initialTypes.SourceType)
-                && !ExcludedTypes.Contains(initialTypes.DestinationType))
-            {
-                lock (this)
-                {
-                    return Configuration.CreateInlineMap(initialTypes, this);
                 }
             }
 
@@ -406,28 +372,13 @@ namespace AutoMapper
                 {
                     typeMap = ResolveTypeMap(pair);
                     // we want the exact map the user included, but we could instantiate an open generic
-                    if(typeMap == null || typeMap.Types != pair || typeMap.IsConventionMap)
+                    if(typeMap == null || typeMap.Types != pair)
                     {
                         throw QueryMapperHelper.MissingMapException(pair);
                     }
                     yield return typeMap;
                 }
             }
-        }
-
-        private TypeMap FindConventionTypeMapFor(TypePair typePair)
-        {
-            var profile = Profiles.FirstOrDefault(p => p.IsConventionMap(typePair));
-            if (profile == null)
-            {
-                return null;
-            }
-            TypeMap typeMap;
-            lock(this)
-            {
-                typeMap = profile.CreateConventionTypeMap(typePair, this);
-            }
-            return typeMap;
         }
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair initialTypes, TypePair typePair)
@@ -519,22 +470,6 @@ namespace AutoMapper
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
-        }
-
-        internal class DefaultTypeMapConfig : ITypeMapConfiguration
-        {
-            public DefaultTypeMapConfig(TypePair types)
-            {
-                Types = types;
-            }
-
-            public void Configure(TypeMap typeMap) { }
-
-            public Type SourceType => Types.SourceType;
-            public Type DestinationType => Types.DestinationType;
-            public bool IsOpenGeneric => false;
-            public TypePair Types { get; }
-            public ITypeMapConfiguration ReverseTypeMap => null;
         }
     }
 

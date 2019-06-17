@@ -61,7 +61,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => { });
 
         [Fact]
         public void Can_map_with_projection()

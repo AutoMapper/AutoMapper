@@ -248,7 +248,7 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var mapRequest = new MapRequest(key, types, typedOptions.InlineConfiguration);
+            var mapRequest = new MapRequest(key, types);
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(mapRequest);
 
@@ -283,7 +283,7 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var mapRequest = new MapRequest(key, types, typedOptions.InlineConfiguration);
+            var mapRequest = new MapRequest(key, types);
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(mapRequest);
 
@@ -315,7 +315,7 @@ namespace AutoMapper
 
             opts(options);
 
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, options.InlineConfiguration));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             options.BeforeMapAction(source, null);
 
@@ -346,7 +346,7 @@ namespace AutoMapper
 
             opts(options);
 
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, options.InlineConfiguration));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             options.BeforeMapAction(source, destination);
 

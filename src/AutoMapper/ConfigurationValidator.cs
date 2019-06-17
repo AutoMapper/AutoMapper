@@ -70,11 +70,6 @@ namespace AutoMapper
                     // it was already validated
                     return;
                 }
-                // dynamic maps get mapped at runtime yolo
-                if (typeMap.IsConventionMap && typeMap.Profile.CreateMissingTypeMaps)
-                {
-                    return;
-                }
                 if (typeMapsChecked.Contains(typeMap))
                 {
                     return;

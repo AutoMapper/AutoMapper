@@ -540,7 +540,6 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<ProductArticle, ProductArticleModel>();
             cfg.CreateMap<Product, ProductModel>()
                 .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
