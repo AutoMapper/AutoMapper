@@ -247,7 +247,7 @@ namespace AutoMapper.Configuration
         public TMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
             void BeforeFunction(TSource src, TDestination dest, ResolutionContext ctxt)
-                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
+                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest, ctxt);
 
             return BeforeMap(BeforeFunction);
         }
@@ -281,7 +281,7 @@ namespace AutoMapper.Configuration
         public TMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
             void AfterFunction(TSource src, TDestination dest, ResolutionContext ctxt)
-                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
+                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest, ctxt);
 
             return AfterMap(AfterFunction);
         }

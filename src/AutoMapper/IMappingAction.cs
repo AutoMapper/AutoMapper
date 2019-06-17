@@ -12,6 +12,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="source">Source object</param>
         /// <param name="destination">Destination object</param>
-        void Process(TSource source, TDestination destination);
+        /// <param name="context">Resolution context</param>
+        void Process(TSource source, TDestination destination, ResolutionContext context);
     }
 }
