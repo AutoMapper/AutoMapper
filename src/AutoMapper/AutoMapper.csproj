@@ -17,8 +17,13 @@
     <RepositoryUrl>https://github.com/AutoMapper/AutoMapper</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ResolvedMatchingContract Include ="LastMajorVersionBinary\AutoMapper.dll" />
+  </ItemGroup>
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
@@ -30,6 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="1.0.0-beta.19312.20" PrivateAssets="All" />  
   </ItemGroup>
 
 </Project>
