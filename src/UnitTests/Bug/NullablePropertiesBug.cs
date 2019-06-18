@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -11,10 +11,10 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Reset();
-            Mapper.CreateMap<Source, Target>();
 
-            var d = Mapper.Map(new Source { A = null }, new Target { A = 10 });
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
+
+            var d = config.CreateMapper().Map(new Source { A = null }, new Target { A = 10 });
 
             d.A.ShouldBeNull();
         }

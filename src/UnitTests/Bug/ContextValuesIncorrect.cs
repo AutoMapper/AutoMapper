@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -21,14 +21,12 @@ namespace AutoMapper.UnitTests.Bug
         {
             private FooDto _destination;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Foo, FooDto>()
-                        .ForAllMembers(opt => opt.Condition(ctx => ctx.DestinationValue == null));
-                });
-            }
+                cfg.CreateMap<Foo, FooDto>()
+                    .ForAllMembers(opt => opt.Condition((src, p, srvVal, destVal) => destVal == null));
+            });
+
             protected override void Because_of()
             {
                 var source = new Foo
@@ -47,13 +45,13 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_map_the_null_value()
             {
-                _destination.Value2.ShouldEqual(4);
+                _destination.Value2.ShouldBe(4);
             }
 
             [Fact]
             public void Should_leave_the_non_null_value_alone()
             {
-                _destination.Value.ShouldEqual(5);
+                _destination.Value.ShouldBe(5);
             }
         }
     }

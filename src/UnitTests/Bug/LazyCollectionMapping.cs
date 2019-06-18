@@ -2,81 +2,72 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class LazyCollectionMapping
-	{
-        public LazyCollectionMapping()
+    public class LazyCollectionMapping
+    {
+        public class OneTimeEnumerator<T> : IEnumerable<T>
         {
-            SetUp();
+            private readonly IEnumerable<T> inner;
+
+            public OneTimeEnumerator(IEnumerable<T> inner)
+            {
+                this.inner = inner;
+            }
+
+            private bool isEnumerated;
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                if (isEnumerated)
+                    throw new NotSupportedException();
+                isEnumerated = true;
+                return inner.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
-		public void SetUp()
-		{
-			Mapper.Reset();
-		}
 
-		public class OneTimeEnumerator<T> : IEnumerable<T>
-		{
-			private readonly IEnumerable<T> inner;
+        public class Source
+        {
+            public IEnumerable<string> Collection { get; set; }
+        }
 
-			public OneTimeEnumerator(IEnumerable<T> inner)
-			{
-				this.inner = inner;
-			}
+        public class Destination
+        {
+            public IEnumerable<string> Collection { get; set; }
+        }
 
-			private bool isEnumerated;
+        [Fact]
+        public void OneTimeEnumerator_should_throw_exception_if_enumerating_twice()
+        {
+            IEnumerable<string> enumerable = Create(new[] {"one", "two", "three"});
+            
+            enumerable.Count().ShouldBe(3);
 
-			public IEnumerator<T> GetEnumerator()
-			{
-				if (isEnumerated)
-					throw new NotSupportedException();
-				isEnumerated = true;
-				return inner.GetEnumerator();
-			}
+            typeof (NotSupportedException).ShouldBeThrownBy(() => enumerable.Count());
+        }
+        
+        [Fact]
+        public void Should_not_enumerate_twice()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return GetEnumerator();
-			}
-		}
+            var source = new Source {Collection = Create(new[] {"one", "two", "three"})};
+            var enumerable = config.CreateMapper().Map(source, new Destination());
 
-		public class Source
-		{
-			public IEnumerable<string> Collection { get; set; }
-		}
+            enumerable.Collection.Count().ShouldBe(3);
+        }
 
-		public class Destination
-		{
-			public IEnumerable<string> Collection { get; set; }
-		}
-
-		[Fact]
-		public void OneTimeEnumerator_should_throw_exception_if_enumerating_twice()
-		{
-			IEnumerable<string> enumerable = Create(new[] {"one", "two", "three"});
-			
-			enumerable.Count().ShouldEqual(3);
-
-			typeof (NotSupportedException).ShouldBeThrownBy(() => enumerable.Count());
-		}
-		
-		[Fact]
-		public void Should_not_enumerate_twice()
-		{
-			Mapper.CreateMap<Source, Destination>();
-
-			var source = new Source {Collection = Create(new[] {"one", "two", "three"})};
-			var enumerable = Mapper.Map(source, new Destination());
-
-			enumerable.Collection.Count().ShouldEqual(3);
-		}
-
-		public static IEnumerable<T> Create<T>(IEnumerable<T> inner)
-		{
-			return new OneTimeEnumerator<T>(inner);
-		}
-	}
+        public static IEnumerable<T> Create<T>(IEnumerable<T> inner)
+        {
+            return new OneTimeEnumerator<T>(inner);
+        }
+    }
 }

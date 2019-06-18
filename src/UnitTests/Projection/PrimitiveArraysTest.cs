@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 using System.Linq;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -15,15 +15,21 @@ namespace AutoMapper.UnitTests.Projection
             [Fact]
             public void Should_not_fail()
             {
-                Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<Source, Destination>();
+                });
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<Source, Destination>());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<Source, Destination>());
             }
 
             [Fact]
             public void Should_map_values()
             {
-                Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<Source, Destination>();
+                });
 
                 var sources = new List<Source>
                 {
@@ -34,12 +40,12 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var expr = sources.AsQueryable().ProjectTo<Destination>();
+                var expr = sources.AsQueryable().ProjectTo<Destination>(config);
 
                 var result = expr.ToList();
 
-                result[0].Value1.ShouldEqual(sources[0].Value1);
-                result[0].Value2.ShouldEqual(sources[0].Value2);
+                result[0].Value1.ShouldBe(sources[0].Value1);
+                result[0].Value2.ShouldBe(sources[0].Value2);
             }
         }
         public class Source

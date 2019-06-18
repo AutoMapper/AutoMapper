@@ -1,34 +1,27 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class SettersInBaseClasses
+    public class SettersInBaseClasses : AutoMapperSpecBase
     {
-        public SettersInBaseClasses()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            SetUp();
-        }
-
-        public void SetUp(){
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, GrandGrandChild>();
-                cfg.CreateMap<Source, GrandChild>();
-                cfg.CreateMap<Source, Child>();
-                cfg.CreateMap<Source, GrandGrandChildPrivate>();
-                cfg.CreateMap<Source, GrandChildPrivate>();
-                cfg.CreateMap<Source, ChildPrivate>();
-            });
-        }
+            cfg.CreateMap<Source, GrandGrandChild>();
+            cfg.CreateMap<Source, GrandChild>();
+            cfg.CreateMap<Source, Child>();
+            cfg.CreateMap<Source, GrandGrandChildPrivate>();
+            cfg.CreateMap<Source, GrandChildPrivate>();
+            cfg.CreateMap<Source, ChildPrivate>();
+        });
 
         [Fact]
         public void PublicSetterInParentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, Child>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         
@@ -37,8 +30,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandChild>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         [Fact]
@@ -46,57 +39,35 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandGrandChild>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
-#if SILVERLIGHT
-        [Fact(Skip = "Not supported in Silverlight 4")]
-#else
         [Fact]
-#endif
-        public void HasValidConfiguration()
-        {
-            Mapper.AssertConfigurationIsValid();
-        }
-
-#if SILVERLIGHT
-        [Fact(Skip = "Not supported in Silverlight 4")]
-#else
-        [Fact]
-#endif
         public void PrivateSetterInParentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, ChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
-#if SILVERLIGHT
-        [Fact(Skip = "Not supported in Silverlight 4")]
-#else
         [Fact]
-#endif
         public void PrivateSetterInGrandparentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
-#if SILVERLIGHT
-        [Fact(Skip = "Not supported in Silverlight 4")]
-#else
         [Fact]
-#endif
         public void PrivateSetterInGrandGrandparentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandGrandChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
     }
 

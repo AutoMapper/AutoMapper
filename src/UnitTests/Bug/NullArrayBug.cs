@@ -1,20 +1,20 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class NullArrayBug : AutoMapperSpecBase
     {
-        private Source _source;
+        private static Source _source;
         private Destination _destination;
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Configuration.AllowNullCollections = false;
-            Mapper.CreateMap<Source, Destination>();
+            cfg.AllowNullCollections = false;
+            cfg.CreateMap<Source, Destination>();
 
-            _source = new Source { Name = null, Data = null };
-        }
+            _source = new Source {Name = null, Data = null};
+        });
 
         protected override void Because_of()
         {

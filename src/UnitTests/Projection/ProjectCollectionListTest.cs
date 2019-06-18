@@ -1,108 +1,102 @@
-﻿﻿using Should;
+﻿﻿using Shouldly;
 ﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Projection
 {
     using System;
     using System.Collections.Generic;
-	using System.Linq;
+    using System.Linq;
 
-	using AutoMapper;
-	using QueryableExtensions;
+    using AutoMapper;
+    using QueryableExtensions;
 
 
     public class ProjectCollectionListTest
-	{
-		private const string Street1 = "Street1";
-		private const string Street2 = "Street2";
+    {
+        private MapperConfiguration _config;
+        private const string Street1 = "Street1";
+        private const string Street2 = "Street2";
 
         public ProjectCollectionListTest()
-		{
-			Mapper.CreateMap<Address, AddressDto>();
-			Mapper.CreateMap<Customer, CustomerDto>();
-		}
+        {
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Address, AddressDto>();
+                cfg.CreateMap<Customer, CustomerDto>();
+            });
+        }
 
-		[Fact(Skip = "EF doesn't support null values in expressions")]
-		public void ProjectWithNullCollectionSourceProperty()
-		{
-			var customers = new[] { new Customer() }.AsQueryable();
+        [Fact]
+        public void ProjectWithAssignedCollectionSourceProperty()
+        {
+            var customer = new Customer { Addresses = new List<Address> { new Address(Street1), new Address(Street2) } };
 
-			var mapped = customers.ProjectTo<CustomerDto>().SingleOrDefault();
-			mapped.ShouldNotBeNull();
-			mapped.Addresses.ShouldBeNull();
-		}
+            var customers = new[] { customer }.AsQueryable();
 
-		[Fact]
-		public void ProjectWithAssignedCollectionSourceProperty()
-		{
-			var customer = new Customer { Addresses = new List<Address> { new Address(Street1), new Address(Street2) } };
+            var mapped = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
 
-			var customers = new[] { customer }.AsQueryable();
+            mapped.ShouldNotBeNull();
 
-			var mapped = customers.ProjectTo<CustomerDto>().SingleOrDefault();
+            mapped.Addresses.ShouldBeOfLength(2);
+            mapped.Addresses[0].Street.ShouldBe(Street1);
+            mapped.Addresses[1].Street.ShouldBe(Street2);
+        }
 
-			mapped.ShouldNotBeNull();
+        public class Customer
+        {
+            public IList<Address> Addresses { get; set; }
+        }
 
-			mapped.Addresses.ShouldBeOfLength(2);
-            mapped.Addresses[0].Street.ShouldEqual(Street1);
-            mapped.Addresses[1].Street.ShouldEqual(Street2);
-		}
+        public class Address
+        {
+            public Address(string street)
+            {
+                Street = street;
+            }
 
-		public class Customer
-		{
-			public IList<Address> Addresses { get; set; }
-		}
+            public string Street { get; set; }
+        }
 
-		public class Address
-		{
-			public Address(string street)
-			{
-				Street = street;
-			}
+        public class CustomerDto
+        {
+            public IList<AddressDto> Addresses { get; set; }
+        }
 
-			public string Street { get; set; }
-		}
+        public class AddressDto : IEquatable<AddressDto>
+        {
+            public bool Equals(AddressDto other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(Street, other.Street);
+            }
 
-		public class CustomerDto
-		{
-			public IList<AddressDto> Addresses { get; set; }
-		}
+            public override int GetHashCode()
+            {
+                return (Street != null ? Street.GetHashCode() : 0);
+            }
 
-		public class AddressDto : IEquatable<AddressDto>
-		{
-		    public bool Equals(AddressDto other)
-		    {
-		        if (ReferenceEquals(null, other)) return false;
-		        if (ReferenceEquals(this, other)) return true;
-		        return string.Equals(Street, other.Street);
-		    }
+            public static bool operator ==(AddressDto left, AddressDto right)
+            {
+                return Equals(left, right);
+            }
 
-		    public override int GetHashCode()
-		    {
-		        return (Street != null ? Street.GetHashCode() : 0);
-		    }
+            public static bool operator !=(AddressDto left, AddressDto right)
+            {
+                return !Equals(left, right);
+            }
 
-		    public static bool operator ==(AddressDto left, AddressDto right)
-		    {
-		        return Equals(left, right);
-		    }
+            public string Street { get; set; }
 
-		    public static bool operator !=(AddressDto left, AddressDto right)
-		    {
-		        return !Equals(left, right);
-		    }
+            public override string ToString()
+            {
+                return Street;
+            }
 
-		    public string Street { get; set; }
-
-			public override string ToString()
-			{
-				return Street;
-			}
-
-			public override bool Equals(object obj)
-			{
-				return string.Equals(ToString(), obj.ToString());
-			}
-		}
-	}
+            public override bool Equals(object obj)
+            {
+                return string.Equals(ToString(), obj.ToString());
+            }
+        }
+    }
 }

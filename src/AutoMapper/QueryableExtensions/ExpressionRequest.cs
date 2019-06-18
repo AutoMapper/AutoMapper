@@ -1,9 +1,14 @@
+
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.QueryableExtensions
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-
+    [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
         public Type SourceType { get; }
@@ -12,11 +17,21 @@ namespace AutoMapper.QueryableExtensions
 
         public MemberInfo[] MembersToExpand { get; }
 
-        public ExpressionRequest(Type sourceType, Type destinationType, params MemberInfo[] membersToExpand)
+        internal ICollection<ExpressionRequest> PreviousRequests { get; }
+
+        internal IEnumerable<ExpressionRequest> GetPreviousRequestsAndSelf() => PreviousRequests.Concat(new[] { this });
+
+        internal bool AlreadyExists => PreviousRequests.Contains(this);
+
+        public ExpressionRequest(Type sourceType, Type destinationType, MemberInfo[] membersToExpand, ExpressionRequest parentRequest)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            MembersToExpand = membersToExpand.OrderBy(p=>p.Name).ToArray();
+            MembersToExpand = membersToExpand.OrderBy(p => p.Name).ToArray();
+
+            PreviousRequests = parentRequest == null 
+                ? new HashSet<ExpressionRequest>() 
+                : new HashSet<ExpressionRequest>(parentRequest.GetPreviousRequestsAndSelf());
         }
 
         public bool Equals(ExpressionRequest other)
@@ -37,22 +52,16 @@ namespace AutoMapper.QueryableExtensions
 
         public override int GetHashCode()
         {
-            unchecked
+            var hashCode = HashCodeCombiner.Combine(SourceType, DestinationType);
+            foreach(var member in MembersToExpand)
             {
-                var hashCode = SourceType.GetHashCode();
-                hashCode = (hashCode*397) ^ DestinationType.GetHashCode();
-                return MembersToExpand.Aggregate(hashCode, (currentHash, p) => (currentHash * 397) ^ p.GetHashCode());
+                hashCode = HashCodeCombiner.CombineCodes(hashCode, member.GetHashCode());
             }
+            return hashCode;
         }
 
-        public static bool operator ==(ExpressionRequest left, ExpressionRequest right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(ExpressionRequest left, ExpressionRequest right) => Equals(left, right);
 
-        public static bool operator !=(ExpressionRequest left, ExpressionRequest right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(ExpressionRequest left, ExpressionRequest right) => !Equals(left, right);
     }
 }

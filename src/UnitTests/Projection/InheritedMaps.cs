@@ -4,7 +4,7 @@
     {
         using System.Linq;
         using QueryableExtensions;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class SourceBase
@@ -26,17 +26,14 @@
         {
             private Dest[] _dest;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<SourceBase, Dest>()
-                        .Include<Source, Dest>()
-                        .ForMember(d => d.Value, opt => opt.MapFrom(src => src.OtherValue));
+                cfg.CreateMap<SourceBase, Dest>()
+                    .Include<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.MapFrom(src => src.OtherValue));
 
-                    cfg.CreateMap<Source, Dest>();
-                });
-            }
+                cfg.CreateMap<Source, Dest>();
+            });
 
             protected override void Because_of()
             {
@@ -48,13 +45,13 @@
                     }
                 }.AsQueryable();
 
-                _dest = sources.ProjectTo<Dest>().ToArray();
+                _dest = sources.ProjectTo<Dest>(Configuration).ToArray();
             }
 
             [Fact]
             public void Should_inherit_base_mapping()
             {
-                _dest[0].Value.ShouldEqual(10);
+                _dest[0].Value.ShouldBe(10);
             }
         }
     }

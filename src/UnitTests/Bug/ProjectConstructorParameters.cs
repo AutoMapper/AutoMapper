@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -36,22 +36,22 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, SourceDto>();
-        }
+            cfg.CreateMap<Source, SourceDto>();
+        });
 
         protected override void Because_of()
         {
             var source = new Source { Inner = new Inner { Member = SomeValue } };
             //_dest = Mapper.Map<Source, SourceDto>(source);
-            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>().First();
+            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>(Configuration).First();
         }
 
         [Fact]
         public void Should_project_constructor_parameter_mappings()
         {
-            _dest.Value.ShouldEqual(SomeValue);
+            _dest.Value.ShouldBe(SomeValue);
         }
     }
 }

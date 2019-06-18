@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using AutoMapper;
 using Xunit;
 
@@ -26,10 +26,10 @@ namespace AutoMapper.UnitTests.Bug
             public Values? Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(c=>c.CreateMap<Source, Destination>());
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {

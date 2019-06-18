@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -18,25 +18,25 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void specifying_map_should_override_ignore()
         {
-            Mapper.CreateMap<DomainBase, DtoBase>()
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DomainBase, DtoBase>()
                 .ForMember(m=>m.SomeDifferentProperty, m=>m.Ignore())
-                .ForMember(m=>m.SomeDifferentProperty, m=>m.MapFrom(s=>s.SomeProperty));
+                .ForMember(m=>m.SomeDifferentProperty, m=>m.MapFrom(s=>s.SomeProperty)));
 
-            var dto = Mapper.Map<DomainBase, DtoBase>(new DomainBase {SomeProperty = "Test"});
+            var dto = config.CreateMapper().Map<DomainBase, DtoBase>(new DomainBase {SomeProperty = "Test"});
 
-            "Test".ShouldEqual(dto.SomeDifferentProperty);
+            "Test".ShouldBe(dto.SomeDifferentProperty);
         }
 
         [Fact]
         public void specifying_map_should_override_ignore_with_one_parameter()
         {
-            Mapper.CreateMap<DomainBase, DtoBase>()
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DomainBase, DtoBase>()
                 .ForMember(m => m.SomeDifferentProperty, m => m.Ignore())
-                .ForMember(m => m.SomeDifferentProperty, m => m.MapFrom(s => s.SomeProperty));
+                .ForMember(m => m.SomeDifferentProperty, m => m.MapFrom(s => s.SomeProperty)));
 
-            var dto = Mapper.Map<DtoBase>(new DomainBase { SomeProperty = "Test" });
+            var dto = config.CreateMapper().Map<DtoBase>(new DomainBase { SomeProperty = "Test" });
 
-            "Test".ShouldEqual(dto.SomeDifferentProperty);
+            "Test".ShouldBe(dto.SomeDifferentProperty);
         }
     }
 }

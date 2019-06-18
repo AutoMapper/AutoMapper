@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -18,11 +18,10 @@ namespace AutoMapper.UnitTests
             public SomeEnum? EnumValue { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Destination>();
-            Mapper.AssertConfigurationIsValid();
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {
@@ -32,7 +31,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_enum_to_nullable_enum()
         {
-            _destination.EnumValue.ShouldEqual(SomeEnum.Bar);
+            _destination.EnumValue.ShouldBe(SomeEnum.Bar);
         }
     }
 }

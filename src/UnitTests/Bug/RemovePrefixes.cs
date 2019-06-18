@@ -1,14 +1,12 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using AutoMapper.Mappers;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class RemovePrefixes : AutoMapperSpecBase
+    public class RemovePrefixes : NonValidatingSpecBase
     {
-        ConfigurationStore config;
-
         class Source
         {
             public int GetNumber { get; set; }
@@ -18,17 +16,16 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            config.ClearPrefixes();
-            config.CreateMap<Source, Destination>();
-        }
+            cfg.ClearPrefixes();
+            cfg.CreateMap<Source, Destination>();
+        });
 
         [Fact]
         public void Should_not_map_with_default_postfix()
         {
-            new Action(config.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
         }
     }
 }

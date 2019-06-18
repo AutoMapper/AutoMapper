@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -23,12 +23,12 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.AllowNullCollections = true;
                 cfg.CreateMap<IFoo, IFoo>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
             IFoo bar = new Bar
             {
@@ -39,9 +39,9 @@ namespace AutoMapper.UnitTests.Bug
                 Value = 10
             };
 
-            Mapper.Map(bar, baz);
+            config.CreateMapper().Map(bar, baz);
 
-            baz.Value.ShouldEqual(5);
+            baz.Value.ShouldBe(5);
         }
     }
 }

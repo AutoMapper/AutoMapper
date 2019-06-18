@@ -1,5 +1,4 @@
-﻿#if !WINDOWS_PHONE
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Mappers;
 using Xunit;
@@ -26,8 +25,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void ShouldMapToNewISet()
         {
-            Mapper.Initialize(config =>
-                config.CreateMap<SourceWithIEnumerable, TargetWithISet>()
+            var config = new MapperConfiguration(cfg =>
+                cfg.CreateMap<SourceWithIEnumerable, TargetWithISet>()
                     .ForMember(dest => dest.Stuff, opt => opt.MapFrom(src => src.Stuff.Select(s => s.Value))));
 
             var source = new SourceWithIEnumerable
@@ -41,8 +40,7 @@ namespace AutoMapper.UnitTests.Bug
                             }
             };
 
-            var target = Mapper.Map<SourceWithIEnumerable, TargetWithISet>(source);
+            var target = config.CreateMapper().Map<SourceWithIEnumerable, TargetWithISet>(source);
         }
     }
 }
-#endif

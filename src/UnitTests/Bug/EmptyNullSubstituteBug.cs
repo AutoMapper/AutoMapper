@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class EmptyNullSubstituteBug : NonValidatingSpecBase
@@ -21,12 +21,12 @@
             public string NotifyEmail { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Model, Entity>()
+            cfg.CreateMap<Model, Entity>()
                             .ForMember(e => e.ClientIPAddress, opts => opts.NullSubstitute(""))
                             .ForMember(e => e.NotifyEmail, opts => opts.NullSubstitute(""));
-        }
+        });
 
         protected override void Because_of()
         {
@@ -50,7 +50,7 @@
         [Fact]
         public void Should_keep_existing_ip_address()
         {
-            _destination.ClientIPAddress.ShouldEqual("192.22.2.1");
+            _destination.ClientIPAddress.ShouldBe("192.22.2.1");
         }
     }
 }

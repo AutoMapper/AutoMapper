@@ -1,26 +1,19 @@
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
-    using System.Linq;
-    using System.Reflection;
-    using Internal;
-
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-        {
-            var implicitOperator = GetExplicitConversionOperator(context);
-
-            return implicitOperator.Invoke(null, new[] {context.SourceValue});
-        }
-
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             var methodInfo = GetExplicitConversionOperator(context);
 
             return methodInfo != null;
         }
 
-        private static MethodInfo GetExplicitConversionOperator(ResolutionContext context)
+        private static MethodInfo GetExplicitConversionOperator(TypePair context)
         {
             var sourceTypeMethod = context.SourceType
                 .GetDeclaredMethods()
@@ -28,9 +21,16 @@ namespace AutoMapper.Mappers
                 .Where(mi => mi.Name == "op_Explicit")
                 .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
 
-            var destTypeMethod = context.DestinationType.GetMethod("op_Explicit", new[] {context.SourceType});
+            var destTypeMethod = context.DestinationType.GetDeclaredMethod("op_Explicit", new[] {context.SourceType});
 
             return sourceTypeMethod ?? destTypeMethod;
+        }
+
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            var implicitOperator = GetExplicitConversionOperator(new TypePair(sourceExpression.Type, destExpression.Type));
+            return Expression.Call(null, implicitOperator, sourceExpression);
         }
     }
 }

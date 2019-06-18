@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -32,14 +32,11 @@ namespace AutoMapper.UnitTests.Bug
 
         public class DestChild {}
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Dest>();
-                cfg.CreateMap<Child, DestChild>();
-            });
-        }
+            cfg.CreateMap<Source, Dest>();
+            cfg.CreateMap<Child, DestChild>();
+        });
 
         protected override void Because_of()
         {
@@ -57,7 +54,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_collection_items()
         {
-            _dest.Children.Count.ShouldEqual(2);
+            _dest.Children.Count.ShouldBe(2);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -20,14 +20,11 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                // BUG. ArgumentException : Expression must be writeable
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            // BUG. ArgumentException : Expression must be writeable
+            cfg.CreateMap<Source, Destination>();
+        });
 
         [Fact]
         public void Should_map_over_constructor()
@@ -36,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var dest = Mapper.Map<Destination>(source);
 
-            dest.Value.ShouldEqual(source.Value);
+            dest.Value.ShouldBe(source.Value);
         }
     }
 }

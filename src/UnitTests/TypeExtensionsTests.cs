@@ -1,7 +1,6 @@
 ﻿namespace AutoMapper.UnitTests
 {
-    using Internal;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class TypeExtensionsTests
@@ -24,7 +23,7 @@
             [Fact]
             public void Should_recognize_public_members()
             {
-//                typeof(Foo).GetProperties().Length.ShouldEqual(4);
+//                typeof(Foo).GetProperties().Length.ShouldBe(4);
             }
         } 
     }

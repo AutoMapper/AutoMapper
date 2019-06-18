@@ -5,7 +5,7 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ListSourceMapperBug
@@ -34,13 +34,13 @@
         [Fact]
         public void CustomListSourceShouldNotBlowUp()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             var source = new CustomCollection<Source> {new Source()};
 
-            var dests = Mapper.Map<CustomCollection<Source>, CustomCollection<Dest>>(source);
+            var dests = config.CreateMapper().Map<CustomCollection<Source>, CustomCollection<Dest>>(source);
 
-            dests.Count.ShouldEqual(1);
+            dests.Count.ShouldBe(1);
         }
     }
 }

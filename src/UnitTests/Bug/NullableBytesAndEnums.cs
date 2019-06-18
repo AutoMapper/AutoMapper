@@ -1,49 +1,45 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class NullableBytesAndEnums : AutoMapperSpecBase
-	{
-		private Destination _destination;
+    public class NullableBytesAndEnums : AutoMapperSpecBase
+    {
+        private Destination _destination;
 
-		public class Source
-		{
-			public byte? Value { get; set; }
-		}
+        public class Source
+        {
+            public byte? Value { get; set; }
+        }
 
-		public enum Foo : byte
-		{
-			Blarg = 1,
-			Splorg = 2
-		}
+        public enum Foo : byte
+        {
+            Blarg = 1,
+            Splorg = 2
+        }
 
-		public class Destination
-		{
-			public Foo? Value { get; set; }
-		}
+        public class Destination
+        {
+            public Foo? Value { get; set; }
+        }
 
-		protected override void Establish_context()
-		{
-			Mapper.Initialize(cfg =>
-			{
-				cfg.CreateMap<Source, Destination>();
-			});
-		}
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
 
-		protected override void Because_of()
-		{
-			_destination = Mapper.Map<Source, Destination>(new Source {Value = 2});
-		}
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Source, Destination>(new Source {Value = 2});
+        }
 
-		[Fact]
-		public void Should_map_the_byte_to_the_enum_with_the_same_value()
-		{
-			_destination.Value.ShouldEqual(Foo.Splorg);
-		}
-	}
+        [Fact]
+        public void Should_map_the_byte_to_the_enum_with_the_same_value()
+        {
+            _destination.Value.ShouldBe(Foo.Splorg);
+        }
+    }
 
-#if NET40
     public class NullableLong : AutoMapperSpecBase
     {
         private Destination _destination;
@@ -58,13 +54,10 @@ namespace AutoMapper.UnitTests.Bug
             public long? Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {
@@ -74,8 +67,44 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_the_byte_to_the_enum_with_the_same_value()
         {
-            _destination.Value.ShouldEqual(2);
+            _destination.Value.ShouldBe(2);
         }
     }
-#endif
+
+    public class NullableShortWithCustomMapFrom : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public short Value { get; set; }
+        }
+
+        public class Destination
+        {
+            public short? Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>()
+                .ForMember(t => t.Value, opts => opts.MapFrom(s => s.Value > 0 ? s.Value : default(short?)));
+        });
+
+        protected override void Because_of()
+        {
+        }
+
+        [Fact]
+        public void Should_map_the_value()
+        {
+            var destination = Mapper.Map<Source, Destination>(new Source { Value = 2 });
+            destination.Value.ShouldBe((short)2);
+        }
+
+        [Fact]
+        public void Should_map_the_value_with_condition()
+        {
+            var destination = Mapper.Map<Source, Destination>(new Source { Value = 0 });
+            destination.Value.ShouldBeNull();
+        }
+    }
 }

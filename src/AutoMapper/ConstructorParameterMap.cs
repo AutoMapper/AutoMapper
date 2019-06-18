@@ -1,40 +1,45 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    public class ConstructorParameterMap
+    public class ConstructorParameterMap : DefaultMemberMap
     {
-        public ConstructorParameterMap(ParameterInfo parameter, IMemberGetter[] sourceResolvers, bool canResolve)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,
+            bool canResolveValue)
         {
+            TypeMap = typeMap;
             Parameter = parameter;
-            SourceResolvers = sourceResolvers;
-            CanResolve = canResolve;
+            SourceMembers = sourceMembers.ToList();
+            CanResolveValue = canResolveValue;
         }
 
-        public ParameterInfo Parameter { get; private set; }
+        public ParameterInfo Parameter { get; }
 
-        public IMemberGetter[] SourceResolvers { get; private set; }
+        public override TypeMap TypeMap { get; }
 
-        public bool CanResolve { get; set; }
+        public override Type SourceType =>
+            CustomMapExpression?.ReturnType
+            ?? CustomMapFunction?.ReturnType
+            ?? (Parameter.IsOptional 
+                ? Parameter.ParameterType 
+                : SourceMembers.Last().GetMemberType());
 
-        public Expression GetExpression(Expression instanceParameter)
-        {
-            return SourceResolvers.Aggregate(instanceParameter, (parameter, getter) => Expression.MakeMemberAccess(parameter, getter.MemberInfo));
-        }
+        public override Type DestinationType => Parameter.ParameterType;
 
-        public ResolutionResult ResolveValue(ResolutionContext context)
-        {
-            var result = new ResolutionResult(context);
+        public override IEnumerable<MemberInfo> SourceMembers { get; }
+        public override string DestinationName => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
 
-            return SourceResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
-        }
+        public bool HasDefaultValue => Parameter.IsOptional;
 
-        public void ResolveUsing(IEnumerable<IMemberGetter> members)
-        {
-            SourceResolvers = members.ToArray();
-        }
+        public override LambdaExpression CustomMapExpression { get; set; }
+        public override LambdaExpression CustomMapFunction { get; set; }
+
+        public override bool CanResolveValue { get; set; }
+
+        public override bool Inline { get; set; }
     }
 }

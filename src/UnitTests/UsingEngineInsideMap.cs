@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class UsingEngineInsideMap : AutoMapperSpecBase
@@ -23,15 +23,16 @@
             public int Foo { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.Child, opt => opt.ResolveUsing(result => result.Context.Engine.Map<Source, ChildDest>((Source) result.Value)));
-                cfg.CreateMap<Source, ChildDest>();
-            });
-        }
+            cfg.CreateMap<Source, Dest>()
+                .ForMember(dest => dest.Child,
+                    opt =>
+                        opt.MapFrom(
+                            (src, dest, destMember, context) =>
+                                context.Mapper.Map(src, destMember, typeof (Source), typeof (ChildDest), context)));
+            cfg.CreateMap<Source, ChildDest>();
+        });
 
         protected override void Because_of()
         {
@@ -42,7 +43,25 @@
         public void Should_map_child_property()
         {
             _dest.Child.ShouldNotBeNull();
-            _dest.Child.Foo.ShouldEqual(5);
+            _dest.Child.Foo.ShouldBe(5);
         }
+    }
+
+    public class When_mapping_null_with_context_mapper : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+            cfg.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom((s,d,dm, context)=>context.Mapper.Map<string>(null))));
+
+        [Fact]
+        public void Should_return_null() => Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
     }
 }

@@ -1,13 +1,10 @@
+using System;
+#if !DEBUG
+using System.Linq;
+#endif
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-#if NET45
-    [Serializable]
-#endif
     public class AutoMapperMappingException : Exception
     {
         private readonly string _message;
@@ -24,102 +21,54 @@ namespace AutoMapper
         }
 
         public AutoMapperMappingException(string message)
-            : base(message)
-        {
-            _message = message;
-        }
+            : base(message) => _message = message;
 
-        public AutoMapperMappingException(string message, Exception inner)
-            : base(null, inner)
-        {
-            _message = message;
-        }
+        public AutoMapperMappingException(string message, Exception innerException)
+            : base(message, innerException) => _message = message;
 
-        public AutoMapperMappingException(ResolutionContext context)
-        {
-            Context = context;
-        }
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types)
+            : this(message, innerException) => Types = types;
 
-        public AutoMapperMappingException(ResolutionContext context, Exception inner)
-            : base(null, inner)
-        {
-            Context = context;
-        }
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
+            : this(message, innerException, types) => TypeMap = typeMap;
 
-        public AutoMapperMappingException(ResolutionContext context, string message)
-            : this(context)
-        {
-            _message = message;
-        }
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, IMemberMap memberMap)
+            : this(message, innerException, types, typeMap) => MemberMap = memberMap;
 
-        public ResolutionContext Context { get; }
+        public TypePair? Types { get; set; }
+        public TypeMap TypeMap { get; set; }
+        public IMemberMap MemberMap { get; set; }
 
         public override string Message
         {
             get
             {
-                string message = null;
+                var message = _message;
                 var newLine = Environment.NewLine;
-                if (Context != null)
+                if (Types?.SourceType != null && Types?.DestinationType != null)
                 {
-                    message = _message + newLine + newLine + "Mapping types:";
-                    message += newLine +
-                               $"{Context.SourceType.Name} -> {Context.DestinationType.Name}";
-                    message += newLine +
-                               $"{Context.SourceType.FullName} -> {Context.DestinationType.FullName}";
-
-                    var destPath = GetDestPath(Context);
-                    message += newLine + newLine + "Destination path:" + newLine + destPath;
-
-                    message += newLine + newLine + "Source value:" + newLine + (Context.SourceValue ?? "(null)");
-
-                    return message;
+                    message = message + newLine + newLine + "Mapping types:";
+                    message += newLine + $"{Types?.SourceType.Name} -> {Types?.DestinationType.Name}";
+                    message += newLine + $"{Types?.SourceType.FullName} -> {Types?.DestinationType.FullName}";
                 }
-                if (_message != null)
+                if (TypeMap != null)
                 {
-                    message = _message;
+                    message = message + newLine + newLine + "Type Map configuration:";
+                    message += newLine + $"{TypeMap.SourceType.Name} -> {TypeMap.DestinationType.Name}";
+                    message += newLine + $"{TypeMap.SourceType.FullName} -> {TypeMap.DestinationType.FullName}";
                 }
-
-                message = (message == null ? null : message + newLine) + base.Message;
+                if (MemberMap != null)
+                {
+                    message = message + newLine + newLine + "Destination Member:";
+                    message += newLine + $"{MemberMap.DestinationName}" + newLine;
+                }
 
                 return message;
             }
         }
 
-        private string GetDestPath(ResolutionContext context)
-        {
-            var allContexts = GetContexts(context).Reverse();
-
-            var builder = new StringBuilder(allContexts.First().DestinationType.Name);
-
-            foreach (var ctxt in allContexts)
-            {
-                if (!string.IsNullOrEmpty(ctxt.MemberName))
-                {
-                    builder.Append(".");
-                    builder.Append(ctxt.MemberName);
-                }
-                if (ctxt.ArrayIndex != null)
-                {
-                    builder.AppendFormat("[{0}]", ctxt.ArrayIndex);
-                }
-            }
-            return builder.ToString();
-        }
-
-        private static IEnumerable<ResolutionContext> GetContexts(ResolutionContext context)
-        {
-            while (context.Parent != null)
-            {
-                yield return context;
-
-                context = context.Parent;
-            }
-            yield return context;
-        }
-
 #if !DEBUG
-	    public override string StackTrace
+        public override string StackTrace
         {
             get
             {

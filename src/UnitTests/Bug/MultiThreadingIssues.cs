@@ -1,344 +1,1326 @@
-﻿#if !SILVERLIGHT && !NETFX_CORE
-using System ;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics ;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading ;
-using System.Threading.Tasks ;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper.Mappers;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
 
     public class MultiThreadingIssues
     {
-		public class Type1
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-			public int Age ;
-		}
-
-		public class Type1Point3
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-		}
-
-		public class Type1Point2
-		{
-			public string FirstName ;
-			public string MiddleName ;
-		}
-
-		public class Type1Point1
-		{
-			public string FirstName ;
-		}
-
-		public class DestType
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-			public int Age ;
-		}
-
-    	static int _done ;
-    	readonly ManualResetEvent _allDone = new ManualResetEvent( false );
-
-		[Fact]
-        public void ShouldMapToNewISet()
+        public class Type1
         {
-			const int threadCount = 130 ;
-
-			for (int i = 0; i < threadCount; i++)
-			{
-				Task.Factory.StartNew( doMapping ).ContinueWith(
-					a =>
-						{
-							if (Interlocked.Increment(ref _done) == threadCount)
-							{
-								_allDone.Set( ) ;
-							}
-
-						} ) ;
-			}
-
-			_allDone.WaitOne( TimeSpan.FromSeconds( 10 ) ) ;
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
         }
 
-    	static void doMapping( )
-    	{
-    		var source = createSource( ) ;
+        public class Type1Point3
+        {
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+        }
 
-    		Console.WriteLine( @"Mapping {0} on thread {1}", source.GetType( ), Thread.CurrentThread.ManagedThreadId ) ;
+        public class Type1Point2
+        {
+            public string FirstName;
+            public string MiddleName;
+        }
 
-    		Mapper.CreateMap( source.GetType( ), typeof( DestType ) ) ;
+        public class Type1Point1
+        {
+            public string FirstName;
+        }
 
-    		DestType t2 = (DestType)Mapper.Map(source, source.GetType(  ), typeof( DestType ) )  ;
-    	}
-    	
-		static readonly Random _random = new Random();
+        public class DestType
+        {
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
+        }
 
-    	static object createSource( )
-    	{
-    		
-			int n = _random.Next( 0, 4 ) ;
-    		
-			if( n == 0 )
-			{
-				return new Type1
-					{
-						Age = 12,
-						FirstName = @"Fred",
-						LastName = @"Smith",
-						MiddleName = @"G"
-					} ;
-			}
-    		if( n == 1 )
-    		{
-    			return new Type1Point1( ) 
-					{
-						FirstName = @"Fred",
-					} ;
+        static int _done;
+        readonly ManualResetEvent _allDone = new ManualResetEvent(false);
 
-    		}
-    		if( n == 2 )
-    		{
-    			return new Type1Point2( ) 
-					{
-						FirstName = @"Fred",
-						MiddleName = @"G"
-					} ;
+        [Fact]
+        public void ShouldMapToNewISet()
+        {
+            const int threadCount = 13;
 
-    		}
-    		if( n == 3 )
-    		{
-    			return new Type1Point3( ) 
-					{
-						FirstName = @"Fred",
-						LastName = @"Smith",
-						MiddleName = @"G"
-					} ;
+            for(int i = 0; i < threadCount; i++)
+            {
+                Task.Factory.StartNew(doMapping).ContinueWith(
+                    a =>
+                    {
+                        if(Interlocked.Increment(ref _done) == threadCount)
+                        {
+                            _allDone.Set();
+                        }
 
-    		}
-    		
-			throw new Exception();
-    	}
+                    });
+            }
+
+            _allDone.WaitOne(TimeSpan.FromSeconds(10));
+        }
+
+        static void doMapping()
+        {
+            var source = createSource();
+
+            Debug.WriteLine(@"Mapping {0} on thread {1}", source.GetType(), Thread.CurrentThread.ManagedThreadId);
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(source.GetType(), typeof(DestType)));
+
+            DestType t2 = (DestType)config.CreateMapper().Map(source, source.GetType(), typeof(DestType));
+        }
+
+        static readonly Random _random = new Random();
+
+        static object createSource()
+        {
+
+            int n = _random.Next(0, 4);
+
+            if(n == 0)
+            {
+                return new Type1
+                {
+                    Age = 12,
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
+            }
+            if(n == 1)
+            {
+                return new Type1Point1()
+                {
+                    FirstName = @"Fred",
+                };
+
+            }
+            if(n == 2)
+            {
+                return new Type1Point2()
+                {
+                    FirstName = @"Fred",
+                    MiddleName = @"G"
+                };
+
+            }
+            if(n == 3)
+            {
+                return new Type1Point3()
+                {
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
+
+            }
+
+            throw new Exception();
+        }
     }
 
     public class DynamicMapThreadingIssues
     {
         public class SomeDtoA
         {
-            private string Property1 { get; set; }
-            private string Property21 { get; set; }
-            private string Property3 { get; set; }
-            private string Property4 { get; set; }
-            private string Property5 { get; set; }
-            private string Property6 { get; set; }
-            private string Property7 { get; set; }
-            private string Property8 { get; set; }
-            private string Property9 { get; set; }
-            private string Property10 { get; set; }
-            private string Property11 { get; set; }
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
         }
 
         public class SomeDtoB
         {
-            private string Property1 { get; set; }
-            private string Property21 { get; set; }
-            private string Property3 { get; set; }
-            private string Property4 { get; set; }
-            private string Property5 { get; set; }
-            private string Property6 { get; set; }
-            private string Property7 { get; set; }
-            private string Property8 { get; set; }
-            private string Property9 { get; set; }
-            private string Property10 { get; set; }
-            private string Property11 { get; set; }
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
         }
 
         public class SomeDtoC
         {
-            private string Property1 { get; set; }
-            private string Property21 { get; set; }
-            private string Property3 { get; set; }
-            private string Property4 { get; set; }
-            private string Property5 { get; set; }
-            private string Property6 { get; set; }
-            private string Property7 { get; set; }
-            private string Property8 { get; set; }
-            private string Property9 { get; set; }
-            private string Property10 { get; set; }
-            private string Property11 { get; set; }
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
         }
 
         public class SomeDtoD
         {
-            private string Property1 { get; set; }
-            private string Property21 { get; set; }
-            private string Property3 { get; set; }
-            private string Property4 { get; set; }
-            private string Property5 { get; set; }
-            private string Property6 { get; set; }
-            private string Property7 { get; set; }
-            private string Property8 { get; set; }
-            private string Property9 { get; set; }
-            private string Property10 { get; set; }
-            private string Property11 { get; set; }
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
         }
 
         [Fact]
         public void Should_not_fail()
         {
-            Mapper.Reset();
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var mapper = config.CreateMapper();
 
-            var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
+            var tasks = Enumerable.Range(0, 5).Select(index =>
+              Task.Factory.StartNew(() =>
                   {
-                      Mapper.DynamicMap<SomeDtoA, SomeDtoB>(new SomeDtoA());
-                      Mapper.DynamicMap<SomeDtoB, SomeDtoA>(new SomeDtoB());
-                      Mapper.DynamicMap<SomeDtoC, SomeDtoD>(new SomeDtoC());
-                      Mapper.DynamicMap<SomeDtoD, SomeDtoC>(new SomeDtoD());
-                  }))
-          .ToArray();
-            Exception exception = null;
-            try
-            {
-                Task.WaitAll(tasks);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            exception.ShouldBeNull();
-            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
+                      if(index % 2 == 0)
+                      {
+                          mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoA());
+                          mapper.Map<SomeDtoC, SomeDtoD>(new SomeDtoC());
+                      }
+                      else
+                      {
+                          mapper.Map<SomeDtoB, SomeDtoA>(new SomeDtoB());
+                          mapper.Map<SomeDtoD, SomeDtoC>(new SomeDtoD());
+                      }
+                  })).ToArray();
+            Task.WaitAll(tasks);
         }
-        [Fact]
-        public void Should_not_fail_with_create_map()
-        {
-            Mapper.Reset();
+    }
 
-            var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
+    public class ResolveTypeMapThreadingIssues
+    {
+        public class SomeDtoA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeDtoB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeDtoC : SomeDtoA
+        {
+        }
+
+        public class SomeDtoD : SomeDtoB
+        {
+        }
+
+        [Fact]
+        public void Should_not_fail()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var mapper = config.CreateMapper();
+
+            var tasks = Enumerable.Range(0, 5).Select(index =>
+              Task.Factory.StartNew(() =>
+              {
+                  if(index % 2 == 0)
                   {
-                      Mapper.CreateMap<SomeDtoA, SomeDtoB>();
-                      Mapper.CreateMap<SomeDtoB, SomeDtoA>();
-                      Mapper.CreateMap<SomeDtoC, SomeDtoD>();
-                      Mapper.CreateMap<SomeDtoD, SomeDtoC>();
-                  }))
-          .ToArray();
-            Exception exception = null;
-            try
+                      mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoC());
+                  }
+                  else
+                  {
+                      mapper.Map<SomeDtoC, SomeDtoB>(new SomeDtoC());
+                  }
+              })).ToArray();
+            Task.WaitAll(tasks);
+        }
+    }
+
+    public class ResolveWithCreateMissingTypeMaps
+    {
+        public class SomeDtoA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoC
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoD
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoE
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoF
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoG
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoH
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoI
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoJ
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoK
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoL
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoM
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoN
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoO
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoP
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeEntityA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityC
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityD
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityE
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityF
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityG
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityH
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityI
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityJ
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityK
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityL
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityM
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityN
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityO
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityP
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        [Fact]
+        public void Should_work()
+        {
+            var c = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var types = new[]{
+                new[] { typeof(SomeEntityA), typeof(SomeDtoA) },
+                new[] { typeof(SomeEntityB), typeof(SomeDtoB) },
+                new[] { typeof(SomeEntityC), typeof(SomeDtoC) },
+                new[] { typeof(SomeEntityD), typeof(SomeDtoD) },
+                new[] { typeof(SomeEntityE), typeof(SomeDtoE) },
+                new[] { typeof(SomeEntityF), typeof(SomeDtoF) },
+                new[] { typeof(SomeEntityG), typeof(SomeDtoG) },
+                new[] { typeof(SomeEntityH), typeof(SomeDtoH) },
+                new[] { typeof(SomeEntityI), typeof(SomeDtoI) },
+                new[] { typeof(SomeEntityJ), typeof(SomeDtoJ) },
+                new[] { typeof(SomeEntityK), typeof(SomeDtoK) },
+                new[] { typeof(SomeEntityL), typeof(SomeDtoL) },
+                new[] { typeof(SomeEntityM), typeof(SomeDtoM) },
+                new[] { typeof(SomeEntityN), typeof(SomeDtoN) },
+                new[] { typeof(SomeEntityO), typeof(SomeDtoO) },
+                new[] { typeof(SomeEntityP), typeof(SomeDtoP) },
+            };
+            var tasks = 
+                types
+                .Concat(types.Select(t=>t.Reverse().ToArray()))
+                .ToArray()
+                .Select(s => Task.Factory.StartNew(() => c.ResolveTypeMap(s[0], s[1])))
+                .ToArray();
+            Task.WaitAll(tasks);
+        }
+    }
+
+    public class ResolveWithGenericMap
+    {
+        public class SomeDtoA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoC
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoD
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoE
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoF
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoG
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoH
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoI
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoJ
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoK
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoL
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoM
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoN
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoO
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeDtoP
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string PropertyX { get; set; }
+        }
+
+        public class SomeEntityA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityC
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityD
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityE
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityF
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityG
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityH
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityI
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityJ
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityK
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityL
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityM
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityN
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityO
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeEntityP
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class Entity<T>
+        {
+            public T Data { get; set; }
+        }
+
+        public class Dto<T>
+        {
+            public T Data { get; set; }
+            public int Value { get; set; }
+        }
+
+        [Fact]
+        public void Should_work()
+        {
+            var sourceType = typeof(Entity<>);
+            var destinationType = typeof(Dto<>);
+            var c = new MapperConfiguration(cfg =>
             {
-                Task.WaitAll(tasks);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            exception.ShouldBeNull();
-            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
+                cfg.CreateMap(sourceType, destinationType).ForMember("Value", o => o.Ignore());
+            });
+            var types = new[]{
+                new[] { typeof(SomeEntityA), typeof(SomeDtoA) },
+                new[] { typeof(SomeEntityB), typeof(SomeDtoB) },
+                new[] { typeof(SomeEntityC), typeof(SomeDtoC) },
+                new[] { typeof(SomeEntityD), typeof(SomeDtoD) },
+                new[] { typeof(SomeEntityE), typeof(SomeDtoE) },
+                new[] { typeof(SomeEntityF), typeof(SomeDtoF) },
+                new[] { typeof(SomeEntityG), typeof(SomeDtoG) },
+                new[] { typeof(SomeEntityH), typeof(SomeDtoH) },
+                new[] { typeof(SomeEntityI), typeof(SomeDtoI) },
+                new[] { typeof(SomeEntityJ), typeof(SomeDtoJ) },
+                new[] { typeof(SomeEntityK), typeof(SomeDtoK) },
+                new[] { typeof(SomeEntityL), typeof(SomeDtoL) },
+                new[] { typeof(SomeEntityM), typeof(SomeDtoM) },
+                new[] { typeof(SomeEntityN), typeof(SomeDtoN) },
+                new[] { typeof(SomeEntityO), typeof(SomeDtoO) },
+                new[] { typeof(SomeEntityP), typeof(SomeDtoP) },
+            };
+            var tasks =
+                types
+                .Concat(types.Select(t => t.Reverse().ToArray()))
+                .Select(t=>new { SourceType = sourceType.MakeGenericType(t[0]), DestinationType = destinationType.MakeGenericType(t[1]) })
+                .ToArray()
+                .Select(s => Task.Factory.StartNew(() => c.ResolveTypeMap(s.SourceType, s.DestinationType)))
+                .ToArray();
+            Task.WaitAll(tasks);
         }
     }
 }
-#endif
-
-// The three exceptions I saw while running the multithreading tests for DynamicMap (lbargaoanu)
-
-//Unhandled Exception: System.AggregateException: One or more errors occurred. ---> AutoMapper.AutoMapperMappingException:
-
-//Mapping types:
-//SomeDtoB -> SomeDtoA
-//TestConsole.Program+SomeDtoB -> TestConsole.Program+SomeDtoA
-
-//Destination path:
-//SomeDtoA
-
-//Source value:
-//TestConsole.Program+SomeDtoB ---> System.NullReferenceException: Object reference not set to an instance of an object.
-//   at AutoMapper.MappingEngine.AutoMapper.IMappingEngineRunner.Map(ResolutionContext context) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.c
-//s:line 256
-//   --- End of inner exception stack trace ---
-//   at AutoMapper.MappingEngine.AutoMapper.IMappingEngineRunner.Map(ResolutionContext context) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.c
-//s:line 264
-//   at AutoMapper.MappingEngine.DynamicMap(Object source, Type sourceType, Type destinationType) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine
-//.cs:line 199
-//   at AutoMapper.MappingEngine.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.cs:line 170
-//   at AutoMapper.Mapper.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\Mapper.cs:line 174
-//   at TestConsole.Program.<>c.<Main>b__6_1() in D:\Projects\TestConsole\TestConsole\Program.cs:line 141
-//   at System.Threading.Tasks.Task.Execute()
-//   --- End of inner exception stack trace ---
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
-//   at TestConsole.Program.Main(String[] args) in D:\Projects\TestConsole\TestConsole\Program.cs:line 146
-
-//Unhandled Exception: System.AggregateException: One or more errors occurred. ---> AutoMapper.AutoMapperMappingException:
-
-//Mapping types:
-//SomeDtoB -> SomeDtoA
-//TestConsole.Program+SomeDtoB -> TestConsole.Program+SomeDtoA
-
-//Destination path:
-//SomeDtoA
-
-//Source value:
-//TestConsole.Program+SomeDtoB ---> System.NullReferenceException: Object reference not set to an instance of an object.
-//   at AutoMapper.Mappers.TypeMapMapper.Map(ResolutionContext context, IMappingEngineRunner mapper) in D:\Projects\AutoMapper\src\AutoMapper\Mappers\Ty
-//peMapMapper.cs:line 17
-//   at AutoMapper.MappingEngine.AutoMapper.IMappingEngineRunner.Map(ResolutionContext context) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.c
-//s:line 260
-//   --- End of inner exception stack trace ---
-//   at AutoMapper.MappingEngine.AutoMapper.IMappingEngineRunner.Map(ResolutionContext context) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.c
-//s:line 268
-//   at AutoMapper.MappingEngine.DynamicMap(Object source, Type sourceType, Type destinationType) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine
-//.cs:line 199
-//   at AutoMapper.MappingEngine.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.cs:line 170
-//   at AutoMapper.Mapper.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\Mapper.cs:line 174
-//   at TestConsole.Program.<>c.<Main>b__6_1() in D:\Projects\TestConsole\TestConsole\Program.cs:line 141
-//   at System.Threading.Tasks.Task.Execute()
-//   --- End of inner exception stack trace ---
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
-//   at TestConsole.Program.Main(String[] args) in D:\Projects\TestConsole\TestConsole\Program.cs:line 145
-
-//Unhandled Exception: System.AggregateException: One or more errors occurred. ---> System.Collections.Generic.KeyNotFoundException: The given key was n
-//ot present in the dictionary.
-//   at System.Collections.Concurrent.ConcurrentDictionary`2.get_Item(TKey key)
-//   at AutoMapper.Internal.DictionaryFactoryOverride.ConcurrentDictionaryImpl`2.get_Item(TKey key) in D:\Projects\AutoMapper\src\AutoMapper\Internal\Co
-//ncurrentDictionaryFactory.cs:line 42
-//   at AutoMapper.ConfigurationStore.<ResolveTypeMap>b__87_1(TypePair tp) in D:\Projects\AutoMapper\src\AutoMapper\ConfigurationStore.cs:line 356
-//   at System.Linq.Enumerable.WhereSelectEnumerableIterator`2.MoveNext()
-//   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source, Func`2 predicate)
-//   at AutoMapper.ConfigurationStore.<ResolveTypeMap>b__87_0(TypePair _) in D:\Projects\AutoMapper\src\AutoMapper\ConfigurationStore.cs:line 353
-//   at System.Collections.Concurrent.ConcurrentDictionary`2.GetOrAdd(TKey key, Func`2 valueFactory)
-//   at AutoMapper.Internal.DictionaryFactoryOverride.ConcurrentDictionaryImpl`2.GetOrAdd(TKey key, Func`2 valueFactory) in D:\Projects\AutoMapper\src\A
-//utoMapper\Internal\ConcurrentDictionaryFactory.cs:line 37
-//   at AutoMapper.ConfigurationStore.ResolveTypeMap(TypePair typePair) in D:\Projects\AutoMapper\src\AutoMapper\ConfigurationStore.cs:line 351
-//   at AutoMapper.ConfigurationStore.ResolveTypeMap(Type sourceType, Type destinationType) in D:\Projects\AutoMapper\src\AutoMapper\ConfigurationStore.
-//cs:line 346
-//   at AutoMapper.ConfigurationStore.ResolveTypeMap(Object source, Object destination, Type sourceType, Type destinationType) in D:\Projects\AutoMapper
-//\src\AutoMapper\ConfigurationStore.cs:line 364
-//   at AutoMapper.MappingEngine.DynamicMap(Object source, Type sourceType, Type destinationType) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine
-//.cs:line 191
-//   at AutoMapper.MappingEngine.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\MappingEngine.cs:line 170
-//   at AutoMapper.Mapper.DynamicMap[TSource, TDestination](TSource source) in D:\Projects\AutoMapper\src\AutoMapper\Mapper.cs:line 174
-//   at TestConsole.Program.<>c.<Main>b__6_1() in D:\Projects\TestConsole\TestConsole\Program.cs:line 143
-//   at System.Threading.Tasks.Task.Execute()
-//   --- End of inner exception stack trace ---
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
-//   at System.Threading.Tasks.Task.WaitAll(Task[] tasks)
-//   at TestConsole.Program.Main(String[] args) in D:\Projects\TestConsole\TestConsole\Program.cs:line 145

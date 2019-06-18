@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -20,11 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemBase>();
             }
-#if SILVERLIGHT
-            public List<ItemBase> Items { get; set; }
-#else
             public List<ItemBase> Items { get; private set; }
-#endif
         }
 
         public class ItemDto {}
@@ -37,11 +33,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemDto>();
             }
-#if SILVERLIGHT
-            public List<ItemDto> Items { get; set; }
-#else
             public List<ItemDto> Items { get; private set; }
-#endif
         }
 
         // Getting an exception casting from SpecificItemDto to GeneralItemDto 
@@ -49,7 +41,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void item_collection_should_map_by_base_type()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Container, ContainerDto>();
                 cfg.CreateMap<ItemBase, ItemDto>()
@@ -59,7 +51,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<SpecificItem, SpecificItemDto>();
             });
 
-            var dto = Mapper.Map<Container, ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<Container, ContainerDto>(new Container
                                                     {
                                                         Items =
                                                             {
@@ -68,14 +60,14 @@ namespace AutoMapper.UnitTests.Bug
                                                             }
                                                     });
 
-            dto.Items[0].ShouldBeType<GeneralItemDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[0].ShouldBeOfType<GeneralItemDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
         }
 
         [Fact]
         public void item_collection_should_map_by_base_type_for_map_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Container, ContainerDto>();
                 cfg.CreateMap<ItemBase, ItemDto>()
@@ -85,7 +77,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<SpecificItem, SpecificItemDto>();
             });
 
-            var dto = Mapper.Map<ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<ContainerDto>(new Container
             {
                 Items =
                                                             {
@@ -94,8 +86,8 @@ namespace AutoMapper.UnitTests.Bug
                                                             }
             });
 
-            dto.Items[0].ShouldBeType<GeneralItemDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[0].ShouldBeOfType<GeneralItemDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
         }
     }
 }

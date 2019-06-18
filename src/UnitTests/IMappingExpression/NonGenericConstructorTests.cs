@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class NonGenericConstructorTests : AutoMapperSpecBase
@@ -32,11 +32,11 @@
             public int Other { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Expression<Func<Source, Dest>> constructor = src => new Dest(src.Value + 10);
-            Mapper.CreateMap(typeof(Source), typeof(Dest)).ConstructProjectionUsing(constructor);
-        }
+            Expression<Func<object, object>> constructor = src => new Dest(((Source) src).Value + 10);
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructUsing(constructor);
+        });
 
         protected override void Because_of()
         {
@@ -48,13 +48,13 @@
                 }
             }.AsQueryable();
 
-            _dest = values.ProjectTo<Dest>().ToArray();
+            _dest = values.ProjectTo<Dest>(Configuration).ToArray();
         }
 
         [Fact]
         public void Should_construct_correctly()
         {
-            _dest[0].Other.ShouldEqual(15);
+            _dest[0].Other.ShouldBe(15);
         }
     }
 }

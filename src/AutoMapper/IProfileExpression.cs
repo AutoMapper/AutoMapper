@@ -1,13 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration.Conventions;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Reflection;
-
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
     public interface IProfileExpression
     {
+        /// <summary>
+        /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
+        /// </summary>
+        void DisableConstructorMapping();
+
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
         /// </summary>
@@ -27,17 +36,6 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList);
 
         /// <summary>
-        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
-        /// Specify the member list to validate against during configuration validation.
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TDestination">Destination type</typeparam>
-        /// <param name="profileName">Profile name</param>
-        /// <param name="memberList">Member list to validate</param>
-        /// <returns>Mapping expression for more configuration options</returns>
-        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList);
-
-        /// <summary>
         /// Create a mapping configuration from the source type to the destination type.
         /// Use this method when the source and destination type are known at runtime and not compile time.
         /// </summary>
@@ -55,17 +53,6 @@ namespace AutoMapper
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
-
-        /// <summary>
-        /// Creates a mapping configuration from the source type to the destination type.
-        /// Specify the member list to validate against during configuration validation.
-        /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <param name="memberList">Member list to validate</param>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Mapping expression for more configuration options</returns>
-        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName);
 
         /// <summary>
         /// Clear the list of recognized prefixes.
@@ -120,18 +107,18 @@ namespace AutoMapper
         /// <summary>
         /// Allow null destination values. If false, destination objects will be created for deep object graphs. Default true.
         /// </summary>
-        bool AllowNullDestinationValues { get; set; }
+        bool? AllowNullDestinationValues { get; set; }
 
         /// <summary>
         /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
         /// </summary>
-        bool AllowNullCollections { get; set; }
+        bool? AllowNullCollections { get; set; }
 
         /// <summary>
-        /// Include an assembly to search for extension methods to match
+        /// Allows to enable null-value propagation for query mapping. 
+        /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>
-        /// <param name="assembly">Assembly containing extension methods</param>
-        void IncludeSourceExtensionMethods(Assembly assembly);
+        bool? EnableNullPropagationForQueryMapping { get; set; }
 
         /// <summary>
         /// Naming convention for source members
@@ -144,21 +131,41 @@ namespace AutoMapper
         INamingConvention DestinationMemberNamingConvention { get; set; }
 
         /// <summary>
-        /// Specify which properties should be mapped.
-        /// By default only public properties are mapped.
-        /// </summary>
-        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
-
-        /// <summary>
-        /// Specify which fields should be mapped.
-        /// By default only public fields are mapped.
-        /// </summary>
-        Func<FieldInfo, bool> ShouldMapField { get; set; }
-
-        /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>
         /// <param name="configuration">configuration callback</param>
         void ForAllMaps(Action<TypeMap, IMappingExpression> configuration);
+
+        /// <summary>
+        /// Customize configuration for all members across all maps
+        /// </summary>
+        /// <param name="condition">Condition</param>
+        /// <param name="memberOptions">Callback for member options. Use the property map for conditional maps.</param>
+        void ForAllPropertyMaps(Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> memberOptions);
+
+        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+        Func<FieldInfo, bool> ShouldMapField { get; set; }
+        Func<MethodInfo, bool> ShouldMapMethod { get; set; }
+        Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
+        
+        string ProfileName { get; }
+        IMemberConfiguration AddMemberConfiguration();
+        IConditionalObjectMapper AddConditionalObjectMapper();
+
+        /// <summary>
+        /// Include extension methods against source members for matching destination members to. Default source extension methods from <see cref="System.Linq.Enumerable"/>
+        /// </summary>
+        /// <param name="type">Static type that contains extension methods</param>
+        void IncludeSourceExtensionMethods(Type type);
+
+        /// <summary>
+        /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
+        /// </summary>
+        IList<ValueTransformerConfiguration> ValueTransformers { get; }
+
+        /// <summary>
+        /// Validate maps created dynamically/inline on the first map. Defaults to true.
+        /// </summary>
+        bool? ValidateInlineMaps { get; set; }
     }
 }

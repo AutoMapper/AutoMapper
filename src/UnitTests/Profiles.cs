@@ -1,120 +1,117 @@
 using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-	namespace Profiles
-	{
-	    using Should.Core.Assertions;
+    namespace Profiles
+    {
+        public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
+        {
+            private Dto _result;
 
-	    public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
-		{
-			private Dto _result;
+            public class Model
+            {
+                public int Value { get; set; }
+            }
 
-			public class Model
-			{
-				public int Value { get; set; }
-			}
-
-			public class Dto
-			{
-			    public Dto(string value)
-			    {
-			        Value = value;
-			    }
-
-				public string Value { get; }
-			}
-
-			protected override void Establish_context()
-			{
-                Mapper.Initialize(cfg =>
+            public class Dto
+            {
+                public Dto(string value)
                 {
-                    cfg.DisableConstructorMapping();
+                    Value = value + "ffff";
+                }
 
-                    cfg.CreateProfile("Custom");
+                public Dto()
+                {
+                    Value = "Hello";
+                }
 
-                    cfg.CreateMap<Model, Dto>().WithProfile("Custom");
-                });
-			}
+                public string Value { get; }
+            }
 
-			protected override void Because_of()
-			{
-				_result = Mapper.Map<Model, Dto>(new Model {Value = 5});
-			}
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.DisableConstructorMapping();
 
-			[Fact(Skip = "Because the stupid config model isn't right")]
-			public void Should_not_include_default_profile_configuration_with_profiled_maps()
-			{
-				_result.Value.ShouldEqual("5");
-			}
-		}
+                cfg.CreateProfile("Custom", p => p.CreateMap<Model, Dto>());
+            });
 
-		public class When_configuring_a_profile_through_a_profile_subclass : AutoMapperSpecBase
-		{
-			private Dto _result;
-		    private CustomProfile1 _customProfile;
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Model, Dto>(new Model {Value = 5});
+            }
 
-		    public class Model
-			{
-				public int Value { get; set; }
-			}
+            [Fact]
+            public void Should_include_default_profile_configuration_with_profiled_maps()
+            {
+                _result.Value.ShouldBe("Hello");
+            }
+        }
 
-			public class Dto
-			{
-				public string FooValue { get; set; }
-			}
+        public class When_configuring_a_profile_through_a_profile_subclass : AutoMapperSpecBase
+        {
+            private Dto _result;
+            private static CustomProfile1 _customProfile;
 
-			public class Dto2
-			{
-				public string FooValue { get; set; }
-			}
+            public class Model
+            {
+                public int Value { get; set; }
+            }
 
-			public class CustomProfile1 : Profile
-			{
-				protected override void Configure()
-				{
+            public class Dto
+            {
+                public string FooValue { get; set; }
+            }
+
+            public class Dto2
+            {
+                public string FooValue { get; set; }
+            }
+
+            public class CustomProfile1 : Profile
+            {
+                public CustomProfile1()
+                {
                     RecognizeDestinationPrefixes("Foo");
+                    CreateMap<Model, Dto>();
+                }
+            }
 
-					CreateMap<Model, Dto>();
-				}
-			}
-
-			public class CustomProfile2 : Profile
-			{
-				protected override void Configure()
-				{
+            public class CustomProfile2 : Profile
+            {
+                public CustomProfile2()
+                {
                     RecognizeDestinationPrefixes("Foo");
 
                     CreateMap<Model, Dto2>();
-				}
-			}
+                }
+            }
 
-			protected override void Establish_context()
-			{
-			    _customProfile = new CustomProfile1();
-			    Mapper.AddProfile(_customProfile);
-				Mapper.AddProfile<CustomProfile2>();
-			}
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                _customProfile = new CustomProfile1();
+                cfg.AddProfile(_customProfile);
+                cfg.AddProfile<CustomProfile2>();
+            });
 
-			protected override void Because_of()
-			{
-				_result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
-			}
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
+            }
 
-		    [Fact]
-		    public void Should_default_the_custom_profile_name_to_the_type_name()
-		    {
-                _customProfile.ProfileName.ShouldEqual(typeof(CustomProfile1).FullName);
-		    }
+            [Fact]
+            public void Should_default_the_custom_profile_name_to_the_type_name()
+            {
+                _customProfile.ProfileName.ShouldBe(typeof(CustomProfile1).FullName);
+            }
 
-			[Fact]
-			public void Should_use_the_overridden_configuration_method_to_configure()
-			{
-				_result.FooValue.ShouldEqual("5");
-			}
-		}
+            [Fact]
+            public void Should_use_the_overridden_configuration_method_to_configure()
+            {
+                _result.FooValue.ShouldBe("5");
+            }
+        }
 
 
         public class When_disabling_constructor_mapping_with_profiles : AutoMapperSpecBase
@@ -123,7 +120,7 @@ namespace AutoMapper.UnitTests
 
             public class AProfile : Profile
             {
-                protected override void Configure()
+                public AProfile()
                 {
                     DisableConstructorMapping();
                     CreateMap<A, B>();
@@ -150,10 +147,10 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.AddProfile<AProfile>();
-            }
+                cfg.AddProfile<AProfile>();
+            });
 
             protected override void Because_of()
             {
@@ -163,10 +160,10 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void When_using_profile_and_no_constructor_mapping()
             {
-                Assert.Equal("BLUEZ", _b.Value);
+                Assert.Equal("BLUEZ", _b.Value, StringComparer.Ordinal);
             }
         }
 
 
-	}
+    }
 }

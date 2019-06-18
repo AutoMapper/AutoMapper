@@ -1,15 +1,17 @@
-﻿namespace AutoMapper.Mappers
+﻿using System.Linq.Expressions;
+
+namespace AutoMapper.Mappers
 {
+    using static Expression;
+
     public class StringMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-        {
-            return context.SourceValue?.ToString();
-        }
+        public bool IsMatch(TypePair context) => context.DestinationType == typeof(string) && context.SourceType != typeof(string);
 
-        public bool IsMatch(ResolutionContext context)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+            return Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString"));
         }
     }
 }

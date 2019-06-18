@@ -1,13 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Threading;
-    using Internal;
-
     public class QueryMapperVisitor : ExpressionVisitor
     {
         private readonly IQueryable _destQuery;
@@ -19,20 +18,18 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly MemberAccessQueryMapperVisitor _memberVisitor;
 
 
-        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery,
-            IMappingEngine mappingEngine)
+        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery, IConfigurationProvider config)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             _destQuery = destQuery;
             _instanceParameter = Expression.Parameter(destinationType, "dto");
-            _memberVisitor = new MemberAccessQueryMapperVisitor(this, mappingEngine);
+            _memberVisitor = new MemberAccessQueryMapperVisitor(this, config);
         }
 
-        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery,
-            IQueryable<TDestination> destQuery, IMappingEngine map)
+        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config)
         {
-            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, map);
+            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, config);
             var expr = visitor.Visit(sourceQuery.Expression);
 
             var newDestQuery = destQuery.Provider.CreateQuery<TDestination>(expr);
@@ -52,16 +49,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             return newNode;
         }
 
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return _instanceParameter;
-        }
+        protected override Expression VisitParameter(ParameterExpression node) => _instanceParameter;
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            var query = node.Value as IQueryable;
             // It is data source of queryable object instance
-            if (query != null && query.ElementType == _sourceType)
+            if (node.Value is IQueryable query && query.ElementType == _sourceType)
                 return _destQuery.Expression;
             return node;
         }
@@ -75,11 +68,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, Thread.CurrentThread.CurrentCulture);
-#else
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type);
-#endif
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, CultureInfo.CurrentCulture);
+
                 right = Expression.Constant(value, left.Type);
             }
 
@@ -123,19 +113,27 @@ namespace AutoMapper.QueryableExtensions.Impl
             var newObject = Visit(node.Object);
 
 
+
             var genericMethod = node.Method.GetGenericMethodDefinition();
             var methodArgs = node.Method.GetGenericArguments();
             methodArgs[0] = methodArgs[0].ReplaceItemType(_sourceType, _destinationType);
-            methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), typeof(int));
+
+            // for typical orderby expression, a unaryexpression is used that contains a 
+            // func which in turn defines the type of the field that has to be used for ordering/sorting
+            if (newOrderByExpr is UnaryExpression unary && unary.Operand.Type.IsGenericType())
+            {
+                methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), unary.Operand.Type.GetGenericArguments().Last());
+            }
+            else
+            {
+                methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), typeof(int));
+            }
             var orderByMethod = genericMethod.MakeGenericMethod(methodArgs);
 
             return Expression.Call(newObject, orderByMethod, newQuery, newOrderByExpr);
         }
 
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            return _memberVisitor.Visit(node);
-        }
+        protected override Expression VisitMember(MemberExpression node) => _memberVisitor.Visit(node);
 
         private MethodInfo ChangeMethodArgTypeFormSourceToDest(MethodInfo mi)
         {
@@ -152,7 +150,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             if (lambdaType.IsGenericType())
             {
-                var genArgs = lambdaType.GetGenericArguments();
+                var genArgs = lambdaType.GetTypeInfo().GenericTypeArguments;
                 var newGenArgs = genArgs.Select(t => t.ReplaceItemType(_sourceType, _destinationType)).ToArray();
                 var genericTypeDef = lambdaType.GetGenericTypeDefinition();
                 if (genericTypeDef.FullName.StartsWith("System.Func"))

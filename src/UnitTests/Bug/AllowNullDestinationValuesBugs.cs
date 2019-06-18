@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -24,16 +24,13 @@ namespace AutoMapper.UnitTests.Bug
                 public string Name { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
             {
-                Mapper.Initialize(config =>
-                {
-                    config.AllowNullDestinationValues = false;
-                    config.CreateMap<Inner, Inner>();
-                    config.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.SomeOtherProperty, opt => opt.MapFrom(src => src.Property));
-                });
-            }
+                config.AllowNullDestinationValues = false;
+                config.CreateMap<Inner, Inner>();
+                config.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.SomeOtherProperty, opt => opt.MapFrom(src => src.Property));
+            });
 
             protected override void Because_of()
             {

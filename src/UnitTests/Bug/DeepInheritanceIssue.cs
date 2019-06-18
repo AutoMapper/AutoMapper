@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ContainsASrc, ContainsADest>();
 
@@ -28,10 +28,11 @@ namespace AutoMapper.UnitTests.Bug
             var expectedContCSrc = new ContainsASrc() {A = expectedCSrc};
             var expectedContBSrc = new ContainsASrc() {A = expectedBSrc};
 
-            var actualContCDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
-            var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
+            var mapper = config.CreateMapper();
+            var actualContCDest = mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
+            var actualContBDest = mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
             actualContBDest.ShouldNotBeNull();
             actualContCDest.ShouldNotBeNull();
         }

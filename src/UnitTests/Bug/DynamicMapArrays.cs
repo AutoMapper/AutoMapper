@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 using AutoMapper;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class DynamicMapArrays : AutoMapperSpecBase
+    public class DynamicMapArrays
     {
         Source[] source;
         Destination[] destination;
@@ -26,18 +26,13 @@ namespace AutoMapper.UnitTests.Bug
             public int Value { get; set; }
         }
 
-        protected override void Because_of()
-        {
-            source = Enumerable.Range(0, 9).Select(i => new Source(i)).ToArray();
-            destination = Mapper.DynamicMap<Destination[]>(source);
-            //Mapper.CreateMap<Source, Destination>();
-            //destination = Mapper.Map<Destination[]>(source);
-        }
-
         [Fact]
         public void Should_dynamic_map_the_array()
         {
-            destination.Length.ShouldEqual(source.Length);
+            source = Enumerable.Range(0, 9).Select(i => new Source(i)).ToArray();
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            destination = config.CreateMapper().Map<Destination[]>(source);
+            destination.Length.ShouldBe(source.Length);
             Array.TrueForAll(source, s => s.Value == destination[s.Value].Value).ShouldBeTrue(); 
         }
     }

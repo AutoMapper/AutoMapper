@@ -6,7 +6,6 @@
         using QueryableExtensions;
         using Xunit;
         using System.Linq;
-        using Should.Core.Assertions;
 
         public class LinqTests
         {
@@ -49,10 +48,13 @@
             public void Example()
             {
 
-                Mapper.CreateMap<Entity, EntityViewModel>()
-                    .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<Entity, EntityViewModel>()
+                        .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
+                });
 
-                var expression = Mapper.Engine.CreateMapExpression<Entity, EntityViewModel>();
+                var expression = config.ExpressionBuilder.GetMapExpression<Entity, EntityViewModel>();
 
                 var entity = new Entity
                 {
@@ -78,13 +80,15 @@
             [Fact]
             public void SubMap()
             {
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<SubEntity, SubEntityViewModel>()
+                        .ForMember(m => m.Description, o => o.MapFrom(s => s.Description));
 
-                Mapper.CreateMap<SubEntity, SubEntityViewModel>()
-                    .ForMember(m => m.Description, o => o.MapFrom(s => s.Description));
+                    cfg.CreateMap<Entity, EntityDetailledViewModel>();
+                });
 
-                Mapper.CreateMap<Entity, EntityDetailledViewModel>();
-
-                var expression = Mapper.Engine.CreateMapExpression<Entity, EntityDetailledViewModel>();
+                var expression = config.ExpressionBuilder.GetMapExpression<Entity, EntityDetailledViewModel>();
 
                 var entity = new Entity
                 {

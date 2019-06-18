@@ -2,60 +2,39 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
-    public static class MapperRegistry
+    internal static class MapperRegistry
     {
-        private static readonly IObjectMapper[] _initialMappers =
+        public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
-            new ExpressionMapper(), 
-            new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
-            new AssignableArrayMapper(), 
+            new NullableSourceMapper(),
+            new NullableDestinationMapper(),
             new FlagsEnumMapper(),
-            new EnumMapper(),
+            new StringToEnumMapper(), 
+            new EnumToStringMapper(),
+            new EnumToEnumMapper(), 
+            new EnumToUnderlyingTypeMapper(),
+            new UnderlyingTypeToEnumMapper(),
             new MultidimensionalArrayMapper(),
-            new PrimitiveArrayMapper(),
+            new ArrayCopyMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if NET4 || MONODROID || MONOTOUCH || __IOS__
             new NameValueCollectionMapper(),
-#endif
+            new ReadOnlyDictionaryMapper(),
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
-#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || DNXCORE50
             new HashSetMapper(),
-#endif
             new CollectionMapper(),
             new EnumerableMapper(),
-#if MONODROID || MONOTOUCH || __IOS__ || NET4
-            new ListSourceMapper(),
-#endif
-#if SILVERLIGHT || NETFX_CORE
-            new StringMapper(),
-#endif
             new AssignableMapper(),
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
+            new ConvertMapper(),
+            new StringMapper(),
             new TypeConverterMapper(),
-#endif
-            new NullableSourceMapper(),
-            //new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
-            new OpenGenericMapper()
+            new FromStringDictionaryMapper(),
+            new ToStringDictionaryMapper(),
+            new FromDynamicMapper(),
+            new ToDynamicMapper()
         };
-
-        private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);
-
-        /// <summary>
-        /// Extension point for modifying list of object mappers
-        /// </summary>
-        public static IList<IObjectMapper> Mappers => _mappers;
-
-        /// <summary>
-        /// Reset mapper registry to built-in values
-        /// </summary>
-        public static void Reset()
-        {
-            _mappers.Clear();
-            _mappers.AddRange(_initialMappers);
-        }
     }
 }

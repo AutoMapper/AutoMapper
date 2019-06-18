@@ -1,11 +1,11 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
     namespace DestinationCtorCalledTwice
     {
-        public class Bug : AutoMapperSpecBase
+        public class Bug
         {
             public class Source
             {
@@ -40,9 +40,10 @@ namespace AutoMapper.UnitTests.Bug
                 var source = new Source {Value = 5};
                 var dest = new Destination {Value = 7};
 
-                Mapper.Map(source, dest, opt => opt.CreateMissingTypeMaps = true);
+                var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+                config.CreateMapper().Map(source, dest);
 
-                Destination.CallCount.ShouldEqual(1);
+                Destination.CallCount.ShouldBe(1);
             }
         }
     }

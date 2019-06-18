@@ -1,10 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using AutoMapper.Configuration;
+using AutoMapper.Features;
+using AutoMapper.QueryableExtensions;
+
 namespace AutoMapper
 {
-    using System;
-    using Impl;
-
-    public interface IConfigurationProvider : IProfileConfiguration
+    public interface IConfigurationProvider
     {
+        void Validate(ValidationContext context);
+
         /// <summary>
         /// Get all configured type maps created
         /// </summary>
@@ -27,14 +33,12 @@ namespace AutoMapper
         TypeMap FindTypeMapFor(TypePair typePair);
 
         /// <summary>
-        /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
+        /// Find the <see cref="TypeMap"/> for the configured source and destination type
         /// </summary>
-        /// <param name="source">Source object</param>
-        /// <param name="destination">Destination object</param>
-        /// <param name="sourceType">Configured source type</param>
-        /// <param name="destinationType">Configured destination type</param>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType);
+        TypeMap FindTypeMapFor<TSource, TDestination>();
 
         /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured source and destination type, checking parent types
@@ -45,27 +49,28 @@ namespace AutoMapper
         TypeMap ResolveTypeMap(Type sourceType, Type destinationType);
 
         /// <summary>
+        /// Resolve the <see cref="TypeMap"/> for the configured source and destination type, checking parent types
+        /// </summary>
+        /// <param name="sourceType">Configured source type</param>
+        /// <param name="destinationType">Configured destination type</param>
+        /// <param name="inlineConfiguration">Inline type map configuration if exists</param>
+        /// <returns>Type map configuration</returns>
+        TypeMap ResolveTypeMap(Type sourceType, Type destinationType, ITypeMapConfiguration inlineConfiguration);
+
+        /// <summary>
+        /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
+        /// </summary>
+        /// <param name="typePair">Type pair</param>
+        /// <param name="inlineConfiguration">Inline type map configuration if exists</param>
+        /// <returns>Type map configuration</returns>
+        TypeMap ResolveTypeMap(TypePair typePair, ITypeMapConfiguration inlineConfiguration);
+
+        /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
         TypeMap ResolveTypeMap(TypePair typePair);
-
-        /// <summary>
-        /// Resolve the <see cref="TypeMap"/> for the resolution result and destination type, checking parent types
-        /// </summary>
-        /// <param name="resolutionResult">Resolution result from the source object</param>
-        /// <param name="destinationType">Configured destination type</param>
-        /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType);
-
-        /// <summary>
-        /// Get named profile configuration
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns></returns>
-        IProfileConfiguration GetProfileConfiguration(string profileName);
-
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
@@ -94,20 +99,20 @@ namespace AutoMapper
         /// Get all configured mappers
         /// </summary>
         /// <returns>List of mappers</returns>
-        IObjectMapper[] GetMappers();
+        IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
-        /// Creates a <see cref="TypeMap"/> based on a source and destination type
+        /// Gets the features collection.
         /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <returns>Type map configuration</returns>
-        TypeMap CreateTypeMap(Type sourceType, Type destinationType);
+        /// <value>The feature colection.</value>
+        Features<IRuntimeFeature> Features { get; }
 
         /// <summary>
-        /// Fired each time a type map is created
+        /// Find a matching object mapper.
         /// </summary>
-        event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+        /// <param name="types">the types to match</param>
+        /// <returns>the matching mapper or null</returns>
+        IObjectMapper FindMapper(TypePair types);
 
         /// <summary>
         /// Factory method to create formatters, resolvers and type converters
@@ -115,13 +120,66 @@ namespace AutoMapper
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>
-        /// Find the closed generic type map for an item that maps to an open generic type map
+        /// Allows to enable null-value propagation for query mapping.
+        /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>
-        TypeMap FindClosedGenericTypeMapFor(ResolutionContext context);
+        bool EnableNullPropagationForQueryMapping { get; }
+
+        int MaxExecutionPlanDepth { get; }
+
+        IExpressionBuilder ExpressionBuilder { get; }
+
+        IEnumerable<IExpressionResultConverter> ResultConverters { get; }
+
+        IEnumerable<IExpressionBinder> Binders { get; }
 
         /// <summary>
-        /// Determines if a context has an open generic type map defined
+        /// Create a mapper instance based on this configuration. Mapper instances are lightweight and can be created as needed.
         /// </summary>
-        bool HasOpenGenericTypeMapDefined(ResolutionContext context);
+        /// <returns>The mapper instance</returns>
+        IMapper CreateMapper();
+
+        /// <summary>
+        /// Create a mapper instance with the specified service constructor to be used for resolvers and type converters.
+        /// </summary>
+        /// <param name="serviceCtor">Service factory to create services</param>
+        /// <returns>The mapper instance</returns>
+        IMapper CreateMapper(Func<Type, object> serviceCtor);
+
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, IMemberMap memberMap = null);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest);
+
+        /// <summary>
+        /// Compile all underlying mapping expressions to cached delegates.
+        /// Use if you want AutoMapper to compile all mappings up front instead of deferring expression compilation for each first map.
+        /// </summary>
+        void CompileMappings();
+
+        Delegate GetMapperFunc(MapRequest request);
+
+        Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
+
+        void RegisterTypeMap(TypeMap typeMap);
+
+        IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes);
+
+        /// <summary>
+        /// Builds the execution plan used to map the source to destination.
+        /// Useful to understand what exactly is happening during mapping.
+        /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the wiki</a> for details.
+        /// </summary>
+        /// <param name="sourceType">the runtime type of the source object</param>
+        /// <param name="destinationType">the runtime type of the destination object</param>
+        /// <returns>the execution plan</returns>
+        LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType);
+
+        /// <summary>
+        /// Builds the execution plan used to map the source to destination.
+        /// Useful to understand what exactly is happening during mapping.
+        /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the wiki</a> for details.
+        /// </summary>
+        /// <param name="mapRequest">The source/destination map request</param>
+        /// <returns>the execution plan</returns>
+        LambdaExpression BuildExecutionPlan(MapRequest mapRequest);
     }
 }

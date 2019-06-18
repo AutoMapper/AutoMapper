@@ -1,55 +1,131 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.Internal
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
+    using Configuration;
 
-	public static class ReflectionHelper
-	{
-        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
+    public static class ReflectionHelper
+    {
+        public static bool CanBeSet(MemberInfo propertyOrField)
         {
-            return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
+            return propertyOrField is FieldInfo field ? 
+                        !field.IsInitOnly : 
+                        ((PropertyInfo)propertyOrField).CanWrite;
         }
 
-        public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
+        public static object GetDefaultValue(ParameterInfo parameter)
+        {
+            if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType())
+            {
+                return Activator.CreateInstance(parameter.ParameterType);
+            }
+            return parameter.DefaultValue;
+        }
+
+        public static object MapMember(ResolutionContext context, MemberInfo member, object value, object destination = null)
+        {
+            var memberType = GetMemberType(member);
+            var destValue = destination == null ? null : GetMemberValue(member, destination);
+            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, DefaultMemberMap.Instance);
+        }
+
+        public static bool IsDynamic(object obj) => obj is IDynamicMetaObjectProvider;
+
+        public static bool IsDynamic(Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
+
+        public static void SetMemberValue(MemberInfo propertyOrField, object target, object value)
+        {
+            if (propertyOrField is PropertyInfo property)
+            {
+                property.SetValue(target, value, null);
+                return;
+            }
+            if (propertyOrField is FieldInfo field)
+            {
+                field.SetValue(target, value);
+                return;
+            }
+            throw Expected(propertyOrField);
+        }
+
+        private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
+            => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
+
+        public static object GetMemberValue(MemberInfo propertyOrField, object target)
+        {
+            if (propertyOrField is PropertyInfo property)
+            {
+                return property.GetValue(target, null);
+            }
+            if (propertyOrField is FieldInfo field)
+            {
+                return field.GetValue(target);
+            }
+            throw Expected(propertyOrField);
+        }
+
+        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
+        {
+            MemberInfo property = null;
+            foreach (var memberName in fullMemberName.Split('.'))
+            {
+                var currentType = GetCurrentType(property, type);
+                yield return property = currentType.GetFieldOrProperty(memberName);
+            }
+        }
+
+        private static Type GetCurrentType(MemberInfo member, Type type)
+        {
+            var memberType = member?.GetMemberType() ?? type;
+            if (memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            {
+                memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
+            }
+            return memberType;
+        }
+
+        public static MemberInfo GetFieldOrProperty(LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
-            if(memberExpression == null)
-            {
-                throw new ArgumentOutOfRangeException("expression", "Expected a property/field access expression, not " + expression);
-            }
-            return (MemberInfo) memberExpression.Member;
+            return memberExpression != null
+                ? memberExpression.Member
+                : throw new ArgumentOutOfRangeException(nameof(expression), "Expected a property/field access expression, not " + expression);
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {
             Expression expressionToCheck = lambdaExpression;
 
-            bool done = false;
+            var done = false;
 
             while (!done)
             {
                 switch (expressionToCheck.NodeType)
                 {
                     case ExpressionType.Convert:
-                        expressionToCheck = ((UnaryExpression) expressionToCheck).Operand;
+                        expressionToCheck = ((UnaryExpression)expressionToCheck).Operand;
                         break;
                     case ExpressionType.Lambda:
-                        expressionToCheck = ((LambdaExpression) expressionToCheck).Body;
+                        expressionToCheck = ((LambdaExpression)expressionToCheck).Body;
                         break;
                     case ExpressionType.MemberAccess:
-                        var memberExpression = ((MemberExpression) expressionToCheck);
+                        var memberExpression = ((MemberExpression)expressionToCheck);
 
                         if (memberExpression.Expression.NodeType != ExpressionType.Parameter &&
                             memberExpression.Expression.NodeType != ExpressionType.Convert)
                         {
                             throw new ArgumentException(
-                                $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.",
+                                $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. You can use ForPath, a custom resolver on the child type or the AfterMap option instead.",
                                 nameof(lambdaExpression));
                         }
 
-                        MemberInfo member = memberExpression.Member;
+                        var member = memberExpression.Member;
 
                         return member;
                     default:
@@ -62,50 +138,22 @@ namespace AutoMapper.Internal
                 "Custom configuration for members is only supported for top-level individual members on a type.");
         }
 
-        public static Type GetMemberType(this MemberInfo memberInfo)
+        public static Type GetMemberType(MemberInfo memberInfo)
         {
-            if (memberInfo is MethodInfo)
-                return ((MethodInfo) memberInfo).ReturnType;
-            if (memberInfo is PropertyInfo)
-                return ((PropertyInfo) memberInfo).PropertyType;
-            if (memberInfo is FieldInfo)
-                return ((FieldInfo) memberInfo).FieldType;
-            return null;
+            switch (memberInfo)
+            {
+                case MethodInfo mInfo:
+                    return mInfo.ReturnType;
+                case PropertyInfo pInfo:
+                    return pInfo.PropertyType;
+                case FieldInfo fInfo:
+                    return fInfo.FieldType;
+                case null:
+                    throw new ArgumentNullException(nameof(memberInfo));
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(memberInfo));
+            }
         }
-        
-		public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
-		{
-			if (accessorCandidate == null)
-				return null;
-
-			if (accessorCandidate is PropertyInfo)
-                return new PropertyGetter((PropertyInfo) accessorCandidate);
-
-			if (accessorCandidate is FieldInfo)
-                return new FieldGetter((FieldInfo) accessorCandidate);
-
-			if (accessorCandidate is MethodInfo)
-                return new MethodGetter((MethodInfo) accessorCandidate);
-
-			return null;
-		}
-        
-		public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
-		{
-			var fieldInfo = accessorCandidate as FieldInfo;
-			if (fieldInfo != null)
-                return accessorCandidate.DeclaringType.IsValueType()
-                    ? (IMemberAccessor) new ValueTypeFieldAccessor(fieldInfo)
-                    : new FieldAccessor(fieldInfo);
-
-			var propertyInfo = accessorCandidate as PropertyInfo;
-			if (propertyInfo != null)
-                return accessorCandidate.DeclaringType.IsValueType()
-                    ? (IMemberAccessor) new ValueTypePropertyAccessor(propertyInfo)
-                    : new PropertyAccessor(propertyInfo);
-
-			return null;
-		}
 
         /// <summary>
         /// if targetType is oldType, method will return newType
@@ -116,21 +164,21 @@ namespace AutoMapper.Internal
         /// <param name="oldType"></param>
         /// <param name="newType"></param>
         /// <returns></returns>
-        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
+        public static Type ReplaceItemType(Type targetType, Type oldType, Type newType)
         {
             if (targetType == oldType)
                 return newType;
 
             if (targetType.IsGenericType())
             {
-                var genSubArgs = targetType.GetGenericArguments();
+                var genSubArgs = targetType.GetTypeInfo().GenericTypeArguments;
                 var newGenSubArgs = new Type[genSubArgs.Length];
-                for (int i = 0; i < genSubArgs.Length; i++)
+                for (var i = 0; i < genSubArgs.Length; i++)
                     newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
                 return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
             }
 
             return targetType;
         }
-	}
+    }
 }

@@ -1,30 +1,28 @@
-﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__
+﻿using System.Collections.Specialized;
+using System.Linq.Expressions;
+using static System.Linq.Expressions.Expression;
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
-    using System.Collections.Specialized;
-
     public class NameValueCollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        private static NameValueCollection Map(NameValueCollection source)
         {
-            if (!IsMatch(context) || context.SourceValue == null)
-                return null;
-
             var nvc = new NameValueCollection();
-            var source = context.SourceValue as NameValueCollection;
             foreach (var s in source.AllKeys)
                 nvc.Add(s, source[s]);
 
             return nvc;
         }
 
-        public bool IsMatch(ResolutionContext context)
-        {
-            return
-                context.SourceType == typeof (NameValueCollection) &&
-                context.DestinationType == typeof (NameValueCollection);
-        }
+        private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetDeclaredMethod(nameof(Map));
+
+        public bool IsMatch(TypePair context) => context.SourceType == typeof (NameValueCollection) &&
+                                                 context.DestinationType == typeof (NameValueCollection);
+
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression) => 
+            Call(null, MapMethodInfo, sourceExpression);
     }
 }
-
-#endif

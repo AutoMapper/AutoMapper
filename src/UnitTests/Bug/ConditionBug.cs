@@ -3,7 +3,7 @@
     namespace ConditionBug
     {
         using System.Collections.Generic;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Example : AutoMapperSpecBase
@@ -28,15 +28,15 @@
                 public string Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
-                                             .ForMember(dest => dest.Value, opt =>
-                                             {
-                                                 opt.Condition(src => src.Value.Count > 1);
-                                                 opt.ResolveUsing(src => src.Value[1].SubValue);
-                                             }));
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt =>
+                    {
+                        opt.PreCondition(src => src.Value.Count > 1);
+                        opt.MapFrom(src => src.Value[1].SubValue);
+                    });
+            });
 
             [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_false()
@@ -56,7 +56,7 @@
                 src.Value.Add(new SubSource {SubValue = "x"});
                 var destination = Mapper.Map<Source, Destination>(src);
 
-                destination.Value.ShouldEqual("x");
+                destination.Value.ShouldBe("x");
             }
         }
 
@@ -72,15 +72,13 @@
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
-            {
-                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+                cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.HasValue);
+                        opt.PreCondition(src => src.Value.HasValue);
                         opt.MapFrom(src => src.Value.Value + 10);
                     }));
-            }
 
 
             [Fact]
@@ -88,7 +86,7 @@
             {
                 var dest = Mapper.Map<Source, Destination>(new Source());
 
-                dest.Value.ShouldEqual(0);
+                dest.Value.ShouldBe(0);
             }
         }
     }
@@ -96,7 +94,7 @@
     namespace ConditionPropertyBug
     {
         using System;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Example : AutoMapperSpecBase
@@ -127,16 +125,14 @@
                 public int BasePrice { get; set; }
             }
 
-            protected override void Establish_context()
-            {
-                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+                cfg.CreateMap<Source, Destination>()
                     .ForMember(itemDTO => itemDTO.BasePrice,
                         config =>
                         {
-                            config.Condition(item => item.HasBasePrice);
+                            config.PreCondition(item => item.HasBasePrice);
                             config.MapFrom(item => item.BasePrice);
                         }));
-            }
 
             [Fact]
             public void Should_skip_the_mapping_when_the_condition_property_is_false()
@@ -144,7 +140,7 @@
                 var src = new Source();
                 var dest = Mapper.Map<Source, Destination>(src);
 
-                dest.BasePrice.ShouldEqual(0);
+                dest.BasePrice.ShouldBe(0);
             }
 
             [Fact]
@@ -153,7 +149,7 @@
                 var src = new Source {BasePrice = 15};
                 var dest = Mapper.Map<Source, Destination>(src);
 
-                dest.BasePrice.ShouldEqual(src.BasePrice);
+                dest.BasePrice.ShouldBe(src.BasePrice);
             }
         }
     }
@@ -161,7 +157,7 @@
 
     namespace SourceValueConditionPropertyBug
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class Source
@@ -176,18 +172,18 @@
 
         public class ConditionTests : AutoMapperSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null)));
-            }
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.Condition((src, dest, srcVal, destVal) => destVal == null));
+            });
 
             [Fact]
             public void Should_map_value_when_null()
             {
                 var destination = new Dest();
                 Mapper.Map(new Source {Value = 5}, destination);
-                destination.Value.ShouldEqual(5);
+                destination.Value.ShouldBe(5);
             }
 
             [Fact]
@@ -195,7 +191,7 @@
             {
                 var destination = new Dest { Value = 6};
                 Mapper.Map(new Source {Value = 5}, destination);
-                destination.Value.ShouldEqual(6);
+                destination.Value.ShouldBe(6);
             }
         }
     }
@@ -203,42 +199,126 @@
     namespace SourceValueExceptionConditionPropertyBug
     {
         using System;
-        using Should;
+        using System.Collections.Generic;
+        using Shouldly;
         using Xunit;
+
+        public enum Property
+        {
+            Value1 = 0,
+            Value2 = 1,
+            Value3 = 2,
+            Value4 = 3
+        }
 
         public class Source
         {
-            public bool Accessed = false;
-            public int Value
+            public Dictionary<Property, bool> Accessed = new Dictionary<Property, bool>
+            {
+                {Property.Value1, false},
+                {Property.Value2, false},
+                {Property.Value3, false},
+                {Property.Value4, false}
+            };
+
+            public int Value1
             {
                 get
                 {
-                    Accessed = true;
+                    Accessed[Property.Value1] = true;
                     return 5;
+                }
+            }
+
+            public int Value2
+            {
+                get
+                {
+                    Accessed[Property.Value2] = true;
+                    return 10;
+                }
+            }
+
+            public int Value3
+            {
+                get
+                {
+                    Accessed[Property.Value3] = true;
+                    return 15;
+                }
+            }
+
+            public int Value4
+            {
+                get
+                {
+                    Accessed[Property.Value4] = true;
+                    return 20;
                 }
             }
         }
 
         public class Dest
         {
-            public int Value { get; set; }
+            public int Value1 { get; set; }
+
+            public int Value2 { get; set; }
+
+            public int Value3 { get; set; }
+
+            public int Value4 { get; set; }
+
+            public bool MarkerBool { get; set; }
         }
 
         public class ConditionTests : NonValidatingSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false)));
-            }
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value1, opt => opt.PreCondition((Source src) => false))
+                    .ForMember(d => d.Value2, opt => opt.PreCondition((ResolutionContext rc) => false))
+                    .ForMember(d => d.Value3, opt => opt.PreCondition((src, rc) => false))//;
+                    .ForMember(d => d.Value4, opt => opt.PreCondition((src, dest, rc) =>
+                    {
+                        dest.MarkerBool = true;
+                        return false;
+                    }));
+            });
 
             [Fact]
-            public void Should_not_map()
+            public void Should_not_map_when_precondition_with_source_parameter_is_false()
             {
                 var source = new Source();
                 Mapper.Map<Source, Dest>(source);
-                source.Accessed.ShouldBeFalse();
+                source.Accessed[Property.Value1].ShouldBeFalse();
             }
+
+            [Fact]
+            public void Should_not_map_when_precondition_with_resolutioncontext_parameter_is_false()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value2].ShouldBeFalse();
+            }
+
+            [Fact]
+            public void Should_not_map_when_precondition_with_source_and_resolutioncontext_parameters_is_false()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value3].ShouldBeFalse();
+            }
+
+            [Fact]
+            public void Should_not_map_and_should_produce_sideeffect_when_precondition_with_source_and_desc_parameters_is_false()
+            {
+                var source = new Source();
+                var dest = Mapper.Map<Source, Dest>(source);
+                source.Accessed[Property.Value4].ShouldBeFalse();
+                dest.MarkerBool.ShouldBeTrue();
+            }
+
         }
     }
 

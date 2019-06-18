@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -10,14 +10,11 @@ namespace AutoMapper.UnitTests.Bug
             private Stuff _source;
             private StuffView _dest;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.RecognizeDestinationPostfixes("CodeKey", "Key");
-                    cfg.CreateMap<Stuff, StuffView>();
-                });
-            }
+                cfg.RecognizeDestinationPostfixes("CodeKey", "Key");
+                cfg.CreateMap<Stuff, StuffView>();
+            });
 
             protected override void Because_of()
             {
@@ -33,19 +30,19 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_recognize_a_full_prefix()
             {
-                _dest.IdCodeKey.ShouldEqual(_source.Id);
+                _dest.IdCodeKey.ShouldBe(_source.Id);
             }
 
             [Fact]
             public void Should_recognize_a_partial_prefix()
             {
-                _dest.NameKey.ShouldEqual(_source.Name);
+                _dest.NameKey.ShouldBe(_source.Name);
             }
 
             [Fact]
             public void Should_recognize_a_partial_match_prefix()
             {
-                _dest.RankCodeKey.ShouldEqual(_source.RankCode);
+                _dest.RankCodeKey.ShouldBe(_source.RankCode);
             }
 
             public class Stuff

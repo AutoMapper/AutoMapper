@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -35,15 +34,10 @@ namespace AutoMapper.UnitTests
             public Destination Parent { get; set; }
         }
 
-        private Source _source;
+        private readonly Source _source;
 
         public MaxDepthTests()
         {
-            Initializer();
-        }
-        public void Initializer()
-        {
-            Mapper.Reset();
             var nest = new Source(1);
 
             nest.AddChild(new Source(2));
@@ -65,8 +59,8 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Second_level_children_are_null_with_max_depth_1()
         {
-            Mapper.CreateMap<Source, Destination>().MaxDepth(1);
-            var destination = Mapper.Map<Source, Destination>(_source);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(1));
+            var destination = config.CreateMapper().Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
                 child.ShouldBeNull();
@@ -76,21 +70,21 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Second_level_children_are_not_null_with_max_depth_2()
         {
-            Mapper.CreateMap<Source, Destination>().MaxDepth(2);
-            var destination = Mapper.Map<Source, Destination>(_source);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(2));
+            var destination = config.CreateMapper().Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
-                2.ShouldEqual(child.Level);
+                2.ShouldBe(child.Level);
                 child.ShouldNotBeNull();
-                destination.ShouldEqual(child.Parent);
+                destination.ShouldBe(child.Parent);
             }
         }
 
         [Fact]
         public void Third_level_children_are_null_with_max_depth_2()
         {
-            Mapper.CreateMap<Source, Destination>().MaxDepth(2);
-            var destination = Mapper.Map<Source, Destination>(_source);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(2));
+            var destination = config.CreateMapper().Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
                 child.Children.ShouldNotBeNull();
@@ -104,16 +98,16 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Third_level_children_are_not_null_max_depth_3()
         {
-            Mapper.CreateMap<Source, Destination>().MaxDepth(3);
-            var destination = Mapper.Map<Source, Destination>(_source);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(3));
+            var destination = config.CreateMapper().Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
                 child.Children.ShouldNotBeNull();
                 foreach (var subChild in child.Children)
                 {
-                    3.ShouldEqual(subChild.Level);
+                    3.ShouldBe(subChild.Level);
                     subChild.Children.ShouldNotBeNull();
-                    child.ShouldEqual(subChild.Parent);
+                    child.ShouldBe(subChild.Parent);
                 }
             }
         }

@@ -1,81 +1,101 @@
 ﻿﻿using Xunit;
-﻿using Should;
+﻿using Shouldly;
 
 namespace AutoMapper.UnitTests.Projection
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-	using AutoMapper;
-	using QueryableExtensions;
+    using AutoMapper;
+    using QueryableExtensions;
 
-    public class ProjectTest
-	{
-        public ProjectTest()
+    public class ProjectWithFields : AutoMapperSpecBase
+    {
+        public class Foo
         {
-			Mapper.CreateMap<Address, AddressDto>();
-			Mapper.CreateMap<Customer, CustomerDto>();
+            public int A;
         }
 
-		[Fact(Skip = "EF doesn't support null values in expressions")]
-		public void SelectUsingProjectToWithNullComplexSourceProperty()
-		{
-			var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();
+        public class FooDto
+        {
+            public int A;
+        }
 
-			var projected = customers.ProjectTo<CustomerDto>().SingleOrDefault();
-			projected.ShouldNotBeNull();
-			projected.Address.ShouldBeNull();
-		}
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Foo, FooDto>();
+        });
 
-		[Fact]
-		public void ProjectToWithUnmappedTypeShouldThrowException()
-		{
-			var customers =
-				new[] { new Customer { FirstName = "Bill", LastName = "White", Address = new Address("Street1") } }
-					.AsQueryable();
+        [Fact]
+        public void Should_work()
+        {
+            new[] { new Foo() }.AsQueryable().ProjectTo<FooDto>(Configuration).Single().A.ShouldBe(0);
+        } 
+    }
 
-			IList<Unmapped> projected = null;
+    public class ProjectTest
+    {
+        private MapperConfiguration _config;
 
-            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.ProjectTo<Unmapped>().ToList());
+        public ProjectTest()
+        {
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Address, AddressDto>();
+                cfg.CreateMap<Customer, CustomerDto>();
+                cfg.CreateMissingTypeMaps = false;
+            });
+        }
 
-			projected.ShouldBeNull();
-		}
+        [Fact]
+        public void ProjectToWithUnmappedTypeShouldThrowException()
+        {
+            var customers =
+                new[] { new Customer { FirstName = "Bill", LastName = "White", Address = new Address("Street1") } }
+                    .AsQueryable();
 
-		public class Customer
-		{
-			public string FirstName { get; set; }
+            IList<Unmapped> projected = null;
 
-			public string LastName { get; set; }
+            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.ProjectTo<Unmapped>(_config).ToList());
 
-			public Address Address { get; set; }
-		}
+            projected.ShouldBeNull();
+        }
 
-		public class Address
-		{
-			public Address(string street)
-			{
-				Street = street;
-			}
+        public class Customer
+        {
+            public string FirstName { get; set; }
 
-			public string Street { get; set; }
-		}
+            public string LastName { get; set; }
 
-		public class CustomerDto
-		{
-			public string FirstName { get; set; }
+            public Address Address { get; set; }
+        }
 
-			public AddressDto Address { get; set; }
-		}
+        public class Address
+        {
+            public Address(string street)
+            {
+                Street = street;
+            }
 
-		public class AddressDto
-		{
-			public string Street { get; set; }
-		}
+            public string Street { get; set; }
+        }
 
-		public class Unmapped
-		{
-			public string FirstName { get; set; }
-		}
-	}
+        public class CustomerDto
+        {
+            public string FirstName { get; set; }
+
+            public AddressDto Address { get; set; }
+        }
+
+        public class AddressDto
+        {
+            public string Street { get; set; }
+        }
+
+        public class Unmapped
+        {
+            public string FirstName { get; set; }
+        }
+    }
 }

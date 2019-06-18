@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -18,9 +18,9 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_detect_unmapped_destination_property_named_type()
         {
-            Mapper.Initialize(c=>c.CreateMap<Source, Destination>());
-            new Action(Mapper.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(
-                ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldEqual("Type"));
+            var config = new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+            new Action(config.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(
+                ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldBe("Type"));
         }
     }
 }

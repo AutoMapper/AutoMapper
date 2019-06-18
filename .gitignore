@@ -1,5 +1,9 @@
 build/
 release/
+scripts/
+artifacts/
+.dotnet
+TestResults/
 *.suo
 *.user
 bin
@@ -20,3 +24,10 @@ packages
 .nuget
 project.lock.json
 .vs
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Read the Docs
+docs/_build

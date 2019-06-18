@@ -1,9 +1,8 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-#if !SILVERLIGHT
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;
@@ -29,13 +28,11 @@ namespace AutoMapper.UnitTests.Bug
             DifferentNamedEnum = 1,
             SecondNameEnum = 2
         }
-        protected override void Establish_context()
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<FirstClass, SecondClass>();
-            });
-        }
+            cfg.CreateMap<FirstClass, SecondClass>();
+        });
 
         protected override void Because_of()
         {
@@ -49,9 +46,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_match_on_the_name_even_if_values_match()
         {
-            _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
+            _result.EnumValue.ShouldBe(SecondEnum.DifferentNamedEnum);
         }
     }
-#endif
 
 }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -50,17 +50,13 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemDto>();
             }
-#if SILVERLIGHT
-            public List<ItemDto> Items { get; set; }
-#else
             public List<ItemDto> Items { get; private set; }
-#endif
         }
 
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -83,7 +79,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<Container, ContainerDto>();
             });
 
-            var dto = Mapper.Map<Container, ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<Container, ContainerDto>(new Container
                                                               {
                                                                   Items =
                                                                       {
@@ -92,15 +88,15 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
                                                               });
 
-            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
-            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
+            dto.Items[0].Description.ShouldBeOfType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeOfType<SpecificDescriptionDto>();
         }
 
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -123,7 +119,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<Container, ContainerDto>();
             });
 
-            var dto = Mapper.Map<ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<ContainerDto>(new Container
             {
                 Items =
                                                                       {
@@ -132,15 +128,15 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
             });
 
-            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
-            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
+            dto.Items[0].Description.ShouldBeOfType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeOfType<SpecificDescriptionDto>();
         }
 
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -161,18 +157,18 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
             });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
-            var dto = Mapper.Map<ItemBase, ItemDto>(new DifferentItem());
+            var dto = config.CreateMapper().Map<ItemBase, ItemDto>(new DifferentItem());
 
-            dto.ShouldBeType<ItemDto>();
-            dto.Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.ShouldBeOfType<ItemDto>();
+            dto.Description.ShouldBeOfType<DifferentDescriptionDto>();
         }
 
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -193,12 +189,12 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
             });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
-            var dto = Mapper.Map<ItemDto>(new DifferentItem());
+            var dto = config.CreateMapper().Map<ItemDto>(new DifferentItem());
 
-            dto.ShouldBeType<ItemDto>();
-            dto.Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.ShouldBeOfType<ItemDto>();
+            dto.Description.ShouldBeOfType<DifferentDescriptionDto>();
         }
     }
 }

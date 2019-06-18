@@ -1,82 +1,97 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration;
+using AutoMapper.Mappers.Internal;
+
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Collections;
-    using System.Linq;
-    using Internal;
+    using static Expression;
 
-    public class MultidimensionalArrayMapper : EnumerableMapperBase<Array>
+    public class MultidimensionalArrayMapper : IObjectMapper
     {
-        MultidimensionalArrayFiller filler;
-        public override bool IsMatch(ResolutionContext context)
+        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
+            where TSource : IEnumerable
         {
-            return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
-        }
+            var destElementType = ElementTypeHelper.GetElementType(typeof(TDestination));
 
-        protected override void ClearEnumerable(Array enumerable)
-        {
-            // no op
-        }
-
-        protected override void SetElementValue(Array destination, object mappedValue, int index)
-        {
-            filler.NewValue(mappedValue);
-        }
-
-        protected override Array CreateDestinationObjectBase(Type destElementType, int sourceLength)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,
-            Type destElementType, int sourceLength)
-        {
-            var sourceArray = context.SourceValue as Array;
-            if(sourceArray == null)
+            if (typeof(TDestination).IsAssignableFrom(typeof(TSource)))
             {
-                return ObjectCreator.CreateArray(destElementType, sourceLength);
+                var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
+                if (elementTypeMap == null)
+                    return source as Array;
             }
-            var destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
-            filler = new MultidimensionalArrayFiller(destinationArray);
+
+            var sourceList = (IEnumerable)source;
+            var sourceArray = source as Array;
+            var destinationArray = sourceArray == null 
+                ? Array.CreateInstance(destElementType, sourceList.Cast<object>().Count()) 
+                : Array.CreateInstance(destElementType, Enumerable.Range(0, sourceArray.Rank).Select(sourceArray.GetLength).ToArray());
+
+            var filler = new MultidimensionalArrayFiller(destinationArray);
+            foreach (var item in sourceList)
+            {
+                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType, null));
+            }
             return destinationArray;
         }
-    }
 
-    public class MultidimensionalArrayFiller
-    {
-        int[] indices;
-        Array destination;
+        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetDeclaredMethod(nameof(Map));
 
-        public MultidimensionalArrayFiller(Array destination)
+        public bool IsMatch(TypePair context) => 
+            context.DestinationType.IsArray 
+            && context.DestinationType.GetArrayRank() > 1 
+            && context.SourceType.IsEnumerableType();
+
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
+                    ElementTypeHelper.GetElementType(sourceExpression.Type)),
+                sourceExpression,
+                contextExpression);
+
+        public class MultidimensionalArrayFiller
         {
-            indices = new int[destination.Rank];
-            this.destination = destination;
-        }
+            private readonly int[] _indices;
+            private readonly Array _destination;
 
-        public void NewValue(object value)
-        {
-            int dimension = destination.Rank - 1;
-            bool changedDimension = false;
-            while(indices[dimension] == destination.GetLength(dimension))
+            public MultidimensionalArrayFiller(Array destination)
             {
-                indices[dimension] = 0;
-                dimension--;
-                if(dimension < 0)
+                _indices = new int[destination.Rank];
+                _destination = destination;
+            }
+
+            public void NewValue(object value)
+            {
+                var dimension = _destination.Rank - 1;
+                var changedDimension = false;
+                while (_indices[dimension] == _destination.GetLength(dimension))
                 {
-                    throw new InvalidOperationException("Not enough room in destination array " + destination);
+                    _indices[dimension] = 0;
+                    dimension--;
+                    if (dimension < 0)
+                    {
+                        throw new InvalidOperationException("Not enough room in destination array " + _destination);
+                    }
+                    _indices[dimension]++;
+                    changedDimension = true;
                 }
-                indices[dimension]++;
-                changedDimension = true;
-            }
-            destination.SetValue(value, indices);
-            if(changedDimension)
-            {
-                indices[dimension+1]++;
-            }
-            else
-            {
-                indices[dimension]++;
+                _destination.SetValue(value, _indices);
+                if (changedDimension)
+                {
+                    _indices[dimension + 1]++;
+                }
+                else
+                {
+                    _indices[dimension]++;
+                }
             }
         }
     }
+
 }

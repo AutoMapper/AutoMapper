@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ConstructorTests : AutoMapperSpecBase
@@ -30,11 +30,11 @@
             public int Other { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>()
-                .ConstructProjectionUsing(src => new Dest(src.Value + 10));
-        }
+            cfg.CreateMap<Source, Dest>()
+                .ConstructUsing(src => new Dest(src.Value + 10));
+        });
 
         protected override void Because_of()
         {
@@ -46,13 +46,13 @@
                 }
             }.AsQueryable();
 
-            _dest = values.ProjectTo<Dest>().ToArray();
+            _dest = values.ProjectTo<Dest>(Configuration).ToArray();
         }
 
         [Fact]
         public void Should_construct_correctly()
         {
-            _dest[0].Other.ShouldEqual(15);
+            _dest[0].Other.ShouldBe(15);
         }
     }
 }

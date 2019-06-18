@@ -20,7 +20,7 @@
         }
         public class GoodProfile : Profile
         {
-            protected override void Configure()
+            public GoodProfile()
             {
                 CreateMap<GoodSrc, GoodDest>();
             }
@@ -28,26 +28,23 @@
 
         public class BadProfile : Profile
         {
-            protected override void Configure()
+            public BadProfile()
             {
                 CreateMap<BadSrc, BadDest>();
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile<GoodProfile>();
-                cfg.AddProfile<BadProfile>();
-            });
-        }
+            cfg.AddProfile<GoodProfile>();
+            cfg.AddProfile<BadProfile>();
+        });
 
         [Fact]
         public void Should_pass_specific_profile_assertion()
         {
             typeof(AutoMapperConfigurationException)
-                .ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid<GoodProfile>);
+                .ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid<GoodProfile>);
         }
     }
 }

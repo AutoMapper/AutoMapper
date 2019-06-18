@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -17,13 +17,10 @@ namespace AutoMapper.UnitTests.Bug
             public decimal? Number { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {
@@ -37,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_int_to_nullable_decimal()
         {
-            _destination.Number.ShouldEqual(23);
+            _destination.Number.ShouldBe(23);
         }
     }
 }

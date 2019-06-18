@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -15,11 +15,14 @@ namespace AutoMapper.UnitTests.Bug
                 [Fact]
                 public void Example()
                 {
-                    Mapper.CreateMap<int?, Entity>()
+                    var config = new MapperConfiguration(cfg =>
+                    {
+                        cfg.CreateMap<int?, Entity>()
                             .ConvertUsing<NullableIntToEntityConverter>();
 
-                    Mapper.CreateMap<int, Entity>()
+                        cfg.CreateMap<int, Entity>()
                             .ConvertUsing<IntToEntityConverter>();
+                    });
 
                     var guids = new List<int?>()
                     {
@@ -28,23 +31,23 @@ namespace AutoMapper.UnitTests.Bug
                         null
                     };
 
-                    var result = Mapper.Map<List<Entity>>(guids);
+                    var result = config.CreateMapper().Map<List<Entity>>(guids);
 
                     result[2].ShouldBeNull();
                 }
             }
 
-            public class IntToEntityConverter : TypeConverter<int, Entity>
+            public class IntToEntityConverter : ITypeConverter<int, Entity>
             {
-                protected override Entity ConvertCore(int source)
+                public Entity Convert(int source, Entity destination, ResolutionContext context)
                 {
                     return new Entity() { Id = source };
                 }
             }
 
-            public class NullableIntToEntityConverter : TypeConverter<int?, Entity>
+            public class NullableIntToEntityConverter : ITypeConverter<int?, Entity>
             {
-                protected override Entity ConvertCore(int? source)
+                public Entity Convert(int? source, Entity destination, ResolutionContext context)
                 {
                     if (source.HasValue)
                     {

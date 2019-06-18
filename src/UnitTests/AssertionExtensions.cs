@@ -1,59 +1,37 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
-using Should.Core.Exceptions;
-using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {
-    using Internal;
+    public static class AssertionExtensions
+    {
+        public static void ShouldContain(this IEnumerable items, object item) 
+            => ShouldBeEnumerableTestExtensions.ShouldContain(items.Cast<object>(), item);
 
-    public delegate void ThrowingAction();
+        public static void ShouldBeEmpty(this IEnumerable items) 
+            => ShouldBeEnumerableTestExtensions.ShouldBeEmpty(items.Cast<object>());
 
-	public static class AssertionExtensions
-	{
-		public static void ShouldNotBeThrownBy(this Type exception, Action action)
-		{
-			try
-			{
-				action();
-			}
-			catch (Exception ex)
-			{
-				if (exception.IsInstanceOfType(ex))
-				{
-					throw new AssertException(string.Format("Expected no exception of type {0} to be thrown.", exception), ex);
-				}
-			}
-		}
+        public static void ShouldBeThrownBy(this Type exceptionType, Action action) 
+            => action.ShouldThrow(exceptionType);
 
-        public static void ShouldContain(this IEnumerable items, object item)
+        public static void ShouldThrowException<T>(this Action action, Action<T> customAssertion) where T : Exception
         {
-            CollectionAssertExtensions.ShouldContain(items.Cast<object>(), item);
-        }
-
-        public static void ShouldBeThrownBy(this Type exceptionType, ThrowingAction action)
-        {
-            Exception e = null;
-
+            bool throws = false;
             try
             {
-                action.Invoke();
+                action();
             }
-            catch (Exception ex)
+            catch (T e)
             {
-                e = ex;
+                throws = true;
+                customAssertion(e);
             }
-
-            e.ShouldNotBeNull();
-            e.ShouldBeType(exceptionType);
+            throws.ShouldBeTrue();
         }
 
-        public static void ShouldNotBeInstanceOf<TExpectedType>(this object actual)
-        {
-            actual.ShouldNotBeType<TExpectedType>();
-        }
-	}
+        public static void ShouldNotBeThrownBy(this Type exceptionType, Action action) 
+            => action.ShouldNotThrow();
+    }
 }

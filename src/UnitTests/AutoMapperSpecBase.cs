@@ -1,39 +1,48 @@
 using System;
-using Should;
 using Xunit;
-#if !SILVERLIGHT && !NETFX_CORE
-using Rhino.Mocks;
-#endif
 
 namespace AutoMapper.UnitTests
 {
-    public class AutoMapperSpecBase : NonValidatingSpecBase
+    using QueryableExtensions;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     {
         [Fact]
         public void Should_have_valid_configuration()
         {
-            Mapper.AssertConfigurationIsValid();
+            Configuration.AssertConfigurationIsValid();
         }
+
     }
 
-    public class NonValidatingSpecBase : SpecBase
+    public abstract class NonValidatingSpecBase : SpecBase
     {
-        protected override void Cleanup()
-        {
-            Mapper.Reset();
-        }
+        private IMapper mapper;
 
+        protected abstract MapperConfiguration Configuration { get; }
+        protected IConfigurationProvider ConfigProvider => Configuration;
+
+        protected IMapper Mapper => mapper ?? (mapper = Configuration.CreateMapper());
+
+        protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
+            Mapper.ProjectTo(source, parameters, membersToExpand);
+
+        protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
+            Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
     }
 
     public abstract class SpecBaseBase
     {
-        public virtual void MainSetup()
+        protected virtual void MainSetup()
         {
             Establish_context();
             Because_of();
         }
 
-        public virtual void MainTeardown()
+        protected virtual void MainTeardown()
         {
             Cleanup();
         }
@@ -49,30 +58,18 @@ namespace AutoMapper.UnitTests
         protected virtual void Cleanup()
         {
         }
-
-#if !SILVERLIGHT && !NETFX_CORE
-        protected TType CreateDependency<TType>()
-            where TType : class
-        {
-            return MockRepository.GenerateMock<TType>();
-        }
-
-        protected TType CreateStub<TType>() where TType : class
-        {
-            return MockRepository.GenerateStub<TType>();
-        }
-#endif
     }
     public abstract class SpecBase : SpecBaseBase, IDisposable
     {
         protected SpecBase()
         {
-            MainSetup();
+            Establish_context();
+            Because_of();
         }
 
         public void Dispose()
         {
-            MainTeardown();
+            Cleanup();
         }
     }
 

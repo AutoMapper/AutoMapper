@@ -1,36 +1,51 @@
+using System;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-
     public static class QueryMapperHelper
     {
-        public static PropertyMap GetPropertyMap(this IMappingEngine mappingEngine, MemberInfo sourceMemberInfo, Type destinationMemberType)
+        public static PropertyMap GetPropertyMap(this IConfigurationProvider config, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(sourceMemberInfo.DeclaringType, destinationMemberType);
+            var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
-            if (typeMap == null)
-            {
-                const string MessageFormat = "Missing map from {0} to {1}. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.DeclaringType.Name, destinationMemberType.Name);
-                throw new InvalidOperationException(message);
-            }
-
-            var propertyMap = typeMap.GetPropertyMaps()
-                .FirstOrDefault(pm => pm.CanResolveValue() &&
+            var propertyMap = typeMap.PropertyMaps
+                .FirstOrDefault(pm => pm.CanResolveValue &&
                                       pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
 
             if (propertyMap == null)
-            {
-                const string MessageFormat = "Missing property map from {0} to {1} for {2} property. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.DeclaringType.Name, destinationMemberType.Name,
-                    sourceMemberInfo.Name);
-                throw new InvalidOperationException(message);
-            }
+                throw PropertyConfigurationException(typeMap, sourceMemberInfo.Name);
+
             return propertyMap;
         }
+
+        public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
+        {
+            var propertyMap = typeMap.PropertyMaps.SingleOrDefault(item => item.DestinationName == destinationPropertyName);
+            if (propertyMap == null)
+                throw PropertyConfigurationException(typeMap, destinationPropertyName);
+
+            return propertyMap;
+        }
+
+        public static TypeMap CheckIfMapExists(this IConfigurationProvider config, Type sourceType, Type destinationType)
+        {
+            var typeMap = config.ResolveTypeMap(sourceType, destinationType);
+            if(typeMap == null)
+            {
+                throw MissingMapException(sourceType, destinationType);
+            }
+            return typeMap;
+        }
+
+        public static Exception PropertyConfigurationException(TypeMap typeMap, params string[] unmappedPropertyNames)
+            => new AutoMapperConfigurationException(new[] { new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, true) });
+
+        public static Exception MissingMapException(TypePair types)
+            => MissingMapException(types.SourceType, types.DestinationType);
+
+        public static Exception MissingMapException(Type sourceType, Type destinationType) 
+            => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using Mapper.CreateMap<{sourceType.Name}, {destinationType.Name}>.");
     }
 }

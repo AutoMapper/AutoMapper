@@ -1,0 +1,13 @@
+; Top-most http://editorconfig.org/ file
+root = true
+
+[*]
+end_of_line = LF
+indent_style = space
+indent_size = 4
+
+[*.xml]
+indent_size = 2
+
+[*.csproj]
+indent_size = 2

@@ -1,66 +1,49 @@
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
+using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.ComponentModel;
-    using Internal;
-
     public class TypeConverterMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        private static TDestination Map<TSource, TDestination>(TSource source)
         {
-            if (context.SourceValue == null)
+            var typeConverter = GetTypeConverter(typeof(TSource));
+
+            if (typeConverter.CanConvertTo(typeof(TDestination)))
             {
-                return mapper.CreateObject(context);
+                return (TDestination)typeConverter.ConvertTo(source, typeof(TDestination));
             }
-            Func<object> converter = GetConverter(context);
-            return converter?.Invoke();
+
+            typeConverter = GetTypeConverter(typeof(TDestination));
+            if (typeConverter.CanConvertFrom(typeof(TSource)))
+            {
+                return (TDestination)typeConverter.ConvertFrom(source);
+            }
+
+            return default;
         }
 
-        private static Func<object> GetConverter(ResolutionContext context)
+        private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetDeclaredMethod(nameof(Map));
+
+        public bool IsMatch(TypePair context)
         {
-            TypeConverter typeConverter = GetTypeConverter(context.SourceType);
-            if (typeConverter.CanConvertTo(context.DestinationType))
-                return () => typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
-            if (context.DestinationType.IsNullableType() &&
-                typeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)))
-                return
-                    () =>
-                        typeConverter.ConvertTo(context.SourceValue, Nullable.GetUnderlyingType(context.DestinationType));
+            var sourceTypeConverter = GetTypeConverter(context.SourceType);
+            var destTypeConverter = GetTypeConverter(context.DestinationType);
 
-            typeConverter = GetTypeConverter(context.DestinationType);
-            if (typeConverter.CanConvertFrom(context.SourceType))
-                return () => typeConverter.ConvertFrom(context.SourceValue);
-
-            return null;
+            return sourceTypeConverter.CanConvertTo(context.DestinationType) || destTypeConverter.CanConvertFrom(context.SourceType);
         }
 
-        public bool IsMatch(ResolutionContext context)
-        {
-            return GetConverter(context) != null;
-        }
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
+                sourceExpression);
 
-        private static TypeConverter GetTypeConverter(Type type)
-        {
-#if !SILVERLIGHT
-            return TypeDescriptor.GetConverter(type);
-#else
-            var attributes = type.GetCustomAttributes(typeof (TypeConverterAttribute), false);
-
-            if (attributes.Length != 1)
-                return new TypeConverter();
-
-            var converterAttribute = (TypeConverterAttribute) attributes[0];
-            var converterType = Type.GetType(converterAttribute.ConverterTypeName);
-
-            if (converterType == null)
-                return new TypeConverter();
-
-            return Activator.CreateInstance(converterType) as TypeConverter;
-#endif
-        }
+        private static TypeConverter GetTypeConverter(Type type) => TypeDescriptor.GetConverter(type);
     }
 }
-
-#endif

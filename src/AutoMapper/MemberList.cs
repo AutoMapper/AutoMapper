@@ -13,6 +13,11 @@ namespace AutoMapper
         /// <summary>
         /// Check that all source members are mapped
         /// </summary>
-        Source = 1
+        Source = 1,
+
+        /// <summary>
+        /// Check neither source nor destination members, skipping validation
+        /// </summary>
+        None = 2
     }
 }
