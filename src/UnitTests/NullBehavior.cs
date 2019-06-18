@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         public void Should_map_to_non_null()
         {
             Mapper.Map<int[]>(null).ShouldNotBeNull();
-            Mapper.Map<int[], int[]>((int[])null).ShouldNotBeNull();
+            Mapper.Map<int[]>(null, _=> { }).ShouldNotBeNull();
         }
     }
 
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         public void Should_map_to_null()
         {
             Mapper.Map<int[]>(null).ShouldBeNull();
-            Mapper.Map<int[], int[]>((int[])null).ShouldBeNull();
+            Mapper.Map<int[]>(null, _ => { }).ShouldBeNull();
         }
     }
 
