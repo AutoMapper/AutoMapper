@@ -44,7 +44,7 @@ task copy_last_major_version -depends compile {
         exec { & git config user.email "CI@automapper.com" }
         exec { & git add $source_dir\AutoMapper\LastMajorVersionBinary\AutoMapper.dll }
         exec { & git commit -m "automatic LastMajorVersionBinary update" }
-        exec { & git push origin +refs/pull/APPVEYOR_PULL_REQUEST_NUMBER/merge }
+        exec { & git push origin +refs/pull/$env:APPVEYOR_PULL_REQUEST_NUMBER/merge }
     } finally {
         Pop-Location
     }
