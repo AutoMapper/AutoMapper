@@ -14,7 +14,7 @@ properties {
 
 
 task default -depends local
-task local -depends compile, test
+task local -depends compile, copy_last_major_version, test
 task ci -depends clean, release, local, pack, benchmark
 
 task clean {
@@ -35,6 +35,19 @@ task compile -depends clean {
 	exec { dotnet --info }
 
     exec { dotnet build -c $config --version-suffix=$buildSuffix }
+}
+
+task copy_last_major_version -depends compile {
+	exec { copy $source_dir\AutoMapper\bin\release\net461\AutoMapper.dll $source_dir\AutoMapper\LastMajorVersionBinary\AutoMapper.dll }
+    Push-Location -Path $source_dir
+    try {
+        exec { & git config user.email "CI@automapper.com" }
+        exec { & git add $source_dir\AutoMapper\LastMajorVersionBinary\AutoMapper.dll }
+        exec { & git commit -m "automatic LastMajorVersionBinary update" }
+        exec { & git push origin +refs/pull/APPVEYOR_PULL_REQUEST_NUMBER/merge }
+    } finally {
+        Pop-Location
+    }
 }
 
 task pack -depends compile {
