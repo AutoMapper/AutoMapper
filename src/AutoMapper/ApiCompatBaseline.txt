@@ -14,6 +14,9 @@ InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurat
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddMaps(System.Type[])' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.AddProfiles(System.Collections.Generic.IEnumerable<AutoMapper.Profile>)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMapperConfigurationExpression.Features.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingAction<TSource, TDestination>.Process(TSource, TDestination)' is present in the contract but not in the implementation.
+MembersMustExist : Member 'AutoMapper.IMappingAction<TSource, TDestination>.Process(TSource, TDestination)' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingAction<TSource, TDestination>.Process(TSource, TDestination, AutoMapper.ResolutionContext)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.ValueTransformers' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.AfterMap(System.Action<System.Object, System.Object>)' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMappingExpression.AfterMap<TMappingAction>()' is present in the contract but not in the implementation.
@@ -107,4 +110,4 @@ MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.T
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object, System.String[])' does not exist in the implementation but it does exist in the contract.
-Total Issues: 108
+Total Issues: 111
