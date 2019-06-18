@@ -35,4 +35,8 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="PostBuild.bat" />
+  </Target>
+
 </Project>
