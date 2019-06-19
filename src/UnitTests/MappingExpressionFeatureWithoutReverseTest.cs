@@ -21,7 +21,8 @@ namespace AutoMapper.UnitTests
                     .SetFeature(featureA)
                     .SetFeature(new MappingExpressionFeatureB(3))
                     .SetFeature(new MappingExpressionFeatureB(2))
-                    .SetFeature(featureB);
+                    .SetFeature(featureB)
+                    .ReverseMap();
             });
 
 
@@ -37,7 +38,7 @@ namespace AutoMapper.UnitTests
             void Validate(MappingExpressionFeatureBase feature)
             {
                 feature.ConfigureTypeMaps.ShouldBeOfLength(1);
-                feature.ReverseExecutedCount.ShouldBe(0);
+                feature.ReverseExecutedCount.ShouldBe(1);
             }
         }
 
@@ -48,7 +49,8 @@ namespace AutoMapper.UnitTests
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .SetFeature(featureA);
+                    .SetFeature(featureA)
+                    .ReverseMap();
             });
 
             var typeMap = config.FindTypeMapFor<Source, Dest>();
@@ -63,7 +65,7 @@ namespace AutoMapper.UnitTests
                 where TFeature : TypeMapFeatureBase
             {
                 feature.ConfigureTypeMaps.ShouldBeOfLength(1);
-                feature.ReverseExecutedCount.ShouldBe(0);
+                feature.ReverseExecutedCount.ShouldBe(1);
 
                 var typeMapFeature = typeMap.Features.Get<TFeature>();
                 typeMapFeature.ShouldNotBeNull();
@@ -113,7 +115,8 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap<Source, Dest>()
                     .SetFeature(featureA)
-                    .SetFeature(featureB);
+                    .SetFeature(featureB)
+                    .ReverseMap();
             });
 
 
@@ -130,7 +133,7 @@ namespace AutoMapper.UnitTests
                 where TFeature : TypeMapFeatureBase
             {
                 feature.ConfigureTypeMaps.ShouldBeOfLength(1);
-                feature.ReverseExecutedCount.ShouldBe(0);
+                feature.ReverseExecutedCount.ShouldBe(1);
 
                 var typeMapFeature = typeMap.Features.Get<TFeature>();
                 typeMapFeature.ShouldNotBeNull();

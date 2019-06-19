@@ -75,6 +75,7 @@ namespace AutoMapper.UnitTests
         {
             cfg.CreateMap<SourceA, DestA>();
             cfg.CreateMap<SourceB, DestB>();
+            cfg.CreateMap<SourceItem, DestItem>();
         });
 
         [Fact]

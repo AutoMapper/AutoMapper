@@ -73,7 +73,9 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
-            if(typeMapsPath == null)
+            var inlineWasChecked = _typeMap.WasInlineChecked;
+            _typeMap.WasInlineChecked = true;
+            if (typeMapsPath == null)
             {
                 typeMapsPath = new HashSet<TypeMap>();
             }
@@ -87,7 +89,7 @@ namespace AutoMapper.Execution
             {
                 var memberMap = item.MemberMap;
                 var memberTypeMap = item.MemberTypeMap;
-                if(typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
+                if(!inlineWasChecked && typeMapsPath.Count % _configurationProvider.MaxExecutionPlanDepth == 0)
                 {
                     memberMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {_typeMap.SourceType} - {_typeMap.DestinationType}");
