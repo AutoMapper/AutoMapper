@@ -204,10 +204,7 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TDestination>(object source)
         {
-            if (source == null)
-                return default;
-
-            var types = new TypePair(source.GetType(), typeof(TDestination));
+            var types = new TypePair(source?.GetType() ?? typeof(object), typeof(TDestination));
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
@@ -218,9 +215,7 @@ namespace AutoMapper
         {
             var mappedObject = default(TDestination);
 
-            if (source == null) return mappedObject;
-
-            var sourceType = source.GetType();
+            var sourceType = source?.GetType() ?? typeof(object);
             var destinationType = typeof(TDestination);
 
             mappedObject = (TDestination)((IMapper)this).Map(source, sourceType, destinationType, opts);
