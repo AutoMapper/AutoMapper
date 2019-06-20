@@ -8,6 +8,71 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class Dynamic_constructor_mapping : AutoMapperSpecBase
+    {
+        public class ParentDTO<T>
+        {
+            public ChildDTO<T> First => Children[0];
+            public List<ChildDTO<T>> Children { get; set; } = new List<ChildDTO<T>>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildDTO<T>
+        {
+            public int IdChild { get; set; }
+            public ParentDTO<T> Parent { get; set; }
+        }
+
+        public class ParentModel<T>
+        {
+            public ChildModel<T> First { get; set; }
+            public List<ChildModel<T>> Children { get; set; } = new List<ChildModel<T>>();
+            public int IdParent { get; set; }
+        }
+
+        public class ChildModel<T>
+        {
+            int _idChild;
+
+            public ChildModel(ParentModel<T> parent)
+            {
+                Parent = parent;
+            }
+
+            public int IdChild
+            {
+                get => _idChild;
+                set
+                {
+                    if (_idChild != 0)
+                    {
+                        throw new Exception("Set IdChild again.");
+                    }
+                    _idChild = value;
+                }
+            }
+            public ParentModel<T> Parent { get; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDTO<>)).ReverseMap();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var parentDto = new ParentDTO<int> { IdParent = 1 };
+            for (var i = 0; i < 5; i++)
+            {
+                parentDto.Children.Add(new ChildDTO<int> { IdChild = i, Parent = parentDto });
+            }
+            var parentModel = Mapper.Map<ParentModel<int>>(parentDto);
+            var mappedChildren = Mapper.Map<List<ChildDTO<int>>, List<ChildModel<int>>>(parentDto.Children);
+        }
+    }
+
     public class Constructor_mapping_without_preserve_references : AutoMapperSpecBase
     {
         public class ParentDTO
