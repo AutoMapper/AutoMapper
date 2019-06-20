@@ -6,6 +6,60 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_the_source_has_cyclical_references_with_dynamic_map : AutoMapperSpecBase
+    {
+        public class CDataTypeModel<T>
+        {
+            public string Name { get; set; }
+            public List<CFieldDefinitionModel<T>> FieldDefinitionList { get; set; }
+        }
+        public class CDataTypeDTO<T>
+        {
+            public string Name { get; set; }
+            public List<CFieldDefinitionDTO<T>> FieldDefinitionList { get; set; }
+        }
+        public class CFieldDefinitionModel<T>
+        {
+            public string Name { get; set; }
+            public CDataTypeModel<T> DataType { get; set; }
+            public CComponentDefinitionModel<T> ComponentDefinition { get; set; }
+        }
+        public class CFieldDefinitionDTO<T>
+        {
+            public string Name { get; set; }
+            public CDataTypeDTO<T> DataType { get; set; }
+            public CComponentDefinitionDTO<T> ComponentDefinition { get; set; }
+        }
+        public class CComponentDefinitionModel<T>
+        {
+            public string Name { get; set; }
+            public List<CFieldDefinitionModel<T>> FieldDefinitionList { get; set; }
+        }
+        public class CComponentDefinitionDTO<T>
+        {
+            public string Name { get; set; }
+            public List<CFieldDefinitionDTO<T>> FieldDefinitionList { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(CDataTypeModel<>), typeof(CDataTypeDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(CFieldDefinitionModel<>), typeof(CFieldDefinitionDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(CComponentDefinitionModel<>), typeof(CComponentDefinitionDTO<>)).ReverseMap();
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var component = new CComponentDefinitionDTO<int>();
+            var type = new CDataTypeDTO<int>();
+            var field = new CFieldDefinitionDTO<int> { ComponentDefinition = component, DataType = type };
+            type.FieldDefinitionList = component.FieldDefinitionList = new List<CFieldDefinitionDTO<int>> { field };
+            var fieldModel = Mapper.Map<CFieldDefinitionModel<int>>(field);
+            fieldModel.ShouldBeSameAs(fieldModel.ComponentDefinition.FieldDefinitionList[0]);
+            fieldModel.ShouldBeSameAs(fieldModel.DataType.FieldDefinitionList[0]);
+        }
+    }
+
     public class When_the_same_map_is_used_again : AutoMapperSpecBase
     {
         class Source
