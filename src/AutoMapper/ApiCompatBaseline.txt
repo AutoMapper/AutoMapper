@@ -109,6 +109,12 @@ InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IProfileExpressio
 MembersMustExist : Member 'AutoMapper.IProfileExpression.ValidateInlineMaps.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IProfileExpression.ValidateInlineMaps.set(System.Nullable<System.Boolean>)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'AutoMapper.IProfileExpression.ValidateInlineMaps.set(System.Nullable<System.Boolean>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.AssertConfigurationIsValid()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.Configuration.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.Initialize(AutoMapper.Configuration.MapperConfigurationExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.Initialize(System.Action<AutoMapper.IMapperConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.Instance.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.Mapper.Reset()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.MapperConfiguration.ResolveTypeMap(AutoMapper.TypePair, AutoMapper.Configuration.ITypeMapConfiguration)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.MapperConfiguration.ResolveTypeMap(System.Type, System.Type, AutoMapper.Configuration.ITypeMapConfiguration)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.MappingOperationOptions<TSource, TDestination>.ConfigureMap()' does not exist in the implementation but it does exist in the contract.
@@ -167,6 +173,10 @@ TypesMustExist : Type 'AutoMapper.Mappers.ConventionGeneratorExtensions' does no
 TypesMustExist : Type 'AutoMapper.Mappers.IConditionalObjectMapper' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ExpressionBuilder.FirstPassLetPropertyMaps.Push(AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.Extensions.ProjectTo<TDestination>(System.Linq.IQueryable, System.Collections.Generic.IDictionary<System.String, System.Object>, System.String[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.Extensions.ProjectTo<TDestination>(System.Linq.IQueryable, System.Linq.Expressions.Expression<System.Func<TDestination, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.Extensions.ProjectTo<TDestination>(System.Linq.IQueryable, System.Object, System.Linq.Expressions.Expression<System.Func<TDestination, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' is present in the contract but not in the implementation.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Collections.Generic.IDictionary<System.String, System.Object>, System.Reflection.MemberInfo[])' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.IProjectionExpression' does not exist in the implementation but it does exist in the contract.
@@ -181,4 +191,4 @@ MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.T
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object, System.String[])' does not exist in the implementation but it does exist in the contract.
-Total Issues: 182
+Total Issues: 192
