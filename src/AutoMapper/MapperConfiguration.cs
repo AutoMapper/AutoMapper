@@ -207,7 +207,7 @@ namespace AutoMapper
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && !typeMap.Sealed && _typeMapRegistry.GetOrDefault(typePair) == null)
+            if (typeMap != null && typeMap.MapExpression == null && _typeMapRegistry.GetOrDefault(typePair) == null)
             {
                 lock (typeMap)
                 {

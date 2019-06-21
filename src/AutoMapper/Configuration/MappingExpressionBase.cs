@@ -21,14 +21,9 @@ namespace AutoMapper.Configuration
         protected MappingExpressionBase(MemberList memberList, TypePair types)
         {
             Types = types;
-            IsOpenGeneric = types.SourceType.IsGenericTypeDefinition
-                            || types.DestinationType.IsGenericTypeDefinition
-                            || types.SourceType.IsGenericType
-                            || types.DestinationType.IsGenericType;
+            IsOpenGeneric = types.SourceType.IsGenericTypeDefinition() || types.DestinationType.IsGenericTypeDefinition();
             TypeMapActions.Add(tm => tm.ConfiguredMemberList = memberList);
-            TypeMapActions.Add(tm => tm.IsOpenGeneric = IsOpenGeneric);
         }
-
         public TypePair Types { get; }
         public bool IsOpenGeneric { get; }
         public Type SourceType => Types.SourceType;

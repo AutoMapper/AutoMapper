@@ -143,71 +143,70 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
         }
     }
 
-    // TODO: Fix
-    //public class RecursiveDynamicMapping : AutoMapperSpecBase
-    //{
-    //    private ParentDto<int> _dto;
+    public class RecursiveDynamicMapping : AutoMapperSpecBase
+    {
+        private ParentDto<int> _dto;
 
-    //    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-    //    {
-    //        cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDto<>));
-    //        cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDto<>));
-    //    });
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDto<>));
+            cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDto<>));
+        });
 
-    //    protected override void Because_of()
-    //    {
-    //        var parent = new ParentModel<int> { ID = "PARENT_ONE" };
+        protected override void Because_of()
+        {
+            var parent = new ParentModel<int> { ID = "PARENT_ONE" };
 
-    //        parent.AddChild(new ChildModel<int> { ID = "CHILD_ONE" });
+            parent.AddChild(new ChildModel<int> { ID = "CHILD_ONE" });
 
-    //        parent.AddChild(new ChildModel<int> { ID = "CHILD_TWO" });
+            parent.AddChild(new ChildModel<int> { ID = "CHILD_TWO" });
 
-    //        _dto = Mapper.Map<ParentModel<int>, ParentDto<int>>(parent);
-    //    }
+            _dto = Mapper.Map<ParentModel<int>, ParentDto<int>>(parent);
+        }
 
-    //    [Fact]
-    //    public void Should_preserve_the_parent_child_relationship_on_the_destination()
-    //    {
-    //        _dto.Children[0].Parent.ShouldBeSameAs(_dto);
-    //        _dto.Children[1].Parent.ShouldBeSameAs(_dto);
-    //    }
+        [Fact]
+        public void Should_preserve_the_parent_child_relationship_on_the_destination()
+        {
+            _dto.Children[0].Parent.ShouldBeSameAs(_dto);
+            _dto.Children[1].Parent.ShouldBeSameAs(_dto);
+        }
 
-    //    public class ParentModel<T>
-    //    {
-    //        public ParentModel()
-    //        {
-    //            Children = new List<ChildModel<T>>();
-    //        }
+        public class ParentModel<T>
+        {
+            public ParentModel()
+            {
+                Children = new List<ChildModel<T>>();
+            }
 
-    //        public string ID { get; set; }
+            public string ID { get; set; }
 
-    //        public IList<ChildModel<T>> Children { get; private set; }
+            public IList<ChildModel<T>> Children { get; private set; }
 
-    //        public void AddChild(ChildModel<T> child)
-    //        {
-    //            child.Parent = this;
-    //            Children.Add(child);
-    //        }
-    //    }
+            public void AddChild(ChildModel<T> child)
+            {
+                child.Parent = this;
+                Children.Add(child);
+            }
+        }
 
-    //    public class ChildModel<T>
-    //    {
-    //        public string ID { get; set; }
-    //        public ParentModel<T> Parent { get; set; }
-    //    }
+        public class ChildModel<T>
+        {
+            public string ID { get; set; }
+            public ParentModel<T> Parent { get; set; }
+        }
 
-    //    public class ParentDto<T>
-    //    {
-    //        public string ID { get; set; }
-    //        public IList<ChildDto<T>> Children { get; set; }
-    //    }
+        public class ParentDto<T>
+        {
+            public string ID { get; set; }
+            public IList<ChildDto<T>> Children { get; set; }
+        }
 
-    //    public class ChildDto<T>
-    //    {
-    //        public string ID { get; set; }
-    //        public ParentDto<T> Parent { get; set; }
-    //    }
-    //}
+        public class ChildDto<T>
+        {
+            public string ID { get; set; }
+            public ParentDto<T> Parent { get; set; }
+        }
+    }
 
     public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_with_context : AutoMapperSpecBase
     {

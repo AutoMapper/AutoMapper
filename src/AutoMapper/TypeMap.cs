@@ -27,6 +27,7 @@ namespace AutoMapper
         private readonly Dictionary<MemberPath, PathMap> _pathMaps = new Dictionary<MemberPath, PathMap>();
         private readonly Dictionary<MemberInfo, SourceMemberConfig> _sourceMemberConfigs = new Dictionary<MemberInfo, SourceMemberConfig>();
         private PropertyMap[] _orderedPropertyMaps;
+        private bool _sealed;
         private readonly HashSet<TypeMap> _inheritedTypeMaps = new HashSet<TypeMap>();
         private readonly List<IncludedMember> _includedMembersTypeMaps = new List<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
@@ -108,7 +109,6 @@ namespace AutoMapper
 
         public bool? IsValid { get; set; }
         internal bool WasInlineChecked { get; set; }
-        public bool Sealed { get; private set; }
 
         public bool PassesCtorValidation =>
             DisableConstructorValidation
@@ -137,7 +137,6 @@ namespace AutoMapper
             && !(IsValid ?? false);
 
         public bool IsClosedGeneric { get; internal set; }
-        public bool IsOpenGeneric { get; internal set; }
         public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 
@@ -265,11 +264,11 @@ namespace AutoMapper
 
         public void Seal(IConfigurationProvider configurationProvider)
         {
-            if(Sealed)
+            if(_sealed)
             {
                 return;
             }
-            Sealed = true;
+            _sealed = true;
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
@@ -284,10 +283,7 @@ namespace AutoMapper
             _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
             _propertyMaps.Clear();
 
-            if (!IsOpenGeneric)
-            {
-                MapExpression = CreateMapperLambda(configurationProvider, null);
-            }
+            MapExpression = CreateMapperLambda(configurationProvider, null);
 
             Features.Seal(configurationProvider);
         }
