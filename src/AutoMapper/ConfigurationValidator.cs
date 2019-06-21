@@ -57,7 +57,7 @@ namespace AutoMapper
         {
             if(typeMap == null)
             {
-                if (types.SourceType.IsGenericParameter || types.DestinationType.IsGenericParameter)
+                if (types.SourceType.ContainsGenericParameters || types.DestinationType.ContainsGenericParameters)
                 {
                     return;
                 }
