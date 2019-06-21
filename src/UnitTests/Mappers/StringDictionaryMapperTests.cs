@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -62,7 +62,7 @@ namespace AutoMapper.UnitTests.Mappers
             public string Bar { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -82,7 +82,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -103,7 +103,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -124,7 +124,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {

@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests
         {
             cfg.CreateProfile("New Profile", profile =>
             {
-                profile.AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+                profile.CreateMap<Category, CategoryDto>();
             });
         });
 

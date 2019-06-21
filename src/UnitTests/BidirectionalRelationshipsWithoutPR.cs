@@ -8,53 +8,53 @@ namespace AutoMapper.UnitTests
 {
     public class When_the_source_has_cyclical_references_with_dynamic_map : AutoMapperSpecBase
     {
-        public class CDataTypeModel
+        public class CDataTypeModel<T>
         {
             public string Name { get; set; }
-            public List<CFieldDefinitionModel> FieldDefinitionList { get; set; }
+            public List<CFieldDefinitionModel<T>> FieldDefinitionList { get; set; }
         }
-        public class CDataTypeDTO
+        public class CDataTypeDTO<T>
         {
             public string Name { get; set; }
-            public List<CFieldDefinitionDTO> FieldDefinitionList { get; set; }
+            public List<CFieldDefinitionDTO<T>> FieldDefinitionList { get; set; }
         }
-        public class CFieldDefinitionModel
+        public class CFieldDefinitionModel<T>
         {
             public string Name { get; set; }
-            public CDataTypeModel DataType { get; set; }
-            public CComponentDefinitionModel ComponentDefinition { get; set; }
+            public CDataTypeModel<T> DataType { get; set; }
+            public CComponentDefinitionModel<T> ComponentDefinition { get; set; }
         }
-        public class CFieldDefinitionDTO
+        public class CFieldDefinitionDTO<T>
         {
             public string Name { get; set; }
-            public CDataTypeDTO DataType { get; set; }
-            public CComponentDefinitionDTO ComponentDefinition { get; set; }
+            public CDataTypeDTO<T> DataType { get; set; }
+            public CComponentDefinitionDTO<T> ComponentDefinition { get; set; }
         }
-        public class CComponentDefinitionModel
+        public class CComponentDefinitionModel<T>
         {
             public string Name { get; set; }
-            public List<CFieldDefinitionModel> FieldDefinitionList { get; set; }
+            public List<CFieldDefinitionModel<T>> FieldDefinitionList { get; set; }
         }
-        public class CComponentDefinitionDTO
+        public class CComponentDefinitionDTO<T>
         {
             public string Name { get; set; }
-            public List<CFieldDefinitionDTO> FieldDefinitionList { get; set; }
+            public List<CFieldDefinitionDTO<T>> FieldDefinitionList { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
-            cfg.CreateMap<CDataTypeDTO, CDataTypeModel>();
-            cfg.CreateMap<CFieldDefinitionDTO, CFieldDefinitionModel>();
+            cfg.CreateMap(typeof(CDataTypeModel<>), typeof(CDataTypeDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(CFieldDefinitionModel<>), typeof(CFieldDefinitionDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(CComponentDefinitionModel<>), typeof(CComponentDefinitionDTO<>)).ReverseMap();
         });
 
         [Fact]
         public void Should_map_ok()
         {
-            var component = new CComponentDefinitionDTO();
-            var type = new CDataTypeDTO();
-            var field = new CFieldDefinitionDTO { ComponentDefinition = component, DataType = type };
-            type.FieldDefinitionList  = component.FieldDefinitionList = new List<CFieldDefinitionDTO> { field };
-            var fieldModel = Mapper.Map<CFieldDefinitionModel>(field);
+            var component = new CComponentDefinitionDTO<int>();
+            var type = new CDataTypeDTO<int>();
+            var field = new CFieldDefinitionDTO<int> { ComponentDefinition = component, DataType = type };
+            type.FieldDefinitionList = component.FieldDefinitionList = new List<CFieldDefinitionDTO<int>> { field };
+            var fieldModel = Mapper.Map<CFieldDefinitionModel<int>>(field);
             fieldModel.ShouldBeSameAs(fieldModel.ComponentDefinition.FieldDefinitionList[0]);
             fieldModel.ShouldBeSameAs(fieldModel.DataType.FieldDefinitionList[0]);
         }

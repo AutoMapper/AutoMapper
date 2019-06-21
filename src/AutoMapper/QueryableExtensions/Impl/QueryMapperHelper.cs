@@ -46,6 +46,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             => MissingMapException(types.SourceType, types.DestinationType);
 
         public static Exception MissingMapException(Type sourceType, Type destinationType) 
-            => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using Mapper.CreateMap<{sourceType.Name}, {destinationType.Name}>.");
+            => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using CreateMap<{sourceType.Name}, {destinationType.Name}>.");
     }
 }

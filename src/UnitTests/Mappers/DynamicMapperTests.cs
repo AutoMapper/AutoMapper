@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         [Fact]
         public void Should_map_source_properties()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             dynamic destination = config.CreateMapper().Map<DynamicDictionary>(new Source());
             ((int)destination.Count).ShouldBe(1);
             Assert.Equal(24, destination.Value);
@@ -62,7 +62,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         [Fact]
         public void Should_map_source_properties()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             var data = new[] { 1, 2, 3 };
             _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar", Data = data, Baz = 12 });
             ((int)_destination.Count).ShouldBe(4);
@@ -84,7 +84,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Foo = "Foo";
             source.Bar = "Bar";
             source.Jack = "Jack";
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
@@ -110,7 +110,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Foo = "Foo";
             source.Bar = "Bar";
             source.Jack = "Jack";
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
@@ -144,7 +144,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             source.Baz = null;
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
@@ -162,7 +162,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             source.Bar = "Bar";
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<DynamicDictionary>(source);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
@@ -183,7 +183,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.StringValue = "Test";
             source.NullIntValue = 5;
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal(5, destination.NullIntValue);
@@ -194,7 +194,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             dynamic source = new DynamicDictionary();
             source.StringValue = "Test";
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal((int?)null, destination.NullIntValue);
@@ -206,7 +206,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.StringValue = "Test";
             source.NullIntValue = null;
-            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var config = new MapperConfiguration(cfg => { });
             var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal((int?)null, destination.NullIntValue);

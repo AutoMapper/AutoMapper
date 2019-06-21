@@ -44,7 +44,6 @@ namespace AutoMapper.UnitTests.Projection
             {
                 cfg.CreateMap<Address, AddressDto>();
                 cfg.CreateMap<Customer, CustomerDto>();
-                cfg.CreateMissingTypeMaps = false;
             });
         }
 

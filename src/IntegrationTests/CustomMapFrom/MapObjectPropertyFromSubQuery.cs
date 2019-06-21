@@ -536,15 +536,15 @@ namespace AutoMapper.IntegrationTests
         }
     }
 
-    public class MapObjectPropertyFromSubQueryWithCollectionSameName : AutoMapperSpecBase
+    public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidatingSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<ProductArticle, ProductArticleModel>();
             cfg.CreateMap<Product, ProductModel>()
                 .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
                 .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
+            cfg.CreateMap<Product, ArticlesModel>();
             cfg.CreateMap<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });

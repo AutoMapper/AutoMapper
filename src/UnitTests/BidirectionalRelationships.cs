@@ -78,155 +78,6 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
         }
     }
 
-    public class RecursiveDynamicMappingWithAnonymousType : AutoMapperSpecBase
-    {
-        public class Book
-        {
-            public int BookId { get; set; }
-            public string Name { get; set; }
-            public List<BookAuthor> BookAuthors { get; set; }
-        }
-        public class Author
-        {
-            public int AuthorId { get; set; }
-            public string AuthorName { get; set; }
-            public List<BookAuthor> BookAuthors { get; set; }
-        }
-        public class BookAuthor
-        {
-            public int BookId { get; set; }
-            public Book Book { get; set; }
-
-            public int AuthorId { get; set; }
-            public Author Author { get; set; }
-        }
-        public class BookViewModel
-        {
-            public int BookId { get; set; }
-            public string Name { get; set; }
-            public virtual List<AuthorViewModel> Authors { get; set; }
-        }
-        public class AuthorViewModel
-        {
-            public int AuthorId { get; set; }
-            public string AuthorName { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
-        {
-            cfg.CreateMissingTypeMaps = true;
-            cfg.CreateMap<Book, BookViewModel>()
-                .ForMember(b => b.Authors, opt => opt.MapFrom(b => b.BookAuthors.Select(ba => ba.Author)))
-                .ReverseMap()
-                .ForMember(b => b.BookAuthors, opt => opt.MapFrom(b => b.Authors.Select(a => new { b.BookId, Book = b, a.AuthorId, Author = a })))                ;
-            cfg.CreateMap<Author, AuthorViewModel>().ReverseMap();
-        });
-
-        [Fact]
-        public void Should_preserve_references()
-        {
-            var source = GetBook();
-            var bookModel = Mapper.Map<BookViewModel>(source);
-            var book2 = Mapper.Map<Book>(bookModel);
-        }
-
-        Book GetBook()
-        {
-            var book = new Book
-            {
-                BookId = 1,
-                Name = "B1",
-            };
-            book.BookAuthors = new List<BookAuthor>
-            {
-                new BookAuthor
-                {
-                    BookId = book.BookId,
-                    Book = book,
-                    AuthorId = 1,
-                    Author = new Author
-                    {
-                        AuthorId = 1,
-                        AuthorName = "A1"
-                    }
-                },
-                new BookAuthor
-                {
-                    BookId = book.BookId,
-                    Book = book,
-                    AuthorId = 2,
-                    Author = new Author
-                    {
-                        AuthorId = 2,
-                        AuthorName = "A2"
-                    }
-                },
-            };
-            return book;
-        }
-    }
-
-    public class RecursiveDynamicMapping : AutoMapperSpecBase
-    {
-        private ParentDto _dto;
-
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
-
-        protected override void Because_of()
-        {
-            var parent = new ParentModel { ID = "PARENT_ONE" };
-
-            parent.AddChild(new ChildModel { ID = "CHILD_ONE" });
-
-            parent.AddChild(new ChildModel { ID = "CHILD_TWO" });
-
-            _dto = Mapper.Map<ParentModel, ParentDto>(parent);
-        }
-
-        [Fact]
-        public void Should_preserve_the_parent_child_relationship_on_the_destination()
-        {
-            _dto.Children[0].Parent.ShouldBeSameAs(_dto);
-            _dto.Children[1].Parent.ShouldBeSameAs(_dto);
-        }
-
-        public class ParentModel
-        {
-            public ParentModel()
-            {
-                Children = new List<ChildModel>();
-            }
-
-            public string ID { get; set; }
-
-            public IList<ChildModel> Children { get; private set; }
-
-            public void AddChild(ChildModel child)
-            {
-                child.Parent = this;
-                Children.Add(child);
-            }
-        }
-
-        public class ChildModel
-        {
-            public string ID { get; set; }
-            public ParentModel Parent { get; set; }
-        }
-
-        public class ParentDto
-        {
-            public string ID { get; set; }
-            public IList<ChildDto> Children { get; set; }
-        }
-
-        public class ChildDto
-        {
-            public string ID { get; set; }
-            public ParentDto Parent { get; set; }
-        }
-    }
-
     public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
     {
         private ParentDto _dto;
@@ -292,108 +143,70 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
         }
     }
 
+    public class RecursiveDynamicMapping : AutoMapperSpecBase
+    {
+        private ParentDto<int> _dto;
 
-    //public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_StackOverflow : AutoMapperSpecBase
-    //{
-    //    private ParentDto _dto;
-    //    private ParentModel _parent;
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDto<>));
+            cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDto<>));
+        });
 
-    //    protected override void Establish_context()
-    //    {
-    //        _parent = new ParentModel
-    //            {
-    //                ID = 2
-    //            };
+        protected override void Because_of()
+        {
+            var parent = new ParentModel<int> { ID = "PARENT_ONE" };
 
-    //        List<ChildModel> childModels = new List<ChildModel>
-    //            {
-    //                new ChildModel
-    //                    {
-    //                        ID = 1,
-    //                        Parent = _parent
-    //                    }
-    //            };
+            parent.AddChild(new ChildModel<int> { ID = "CHILD_ONE" });
 
-    //        Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
+            parent.AddChild(new ChildModel<int> { ID = "CHILD_TWO" });
 
-    //        Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
-    //        Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+            _dto = Mapper.Map<ParentModel<int>, ParentDto<int>>(parent);
+        }
 
-    //        Mapper.CreateMap<ParentModel, ParentDto>()
-    //            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
-    //        Mapper.CreateMap<ChildModel, ChildDto>();
+        [Fact]
+        public void Should_preserve_the_parent_child_relationship_on_the_destination()
+        {
+            _dto.Children[0].Parent.ShouldBeSameAs(_dto);
+            _dto.Children[1].Parent.ShouldBeSameAs(_dto);
+        }
 
-    //        config.AssertConfigurationIsValid();
-    //    }
+        public class ParentModel<T>
+        {
+            public ParentModel()
+            {
+                Children = new List<ChildModel<T>>();
+            }
 
-    //    protected override void Because_of()
-    //    {
-    //        _dto = Mapper.Map<ParentModel, ParentDto>(_parent);
-    //    }
+            public string ID { get; set; }
 
-    //    [Fact(Skip = "This test breaks the Test Runner")]
-    //    public void Should_preserve_the_parent_child_relationship_on_the_destination()
-    //    {
-    //        _dto.Children[0].Parent.ID.ShouldBe(_dto.ID);
-    //    }
+            public IList<ChildModel<T>> Children { get; private set; }
 
-    //    public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
-    //    {
-    //        private readonly Dictionary<int, ParentModel> _parentModels;
+            public void AddChild(ChildModel<T> child)
+            {
+                child.Parent = this;
+                Children.Add(child);
+            }
+        }
 
-    //        public ChildIdToParentDtoConverter(Dictionary<int, ParentModel> parentModels)
-    //        {
-    //            _parentModels = parentModels;
-    //        }
+        public class ChildModel<T>
+        {
+            public string ID { get; set; }
+            public ParentModel<T> Parent { get; set; }
+        }
 
-    //        public ParentDto Convert(int childId)
-    //        {
-    //            ParentModel parentModel = _parentModels[childId];
-    //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-    //            return mappingEngine.Map<ParentModel, ParentDto>(parentModel);
-    //        }
-    //    }
+        public class ParentDto<T>
+        {
+            public string ID { get; set; }
+            public IList<ChildDto<T>> Children { get; set; }
+        }
 
-    //    public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
-    //    {
-    //        private readonly IList<ChildModel> _childModels;
-
-    //        public ParentIdToChildDtoListConverter(IList<ChildModel> childModels)
-    //        {
-    //            _childModels = childModels;
-    //        }
-
-    //        protected override List<ChildDto> ConvertCore(int childId)
-    //        {
-    //            List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
-    //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-    //            return mappingEngine.Map<List<ChildModel>, List<ChildDto>>(childModels);
-    //        }
-    //    }
-
-    //    public class ParentModel
-    //    {
-    //        public int ID { get; set; }
-    //    }
-
-    //    public class ChildModel
-    //    {
-    //        public int ID { get; set; }
-    //        public ParentModel Parent { get; set; }
-    //    }
-
-    //    public class ParentDto
-    //    {
-    //        public int ID { get; set; }
-    //        public List<ChildDto> Children { get; set; }
-    //    }
-
-    //    public class ChildDto
-    //    {
-    //        public int ID { get; set; }
-    //        public ParentDto Parent { get; set; }
-    //    }
-    //}
+        public class ChildDto<T>
+        {
+            public string ID { get; set; }
+            public ParentDto<T> Parent { get; set; }
+        }
+    }
 
     public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_with_context : AutoMapperSpecBase
     {

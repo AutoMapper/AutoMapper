@@ -57,7 +57,7 @@ namespace AutoMapper
         {
             if(typeMap == null)
             {
-                if (types.SourceType.IsGenericParameter || types.DestinationType.IsGenericParameter)
+                if (types.SourceType.ContainsGenericParameters || types.DestinationType.ContainsGenericParameters)
                 {
                     return;
                 }
@@ -68,11 +68,6 @@ namespace AutoMapper
                 if (typeMap.IsClosedGeneric)
                 {
                     // it was already validated
-                    return;
-                }
-                // dynamic maps get mapped at runtime yolo
-                if (typeMap.IsConventionMap && typeMap.Profile.CreateMissingTypeMaps)
-                {
                     return;
                 }
                 if (typeMapsChecked.Contains(typeMap))

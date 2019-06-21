@@ -482,10 +482,9 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource).ReverseMap();
-            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ReverseMap();
         });
         [Fact]
         public void Should_unflatten()
@@ -569,13 +568,12 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Destination, Source>()
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
                 .ForMember(d => d.OtherInnerSource, o => o.MapFrom(s => s))
                 .ReverseMap();
-            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ReverseMap();
         });
         [Fact]
         public void Should_flatten()
@@ -614,14 +612,13 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
-            cfg.CreateMap<Destination, Source>()
+            cfg.CreateMap<Destination, Source>(MemberList.None)
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
                 .ForMember(d => d.OtherInnerSource, o => o.MapFrom(s => s))
                 .ReverseMap()
                 .IncludeMembers();
-            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ReverseMap();
         });
         [Fact]
         public void Should_flatten()
@@ -942,10 +939,9 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource").ReverseMap();
-            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ReverseMap();
         });
         [Fact]
         public void Should_unflatten()

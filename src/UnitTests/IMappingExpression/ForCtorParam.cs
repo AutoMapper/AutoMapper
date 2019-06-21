@@ -28,7 +28,6 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap(typeof(Source), typeof(Dest))
                 .ForCtorParam("thing", opt => opt.MapFrom(src => ((Source)src).Value));
         });

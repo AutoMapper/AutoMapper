@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
@@ -150,7 +148,6 @@ namespace AutoMapper
         
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
-        IConditionalObjectMapper AddConditionalObjectMapper();
 
         /// <summary>
         /// Include extension methods against source members for matching destination members to. Default source extension methods from <see cref="System.Linq.Enumerable"/>
@@ -162,10 +159,5 @@ namespace AutoMapper
         /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
         /// </summary>
         IList<ValueTransformerConfiguration> ValueTransformers { get; }
-
-        /// <summary>
-        /// Validate maps created dynamically/inline on the first map. Defaults to true.
-        /// </summary>
-        bool? ValidateInlineMaps { get; set; }
     }
 }

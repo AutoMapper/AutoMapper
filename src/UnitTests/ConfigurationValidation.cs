@@ -31,7 +31,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = false;
             cfg.CreateMap<Source, Destination>();
         });
 
@@ -249,7 +248,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>()
                 .ForCtorParam("blarg", opt => opt.MapFrom(src => src.Value));
         });
@@ -393,7 +391,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -520,7 +517,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -555,7 +551,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -660,7 +655,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dest => dest.Bar, opt => opt.MapFrom(src => src.Barr));
-            cfg.CreateMissingTypeMaps = false;
         });
 
         [Fact]
@@ -777,7 +771,6 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = false;
             cfg.CreateMap<Query, Command>().ForMember(d => d.Details, o => o.MapFrom<DetailsValueResolver>());
         });
         public class DetailsValueResolver : IValueResolver<Query, Command, List<KeyValuePair<string, string>>>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
@@ -21,23 +20,10 @@ namespace AutoMapper
         public IDictionary<string, object> Items => _items ?? (_items = new StringDictionary());
         public Action<TSource, TDestination> BeforeMapAction { get; protected set; }
         public Action<TSource, TDestination> AfterMapAction { get; protected set; }
-        public ITypeMapConfiguration InlineConfiguration { get; protected set; } = new MappingExpression<TSource,TDestination>(MemberList.Destination);
 
         public void BeforeMap(Action<TSource, TDestination> beforeFunction) => BeforeMapAction = beforeFunction;
 
         public void AfterMap(Action<TSource, TDestination> afterFunction) => AfterMapAction = afterFunction;
-
-        public IMappingExpression<TSource, TDestination> ConfigureMap()
-            => ConfigureMap(MemberList.Destination);
-
-        public IMappingExpression<TSource, TDestination> ConfigureMap(MemberList memberList)
-        {
-            var typeMapConfiguration = new MappingExpression<TSource, TDestination>(memberList);
-
-            InlineConfiguration = typeMapConfiguration;
-
-            return typeMapConfiguration;
-        }
 
         public T CreateInstance<T>()
         {

@@ -50,24 +50,6 @@ namespace AutoMapper.Configuration
 
         public void AddProfile(Type profileType) => AddProfile((Profile)Activator.CreateInstance(profileType));
 
-        public void AddProfiles(IEnumerable<Assembly> assembliesToScan)
-            => AddMaps(assembliesToScan);
-
-        public void AddProfiles(params Assembly[] assembliesToScan)
-            => AddMaps(assembliesToScan);
-
-        public void AddProfiles(IEnumerable<string> assemblyNamesToScan)
-            => AddMaps(assemblyNamesToScan);
-
-        public void AddProfiles(params string[] assemblyNamesToScan)
-            => AddMaps(assemblyNamesToScan);
-
-        public void AddProfiles(IEnumerable<Type> typesFromAssembliesContainingProfiles)
-            => AddMaps(typesFromAssembliesContainingProfiles);
-
-        public void AddProfiles(params Type[] typesFromAssembliesContainingProfiles)
-            => AddMaps(typesFromAssembliesContainingProfiles);
-
         public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
         {
             foreach (var profile in enumerableOfProfiles)

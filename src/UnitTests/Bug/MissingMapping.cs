@@ -18,7 +18,7 @@
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMissingTypeMaps = false);
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => { });
 
         [Fact]
         public void Can_not_map_unmapped_type()

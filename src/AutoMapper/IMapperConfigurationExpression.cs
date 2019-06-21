@@ -9,12 +9,6 @@ namespace AutoMapper
     public interface IMapperConfigurationExpression : IProfileExpression
     {
         /// <summary>
-        /// Create missing type maps during mapping, if necessary
-        /// </summary>
-        [Obsolete("Support for automatically created maps will be removed in version 9.0. You will need to explicitly configure maps, manually or using reflection. Also consider attribute mapping (http://docs.automapper.org/en/latest/Attribute-mapping.html).")]
-        bool ? CreateMissingTypeMaps { get; set; }
-
-        /// <summary>
         /// Add an existing profile
         /// </summary>
         /// <param name="profile">Profile to add</param>
@@ -31,47 +25,6 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileType">Profile type</param>
         void AddProfile(Type profileType);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="assembliesToScan">Assemblies containing profiles</param>
-        [Obsolete("Use AddMaps instead. Will be removed in 9.0")]
-        void AddProfiles(IEnumerable<Assembly> assembliesToScan);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="assembliesToScan">Assemblies containing profiles</param>
-        [Obsolete("Use AddMaps instead. Will be removed in 9.0")]
-        void AddProfiles(params Assembly[] assembliesToScan);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="assemblyNamesToScan">Assembly names to load and scan containing profiles</param>
-        void AddProfiles(IEnumerable<string> assemblyNamesToScan);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="assemblyNamesToScan">Assembly names to load and scan containing profiles</param>
-        [Obsolete("Use AddMaps instead. Will be removed in 9.0")]
-        void AddProfiles(params string[] assemblyNamesToScan);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="typesFromAssembliesContainingProfiles">Types from assemblies containing profiles</param>
-        [Obsolete("Use AddMaps instead. Will be removed in 9.0")]
-        void AddProfiles(IEnumerable<Type> typesFromAssembliesContainingProfiles);
-
-        /// <summary>
-        /// Add profiles contained in assemblies
-        /// </summary>
-        /// <param name="typesFromAssembliesContainingProfiles">Types from assemblies containing profiles</param>
-        [Obsolete("Use AddMaps instead. Will be removed in 9.0")]
-        void AddProfiles(params Type[] typesFromAssembliesContainingProfiles);
 
         /// <summary>
         /// Add profiles contained in an IEnumerable

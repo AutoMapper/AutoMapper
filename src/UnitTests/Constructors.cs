@@ -10,31 +10,31 @@ namespace AutoMapper.UnitTests.Constructors
 {
     public class Dynamic_constructor_mapping : AutoMapperSpecBase
     {
-        public class ParentDTO
+        public class ParentDTO<T>
         {
-            public ChildDTO First => Children[0];
-            public List<ChildDTO> Children { get; set; } = new List<ChildDTO>();
+            public ChildDTO<T> First => Children[0];
+            public List<ChildDTO<T>> Children { get; set; } = new List<ChildDTO<T>>();
             public int IdParent { get; set; }
         }
 
-        public class ChildDTO
+        public class ChildDTO<T>
         {
             public int IdChild { get; set; }
-            public ParentDTO Parent { get; set; }
+            public ParentDTO<T> Parent { get; set; }
         }
 
-        public class ParentModel
+        public class ParentModel<T>
         {
-            public ChildModel First { get; set; }
-            public List<ChildModel> Children { get; set; } = new List<ChildModel>();
+            public ChildModel<T> First { get; set; }
+            public List<ChildModel<T>> Children { get; set; } = new List<ChildModel<T>>();
             public int IdParent { get; set; }
         }
 
-        public class ChildModel
+        public class ChildModel<T>
         {
             int _idChild;
 
-            public ChildModel(ParentModel parent)
+            public ChildModel(ParentModel<T> parent)
             {
                 Parent = parent;
             }
@@ -44,28 +44,32 @@ namespace AutoMapper.UnitTests.Constructors
                 get => _idChild;
                 set
                 {
-                    if(_idChild != 0)
+                    if (_idChild != 0)
                     {
                         throw new Exception("Set IdChild again.");
                     }
                     _idChild = value;
                 }
             }
-            public ParentModel Parent { get; }
+            public ParentModel<T> Parent { get; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDTO<>)).ReverseMap();
+            cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDTO<>)).ReverseMap();
+        });
 
         [Fact]
         public void Should_work()
         {
-            var parentDto = new ParentDTO { IdParent = 1 };
-            for(var i = 0; i < 5; i++)
+            var parentDto = new ParentDTO<int> { IdParent = 1 };
+            for (var i = 0; i < 5; i++)
             {
-                parentDto.Children.Add(new ChildDTO { IdChild = i, Parent = parentDto });
+                parentDto.Children.Add(new ChildDTO<int> { IdChild = i, Parent = parentDto });
             }
-            var parentModel = Mapper.Map<ParentModel>(parentDto);
-            var mappedChildren = Mapper.Map<List<ChildDTO>, List<ChildModel>>(parentDto.Children);
+            var parentModel = Mapper.Map<ParentModel<int>>(parentDto);
+            var mappedChildren = Mapper.Map<List<ChildDTO<int>>, List<ChildModel<int>>>(parentDto.Children);
         }
     }
 
@@ -373,7 +377,6 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
         {
-            c.CreateMissingTypeMaps = true;
             c.CreateMap<Source, Destination>().ForCtorParam("inner", o=>o.MapFrom(s=>s.InnerSource));
             c.CreateMap<InnerSource, InnerDestination>();
         });
@@ -834,7 +837,6 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Destination>().ForCtorParam("foo", opt => opt.MapFrom(s => s.Nested.Foo));
         });
 
@@ -922,7 +924,6 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = false;
             cfg.CreateMap<Source, Dest>();
         });
 
@@ -1566,7 +1567,6 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
         });
 
@@ -1598,7 +1598,6 @@ namespace AutoMapper.UnitTests.Constructors
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMissingTypeMaps = true;
             cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
         });
 

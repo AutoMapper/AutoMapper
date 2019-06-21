@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
@@ -25,7 +23,6 @@ namespace AutoMapper
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
         private readonly List<ITypeMapConfiguration> _openTypeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
-        private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
@@ -52,9 +49,6 @@ namespace AutoMapper
 
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
         public bool? ConstructorMappingEnabled { get; private set; }
-        [Obsolete("This has no effect and will be removed. Set CreateMissingTypeMaps on the global configuration.")]
-        public bool? CreateMissingTypeMaps { get; set; }
-        public bool? ValidateInlineMaps { get; set; }
 
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> IProfileConfiguration.AllPropertyMapActions
             => _allPropertyMapActions;
@@ -63,7 +57,6 @@ namespace AutoMapper
         IEnumerable<string> IProfileConfiguration.GlobalIgnores => _globalIgnore;
         IEnumerable<IMemberConfiguration> IProfileConfiguration.MemberConfigurations => _memberConfigurations;
         IEnumerable<MethodInfo> IProfileConfiguration.SourceExtensionMethods => _sourceExtensionMethods;
-        IEnumerable<IConditionalObjectMapper> IProfileConfiguration.TypeConfigurations => _typeConfigurations;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
         IEnumerable<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
         IEnumerable<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
@@ -167,15 +160,6 @@ namespace AutoMapper
         {
             var condition = new MemberConfiguration();
             _memberConfigurations.Add(condition);
-            return condition;
-        }
-
-        public IConditionalObjectMapper AddConditionalObjectMapper()
-        {
-            var condition = new ConditionalObjectMapper();
-
-            _typeConfigurations.Add(condition);
-
             return condition;
         }
 
