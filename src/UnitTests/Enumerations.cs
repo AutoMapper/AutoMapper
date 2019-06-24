@@ -216,6 +216,10 @@ namespace AutoMapper.Tests
             };
 
             var mapper = config.CreateMapper();
+
+            var expression =
+                config.BuildExecutionPlan(typeof(OrderWithNullableStatus), typeof(OrderDtoWithNullableStatus));
+
             var dto = mapper.Map<OrderWithNullableStatus, OrderDtoWithNullableStatus>(order);
 
             dto.Status.ShouldBe(Status.InProgress);
@@ -231,6 +235,7 @@ namespace AutoMapper.Tests
             };
 
             var mapper = config.CreateMapper();
+
             var dto = mapper.Map<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>(order);
 
             dto.Status.ShouldBe(StatusForDto.InProgress);

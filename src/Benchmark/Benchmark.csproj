@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <Configuration>Release</Configuration>
     <TargetFrameworks>net47;netcoreapp2.0</TargetFrameworks>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
