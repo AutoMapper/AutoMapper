@@ -4,16 +4,19 @@ namespace AutoMapper.Mappers
 {
     internal static class MapperRegistry
     {
+        /* Mapping order:
+         - Nullables
+         - Collections
+         - Assignable
+         - Primitives
+         - Converters
+         - Conversion operators
+         - "Special" cases
+         */
         public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
             new NullableSourceMapper(),
             new NullableDestinationMapper(),
-            new FlagsEnumMapper(),
-            new StringToEnumMapper(), 
-            new EnumToStringMapper(),
-            new EnumToEnumMapper(), 
-            new EnumToUnderlyingTypeMapper(),
-            new UnderlyingTypeToEnumMapper(),
             new MultidimensionalArrayMapper(),
             new ArrayCopyMapper(),
             new ArrayMapper(),
@@ -26,6 +29,12 @@ namespace AutoMapper.Mappers
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
+            new FlagsEnumMapper(),
+            new StringToEnumMapper(),
+            new EnumToStringMapper(),
+            new EnumToEnumMapper(),
+            new EnumToUnderlyingTypeMapper(),
+            new UnderlyingTypeToEnumMapper(),
             new ConvertMapper(),
             new StringMapper(),
             new TypeConverterMapper(),
