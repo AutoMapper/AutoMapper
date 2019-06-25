@@ -1,4 +1,4 @@
-# Static and Instance API
+# Setup
 
 ```c#
 var config = new MapperConfiguration(cfg => {
