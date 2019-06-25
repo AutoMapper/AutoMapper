@@ -3,7 +3,7 @@
 AutoMapper supports the ability to construct [Custom Value Resolvers](Custom-value-resolvers.html), [Custom Type Converters](Custom-type-converters.html), and [Value Converters](Value-converters.html) using static service location:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
 {
     cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
 
@@ -14,7 +14,7 @@ Mapper.Initialize(cfg =>
 Or dynamic service location, to be used in the case of instance-based containers (including child/nested containers):
 
 ```c#
-var mapper = new Mapper(Mapper.Configuration, childContainer.GetInstance);
+var mapper = new Mapper(configuration, childContainer.GetInstance);
 
 var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 ```

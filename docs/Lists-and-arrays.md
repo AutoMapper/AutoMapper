@@ -17,7 +17,7 @@ public class Destination
 All the basic generic collection types are supported:
 
 ```c#
-Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
 var sources = new[]
 	{
@@ -26,11 +26,11 @@ var sources = new[]
 		new Source { Value = 7 }
 	};
 
-IEnumerable<Destination> ienumerableDest = Mapper.Map<Source[], IEnumerable<Destination>>(sources);
-ICollection<Destination> icollectionDest = Mapper.Map<Source[], ICollection<Destination>>(sources);
-IList<Destination> ilistDest = Mapper.Map<Source[], IList<Destination>>(sources);
-List<Destination> listDest = Mapper.Map<Source[], List<Destination>>(sources);
-Destination[] arrayDest = Mapper.Map<Source[], Destination[]>(sources);
+IEnumerable<Destination> ienumerableDest = mapper.Map<Source[], IEnumerable<Destination>>(sources);
+ICollection<Destination> icollectionDest = mapper.Map<Source[], ICollection<Destination>>(sources);
+IList<Destination> ilistDest = mapper.Map<Source[], IList<Destination>>(sources);
+List<Destination> listDest = mapper.Map<Source[], List<Destination>>(sources);
+Destination[] arrayDest = mapper.Map<Source[], Destination[]>(sources);
 ```
 
 To be specific, the source collection types supported include:
@@ -55,7 +55,7 @@ When mapping a collection property, if the source value is null AutoMapper will 
 This behavior can be changed by setting the `AllowNullCollections` property to true when configuring the mapper.
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
     cfg.AllowNullCollections = true;
     cfg.CreateMap<Source, Destination>();
 });
@@ -90,7 +90,7 @@ public class ChildDestination : ParentDestination
 AutoMapper still requires explicit configuration for child mappings, as AutoMapper cannot "guess" which specific child destination mapping to use.  Here is an example of the above types:
 
 ```c#
-Mapper.Initialize(c=> {
+var configuration = new MapperConfiguration(c=> {
     c.CreateMap<ParentSource, ParentDestination>()
 	     .Include<ChildSource, ChildDestination>();
     c.CreateMap<ChildSource, ChildDestination>();
@@ -103,7 +103,7 @@ var sources = new[]
 		new ParentSource()
 	};
 
-var destinations = Mapper.Map<ParentSource[], ParentDestination[]>(sources);
+var destinations = mapper.Map<ParentSource[], ParentDestination[]>(sources);
 
 destinations[0].ShouldBeInstanceOf<ParentDestination>();
 destinations[1].ShouldBeInstanceOf<ChildDestination>();

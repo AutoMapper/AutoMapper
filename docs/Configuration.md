@@ -11,14 +11,13 @@ var config = new MapperConfiguration(cfg => {
 
 The `MapperConfiguration` instance can be stored statically, in a static field or in a dependency injection container. Once created it cannot be changed/modified.
 
-Alternatively, you can use the static Mapper instance to initialize AutoMapper:
-
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap<Foo, Bar>();
     cfg.AddProfile<FooProfile>();
 });
 ```
+Starting with 9.0, the static API is no longer available.
 
 ## Profile Instances
 
@@ -67,11 +66,10 @@ or by automatically scanning for profiles:
 var config = new MapperConfiguration(cfg => {
     cfg.AddMaps(myAssembly);
 });
-// ... or static approach:
-Mapper.Initialize(cfg => cfg.AddProfiles(myAssembly));
+var configuration = new MapperConfiguration(cfg => cfg.AddProfiles(myAssembly));
 
 // Can also use assembly names:
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
     cfg.AddMaps(new [] {
         "Foo.UI",
         "Foo.Core"
@@ -79,7 +77,7 @@ Mapper.Initialize(cfg =>
 );
 
 // Or marker types for assemblies:
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
     cfg.AddMaps(new [] {
         typeof(HomeController),
         typeof(Entity)
@@ -94,7 +92,7 @@ AutoMapper will scan the designated assemblies for classes inheriting from Profi
 You can set the source and destination naming conventions
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
   cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
   cfg.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 });
@@ -139,7 +137,7 @@ public class Destination
 We want to replace the individual characters, and perhaps translate a word:
 
 ```c#
-Mapper.Initialize(c =>
+var configuration = new MapperConfiguration(c =>
 {
     c.ReplaceMemberName("Ä", "A");
     c.ReplaceMemberName("í", "i");
@@ -160,17 +158,17 @@ public class Dest {
     public int Value { get; set; }
     public int Value2 { get; set; }
 }
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
     cfg.RecognizePrefixes("frm");
     cfg.CreateMap<Source, Dest>();
 });
-Mapper.AssertConfigurationIsValid();
+configuration.AssertConfigurationIsValid();
 ```
 
 By default AutoMapper recognizes the prefix "Get", if you need to clear the prefix:
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
     cfg.ClearPrefixes();
     cfg.RecognizePrefixes("tmp");
 });
@@ -181,7 +179,7 @@ Mapper.Initialize(cfg => {
 By default, AutoMapper tries to map every public property/field. You can filter out properties/fields with the property/field filters:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
 {
 	// don't map any fields
 	cfg.ShouldMapField = fi => false;
@@ -197,7 +195,7 @@ Mapper.Initialize(cfg =>
 By default, AutoMapper only recognizes public members. It can map to private setters, but will skip internal/private methods and properties if the entire property is private/internal. To instruct AutoMapper to recognize members with other visibilities, override the default filters ShouldMapField and/or ShouldMapProperty :
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
 {
     // map properties with public or internal getters
     cfg.ShouldMapProperty = p => p.GetMethod.IsPublic || p.GetMethod.IsAssembly;
@@ -212,20 +210,8 @@ Map configurations will now recognize internal/private members.
 Because expression compilation can be a bit resource intensive, AutoMapper lazily compiles the type map plans on first map. However, this behavior is not always desirable, so you can tell AutoMapper to compile its mappings directly:
 
 ```c#
-Mapper.Initialize(cfg => {});
-Mapper.Configuration.CompileMappings();
+var configuration = new MapperConfiguration(cfg => {});
+configuration.CompileMappings();
 ```
 
 For a few hundred mappings, this may take a couple of seconds.
-
-## Resetting static mapping configuration
-
-The static `Mapper.Initialize` is intended to be called only once. To reset the static mapping configuration (for example, at the start of tests):
-
-```c#
-Mapper.Reset();
-
-Mapper.Initialize(cfg => { /* configure again */ });
-```
-
-`Reset` should not be used in production code. It is intended to support testing scenarios only.
