@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="PreBuild.bat 8.0.0" />
+    <Exec Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(VersionPrefix)" />
   </Target>
 
 </Project>
