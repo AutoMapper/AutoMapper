@@ -40,7 +40,7 @@ or marker types:
 services.AddAutoMapper(type1, type2 /*, ...*/);
 ```
 
-(You can get the object's type by using either `typeof(TypeFromAssemblyA)` or `TypeFromAssemblyA.GetType()` where `TypeFromAssemblyA` is any type of object you want to use). A concrete example would be:
+You can get the object's type by using either `typeof(TypeFromAssemblyA)` or `TypeFromAssemblyA.GetType()` where `TypeFromAssemblyA` is any type of object you want to use. A concrete example would be:
 ```c#
 services.AddAutoMapper(typeof(TypeFromAssemblyA), typeof(TypeFromAssemblyB) /*, ...*/);
 ```
