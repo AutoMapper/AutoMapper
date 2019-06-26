@@ -28,7 +28,7 @@ public class OrderLineDTO
   public decimal Quantity { get; set; }
 }
 
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
 {
   cfg.CreateMap<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name));
@@ -43,7 +43,7 @@ When mapping from DTO Expression
 
 ```c#
 Expression<Func<OrderLineDTO, bool>> dtoExpression = dto=> dto.Item.StartsWith("A");
-var expression = Mapper.Map<Expression<Func<OrderLine, bool>>>(dtoExpression);
+var expression = mapper.Map<Expression<Func<OrderLine, bool>>>(dtoExpression);
 ```
 
 Expression will be translated to `ol => ol.Item.Name.StartsWith("A")`
@@ -54,7 +54,7 @@ Expression translation can work on expressions of collections as well.
 
 ```c#
 Expression<Func<IQueryable<OrderLineDTO>,IQueryable<OrderLineDTO>>> dtoExpression = dtos => dtos.Where(dto => dto.Quantity > 5).OrderBy(dto => dto.Quantity);
-var expression = Mapper.Map<Expression<Func<IQueryable<OrderLine>,IQueryable<OrderLine>>>(dtoExpression);
+var expression = mapper.Map<Expression<Func<IQueryable<OrderLine>,IQueryable<OrderLine>>>(dtoExpression);
 ```
 
 Resulting in `ols => ols.Where(ol => ol.Quantity > 5).OrderBy(ol => ol.Quantity)`
@@ -118,7 +118,7 @@ Does the equivalent of
 
 ### When ProjectTo() is not called
 
-Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes return type, then `ProjectTo<>()` won't be called and value with be returned instead using `Mapper.Map`.
+Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes return type, then `ProjectTo<>()` won't be called and value with be returned instead using `mapper.Map`.
 
 Example:
 
@@ -134,7 +134,7 @@ Sometimes, you may want to edit the collection, that is returned from a mapped q
 With `.ProjectTo<TDto>` this is quite simple, as there is no sense in directly returning the resulting `IQueryable<TDto>` because you cannot edit it anymore anyways. So you will most likely do this:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
     cfg.CreateMap<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
 
@@ -158,7 +158,7 @@ To solve that problem, we introduced the `.OnEnumerated` callback.
 Using it, you can do the following:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
     cfg.CreateMap<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
 

@@ -16,10 +16,10 @@ public class Destination
 ```
 In the Destination type, we probably fat-fingered the destination property.  Other typical issues are source member renames.  To test our configuration, we simply create a unit test that sets up the configuration and executes the AssertConfigurationIsValid method:
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
   cfg.CreateMap<Source, Destination>());
 
-Mapper.Configuration.AssertConfigurationIsValid();
+configuration.AssertConfigurationIsValid();
 ```
 Executing this code produces an AutoMapperConfigurationException, with a descriptive message.  AutoMapper checks to make sure that *every single* Destination type member has a corresponding type member on the source type.
 
@@ -33,7 +33,7 @@ To fix a configuration error (besides renaming the source/destination members), 
 
 With the third option, we have a member on the destination type that we will fill with alternative means, and not through the Map operation.
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
   cfg.CreateMap<Source, Destination>()
 	.ForMember(dest => dest.SomeValuefff, opt => opt.Ignore())
 );
@@ -44,7 +44,7 @@ Mapper.Initialize(cfg =>
 By default, AutoMapper uses the destination type to validate members. It assumes that all destination members need to be mapped. To modify this behavior, use the `CreateMap` overload to specify which member list to validate against:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
   cfg.CreateMap<Source, Destination>(MemberList.Source);
   cfg.CreateMap<Source2, Destination2>(MemberList.None);
 );

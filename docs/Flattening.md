@@ -86,11 +86,11 @@ order.AddOrderLineItem(bosco, 15);
 
 // Configure AutoMapper
 
-Mapper.Initialize(cfg => cfg.CreateMap<Order, OrderDto>());
+var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto>());
 
 // Perform mapping
 
-OrderDto dto = Mapper.Map<Order, OrderDto>(order);
+OrderDto dto = mapper.Map<Order, OrderDto>(order);
 
 dto.CustomerName.ShouldEqual("George Costanza");
 dto.Total.ShouldEqual(74.85m);

@@ -15,7 +15,7 @@ public class SourceDto {
         get { return _value; }
     }
 }
-Mapper.Initialize(cfg => cfg.CreateMap<Source, SourceDto>());
+var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Source, SourceDto>());
 ```
 
 If the destination constructor parameter names don't match, you can modify them at config time:
@@ -33,7 +33,7 @@ public class SourceDto {
         get { return _value; }
     }
 }
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
   cfg.CreateMap<Source, SourceDto>()
     .ForCtorParam("valueParamSomeOtherName", opt => opt.MapFrom(src => src.Value))
 );
@@ -44,12 +44,12 @@ This works for both LINQ projections and in-memory mapping.
 You can also disable constructor mapping:    
 
 ```c#
-Mapper.Initialize(cfg => cfg.DisableConstructorMapping());
+var configuration = new MapperConfiguration(cfg => cfg.DisableConstructorMapping());
 ```
 
 You can configure which constructors are considered for the destination object:
 
 ```c#
 // don't map private constructors
-Mapper.Initialize(cfg => cfg.ShouldUseConstructor = ci => !ci.IsPrivate);
+var configuration = new MapperConfiguration(cfg => cfg.ShouldUseConstructor = ci => !ci.IsPrivate);
 ```

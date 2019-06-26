@@ -17,7 +17,7 @@ In simplified syntax:
          => source.ToString("c");
  }
 
- Mapper.Initialize(cfg => {
+ var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap<Order, OrderDto>()
         .ForMember(d => d.Amount, opt => opt.ConvertUsing(new CurrencyFormatter()));
     cfg.CreateMap<OrderLineItem, OrderLineItemDto>()
@@ -33,7 +33,7 @@ You can customize the source member when the source member name does not match:
          => source.ToString("c");
  }
 
- Mapper.Initialize(cfg => {
+ var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap<Order, OrderDto>()
         .ForMember(d => d.Amount, opt => opt.ConvertUsing(new CurrencyFormatter(), src => src.OrderAmount));
     cfg.CreateMap<OrderLineItem, OrderLineItemDto>()
@@ -49,7 +49,7 @@ If you need the value converters instantiated by the [service locator](Dependenc
          => source.ToString("c");
  }
 
- Mapper.Initialize(cfg => {
+ var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap<Order, OrderDto>()
         .ForMember(d => d.Amount, opt => opt.ConvertUsing<CurrencyFormatter, decimal>());
     cfg.CreateMap<OrderLineItem, OrderLineItemDto>()
@@ -65,7 +65,7 @@ If you do not know the types or member names at runtime, use the various overloa
          => source.ToString("c");
  }
 
- Mapper.Initialize(cfg => {
+ var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap(typeof(Order), typeof(OrderDto))
         .ForMember("Amount", opt => opt.ConvertUsing(new CurrencyFormatter(), "OrderAmount"));
     cfg.CreateMap(typeof(OrderLineItem), typeof(OrderLineItemDto))

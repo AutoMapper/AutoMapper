@@ -14,23 +14,19 @@ First, you need both a source and destination type to work with.  The destinatio
 
 AutoMapper will ignore null reference exceptions when mapping your source to your target. This is by design. If you don't like this approach, you can combine AutoMapper's approach with [custom value resolvers](Custom-value-resolvers.html) if needed.
 
-Once you have your types you can create a map for the two types using a `MapperConfiguration` or the static `Mapper` instance and CreateMap. You only need one `MapperConfiguration` instance typically per AppDomain and should be instantiated during startup. Alternatively, you can just use `Mapper.Initialize` (more examples of initial setup see in [Static-and-Instance-API](Static-and-Instance-API.html).
+Once you have your types you can create a map for the two types using a `MapperConfiguration` and CreateMap. You only need one `MapperConfiguration` instance typically per AppDomain and should be instantiated during startup. More examples of initial setup see in [Setup](Setup.html).
 
 ```c#
-Mapper.Initialize(cfg => cfg.CreateMap<Order, OrderDto>());
-//or
 var config = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto>());
 ```
 
-The type on the left is the source type, and the type on the right is the destination type.  To perform a mapping, use the static or instance Mapper methods, depending on [static or instance initialization](Static-and-Instance-API.html):
+The type on the left is the source type, and the type on the right is the destination type.  To perform a mapping, call one of the `Map` overloads:
 
 ```c#
 var mapper = config.CreateMapper();
 // or
 var mapper = new Mapper(config);
 OrderDto dto = mapper.Map<OrderDto>(order);
-// or
-OrderDto dto = Mapper.Map<OrderDto>(order);
 ```
 
 Most applications can use dependency injection to inject the created `IMapper` instance.
@@ -39,7 +35,7 @@ AutoMapper also has non-generic versions of these methods, for those cases where
 
 ## Where do I configure AutoMapper?
 
-If you're using the static Mapper method, configuration should only happen once per AppDomain.  That means the best place to put the configuration code is in application startup, such as the Global.asax file for ASP.NET applications.  Typically, the configuration bootstrapper class is in its own class, and this bootstrapper class is called from the startup method. The bootstrapper class should call Mapper.Initialize to configure the type maps.
+Configuration should only happen once per AppDomain.  That means the best place to put the configuration code is in application startup, such as the Global.asax file for ASP.NET applications.  Typically, the configuration bootstrapper class is in its own class, and this bootstrapper class is called from the startup method. The bootstrapper class should construct a `MapperConfiguration` object to configure the type maps.
 
 For ASP.NET Core the [Dependency Injection](Dependency-injection.html#asp-net-core) article shows how to configure AutoMapper in your application.
 

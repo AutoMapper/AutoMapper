@@ -28,8 +28,8 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Getting-started
    5.0-Upgrade-Guide
    8.0-Upgrade-Guide
-   Static-and-Instance-API
-   Conventions
+   9.0-Upgrade-Guide
+   Setup
    Understanding-your-mapping
    The-MyGet-build
 
@@ -43,7 +43,6 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Reverse-Mapping-and-Unflattening
    Projection
    Configuration-validation
-   Inline-Mapping
    Lists-and-arrays
    Nested-mappings
    Custom-type-converters

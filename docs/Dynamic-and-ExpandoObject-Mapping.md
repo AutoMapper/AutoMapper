@@ -11,13 +11,13 @@ dynamic foo = new MyDynamicObject();
 foo.Bar = 5;
 foo.Baz = 6;
 
-Mapper.Initialize(cfg => {});
+var configuration = new MapperConfiguration(cfg => {});
 
-var result = Mapper.Map<Foo>(foo);
+var result = mapper.Map<Foo>(foo);
 result.Bar.ShouldEqual(5);
 result.Baz.ShouldEqual(6);
 
-dynamic foo2 = Mapper.Map<MyDynamicObject>(result);
+dynamic foo2 = mapper.Map<MyDynamicObject>(result);
 foo2.Bar.ShouldEqual(5);
 foo2.Baz.ShouldEqual(6);
 ```
