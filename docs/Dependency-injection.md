@@ -39,6 +39,12 @@ or marker types:
 ```c#
 services.AddAutoMapper(type1, type2 /*, ...*/);
 ```
+
+(You can get the object's type by using either `typeof(YourObject)` or `YourObject.GetType()` where `YourObject` is any type of object you want to use). A concrete example would be:
+```c#
+services.AddAutoMapper(typeof(YourObject), typeof(YourObjectDto) /*, ...*/);
+```
+
 Now you can inject AutoMapper at runtime into your services/controllers:
 ```c#
 public class EmployeesController {
