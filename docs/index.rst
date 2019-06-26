@@ -32,6 +32,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Setup
    Understanding-your-mapping
    The-MyGet-build
+   API-Changes
 
 .. _feature-docs:
 
