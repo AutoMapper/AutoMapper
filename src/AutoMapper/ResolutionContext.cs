@@ -29,7 +29,14 @@ namespace AutoMapper
         /// <summary>
         /// Context items from <see cref="Options"/>
         /// </summary>
-        public IDictionary<string, object> Items => Options.Items;
+        public IDictionary<string, object> Items
+        {
+            get
+            {
+                CheckDefault();
+                return Options.Items;
+            }
+        }
 
         /// <summary>
         /// Current mapper
@@ -202,7 +209,7 @@ namespace AutoMapper
         {
             if (IsDefault)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("You must use a Map overload that takes Action<IMappingOperationOptions>!");
             }
         }
     }
