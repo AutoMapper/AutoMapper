@@ -6,6 +6,7 @@ namespace AutoMapper.UnitTests
     namespace ContextItems
     {
         using Shouldly;
+        using System;
         using Xunit;
 
         public class When_mapping_with_contextual_values
@@ -40,6 +41,36 @@ namespace AutoMapper.UnitTests
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => { opt.Items["Item"] = 10; });
 
                 dest.Value.ShouldBe(15);
+            }
+        }
+
+        public class When_mapping_with_contextual_values_wrong_overload : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public int Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.MapFrom((src, d, member, ctxt) => { ctxt.Items["Item"] = 2; return -1; }));
+            });
+
+            [Fact]
+            public void Should_report_error()
+            {
+                new Action(() => Mapper.Map<Source, Dest>(new Source { Value = 5 })).ShouldThrowException<AutoMapperMappingException>(ex =>
+                {
+                    var inner = ex.InnerException;
+                    inner.ShouldBeOfType<InvalidOperationException>();
+                    inner.Message.ShouldBe("You must use a Map overload that takes Action<IMappingOperationOptions>!");
+                });
             }
         }
 
