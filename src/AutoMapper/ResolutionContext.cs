@@ -211,20 +211,20 @@ namespace AutoMapper
     {
         public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
-
-        private readonly object _source;
         private readonly Type _destinationType;
 
         public ContextCacheKey(object source, Type destinationType)
         {
-            _source = source;
+            Source = source;
             _destinationType = destinationType;
         }
 
-        public override int GetHashCode() => HashCodeCombiner.Combine(_source, _destinationType);
+        public object Source { get; }
+
+        public override int GetHashCode() => HashCodeCombiner.Combine(Source, _destinationType);
 
         public bool Equals(ContextCacheKey other) =>
-            _source == other._source && _destinationType == other._destinationType;
+            Source == other.Source && _destinationType == other._destinationType;
 
         public override bool Equals(object other) => 
             other is ContextCacheKey && Equals((ContextCacheKey)other);
