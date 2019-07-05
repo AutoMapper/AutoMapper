@@ -57,7 +57,7 @@ namespace AutoMapper.Internal
             var breakLabel = Label("LoopBreak");
 
             Expression disposeCall;
-            if (enumeratorType.GetInterface("System.IDisposable", true) == null)
+            if (!typeof(IDisposable).IsAssignableFrom(enumeratorType))
             {
                 // Try to dispose at runtime
                 var disposableVar = Variable(typeof(IDisposable), "disposable");
