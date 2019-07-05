@@ -56,54 +56,40 @@ namespace AutoMapper.Internal
 
             var breakLabel = Label("LoopBreak");
 
-            if (enumeratorType.GetInterface("System.IDisposable", true) != null)
+            Expression disposeCall;
+            if (enumeratorType.GetInterface("System.IDisposable", true) == null)
             {
-                // always dispose
-                var loop = Block(new[] { enumeratorVar },
-                    enumeratorAssign,
-                    TryFinally(
-                        Loop(
-                            IfThenElse(
-                                Equal(moveNextCall, Constant(true)),
-                                Block(new[] { loopVar },
-                                    Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
-                                    loopContent
-                                ),
-                                Break(breakLabel)
-                            ),
-                            breakLabel),
-                        Call(enumeratorVar, enumeratorVar.Type.GetInheritedMethod(nameof(IDisposable.Dispose))))
-                );
-
-                return loop;
-            }
-            else
-            {
-                // Dispose at runtime
+                // Try to dispose at runtime
                 var disposableVar = Variable(typeof(IDisposable), "disposable");
-                Expression tryDisposeCall = Block(new[] { disposableVar },
+                disposeCall = Block(new[] { disposableVar },
                     Assign(disposableVar, TypeAs(enumeratorVar, typeof(IDisposable))),
                     IfThen(NotEqual(disposableVar, Constant(null, typeof(object))),
                         Call(disposableVar, disposableVar.Type.GetInheritedMethod(nameof(IDisposable.Dispose)))));
 
-                var loop = Block(new[] { enumeratorVar },
-                    enumeratorAssign,
-                    TryFinally(
-                        Loop(
-                            IfThenElse(
-                                Equal(moveNextCall, Constant(true)),
-                                Block(new[] { loopVar },
-                                    Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
-                                    loopContent
-                                ),
-                                Break(breakLabel)
-                            ),
-                            breakLabel),
-                        tryDisposeCall)
-                );
-
-                return loop;
             }
+            else
+            {
+                // Always dispose directly
+                disposeCall = Call(enumeratorVar, enumeratorVar.Type.GetInheritedMethod(nameof(IDisposable.Dispose)));
+            }
+
+            var loop = Block(new[] { enumeratorVar },
+                enumeratorAssign,
+                TryFinally(
+                    Loop(
+                        IfThenElse(
+                            Equal(moveNextCall, Constant(true)),
+                            Block(new[] { loopVar },
+                                Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
+                                loopContent
+                            ),
+                            Break(breakLabel)
+                        ),
+                        breakLabel),
+                    disposeCall)
+            );
+
+            return loop;
         }
 
         public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
