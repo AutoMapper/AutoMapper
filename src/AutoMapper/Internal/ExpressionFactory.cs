@@ -56,18 +56,26 @@ namespace AutoMapper.Internal
 
             var breakLabel = Label("LoopBreak");
 
+            var disposableVar = Variable(typeof(IDisposable), "disposable");
+            Expression tryDisposeCall = Block(new[] { disposableVar },
+                Assign(disposableVar, TypeAs(enumeratorVar, typeof(IDisposable))),
+                IfThen(NotEqual(disposableVar, Constant(null, typeof(object))),
+                    Call(disposableVar, disposableVar.Type.GetInheritedMethod(nameof(IDisposable.Dispose)))));
+
             var loop = Block(new[] { enumeratorVar },
                 enumeratorAssign,
-                Loop(
-                    IfThenElse(
-                        Equal(moveNextCall, Constant(true)),
-                        Block(new[] { loopVar },
-                            Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
-                            loopContent
+                TryFinally(
+                    Loop(
+                        IfThenElse(
+                            Equal(moveNextCall, Constant(true)),
+                            Block(new[] { loopVar },
+                                Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
+                                loopContent
+                            ),
+                            Break(breakLabel)
                         ),
-                        Break(breakLabel)
-                    ),
-                breakLabel)
+                        breakLabel),
+                    tryDisposeCall)
             );
 
             return loop;
