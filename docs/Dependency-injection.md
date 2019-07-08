@@ -39,6 +39,12 @@ or marker types:
 ```c#
 services.AddAutoMapper(type1, type2 /*, ...*/);
 ```
+
+You can get the object's type by using either `typeof(TypeFromAssemblyA)` or `TypeFromAssemblyA.GetType()` where `TypeFromAssemblyA` is any type of object you want to use. A concrete example would be:
+```c#
+services.AddAutoMapper(typeof(ProfileTypeFromAssemblyA), typeof(ProfileTypeFromAssemblyB) /*, ...*/);
+```
+
 Now you can inject AutoMapper at runtime into your services/controllers:
 ```c#
 public class EmployeesController {
