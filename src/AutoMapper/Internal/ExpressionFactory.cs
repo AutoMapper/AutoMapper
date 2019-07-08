@@ -23,7 +23,7 @@ namespace AutoMapper.Internal
 
 
         public static MemberExpression MemberAccesses(string members, Expression obj) =>
-            (MemberExpression) ReflectionHelper.GetMemberPath(obj.Type, members).MemberAccesses(obj);
+            (MemberExpression)ReflectionHelper.GetMemberPath(obj.Type, members).MemberAccesses(obj);
 
         public static Expression GetSetter(MemberExpression memberExpression)
         {
@@ -37,11 +37,11 @@ namespace AutoMapper.Internal
 
         public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression) => GetExpressionBodyMethod(expression);
 
-        private static MethodInfo GetExpressionBodyMethod(LambdaExpression expression) => ((MethodCallExpression) expression.Body).Method;
+        private static MethodInfo GetExpressionBodyMethod(LambdaExpression expression) => ((MethodCallExpression)expression.Body).Method;
 
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
-            if(collection.Type.IsArray)
+            if (collection.Type.IsArray)
             {
                 return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
@@ -58,16 +58,17 @@ namespace AutoMapper.Internal
 
             var loop = Block(new[] { enumeratorVar },
                 enumeratorAssign,
-                Loop(
-                    IfThenElse(
-                        Equal(moveNextCall, Constant(true)),
-                        Block(new[] { loopVar },
-                            Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
-                            loopContent
+                Using(enumeratorVar,
+                    Loop(
+                        IfThenElse(
+                            Equal(moveNextCall, Constant(true)),
+                            Block(new[] { loopVar },
+                                Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
+                                loopContent
+                            ),
+                            Break(breakLabel)
                         ),
-                        Break(breakLabel)
-                    ),
-                breakLabel)
+                    breakLabel))
             );
 
             return loop;
@@ -127,12 +128,12 @@ namespace AutoMapper.Internal
             Expression nullConditions = Constant(false);
             do
             {
-                if(target is MemberExpression member)
+                if (target is MemberExpression member)
                 {
                     target = member.Expression;
                     NullCheck();
                 }
-                else if(target is MethodCallExpression methodCall)
+                else if (target is MethodCallExpression methodCall)
                 {
                     var isStatic = methodCall.Method.IsStatic;
                     if (isStatic)
@@ -150,7 +151,7 @@ namespace AutoMapper.Internal
                     }
                     NullCheck();
                 }
-                else if(target?.NodeType == ExpressionType.Parameter)
+                else if (target?.NodeType == ExpressionType.Parameter)
                 {
                     var returnType = Nullable.GetUnderlyingType(destinationType) == expression.Type ? destinationType : expression.Type;
                     var nullCheck = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
@@ -161,15 +162,32 @@ namespace AutoMapper.Internal
                     return expression;
                 }
             }
-            while(true);
+            while (true);
             void NullCheck()
             {
-                if(target == null || target.Type.IsValueType())
+                if (target == null || target.Type.IsValueType())
                 {
                     return;
                 }
                 nullConditions = OrElse(Equal(target, Constant(null, target.Type)), nullConditions);
             }
+        }
+
+        static readonly Expression<Action<IDisposable>> DisposeExpression = disposable => disposable.Dispose();
+
+        public static Expression Using(Expression disposable, Expression body)
+        {
+            Expression disposeCall;
+            if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
+            {
+                disposeCall = DisposeExpression.ReplaceParameters(disposable);
+            }
+            else
+            {
+                var asDisposable = TypeAs(disposable, typeof(IDisposable));
+                disposeCall = IfNullElse(asDisposable, Empty(), DisposeExpression.ReplaceParameters(asDisposable));
+            }
+            return TryFinally(body, disposeCall);
         }
 
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
