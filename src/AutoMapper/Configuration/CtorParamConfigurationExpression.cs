@@ -43,5 +43,10 @@ namespace AutoMapper.Configuration
                 action(parameter);
             }
         }
+
+        public bool CheckCtorParamName(string paramName)
+        {
+            return _ctorParamName == paramName;
+        }
     }
 }

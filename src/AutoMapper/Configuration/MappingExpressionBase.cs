@@ -180,6 +180,8 @@ namespace AutoMapper.Configuration
             MemberConfigurations.FirstOrDefault(m => m.DestinationMember.Name == destinationMember.Name);
 
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
+
+        public IList<ICtorParameterConfiguration> GetCtorParameterConfigs() => CtorParamConfigurations;
     }
 
     public abstract class MappingExpressionBase<TSource, TDestination, TMappingExpression>

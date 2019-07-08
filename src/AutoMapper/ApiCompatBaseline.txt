@@ -1,6 +1,7 @@
 Compat issues with assembly AutoMapper:
 MembersMustExist : Member 'AutoMapper.AutoMapperConfigurationException.PropertyMap.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.AutoMapperConfigurationException.PropertyMap.set(AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.ConstructorMap..ctor(System.Reflection.ConstructorInfo, AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.CtorParamConfigurationExpression<TSource>' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IConfigurationProvider.Features' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IConfigurationProvider.Features.get()' is present in the implementation but not in the contract.
@@ -156,6 +157,7 @@ MembersMustExist : Member 'AutoMapper.Configuration.IProfileConfiguration.Valida
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.SourceExpression' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.GetDestinationExpression()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.IPropertyMapConfiguration.SourceExpression.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.Configuration.ITypeMapConfiguration.GetCtorParameterConfigs()' is present in the implementation but not in the contract.
 MembersMustExist : Member 'AutoMapper.Configuration.MapperConfigurationExpression.AddProfiles(System.Collections.Generic.IEnumerable<System.Reflection.Assembly>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.Configuration.MapperConfigurationExpression.AddProfiles(System.Collections.Generic.IEnumerable<System.String>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.Configuration.MapperConfigurationExpression.AddProfiles(System.Collections.Generic.IEnumerable<System.Type>)' does not exist in the implementation but it does exist in the contract.
@@ -191,4 +193,4 @@ MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.T
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object, System.String[])' does not exist in the implementation but it does exist in the contract.
-Total Issues: 192
+Total Issues: 194

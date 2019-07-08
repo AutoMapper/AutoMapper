@@ -53,14 +53,14 @@ namespace AutoMapper
             if (ctorParameters.Length == 0 || !options.ConstructorMappingEnabled)
                 return false;
 
-            var ctorMap = new ConstructorMap(destCtor, typeMap);
+            var ctorMap = new ConstructorMap(destCtor, typeMap, options);
 
             foreach (var parameter in ctorParameters)
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
                 var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
-                if(!canResolve && parameter.IsOptional)
+                if((!canResolve && parameter.IsOptional) || ctorMap.ContainsCtorParameterConfig(parameter.Name))
                 {
                     canResolve = true;
                 }

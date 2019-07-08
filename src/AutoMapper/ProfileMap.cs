@@ -231,6 +231,20 @@ namespace AutoMapper
                 ApplyDerivedMaps(baseMap, derivedMap, configurationProvider);
             }
         }
+
+        public IList<ICtorParameterConfiguration> GetCtorParameterConfigs(TypeMap typeMap)
+        {
+            var list = new List<ICtorParameterConfiguration>();
+            foreach(var config in _typeMapConfigs.Where(c => c.SourceType == typeMap.SourceType && c.DestinationType == typeMap.DestinationType))
+            {
+                if (!(config is MappingExpressionBase mappingExpression))
+                    continue;
+
+                list.AddRange(mappingExpression.GetCtorParameterConfigs());
+            }
+            return list;
+        }
+
     }
 
     public readonly struct IncludedMember
