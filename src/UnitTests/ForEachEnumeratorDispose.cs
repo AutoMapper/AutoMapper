@@ -6,63 +6,133 @@
     using Shouldly;
     using Xunit;
 
-    public class ForEachEnumeratorDispose : NonValidatingSpecBase
+    public class ForEachEnumeratorDispose : SpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<SourceDest, SourceDest>());
+        public IMapper Mapper => new Mapper(new MapperConfiguration(cfg => cfg.CreateMap<SourceDest, SourceDest>()));
 
         [Fact]
-        public void ForEach_for_nondisposable_should_not_call_Dispose()
+        public void ForEach_for_unknown_nondisposable_class_should_not_call_Dispose()
         {
-            Configuration.CompileMappings();
-
-            SourceDest source = new SourceDest
-            {
-                NondisposableNumbers = new NondisposableCollection()
-            };
+            Collection.IsDisposable = false;
+            Collection.ShouldThrowException = false;
+            Collection.UseStruct = false;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
             Mapper.Map<SourceDest>(source).ShouldNotBeNull();
         }
 
         [Fact]
-        public void ForEach_for_disposable_runtimetype_should_call_Dispose()
+        public void ForEach_for_unknown_disposable_class_should_call_Dispose()
         {
-            Configuration.CompileMappings();
-
-            SourceDest source = new SourceDest
-            {
-                DisposableNumbers = new DisposableCollection()
-            };
+            Collection.IsDisposable = true;
+            Collection.ShouldThrowException = false;
+            Collection.UseStruct = false;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
             Mapper.Map<SourceDest>(source).ShouldNotBeNull();
-
-            source.DisposableNumbers.IsDisposed.ShouldBe(true);
+            source.Numbers.IsDisposed.ShouldBe(true);
         }
 
         [Fact]
-        public void ForEach_for_disposable_type_should_call_Dispose_directly()
+        public void ForEach_for_unknown_disposable_class_should_call_Dispose_despite_of_exception()
         {
-            Configuration.CompileMappings();
+            Collection.IsDisposable = true;
+            Collection.ShouldThrowException = true;
+            Collection.UseStruct = false;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
+            Should.Throw<Exception>(() => Mapper.Map<SourceDest>(source).ShouldNotBeNull());
+            source.Numbers.IsDisposed.ShouldBe(true);
+        }
 
-            SourceDest source = new SourceDest
-            {
-                GenericDisposableNumbers = new GenericDisposableCollection()
-            };
+        [Fact]
+        public void ForEach_for_unknown_nondisposable_struct_should_not_call_Dispose()
+        {
+            Collection.IsDisposable = false;
+            Collection.ShouldThrowException = false;
+            Collection.UseStruct = true;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
             Mapper.Map<SourceDest>(source).ShouldNotBeNull();
+        }
 
-            source.GenericDisposableNumbers.IsDisposed.ShouldBe(true);
+        [Fact]
+        public void ForEach_for_unknown_disposable_struct_should_call_Dispose()
+        {
+            Collection.IsDisposable = true;
+            Collection.ShouldThrowException = false;
+            Collection.UseStruct = true;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
+            Mapper.Map<SourceDest>(source).ShouldNotBeNull();
+            source.Numbers.IsDisposed.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ForEach_for_unknown_disposable_struct_should_call_Dispose_despite_of_exception()
+        {
+            Collection.IsDisposable = true;
+            Collection.ShouldThrowException = true;
+            Collection.UseStruct = true;
+            SourceDest source = new SourceDest { Numbers = new Collection() };
+            Should.Throw<Exception>(() => Mapper.Map<SourceDest>(source).ShouldNotBeNull());
+            source.Numbers.IsDisposed.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ForEach_for_known_disposable_class_should_call_Dispose()
+        {
+            GenericCollection.UseStruct = false;
+            GenericCollection.ShouldThrowException = false;
+            SourceDest source = new SourceDest { GenericNumbers = new GenericCollection() };
+            Mapper.Map<SourceDest>(source).ShouldNotBeNull();
+            source.GenericNumbers.IsDisposed.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ForEach_for_known_disposable_class_should_call_Dispose_despite_of_exception()
+        {
+            GenericCollection.UseStruct = false;
+            GenericCollection.ShouldThrowException = true;
+            SourceDest source = new SourceDest { GenericNumbers = new GenericCollection() };
+            Should.Throw<Exception>(() => Mapper.Map<SourceDest>(source).ShouldNotBeNull());
+            source.GenericNumbers.IsDisposed.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ForEach_for_known_disposable_struct_should_call_Dispose()
+        {
+            GenericCollection.UseStruct = true;
+            GenericCollection.ShouldThrowException = false;
+            SourceDest source = new SourceDest { GenericNumbers = new GenericCollection() };
+            Mapper.Map<SourceDest>(source).ShouldNotBeNull();
+            source.GenericNumbers.IsDisposed.ShouldBe(true);
+        }
+
+        [Fact]
+        public void ForEach_for_known_disposable_struct_should_call_Dispose_despite_of_exception()
+        {
+            GenericCollection.UseStruct = true;
+            GenericCollection.ShouldThrowException = true;
+            SourceDest source = new SourceDest { GenericNumbers = new GenericCollection() };
+            Should.Throw<Exception>(() => Mapper.Map<SourceDest>(source).ShouldNotBeNull());
+            source.GenericNumbers.IsDisposed.ShouldBe(true);
         }
     }
 
     public class SourceDest
     {
-        public NondisposableCollection NondisposableNumbers { get; set; }
+        public Collection Numbers { get; set; }
 
-        public DisposableCollection DisposableNumbers { get; set; }
-
-        public GenericDisposableCollection GenericDisposableNumbers { get; set; }
+        public GenericCollection GenericNumbers { get; set; }
     }
 
-    public class NondisposableCollection : IList
+    public class Collection : IList
     {
-        private class NondisposableEnumerator : IEnumerator
+        public static bool IsDisposable { get; set; }
+
+        public static bool UseStruct { get; set; }
+
+        public static bool ShouldThrowException { get; set; }
+
+        public bool IsDisposed { get; private set; }
+
+        private class NonDisposableEnumerator : IEnumerator
         {
             public bool MoveNext() => false;
 
@@ -71,96 +141,60 @@
             object IEnumerator.Current => null;
         }
 
-        public IEnumerator GetEnumerator()
+        private struct NonDisposableEnumeratorStruct : IEnumerator
         {
-            return new NondisposableEnumerator();
-        }
+            public bool MoveNext() => false;
 
-        public void CopyTo(Array array, int index)
-        {
-            throw new NotImplementedException();
-        }
+            public void Reset() { }
 
-        public int Count
-        {
-            get { throw new NotImplementedException(); }
+            object IEnumerator.Current => null;
         }
-
-        public object SyncRoot
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool IsSynchronized
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public int Add(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Contains(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear()
-        {
-        }
-
-        public int IndexOf(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Insert(int index, object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object this[int index]
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public bool IsReadOnly
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool IsFixedSize
-        {
-            get { throw new NotImplementedException(); }
-        }
-    }
-
-    public class DisposableCollection : IList
-    {
-        public bool IsDisposed { get; private set; }
 
         private class DisposableEnumerator : IEnumerator, IDisposable
         {
-            private readonly DisposableCollection _collection;
+            private readonly Collection _collection;
 
-            public DisposableEnumerator(DisposableCollection collection)
+            public DisposableEnumerator(Collection collection)
             {
                 _collection = collection;
             }
 
-            public bool MoveNext() => false;
+            public bool MoveNext()
+            {
+                if (ShouldThrowException)
+                {
+                    throw new InvalidOperationException();
+                }
+                return false;
+            }
+
+            public void Reset() { }
+
+            object IEnumerator.Current => null;
+
+            public void Dispose()
+            {
+                _collection.IsDisposed = true;
+            }
+        }
+
+        private struct DisposableEnumeratorStruct : IEnumerator, IDisposable
+        {
+            private readonly Collection _collection;
+
+            public DisposableEnumeratorStruct(Collection collection)
+            {
+                _collection = collection;
+            }
+
+            public bool MoveNext()
+            {
+                if (ShouldThrowException)
+                {
+                    throw new InvalidOperationException();
+                }
+                return false;
+            }
 
             public void Reset() { }
 
@@ -174,7 +208,19 @@
 
         public IEnumerator GetEnumerator()
         {
-            return new DisposableEnumerator(this);
+            if (IsDisposable)
+            {
+                if (UseStruct)
+                {
+                    return new DisposableEnumeratorStruct(this);
+                }
+                return new DisposableEnumerator(this);
+            }
+            if (UseStruct)
+            {
+                return new NonDisposableEnumeratorStruct();
+            }
+            return new NonDisposableEnumerator();
         }
 
         public void CopyTo(Array array, int index)
@@ -248,15 +294,19 @@
         }
     }
 
-    public class GenericDisposableCollection : IList<int>
+    public class GenericCollection : IList<int>
     {
+        public static bool UseStruct { get; set; }
+
+        public static bool ShouldThrowException { get; set; }
+
         public bool IsDisposed { get; private set; }
 
         private class GenericDisposableEnumerator : IEnumerator<int>
         {
-            private readonly GenericDisposableCollection _collection;
+            private readonly GenericCollection _collection;
 
-            public GenericDisposableEnumerator(GenericDisposableCollection collection)
+            public GenericDisposableEnumerator(GenericCollection collection)
             {
                 _collection = collection;
             }
@@ -266,7 +316,44 @@
                 _collection.IsDisposed = true;
             }
 
-            public bool MoveNext() => false;
+            public bool MoveNext()
+            {
+                if (ShouldThrowException)
+                {
+                    throw new InvalidOperationException();
+                }
+                return false;
+            }
+
+            public void Reset() { }
+
+            object IEnumerator.Current => Current;
+
+            public int Current => 0;
+        }
+
+        private struct GenericDisposableEnumeratorStruct : IEnumerator<int>
+        {
+            private readonly GenericCollection _collection;
+
+            public GenericDisposableEnumeratorStruct(GenericCollection collection)
+            {
+                _collection = collection;
+            }
+
+            public void Dispose()
+            {
+                _collection.IsDisposed = true;
+            }
+
+            public bool MoveNext()
+            {
+                if (ShouldThrowException)
+                {
+                    throw new InvalidOperationException();
+                }
+                return false;
+            }
 
             public void Reset() { }
 
@@ -282,6 +369,10 @@
 
         public IEnumerator<int> GetEnumerator()
         {
+            if (UseStruct)
+            {
+                return new GenericDisposableEnumeratorStruct(this);
+            }
             return new GenericDisposableEnumerator(this);
         }
 
