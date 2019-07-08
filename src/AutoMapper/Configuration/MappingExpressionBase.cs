@@ -58,7 +58,20 @@ namespace AutoMapper.Configuration
                 }
             }
 
-            foreach(var action in TypeMapActions)
+            var destTypeInfo = typeMap.DestinationTypeDetails;
+            if(!typeMap.DestinationType.IsAbstract())
+            {
+                foreach(var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
+                {
+                    if(typeMap.Profile.MapDestinationCtorToSource(typeMap, destCtor, typeMap.SourceTypeDetails, CtorParamConfigurations))
+                    {
+                        break;
+                    }
+                }
+            }
+
+
+            foreach (var action in TypeMapActions)
             {
                 action(typeMap);
             }
