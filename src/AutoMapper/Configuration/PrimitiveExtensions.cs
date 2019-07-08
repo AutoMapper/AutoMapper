@@ -24,6 +24,9 @@ namespace AutoMapper.Configuration
         public static MethodInfo GetInheritedMethod(this Type type, string name)
             => PrimitiveHelper.GetInheritedMethod(type, name);
 
+        public static IEnumerable<MethodInfo> GetInheritedMethods(this Type type, string name)
+            => PrimitiveHelper.GetInheritedMethods(type, name);
+
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
             => PrimitiveHelper.GetFieldOrProperty(type, name);
 

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -45,13 +46,14 @@ namespace AutoMapper.Internal
             {
                 return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
-            var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
+            List<MethodInfo> getEnumeratorMethods = collection.Type.GetInheritedMethods(nameof(IEnumerable.GetEnumerator)).ToList();
+            var getEnumerator = getEnumeratorMethods.FirstOrDefault(mi => mi.ReturnType.GetGenericInterface(typeof(IEnumerator<>)) != null) ?? getEnumeratorMethods.First();
             var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
-            var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
+            var moveNext = enumeratorType.GetInheritedMethod(nameof(IEnumerator.MoveNext));
             var moveNextCall = Call(enumeratorVar, moveNext);
 
             var breakLabel = Label("LoopBreak");

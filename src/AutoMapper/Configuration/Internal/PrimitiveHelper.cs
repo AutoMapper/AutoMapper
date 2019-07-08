@@ -22,6 +22,9 @@ namespace AutoMapper.Configuration.Internal
         public static MethodInfo GetInheritedMethod(Type type, string name)
             => type.GetInheritedMember(name) as MethodInfo ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
 
+        public static IEnumerable<MethodInfo> GetInheritedMethods(Type type, string name)
+            => type.GetAllMembers().OfType<MethodInfo>().Where(mi => mi.Name == name);
+
         public static MemberInfo GetFieldOrProperty(Type type, string name) 
             => type.GetInheritedMember(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
