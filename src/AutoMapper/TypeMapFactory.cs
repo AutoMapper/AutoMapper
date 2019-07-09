@@ -24,52 +24,52 @@ namespace AutoMapper
                     typeMap.AddPropertyMap(destProperty, resolvers);
                 }
             }
-            if (!destinationType.IsAbstract())
-            {
-                foreach (var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
-                {
-                    if (MapDestinationCtorToSource(typeMap, destCtor, sourceTypeInfo, options))
-                    {
-                        break;
-                    }
-                }
-            }
+            //if (!destinationType.IsAbstract())
+            //{
+            //    foreach (var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
+            //    {
+            //        if (MapDestinationCtorToSource(typeMap, destCtor, sourceTypeInfo, options))
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
             return typeMap;
         }
 
         private bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
-            if(string.IsNullOrEmpty(destMemberInfo))
+            if (string.IsNullOrEmpty(destMemberInfo))
             {
                 return false;
             }
             return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
         }
 
-        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, ProfileMap options)
-        {
-            var ctorParameters = destCtor.GetParameters();
+        //private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, ProfileMap options)
+        //{
+        //    var ctorParameters = destCtor.GetParameters();
 
-            if (ctorParameters.Length == 0 || !options.ConstructorMappingEnabled)
-                return false;
+        //    if (ctorParameters.Length == 0 || !options.ConstructorMappingEnabled)
+        //        return false;
 
-            var ctorMap = new ConstructorMap(destCtor, typeMap, options);
+        //    var ctorMap = new ConstructorMap(destCtor, typeMap, options);
 
-            foreach (var parameter in ctorParameters)
-            {
-                var resolvers = new LinkedList<MemberInfo>();
+        //    foreach (var parameter in ctorParameters)
+        //    {
+        //        var resolvers = new LinkedList<MemberInfo>();
 
-                var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
-                if((!canResolve && parameter.IsOptional) || ctorMap.ContainsCtorParameterConfig(parameter.Name))
-                {
-                    canResolve = true;
-                }
-                ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
-            }
+        //        var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
+        //        if((!canResolve && parameter.IsOptional) || ctorMap.ContainsCtorParameterConfig(parameter.Name))
+        //        {
+        //            canResolve = true;
+        //        }
+        //        ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
+        //    }
 
-            typeMap.ConstructorMap = ctorMap;
+        //    typeMap.ConstructorMap = ctorMap;
 
-            return ctorMap.CanResolve;
-        }
+        //    return ctorMap.CanResolve;
+        //}
     }
 }

@@ -15,17 +15,15 @@ namespace AutoMapper
     public class ConstructorMap
     {
         private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
-        private readonly IList<ICtorParameterConfiguration> _ctorConfigs = new List<ICtorParameterConfiguration>();
 
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
         public IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
 
-        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap, ProfileMap options)
+        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
             Ctor = ctor;
             TypeMap = typeMap;
-            _ctorConfigs = options.GetCtorParameterConfigs(typeMap);
         }
 
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
@@ -56,11 +54,6 @@ namespace AutoMapper
         public void AddParameter(ParameterInfo parameter, MemberInfo[] resolvers, bool canResolve)
         {
             _ctorParams.Add(new ConstructorParameterMap(TypeMap, parameter, resolvers, canResolve));
-        }
-
-        public bool ContainsCtorParameterConfig(string paramName)
-        {
-            return _ctorConfigs.Any(c => c.CheckCtorParamName(paramName));
         }
     }
 }

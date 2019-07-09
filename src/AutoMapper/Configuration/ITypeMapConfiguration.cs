@@ -6,7 +6,6 @@ namespace AutoMapper.Configuration
     public interface ITypeMapConfiguration
     {
         void Configure(TypeMap typeMap);
-        IList<ICtorParameterConfiguration> GetCtorParameterConfigs();
         Type SourceType { get; }
         Type DestinationType { get; }
         bool IsOpenGeneric { get; }
