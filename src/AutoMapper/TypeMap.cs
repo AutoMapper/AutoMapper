@@ -270,14 +270,14 @@ namespace AutoMapper
             }
             _sealed = true;
 
-            foreach (var inheritedTypeMap in _inheritedTypeMaps)
-            {
-                ApplyInheritedTypeMap(inheritedTypeMap);
-            }
-            foreach(var includedMemberTypeMap in _includedMembersTypeMaps)
+            foreach (var includedMemberTypeMap in _includedMembersTypeMaps)
             {
                 includedMemberTypeMap.TypeMap.Seal(configurationProvider);
                 ApplyIncludedMemberTypeMap(includedMemberTypeMap);
+            }
+            foreach (var inheritedTypeMap in _inheritedTypeMaps)
+            {
+                ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
             _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();

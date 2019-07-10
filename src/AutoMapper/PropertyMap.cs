@@ -93,8 +93,7 @@ namespace AutoMapper
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
-            CustomSource = CustomSource ?? inheritedMappedProperty.CustomSource;
-            _memberChain = inheritedMappedProperty._memberChain;
+            _memberChain = _memberChain.Count == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }
 
         public override bool CanResolveValue => HasSource && !Ignored;
