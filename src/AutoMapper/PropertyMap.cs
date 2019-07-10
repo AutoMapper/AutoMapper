@@ -14,7 +14,7 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationMember.Name}")]
     public class PropertyMap : DefaultMemberMap
     {
-        private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
+        private List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
@@ -34,7 +34,7 @@ namespace AutoMapper
             CustomSource = expression;
             if(includedMemberMap._memberChain.Count > 0)
             {
-                ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
+                _memberChain = expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain).ToList();
             }
             CustomMapExpression = CheckCustomSource(CustomMapExpression);
         }
@@ -93,6 +93,8 @@ namespace AutoMapper
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
+            CustomSource = CustomSource ?? inheritedMappedProperty.CustomSource;
+            _memberChain = inheritedMappedProperty._memberChain;
         }
 
         public override bool CanResolveValue => HasSource && !Ignored;
