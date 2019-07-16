@@ -377,15 +377,8 @@ namespace AutoMapper.Execution
             return TryCatch(memberMapExpression,
                 MakeCatchBlock(typeof(Exception), exception,
                     Block(
-                        Throw(
-                            New(mappingExceptionCtor,
-                                Constant("Error mapping types."),
-                                exception,
-                                Constant(memberMap.TypeMap.Types),
-                                Constant(memberMap.TypeMap),
-                                Constant(memberMap)
-                            )
-                        ),
+                        Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
+                            Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap))),
                         Default(memberMapExpression.Type))
                     , null));
         }
