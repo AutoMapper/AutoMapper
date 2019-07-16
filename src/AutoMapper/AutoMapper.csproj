@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ResolvedMatchingContract Include="..\LastMajorVersionBinary\AutoMapper.dll" />
+    <ResolvedMatchingContract Include="LastMajorVersionBinary\AutoMapper.dll" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -42,5 +43,8 @@
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(VersionPrefix)" />
   </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FastExpressionCompiler\src\FastExpressionCompiler\FastExpressionCompiler.csproj" />
+  </ItemGroup>
 
 </Project>

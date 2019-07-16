@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Bug
                     srcParam
                 );
 
-                var compiled = expression.CompileFast();
+                var compiled = expression.CompileFast(true);
 
                 var src = new Source();
                 var dest = compiled(src);
@@ -187,27 +187,6 @@ namespace AutoMapper.UnitTests.Bug
             public Status? Status { get; set; }
         }
 
-
-        [Fact]
-        public void ShouldMapSharedNullableEnum()
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<OrderWithNullableStatus, OrderDtoWithNullableStatus>());
-
-            var order = new OrderWithNullableStatus
-            {
-                Status = Status.InProgress
-            };
-
-            var mapper = config.CreateMapper();
-
-            var expression =
-                config.BuildExecutionPlan(typeof(OrderWithNullableStatus), typeof(OrderDtoWithNullableStatus));
-
-            var dto = mapper.Map<OrderWithNullableStatus, OrderDtoWithNullableStatus>(order);
-
-            dto.Status.ShouldBe(Status.InProgress);
-        }
-
         [Fact]
         public void ShouldAlsoWork()
         {
@@ -219,15 +198,18 @@ namespace AutoMapper.UnitTests.Bug
             var expression = Lambda<Func<OrderWithNullableStatus, OrderDtoWithNullableStatus>>(
                 Block(typeof(OrderDtoWithNullableStatus), new[] { destParam, resolvedValueParam, propertyValueParam },
                     Assign(destParam, New(typeof(OrderDtoWithNullableStatus).GetConstructors()[0])),
-                    Assign(resolvedValueParam, Condition(Equal(srcParam, Constant(null)), Default(typeof(Status?)), Property(srcParam, "Status"))),
-                    Assign(propertyValueParam, resolvedValueParam),
+                    Assign(resolvedValueParam, Property(srcParam, "Status")),
+                    Assign(propertyValueParam, Condition(
+                        Equal(resolvedValueParam, Constant(null)),
+                        Default(typeof(Status?)),
+                        Convert(Property(resolvedValueParam, "Value"), typeof(Status?)))),
                     Assign(Property(destParam, "Status"), propertyValueParam),
                     destParam
                 ),
                 srcParam
             );
 
-            var compiled = expression.CompileFast();
+            var compiled = expression.CompileFast(true);
 
             var src = new OrderWithNullableStatus
             {
@@ -239,7 +221,5 @@ namespace AutoMapper.UnitTests.Bug
             dest.ShouldNotBeNull();
             dest.Status.ShouldBe(Status.InProgress);
         }
-
-
     }
 }
