@@ -13,7 +13,7 @@ class Bar {
 }
 ```
 
-In the following mapping the property baz will only be mapped if it is greater than or equal to 0 in the source object.  Note - with a normal Condition, AutoMapper will still map the destination value, and then discard it if the condition is not met.  If you want to avoid a (potentially) expensive resolution process, use a PreCondition as described below.
+In the following mapping the property baz will only be mapped if it is greater than or equal to 0 in the source object.
 
 ```c#
 var configuration = new MapperConfiguration(cfg => {
@@ -21,7 +21,8 @@ var configuration = new MapperConfiguration(cfg => {
     .ForMember(dest => dest.baz, opt => opt.Condition(src => (src.baz >= 0)));
 });
 ```
-
+If you have a resolver, see [here](Custom-value-resolvers.html#resolvers-and-conditions) for a concrete example.
+  
 ## Preconditions
 
 Similarly, there is a PreCondition method. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned.
