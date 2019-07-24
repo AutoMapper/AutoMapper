@@ -21,10 +21,23 @@ var configuration = new MapperConfiguration(cfg => {
     .ForMember(dest => dest.baz, opt => opt.Condition(src => (src.baz >= 0)));
 });
 ```
-
+If you have a resolver, see [here](Custom-value-resolvers.html#resolvers-and-conditions) for a concrete example.
+  
 ## Preconditions
 
 Similarly, there is a PreCondition method. The difference is that it runs sooner in the mapping process, before the source value is resolved (think MapFrom). So the precondition is called, then we decide which will be the source of the mapping (resolving), then the condition is called and finally the destination value is assigned.
+
+```c#
+var configuration = new MapperConfiguration(cfg => {
+  cfg.CreateMap<Foo,Bar>()
+    .ForMember(dest => dest.baz, opt => {
+        opt.PreCondition(src => (src.baz >= 0));
+        opt.MapFrom(src => {
+            // Expensive resolution proccess that can be avoided with a PreCondition
+        });
+    });
+});
+```
 
 You can [see the steps](Understanding-your-mapping.html) yourself.
 
