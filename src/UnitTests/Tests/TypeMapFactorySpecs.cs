@@ -33,8 +33,6 @@ namespace AutoMapper.UnitTests.Tests
 
     public class When_constructing_type_maps_with_matching_property_names : SpecBase
     {
-        private TypeMapFactory _factory;
-
         public class Source
         {
             public int Value { get; set; }
@@ -45,11 +43,6 @@ namespace AutoMapper.UnitTests.Tests
         {
             public int Value { get; set; }
             public int SomeOtherValue { get; set; }
-        }
-
-        protected override void Establish_context()
-        {
-            _factory = new TypeMapFactory();
         }
 
         private class TestProfile : Profile
@@ -65,7 +58,7 @@ namespace AutoMapper.UnitTests.Tests
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             var profile = new ProfileMap(mappingOptions);
 
-            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), profile);
+            var typeMap = TypeMapFactory.CreateTypeMap(typeof(Source), typeof(Destination), profile);
 
             var propertyMaps = typeMap.PropertyMaps;
 
@@ -75,7 +68,6 @@ namespace AutoMapper.UnitTests.Tests
 
     public class When_using_a_custom_source_naming_convention : SpecBase
     {
-        private TypeMapFactory _factory;
         private TypeMap _map;
         private ProfileMap _mappingOptions;
         
@@ -109,14 +101,11 @@ namespace AutoMapper.UnitTests.Tests
                 _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             });
             _mappingOptions = new ProfileMap(profile);
-
-            _factory = new TypeMapFactory();
-
         }
 
         protected override void Because_of()
         {
-            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+            _map = TypeMapFactory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
         }
 
         [Fact]
@@ -128,7 +117,6 @@ namespace AutoMapper.UnitTests.Tests
 
     public class When_using_a_custom_destination_naming_convention : SpecBase
     {
-        private TypeMapFactory _factory;
         private TypeMap _map;
         private ProfileMap _mappingOptions;
 
@@ -163,13 +151,11 @@ namespace AutoMapper.UnitTests.Tests
                 _.DestinationMemberNamingConvention = namingConvention;
             });
             _mappingOptions = new ProfileMap(profile);
-
-            _factory = new TypeMapFactory();
         }
 
         protected override void Because_of()
         {
-            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+            _map = TypeMapFactory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
         }
 
         [Fact]
@@ -181,8 +167,6 @@ namespace AutoMapper.UnitTests.Tests
 
     public class When_using_a_source_member_name_replacer : SpecBase
     {
-        private TypeMapFactory _factory;
-
         public class Source
         {
             public int Value { get; set; }
@@ -195,11 +179,6 @@ namespace AutoMapper.UnitTests.Tests
             public int Value { get; set; }
             public int Aviator { get; set; }
             public int SubAirlineFlight { get; set; }
-        }
-
-        protected override void Establish_context()
-        {
-            _factory = new TypeMapFactory();
         }
 
         [Fact]

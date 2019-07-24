@@ -139,6 +139,9 @@ MembersMustExist : Member 'AutoMapper.TypeMap.AddInheritedMap(AutoMapper.TypeMap
 MembersMustExist : Member 'AutoMapper.TypeMap.GetExistingPropertyMapFor(System.Reflection.MemberInfo)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.TypeMap.IsConventionMap.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.TypeMap.IsConventionMap.set(System.Boolean)' does not exist in the implementation but it does exist in the contract.
+CannotMakeTypeAbstract : Type 'AutoMapper.TypeMapFactory' is abstract in the implementation but is not abstract in the contract.
+CannotSealType : Type 'AutoMapper.TypeMapFactory' is actually (has the sealed modifier) sealed in the implementation but not sealed in the contract.
+MembersMustExist : Member 'AutoMapper.TypeMapFactory..ctor()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.ValidationContext..ctor(AutoMapper.TypePair, AutoMapper.PropertyMap, AutoMapper.IObjectMapper)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.ValidationContext..ctor(AutoMapper.TypePair, AutoMapper.PropertyMap, AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.ValidationContext.PropertyMap.get()' does not exist in the implementation but it does exist in the contract.
@@ -191,4 +194,4 @@ MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.T
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Collections.Generic.IDictionary<System.String, System.Object>, System.Linq.Expressions.Expression<System.Func<TResult, System.Object>>[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.ProjectionExpression.To<TResult>(System.Object, System.String[])' does not exist in the implementation but it does exist in the contract.
-Total Issues: 192
+Total Issues: 195

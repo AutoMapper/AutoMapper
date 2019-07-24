@@ -12,7 +12,6 @@ namespace AutoMapper
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
-        private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
         private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
         private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
@@ -119,7 +118,7 @@ namespace AutoMapper
 
         private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
         {
-            var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
+            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
 
             config.Configure(typeMap);
 
@@ -162,7 +161,7 @@ namespace AutoMapper
 
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IConfigurationProvider configurationProvider)
         {
-            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
+            var closedMap = TypeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
             closedMap.IsClosedGeneric = true;
             openMapConfig.Configure(closedMap);
 
@@ -231,6 +230,42 @@ namespace AutoMapper
                 ApplyDerivedMaps(baseMap, derivedMap, configurationProvider);
             }
         }
+
+        public bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, List<ICtorParameterConfiguration> ctorParamConfigurations)
+        {
+            var ctorParameters = destCtor.GetParameters();
+
+            if (ctorParameters.Length == 0 || !ConstructorMappingEnabled)
+                return false;
+
+            var ctorMap = new ConstructorMap(destCtor, typeMap);
+
+            foreach (var parameter in ctorParameters)
+            {
+                var resolvers = new LinkedList<MemberInfo>();
+
+                var canResolve = MapDestinationPropertyToSource(sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
+                if ((!canResolve && parameter.IsOptional) || ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name))
+                {
+                    canResolve = true;
+                }
+                ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
+            }
+
+            typeMap.ConstructorMap = ctorMap;
+
+            return ctorMap.CanResolve;
+        }
+
+        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members)
+        {
+            if (string.IsNullOrEmpty(destMemberInfo))
+            {
+                return false;
+            }
+            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
+        }
+
     }
 
     public readonly struct IncludedMember
