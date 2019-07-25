@@ -10,21 +10,21 @@ using System.Reflection;
 
 namespace AutoMapper.UnitTests
 {
-    public class Enumerator_non_disposable_class : AutoMapperSpecBase
+    public class Enumerator_disposable_at_runtime_class : AutoMapperSpecBase
     {
         class CustomList<T> : List<T>
         {
             private CustomEnumerator _enumerator;
 
-            public new CustomEnumerator GetEnumerator()
+            public new EnumeratorBase GetEnumerator()
             {
                 _enumerator = new CustomEnumerator(base.GetEnumerator(), this);
                 return _enumerator;
             }
             public bool Disposed { get; set; }
-            public class CustomEnumerator
+            public class EnumeratorBase
             {
-                public CustomEnumerator(IEnumerator<T> enumerator, CustomList<T> list)
+                public EnumeratorBase(IEnumerator<T> enumerator, CustomList<T> list)
                 {
                     Enumerator = enumerator;
                     List = list;
@@ -40,16 +40,20 @@ namespace AutoMapper.UnitTests
                 public bool MoveNext() => Enumerator.MoveNext();
                 public void Reset() => Enumerator.Reset();
             }
+            public class CustomEnumerator : EnumeratorBase, IDisposable
+            {
+                public CustomEnumerator(IEnumerator<T> enumerator, CustomList<T> list) : base(enumerator, list) { }
+            }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(_ => { });
 
         [Fact]
-        public void Should_not_call_dispose()
+        public void Should_call_dispose()
         {
             var source = new CustomList<int>();
             Mapper.Map<List<int>>(source);
-            source.Disposed.ShouldBeFalse();
+            source.Disposed.ShouldBeTrue();
         }
     }
     public class Enumerator_non_disposable_struct : AutoMapperSpecBase
