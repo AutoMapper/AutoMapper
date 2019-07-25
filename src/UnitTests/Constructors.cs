@@ -46,6 +46,24 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBeNull();
     }
+    public class Nullable_enum_default_value_not_null : AutoMapperSpecBase
+    {
+        public class Source
+        {
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; }
+            public Target(TargetEnum? Enum = TargetEnum.B)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBe(TargetEnum.B);
+    }
     public class Dynamic_constructor_mapping : AutoMapperSpecBase
     {
         public class ParentDTO<T>
