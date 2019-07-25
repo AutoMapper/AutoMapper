@@ -8,6 +8,44 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class Nullable_enum_default_value : AutoMapperSpecBase
+    {
+        public enum SourceEnum { A, B }
+        public class Source
+        {
+            public SourceEnum? Enum { get; set; }
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; set; }
+            public Target(TargetEnum? Enum = TargetEnum.A)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source { Enum = SourceEnum.B }).Enum.ShouldBe(TargetEnum.B);
+    }
+    public class Nullable_enum_default_value_null : AutoMapperSpecBase
+    {
+        public class Source
+        {
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; }
+            public Target(TargetEnum? Enum = null)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBeNull();
+    }
     public class Dynamic_constructor_mapping : AutoMapperSpecBase
     {
         public class ParentDTO<T>
