@@ -184,8 +184,13 @@ namespace AutoMapper.Internal
             }
             else
             {
-                var asDisposable = TypeAs(disposable, typeof(IDisposable));
-                disposeCall = IfNullElse(asDisposable, Empty(), DisposeExpression.ReplaceParameters(asDisposable));
+                if (disposable.Type.IsValueType)
+                {
+                    return body;
+                }
+                var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
+                var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
+                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty(), DisposeExpression.ReplaceParameters(disposableVariable)));
             }
             return TryFinally(body, disposeCall);
         }

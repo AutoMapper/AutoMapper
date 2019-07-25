@@ -10,6 +10,90 @@ using System.Reflection;
 
 namespace AutoMapper.UnitTests
 {
+    public class Enumerator_non_disposable_class : AutoMapperSpecBase
+    {
+        class CustomList<T> : List<T>
+        {
+            private CustomEnumerator _enumerator;
+
+            public new CustomEnumerator GetEnumerator()
+            {
+                _enumerator = new CustomEnumerator(base.GetEnumerator(), this);
+                return _enumerator;
+            }
+            public bool Disposed { get; set; }
+            public class CustomEnumerator
+            {
+                public CustomEnumerator(IEnumerator<T> enumerator, CustomList<T> list)
+                {
+                    Enumerator = enumerator;
+                    List = list;
+                }
+                public IEnumerator<T> Enumerator { get; }
+                public CustomList<T> List { get; }
+                public T Current => Enumerator.Current;
+                public void Dispose()
+                {
+                    Enumerator.Dispose();
+                    List.Disposed = true;
+                }
+                public bool MoveNext() => Enumerator.MoveNext();
+                public void Reset() => Enumerator.Reset();
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(_ => { });
+
+        [Fact]
+        public void Should_not_call_dispose()
+        {
+            var source = new CustomList<int>();
+            Mapper.Map<List<int>>(source);
+            source.Disposed.ShouldBeFalse();
+        }
+    }
+    public class Enumerator_non_disposable_struct : AutoMapperSpecBase
+    {
+        class CustomList<T> : List<T>
+        {
+            private CustomEnumerator _enumerator;
+
+            public new CustomEnumerator GetEnumerator()
+            {
+                _enumerator = new CustomEnumerator(base.GetEnumerator(), this);
+                return _enumerator;
+            }
+            public bool Disposed { get; set; }
+            public struct CustomEnumerator
+            {
+                public CustomEnumerator(IEnumerator<T> enumerator, CustomList<T> list)
+                {
+                    Enumerator = enumerator;
+                    List = list;
+                }
+                public IEnumerator<T> Enumerator { get; }
+                public CustomList<T> List { get; }
+                public T Current => Enumerator.Current;
+                public void Dispose()
+                {
+                    Enumerator.Dispose();
+                    List.Disposed = true;
+                }
+                public bool MoveNext() => Enumerator.MoveNext();
+                public void Reset() => Enumerator.Reset();
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(_ => { });
+
+        [Fact]
+        public void Should_not_call_dispose()
+        {
+            var source = new CustomList<int>();
+            Mapper.Map<List<int>>(source);
+            source.Disposed.ShouldBeFalse();
+        }
+    }
     public class Enumerator_dispose : AutoMapperSpecBase
     {
         class CustomList<T> : List<T>
