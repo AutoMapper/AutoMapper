@@ -88,6 +88,10 @@ var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destina
 
 AutoMapper will use that specific object, helpful in scenarios where the resolver might have constructor arguments or need to be constructed by an IoC container.
 
+### The resolved value is mapped to the destination property
+
+Note that value you return from your resolver is not simply assigned to the destination property. Any map that applies will be used and the result of that mapping will be the final destination property value. Check [the execution plan](Understanding-your-mapping.html).
+
 ### Customizing the source value supplied to the resolver
 
 By default, AutoMapper passes the source object to the resolver. This limits the reusability of resolvers, since the resolver is coupled to the source type. If, however, we supply a common resolver across multiple types, we configure AutoMapper to redirect the source value supplied to the resolver, and also use a different resolver interface so that our resolver can get use of the source/destination members:
