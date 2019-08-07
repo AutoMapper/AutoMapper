@@ -90,7 +90,7 @@ AutoMapper will use that specific object, helpful in scenarios where the resolve
 
 ### The resolved value is mapped to the destination property
 
-Note that value you return from your resolver is not simply assigned to the destination property. Any map that applies will be used and the result of that mapping will be the final destination property value. Check [the execution plan](Understanding-your-mapping.html).
+Note that the value you return from your resolver is not simply assigned to the destination property. Any map that applies will be used and the result of that mapping will be the final destination property value. Check [the execution plan](Understanding-your-mapping.html).
 
 ### Customizing the source value supplied to the resolver
 
