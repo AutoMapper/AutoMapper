@@ -29,33 +29,72 @@ Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#suppo
 
 ### ASP.NET Core
 
-There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.Microsoft.DependencyInjection/) to be used with the default injection mechanism described [here](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection/blob/master/README.md) and used in [this project](https://github.com/jbogard/ContosoUniversityCore/blob/master/src/ContosoUniversityCore/Startup.cs).
+Add the main AutoMapper Package to your solution via NuGet.
+Add the AutoMapper Dependency Injection Package to your solution via NuGet.
 
-Once the nuget package is downloaded, simply add AutoMapper to your IServiceCollection in your startup.cs class:
+Create a new class for a mapping profile. (I made a class in the main solution directory called MappingProfile.cs and add the following code.) I'll use a User and UserDto object as an example.
 ```c#
-services.AddAutoMapper(assembly1, assembly2 /*, ...*/);
-```
-or marker types:
-```c#
-services.AddAutoMapper(type1, type2 /*, ...*/);
-```
-
-You can get the object's type by using either `typeof(TypeFromAssemblyA)` or `TypeFromAssemblyA.GetType()` where `TypeFromAssemblyA` is any type of object you want to use. A concrete example would be:
-```c#
-services.AddAutoMapper(typeof(ProfileTypeFromAssemblyA), typeof(ProfileTypeFromAssemblyB) /*, ...*/);
-```
-
-Now you can inject AutoMapper at runtime into your services/controllers:
-```c#
-public class EmployeesController {
-	private readonly IMapper _mapper;
-
-	public EmployeesController(IMapper mapper)
-		=> _mapper = mapper;
-
-	// use _mapper.Map to map
+public class MappingProfile : Profile {
+    public MappingProfile() {
+        // Add as many of these lines as you need to map your objects
+        CreateMap<User, UserDto>();
+        CreateMap<UserDto, User>();
+    }
 }
 ```
+Then add the AutoMapperConfiguration in the Startup.cs as shown below:
+```c#
+public void ConfigureServices(IServiceCollection services) {
+    // .... Ignore code before this
+
+   // Auto Mapper Configurations
+    var mappingConfig = new MapperConfiguration(mc =>
+    {
+        mc.AddProfile(new MappingProfile());
+    });
+
+    IMapper mapper = mappingConfig.CreateMapper();
+    services.AddSingleton(mapper);
+
+    services.AddMvc();
+
+}
+```
+To invoke the mapped object in code, do something like the following:
+
+```c#
+public class UserController : Controller {
+
+    // Create a field to store the mapper object
+    private readonly IMapper _mapper;
+
+    // Assign the object in the constructor for dependency injection
+    public UserController(IMapper mapper) {
+        _mapper = mapper;
+    }
+
+    public async Task<IActionResult> Edit(string id) {
+
+        // Instantiate source object
+        // (Get it from the database or whatever your code calls for)
+        var user = await _context.Users
+            .SingleOrDefaultAsync(u => u.Id == id);
+
+        // Instantiate the mapped data transfer object
+        // using the mapper you stored in the private field.
+        // The type of the source object is the first type argument
+        // and the type of the destination is the second.
+        // Pass the source object you just instantiated above
+        // as the argument to the _mapper.Map<>() method.
+        var model = _mapper.Map<UserDto>(user);
+
+        // .... Do whatever you want after that!
+    }
+}
+```
+I hope this helps someone starting fresh with ASP.NET Core! I welcome any feedback or criticisms as I'm still new to the .NET world!
+
+SOURCE: https://stackoverflow.com/questions/40275195/how-to-set-up-automapper-in-asp-net-core
 
 ### Ninject
 
