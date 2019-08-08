@@ -31,13 +31,13 @@ Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#suppo
 
 There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.Microsoft.DependencyInjection/) to be used with the default injection mechanism described [here](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection) and used in [this project](https://github.com/jbogard/ContosoUniversityCore/blob/master/src/ContosoUniversityCore/Startup.cs).
 
-You define the configuration using [profiles](Configuration.html#profile-instances). And then you let AutoMapper know where those profiles are defined by calling the extension method `AddAutoMapper` (for `IServiceCollection`) in your startup.cs class:
+You define the configuration using [profiles](Configuration.html#profile-instances). And then you let AutoMapper know in what assemblies are those profiles defined by calling the `IServiceCollection` extension method `AddAutoMapper` at startup:
 ```c#
-services.AddAutoMapper(assembly1, assembly2 /*, ...*/);
+services.AddAutoMapper(profileAssembly1, profileAssembly2 /*, ...*/);
 ```
 or marker types:
 ```c#
-services.AddAutoMapper(type1, type2 /*, ...*/);
+services.AddAutoMapper(profileType1, profileType2 /*, ...*/);
 ```
 You can get the object's type by using either `typeof(TypeFromAssemblyA)` or `TypeFromAssemblyA.GetType()` where `TypeFromAssemblyA` is any type of object you want to use. A concrete example would be:
 ```c#
