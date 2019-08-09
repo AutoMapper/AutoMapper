@@ -345,7 +345,7 @@ namespace AutoMapper.Execution
             if(ctorParamMap.CustomMapFunction != null)
                 return ctorParamMap.CustomMapFunction.ConvertReplaceParameters(Source, Context);
             if (ctorParamMap.HasDefaultValue)
-                return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
+                return Constant(ctorParamMap.Parameter.GetDefaultValue());
             return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);
         }
 
