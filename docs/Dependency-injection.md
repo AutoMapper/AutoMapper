@@ -44,10 +44,9 @@ Now you can inject AutoMapper at runtime into your services/controllers:
 public class EmployeesController {
 	private readonly IMapper _mapper;
 
-	public EmployeesController(IMapper mapper)
-		=> _mapper = mapper;
+	public EmployeesController(IMapper mapper) => _mapper = mapper;
 
-	// use _mapper.Map to map
+	// use _mapper.Map or _mapper.ProjectTo
 }
 ```
 
