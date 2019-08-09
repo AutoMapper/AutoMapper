@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
-using AutoMapper.Mappers;
 using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -29,17 +28,24 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     return null;
                 }
-                expression = transformedExpressions.Aggregate(expression, (source, lambda) => Select(source, lambda));
+                expression = transformedExpressions.Aggregate(expression, Select);
             }
 
-            expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
+            expression =
+                propertyMap.DestinationType.IsArray
+                    ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] {destinationListType}, expression)
+                    : propertyMap.DestinationType.IsListType()
+                        ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] {destinationListType}, expression)
+                        : propertyMap.DestinationType.IsCollectionType()
+                            ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] {destinationListType}, expression)
+                            : expression;
 
             return Expression.Bind(propertyMap.DestinationMember, expression);
         }
 
         private static Expression Select(Expression source, LambdaExpression lambda)
         {
-            return Expression.Call(typeof(Enumerable), "Select", new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
+            return Expression.Call(typeof(Enumerable), nameof(Enumerable.Select), new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
         }
     }
 }
