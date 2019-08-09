@@ -33,12 +33,10 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             expression =
                 propertyMap.DestinationType.IsArray
-                    ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] {destinationListType}, expression)
-                    : propertyMap.DestinationType.IsListType()
+                    ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] {destinationListType}, expression) 
+                    : propertyMap.DestinationType.IsCollectionType()
                         ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] {destinationListType}, expression)
-                        : propertyMap.DestinationType.IsCollectionType()
-                            ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] {destinationListType}, expression)
-                            : expression;
+                        : expression;
 
             return Expression.Bind(propertyMap.DestinationMember, expression);
         }
