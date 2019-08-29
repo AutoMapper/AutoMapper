@@ -51,7 +51,9 @@ public class EmployeesController {
 ```
 ### AutoFac
 
-https://dotnetfalcon.com/autofac-support-for-automapper/
+Check [this blog](https://dotnetfalcon.com/autofac-support-for-automapper/).
+
+There is also a third-party [NuGet package](https://www.nuget.org/packages/AutoMapper.Contrib.Autofac.DependencyInjection) you might want to try.
 
 ```c#
 public class AutoMapperModule : Autofac.Module

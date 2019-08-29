@@ -206,6 +206,7 @@ Not all mapping options can be supported, as the expression generated must be in
 * ConvertUsing (Expression-based)
 * Ignore
 * NullSubstitute
+* Value transformers
 
 Not supported:
 * Condition
@@ -216,6 +217,7 @@ Not supported:
 * Custom resolvers
 * Custom type converters
 * ForPath
+* Value converters
 * **Any calculated property on your domain object**
 
 Additionally, recursive or self-referencing destination types are not supported as LINQ providers do not support this. Typically hierarchical relational data models require common table expressions (CTEs) to correctly resolve a recursive join.
