@@ -50,7 +50,7 @@ public List<OrderLineDTO> GetLinesForOrder(int orderId)
   using (var context = new orderEntities())
   {
     return context.OrderLines.Where(ol => ol.OrderId == orderId)
-             .ProjectTo<OrderLineDTO>().ToList();
+             .ProjectTo<OrderLineDTO>(configuration).ToList();
   }
 }
 ```
