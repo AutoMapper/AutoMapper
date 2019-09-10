@@ -131,7 +131,7 @@ class Destination
 
 cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
 cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+cfg.CreateMap<OtherInnerSource, Destination>();
 
 var source = new Source { Name = "name", InnerSource = new InnerSource{ Description = "description" }, 
                           OtherInnerSource = new OtherInnerSource{ Title = "title" } };
