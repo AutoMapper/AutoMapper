@@ -207,11 +207,12 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class FlatteningWithSourceValidation : AutoMapperSpecBase
+    public class FlatteningWithSourceValidation : NonValidatingSpecBase
     {
         public class Customer
         {
             public int Id { get; set; }
+            public int AnotherId { get; set; }
             public string Name { get; set; }
             public Address Address { get; set; }
         }
@@ -228,6 +229,9 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
             public string AddressCity { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source));
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source).ForMember(d=>d.Id, o=>o.MapFrom(s=>s.AnotherId)));
+        [Fact]
+        public void Should_validate() =>
+            new Action(() => Configuration.AssertConfigurationIsValid()).ShouldThrowException<AutoMapperConfigurationException>(ex => ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Address.Id)));
     }
 }

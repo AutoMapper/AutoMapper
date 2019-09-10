@@ -192,7 +192,9 @@ namespace AutoMapper
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
             string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
                 ? pm.DestinationName
-                : pm.SourceMembers.FirstOrDefault()?.Name ?? pm.DestinationName;
+                : pm.SourceMembers.Count > 1
+                    ? pm.SourceMembers.FirstOrDefault()?.Name 
+                    : pm.SourceMember?.Name ?? pm.DestinationName;
             string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
         }
 

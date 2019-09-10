@@ -9,7 +9,7 @@ namespace AutoMapper
     {
         TypeMap TypeMap { get; }
         Type SourceType { get; }
-        IEnumerable<MemberInfo> SourceMembers { get; }
+        IReadOnlyCollection<MemberInfo> SourceMembers { get; }
         LambdaExpression CustomSource { get; }
         Type DestinationType { get; }
         string DestinationName { get; }

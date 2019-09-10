@@ -52,7 +52,7 @@ namespace AutoMapper
 
         public override Type DestinationType => DestinationMember.GetMemberType();
 
-        public override IEnumerable<MemberInfo> SourceMembers => _memberChain;
+        public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
         public override LambdaExpression CustomSource { get; set; }
         public override bool Inline { get; set; } = true;
         public override bool Ignored { get; set; }
