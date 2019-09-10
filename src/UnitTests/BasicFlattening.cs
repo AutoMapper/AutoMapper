@@ -206,4 +206,28 @@ namespace AutoMapper.UnitTests
             _dto.VendorCurrency.ShouldBeNull();
         }
     }
+
+    public class FlatteningWithSourceValidation : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+        }
+        public class Address
+        {
+            public int Id { get; set; }
+            public string Street { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+        }
+        public class CustomerDTO
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string AddressCity { get; set; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source));
+    }
 }
