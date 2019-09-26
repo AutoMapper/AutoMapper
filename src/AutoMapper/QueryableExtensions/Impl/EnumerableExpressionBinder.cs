@@ -30,14 +30,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 expression = transformedExpressions.Aggregate(expression, Select);
             }
-
-            expression =
-                propertyMap.DestinationType.IsArray
-                    ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] {destinationListType}, expression) 
-                    : propertyMap.DestinationType.IsCollectionType()
-                        ? Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] {destinationListType}, expression)
-                        : expression;
-
+            if (!propertyMap.DestinationType.IsAssignableFrom(expression.Type))
+            {
+                var convertFunction = propertyMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
+                expression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, expression);
+            }
             return Expression.Bind(propertyMap.DestinationMember, expression);
         }
 
