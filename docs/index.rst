@@ -24,20 +24,10 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    :hidden:
    :maxdepth: 2
    :caption: Overview
-
    Getting-started
    Quickstart
    Understanding-your-mapping
    The-MyGet-build
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-   :caption: Upgrading
-
-   API-Changes
-   5.0-Upgrade-Guide
-   8.0-Upgrade-Guide
-   9.0-Upgrade-Guide
 .. _feature-docs:
 .. toctree::
    :maxdepth: 2
@@ -52,8 +42,6 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Flattening
    Reverse-Mapping-and-Unflattening
    Mapping-inheritance
-   Conditional-mapping
-   Null-substitution
    Attribute-mapping
    Dynamic-and-ExpandoObject-Mapping
    Open-Generics
@@ -64,9 +52,19 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    :caption: Extensibility
    Custom-type-converters
    Custom-value-resolvers
+   Conditional-mapping
+   Null-substitution
    Value-converters
    Value-transformers
    Before-and-after-map-actions
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Upgrading
+   API-Changes
+   5.0-Upgrade-Guide
+   8.0-Upgrade-Guide
+   9.0-Upgrade-Guide
       
 Examples
 ========
