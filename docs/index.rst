@@ -41,30 +41,32 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. _feature-docs:
 .. toctree::
    :maxdepth: 2
-   :caption: Feature Documentation
-
+   :caption: Features
+   Configuration
+   Configuration-validation
+   Dependency-injection
+   Projection
+   Nested-mappings
+   Lists-and-arrays
+   Construction
    Flattening
    Reverse-Mapping-and-Unflattening
-   Projection
-   Configuration-validation
-   Lists-and-arrays
-   Nested-mappings
+   Mapping-inheritance
+   Conditional-mapping
+   Null-substitution
+   Attribute-mapping
+   Dynamic-and-ExpandoObject-Mapping
+   Open-Generics
+   Queryable-Extensions
+   Expression-Translation-(UseAsDataSource)
+.. toctree::
+   :maxdepth: 2
+   :caption: Extensibility
    Custom-type-converters
    Custom-value-resolvers
    Value-converters
    Value-transformers
-   Null-substitution
    Before-and-after-map-actions
-   Dependency-injection
-   Mapping-inheritance
-   Queryable-Extensions
-   Configuration
-   Attribute-mapping
-   Construction
-   Conditional-mapping
-   Open-Generics
-   Dynamic-and-ExpandoObject-Mapping
-   Expression-Translation-(UseAsDataSource)
       
 Examples
 ========
