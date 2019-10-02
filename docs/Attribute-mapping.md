@@ -28,14 +28,14 @@ This is equivalent to a `CreateMap<Order, OrderDto>()` configuration.
 
 To customize the overall type map configuration, you can set the following properties on the `AutoMapAttribute`:
 
- - ReverseMap (bool)
- - ConstructUsingServiceLocator (bool)
- - MaxDepth (int)
- - PreserveReferences (bool)
- - DisableCtorValidation (bool)
- - IncludeAllDerived (bool)
- - TypeConverter (Type)
- 
+- ReverseMap (bool)
+- ConstructUsingServiceLocator (bool)
+- MaxDepth (int)
+- PreserveReferences (bool)
+- DisableCtorValidation (bool)
+- IncludeAllDerived (bool)
+- TypeConverter (Type)
+
 These all correspond to the similar fluent mapping configuration options. Only the `sourceType` value is required to map.
 
 ## Member configuration
@@ -89,11 +89,11 @@ You cannot flatten with this attribute, only redirect source type members (i.e. 
 
 Additional attribute-based configuration options include:
 
- - `MapAtRuntimeAttribute`
- - `MappingOrderAttribute`
- - `NullSubstituteAttribute`
- - `UseExistingValueAttribute`
- - `ValueConverterAttribute`
- - `ValueResolverAttribute`
- 
+- `MapAtRuntimeAttribute`
+- `MappingOrderAttribute`
+- `NullSubstituteAttribute`
+- `UseExistingValueAttribute`
+- `ValueConverterAttribute`
+- `ValueResolverAttribute`
+
 Each corresponds to the same fluent configuration mapping option.
