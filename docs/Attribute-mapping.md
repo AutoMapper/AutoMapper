@@ -48,7 +48,11 @@ If the attribute-based configuration is not available or will not work, you can 
 
 ### Ignoring members
 
-Use the `IgnoreAttribute` to ignore an individual destination member from mapping and/or validation:
+Two different attributes can be used to ignore individual destination members from mapping and/or validation:
+
+#### IgnoreAttribute
+
+`IgnoreAttribute` can be used when the class is decorated with `AutoMap` attribute.
 
 ```c#
 using AutoMapper.Configuration.Annotations;
@@ -56,6 +60,18 @@ using AutoMapper.Configuration.Annotations;
 [AutoMap(typeof(Order))]
 public class OrderDto {
     [Ignore]
+    public decimal Total { get; set; }
+```
+
+#### IgnoreMapAttribute
+
+`IgnoreMapAttribute` can be used in all other cases.
+
+```c#
+using AutoMapper.Configuration.Annotations;
+
+public class OrderDto {
+    [IgnoreMap]
     public decimal Total { get; set; }
 ```
 
