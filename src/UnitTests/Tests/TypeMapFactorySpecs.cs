@@ -199,4 +199,47 @@ namespace AutoMapper.UnitTests.Tests
             dest.Value.ShouldBe(5);
         }
     }
+
+    public class When_using_a_source_member_name_replacer_with_profile : SpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+            public int Ävíator { get; set; }
+            public int SubAirlinaFlight { get; set; }
+        }
+
+        public class Destination
+        {
+            public int Value { get; set; }
+            public int Aviator { get; set; }
+            public int SubAirlineFlight { get; set; }
+        }
+
+        public class TestProfile : Profile
+        {
+            public TestProfile()
+            {
+                CreateMap<Source, Destination>();
+            }
+        }
+
+        [Fact]
+        public void Should_map_properties_with_different_names()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.ReplaceMemberName("A", "Ä");
+                cfg.ReplaceMemberName("i", "í");
+                cfg.ReplaceMemberName("Airline", "Airlina");
+                cfg.AddProfile<TestProfile>();
+            });
+
+            var mapper = config.CreateMapper();
+            var dest = mapper.Map<Destination>(new Source { Ävíator = 3, SubAirlinaFlight = 4, Value = 5 });
+            dest.Aviator.ShouldBe(3);
+            dest.SubAirlineFlight.ShouldBe(4);
+            dest.Value.ShouldBe(5);
+        }
+    }
 }
