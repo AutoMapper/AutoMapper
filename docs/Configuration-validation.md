@@ -23,6 +23,22 @@ configuration.AssertConfigurationIsValid();
 ```
 Executing this code produces an AutoMapperConfigurationException, with a descriptive message.  AutoMapper checks to make sure that *every single* Destination type member has a corresponding type member on the source type.
 
+In a similar fashion, you could create a unit test that tests all AutoMapper Profiles in an Assembly, using `System.Linq` and `System.Reflection`.
+
+```c#
+var profiles = Assembly.GetAssembly(typeof(YourClass)).GetTypes().Where(type => type.IsClass && type.IsSubclassOf(typeof(AutoMapper.Profile)));
+
+var configuration = new MapperConfiguration(cfg =>
+{
+    foreach(var profile in profiles)
+    {
+        cfg.AddProfile(profile);
+    }
+});
+
+configuration.AssertConfigurationIsValid();
+```
+
 ## Overriding configuration errors
 
 To fix a configuration error (besides renaming the source/destination members), you have three choices for providing an alternate configuration:
