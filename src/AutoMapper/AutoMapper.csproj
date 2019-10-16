@@ -35,7 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19462-01" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.19515.1" PrivateAssets="All" />  
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.19515.2" PrivateAssets="All" />  
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
