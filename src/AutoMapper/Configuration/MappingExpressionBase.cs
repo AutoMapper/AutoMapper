@@ -34,6 +34,7 @@ namespace AutoMapper.Configuration
 
         protected MappingExpressionBase ReverseMapExpression { get; set; }
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
+        protected IEnumMapConfiguration EnumMapConfiguration { get; set; } 
         protected List<IPropertyMapConfiguration> MemberConfigurations { get; } = new List<IPropertyMapConfiguration>();
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations { get; } = new List<ISourceMemberConfiguration>();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations { get; } = new List<ICtorParameterConfiguration>();
@@ -90,6 +91,10 @@ namespace AutoMapper.Configuration
             foreach(var valueTransformer in ValueTransformers)
             {
                 typeMap.AddValueTransformation(valueTransformer);
+            }
+            if (EnumMapConfiguration != null)
+            {
+                EnumMapConfiguration.Configure(typeMap);
             }
 
             Features.Configure(typeMap);
@@ -410,6 +415,23 @@ namespace AutoMapper.Configuration
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
             TypeMapActions.Add(tm => tm.TypeConverterType = typeof(TTypeConverter));
+        }
+
+        public void ConvertAsEnum()
+        {
+            ConvertAsEnum(null);
+        }
+
+        public void ConvertAsEnum(Action<IEnumConfigurationExpression<TSource, TDestination>> enumOptions)
+        {
+            var enumConfigurationExpression = new EnumConfigurationExpression<TSource, TDestination>();
+            
+            EnumMapConfiguration = enumConfigurationExpression;
+
+            if (enumOptions != null)
+            {
+                enumOptions(enumConfigurationExpression);
+            }
         }
 
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)

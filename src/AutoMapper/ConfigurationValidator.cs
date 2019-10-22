@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.Configuration;
+using System.Text;
 
 namespace AutoMapper
 {
@@ -21,7 +21,7 @@ namespace AutoMapper
                     let canConstruct = typeMap.PassesCtorValidation
                     where unmappedPropertyNames.Length > 0 || !canConstruct
                     select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, canConstruct)
-                    ).ToArray();
+                ).ToArray();
 
             if (badTypeMaps.Any())
             {
@@ -81,6 +81,11 @@ namespace AutoMapper
                 }
                 var context = new ValidationContext(types, memberMap, typeMap);
                 _config.Validate(context);
+                if (typeMap.IsEnumValueMapping)
+                {
+                    CheckEnumValueMapping(context);
+                }
+
                 CheckPropertyMaps(typeMapsChecked, typeMap);
                 typeMap.IsValid = true;
             }
@@ -120,6 +125,31 @@ namespace AutoMapper
 
                 var destinationType = memberMap.DestinationType;
                 DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, memberMap);
+            }
+        }
+        
+        public void CheckEnumValueMapping(ValidationContext context)
+        {
+            var hasMappingError = false;
+            var sourceEnumMappings = Enum.GetValues(context.Types.SourceType);
+
+            var messageBuilder = new StringBuilder($"Missing enum mapping from {context.Types.SourceType.FullName} to {context.Types.DestinationType.FullName} based on {context.TypeMap.EnumMappingType}");
+
+            messageBuilder.AppendLine();
+            messageBuilder.AppendLine("The following source values are not mapped:");
+
+            foreach (Enum sourceEnumMapping in sourceEnumMappings)
+            {
+                if (!context.TypeMap.EnumValueMappings.ContainsKey(sourceEnumMapping))
+                {
+                    hasMappingError = true;
+                    messageBuilder.AppendLine($" - {sourceEnumMapping}");
+                }
+            }
+
+            if (hasMappingError)
+            {
+                throw new AutoMapperConfigurationException(messageBuilder.ToString());
             }
         }
     }

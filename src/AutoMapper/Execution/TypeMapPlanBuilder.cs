@@ -52,6 +52,11 @@ namespace AutoMapper.Execution
                 return Lambda(customExpression.ReplaceParameters(Source, _initialDestination, Context), Source, _initialDestination, Context);
             }
 
+            if (_typeMap.IsEnumValueMapping)
+            {
+                return Lambda(EnumValueConverterMapper().ReplaceParameters(Source, _initialDestination, Context), Source, _initialDestination, Context);
+            }
+
             CheckForCycles(typeMapsPath);
 
             if(typeMapsPath != null)
@@ -142,6 +147,27 @@ namespace AutoMapper.Execution
                 }
                 return typeMap;
             }
+        }
+
+        private LambdaExpression EnumValueConverterMapper()
+        {
+            var converterMethod = GetType().GetDeclaredMethod(nameof(ConvertEnumValue));
+            var genericConverterMethod = converterMethod.MakeGenericMethod(_typeMap.SourceType, _typeMap.DestinationTypeToUse);
+
+            return Lambda(Call(Expression.Constant(this), genericConverterMethod, Source, _initialDestination,
+                Context));
+        }
+
+        private TDestination ConvertEnumValue<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
+            where TSource : struct, Enum
+            where TDestination : struct, Enum
+        {
+            if (!_typeMap.EnumValueMappings.TryGetValue(source, out Enum result))
+            {
+                throw new AutoMapperMappingException($"Value {source} of type {source.GetType().FullName} not supported");
+            }
+
+            return (TDestination)result;
         }
 
         private LambdaExpression TypeConverterMapper()

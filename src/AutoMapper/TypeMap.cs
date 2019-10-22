@@ -32,6 +32,15 @@ namespace AutoMapper
         private readonly List<IncludedMember> _includedMembersTypeMaps = new List<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
+        private readonly Dictionary<Enum, Enum> _enumValueMappings = new Dictionary<Enum, Enum>();
+        public IReadOnlyDictionary<Enum, Enum> EnumValueMappings => _enumValueMappings;
+        public EnumMappingType EnumMappingType { get; private set; } = EnumMappingType.Value;
+
+        public bool IsEnumValueMapping
+        {
+            get { return SourceType.IsEnum && DestinationType.IsEnum && _enumValueMappings.Any(); }
+        }
+
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
         {
             SourceTypeDetails = sourceType;
@@ -54,6 +63,12 @@ namespace AutoMapper
         }
 
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
+
+        public void ConfigureEnumMappings(EnumMappingType enumMappingType,  Dictionary<Enum, Enum> enumValueMappings)
+        {
+            EnumMappingType = enumMappingType;
+            enumValueMappings.ForAll(enumMapping => _enumValueMappings.Add(enumMapping.Key, enumMapping.Value));
+        }
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 

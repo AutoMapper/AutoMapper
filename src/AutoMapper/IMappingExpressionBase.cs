@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
 using AutoMapper.Features;
 
 namespace AutoMapper
@@ -217,5 +216,16 @@ namespace AutoMapper
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <typeparam name="TTypeConverter">Type converter type</typeparam>
         void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
+
+        /// <summary>
+        /// Use enum value mapping with AssertConfigurationIsValid support
+        /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
+        void ConvertAsEnum();
+        /// <summary>
+        /// Use enum value mapping with AssertConfigurationIsValid support
+        /// </summary>
+        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
+        void ConvertAsEnum(Action<IEnumConfigurationExpression<TSource, TDestination>> enumOptions);
     }
 }
