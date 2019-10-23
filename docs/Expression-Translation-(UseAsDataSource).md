@@ -39,6 +39,16 @@ var configuration = new MapperConfiguration(cfg =>
 });
 ```
 
+Configure the package using the cofiguration help method:
+
+```
+var configuration = new MapperConfiguration(cfg =>
+{
+   cfg.AddExpressionMapping();
+   // Rest of your configuration
+});
+```
+
 When mapping from DTO Expression
 
 ```c#
