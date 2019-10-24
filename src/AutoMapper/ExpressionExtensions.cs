@@ -26,7 +26,7 @@ namespace AutoMapper
             {
                 return new MemberExpression[0];
             }
-            return memberExpression.GetMembers();
+            return memberExpression.GetMembers().Reverse();
         }
 
         public static IEnumerable<MemberExpression> GetMembers(this MemberExpression expression)
@@ -46,7 +46,7 @@ namespace AutoMapper
             }
         }
 
-        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
+        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().FirstOrDefault()?.Expression == exp.Parameters.First();
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
             => ExpressionFactory.ReplaceParameters(exp, replace);
