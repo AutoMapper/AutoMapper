@@ -50,6 +50,61 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
     }
 
+    public class IncludeMembersNested : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Name { get; set; }
+            public InnerSource InnerSource { get; set; }
+            public OtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public NestedInnerSource NestedInnerSource { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public NestedOtherInnerSource NestedOtherInnerSource { get; set; }
+        }
+        class NestedInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class NestedOtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource.NestedInnerSource, s => s.OtherInnerSource.NestedOtherInnerSource);
+            cfg.CreateMap<NestedInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<NestedOtherInnerSource, Destination>(MemberList.None);
+        });
+        [Fact]
+        public void Should_flatten()
+        {
+            var source = new Source
+            {
+                Name = "name",
+                InnerSource = new InnerSource { NestedInnerSource = new NestedInnerSource { Description = "description" } },
+                OtherInnerSource = new OtherInnerSource { NestedOtherInnerSource = new NestedOtherInnerSource { Title = "title" } }
+            };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Name.ShouldBe("name");
+            destination.Description.ShouldBe("description");
+            destination.Title.ShouldBe("title");
+        }
+    }
+
     public class IncludeMembersWithMapFromExpression : AutoMapperSpecBase
     {
         class Source
