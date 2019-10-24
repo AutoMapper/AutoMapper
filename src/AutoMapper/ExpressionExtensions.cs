@@ -26,15 +26,19 @@ namespace AutoMapper
             {
                 return new MemberExpression[0];
             }
-            return memberExpression.GetMembers().Reverse();
+            return memberExpression.GetMembers();
         }
 
         public static IEnumerable<MemberExpression> GetMembers(this MemberExpression expression)
         {
-            while(expression != null)
+            return GetMembersCore().Reverse();
+            IEnumerable<MemberExpression> GetMembersCore()
             {
-                yield return expression;
-                expression = expression.Expression as MemberExpression;
+                while (expression != null)
+                {
+                    yield return expression;
+                    expression = expression.Expression as MemberExpression;
+                }
             }
         }
 
