@@ -1,17 +1,26 @@
 Compat issues with assembly AutoMapper:
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.AutoMapAttribute' changed from '[AttributeUsageAttribute(1036, AllowMultiple=true)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple=true)]' in the implementation.
+MembersMustExist : Member 'AutoMapper.DefaultMemberMap..ctor()' does not exist in the implementation but it does exist in the contract.
+CannotMakeMemberNonVirtual : Member 'AutoMapper.DefaultMemberMap.CustomSource' is non-virtual in the implementation but is virtual in the contract.
+MembersMustExist : Member 'AutoMapper.DefaultMemberMap.CustomSource.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.DefaultMemberMap.CustomSource.set(System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.DefaultMemberMap.SourceMembers.get()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'AutoMapper.DefaultMemberMap.UseDestinationValue.get()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'AutoMapper.DefaultMemberMap.UseDestinationValue.set(System.Boolean)' does not exist in the implementation but it does exist in the contract.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.IgnoreMapAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberConfigurationExpression<TSource, TDestination, TMember>.DontUseDestinationValue()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.CustomSource.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.CustomSource.get()' is present in the contract but not in the implementation.
+MembersMustExist : Member 'AutoMapper.IMemberMap.CustomSource.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMembers.get()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMembers.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'AutoMapper.IMemberMap.SourceMembers.get()' does not exist in the implementation but it does exist in the contract.
-InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.UseDestinationValue.get()' is present in the implementation but not in the contract.
-InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.UseDestinationValue.get()' is present in the contract but not in the implementation.
-MembersMustExist : Member 'AutoMapper.IMemberMap.UseDestinationValue.get()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'AutoMapper.PropertyMap.UseDestinationValue.set(System.Boolean)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.IncludedMember..ctor(AutoMapper.TypeMap, System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PathMap..ctor(AutoMapper.PathMap, AutoMapper.TypeMap, System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PathMap..ctor(System.Linq.Expressions.LambdaExpression, AutoMapper.Internal.MemberPath, AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PathMap.CustomSource.set(System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PropertyMap..ctor(AutoMapper.PropertyMap, AutoMapper.TypeMap, System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PropertyMap.CheckCustomSource(System.Linq.Expressions.LambdaExpression, System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.PropertyMap.CustomSource.set(System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.TypeMap.Condition.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.TypeMap.Condition.set(System.Linq.Expressions.LambdaExpression)' does not exist in the implementation but it does exist in the contract.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.IgnoreAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.MapAtRuntimeAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.MappingOrderAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
@@ -21,4 +30,6 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Conventions.MapToAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-Total Issues: 22
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.LetPropertyMaps.GetSubQueryMarker()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'AutoMapper.QueryableExtensions.LetPropertyMaps.PropertyPath..ctor(AutoMapper.QueryableExtensions.PropertyExpression[], System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
+Total Issues: 33

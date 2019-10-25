@@ -86,6 +86,9 @@ namespace AutoMapper
         TDestination IMapper.Map<TDestination>(object source)
             => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
 
+        TDestination IRuntimeMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map<TDestination>(source, opts);
+
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             opts(Options);
@@ -95,6 +98,9 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
+
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
+            ((IMapper)this).Map<TSource, TDestination>(source, opts);
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
@@ -116,6 +122,9 @@ namespace AutoMapper
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
 
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
+            ((IMapper)this).Map<TSource, TDestination>(source, destination, opts);
+
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(_inner.ServiceCtor);
@@ -134,6 +143,9 @@ namespace AutoMapper
         object IMapper.Map(object source, Type sourceType, Type destinationType)
             => _inner.Map(source, null, sourceType, destinationType, this);
 
+        object IRuntimeMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map(source, sourceType, destinationType, opts);
+
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             opts(Options);
@@ -143,6 +155,9 @@ namespace AutoMapper
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, sourceType, destinationType, this);
+
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map(source, destination, sourceType, destinationType, opts);
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
