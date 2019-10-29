@@ -39,7 +39,7 @@ var configuration = new MapperConfiguration(cfg =>
 });
 ```
 
-Configure the package using the cofiguration help method:
+Configure the package using the configuration help method:
 
 ```
 var configuration = new MapperConfiguration(cfg =>
