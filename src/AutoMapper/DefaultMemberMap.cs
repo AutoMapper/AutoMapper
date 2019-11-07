@@ -26,7 +26,7 @@ namespace AutoMapper
         public virtual bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
         public virtual bool Inline { get => true; set { } }
-        public virtual bool UseDestinationValue { get => default; set { } }
+        public virtual bool? UseDestinationValue { get => default; set { } }
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }

@@ -62,7 +62,7 @@ namespace AutoMapper
         public override LambdaExpression Condition { get; set; }
         public override LambdaExpression PreCondition { get; set; }
         public override LambdaExpression CustomMapExpression { get; set; }
-        public override bool UseDestinationValue { get; set; }
+        public override bool? UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public override object NullSubstitute { get; set; }
         public override ValueResolverConfiguration ValueResolverConfig { get; set; }
@@ -92,6 +92,7 @@ namespace AutoMapper
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
+            UseDestinationValue = UseDestinationValue ?? inheritedMappedProperty.UseDestinationValue;
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             _memberChain = _memberChain.Count == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }

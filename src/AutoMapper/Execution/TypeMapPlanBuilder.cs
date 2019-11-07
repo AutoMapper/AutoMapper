@@ -395,7 +395,7 @@ namespace AutoMapper.Execution
                 getter = destMember;
 
             Expression destValueExpr;
-            if (memberMap.UseDestinationValue)
+            if (memberMap.UseDestinationValue.GetValueOrDefault())
             {
                 destValueExpr = getter;
             }
