@@ -4,6 +4,7 @@ MembersMustExist : Member 'AutoMapper.DefaultMemberMap.SourceMembers.get()' does
 MembersMustExist : Member 'AutoMapper.DefaultMemberMap.UseDestinationValue.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.DefaultMemberMap.UseDestinationValue.set(System.Boolean)' does not exist in the implementation but it does exist in the contract.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.IgnoreMapAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberConfigurationExpression<TSource, TDestination, TMember>.DontUseDestinationValue()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMembers.get()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.SourceMembers.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'AutoMapper.IMemberMap.SourceMembers.get()' does not exist in the implementation but it does exist in the contract.
@@ -20,4 +21,4 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Conventions.MapToAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-Total Issues: 21
+Total Issues: 22
