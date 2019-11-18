@@ -257,10 +257,9 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.AllowNull = true);
         }
 
-        public void UseDestinationValue()
-        {
-            PropertyMapActions.Add(pm => pm.UseDestinationValue = true);
-        }
+        public void UseDestinationValue() => SetUseDestinationValue(true);
+
+        private void SetUseDestinationValue(bool value) => PropertyMapActions.Add(pm => pm.UseDestinationValue = value);
 
         public void SetMappingOrder(int mappingOrder)
         {
@@ -343,5 +342,7 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse() =>
             PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, GetDestinationExpression());
+
+        public void DontUseDestinationValue() => SetUseDestinationValue(false);
     }
 }

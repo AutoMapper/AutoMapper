@@ -31,10 +31,14 @@ namespace AutoMapper
 
         public static IEnumerable<MemberExpression> GetMembers(this MemberExpression expression)
         {
-            while(expression != null)
+            return GetMembersCore().Reverse();
+            IEnumerable<MemberExpression> GetMembersCore()
             {
-                yield return expression;
-                expression = expression.Expression as MemberExpression;
+                while (expression != null)
+                {
+                    yield return expression;
+                    expression = expression.Expression as MemberExpression;
+                }
             }
         }
 
@@ -46,7 +50,7 @@ namespace AutoMapper
             }
         }
 
-        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
+        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().FirstOrDefault()?.Expression == exp.Parameters.First();
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
             => ExpressionFactory.ReplaceParameters(exp, replace);

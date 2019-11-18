@@ -1,8 +1,90 @@
 ﻿using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests
 {
+    public class ReadonlyCollectionPropertiesOverride : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<DomainModelBase, ModelBase>()
+                .ForMember(d => d.CodeList, o => o.MapFrom(s => s.CodeList))
+                .ForMember(d => d.KeyValuesOtherName, o => o.MapFrom(s => new[] { new KeyValueModel { Key = "key1", Value = "value1" } }))
+                .Include<DomainModel, Model>();
+            cfg.CreateMap<DomainModel, Model>().ForAllMembers(o => o.DontUseDestinationValue());
+        });
+        public class DomainModelBase
+        {
+            public ICollection<string> CodeList { get; } = new List<string>();
+        }
+        public class DomainModel : DomainModelBase
+        {
+        }
+        public class ModelBase
+        {
+            public ICollection<KeyValueModel> KeyValuesOtherName { get; } = new List<KeyValueModel>();
+            public ICollection<string> CodeList { get; } = new List<string>();
+        }
+        public class Model : ModelBase
+        {
+        }
+        public class KeyValueModel
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+        [Fact]
+        public void ShouldMapOk()
+        {
+            var domainModel = new DomainModel { CodeList = { "DMItemCode1" } };
+            var result = Mapper.Map<Model>(domainModel);
+            result.CodeList.ShouldBeEmpty();
+            result.KeyValuesOtherName.ShouldBeEmpty();
+        }
+    }
+    public class ReadonlyCollectionProperties : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<DomainModelBase, ModelBase>()
+                .ForMember(d => d.CodeList, o => o.MapFrom(s => s.CodeList))
+                .ForMember(d => d.KeyValuesOtherName, o => o.MapFrom(s => new[] { new KeyValueModel { Key = "key1", Value = "value1" } }))
+                .Include<DomainModel, Model>();
+            cfg.CreateMap<DomainModel, Model>();
+        });
+        public class DomainModelBase
+        {
+            public ICollection<string> CodeList { get; } = new List<string>();
+        }
+        public class DomainModel : DomainModelBase
+        {
+        }
+        public class ModelBase
+        {
+            public ICollection<KeyValueModel> KeyValuesOtherName { get; } = new List<KeyValueModel>();
+            public ICollection<string> CodeList { get; } = new List<string>();
+        }
+        public class Model : ModelBase
+        {
+        }
+        public class KeyValueModel
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+        [Fact]
+        public void ShouldMapOk()
+        {
+            var domainModel = new DomainModel { CodeList = { "DMItemCode1" } };
+            var result = Mapper.Map<Model>(domainModel);
+            result.CodeList.First().ShouldBe("DMItemCode1");
+            var keyValue = result.KeyValuesOtherName.First();
+            keyValue.Key.ShouldBe("key1");
+            keyValue.Value.ShouldBe("value1");
+        }
+    }
     public class IncludedBaseMappingShouldInheritBaseMappings : SpecBase
     {
         public class ModelObject

@@ -10,6 +10,8 @@ namespace AutoMapper
 
     public class Mapper : IRuntimeMapper
     {
+        internal const string NoContextMapperOptions = "Set options in the outer Map call instead.";
+
         public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
         {
