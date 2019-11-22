@@ -30,6 +30,8 @@ public class OrderLineDTO
 
 var configuration = new MapperConfiguration(cfg =>
 {
+  cfg.AddExpressionMapping();
+  
   cfg.CreateMap<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name));
   cfg.CreateMap<OrderLineDTO, OrderLine>()
@@ -38,7 +40,6 @@ var configuration = new MapperConfiguration(cfg =>
     .ForMember(i => i.Name, conf => conf.MapFrom(dto => dto.Item));
 });
 ```
-
 When mapping from DTO Expression
 
 ```c#
