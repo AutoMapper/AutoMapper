@@ -23,45 +23,48 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. toctree::
    :hidden:
    :maxdepth: 2
-   :caption: User Documentation
-
+   :caption: Overview
    Getting-started
+   Quickstart
+   Understanding-your-mapping
+   The-MyGet-build
+.. _feature-docs:
+.. toctree::
+   :maxdepth: 2
+   :caption: Features
+   Configuration
+   Configuration-validation
+   Dependency-injection
+   Projection
+   Nested-mappings
+   Lists-and-arrays
+   Construction
+   Flattening
+   Reverse-Mapping-and-Unflattening
+   Mapping-inheritance
+   Attribute-mapping
+   Dynamic-and-ExpandoObject-Mapping
+   Open-Generics
+   Queryable-Extensions
+   Expression-Translation-(UseAsDataSource)
+.. toctree::
+   :maxdepth: 2
+   :caption: Extensibility
+   Custom-type-converters
+   Custom-value-resolvers
+   Conditional-mapping
+   Null-substitution
+   Value-converters
+   Value-transformers
+   Before-and-after-map-actions
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Upgrading
+   API-Changes
    5.0-Upgrade-Guide
    8.0-Upgrade-Guide
    9.0-Upgrade-Guide
-   Setup
-   Understanding-your-mapping
-   The-MyGet-build
-   API-Changes
-
-.. _feature-docs:
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Feature Documentation
-
-   Flattening
-   Reverse-Mapping-and-Unflattening
-   Projection
-   Configuration-validation
-   Lists-and-arrays
-   Nested-mappings
-   Custom-type-converters
-   Custom-value-resolvers
-   Value-converters
-   Value-transformers
-   Null-substitution
-   Before-and-after-map-actions
-   Dependency-injection
-   Mapping-inheritance
-   Queryable-Extensions
-   Configuration
-   Attribute-mapping
-   Construction
-   Conditional-mapping
-   Open-Generics
-   Dynamic-and-ExpandoObject-Mapping
-   Expression-Translation-(UseAsDataSource)
       
 Examples
 ========
