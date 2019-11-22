@@ -21,14 +21,15 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. _user-docs:
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
    :caption: Overview
    Getting-started
    Quickstart
    Understanding-your-mapping
    The-MyGet-build
+
 .. _feature-docs:
+
 .. toctree::
    :maxdepth: 2
    :caption: Features
@@ -47,6 +48,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Open-Generics
    Queryable-Extensions
    Expression-Translation-(UseAsDataSource)
+
 .. toctree::
    :maxdepth: 2
    :caption: Extensibility
@@ -57,8 +59,8 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Value-converters
    Value-transformers
    Before-and-after-map-actions
+
 .. toctree::
-   :hidden:
    :maxdepth: 2
    :caption: Upgrading
    API-Changes
