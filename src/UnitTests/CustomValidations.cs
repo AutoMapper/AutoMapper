@@ -5,7 +5,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class AdvancedConfiguration
+    public class CustomValidations
     {
         public class Source
         {
