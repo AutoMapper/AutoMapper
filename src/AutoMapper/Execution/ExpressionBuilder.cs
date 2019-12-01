@@ -60,7 +60,7 @@ namespace AutoMapper.Execution
             var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
                 : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
-            var ifSourceNull = destinationParameter.Type.IsCollectionType() ? ClearDestinationCollection() : destination;
+            var ifSourceNull = destinationParameter.Type.IsGenericCollectionType() ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
             Expression ClearDestinationCollection()
             {

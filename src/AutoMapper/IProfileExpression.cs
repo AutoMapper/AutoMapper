@@ -119,6 +119,11 @@ namespace AutoMapper
         bool? EnableNullPropagationForQueryMapping { get; set; }
 
         /// <summary>
+        /// Enable mapping of collection members that have no write accessor (i.e no setter for properties).
+        /// </summary>
+        bool? EnableMappingOfCollectionMembersWithoutWriteAccessor { get; set; }
+
+        /// <summary>
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }
@@ -145,7 +150,7 @@ namespace AutoMapper
         Func<FieldInfo, bool> ShouldMapField { get; set; }
         Func<MethodInfo, bool> ShouldMapMethod { get; set; }
         Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
-        
+
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
 

@@ -1,6 +1,6 @@
-using AutoMapper.Configuration;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -23,7 +23,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             // Handles null source property so it will not create an object with possible non-nullable properties 
             // which would result in an exception.
-            if (propertyMap.TypeMap.Profile.AllowNullDestinationValues && !propertyMap.AllowNull && !(result.ResolutionExpression is ParameterExpression) && !result.ResolutionExpression.Type.IsCollectionType())
+            if (propertyMap.TypeMap.Profile.AllowNullDestinationValues && !propertyMap.AllowNull && !(result.ResolutionExpression is ParameterExpression) && !result.ResolutionExpression.Type.IsGenericCollectionType())
             {
                 transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }

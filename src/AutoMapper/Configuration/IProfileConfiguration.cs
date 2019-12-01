@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Mappers;
 
 namespace AutoMapper.Configuration
 {
@@ -16,6 +15,7 @@ namespace AutoMapper.Configuration
         bool? AllowNullDestinationValues { get; }
         bool? AllowNullCollections { get; }
         bool? EnableNullPropagationForQueryMapping { get; }
+        bool? EnableMappingOfCollectionMembersWithoutWriteAccessor { get; }
         IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
 

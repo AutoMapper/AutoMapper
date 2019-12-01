@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using Shouldly;
 using Xunit;
 
@@ -98,6 +96,81 @@ namespace AutoMapper.UnitTests.Mappers
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
             {
+                config.CreateMap<Source, Destination>();
+            });
+
+            [Fact]
+            public void Should_map_readonly_values()
+            {
+                var source = new Source
+                {
+                    Values = new List<int>
+                    {
+                        1,
+                        2,
+                        3,
+                        4,
+                    }
+                };
+
+                var dest = Mapper.Map<Destination>(source);
+
+                dest.Values.Count.ShouldBe(4);
+            }
+        }
+
+        public class When_mapping_to_collection_property_without_setter_and_feature_not_enabled : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public IReadOnlyCollection<int> Values { get; set; }
+            }
+
+            public class Destination
+            {
+                public IList<int> Values { get; } = new List<int>();
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+            {
+                config.CreateMap<Source, Destination>();
+            });
+
+            [Fact]
+            public void Should_map_readonly_values()
+            {
+                var source = new Source
+                {
+                    Values = new List<int>
+                    {
+                        1,
+                        2,
+                        3,
+                        4,
+                    }
+                };
+
+                var dest = Mapper.Map<Destination>(source);
+
+                dest.Values.Count.ShouldBe(0);
+            }
+        }
+
+        public class When_mapping_to_collection_property_without_setter_and_feature_enabled : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public IReadOnlyCollection<int> Values { get; set; }
+            }
+
+            public class Destination
+            {
+                public IList<int> Values { get; } = new List<int>();
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+            {
+                config.EnableMappingOfCollectionMembersWithoutWriteAccessor = true;
                 config.CreateMap<Source, Destination>();
             });
 

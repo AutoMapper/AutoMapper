@@ -11,7 +11,6 @@ namespace AutoMapper
 {
     using AutoMapper.Features;
     using Internal;
-    using static Expression;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -153,6 +152,15 @@ namespace AutoMapper
             var propertyMap = new PropertyMap(destProperty, this);
 
             propertyMap.ChainMembers(resolvers);
+
+            if (propertyMap.CanResolveValue
+                && Profile.EnableMappingOfCollectionMembersWithoutWriteAccessor
+                && destProperty is PropertyInfo propertyInfo
+                && propertyInfo.PropertyType.IsGenericCollectionType()
+                && !ReflectionHelper.CanBeSet(propertyMap.DestinationMember))
+            {
+                propertyMap.UseDestinationValue = true;
+            }
 
             AddPropertyMap(propertyMap);
         }

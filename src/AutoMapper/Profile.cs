@@ -66,6 +66,7 @@ namespace AutoMapper
         public bool? AllowNullDestinationValues { get; set; }
         public bool? AllowNullCollections { get; set; }
         public bool? EnableNullPropagationForQueryMapping { get; set; }
+        public bool? EnableMappingOfCollectionMembersWithoutWriteAccessor { get; set; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
         public Func<FieldInfo, bool> ShouldMapField { get; set; }
         public Func<MethodInfo, bool> ShouldMapMethod { get; set; }
@@ -95,13 +96,13 @@ namespace AutoMapper
             });
         }
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() => 
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() =>
             CreateMap<TSource, TDestination>(MemberList.Destination);
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList) => 
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList) =>
             CreateMappingExpression<TSource, TDestination>(memberList);
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType) => 
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType) =>
             CreateMap(sourceType, destinationType, MemberList.Destination);
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)

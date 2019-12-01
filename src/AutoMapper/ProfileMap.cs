@@ -29,6 +29,7 @@ namespace AutoMapper
             AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
             AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
             EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
+            EnableMappingOfCollectionMembersWithoutWriteAccessor = profile.EnableMappingOfCollectionMembersWithoutWriteAccessor ?? configuration?.EnableMappingOfCollectionMembersWithoutWriteAccessor ?? false;
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
@@ -72,6 +73,7 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
+        public bool EnableMappingOfCollectionMembersWithoutWriteAccessor { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; }

@@ -31,8 +31,11 @@ namespace AutoMapper.Configuration.Internal
         public static Type GetTypeOfNullable(Type type) 
             => type.GetTypeInfo().GenericTypeArguments[0];
 
-        public static bool IsCollectionType(Type type) 
+        public static bool IsGenericCollectionType(Type type) 
             => type.ImplementsGenericInterface(typeof(ICollection<>));
+
+        public static bool IsCollectionType(Type type)
+            => typeof(ICollection).IsAssignableFrom(type) || IsGenericCollectionType(type);
 
         public static bool IsEnumerableType(Type type) 
             => typeof(IEnumerable).IsAssignableFrom(type);

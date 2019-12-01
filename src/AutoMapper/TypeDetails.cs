@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +18,9 @@ namespace AutoMapper
             Type = type;
             var membersToMap = MembersToMap(config.ShouldMapProperty, config.ShouldMapField);
             var publicReadableMembers = GetAllPublicReadableMembers(membersToMap);
-            var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
+            var publicWritableMembers = config.EnableMappingOfCollectionMembersWithoutWriteAccessor
+                ? this.GetAllPublicWritableMembersWithSupportForAnyWritableCollection(membersToMap)
+                : this.GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
             PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
@@ -60,7 +61,7 @@ namespace AutoMapper
         }
 
         private static Func<MemberInfo, bool> MembersToMap(
-            Func<PropertyInfo, bool> shouldMapProperty, 
+            Func<PropertyInfo, bool> shouldMapProperty,
             Func<FieldInfo, bool> shouldMapField)
         {
             return m =>
@@ -153,19 +154,21 @@ namespace AutoMapper
                         ? // favor the first property that can both read & write - otherwise pick the first one
                         x.First(y => y.CanWrite && y.CanRead)
                         : x.First())
-                .Where(pi => pi.CanWrite || pi.PropertyType.IsListOrDictionaryType())
                 //.OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
                 .Concat(allMembers.Where(x => x is FieldInfo)); // add FieldInfo objects back
 
             return filteredMembers.ToArray();
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap) 
+        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
-        
+
+        private IEnumerable<MemberInfo> GetAllPublicWritableMembersWithSupportForAnyWritableCollection(Func<MemberInfo, bool> membersToMap)
+            => GetAllPublicMembers(PropertyWritableWithSupportForAnyWritableCollection, FieldWritable, membersToMap);
+
         private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
         {
             return Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
@@ -177,10 +180,16 @@ namespace AutoMapper
 
         private static bool PropertyWritable(PropertyInfo propertyInfo)
         {
-            var propertyIsEnumerable = (typeof(string) != propertyInfo.PropertyType)
-                                        && typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(propertyInfo.PropertyType.GetTypeInfo());
+            var propertyIsListOrDictionary = propertyInfo.PropertyType.IsListOrDictionaryType();
 
-            return propertyInfo.CanWrite || propertyIsEnumerable;
+            return propertyInfo.CanWrite || propertyIsListOrDictionary;
+        }
+
+        private static bool PropertyWritableWithSupportForAnyWritableCollection(PropertyInfo propertyInfo)
+        {
+            var propertyIsWritableCollection = propertyInfo.PropertyType.IsCollectionType();
+
+            return propertyInfo.CanWrite || propertyIsWritableCollection;
         }
 
         private static bool FieldWritable(FieldInfo fieldInfo) => !fieldInfo.IsInitOnly;

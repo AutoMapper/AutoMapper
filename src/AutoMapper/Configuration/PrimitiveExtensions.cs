@@ -33,6 +33,9 @@ namespace AutoMapper.Configuration
         public static Type GetTypeOfNullable(this Type type)
             => PrimitiveHelper.GetTypeOfNullable(type);
 
+        public static bool IsGenericCollectionType(this Type type)
+            => PrimitiveHelper.IsGenericCollectionType(type);
+
         public static bool IsCollectionType(this Type type)
             => PrimitiveHelper.IsCollectionType(type);
 
