@@ -66,7 +66,7 @@ or by automatically scanning for profiles:
 var config = new MapperConfiguration(cfg => {
     cfg.AddMaps(myAssembly);
 });
-var configuration = new MapperConfiguration(cfg => cfg.AddProfiles(myAssembly));
+var configuration = new MapperConfiguration(cfg => cfg.AddMaps(myAssembly));
 
 // Can also use assembly names:
 var configuration = new MapperConfiguration(cfg =>

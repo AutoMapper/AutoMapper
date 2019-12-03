@@ -78,7 +78,8 @@ namespace AutoMapper.Execution
 
         private static Expression DefaultDestination(Type destinationType, Type declaredDestinationType, ProfileMap profileMap)
         {
-            if(profileMap.AllowNullCollections || destinationType == typeof(string) || !destinationType.IsEnumerableType())
+            var isCollection = destinationType.IsNonStringEnumerable();
+            if ((isCollection && profileMap.AllowNullCollections) || (!isCollection && profileMap.AllowNullDestinationValues))
             {
                 return Default(declaredDestinationType);
             }
