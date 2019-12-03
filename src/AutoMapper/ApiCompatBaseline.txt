@@ -26,4 +26,5 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Conventions.MapToAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-Total Issues: 27
+MembersMustExist : Member 'AutoMapper.Execution.DelegateFactory.GenerateConstructorExpression(System.Type, AutoMapper.ProfileMap)' does not exist in the implementation but it does exist in the contract.
+Total Issues: 28

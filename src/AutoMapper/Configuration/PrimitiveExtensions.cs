@@ -15,6 +15,8 @@ namespace AutoMapper.Configuration
             }
         }
 
+        public static bool IsNonStringEnumerable(this Type type) => type != typeof(string) && type.IsEnumerableType();
+
         public static bool IsSetType(this Type type)
             => type.ImplementsGenericInterface(typeof(ISet<>));
 
