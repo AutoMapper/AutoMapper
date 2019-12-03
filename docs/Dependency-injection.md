@@ -126,7 +126,7 @@ public class AutoMapperModule : NinjectModule
         var config = new MapperConfiguration(cfg =>
         {
             // Add all profiles in current assembly
-            cfg.AddProfiles(GetType().Assembly);
+            cfg.AddMaps(GetType().Assembly);
         });
 
         return config;
@@ -178,7 +178,7 @@ public class MapperProvider
         var mce = new MapperConfigurationExpression();
         mce.ConstructServicesUsing(_container.GetInstance);
 
-        mce.AddProfiles(typeof(SomeProfile).Assembly);
+        mce.AddMaps(typeof(SomeProfile).Assembly);
 
         var mc = new MapperConfiguration(mce);
         mc.AssertConfigurationIsValid();

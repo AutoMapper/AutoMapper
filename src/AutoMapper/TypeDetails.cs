@@ -175,13 +175,7 @@ namespace AutoMapper
 
         private static bool FieldReadable(FieldInfo fieldInfo) => true;
 
-        private static bool PropertyWritable(PropertyInfo propertyInfo)
-        {
-            var propertyIsEnumerable = (typeof(string) != propertyInfo.PropertyType)
-                                        && typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(propertyInfo.PropertyType.GetTypeInfo());
-
-            return propertyInfo.CanWrite || propertyIsEnumerable;
-        }
+        private static bool PropertyWritable(PropertyInfo propertyInfo) => propertyInfo.CanWrite || propertyInfo.PropertyType.IsNonStringEnumerable();
 
         private static bool FieldWritable(FieldInfo fieldInfo) => !fieldInfo.IsInitOnly;
 

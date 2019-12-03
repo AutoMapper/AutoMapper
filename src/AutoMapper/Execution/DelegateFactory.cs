@@ -25,11 +25,6 @@ namespace AutoMapper.Execution
             return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
         }
 
-        public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration) =>
-            configuration.AllowNullDestinationValues
-                ? GenerateConstructorExpression(type)
-                : GenerateNonNullConstructorExpression(type);
-
         public static Expression GenerateNonNullConstructorExpression(Type type) => type.IsValueType()
             ? Default(type)
             : (type == typeof(string)
