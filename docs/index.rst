@@ -23,6 +23,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. toctree::
    :maxdepth: 2
    :caption: Overview
+   
    Getting-started
    Quickstart
    Understanding-your-mapping
@@ -33,6 +34,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. toctree::
    :maxdepth: 2
    :caption: Features
+   
    Configuration
    Configuration-validation
    Dependency-injection
@@ -54,6 +56,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. toctree::
    :maxdepth: 2
    :caption: Extensibility
+   
    Custom-type-converters
    Custom-value-resolvers
    Conditional-mapping
@@ -67,6 +70,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
 .. toctree::
    :maxdepth: 2
    :caption: Upgrading
+   
    API-Changes
    5.0-Upgrade-Guide
    8.0-Upgrade-Guide
