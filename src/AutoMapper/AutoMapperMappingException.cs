@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Wraps mapping exceptions. Check exception.ToString() for the full error message.
+    /// </summary>
     public class AutoMapperMappingException : Exception
     {
         private readonly string _message;
