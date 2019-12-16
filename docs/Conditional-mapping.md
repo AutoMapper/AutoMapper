@@ -33,7 +33,7 @@ var configuration = new MapperConfiguration(cfg => {
     .ForMember(dest => dest.baz, opt => {
         opt.PreCondition(src => (src.baz >= 0));
         opt.MapFrom(src => {
-            // Expensive resolution proccess that can be avoided with a PreCondition
+            // Expensive resolution process that can be avoided with a PreCondition
         });
     });
 });
