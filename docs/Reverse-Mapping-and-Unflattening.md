@@ -25,7 +25,7 @@ public class OrderDto {
 We can map both directions, including unflattening:
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
   cfg.CreateMap<Order, OrderDto>()
      .ReverseMap();
 });
@@ -43,11 +43,11 @@ var order = new Order {
   Total = 15.8m
 };
 
-var orderDto = Mapper.Map<Order, OrderDto>(order);
+var orderDto = mapper.Map<Order, OrderDto>(order);
 
 orderDto.CustomerName = "Joe";
 
-Mapper.Map(orderDto, order);
+mapper.Map(orderDto, order);
 
 order.Customer.Name.ShouldEqual("Joe");
 ```

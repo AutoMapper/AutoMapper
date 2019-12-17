@@ -3,7 +3,7 @@
 Occasionally, you might need to perform custom logic before or after a map occurs. These should be a rarity, as it's more obvious to do this work outside of AutoMapper. You can create global before/after map actions:
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
   cfg.CreateMap<Source, Dest>()
     .BeforeMap((src, dest) => src.Value = src.Value + 10)
     .AfterMap((src, dest) => dest.Name = "John");
@@ -14,7 +14,7 @@ Or you can create before/after map callbacks during mapping:
 
 ```c#
 int i = 10;
-Mapper.Map<Source, Dest>(src, opt => {
+mapper.Map<Source, Dest>(src, opt => {
     opt.BeforeMap((src, dest) => src.Value = src.Value + i);
     opt.AfterMap((src, dest) => dest.Name = HttpContext.Current.Identity.Name);
 });
@@ -30,13 +30,13 @@ Using the previous example, here is an encapsulation of naming some objects "Joh
 ``` csharp
 public class NameMeJohnAction : IMappingAction<SomePersonObject, SomeOtherPersonObject>
 {
-    public void Process(SomePersonObject source, SomeOtherPersonObject destination)
+    public void Process(SomePersonObject source, SomeOtherPersonObject destination, ResolutionContext context)
     {
         destination.Name = "John";
     }
 }
 
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
   cfg.CreateMap<SomePersonObject, SomeOtherPersonObject>()
     .AfterMap<NameMeJohnAction>();
 });
@@ -57,7 +57,7 @@ public class SetTraceIdentifierAction : IMappingAction<SomeModel, SomeOtherModel
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
-    public void Process(SomeModel source, SomeOtherModel destination)
+    public void Process(SomeModel source, SomeOtherModel destination, ResolutionContext context)
     {
         destination.TraceIdentifier = _httpContextAccessor.HttpContext.TraceIdentifier;
     }

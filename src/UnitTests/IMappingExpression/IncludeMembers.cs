@@ -50,6 +50,61 @@ namespace AutoMapper.UnitTests.IMappingExpression
         }
     }
 
+    public class IncludeMembersNested : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Name { get; set; }
+            public InnerSource InnerSource { get; set; }
+            public OtherInnerSource OtherInnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public NestedInnerSource NestedInnerSource { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public NestedOtherInnerSource NestedOtherInnerSource { get; set; }
+        }
+        class NestedInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
+        class NestedOtherInnerSource
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource.NestedInnerSource, s => s.OtherInnerSource.NestedOtherInnerSource);
+            cfg.CreateMap<NestedInnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<NestedOtherInnerSource, Destination>(MemberList.None);
+        });
+        [Fact]
+        public void Should_flatten()
+        {
+            var source = new Source
+            {
+                Name = "name",
+                InnerSource = new InnerSource { NestedInnerSource = new NestedInnerSource { Description = "description" } },
+                OtherInnerSource = new OtherInnerSource { NestedOtherInnerSource = new NestedOtherInnerSource { Title = "title" } }
+            };
+            var destination = Mapper.Map<Destination>(source);
+            destination.Name.ShouldBe("name");
+            destination.Description.ShouldBe("description");
+            destination.Title.ShouldBe("title");
+        }
+    }
+
     public class IncludeMembersWithMapFromExpression : AutoMapperSpecBase
     {
         class Source
@@ -1203,5 +1258,146 @@ namespace AutoMapper.UnitTests.IMappingExpression
         });
         [Fact]
         public void Should_inherit_configuration() => Mapper.Map<Destination>(new ParentOfSource { InnerSource = new Source { FirstName = "first", LastName = "last" } }).FullName.ShouldBe("first last");
+    }
+    public class IncludeMembersWithIncludeBase : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+        }
+        public class Address
+        {
+            public string Line1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CustomerDtoBase
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string AddressLine1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CreateCustomerDto : CustomerDtoBase
+        {
+            public string CreatedBy { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address) .ForMember(m => m.Id, o => o.Ignore());
+            cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
+            cfg.CreateMap<Customer, CreateCustomerDto>().IncludeBase<Customer, CustomerDtoBase>().ForMember(m => m.CreatedBy, o => o.Ignore());
+        });
+        [Fact]
+        public void Should_inherit_IncludeMembers() => Mapper.Map<CreateCustomerDto>(new Customer { Address = new Address { Postcode = "Postcode" } }).Postcode.ShouldBe("Postcode");
+    }
+    public class IncludeMembersWithIncludeBaseOverride : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+            public Address NewAddress { get; set; }
+        }
+        public class Address
+        {
+            public string Line1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CustomerDtoBase
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string AddressLine1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CreateCustomerDto : CustomerDtoBase
+        {
+            public string CreatedBy { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
+            cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
+            cfg.CreateMap<Address, CreateCustomerDto>(MemberList.None).IncludeBase<Address, CustomerDtoBase>();
+            cfg.CreateMap<Customer, CreateCustomerDto>().IncludeMembers(s => s.NewAddress).IncludeBase<Customer, CustomerDtoBase>().ForMember(m => m.CreatedBy, o => o.Ignore());
+        });
+        [Fact]
+        public void Should_override_IncludeMembers() => Mapper.Map<CreateCustomerDto>(new Customer { NewAddress = new Address { Postcode = "Postcode" } }).Postcode.ShouldBe("Postcode");
+    }
+    public class IncludeMembersWithIncludeBaseOverrideMapFrom : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+        }
+        public class Address
+        {
+            public string Line1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CustomerDtoBase
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string AddressLine1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CreateCustomerDto : CustomerDtoBase
+        {
+            public string CreatedBy { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
+            cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
+            cfg.CreateMap<Customer, CreateCustomerDto>()
+                .IncludeBase<Customer, CustomerDtoBase>()
+                .ForMember(d=>d.Postcode, o=>o.MapFrom((s, d)=>s.Name))
+                .ForMember(m => m.CreatedBy, o => o.Ignore());
+        });
+        [Fact]
+        public void Should_override_IncludeMembers() => Mapper.Map<CreateCustomerDto>(new Customer { Name = "Postcode", Address = new Address() }).Postcode.ShouldBe("Postcode");
+    }
+    public class IncludeMembersWithIncludeBaseOverrideConvention : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+        }
+        public class NewCustomer : Customer
+        {
+            public string Postcode { get; set; }
+        }
+        public class Address
+        {
+            public string Line1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CustomerDtoBase
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string AddressLine1 { get; set; }
+            public string Postcode { get; set; }
+        }
+        public class CreateCustomerDto : CustomerDtoBase
+        {
+            public string CreatedBy { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
+            cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
+            cfg.CreateMap<NewCustomer, CreateCustomerDto>().IncludeBase<Customer, CustomerDtoBase>().ForMember(m => m.CreatedBy, o => o.Ignore());
+        });
+        [Fact]
+        public void Should_override_IncludeMembers() => Mapper.Map<CreateCustomerDto>(new NewCustomer { Postcode = "Postcode", Address = new Address() }).Postcode.ShouldBe("Postcode");
     }
 }

@@ -143,6 +143,16 @@ namespace AutoMapper
 
     public interface IRuntimeMapper : IMapper
     {
+        [Obsolete(Mapper.NoContextMapperOptions)]
+        new TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);
+        [Obsolete(Mapper.NoContextMapperOptions)]
+        new TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts);
+        [Obsolete(Mapper.NoContextMapperOptions)]
+        new TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts);
+        [Obsolete(Mapper.NoContextMapperOptions)]
+        new object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        [Obsolete(Mapper.NoContextMapperOptions)]
+        new object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
         ResolutionContext DefaultContext { get; }
         object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context, IMemberMap memberMap = null);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, IMemberMap memberMap = null);

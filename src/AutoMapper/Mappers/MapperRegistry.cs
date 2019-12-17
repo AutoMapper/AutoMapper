@@ -4,6 +4,15 @@ namespace AutoMapper.Mappers
 {
     internal static class MapperRegistry
     {
+        /* Mapping order:
+         - Nullables
+         - Collections
+         - Assignable
+         - Primitives
+         - Converters
+         - Conversion operators
+         - "Special" cases
+         */
         public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
             new NullableSourceMapper(),
