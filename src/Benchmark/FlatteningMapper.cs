@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 
 namespace Benchmark
@@ -14,7 +15,6 @@ namespace Benchmark
         public abstract object ManualMap();
     }
 
-    [ClrJob, CoreJob]
     public class ExpressionCompilationBenchmark
     {
         public class Address
@@ -70,7 +70,7 @@ namespace Benchmark
         }
     }
 
-    [ClrJob, CoreJob]
+    [SimpleJob(RuntimeMoniker.Net47), SimpleJob(RuntimeMoniker.CoreRt31)]
     public class DeepTypeMapper : MapperBenchmarkBase
     {
         private static readonly Customer _customer;
@@ -180,7 +180,7 @@ namespace Benchmark
 
     }
 
-    [ClrJob, CoreJob]
+    [SimpleJob(RuntimeMoniker.Net47), SimpleJob(RuntimeMoniker.CoreRt31)]
     public class ComplexTypeMapper : MapperBenchmarkBase
     {
         private static readonly Foo _foo;
@@ -334,7 +334,7 @@ namespace Benchmark
 
     }
 
-    [ClrJob, CoreJob]
+    [SimpleJob(RuntimeMoniker.Net47), SimpleJob(RuntimeMoniker.CoreRt31)]
     public class CtorMapper : MapperBenchmarkBase
     {
         private static readonly Model11 _model;
@@ -377,7 +377,7 @@ namespace Benchmark
 
     }
 
-    [ClrJob, CoreJob]
+    [SimpleJob(RuntimeMoniker.Net47), SimpleJob(RuntimeMoniker.CoreRt31)]
     public class FlatteningMapper : MapperBenchmarkBase
     {
         private static readonly ModelObject _source;

@@ -20,6 +20,10 @@
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>CHOCOLATE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ResolvedMatchingContract Include="..\LastMajorVersionBinary\AutoMapper.dll" />
   </ItemGroup>

@@ -4663,7 +4663,7 @@ namespace FastExpressionCompiler
     }
 
     /// Hey
-    public static class ILGeneratorHacks
+    internal static class ILGeneratorHacks
     {
         /*
         // Original methods from ILGenerator.cs

@@ -11,6 +11,12 @@ namespace AutoMapper
 
     internal static class ExpressionExtensions
     {
+#if VANILLA
+        public static Func<R> CompileFast<R>(this Expression<Func<R>> lambdaExpr) => lambdaExpr.Compile();
+        public static Delegate CompileFast(this LambdaExpression lambdaExpr) => lambdaExpr.Compile();
+        public static Func<T1, T2, T3, R> CompileFast<T1, T2, T3, R>(this Expression<Func<T1, T2, T3, R>> lambdaExpr) => lambdaExpr.Compile();
+#endif
+
         public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
             members
                 .Aggregate(
