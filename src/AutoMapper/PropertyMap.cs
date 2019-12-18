@@ -14,7 +14,7 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationMember.Name}")]
     public class PropertyMap : DefaultMemberMap
     {
-        private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
+        private List<MemberInfo> _memberChain = new List<MemberInfo>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
@@ -34,7 +34,7 @@ namespace AutoMapper
             CustomSource = expression;
             if(includedMemberMap._memberChain.Count > 0)
             {
-                ChainMembers(expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain));
+                _memberChain = expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain).ToList();
             }
             CustomMapExpression = CheckCustomSource(CustomMapExpression);
         }
@@ -52,7 +52,7 @@ namespace AutoMapper
 
         public override Type DestinationType => DestinationMember.GetMemberType();
 
-        public override IEnumerable<MemberInfo> SourceMembers => _memberChain;
+        public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
         public override LambdaExpression CustomSource { get; set; }
         public override bool Inline { get; set; } = true;
         public override bool Ignored { get; set; }
@@ -62,7 +62,7 @@ namespace AutoMapper
         public override LambdaExpression Condition { get; set; }
         public override LambdaExpression PreCondition { get; set; }
         public override LambdaExpression CustomMapExpression { get; set; }
-        public override bool UseDestinationValue { get; set; }
+        public override bool? UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public override object NullSubstitute { get; set; }
         public override ValueResolverConfiguration ValueResolverConfig { get; set; }
@@ -92,7 +92,9 @@ namespace AutoMapper
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
             ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
+            UseDestinationValue = UseDestinationValue ?? inheritedMappedProperty.UseDestinationValue;
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
+            _memberChain = _memberChain.Count == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }
 
         public override bool CanResolveValue => HasSource && !Ignored;

@@ -117,6 +117,11 @@ namespace AutoMapper
         void SetMappingOrder(int mappingOrder);
 
         /// <summary>
+        /// Reset UseDestinationValue.
+        /// </summary>
+        void DontUseDestinationValue();
+
+        /// <summary>
         /// Use the destination value instead of mapping from the source value or creating a new instance
         /// </summary>
         void UseDestinationValue();

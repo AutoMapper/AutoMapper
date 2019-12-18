@@ -404,11 +404,10 @@ namespace AutoMapper.QueryableExtensions
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
 
                 var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
-                var typeMapFactory = new TypeMapFactory();
                 TypeMap firstTypeMap;
                 lock(_configurationProvider)
                 {
-                    firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
+                    firstTypeMap = TypeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
                 }
                 var secondParameter = Parameter(letType, "dtoLet");
 

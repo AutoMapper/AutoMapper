@@ -29,7 +29,14 @@ namespace AutoMapper
         /// <summary>
         /// Context items from <see cref="Options"/>
         /// </summary>
-        public IDictionary<string, object> Items => Options.Items;
+        public IDictionary<string, object> Items
+        {
+            get
+            {
+                CheckDefault();
+                return Options.Items;
+            }
+        }
 
         /// <summary>
         /// Current mapper
@@ -79,6 +86,9 @@ namespace AutoMapper
         TDestination IMapper.Map<TDestination>(object source)
             => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
 
+        TDestination IRuntimeMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map<TDestination>(source, opts);
+
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             opts(Options);
@@ -88,6 +98,9 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
+
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
+            ((IMapper)this).Map<TSource, TDestination>(source, opts);
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
@@ -109,6 +122,9 @@ namespace AutoMapper
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
 
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
+            ((IMapper)this).Map<TSource, TDestination>(source, destination, opts);
+
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(_inner.ServiceCtor);
@@ -127,6 +143,9 @@ namespace AutoMapper
         object IMapper.Map(object source, Type sourceType, Type destinationType)
             => _inner.Map(source, null, sourceType, destinationType, this);
 
+        object IRuntimeMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map(source, sourceType, destinationType, opts);
+
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             opts(Options);
@@ -136,6 +155,9 @@ namespace AutoMapper
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, sourceType, destinationType, this);
+
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
+            ((IMapper)this).Map(source, destination, sourceType, destinationType, opts);
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
@@ -202,7 +224,7 @@ namespace AutoMapper
         {
             if (IsDefault)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("You must use a Map overload that takes Action<IMappingOperationOptions>!");
             }
         }
     }
@@ -211,20 +233,20 @@ namespace AutoMapper
     {
         public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
-
-        private readonly object _source;
         private readonly Type _destinationType;
 
         public ContextCacheKey(object source, Type destinationType)
         {
-            _source = source;
+            Source = source;
             _destinationType = destinationType;
         }
 
-        public override int GetHashCode() => HashCodeCombiner.Combine(_source, _destinationType);
+        public object Source { get; }
+
+        public override int GetHashCode() => HashCodeCombiner.Combine(Source, _destinationType);
 
         public bool Equals(ContextCacheKey other) =>
-            _source == other._source && _destinationType == other._destinationType;
+            Source == other.Source && _destinationType == other._destinationType;
 
         public override bool Equals(object other) => 
             other is ContextCacheKey && Equals((ContextCacheKey)other);

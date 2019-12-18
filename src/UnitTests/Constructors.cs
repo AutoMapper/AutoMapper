@@ -8,6 +8,62 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class Nullable_enum_default_value : AutoMapperSpecBase
+    {
+        public enum SourceEnum { A, B }
+        public class Source
+        {
+            public SourceEnum? Enum { get; set; }
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; set; }
+            public Target(TargetEnum? Enum = TargetEnum.A)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source { Enum = SourceEnum.B }).Enum.ShouldBe(TargetEnum.B);
+    }
+    public class Nullable_enum_default_value_null : AutoMapperSpecBase
+    {
+        public class Source
+        {
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; }
+            public Target(TargetEnum? Enum = null)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBeNull();
+    }
+    public class Nullable_enum_default_value_not_null : AutoMapperSpecBase
+    {
+        public class Source
+        {
+        }
+        public enum TargetEnum { A, B }
+        public class Target
+        {
+            public TargetEnum? Enum { get; }
+            public Target(TargetEnum? Enum = TargetEnum.B)
+            {
+                this.Enum = Enum;
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
+        [Fact]
+        void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBe(TargetEnum.B);
+    }
     public class Dynamic_constructor_mapping : AutoMapperSpecBase
     {
         public class ParentDTO<T>
@@ -1609,4 +1665,135 @@ namespace AutoMapper.UnitTests.Constructors
             dest.Value1.ShouldBeNull();
         }
     }
+
+    public class When_configuring_ctor_param_members_without_source_property_1 : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Result { get; }
+
+            public Source(string result)
+            {
+                Result = result;
+            }
+        }
+
+        public class Dest
+        {
+            public string Result{ get; }
+            public dynamic Details { get; }
+
+            public Dest(string result, DestInner1 inner1)
+            {
+                Result = result;
+                Details = inner1;
+            }
+            public Dest(string result, DestInner2 inner2)
+            {
+                Result = result;
+                Details = inner2;
+            }
+
+            public class DestInner1
+            {
+                public int Value { get; }
+
+                public DestInner1(int value)
+                {
+                    Value = value;
+                }
+            }
+
+            public class DestInner2
+            {
+                public int Value { get; }
+
+                public DestInner2(int value)
+                {
+                    Value = value;
+                }
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        {
+            config.CreateMap<Source, Dest>()
+                .ForCtorParam("inner1", cfg => cfg.MapFrom(_ => new Dest.DestInner1(100)));
+        });
+
+        [Fact]
+        public void Should_redirect_value()
+        {
+            var dest = Mapper.Map<Dest>(new Source("Success"));
+
+            dest.ShouldNotBeNull();
+            Assert.Equal("100", dest.Details.Value.ToString());
+        }
+    }
+
+    public class When_configuring_ctor_param_members_without_source_property_2 : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Result { get; }
+
+            public Source(string result)
+            {
+                Result = result;
+            }
+        }
+
+        public class Dest
+        {
+            public string Result{ get; }
+            public dynamic Details { get; }
+
+            public Dest(string result, DestInner1 inner1)
+            {
+                Result = result;
+                Details = inner1;
+            }
+            public Dest(string result, DestInner2 inner2)
+            {
+                Result = result;
+                Details = inner2;
+            }
+
+            public class DestInner1
+            {
+                public int Value { get; }
+
+                public DestInner1(int value)
+                {
+                    Value = value;
+                }
+            }
+
+            public class DestInner2
+            {
+                public int Value { get; }
+
+                public DestInner2(int value)
+                {
+                    Value = value;
+                }
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        {
+            config.CreateMap<Source, Dest>()
+                .ForCtorParam("inner2", cfg => cfg.MapFrom(_ => new Dest.DestInner2(100)));
+        });
+
+        [Fact]
+        public void Should_redirect_value()
+        {
+            var dest = Mapper.Map<Dest>(new Source("Success"));
+
+            dest.ShouldNotBeNull();
+            Assert.Equal("100", dest.Details.Value.ToString());
+        }
+    }
+
 }

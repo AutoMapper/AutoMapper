@@ -59,7 +59,7 @@ namespace AutoMapper.Execution
             var defaultDestination = DefaultDestination(destinationType, declaredDestinationType, profileMap);
             var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
-                : memberMap.UseDestinationValue ? destinationParameter : defaultDestination;
+                : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
             var ifSourceNull = destinationParameter.Type.IsCollectionType() ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
             Expression ClearDestinationCollection()
@@ -78,7 +78,8 @@ namespace AutoMapper.Execution
 
         private static Expression DefaultDestination(Type destinationType, Type declaredDestinationType, ProfileMap profileMap)
         {
-            if(profileMap.AllowNullCollections || destinationType == typeof(string) || !destinationType.IsEnumerableType())
+            var isCollection = destinationType.IsNonStringEnumerable();
+            if ((isCollection && profileMap.AllowNullCollections) || (!isCollection && profileMap.AllowNullDestinationValues))
             {
                 return Default(declaredDestinationType);
             }

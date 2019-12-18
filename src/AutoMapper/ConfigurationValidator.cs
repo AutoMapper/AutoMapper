@@ -75,12 +75,15 @@ namespace AutoMapper
                     return;
                 }
                 typeMapsChecked.Add(typeMap);
+
+                var context = new ValidationContext(types, memberMap, typeMap);
+                _config.Validate(context);
+
                 if(typeMap.CustomMapExpression != null || typeMap.CustomMapFunction != null || typeMap.TypeConverterType != null)
                 {
                     return;
                 }
-                var context = new ValidationContext(types, memberMap, typeMap);
-                _config.Validate(context);
+
                 CheckPropertyMaps(typeMapsChecked, typeMap);
                 typeMap.IsValid = true;
             }

@@ -10,12 +10,12 @@ You can create value transformers at several different levels:
  - Member
 
 ```c#
-Mapper.Initialize(cfg => {
+var configuration = new MapperConfiguration(cfg => {
     cfg.ValueTransformers.Add<string>(val => val + "!!!");
 });
 
 var source = new Source { Value = "Hello" };
-var dest = Mapper.Map<Dest>(source);
+var dest = mapper.Map<Dest>(source);
 
 dest.Value.ShouldBe("Hello!!!");
 ```

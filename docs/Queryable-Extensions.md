@@ -1,10 +1,10 @@
 # Queryable Extensions
 
-When using an ORM such as NHibernate or Entity Framework with AutoMapper's standard `Mapper.Map` functions, you may notice that the ORM will query all the fields of all the objects within a graph when AutoMapper is attempting to map the results to a destination type.
+When using an ORM such as NHibernate or Entity Framework with AutoMapper's standard `mapper.Map` functions, you may notice that the ORM will query all the fields of all the objects within a graph when AutoMapper is attempting to map the results to a destination type.
 
 If your ORM exposes `IQueryable`s, you can use AutoMapper's QueryableExtensions helper methods to address this key pain.
 
-Using Entity Framework for an example, say that you have an entity `OrderLine` with a relationship with an entity `Item`. If you want to map this to an `OrderLineDTO` with the `Item`'s `Name` property, the standard `Mapper.Map` call will result in Entity Framework querying the entire `OrderLine` and `Item` table.
+Using Entity Framework for an example, say that you have an entity `OrderLine` with a relationship with an entity `Item`. If you want to map this to an `OrderLineDTO` with the `Item`'s `Name` property, the standard `mapper.Map` call will result in Entity Framework querying the entire `OrderLine` and `Item` table.
 
 Use this approach instead.
 
@@ -41,7 +41,7 @@ public class OrderLineDTO
 You can use the Queryable Extensions like so:
 
 ```c#
-Mapper.Initialize(cfg =>
+var configuration = new MapperConfiguration(cfg =>
     cfg.CreateMap<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
 
@@ -50,7 +50,7 @@ public List<OrderLineDTO> GetLinesForOrder(int orderId)
   using (var context = new orderEntities())
   {
     return context.OrderLines.Where(ol => ol.OrderId == orderId)
-             .ProjectTo<OrderLineDTO>().ToList();
+             .ProjectTo<OrderLineDTO>(configuration).ToList();
   }
 }
 ```
@@ -94,7 +94,7 @@ This map through AutoMapper will result in a SELECT N+1 problem, as each child `
 In the case where members names don't line up, or you want to create calculated property, you can use MapFrom (the expression-based overload) to supply a custom expression for a destination member:
 
 ```c#
-Mapper.Initialize(cfg => cfg.CreateMap<Customer, CustomerDto>()
+var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDto>()
     .ForMember(d => d.FullName, opt => opt.MapFrom(c => c.FirstName + " " + c.LastName))
     .ForMember(d => d.TotalContacts, opt => opt.MapFrom(c => c.Contacts.Count()));
 ```
@@ -135,7 +135,7 @@ public class Order {
 public class OrderDto {
     public string OrderType { get; set; }
 }
-var orders = dbContext.Orders.ProjectTo<OrderDto>().ToList();
+var orders = dbContext.Orders.ProjectTo<OrderDto>(configuration).ToList();
 orders[0].OrderType.ShouldEqual("Online");
 ```
 
@@ -144,16 +144,16 @@ orders[0].OrderType.ShouldEqual("Online");
 In some scenarios, such as OData, a generic DTO is returned through an IQueryable controller action. Without explicit instructions, AutoMapper will expand all members in the result. To control which members are expanded during projection, set ExplicitExpansion in the configuration and then pass in the members you want to explicitly expand:
 
 ```c#
-dbContext.Orders.ProjectTo<OrderDto>(
+dbContext.Orders.ProjectTo<OrderDto>(configuration,
     dest => dest.Customer,
     dest => dest.LineItems);
 // or string-based
-dbContext.Orders.ProjectTo<OrderDto>(
+dbContext.Orders.ProjectTo<OrderDto>(configuration,
     null,
     "Customer",
     "LineItems");
 // for collections
-dbContext.Orders.ProjectTo<OrderDto>(
+dbContext.Orders.ProjectTo<OrderDto>(configuration,
     null,
     dest => dest.LineItems.Select(item => item.Product));
 ```
@@ -206,6 +206,7 @@ Not all mapping options can be supported, as the expression generated must be in
 * ConvertUsing (Expression-based)
 * Ignore
 * NullSubstitute
+* Value transformers
 
 Not supported:
 * Condition
@@ -216,6 +217,7 @@ Not supported:
 * Custom resolvers
 * Custom type converters
 * ForPath
+* Value converters
 * **Any calculated property on your domain object**
 
 Additionally, recursive or self-referencing destination types are not supported as LINQ providers do not support this. Typically hierarchical relational data models require common table expressions (CTEs) to correctly resolve a recursive join.

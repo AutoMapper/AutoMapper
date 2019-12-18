@@ -47,13 +47,13 @@ And supply AutoMapper with either an instance of a custom type converter, or sim
 [Test]
 public void Example()
 {
-    Mapper.Initialize(cfg => {
+    var configuration = new MapperConfiguration(cfg => {
       cfg.CreateMap<string, int>().ConvertUsing(s => Convert.ToInt32(s));
       cfg.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
       cfg.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
       cfg.CreateMap<Source, Destination>();
     });
-    Mapper.AssertConfigurationIsValid();
+    configuration.AssertConfigurationIsValid();
 
     var source = new Source
     {
@@ -62,7 +62,7 @@ public void Example()
         Value3 = "AutoMapperSamples.GlobalTypeConverters.GlobalTypeConverters+Destination"
     };
 
-    Destination result = Mapper.Map<Source, Destination>(source);
+    Destination result = mapper.Map<Source, Destination>(source);
     result.Value3.ShouldEqual(typeof(Destination));
 }
 

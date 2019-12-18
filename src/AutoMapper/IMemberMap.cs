@@ -9,7 +9,7 @@ namespace AutoMapper
     {
         TypeMap TypeMap { get; }
         Type SourceType { get; }
-        IEnumerable<MemberInfo> SourceMembers { get; }
+        IReadOnlyCollection<MemberInfo> SourceMembers { get; }
         LambdaExpression CustomSource { get; }
         Type DestinationType { get; }
         string DestinationName { get; }
@@ -17,7 +17,7 @@ namespace AutoMapper
         bool CanResolveValue { get; }
         bool Ignored { get; }
         bool Inline { get; set; }
-        bool UseDestinationValue { get; }
+        bool? UseDestinationValue { get; }
         object NullSubstitute { get; }
         LambdaExpression PreCondition { get; }
         LambdaExpression Condition { get; }

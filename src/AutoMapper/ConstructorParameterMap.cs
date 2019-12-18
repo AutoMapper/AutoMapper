@@ -30,7 +30,7 @@ namespace AutoMapper
 
         public override Type DestinationType => Parameter.ParameterType;
 
-        public override IEnumerable<MemberInfo> SourceMembers { get; }
+        public override IReadOnlyCollection<MemberInfo> SourceMembers { get; }
         public override string DestinationName => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
 
         public bool HasDefaultValue => Parameter.IsOptional;

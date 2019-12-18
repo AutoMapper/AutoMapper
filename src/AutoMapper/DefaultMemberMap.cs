@@ -17,7 +17,7 @@ namespace AutoMapper
 
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType => default;
-        public virtual IEnumerable<MemberInfo> SourceMembers => Enumerable.Empty<MemberInfo>();
+        public virtual IReadOnlyCollection<MemberInfo> SourceMembers => Array.Empty<MemberInfo>();
         public virtual LambdaExpression CustomSource { get => default; set { } }
         public virtual string DestinationName => default;
         public virtual Type DestinationType => default;
@@ -26,7 +26,7 @@ namespace AutoMapper
         public virtual bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
         public virtual bool Inline { get => true; set { } }
-        public virtual bool UseDestinationValue { get => default; set { } }
+        public virtual bool? UseDestinationValue { get => default; set { } }
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }

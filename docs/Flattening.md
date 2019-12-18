@@ -86,11 +86,11 @@ order.AddOrderLineItem(bosco, 15);
 
 // Configure AutoMapper
 
-Mapper.Initialize(cfg => cfg.CreateMap<Order, OrderDto>());
+var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto>());
 
 // Perform mapping
 
-OrderDto dto = Mapper.Map<Order, OrderDto>(order);
+OrderDto dto = mapper.Map<Order, OrderDto>(order);
 
 dto.CustomerName.ShouldEqual("George Costanza");
 dto.Total.ShouldEqual(74.85m);
@@ -131,7 +131,7 @@ class Destination
 
 cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
 cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+cfg.CreateMap<OtherInnerSource, Destination>();
 
 var source = new Source { Name = "name", InnerSource = new InnerSource{ Description = "description" }, 
                           OtherInnerSource = new OtherInnerSource{ Title = "title" } };
