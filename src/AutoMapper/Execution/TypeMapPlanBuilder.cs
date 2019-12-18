@@ -232,7 +232,7 @@ namespace AutoMapper.Execution
             var createInnerObjects = CreateInnerObjects(destination);
             var setFinalValue = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
 
-            var pathMapExpression = Block(createInnerObjects, setFinalValue);
+            var pathMapExpression = Block(typeof(void), createInnerObjects, setFinalValue);
 
             return TryMemberMap(pathMap, pathMapExpression);
         }
@@ -352,7 +352,7 @@ namespace AutoMapper.Execution
         {
             var resolvedExpression = ResolveSource(ctorParamMap);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
-            var tryMap = Block(new[] {resolvedValue},
+            var tryMap = Block(typeof(void), new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
                 MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue, Context));
             return TryMemberMap(ctorParamMap, tryMap);
@@ -375,12 +375,10 @@ namespace AutoMapper.Execution
             var mappingExceptionCtor = ((NewExpression) CtorExpression.Body).Constructor;
 
             return TryCatch(memberMapExpression,
-                MakeCatchBlock(typeof(Exception), exception,
-                    Block(
-                        Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
-                            Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap))),
-                        Default(memberMapExpression.Type))
-                    , null));
+                        MakeCatchBlock(typeof(Exception), exception,
+                                Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception,
+                                    Constant(memberMap.TypeMap.Types), Constant(memberMap.TypeMap), Constant(memberMap)))
+                            , null));
         }
 
         private Expression CreatePropertyMapFunc(IMemberMap memberMap, Expression destination, MemberInfo destinationMember)
@@ -478,7 +476,7 @@ namespace AutoMapper.Execution
                     mapperExpr
                 );
 
-            return Block(new[] {resolvedValue, propertyValue}.Distinct(), mapperExpr);
+            return Block(typeof(void), new[] {resolvedValue, propertyValue}.Distinct(), mapperExpr);
         }
 
         private Expression BuildValueResolverFunc(IMemberMap memberMap, Expression destValueExpr)
