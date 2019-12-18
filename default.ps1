@@ -42,7 +42,7 @@ task pack -depends compile {
 }
 
 task benchmark {
-    exec { & $source_dir\Benchmark\bin\$config\net461\Benchmark.exe }
+    exec { dotnet run -p .\src\Benchmark\Benchmark.csproj -c Release -f netcoreapp3.1 }
 }
 
 task test {
