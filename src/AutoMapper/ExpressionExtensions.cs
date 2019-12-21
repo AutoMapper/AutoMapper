@@ -69,14 +69,5 @@ namespace AutoMapper
 
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
             => ExpressionFactory.IfNullElse(expression, then, @else);
-
-        public static LambdaExpression[] WithoutCastToObject<T>(this Expression<Func<T, object>>[] expressions)
-            => Array.ConvertAll(
-                expressions,
-                e =>
-                {
-                    var bodyIsCastToObject = (e.Body.NodeType == ExpressionType.Convert || e.Body.NodeType == ExpressionType.ConvertChecked) && e.Body.Type == typeof(object);
-                    return bodyIsCastToObject ? Lambda(((UnaryExpression)e.Body).Operand, e.Parameters) : e;
-                });
     }
 }
