@@ -211,7 +211,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {
-            IncludeMembersCore(memberExpressions);
+            IncludeMembersCore(memberExpressions.WithoutCastToObject());
             return this;
         }
 
