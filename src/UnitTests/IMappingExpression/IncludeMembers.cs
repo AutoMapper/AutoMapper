@@ -1420,26 +1420,4 @@ namespace AutoMapper.UnitTests.IMappingExpression
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
         });
     }
-    public class IncludeMembersFromUnconstrainedGenericValidation : AutoMapperSpecBase
-    {
-        class Source<T>
-        {
-            public T InnerSource { get; set; }
-        }
-        class InnerSource
-        {
-            public string Name { get; set; }
-        }
-        class Destination
-        {
-            public string Name { get; set; }
-        }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-        {
-            var map = cfg.CreateMap<Source<InnerSource>, Destination>();
-            IncludeMembersFromUnconstrainedGeneric(map);
-            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
-        });
-        private static void IncludeMembersFromUnconstrainedGeneric<T>(IMappingExpression<Source<T>, Destination> map) => map.IncludeMembers(src => src.InnerSource);
-    }
 }
