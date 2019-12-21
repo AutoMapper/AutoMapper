@@ -1400,4 +1400,46 @@ namespace AutoMapper.UnitTests.IMappingExpression
         [Fact]
         public void Should_override_IncludeMembers() => Mapper.Map<CreateCustomerDto>(new NewCustomer { Postcode = "Postcode", Address = new Address() }).Postcode.ShouldBe("Postcode");
     }
+    public class IncludeMembersWithValueTypeValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public InnerSource InnerSource { get; set; }
+        }
+        struct InnerSource
+        {
+            public string Name { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        });
+    }
+    public class IncludeMembersFromUnconstrainedGenericValidation : AutoMapperSpecBase
+    {
+        class Source<T>
+        {
+            public T InnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public string Name { get; set; }
+        }
+        class Destination
+        {
+            public string Name { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            var map = cfg.CreateMap<Source<InnerSource>, Destination>();
+            IncludeMembersFromUnconstrainedGeneric(map);
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        });
+        private static void IncludeMembersFromUnconstrainedGeneric<T>(IMappingExpression<Source<T>, Destination> map) => map.IncludeMembers(src => src.InnerSource);
+    }
 }
