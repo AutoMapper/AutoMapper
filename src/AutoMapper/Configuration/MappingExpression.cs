@@ -211,7 +211,15 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {
-            IncludeMembersCore(memberExpressions);
+            var memberExpressionsWithoutCastToObject = Array.ConvertAll(
+                memberExpressions,
+                e =>
+                {
+                    var bodyIsCastToObject = e.Body.NodeType == ExpressionType.Convert && e.Body.Type == typeof(object);
+                    return bodyIsCastToObject ? Expression.Lambda(((UnaryExpression)e.Body).Operand, e.Parameters) : e;
+                });
+
+            IncludeMembersCore(memberExpressionsWithoutCastToObject);
             return this;
         }
 
