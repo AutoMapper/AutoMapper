@@ -25,12 +25,12 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap) => ExpressionResolutionResult(expressionResolutionResult, null);
+            ConstructorParameterMap parameterMap) => ExpressionResolutionResult(expressionResolutionResult, parameterMap.CustomMapExpression);
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
             PropertyMap propertyMap) => propertyMap.CustomMapExpression != null;
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap) => false;
+            ConstructorParameterMap parameterMap) => parameterMap.CustomMapExpression != null;
     }
 }
