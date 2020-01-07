@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
-    public class When_renaming_class_constructor_parameter_ProjectTo : AutoMapperSpecBase
+    public class ForCtorParam_MapFrom_ProjectTo : AutoMapperSpecBase
     {
         public class Source
         {
@@ -13,10 +13,7 @@ namespace AutoMapper.UnitTests
         }
         public class Destination
         {
-            public Destination(string value)
-            {
-                Value = value;
-            }
+            public Destination(string value) => Value = value;
             public string Value { get; }
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
