@@ -7,16 +7,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 {
     public class MemberGetterExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps) 
-            => ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
-
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap) 
-            => ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
-
-        private static ExpressionResolutionResult ExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, IEnumerable<MemberInfo> sourceMembers) 
-            => sourceMembers.Aggregate(expressionResolutionResult, ExpressionResolutionResult);
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap, LetPropertyMaps letPropertyMaps)
+            => propertyMap.SourceMembers.Aggregate(expressionResolutionResult, ExpressionResolutionResult);
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
@@ -27,10 +19,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(member, member.Type);
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) 
-            => propertyMap.SourceMembers.Any();
-
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap) 
-            => propertyMap.SourceMembers.Any();
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) => propertyMap.SourceMembers.Any();
     }
 }

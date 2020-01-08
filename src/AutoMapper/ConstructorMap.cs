@@ -33,7 +33,7 @@ namespace AutoMapper
 
         public bool CanResolve => CtorParams.All(param => param.CanResolveValue);
 
-        public Expression NewExpression(Expression instanceParameter)
+        public Expression NewExpression(Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var parameters = CtorParams.Select(map =>
             {
@@ -42,7 +42,7 @@ namespace AutoMapper
                 var matchingExpressionConverter =
                     ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
 
-                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map)
+                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map, letPropertyMaps)
                     ?? throw new AutoMapperMappingException($"Unable to generate the instantiation expression for the constructor {Ctor}: no expression could be mapped for constructor parameter '{map.Parameter}'.", null, TypeMap.Types);
 
                 return result;
