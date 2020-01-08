@@ -12,6 +12,8 @@ MembersMustExist : Member 'AutoMapper.IMemberMap.SourceMembers.get()' does not e
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.UseDestinationValue.get()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IMemberMap.UseDestinationValue.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'AutoMapper.IMemberMap.UseDestinationValue.get()' does not exist in the implementation but it does exist in the contract.
+CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.IsReadOnlyAttribute' exists on 'AutoMapper.IncludedMember.MemberExpression.get()' in the contract but not the implementation.
+CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.IsReadOnlyAttribute' exists on 'AutoMapper.IncludedMember.TypeMap.get()' in the contract but not the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IRuntimeMapper.Map(System.Object, System.Object, System.Type, System.Type, System.Action<AutoMapper.IMappingOperationOptions>)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IRuntimeMapper.Map(System.Object, System.Type, System.Type, System.Action<AutoMapper.IMappingOperationOptions>)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'AutoMapper.IRuntimeMapper.Map<TDestination>(System.Object, System.Action<AutoMapper.IMappingOperationOptions>)' is present in the implementation but not in the contract.
@@ -46,4 +48,4 @@ MembersMustExist : Member 'AutoMapper.QueryableExtensions.Impl.MemberResolverExp
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.Impl.MemberResolverExpressionResultConverter.CanGetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.PropertyMap)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.Impl.MemberResolverExpressionResultConverter.GetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.ConstructorParameterMap)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'AutoMapper.QueryableExtensions.Impl.MemberResolverExpressionResultConverter.GetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.PropertyMap, AutoMapper.QueryableExtensions.LetPropertyMaps)' does not exist in the implementation but it does exist in the contract.
-Total Issues: 47
+Total Issues: 49
