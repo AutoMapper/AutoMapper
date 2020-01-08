@@ -19,6 +19,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(member, member.Type);
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) => propertyMap.SourceMembers.Any();
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) => propertyMap.SourceMembers.Count > 0;
     }
 }
