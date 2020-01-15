@@ -1,6 +1,6 @@
 # AutoMapper.Extensions.EnumMapping
 
-Automapper supports convention based mapping of enum values in a separate package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/).
+The built in enum mapper is not configurable, it can only be replaced. Alternatively, Automapper supports convention based mapping of enum values in a separate package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/).
 
 ### Usage
 
