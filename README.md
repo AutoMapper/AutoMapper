@@ -15,7 +15,7 @@ This is the main repository for AutoMapper, but there's more:
 * [Collection Extensions](https://github.com/AutoMapper/AutoMapper.Collection)
 * [Microsoft DI Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection)
 * [Expression Mapping](https://github.com/AutoMapper/AutoMapper.Extensions.ExpressionMapping)
-* [Enum Mapping](https://github.com/AutoMapper/AutoMapper.Extensions.EnumMapping)
+* [Enum Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.EnumMapping)
 
 ### How do I get started?
 
