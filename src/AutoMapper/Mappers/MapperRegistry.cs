@@ -20,6 +20,7 @@ namespace AutoMapper.Mappers
             new MultidimensionalArrayMapper(),
             new ArrayCopyMapper(),
             new ArrayMapper(),
+            new EnumerableToReadOnlyDictionaryMapper(),
             new EnumerableToDictionaryMapper(),
             new NameValueCollectionMapper(),
             new ReadOnlyDictionaryMapper(),
