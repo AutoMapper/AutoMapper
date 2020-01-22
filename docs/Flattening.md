@@ -146,7 +146,7 @@ The order of the parameters in the `IncludeMembers` call is relevant. When mappi
 
 IncludeMembers integrates with `ReverseMap`. An included member will be reversed to 
 ```c#
-ForMember(destination => destination.IncludedMember, member => member.MapFrom(source => source))
+ForPath(destination => destination.IncludedMember, member => member.MapFrom(source => source))
 ```
 and the other way around. If that's not what you want, you can avoid `ReverseMap` (explicitly create the reverse map) or you can override the default settings (using `Ignore` or `IncludeMembers` without parameters respectively).
 
