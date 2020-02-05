@@ -14,7 +14,7 @@ domain and application layer.
 AutoMapper supports the following platforms:
 
 * .NET 4.6.1+
-* `.NET Standard 2.0+ https://docs.microsoft.com/en-us/dotnet/standard/net-standard`
+* `.NET Standard 2.0+ <https://docs.microsoft.com/en-us/dotnet/standard/net-standard>`_
 
 New to AutoMapper? Check out the :doc:`Getting-started` page first.
 
