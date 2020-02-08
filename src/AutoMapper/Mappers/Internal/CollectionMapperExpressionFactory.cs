@@ -105,12 +105,12 @@ namespace AutoMapper.Mappers.Internal
             var sourceElementTypes = GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
             var destElementTypes = GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
 
-            var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
-            var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);
-
             var sourceElementType = typeof(KeyValuePair<,>).MakeGenericType(sourceElementTypes);
             itemParam = Parameter(sourceElementType, "item");
             var destElementType = typeof(KeyValuePair<,>).MakeGenericType(destElementTypes);
+
+            var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
+            var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);
 
             var keyExpr = MapExpression(configurationProvider, profileMap, typePairKey,
                 Property(itemParam, "Key"), contextParam);
