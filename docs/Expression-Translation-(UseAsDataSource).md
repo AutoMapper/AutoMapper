@@ -119,7 +119,7 @@ Does the equivalent of
 
 ### When ProjectTo() is not called
 
-Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes return type, then `ProjectTo<>()` won't be called and value with be returned instead using `mapper.Map`.
+Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes return type, then `ProjectTo<>()` won't be called and value will be returned instead using `mapper.Map`.
 
 Example:
 
@@ -154,7 +154,7 @@ public List<OrderLineDTO> GetLinesForOrder(int orderId)
 }
 ```
 
-However, if you did this with the `.UseAsDataSource()` approach, you would loose all its power - namely its ability to modify the internal expression until it is enumerated.
+However, if you did this with the `.UseAsDataSource()` approach, you would lose all of its power - namely its ability to modify the internal expression until it is enumerated.
 To solve that problem, we introduced the `.OnEnumerated` callback.
 Using it, you can do the following:
 
