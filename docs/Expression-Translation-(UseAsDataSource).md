@@ -119,7 +119,7 @@ Does the equivalent of
 
 ### When ProjectTo() is not called
 
-Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes the return type, then `ProjectTo<>()` won't be called and value will be returned instead using `mapper.Map`.
+Expression Translation works for all kinds of functions, including `Select` calls.  If `Select` is used after `UseAsDataSource()` and changes the return type, then `ProjectTo<>()` won't be called and `mapper.Map` will be used instead.
 
 Example:
 
