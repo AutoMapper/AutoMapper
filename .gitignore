@@ -2,6 +2,8 @@ build/
 release/
 scripts/
 artifacts/
+results/
+BenchmarkDotNet.Artifacts*/
 .dotnet
 TestResults/
 *.suo

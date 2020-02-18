@@ -15,7 +15,7 @@ properties {
 
 task default -depends local
 task local -depends compile, test
-task ci -depends clean, release, local, pack, benchmark
+task ci -depends clean, release, local, pack
 
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
@@ -42,7 +42,7 @@ task pack -depends compile {
 }
 
 task benchmark {
-    exec { & $source_dir\Benchmark\bin\$config\net461\Benchmark.exe }
+    exec { dotnet run -p .\src\Benchmark\Benchmark.csproj -c Release -f netcoreapp3.1 }
 }
 
 task test {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers.Internal;
+using FastExpressionCompiler;
 
 namespace AutoMapper.Execution
 {
@@ -22,7 +23,7 @@ namespace AutoMapper.Execution
         {
             var ctorExpr = GenerateConstructorExpression(type);
 
-            return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
+            return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).CompileFast();
         }
 
         public static Expression GenerateNonNullConstructorExpression(Type type) => type.IsValueType()

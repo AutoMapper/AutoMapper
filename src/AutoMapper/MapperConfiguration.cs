@@ -8,6 +8,7 @@ using AutoMapper.Features;
 using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
+using FastExpressionCompiler;
 
 namespace AutoMapper
 {
@@ -450,8 +451,8 @@ namespace AutoMapper
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                Typed = typedExpression.Compile();
-                Untyped = Wrap(mapRequest, Typed).Compile();
+                Typed = typedExpression.CompileFast();
+                Untyped = Wrap(mapRequest, Typed).CompileFast();
             }
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, Delegate typedDelegate)
