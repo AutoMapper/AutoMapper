@@ -50,6 +50,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    Open-Generics
    Queryable-Extensions
    Expression-Translation-(UseAsDataSource)
+   Enum-Mapping
 
 .. _Extensibility:
 
