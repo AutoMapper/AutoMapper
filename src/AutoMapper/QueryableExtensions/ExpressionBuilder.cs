@@ -156,7 +156,7 @@ namespace AutoMapper.QueryableExtensions
             {
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount, letPropertyMaps);
             }
-            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
+            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter, letPropertyMaps);
             if(instanceParameter is ParameterExpression)
                 constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
@@ -179,7 +179,7 @@ namespace AutoMapper.QueryableExtensions
             return visitCount;
         }
 
-        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
+        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var ctorExpr = typeMap.CustomCtorExpression;
             if (ctorExpr != null)
@@ -187,7 +187,7 @@ namespace AutoMapper.QueryableExtensions
                 return ctorExpr;
             }
             var newExpression = typeMap.ConstructorMap?.CanResolve == true
-                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
+                ? typeMap.ConstructorMap.NewExpression(instanceParameter, letPropertyMaps)
                 : New(typeMap.DestinationTypeToUse);
 
             return Lambda(newExpression);
@@ -362,6 +362,10 @@ namespace AutoMapper.QueryableExtensions
 
             public override Expression GetSubQueryMarker()
             {
+                if (_currentPath.Count == 0)
+                {
+                    return null;
+                }
                 var propertyMap = _currentPath.Peek().PropertyMap;
                 var mapFrom = propertyMap.CustomMapExpression;
                 if(!IsSubQuery() || _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationType) == null)

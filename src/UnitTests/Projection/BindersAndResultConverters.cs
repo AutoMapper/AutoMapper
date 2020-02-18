@@ -75,23 +75,13 @@ namespace AutoMapper.UnitTests.Projection
 
         private class EnumToUnderlyingTypeResultConverter : IExpressionResultConverter
         {
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) =>
+            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) =>
                 propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationType;
 
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
-            {
-                throw new NotImplementedException();
-            }
-
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps) =>
+            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap, LetPropertyMaps letPropertyMaps) =>
                 new ExpressionResolutionResult(
                     Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, propertyMap.SourceMember), propertyMap.DestinationType), 
                     propertyMap.DestinationType);
-
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

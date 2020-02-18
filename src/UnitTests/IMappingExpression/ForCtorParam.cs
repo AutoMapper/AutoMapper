@@ -1,9 +1,29 @@
 ﻿using System;
 using Xunit;
 using Shouldly;
+using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
+    public class ForCtorParam_MapFrom_ProjectTo : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Value1 { get; set; }
+        }
+        public class Destination
+        {
+            public Destination(string value) => Value = value;
+            public string Value { get; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
+        [Fact]
+        public void Should_map_ok()
+        {
+            var destination = ProjectTo<Destination>(new[] { new Source { Value1 = "Core" }}.AsQueryable()).Single();
+            destination.Value.ShouldBe("Core");
+        }
+    }
     public class When_configuring__non_generic_ctor_param_members : AutoMapperSpecBase
     {
         public class Source
