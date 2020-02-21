@@ -48,7 +48,7 @@ namespace AutoMapper.Configuration
 
         public void AddProfile<TProfile>() where TProfile : Profile, new() => AddProfile(new TProfile());
 
-        public void AddProfile(Type profileType) => AddProfile((Profile)Activator.CreateInstance(profileType));
+        public void AddProfile(Type profileType) => AddProfile((Profile)ServiceCtor(profileType));
 
         public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
         {
