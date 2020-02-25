@@ -11,6 +11,7 @@ namespace AutoMapper.Configuration
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private LambdaExpression _sourceMember;
+        private string _sourceFieldOrPropertyName;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
@@ -120,10 +121,20 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));
         }
 
-        public void MapFrom(string sourceMemberName)
+        public void MapFrom(string sourceFieldOrPropertyName)
         {
-            _sourceType.GetFieldOrProperty(sourceMemberName);
-            PropertyMapActions.Add(pm => pm.MapFrom(sourceMemberName));
+            _sourceType.GetFieldOrProperty(sourceFieldOrPropertyName);
+
+            if (_sourceType.IsGenericTypeDefinition)
+            {
+                _sourceFieldOrPropertyName = sourceFieldOrPropertyName;
+            }
+            else
+            {
+                _sourceMember = MemberAccessLambda(_sourceType, sourceFieldOrPropertyName);
+            }
+
+            PropertyMapActions.Add(pm => pm.MapFrom(sourceFieldOrPropertyName));
         }
 
         public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
@@ -340,8 +351,18 @@ namespace AutoMapper.Configuration
         public LambdaExpression SourceExpression => _sourceMember;
         public LambdaExpression GetDestinationExpression() => MemberAccessLambda(DestinationMember);
 
-        public IPropertyMapConfiguration Reverse() =>
-            PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, GetDestinationExpression());
+        public IPropertyMapConfiguration Reverse()
+        {
+            if (_sourceType.IsGenericTypeDefinition)
+            {
+                var reversedMemberExpression = new MemberConfigurationExpression<TDestination, TSource, object>(_sourceType.GetFieldOrProperty(_sourceFieldOrPropertyName), DestinationMember.DeclaringType);
+                reversedMemberExpression.MapFrom(DestinationMember.Name);
+                return reversedMemberExpression;
+            }
+
+            LambdaExpression safeDestinationExpression = DestinationMember.DeclaringType.IsGenericTypeDefinition ? null : GetDestinationExpression();
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, safeDestinationExpression);
+        }
 
         public void DontUseDestinationValue() => SetUseDestinationValue(false);
     }
