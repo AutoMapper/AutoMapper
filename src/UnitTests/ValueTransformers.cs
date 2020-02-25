@@ -320,4 +320,29 @@ namespace AutoMapper.UnitTests
             dest.Value.ShouldBe("Jimmy was cool and now is straight up dope");
         }
     }
+    public class TransformingNullable : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+            public int? NotNull { get; set; }
+            public int? Null { get; set; }
+        }
+        public class Dest
+        {
+            public int Value { get; set; }
+            public int? NotNull { get; set; }
+            public int? Null { get; set; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+            cfg.CreateMap<Source, Dest>().AddTransform<int>(source=>source+1).AddTransform<int?>(source => source == null ? null : source + 2));
+        [Fact]
+        public void Should_transform_value()
+        {
+            var dest = Mapper.Map<Source, Dest>(new Source { NotNull = 0 });
+            dest.Value.ShouldBe(1);
+            dest.Null.ShouldBeNull();
+            dest.NotNull.ShouldBe(2);
+        }
+    }
 }
