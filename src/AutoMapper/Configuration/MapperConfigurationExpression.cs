@@ -87,11 +87,11 @@ namespace AutoMapper.Configuration
                 {
                     AddProfile(type.AsType());
                 }
+
                 foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
                 {
                     var mappingExpression = (MappingExpression) autoMapAttributeProfile.CreateMap(autoMapAttribute.SourceType, type);
-                    autoMapAttribute.ApplyConfiguration(mappingExpression);
-
+                
                     foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
                     {
                         foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes().OfType<IMemberConfigurationProvider>())
@@ -99,6 +99,8 @@ namespace AutoMapper.Configuration
                             mappingExpression.ForMember(memberInfo, cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
                         }
                     }
+
+                    autoMapAttribute.ApplyConfiguration(mappingExpression);
                 }
             }
 
