@@ -10,8 +10,8 @@ namespace AutoMapper.Configuration
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
-        private LambdaExpression _sourceMember;
-        private string _sourceMemberName;
+        private LambdaExpression _sourceExpression;
+        private MemberInfo _sourceMember;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
@@ -117,14 +117,13 @@ namespace AutoMapper.Configuration
 
         internal void MapFromUntyped(LambdaExpression sourceExpression)
         {
-            _sourceMember = sourceExpression;
+            _sourceExpression = sourceExpression;
             PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));
         }
 
         public void MapFrom(string sourceMemberName)
         {
-            _sourceType.GetFieldOrProperty(sourceMemberName);
-            _sourceMemberName = sourceMemberName;
+            _sourceMember = _sourceType.GetFieldOrProperty(sourceMemberName);
             PropertyMapActions.Add(pm => pm.MapFrom(sourceMemberName));
         }
 
@@ -339,16 +338,15 @@ namespace AutoMapper.Configuration
             propertyMap.CheckMappedReadonly();
         }
 
-        public LambdaExpression SourceExpression => _sourceMember;
+        public LambdaExpression SourceExpression => _sourceExpression;
         public LambdaExpression GetDestinationExpression() => MemberAccessLambda(DestinationMember);
 
         public IPropertyMapConfiguration Reverse()
         {
             var destinationType = DestinationMember.DeclaringType;
-            if (_sourceMemberName != null)
+            if (_sourceMember != null)
             {
-                var sourceMember = _sourceType.GetFieldOrProperty(_sourceMemberName);
-                var reversedMemberConfiguration = new MemberConfigurationExpression<TDestination, TSource, object>(sourceMember, destinationType);
+                var reversedMemberConfiguration = new MemberConfigurationExpression<TDestination, TSource, object>(_sourceMember, destinationType);
                 reversedMemberConfiguration.MapFrom(DestinationMember.Name);
                 return reversedMemberConfiguration;
             }
@@ -356,7 +354,7 @@ namespace AutoMapper.Configuration
             {
                 return null;
             }
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, GetDestinationExpression());
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceExpression, GetDestinationExpression());
         }
 
         public void DontUseDestinationValue() => SetUseDestinationValue(false);
