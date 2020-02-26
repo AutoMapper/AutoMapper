@@ -217,7 +217,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
-                .ForMember(d => d.Value2, o => o.MapFrom(nameof(Source.Value)))
+                .ForMember(d => d.Value2, o => o.MapFrom("Value"))
                 .ReverseMap();
         });
 
@@ -628,25 +628,29 @@ namespace AutoMapper.UnitTests
         public class Source<T>
         {
             public T Value { get; set; }
+            public string StringValue { get; set; }
         }
         public class Destination<T>
         {
             public T Value2 { get; set; }
+            public string StringValue2 { get; set; }
         }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof(Source<>), typeof(Destination<>))
-                .ForMember(nameof(Destination<int>.Value2), o => o.MapFrom(nameof(Source<int>.Value)))
+                .ForMember("Value2", o => o.MapFrom("Value"))
+                .ForMember("StringValue2", o => o.MapFrom("StringValue"))
                 .ReverseMap();
         });
 
         [Fact]
         public void Should_reverse_map_ok()
         {
-            Destination<int> destination = new Destination<int> { Value2 = 1337 };
+            Destination<int> destination = new Destination<int> { Value2 = 1337, StringValue2 = "StringValue2" };
             Source<int> source = Mapper.Map<Destination<int>, Source<int>>(destination);
             source.Value.ShouldBe(1337);
+            source.StringValue.ShouldBe("StringValue2");
         }
     }
 }

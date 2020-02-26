@@ -11,7 +11,7 @@ namespace AutoMapper.Configuration
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private LambdaExpression _sourceMember;
-        private string _sourceFieldOrPropertyName;
+        private string _sourceMemberName;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
@@ -121,20 +121,11 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));
         }
 
-        public void MapFrom(string sourceFieldOrPropertyName)
+        public void MapFrom(string sourceMemberName)
         {
-            _sourceType.GetFieldOrProperty(sourceFieldOrPropertyName);
-
-            if (_sourceType.IsGenericTypeDefinition)
-            {
-                _sourceFieldOrPropertyName = sourceFieldOrPropertyName;
-            }
-            else
-            {
-                _sourceMember = MemberAccessLambda(_sourceType, sourceFieldOrPropertyName);
-            }
-
-            PropertyMapActions.Add(pm => pm.MapFrom(sourceFieldOrPropertyName));
+            _sourceType.GetFieldOrProperty(sourceMemberName);
+            _sourceMemberName = sourceMemberName;
+            PropertyMapActions.Add(pm => pm.MapFrom(sourceMemberName));
         }
 
         public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
@@ -353,15 +344,19 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            if (_sourceType.IsGenericTypeDefinition)
+            var destinationType = DestinationMember.DeclaringType;
+            if (_sourceMemberName != null)
             {
-                var reversedMemberExpression = new MemberConfigurationExpression<TDestination, TSource, object>(_sourceType.GetFieldOrProperty(_sourceFieldOrPropertyName), DestinationMember.DeclaringType);
-                reversedMemberExpression.MapFrom(DestinationMember.Name);
-                return reversedMemberExpression;
+                var sourceMember = _sourceType.GetFieldOrProperty(_sourceMemberName);
+                var reversedMemberConfiguration = new MemberConfigurationExpression<TDestination, TSource, object>(sourceMember, destinationType);
+                reversedMemberConfiguration.MapFrom(DestinationMember.Name);
+                return reversedMemberConfiguration;
             }
-
-            LambdaExpression safeDestinationExpression = DestinationMember.DeclaringType.IsGenericTypeDefinition ? null : GetDestinationExpression();
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, safeDestinationExpression);
+            if (destinationType.IsGenericTypeDefinition) // .ForMember("InnerSource", o => o.MapFrom(s => s))
+            {
+                return null;
+            }
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, GetDestinationExpression());
         }
 
         public void DontUseDestinationValue() => SetUseDestinationValue(false);
