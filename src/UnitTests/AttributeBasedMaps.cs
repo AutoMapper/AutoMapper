@@ -77,7 +77,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_specifying_map_and_reverse_map_with_attribute_and_sourcemember_attribute : NonValidatingSpecBase
+        public class When_specifying_reverse_map_with_sourcemember_attribute : NonValidatingSpecBase
         {
             public class Source
             {
@@ -93,7 +93,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddMaps(typeof(When_specifying_map_and_reverse_map_with_attribute_and_sourcemember_attribute));
+                cfg.AddMaps(typeof(When_specifying_reverse_map_with_sourcemember_attribute));
             });
 
             [Fact]
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_specifying_open_generic_map_and_reverse_map_with_attribute_and_sourcemember_attribute : NonValidatingSpecBase
+        public class When_specifying_generic_reverse_map_with_sourcemember_attribute : NonValidatingSpecBase
         {
             public class Source<T>
             {
@@ -133,7 +133,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddMaps(typeof(When_specifying_open_generic_map_and_reverse_map_with_attribute_and_sourcemember_attribute));
+                cfg.AddMaps(typeof(When_specifying_generic_reverse_map_with_sourcemember_attribute));
             });
 
             [Fact]
