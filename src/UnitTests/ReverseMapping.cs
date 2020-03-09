@@ -202,6 +202,34 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class ReverseMapFromSourceMemberName : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Destination
+        {
+            public int Value2 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>()
+                .ForMember(d => d.Value2, o => o.MapFrom("Value"))
+                .ReverseMap();
+        });
+
+        [Fact]
+        public void Should_reverse_map_ok()
+        {
+            Destination destination = new Destination { Value2 = 1337 };
+            Source source = Mapper.Map<Source>(destination);
+            source.Value.ShouldBe(1337);
+        }
+    }
+
     public class ReverseDefaultFlatteningWithIgnoreMember : AutoMapperSpecBase
     {
         public class Order
@@ -592,6 +620,37 @@ namespace AutoMapper.UnitTests
         public void Should_create_a_map_with_the_reverse_items()
         {
             _source.Value.ShouldBe(10);
+        }
+    }
+
+    public class When_reverse_mapping_open_generics_with_MapFrom : AutoMapperSpecBase
+    {
+        public class Source<T>
+        {
+            public T Value { get; set; }
+            public string StringValue { get; set; }
+        }
+        public class Destination<T>
+        {
+            public T Value2 { get; set; }
+            public string StringValue2 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<>))
+                .ForMember("Value2", o => o.MapFrom("Value"))
+                .ForMember("StringValue2", o => o.MapFrom("StringValue"))
+                .ReverseMap();
+        });
+
+        [Fact]
+        public void Should_reverse_map_ok()
+        {
+            Destination<int> destination = new Destination<int> { Value2 = 1337, StringValue2 = "StringValue2" };
+            Source<int> source = Mapper.Map<Destination<int>, Source<int>>(destination);
+            source.Value.ShouldBe(1337);
+            source.StringValue.ShouldBe("StringValue2");
         }
     }
 }

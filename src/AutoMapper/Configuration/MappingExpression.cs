@@ -18,10 +18,7 @@ namespace AutoMapper.Configuration
         {
             var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
             var reverseMap = new MappingExpression(reversedTypes, MemberList.None);
-            if(!reversedTypes.IsGenericTypeDefinition)
-            {
-                reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
-            }
+            reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembers(MapToSourceMembers().Select(m => m.DestinationMember.Name).ToArray());
             foreach(var includedMemberName in IncludedMembersNames)
