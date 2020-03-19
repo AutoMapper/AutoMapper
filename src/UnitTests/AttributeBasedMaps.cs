@@ -77,6 +77,82 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_specifying_reverse_map_with_sourcemember_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), ReverseMap = true)]
+            public class Destination
+            {
+                [SourceMember("Value")]
+                public int Value2 { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.AddMaps(typeof(When_specifying_reverse_map_with_sourcemember_attribute));
+            });
+
+            [Fact]
+            public void Should_reverse_map()
+            {
+                var destination = new Destination { Value2 = 5 };
+                var source = Mapper.Map<Source>(destination);
+                source.Value.ShouldBe(5);
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<Source, Destination>()));
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<Destination, Source>()));
+            }
+        }
+
+        public class When_specifying_generic_reverse_map_with_sourcemember_attribute : NonValidatingSpecBase
+        {
+            public class Source<T>
+            {
+                public T Value { get; set; }
+
+                public string StringValue { get; set; }
+            }
+
+            [AutoMap(typeof(Source<>), ReverseMap = true)]
+            public class Destination<T>
+            {
+                [SourceMember("Value")]
+                public int Value2 { get; set; }
+
+                [SourceMember("StringValue")]
+                public string StringValue2 { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.AddMaps(typeof(When_specifying_generic_reverse_map_with_sourcemember_attribute));
+            });
+
+            [Fact]
+            public void Should_reverse_map()
+            {
+                Destination<int> destination = new Destination<int> { Value2 = 5, StringValue2 = "Joe" };
+                Source<int> source = Mapper.Map<Source<int>>(destination);
+                source.Value.ShouldBe(5);
+                source.StringValue.ShouldBe("Joe");
+            }
+
+            [Fact]
+            public void Should_validate_successfully()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(typeof(Source<>), typeof(Destination<>))));
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(typeof(Destination<>), typeof(Source<>))));
+            }
+        }
+
         public class When_duplicating_map_configuration_with_code_and_attribute : NonValidatingSpecBase
         {
             public class Source
