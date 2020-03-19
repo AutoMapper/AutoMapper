@@ -41,6 +41,10 @@ namespace AutoMapper
 
         public List<IExpressionBinder> QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
 
+        /// <summary>
+        /// How many levels deep should recursive queries be expanded.
+        /// Must be zero for EF6. Can be greater than zero for EF Core.
+        /// </summary>
         public int RecursiveQueriesMaxDepth { get; set; }
     }
 }
