@@ -143,7 +143,7 @@ namespace AutoMapper.QueryableExtensions
 
         private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
-            var bindings = new List<MemberBinding>();
+            var memberBindings = new List<MemberBinding>();
             var depth = GetDepth(request, typePairCount);
             if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
             {
@@ -154,7 +154,7 @@ namespace AutoMapper.QueryableExtensions
             }
             else
             {
-                bindings = CreateMemberBindings();
+                memberBindings = CreateMemberBindings();
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter, letPropertyMaps);
             if(instanceParameter is ParameterExpression)
@@ -164,7 +164,7 @@ namespace AutoMapper.QueryableExtensions
 
             var expression = MemberInit(
                 visitor.NewExpression,
-                bindings.ToArray()
+                memberBindings.ToArray()
                 );
             return expression;
             List<MemberBinding> CreateMemberBindings()
