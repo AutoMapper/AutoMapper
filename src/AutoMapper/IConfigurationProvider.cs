@@ -116,6 +116,8 @@ namespace AutoMapper
 
         IEnumerable<IExpressionBinder> Binders { get; }
 
+        int RecursiveQueriesMaxDepth { get; }
+
         /// <summary>
         /// Create a mapper instance based on this configuration. Mapper instances are lightweight and can be created as needed.
         /// </summary>

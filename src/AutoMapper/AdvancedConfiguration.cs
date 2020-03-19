@@ -40,5 +40,7 @@ namespace AutoMapper
         public List<IExpressionResultConverter> QueryableResultConverters { get; } = ExpressionBuilder.DefaultResultConverters();
 
         public List<IExpressionBinder> QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
+
+        public int RecursiveQueriesMaxDepth { get; set; }
     }
 }

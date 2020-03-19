@@ -154,7 +154,7 @@ namespace AutoMapper.QueryableExtensions
             }
             else
             {
-                bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount, letPropertyMaps);
+                bindings = CreateMemberBindings();
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter, letPropertyMaps);
             if(instanceParameter is ParameterExpression)
@@ -167,6 +167,56 @@ namespace AutoMapper.QueryableExtensions
                 bindings.ToArray()
                 );
             return expression;
+            List<MemberBinding> CreateMemberBindings()
+            {
+                var bindings = new List<MemberBinding>();
+                foreach (var propertyMap in typeMap.PropertyMaps
+                                                   .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationMember)) &&
+                                                                pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
+                                                   .OrderBy(pm => pm.DestinationName))
+                {
+                    var propertyExpression = new PropertyExpression(propertyMap);
+                    letPropertyMaps.Push(propertyExpression);
+
+                    CreateMemberBinding(propertyExpression);
+
+                    letPropertyMaps.Pop();
+                }
+                return bindings;
+                void CreateMemberBinding(PropertyExpression propertyExpression)
+                {
+                    var propertyMap = propertyExpression.PropertyMap;
+                    var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter, letPropertyMaps);
+                    propertyExpression.Expression = result.ResolutionExpression;
+                    var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type, propertyMap.DestinationType);
+                    var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationType, request.MembersToExpand, request);
+                    if (propertyRequest.AlreadyExists && depth >= _configurationProvider.RecursiveQueriesMaxDepth)
+                    {
+                        return;
+                    }
+                    var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+                    if (binder == null)
+                    {
+                        var message =
+                            $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationName} ({propertyMap.DestinationType})";
+                        throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
+                    }
+                    var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
+                    if (bindExpression == null)
+                    {
+                        return;
+                    }
+                    var rhs = propertyMap.ValueTransformers
+                        .Concat(typeMap.ValueTransformers)
+                        .Concat(typeMap.Profile.ValueTransformers)
+                        .Where(vt => vt.IsMatch(propertyMap))
+                        .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
+
+                    bindExpression = bindExpression.Update(rhs);
+
+                    bindings.Add(bindExpression);
+                }
+            }
         }
 
         private static int GetDepth(ExpressionRequest request, TypePairCount typePairCount)
@@ -201,57 +251,6 @@ namespace AutoMapper.QueryableExtensions
             {
                 NewExpression = node;
                 return base.VisitNew(node);
-            }
-        }
-
-        private List<MemberBinding> CreateMemberBindings(ExpressionRequest request, TypeMap typeMap, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
-        {
-            var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.PropertyMaps
-                                               .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationMember)) && 
-                                                            pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
-                                               .OrderBy(pm => pm.DestinationName))
-            {
-                var propertyExpression = new PropertyExpression(propertyMap);
-                letPropertyMaps.Push(propertyExpression);
-
-                CreateMemberBinding(propertyExpression);
-
-                letPropertyMaps.Pop();
-            }
-            return bindings;
-            void CreateMemberBinding(PropertyExpression propertyExpression)
-            {
-                var propertyMap = propertyExpression.PropertyMap;
-                var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter, letPropertyMaps);
-                propertyExpression.Expression = result.ResolutionExpression;
-                var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type, propertyMap.DestinationType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationType, request.MembersToExpand, request);
-                if(propertyRequest.AlreadyExists)
-                {
-                    return;
-                }
-                var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
-                if(binder == null)
-                {
-                    var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationName} ({propertyMap.DestinationType})";
-                    throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
-                }
-                var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
-                if(bindExpression == null)
-                {
-                    return;
-                }
-                var rhs = propertyMap.ValueTransformers
-                    .Concat(typeMap.ValueTransformers)
-                    .Concat(typeMap.Profile.ValueTransformers)
-                    .Where(vt => vt.IsMatch(propertyMap))
-                    .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
-
-                bindExpression = bindExpression.Update(rhs);
-
-                bindings.Add(bindExpression);
             }
         }
 
