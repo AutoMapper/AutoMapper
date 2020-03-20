@@ -112,7 +112,7 @@ namespace AutoMapper.Internal
 
         public static Expression ConvertReplaceParameters(LambdaExpression exp, params Expression[] replace)
         {
-            var replaceExp = exp.Body;
+            var replaceExp = exp.CleanExpression().Body;
             for (var i = 0; i < Math.Min(replace.Length, exp.Parameters.Count); i++)
                 replaceExp = new ConvertingVisitor(exp.Parameters[i], replace[i]).Visit(replaceExp);
             return replaceExp;

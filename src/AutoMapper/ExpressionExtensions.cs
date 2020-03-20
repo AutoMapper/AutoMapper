@@ -22,7 +22,7 @@ namespace AutoMapper
         public static IEnumerable<MemberExpression> GetMembers(this Expression expression)
         {
             var memberExpression = expression as MemberExpression;
-            if(memberExpression == null)
+            if (memberExpression == null)
             {
                 return new MemberExpression[0];
             }
@@ -44,13 +44,22 @@ namespace AutoMapper
 
         public static void EnsureMemberPath(this LambdaExpression exp, string name)
         {
-            if(!exp.IsMemberPath())
+            if (!exp.IsMemberPath())
             {
-                throw new ArgumentOutOfRangeException(name, "Only member accesses are allowed. "+exp);
+                throw new ArgumentOutOfRangeException(name, "Only member accesses are allowed. " + exp);
             }
         }
 
-        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMembers().FirstOrDefault()?.Expression == exp.Parameters.First();
+        public static LambdaExpression CleanExpression(this LambdaExpression exp)
+        {
+            Expression expression = exp.Body;
+            while (expression.NodeType == ExpressionType.Convert && expression.Type == typeof(object))
+                expression = ((UnaryExpression)exp.Body).Operand;
+            return Lambda(expression, exp.Parameters);
+        }
+
+        public static bool IsMemberPath(this LambdaExpression exp) =>
+            exp.CleanExpression().Body.GetMembers().FirstOrDefault()?.Expression == exp.Parameters.First();
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
             => ExpressionFactory.ReplaceParameters(exp, replace);
