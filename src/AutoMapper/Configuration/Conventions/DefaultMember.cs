@@ -10,7 +10,7 @@ namespace AutoMapper.Configuration.Conventions
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
+        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null, bool reverseNamingConventions = false)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;

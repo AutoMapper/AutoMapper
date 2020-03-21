@@ -29,6 +29,7 @@ namespace AutoMapper
             AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
             AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
             EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
+            ShouldReverseNamingConventionsForReverseMaps = profile.ShouldReverseNamingConventionsForReverseMaps ?? configuration?.ShouldReverseNamingConventionsForReverseMaps ?? true;
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
@@ -72,6 +73,7 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
+        public bool ShouldReverseNamingConventionsForReverseMaps { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; }
@@ -99,7 +101,7 @@ namespace AutoMapper
 
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, ShouldReverseNamingConventionsForReverseMaps);
                 }
             }
         }
@@ -116,9 +118,9 @@ namespace AutoMapper
             }
         }
 
-        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
+        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config, bool reverseNamingConventions = false)
         {
-            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
+            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, reverseNamingConventions);
 
             config.Configure(typeMap);
 
@@ -244,7 +246,7 @@ namespace AutoMapper
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
-                var canResolve = MapDestinationPropertyToSource(sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
+                var canResolve = MapDestinationPropertyToSource(sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, typeMap.NamingConventionsReversed);
                 if ((!canResolve && parameter.IsOptional) || ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name))
                 {
                     canResolve = true;
@@ -257,13 +259,13 @@ namespace AutoMapper
             return ctorMap.CanResolve;
         }
 
-        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members)
+        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members, bool reverseNamingConventions)
         {
             if (string.IsNullOrEmpty(destMemberInfo))
             {
                 return false;
             }
-            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
+            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
         }
 
     }
