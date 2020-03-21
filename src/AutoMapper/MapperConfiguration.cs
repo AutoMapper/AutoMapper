@@ -44,6 +44,7 @@ namespace AutoMapper
             MaxExecutionPlanDepth = configurationExpression.Advanced.MaxExecutionPlanDepth + 1;
             ResultConverters = configurationExpression.Advanced.QueryableResultConverters.ToArray();
             Binders = configurationExpression.Advanced.QueryableBinders.ToArray();
+            RecursiveQueriesMaxDepth = configurationExpression.Advanced.RecursiveQueriesMaxDepth;
 
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
@@ -87,6 +88,8 @@ namespace AutoMapper
         public IEnumerable<IExpressionResultConverter> ResultConverters { get; }
 
         public IEnumerable<IExpressionBinder> Binders { get; }
+        
+        public int RecursiveQueriesMaxDepth { get; }
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 
