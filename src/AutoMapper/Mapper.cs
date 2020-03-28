@@ -205,5 +205,8 @@ namespace AutoMapper
 
         public IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand)
             => source.ProjectTo<TDestination>(ConfigurationProvider, parameters, membersToExpand);
+
+        public IQueryable ProjectTo(IQueryable source, Type destinationType, IDictionary<string, object> parameters, params string[] membersToExpand)
+            => source.ProjectTo(destinationType, ConfigurationProvider, parameters, membersToExpand);
     }
 }
