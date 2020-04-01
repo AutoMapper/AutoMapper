@@ -276,6 +276,38 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         }
     }
 
+    public class When_mapping_to_an_existing_HashSet_typed_as_IEnumerable : AutoMapperSpecBase
+    {
+        private Destination _destination = new Destination();
+
+        public class Source
+        {
+            public int[] IntCollection { get; set; } = new int[0];
+        }
+
+        public class Destination
+        {
+            public IEnumerable<int> IntCollection { get; set; } = new HashSet<int> { 1, 2, 3, 4, 5 };
+            public string Unmapped { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map(new Source(), _destination);
+        }
+
+        [Fact]
+        public void Should_clear_the_destination()
+        {
+            _destination.IntCollection.Count().ShouldBe(0);
+        }
+    }
+
     public class When_mapping_to_an_existing_array_typed_as_IEnumerable : AutoMapperSpecBase
     {
         private Destination _destination = new Destination();
@@ -398,6 +430,58 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             _destination.Values2.ShouldContain("8");
             _destination.Values2.ShouldContain("7");
             _destination.Values2.ShouldContain("6");
+        }
+    }
+
+    public class When_mapping_to_a_getter_only_ienumerable : AutoMapperSpecBase
+    {
+        private Destination _destination = new Destination();
+        public class Source
+        {
+            public int[] Values { get; set; }
+            public List<int> Values2 { get; set; }
+        }
+        public class Destination
+        {
+            public IEnumerable<int> Values { get; } = new List<int>();
+            public IEnumerable<string> Values2 { get; } = new List<string>();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+        protected override void Because_of() => _destination = Mapper.Map<Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } });
+        [Fact]
+        public void Should_map_the_list_of_source_items()
+        {
+            _destination.Values.ShouldBe(new[] { 1, 2, 3, 4 });
+            _destination.Values2.ShouldBe(new[] { "9", "8", "7", "6" });
+        }
+    }
+
+    public class When_mapping_to_a_getter_only_existing_ienumerable : AutoMapperSpecBase
+    {
+        private Destination _destination = new Destination();
+        public class Source
+        {
+            public int[] Values { get; set; }
+            public List<int> Values2 { get; set; }
+        }
+        public class Destination
+        {
+            public IEnumerable<int> Values { get; } = new List<int>();
+            public IEnumerable<string> Values2 { get; } = new List<string>();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+        protected override void Because_of() => Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } }, _destination);
+        [Fact]
+        public void Should_map_the_list_of_source_items()
+        {
+            _destination.Values.ShouldBe(new[] { 1, 2, 3, 4 });
+            _destination.Values2.ShouldBe(new[]{ "9", "8", "7", "6" });
         }
     }
 

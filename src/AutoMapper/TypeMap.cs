@@ -116,10 +116,10 @@ namespace AutoMapper
             || CustomCtorFunction != null
             || ConstructDestinationUsingServiceLocator
             || ConstructorMap?.CanResolve == true
-            || DestinationTypeToUse.IsInterface()
-            || DestinationTypeToUse.IsAbstract()
-            || DestinationTypeToUse.IsGenericTypeDefinition()
-            || DestinationTypeToUse.IsValueType()
+            || DestinationTypeToUse.IsInterface
+            || DestinationTypeToUse.IsAbstract
+            || DestinationTypeToUse.IsGenericTypeDefinition
+            || DestinationTypeToUse.IsValueType
             || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
         public bool IsConstructorMapping =>

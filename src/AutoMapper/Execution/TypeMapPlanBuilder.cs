@@ -10,6 +10,7 @@ namespace AutoMapper.Execution
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
     using System.Diagnostics;
+    using Internal;
 
     public class TypeMapPlanBuilder
     {
@@ -96,7 +97,7 @@ namespace AutoMapper.Execution
                 }
                 if(typeMapsPath.Contains(memberTypeMap))
                 {
-                    if(memberTypeMap.SourceType.IsValueType())
+                    if(memberTypeMap.SourceType.IsValueType)
                     {
                         if(memberTypeMap.MaxDepth == 0)
                         {
@@ -149,9 +150,9 @@ namespace AutoMapper.Execution
             if (_typeMap.TypeConverterType == null)
                 return null;
             Type type;
-            if (_typeMap.TypeConverterType.IsGenericTypeDefinition())
+            if (_typeMap.TypeConverterType.IsGenericTypeDefinition)
             {
-                var genericTypeParam = _typeMap.SourceType.IsGenericType()
+                var genericTypeParam = _typeMap.SourceType.IsGenericType
                     ? _typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
                     : _typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
                 type = _typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
@@ -176,7 +177,7 @@ namespace AutoMapper.Execution
         {
             var newDestFunc = ToType(CreateNewDestinationFunc(), _typeMap.DestinationTypeToUse);
 
-            var getDest = _typeMap.DestinationTypeToUse.IsValueType() ? newDestFunc : Coalesce(_initialDestination, newDestFunc);
+            var getDest = _typeMap.DestinationTypeToUse.IsValueType ? newDestFunc : Coalesce(_initialDestination, newDestFunc);
 
             Expression destinationFunc = Assign(_destination, getDest);
 
@@ -312,7 +313,7 @@ namespace AutoMapper.Execution
             {
                 return CreateNewDestinationExpression(_typeMap.ConstructorMap);
             }
-            if(_typeMap.DestinationTypeToUse.IsInterface())
+            if(_typeMap.DestinationTypeToUse.IsInterface)
             {
                 var ctor = Call(null,
                     typeof(DelegateFactory).GetDeclaredMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
@@ -399,13 +400,13 @@ namespace AutoMapper.Execution
                 getter = destMember;
 
             Expression destValueExpr;
-            if (memberMap.UseDestinationValue.GetValueOrDefault())
+            if (memberMap.UseDestinationValue == true || (memberMap.UseDestinationValue == null && !ReflectionHelper.CanBeSet(destinationMember)))
             {
                 destValueExpr = getter;
             }
             else
             {
-                if (_initialDestination.Type.IsValueType())
+                if (_initialDestination.Type.IsValueType)
                     destValueExpr = Default(memberMap.DestinationType);
                 else
                     destValueExpr = Condition(Equal(_initialDestination, Constant(null)),

@@ -55,7 +55,7 @@ namespace AutoMapper.Execution
             Debug.WriteLine(typeName, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(typeName,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
-                interfaceType.IsInterface() ? new[] { interfaceType } : Type.EmptyTypes);
+                interfaceType.IsInterface ? new[] { interfaceType } : Type.EmptyTypes);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                 CallingConventions.Standard, Type.EmptyTypes);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
@@ -140,7 +140,7 @@ namespace AutoMapper.Execution
         public static Type GetProxyType(Type interfaceType)
         {
             var key = new TypeDescription(interfaceType);
-            if(!interfaceType.IsInterface())
+            if(!interfaceType.IsInterface)
             {
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }

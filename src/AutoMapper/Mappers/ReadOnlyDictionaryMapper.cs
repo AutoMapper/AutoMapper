@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(TypePair context)
         {
-            if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
+            if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType))
                 return false;
 
             var genericType = context.DestinationType.GetGenericTypeDefinition();

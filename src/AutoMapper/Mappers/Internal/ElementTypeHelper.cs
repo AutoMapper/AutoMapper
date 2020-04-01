@@ -55,7 +55,7 @@ namespace AutoMapper.Mappers.Internal
 
         public static Type GetEnumerationType(Type enumType)
         {
-            return !enumType.IsEnum() ? null : enumType;
+            return !enumType.IsEnum ? null : enumType;
         }
 
         internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)

@@ -29,29 +29,5 @@ namespace AutoMapper.UnitTests
         {
             PrimitiveHelper.GetFieldOrProperty(typeof(DestinationClass), "Value").ShouldNotBeNull();
         }
-
-        [Fact]
-        public void Should_not_flag_only_enumerable_type_as_writeable_collection()
-        {
-            PrimitiveHelper.IsListOrDictionaryType(typeof(string)).ShouldBeFalse();
-        }
-
-        [Fact]
-        public void Should_flag_list_as_writable_collection()
-        {
-            PrimitiveHelper.IsListOrDictionaryType(typeof(int[])).ShouldBeTrue();
-        }
-
-        [Fact]
-        public void Should_flag_generic_list_as_writeable_collection()
-        {
-            PrimitiveHelper.IsListOrDictionaryType(typeof(List<int>)).ShouldBeTrue();
-        }
-
-        [Fact]
-        public void Should_flag_dictionary_as_writeable_collection()
-        {
-            PrimitiveHelper.IsListOrDictionaryType(typeof(Dictionary<string, int>)).ShouldBeTrue();
-        }
     }
 }
