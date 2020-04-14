@@ -180,6 +180,9 @@ namespace AutoMapper
         IQueryable<TDestination> IMapper.ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand)
             => _inner.ProjectTo<TDestination>(source, parameters, membersToExpand);
 
+        IQueryable IMapper.ProjectTo(IQueryable source, Type destinationType, IDictionary<string, object> parameters, params string[] membersToExpand) 
+            => _inner.ProjectTo(source, destinationType, parameters, membersToExpand);
+
         internal object GetDestination(object source, Type destinationType)
         {
             InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out object destination);

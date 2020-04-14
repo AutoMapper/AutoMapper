@@ -139,6 +139,16 @@ namespace AutoMapper
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
         IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand);
+
+        /// <summary>
+        /// Project the input queryable.
+        /// </summary>
+        /// <param name="source">Queryable source</param>
+        /// <param name="destinationType">Destination type to map to</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
+        IQueryable ProjectTo(IQueryable source, Type destinationType, IDictionary<string, object> parameters = null, params string[] membersToExpand);
     }
 
     public interface IRuntimeMapper : IMapper
