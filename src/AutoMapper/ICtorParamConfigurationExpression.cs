@@ -3,7 +3,15 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
-    public interface ICtorParamConfigurationExpression<TSource>
+    public interface ICtorParamConfigurationExpression
+    {
+        /// <summary>
+        /// Specify the source member to map from. Can only reference a member on the source type.
+        /// </summary>
+        /// <param name="sourceMemberName">Property name referencing the source member to map against.</param>
+        void MapFrom(string sourceMemberName);
+    }
+    public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
     {
         /// <summary>
         /// Map constructor parameter from member expression

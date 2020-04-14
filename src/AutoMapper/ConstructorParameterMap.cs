@@ -26,7 +26,7 @@ namespace AutoMapper
             ?? CustomMapFunction?.ReturnType
             ?? (Parameter.IsOptional 
                 ? Parameter.ParameterType 
-                : SourceMembers.Last().GetMemberType());
+                : SourceMembers.LastOrDefault()?.GetMemberType());
 
         public override Type DestinationType => Parameter.ParameterType;
 
@@ -41,5 +41,6 @@ namespace AutoMapper
         public override bool CanResolveValue { get; set; }
 
         public override bool Inline { get; set; }
+        public string SourceMemberName { get; set; }
     }
 }
