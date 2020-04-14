@@ -12,16 +12,17 @@ namespace AutoMapper.Configuration
 
         public CtorParamConfigurationExpression(string ctorParamName) => CtorParamName = ctorParamName;
 
-        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
-        {
+        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
             _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
-        }
 
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
             Expression<Func<TSource, ResolutionContext, TMember>> resolverExpression = (src, ctxt) => resolver(src, ctxt);
             _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
         }
+
+        public void MapFrom(string sourceMemberName) =>
+            _ctorParamActions.Add(cpm => cpm.SourceMemberName = sourceMemberName);
 
         public void Configure(TypeMap typeMap)
         {

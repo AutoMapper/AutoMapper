@@ -343,6 +343,10 @@ namespace AutoMapper.Execution
                     .NullCheck(ctorParamMap.DestinationType);
             if(ctorParamMap.CustomMapFunction != null)
                 return ctorParamMap.CustomMapFunction.ConvertReplaceParameters(Source, Context);
+            if (ctorParamMap.SourceMemberName != null)
+            {
+                return MemberAccesses(ctorParamMap.SourceMemberName, Source);
+            }
             if (ctorParamMap.HasDefaultValue)
                 return Constant(ctorParamMap.Parameter.GetDefaultValue());
             return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);

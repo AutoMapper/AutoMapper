@@ -2,9 +2,30 @@
 using Xunit;
 using Shouldly;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests
 {
+    public class ForCtorParam_MapFrom_String : AutoMapperSpecBase
+    {
+        public class Destination
+        {
+            public Destination(string key1, string value1) => (Key, Value) = (key1, value1);
+            public string Key { get; }
+            public string Value { get; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+            c.CreateMap(typeof(KeyValuePair<,>), typeof(Destination))
+                .ForCtorParam("value1", o => o.MapFrom("Value"))
+                .ForCtorParam("key1", o => o.MapFrom("Key")));
+        [Fact]
+        public void Should_map_ok()
+        {
+            var destination = Map<Destination>(new KeyValuePair<int,int>(1,2));
+            destination.Key.ShouldBe("1");
+            destination.Value.ShouldBe("2");
+        }
+    }
     public class ForCtorParam_MapFrom_ProjectTo : AutoMapperSpecBase
     {
         public class Source
