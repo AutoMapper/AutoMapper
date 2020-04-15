@@ -13,6 +13,9 @@ namespace AutoMapper.Execution
 
     public static class ExpressionBuilder
     {
+        private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
+            ctxt => ctxt.GetTypeDepth(default);
+
         private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
             mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
 
@@ -122,5 +125,12 @@ namespace AutoMapper.Execution
             return null;
         }
 
+        public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap) =>
+            typeMap?.MaxDepth > 0 ?
+                GreaterThan(
+                    Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
+                    Constant(typeMap.MaxDepth)
+                ) :
+                null;
     }
 }
