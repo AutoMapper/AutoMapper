@@ -8,9 +8,15 @@ namespace AutoMapper.Configuration
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
     {
         public string CtorParamName { get; }
+        public Type SourceType { get; }
+
         private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
 
-        public CtorParamConfigurationExpression(string ctorParamName) => CtorParamName = ctorParamName;
+        public CtorParamConfigurationExpression(string ctorParamName, Type sourceType)
+        {
+            CtorParamName = ctorParamName;
+            SourceType = sourceType;
+        }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
             _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
@@ -21,8 +27,11 @@ namespace AutoMapper.Configuration
             _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
         }
 
-        public void MapFrom(string sourceMemberName) =>
+        public void MapFrom(string sourceMemberName)
+        {
+            SourceType.GetFieldOrProperty(sourceMemberName);
             _ctorParamActions.Add(cpm => cpm.SourceMemberName = sourceMemberName);
+        }
 
         public void Configure(TypeMap typeMap)
         {
