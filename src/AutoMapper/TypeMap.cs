@@ -143,6 +143,11 @@ namespace AutoMapper
         public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 
+        public Type MakeGenericType(Type type) => type.IsGenericTypeDefinition ?
+            type.MakeGenericType(SourceType.GenericTypeArguments.Concat(DestinationType.GenericTypeArguments).Take(type.GetGenericParameters().Length).ToArray()) :
+            type;
+
+
         public LambdaExpression[] GetUntypedIncludedMembers() =>
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
