@@ -149,24 +149,11 @@ namespace AutoMapper.Execution
         {
             if (_typeMap.TypeConverterType == null)
                 return null;
-            Type type;
-            if (_typeMap.TypeConverterType.IsGenericTypeDefinition)
-            {
-                var genericTypeParam = _typeMap.SourceType.IsGenericType
-                    ? _typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
-                    : _typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
-                type = _typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
-            }
-            else
-            {
-                type = _typeMap.TypeConverterType;
-            }
             // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
-            var converterInterfaceType =
-                typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationTypeToUse);
+            var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationTypeToUse);
             return Lambda(
                 Call(
-                    ToType(CreateInstance(type), converterInterfaceType),
+                    ToType(CreateInstance(_typeMap.TypeConverterType), converterInterfaceType),
                     converterInterfaceType.GetDeclaredMethod("Convert"),
                     Source, _initialDestination, Context
                 ),
@@ -567,10 +554,11 @@ namespace AutoMapper.Execution
 
         private Expression BuildResolveCall(Expression destValueExpr, IMemberMap memberMap)
         {
+            var typeMap = memberMap.TypeMap;
             var valueResolverConfig = memberMap.ValueResolverConfig;
             var resolverInstance = valueResolverConfig.Instance != null
                 ? Constant(valueResolverConfig.Instance)
-                : CreateInstance(valueResolverConfig.ConcreteType);
+                : CreateInstance(typeMap.MakeGenericType(valueResolverConfig.ConcreteType));
             var source = GetCustomSource(memberMap);
             var sourceMember = valueResolverConfig.SourceMember?.ReplaceParameters(source) ??
                                (valueResolverConfig.SourceMemberName != null
@@ -578,6 +566,10 @@ namespace AutoMapper.Execution
                                    : null);
 
             var iResolverType = valueResolverConfig.InterfaceType;
+            if (iResolverType.ContainsGenericParameters)
+            {
+                iResolverType = iResolverType.GetGenericTypeDefinition().MakeGenericType(new[] { typeMap.SourceType, typeMap.DestinationType }.Concat(iResolverType.GenericTypeArguments.Skip(2)).ToArray());
+            }
             var parameters = 
                 new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
                 .Zip(iResolverType.GetGenericArguments(), ToType)
