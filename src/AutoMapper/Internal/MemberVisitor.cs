@@ -16,10 +16,11 @@ namespace AutoMapper.Internal
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            MemberPath = node.GetMembers().Select(e=>e.Member);
+            _members.AddRange(node.GetMembers().Select(e => e.Member));
             return node;
         }
 
-        public IEnumerable<MemberInfo> MemberPath { get; private set; }
+        private readonly List<MemberInfo> _members = new List<MemberInfo>();
+        public IEnumerable<MemberInfo> MemberPath => _members;
     }
 }
