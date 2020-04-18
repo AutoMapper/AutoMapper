@@ -1,29 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper.UnitTests;
+using Shouldly;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
-using System.Linq;
-using AutoMapper.QueryableExtensions;
-using AutoMapper.UnitTests;
-using Xunit;
-using Shouldly;
 using System.Diagnostics;
+using System.Linq;
+using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
-    public class ExpandCollections : AutoMapperSpecBase
+    public class ExplicitlyExpandCollectionsAndChildReferences : AutoMapperSpecBase
     {
         TrainingCourseDto _course;
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Category, CategoryDto>();
-            cfg.CreateMap<TrainingCourse, TrainingCourseDto>();
+            cfg.CreateMap<TrainingCourse, TrainingCourseDto>().ForMember(c => c.Content, o => o.ExplicitExpansion());
             cfg.CreateMap<TrainingContent, TrainingContentDto>().ForMember(c => c.Category, o => o.ExplicitExpansion());
         });
 
         protected override void Because_of()
         {
-            using(var context = new ClientContext())
+            using (var context = new ClientContext())
             {
                 context.Database.Log = s => Trace.WriteLine(s);
                 _course = ProjectTo<TrainingCourseDto>(context.TrainingCourses, null, c => c.Content.Select(co => co.Category)).FirstOrDefault(n => n.CourseName == "Course 1");
