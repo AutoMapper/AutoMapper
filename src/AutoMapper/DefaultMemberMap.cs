@@ -43,7 +43,7 @@ namespace AutoMapper
             {
                 if (CustomMapExpression != null)
                 {
-                    var finder = new MemberFinderVisitor();
+                    var finder = new MemberFinderVisitor(TypeMap.SourceType);
                     finder.Visit(CustomMapExpression);
 
                     if (finder.Member != null)
