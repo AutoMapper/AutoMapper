@@ -226,15 +226,8 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void AddTransform(Expression<Func<TMember, TMember>> transformer)
-        {
-            PropertyMapActions.Add(pm =>
-            {
-                var config = new ValueTransformerConfiguration(typeof(TMember), transformer);
-
-                pm.AddValueTransformation(config);
-            });
-        }
+        public void AddTransform(Expression<Func<TMember, TMember>> transformer) =>
+            PropertyMapActions.Add(pm => pm.AddValueTransformation(new ValueTransformerConfiguration(pm.DestinationType, transformer)));
 
         public void ExplicitExpansion()
         {

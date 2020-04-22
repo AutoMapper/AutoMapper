@@ -345,4 +345,24 @@ namespace AutoMapper.UnitTests
             dest.NotNull.ShouldBe(2);
         }
     }
+    public class NonGenericMemberTransformer : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Value { get; set; }
+        }
+        public class Dest<T>
+        {
+            public T Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+                cfg.CreateMap(typeof(Source), typeof(Dest<>)).ForMember("Value", opt => opt.AddTransform(d => d + " and more")));
+        [Fact]
+        public void ShouldApplyTypeMapThenProfileThenRoot()
+        {
+            var source = new Source { Value = "value" };
+            var dest = Mapper.Map<Dest<string>>(source);
+            dest.Value.ShouldBe("value and more");
+        }
+    }
 }
