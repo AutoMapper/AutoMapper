@@ -16,7 +16,7 @@ namespace AutoMapper
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.Member.DeclaringType == _sourceType)
+            if (node.Member.DeclaringType.IsAssignableFrom(_sourceType))
             {
                 Member = node;
             }
