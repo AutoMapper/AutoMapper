@@ -358,7 +358,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 cfg.CreateMap(typeof(Source), typeof(Dest<>)).ForMember("Value", opt => opt.AddTransform(d => d + " and more")));
         [Fact]
-        public void ShouldApplyTypeMapThenProfileThenRoot()
+        public void ShouldMatchMemberType()
         {
             var source = new Source { Value = "value" };
             var dest = Mapper.Map<Dest<string>>(source);
