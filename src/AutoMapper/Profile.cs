@@ -66,7 +66,6 @@ namespace AutoMapper
         public bool? AllowNullDestinationValues { get; set; }
         public bool? AllowNullCollections { get; set; }
         public bool? EnableNullPropagationForQueryMapping { get; set; }
-        public bool? ShouldReverseNamingConventionsForReverseMaps { get; set; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
         public Func<FieldInfo, bool> ShouldMapField { get; set; }
         public Func<MethodInfo, bool> ShouldMapMethod { get; set; }
