@@ -41,15 +41,9 @@ namespace AutoMapper
         {
             get
             {
-                if (CustomMapExpression != null)
+                if (CustomMapExpression?.Body is MemberExpression memberExpression && memberExpression.Expression == CustomMapExpression.Parameters[0])
                 {
-                    var finder = new MemberFinderVisitor();
-                    finder.Visit(CustomMapExpression);
-
-                    if (finder.Member != null)
-                    {
-                        return finder.Member.Member;
-                    }
+                    return memberExpression.Member;
                 }
                 return SourceMembers.LastOrDefault();
             }
