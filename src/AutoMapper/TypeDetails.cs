@@ -52,12 +52,10 @@ namespace AutoMapper
                 yield return s;
         }
 
-        private static IEnumerable<string> PostFixes(IEnumerable<string> postfixes, string name)
-        {
-            return
-                postfixes.Where(postfix => name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
-                    .Select(postfix => name.Remove(name.Length - postfix.Length));
-        }
+        private static IEnumerable<string> PostFixes(IEnumerable<string> postfixes, string name) =>
+            postfixes
+                .Where(postfix => name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
+                .Select(postfix => name.Remove(name.Length - postfix.Length));
 
         private static Func<MemberInfo, bool> MembersToMap(
             Func<PropertyInfo, bool> shouldMapProperty, 
@@ -103,9 +101,9 @@ namespace AutoMapper
         {
             var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType == Type);
 
-            var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
+            var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType);
 
-            if (Type.IsInterface() && Type.IsGenericType())
+            if (Type.IsInterface && Type.IsGenericType)
             {
                 genericInterfaces = genericInterfaces.Union(new[] { Type });
             }
@@ -113,7 +111,7 @@ namespace AutoMapper
             return explicitExtensionMethods.Union
             (
                 from genericInterface in genericInterfaces
-                let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
+                let genericInterfaceArguments = genericInterface.GenericTypeArguments
                 let matchedMethods = (
                     from extensionMethod in sourceExtensionMethodSearch
                     where !extensionMethod.IsGenericMethodDefinition
@@ -125,40 +123,28 @@ namespace AutoMapper
                     select extensionMethod.MakeGenericMethod(genericInterfaceArguments)
                 )
                 from methodMatch in matchedMethods
-                where methodMatch.GetParameters()[0].ParameterType.GetTypeInfo().IsAssignableFrom(genericInterface.GetTypeInfo())
+                where methodMatch.GetParameters()[0].ParameterType.IsAssignableFrom(genericInterface)
                 select methodMatch
             ).ToArray();
         }
 
-        private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
-        {
+        private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers) =>
             // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            var filteredMembers = allMembers
+            allMembers
                 .OfType<PropertyInfo>()
                 .GroupBy(x => x.Name) // group properties of the same name together
                 .Select(x => x.First())
-                .Concat(allMembers.Where(x => x is FieldInfo)); // add FieldInfo objects back
+                .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
+                .ToArray();
 
-            return filteredMembers.ToArray();
-        }
-
-        private static MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers)
-        {
+        private static MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers) =>
             // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            var filteredMembers = allMembers
+            allMembers
                 .OfType<PropertyInfo>()
                 .GroupBy(x => x.Name) // group properties of the same name together
-                .Select(x =>
-                    x.Any(y => y.CanWrite && y.CanRead)
-                        ? // favor the first property that can both read & write - otherwise pick the first one
-                        x.First(y => y.CanWrite && y.CanRead)
-                        : x.First())
-                .Where(pi => pi.CanWrite || pi.PropertyType.IsListOrDictionaryType())
-                //.OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
-                .Concat(allMembers.Where(x => x is FieldInfo)); // add FieldInfo objects back
-
-            return filteredMembers.ToArray();
-        }
+                .Select(x => x.FirstOrDefault(y => y.CanWrite && y.CanRead) ?? x.First()) // favor the first property that can both read & write - otherwise pick the first one
+                .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
+                .ToArray();
 
         private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap) 
             => GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
@@ -167,9 +153,7 @@ namespace AutoMapper
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
         
         private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
-        {
-            return Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
-        }
+            => Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
 
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
 
@@ -185,10 +169,10 @@ namespace AutoMapper
             Func<MemberInfo, bool> memberAvailableFor)
         {
             var typesToScan = new List<Type>();
-            for (var t = Type; t != null; t = t.BaseType())
+            for (var t = Type; t != null; t = t.BaseType)
                 typesToScan.Add(t);
 
-            if (Type.IsInterface())
+            if (Type.IsInterface)
                 typesToScan.AddRange(Type.GetTypeInfo().ImplementedInterfaces);
 
             // Scan all types for public properties and fields

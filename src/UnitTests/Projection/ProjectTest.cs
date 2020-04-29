@@ -61,6 +61,18 @@ namespace AutoMapper.UnitTests.Projection
             projected.ShouldBeNull();
         }
 
+        [Fact]
+        public void DynamicProjectToShouldWork()
+        {
+            var customers =
+                new[] { new Customer { FirstName = "Bill", LastName = "White", Address = new Address("Street1") } }
+                    .AsQueryable();
+
+            IQueryable projected = customers.ProjectTo(typeof(CustomerDto), _config);
+
+            projected.Cast<CustomerDto>().Single().FirstName.ShouldBe("Bill");
+        }
+
         public class Customer
         {
             public string FirstName { get; set; }

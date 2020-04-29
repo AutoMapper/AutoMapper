@@ -26,6 +26,7 @@ namespace AutoMapper
         public virtual bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
         public virtual bool Inline { get => true; set { } }
+        public virtual bool CanBeSet => true;
         public virtual bool? UseDestinationValue { get => default; set { } }
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
@@ -41,15 +42,9 @@ namespace AutoMapper
         {
             get
             {
-                if (CustomMapExpression != null)
+                if (CustomMapExpression?.Body is MemberExpression memberExpression && memberExpression.Expression == CustomMapExpression.Parameters[0])
                 {
-                    var finder = new MemberFinderVisitor();
-                    finder.Visit(CustomMapExpression);
-
-                    if (finder.Member != null)
-                    {
-                        return finder.Member.Member;
-                    }
+                    return memberExpression.Member;
                 }
                 return SourceMembers.LastOrDefault();
             }

@@ -285,6 +285,23 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class NonMemberExpressionWithSourceValidation : NonValidatingSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public string OtherValue { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>(MemberList.Source)
+            .ForMember(d=>d.OtherValue, o=>o.MapFrom(s=>s.Value ?? "")));
+        [Fact]
+        public void Should_be_ignored() => new Action(Configuration.AssertConfigurationIsValid)
+            .ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Source.Value));
+    }
+
     public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : NonValidatingSpecBase
     {
         public class ModelObject

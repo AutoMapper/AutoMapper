@@ -319,7 +319,7 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericTypeDefinition())
+            if(destMember.DeclaringType.IsGenericTypeDefinition)
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
@@ -335,7 +335,6 @@ namespace AutoMapper.Configuration
             {
                 action(propertyMap);
             }
-            propertyMap.CheckMappedReadonly();
         }
 
         public LambdaExpression SourceExpression => _sourceExpression;

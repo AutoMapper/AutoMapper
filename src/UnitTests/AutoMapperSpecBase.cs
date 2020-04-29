@@ -27,6 +27,8 @@ namespace AutoMapper.UnitTests
 
         protected IMapper Mapper => mapper ?? (mapper = Configuration.CreateMapper());
 
+        protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
+
         protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
             Mapper.ProjectTo(source, parameters, membersToExpand);
 

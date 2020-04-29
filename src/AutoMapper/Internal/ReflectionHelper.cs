@@ -21,7 +21,7 @@ namespace AutoMapper.Internal
 
         public static object GetDefaultValue(ParameterInfo parameter)
         {
-            if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType())
+            if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType)
             {
                 return Activator.CreateInstance(parameter.ParameterType);
             }
@@ -83,7 +83,7 @@ namespace AutoMapper.Internal
         private static Type GetCurrentType(MemberInfo member, Type type)
         {
             var memberType = member?.GetMemberType() ?? type;
-            if (memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            if (memberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(memberType))
             {
                 memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
             }
@@ -169,7 +169,7 @@ namespace AutoMapper.Internal
             if (targetType == oldType)
                 return newType;
 
-            if (targetType.IsGenericType())
+            if (targetType.IsGenericType)
             {
                 var genSubArgs = targetType.GetTypeInfo().GenericTypeArguments;
                 var newGenSubArgs = new Type[genSubArgs.Length];

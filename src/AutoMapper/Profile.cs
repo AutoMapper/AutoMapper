@@ -110,7 +110,7 @@ namespace AutoMapper
 
             _typeMapConfigs.Add(map);
 
-            if (sourceType.IsGenericTypeDefinition() || destinationType.IsGenericTypeDefinition())
+            if (sourceType.IsGenericTypeDefinition || destinationType.IsGenericTypeDefinition)
                 _openTypeMapConfigs.Add(map);
 
             return map;

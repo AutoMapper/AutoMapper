@@ -165,7 +165,7 @@ namespace AutoMapper.Internal
             while (true);
             void NullCheck()
             {
-                if (target == null || target.Type.IsValueType())
+                if (target == null || target.Type.IsValueType)
                 {
                     return;
                 }
@@ -198,7 +198,7 @@ namespace AutoMapper.Internal
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
         {
             var nonNullElse = ToType(@else ?? Default(then.Type), then.Type);
-            if(expression.Type.IsValueType() && !expression.Type.IsNullableType())
+            if(expression.Type.IsValueType && !expression.Type.IsNullableType())
             {
                 return nonNullElse;
             }

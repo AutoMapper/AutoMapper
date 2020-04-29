@@ -6,18 +6,15 @@ using System.Reflection.Emit;
 
 namespace AutoMapper
 {
-
     internal static class TypeExtensions
     {
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.GetCustomAttribute<TAttribute>() != null;
 
-        public static Type GetGenericTypeDefinitionIfGeneric(this Type type) => type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
-
-        public static Type[] GetGenericArguments(this Type type) => type.GetTypeInfo().GenericTypeArguments;
-
-        public static Type[] GetGenericParameters(this Type type) => type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
+        public static Type GetTypeDefinitionIfGeneric(this Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
+
+        public static Type[] GetGenericParameters(this Type type) => type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
 
         public static Type CreateType(this TypeBuilder type) => type.CreateTypeInfo().AsType();
 
@@ -27,11 +24,11 @@ namespace AutoMapper
         {
             yield return type;
 
-            var baseType = type.BaseType();
+            var baseType = type.BaseType;
             while(baseType != null)
             {
                 yield return baseType;
-                baseType = baseType.BaseType();
+                baseType = baseType.BaseType;
             }
         }
 
@@ -50,13 +47,8 @@ namespace AutoMapper
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type) => type.GetRuntimeMethods();
 
-        public static IEnumerable<PropertyInfo> GetDeclaredProperties(this Type type) => type.GetTypeInfo().DeclaredProperties;
-
         public static PropertyInfo GetDeclaredProperty(this Type type, string name) 
             => type.GetTypeInfo().GetDeclaredProperty(name);
-
-        public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit) 
-            => type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).Cast<object>().ToArray();
 
         public static bool IsStatic(this FieldInfo fieldInfo) => fieldInfo?.IsStatic ?? false;
 
@@ -85,49 +77,6 @@ namespace AutoMapper
 
         public static bool IsPublic(this MemberInfo memberInfo) => (memberInfo as FieldInfo)?.IsPublic ?? (memberInfo as PropertyInfo).IsPublic();
 
-        public static bool IsNotPublic(this ConstructorInfo constructorInfo) => constructorInfo.IsPrivate
-                                                                                || constructorInfo.IsFamilyAndAssembly
-                                                                                || constructorInfo.IsFamilyOrAssembly
-                                                                                || constructorInfo.IsFamily;
-
         public static Assembly Assembly(this Type type) => type.GetTypeInfo().Assembly;
-
-        public static Type BaseType(this Type type) => type.GetTypeInfo().BaseType;
-
-        public static bool IsAssignableFrom(this Type type, Type other) => type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
-
-        public static bool IsAbstract(this Type type) => type.GetTypeInfo().IsAbstract;
-
-        public static bool IsClass(this Type type) => type.GetTypeInfo().IsClass;
-
-        public static bool IsEnum(this Type type) => type.GetTypeInfo().IsEnum;
-
-        public static bool IsGenericType(this Type type) => type.GetTypeInfo().IsGenericType;
-
-        public static bool IsGenericTypeDefinition(this Type type) => type.GetTypeInfo().IsGenericTypeDefinition;
-
-        public static bool IsInterface(this Type type) => type.GetTypeInfo().IsInterface;
-
-        public static bool IsPrimitive(this Type type) => type.GetTypeInfo().IsPrimitive;
-
-        public static bool IsSealed(this Type type) => type.GetTypeInfo().IsSealed;
-
-        public static bool IsValueType(this Type type) => type.GetTypeInfo().IsValueType;
-
-        public static bool IsLiteralType(this Type type) => type == typeof(string) || type.GetTypeInfo().IsValueType;
-
-        public static bool IsInstanceOfType(this Type type, object o) => o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
-
-        public static PropertyInfo[] GetProperties(this Type type) => type.GetRuntimeProperties().ToArray();
-
-        public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetMethod;
-
-        public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo, bool ignored) => propertyInfo.SetMethod;
-        
-        public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo) => propertyInfo.GetMethod;
-
-        public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo) => propertyInfo.SetMethod;
-
-        public static FieldInfo GetField(this Type type, string name) => type.GetRuntimeField(name);
     }
 }

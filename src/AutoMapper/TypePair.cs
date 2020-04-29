@@ -98,9 +98,8 @@ namespace AutoMapper
             {
                 return null;
             }
-            var sourceGenericDefinition = SourceType.IsGenericType() ? SourceType.GetGenericTypeDefinition() : SourceType;
-            var destinationGenericDefinition = DestinationType.IsGenericType() ? DestinationType.GetGenericTypeDefinition() : DestinationType;
-
+            var sourceGenericDefinition = SourceType.GetTypeDefinitionIfGeneric();
+            var destinationGenericDefinition = DestinationType.GetTypeDefinitionIfGeneric();
             return new TypePair(sourceGenericDefinition, destinationGenericDefinition);
         }
 
@@ -116,8 +115,8 @@ namespace AutoMapper
             {
                 destinationArguments = sourceArguments;
             }
-            var closedSourceType = SourceType.IsGenericTypeDefinition() ? SourceType.MakeGenericType(sourceArguments) : SourceType;
-            var closedDestinationType = DestinationType.IsGenericTypeDefinition() ? DestinationType.MakeGenericType(destinationArguments) : DestinationType;
+            var closedSourceType = SourceType.IsGenericTypeDefinition ? SourceType.MakeGenericType(sourceArguments) : SourceType;
+            var closedDestinationType = DestinationType.IsGenericTypeDefinition ? DestinationType.MakeGenericType(destinationArguments) : DestinationType;
             return new TypePair(closedSourceType, closedDestinationType);
         }
 

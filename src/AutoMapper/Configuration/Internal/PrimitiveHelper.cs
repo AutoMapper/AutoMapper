@@ -43,9 +43,6 @@ namespace AutoMapper.Configuration.Internal
         public static bool IsListType(Type type)
             => typeof(IList).IsAssignableFrom(type);
 
-        public static bool IsListOrDictionaryType(Type type)
-            => type.IsListType() || type.IsDictionaryType();
-
         public static bool IsDictionaryType(Type type) 
             => type.ImplementsGenericInterface(typeof(IDictionary<,>));
 
@@ -59,7 +56,7 @@ namespace AutoMapper.Configuration.Internal
         }
 
         public static bool IsGenericType(Type type, Type genericType)
-            => type.IsGenericType() && type.GetGenericTypeDefinition() == genericType;
+            => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
 
         public static Type GetIEnumerableType(Type type)
             => type.GetGenericInterface(typeof(IEnumerable<>));
