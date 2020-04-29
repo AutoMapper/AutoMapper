@@ -396,6 +396,24 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_mapping_to_readonly_collection_without_setter : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public IEnumerable<string> MyCollection { get; } = new[] { "one", "two" };
+        }
+        public class Destination
+        {
+            public IEnumerable<string> MyCollection { get; } = new ReadOnlyCollection<string>(new string[0]);
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
+        [Fact]
+        public void Should_fail() => new Action(() => Mapper.Map(new Source(), new Destination()))
+            .ShouldThrow<AutoMapperMappingException>()
+            .InnerException.ShouldBeOfType<NotSupportedException>()
+            .Message.ShouldBe("Collection is read-only.");
+    }
+
     public class When_mapping_to_readonly_property_UseDestinationValue : AutoMapperSpecBase
     {
         public class Source

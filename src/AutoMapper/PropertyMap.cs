@@ -55,6 +55,7 @@ namespace AutoMapper
         public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
         public override LambdaExpression CustomSource { get; set; }
         public override bool Inline { get; set; } = true;
+        public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
@@ -112,7 +113,7 @@ namespace AutoMapper
 
         public void MapFrom(string propertyOrField)
         {
-            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition() ?
+            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
                                                 // just a placeholder so the member is mapped
                                                 Lambda(Constant(null)) :
                                                 MemberAccessLambda(TypeMap.SourceType, propertyOrField);
@@ -121,13 +122,5 @@ namespace AutoMapper
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
-
-        internal void CheckMappedReadonly()
-        {
-            if(IsResolveConfigured && !ReflectionHelper.CanBeSet(DestinationMember))
-            {
-                UseDestinationValue = true;
-            }
-        }
     }
 }

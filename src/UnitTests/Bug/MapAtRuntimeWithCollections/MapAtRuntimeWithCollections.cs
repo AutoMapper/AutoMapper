@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Entity24, EntityDTO24>().ReverseMap();
             cfg.CreateMap<Entity25, EntityDTO25>().ReverseMap();
             cfg.CreateMap<Entity26, EntityDTO26>().ReverseMap();
-            //cfg.ForAllPropertyMaps(p => !p.SourceType.IsValueType(), (pm, o) => o.MapAtRuntime());
+            //cfg.ForAllPropertyMaps(p => !p.SourceType.IsValueType, (pm, o) => o.MapAtRuntime());
         });
 
         public class Initialize

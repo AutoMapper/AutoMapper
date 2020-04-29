@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
             context.DestinationType.IsArray
             && context.SourceType.IsArray
             && ElementTypeHelper.GetElementType(context.DestinationType) == ElementTypeHelper.GetElementType(context.SourceType)
-            && ElementTypeHelper.GetElementType(context.SourceType).IsPrimitive();
+            && ElementTypeHelper.GetElementType(context.SourceType).IsPrimitive;
 
         public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

@@ -25,7 +25,7 @@ namespace AutoMapper.Execution
             return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
         }
 
-        public static Expression GenerateNonNullConstructorExpression(Type type) => type.IsValueType()
+        public static Expression GenerateNonNullConstructorExpression(Type type) => type.IsValueType
             ? Default(type)
             : (type == typeof(string)
                 ? Constant(string.Empty)
@@ -34,7 +34,7 @@ namespace AutoMapper.Execution
 
         public static Expression GenerateConstructorExpression(Type type)
         {
-            if (type.IsValueType())
+            if (type.IsValueType)
             {
                 return Default(type);
             }
@@ -44,7 +44,7 @@ namespace AutoMapper.Execution
                 return Constant(null, typeof(string));
             }
 
-            if (type.IsInterface())
+            if (type.IsInterface)
             {
                 return
                     type.IsDictionaryType() ? CreateCollection(type, typeof(Dictionary<,>))
@@ -54,7 +54,7 @@ namespace AutoMapper.Execution
                     : InvalidType(type, $"Cannot create an instance of interface type {type}.");
             }
 
-            if (type.IsAbstract())
+            if (type.IsAbstract)
             {
                 return InvalidType(type, $"Cannot create an instance of abstract type {type}.");
             }

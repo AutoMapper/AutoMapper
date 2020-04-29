@@ -120,7 +120,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             // for typical orderby expression, a unaryexpression is used that contains a 
             // func which in turn defines the type of the field that has to be used for ordering/sorting
-            if (newOrderByExpr is UnaryExpression unary && unary.Operand.Type.IsGenericType())
+            if (newOrderByExpr is UnaryExpression unary && unary.Operand.Type.IsGenericType)
             {
                 methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), unary.Operand.Type.GetGenericArguments().Last());
             }
@@ -148,7 +148,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private Type ChangeLambdaArgTypeFormSourceToDest(Type lambdaType, Type returnType)
         {
-            if (lambdaType.IsGenericType())
+            if (lambdaType.IsGenericType)
             {
                 var genArgs = lambdaType.GetTypeInfo().GenericTypeArguments;
                 var newGenArgs = genArgs.Select(t => t.ReplaceItemType(_sourceType, _destinationType)).ToArray();

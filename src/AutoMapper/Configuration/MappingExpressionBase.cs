@@ -21,7 +21,7 @@ namespace AutoMapper.Configuration
         protected MappingExpressionBase(MemberList memberList, TypePair types)
         {
             Types = types;
-            IsOpenGeneric = types.SourceType.IsGenericTypeDefinition() || types.DestinationType.IsGenericTypeDefinition();
+            IsOpenGeneric = types.SourceType.IsGenericTypeDefinition || types.DestinationType.IsGenericTypeDefinition;
             TypeMapActions.Add(tm => tm.ConfiguredMemberList = memberList);
         }
         public TypePair Types { get; }
@@ -59,7 +59,7 @@ namespace AutoMapper.Configuration
             }
 
             var destTypeInfo = typeMap.DestinationTypeDetails;
-            if(!typeMap.DestinationType.IsAbstract())
+            if(!typeMap.DestinationType.IsAbstract)
             {
                 foreach(var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
                 {
@@ -176,7 +176,7 @@ namespace AutoMapper.Configuration
 
         protected void CheckIsDerived(Type derivedType, Type baseType)
         {
-            if(!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition() && !baseType.IsGenericTypeDefinition())
+            if(!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
             {
                 throw new ArgumentOutOfRangeException(nameof(derivedType), $"{derivedType} is not derived from {baseType}.");
             }
@@ -414,7 +414,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
-            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(ctorParamName);
+            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(ctorParamName, SourceType);
 
             paramOptions(ctorParamExpression);
 
