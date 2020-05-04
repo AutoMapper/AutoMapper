@@ -41,6 +41,7 @@ namespace AutoMapper
         public override bool CanResolveValue { get; set; }
 
         public override bool Inline { get; set; }
-        public string SourceMemberName { get; set; }
+
+        public Expression DefaultValue() => Expression.Constant(Parameter.GetDefaultValue());
     }
 }

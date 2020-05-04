@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,8 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    using static Expression;
+
     /// <summary>
     /// Member maps with default values. Used in dynamic/dictionary scenarios when source/destination members do not exist.
     /// </summary>
@@ -48,6 +51,21 @@ namespace AutoMapper
                 }
                 return SourceMembers.LastOrDefault();
             }
+        }
+  
+        public void MapFrom(LambdaExpression sourceMember)
+        {
+            CustomMapExpression = sourceMember;
+            Ignored = false;
+        }
+
+        public void MapFrom(string propertyOrField)
+        {
+            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
+                                                // just a placeholder so the member is mapped
+                                                Lambda(Constant(null)) :
+                                                ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, propertyOrField);
+            MapFrom(mapExpression);
         }
     }
 }

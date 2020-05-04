@@ -415,7 +415,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
-            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(ctorParamName, SourceType);
+            var ctorParamExpression = new CtorParamConfigurationExpression<TSource, TDestination>(ctorParamName, SourceType);
 
             paramOptions(ctorParamExpression);
 

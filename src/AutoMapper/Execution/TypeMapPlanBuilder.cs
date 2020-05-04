@@ -320,25 +320,9 @@ namespace AutoMapper.Execution
             return Block(variables, body);
         }
 
-        private Expression ResolveSource(ConstructorParameterMap ctorParamMap)
-        {
-            if(ctorParamMap.CustomMapExpression != null)
-                return ctorParamMap.CustomMapExpression.ConvertReplaceParameters(Source)
-                    .NullCheck(ctorParamMap.DestinationType);
-            if(ctorParamMap.CustomMapFunction != null)
-                return ctorParamMap.CustomMapFunction.ConvertReplaceParameters(Source, Context);
-            if (ctorParamMap.SourceMemberName != null)
-            {
-                return MemberAccesses(ctorParamMap.SourceMemberName, Source);
-            }
-            if (ctorParamMap.HasDefaultValue)
-                return Constant(ctorParamMap.Parameter.GetDefaultValue());
-            return Chain(ctorParamMap.SourceMembers, ctorParamMap.DestinationType);
-        }
-
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
         {
-            var resolvedExpression = ResolveSource(ctorParamMap);
+            var resolvedExpression = BuildValueResolverFunc(ctorParamMap, _destination, ctorParamMap.DefaultValue());
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
             var tryMap = Block(new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
@@ -469,7 +453,7 @@ namespace AutoMapper.Execution
             return Block(new[] {resolvedValue, propertyValue}.Distinct(), mapperExpr);
         }
 
-        private Expression BuildValueResolverFunc(IMemberMap memberMap, Expression destValueExpr)
+        private Expression BuildValueResolverFunc(IMemberMap memberMap, Expression destValueExpr, Expression defaultValue = null)
         {
             Expression valueResolverFunc;
             var destinationPropertyType = memberMap.DestinationType;
@@ -517,7 +501,7 @@ namespace AutoMapper.Execution
             }
             else
             {
-                valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
+                valueResolverFunc = defaultValue ?? Throw(Constant(new Exception("I done blowed up")));
             }
 
             if (memberMap.NullSubstitute != null)
