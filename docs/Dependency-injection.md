@@ -244,3 +244,35 @@ public class AutoMapperInstaller : IWindsorInstaller
         }
 }
 ```
+
+### Catel.IoC
+
+For those using Catel.IoC here is how you register AutoMapper. First define the configuration using [profiles](Configuration.html#profile-instances). And then you let AutoMapper know in what assemblies those profiles are defined by registering AutoMapper in the ServiceLocator at startup:
+```c#
+ServiceLocator.Default.RegisterInstance(typeof(IMapper), new Mapper(CreateConfiguration()));
+```
+
+Configuration Creation Method:
+```c#
+public static MapperConfiguration CreateConfiguration()
+{
+    var config = new MapperConfiguration(cfg =>
+    {
+        // Add all profiles in current assembly
+        cfg.AddMaps(GetType().Assembly);
+    });
+
+    return config;
+}
+```
+
+Now you can inject AutoMapper at runtime into your services/controllers:
+```c#
+public class EmployeesController {
+	private readonly IMapper _mapper;
+
+	public EmployeesController(IMapper mapper) => _mapper = mapper;
+
+	// use _mapper.Map or _mapper.ProjectTo
+}
+```
