@@ -1,10 +1,32 @@
 using Shouldly;
+using System;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
     namespace NamingConventions
     {
+        public class ExactMatchNamingConvention : NonValidatingSpecBase
+        {
+            class Source
+            {
+                public string Name { get; set; }
+            }
+            class Destination
+            {
+                public string Name { get; set; }
+                public string COMPANY_Name { get; set; }
+            }
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+            {
+                cfg.DestinationMemberNamingConvention = new AutoMapper.ExactMatchNamingConvention();
+                cfg.CreateMap<Source, Destination>();
+            });
+            [Fact]
+            public void Should_not_use_pascal_naming_convention() =>
+                new Action(Mapper.ConfigurationProvider.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>()
+                    .Errors[0].UnmappedPropertyNames.ShouldContain("COMPANY_Name");
+        }
         public class Neda
         {
             public string cmok { get; set; }
