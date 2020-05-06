@@ -82,7 +82,9 @@ namespace AutoMapper.Execution
             }
             typeMapsPath.Add(_typeMap);
             var members = 
-                _typeMap.MemberMaps.Where(pm=>pm.CanResolveValue)
+                _typeMap.MemberMaps
+                .Concat(_typeMap.IncludedDerivedTypes.Select(ResolveTypeMap).SelectMany(tm=>tm.MemberMaps))
+                .Where(pm=>pm.CanResolveValue)
                 .ToArray()
                 .Select(pm=> new { MemberTypeMap = ResolveMemberTypeMap(pm), MemberMap = pm })
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
@@ -106,7 +108,6 @@ namespace AutoMapper.Execution
                         typeMapsPath.Remove(_typeMap);
                         return;
                     }
-
                     SetPreserveReferences(memberTypeMap);
                     foreach(var derivedTypeMap in memberTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
                     {
@@ -126,7 +127,7 @@ namespace AutoMapper.Execution
 
             TypeMap ResolveMemberTypeMap(IMemberMap memberMap)
             {
-                if(memberMap.SourceType == null)
+                if(memberMap.SourceType == null || memberMap.Types.ContainsGenericParameters)
                 {
                     return null;
                 }
