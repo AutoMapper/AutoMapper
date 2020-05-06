@@ -1,1 +1,2 @@
 ﻿T:System.Runtime.CompilerServices.CompilerGeneratedAttribute
+T:System.Runtime.CompilerServices.IteratorStateMachineAttribute
