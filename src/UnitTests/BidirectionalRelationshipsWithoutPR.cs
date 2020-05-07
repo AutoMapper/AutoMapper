@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
@@ -6,6 +7,64 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class CyclesWithInheritance : AutoMapperSpecBase
+    {
+        class FlowChart
+        {
+            public FlowNode[] Nodes;
+        }
+        class FlowNode
+        {
+        }
+        class FlowStep : FlowNode
+        {
+            public FlowNode Next;
+        }
+        class FlowDecision : FlowNode
+        {
+            public FlowNode True;
+            public FlowNode False;
+        }
+        class FlowSwitch<T> : FlowNode
+        {
+            public IDictionary<T, object> Connections;
+        }
+        class FlowChartModel
+        {
+            public FlowNodeModel[] Nodes;
+        }
+        class FlowNodeModel
+        {
+            public Connection[] Connections;
+        }
+        class Connection
+        {
+            public FlowNodeModel Node;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<FlowChart, FlowChartModel>();
+            cfg.CreateMap<FlowNode, FlowNodeModel>()
+                .Include<FlowStep, FlowNodeModel>()
+                .Include<FlowDecision, FlowNodeModel>()
+                .Include(typeof(FlowSwitch<>), typeof(FlowNodeModel))
+                .ForMember(d=>d.Connections, o=>o.Ignore());
+            cfg.CreateMap<FlowStep, FlowNodeModel>().ForMember(d => d.Connections, o => o.MapFrom(s => new[] { s.Next }));
+            cfg.CreateMap<FlowDecision, FlowNodeModel>().ForMember(d => d.Connections, o => o.MapFrom(s => new[] { s.True, s.False }));
+            cfg.CreateMap(typeof(FlowSwitch<>), typeof(FlowNodeModel));
+            cfg.CreateMap<FlowNode, Connection>().ForMember(d => d.Node, o => o.MapFrom(s => s));
+            cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Connection)).ForMember("Node", o => o.MapFrom("Key"));
+        });
+        [Fact]
+        public void Should_map_ok()
+        {
+            var flowStep = new FlowStep();
+            var flowDecision = new FlowDecision { False = flowStep, True = flowStep };
+            flowStep.Next = flowDecision;
+            var source = new FlowChart { Nodes = new FlowNode[] { flowStep, flowDecision } };
+            var dest = Map<FlowChartModel>(source);
+        }
+    }
     public class When_the_source_has_cyclical_references_with_dynamic_map : AutoMapperSpecBase
     {
         public class CDataTypeModel<T>
