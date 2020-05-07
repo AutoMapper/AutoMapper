@@ -23,9 +23,6 @@ namespace AutoMapper.Execution
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
             ctxt => ctxt.DecrementTypeDepth(default);
 
-        private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
-            ctxt => ctxt.GetTypeDepth(default);
-
         private readonly IConfigurationProvider _configurationProvider;
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
@@ -249,14 +246,12 @@ namespace AutoMapper.Execution
                     Condition(_typeMap.Condition.Body,
                         mapperFunc, Default(_typeMap.DestinationTypeToUse));
 
-            if(_typeMap.MaxDepth > 0)
+            var overMaxDepth = Context.OverMaxDepth(_typeMap);
+            if (overMaxDepth != null)
                 mapperFunc = Condition(
-                    LessThanOrEqual(
-                        Call(Context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(_typeMap.Types)),
-                        Constant(_typeMap.MaxDepth)
-                    ),
-                    mapperFunc,
-                    Default(_typeMap.DestinationTypeToUse));
+                    overMaxDepth,
+                    Default(_typeMap.DestinationTypeToUse),
+                    mapperFunc);
 
             if(_typeMap.Profile.AllowNullDestinationValues)
                 mapperFunc = Source.IfNullElse(Default(_typeMap.DestinationTypeToUse), mapperFunc);

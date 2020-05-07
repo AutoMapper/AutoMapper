@@ -41,6 +41,11 @@ namespace AutoMapper.Mappers.Internal
             UseDestinationValue();
 
             var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
+            var overMaxDepth = contextExpression.OverMaxDepth(memberMap?.TypeMap);
+            if (overMaxDepth != null)
+            {
+                addItems = Condition(overMaxDepth, Empty(), addItems);
+            }
             var mapExpr = Block(addItems, destination);
 
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
