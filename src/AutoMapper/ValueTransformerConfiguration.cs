@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
-    public struct ValueTransformerConfiguration
+    public readonly struct ValueTransformerConfiguration
     {
         public ValueTransformerConfiguration(Type valueType, LambdaExpression transformerExpression)
         {
