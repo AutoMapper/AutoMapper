@@ -99,7 +99,8 @@ namespace AutoMapper
 
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, true);
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, isReverseMap: true);
+
                 }
             }
         }
