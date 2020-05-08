@@ -100,7 +100,7 @@ We configured the type map in AutoMapper with the CreateMap method.  AutoMapper 
 
 On the OrderDto type, the Total property matched to the GetTotal() method on Order.  The CustomerName property matched to the Customer.Name property on Order.  As long as we name our destination properties appropriately, we do not need to configure individual property matching.
 
-If you want to disable this behavior you can use the `ExactMatchNamingConvention`:
+If you want to disable this behavior, you can use the `ExactMatchNamingConvention`:
 ```
 cfg.DestinationMemberNamingConvention = new ExactMatchNamingConvention();
 ```
