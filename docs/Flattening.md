@@ -100,6 +100,11 @@ We configured the type map in AutoMapper with the CreateMap method.  AutoMapper 
 
 On the OrderDto type, the Total property matched to the GetTotal() method on Order.  The CustomerName property matched to the Customer.Name property on Order.  As long as we name our destination properties appropriately, we do not need to configure individual property matching.
 
+If you want to disable this behavior you can use the `ExactMatchNamingConvention`:
+```
+cfg.DestinationMemberNamingConvention = new ExactMatchNamingConvention();
+```
+
 ## IncludeMembers
 
 If you need more control when flattening, you can use IncludeMembers. You can map members of a child object to the destination object when you already have a map from the child type to the destination type (unlike the classic flattening that doesn't require a map for the child type).
