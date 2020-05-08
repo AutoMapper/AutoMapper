@@ -114,6 +114,7 @@ public class OrganizationProfile : Profile
   }
 }
 ```
+If you don't need a naming convention, you can use the `ExactMatchNamingConvention`.
 
 ## Replacing characters
 
