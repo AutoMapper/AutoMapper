@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Execution;
-using AutoMapper.QueryableExtensions;
-using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-    using static Expression;
-
     public class ConstructorMap
     {
         private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
@@ -25,34 +18,9 @@ namespace AutoMapper
             TypeMap = typeMap;
         }
 
-        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
-        {
-            new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter()
-        };
-
         public bool CanResolve => CtorParams.All(param => param.CanResolveValue);
 
-        public Expression NewExpression(Expression instanceParameter, LetPropertyMaps letPropertyMaps)
-        {
-            var parameters = CtorParams.Select(map =>
-            {
-                var result = new ExpressionResolutionResult(instanceParameter, Ctor.DeclaringType);
-
-                var matchingExpressionConverter =
-                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
-
-                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map, letPropertyMaps)
-                    ?? throw new AutoMapperMappingException($"Unable to generate the instantiation expression for the constructor {Ctor}: no expression could be mapped for constructor parameter '{map.Parameter}'.", null, TypeMap.Types);
-
-                return result;
-            });
-            return New(Ctor, parameters.Select(p => p.ResolutionExpression));
-        }
-
-        public void AddParameter(ParameterInfo parameter, MemberInfo[] resolvers, bool canResolve)
-        {
+        public void AddParameter(ParameterInfo parameter, MemberInfo[] resolvers, bool canResolve) =>
             _ctorParams.Add(new ConstructorParameterMap(TypeMap, parameter, resolvers, canResolve));
-        }
     }
 }

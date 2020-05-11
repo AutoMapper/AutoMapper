@@ -127,22 +127,16 @@ namespace AutoMapper.QueryableExtensions
 
         private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
         {
-            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType);
-
-            if(typeMap == null)
-            {
-                throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
-            }
-
-            if(typeMap.CustomMapExpression != null)
-            {
-                return typeMap.CustomMapExpression.ReplaceParameters(instanceParameter);
-            }
+            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             return CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap, letPropertyMaps);
         }
 
         private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
+            if (typeMap.CustomMapExpression != null)
+            {
+                return typeMap.CustomMapExpression.ReplaceParameters(instanceParameter);
+            }
             var memberBindings = new List<MemberBinding>();
             var depth = GetDepth(request, typePairCount);
             if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
@@ -156,16 +150,9 @@ namespace AutoMapper.QueryableExtensions
             {
                 memberBindings = CreateMemberBindings();
             }
-            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter, letPropertyMaps);
-            if(instanceParameter is ParameterExpression)
-                constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
-            var visitor = new NewFinderVisitor();
-            visitor.Visit(constructorExpression);
-
-            var expression = MemberInit(
-                visitor.NewExpression,
-                memberBindings.ToArray()
-                );
+            var constructorExpressionLambda = DestinationConstructorExpression(request, instanceParameter, typePairCount, typeMap, letPropertyMaps);
+            var constructorExpression = instanceParameter is ParameterExpression ? constructorExpressionLambda.ReplaceParameters(instanceParameter) : constructorExpressionLambda.Body;
+            var expression = MemberInit((NewExpression)constructorExpression, memberBindings);
             return expression;
             List<MemberBinding> CreateMemberBindings()
             {
@@ -197,9 +184,8 @@ namespace AutoMapper.QueryableExtensions
                     var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
                     if (binder == null)
                     {
-                        var message =
-                            $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationMember.DeclaringType?.Name}.{propertyMap.DestinationName} ({propertyMap.DestinationType})";
-                        throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
+                        ThrowCannotMap(propertyMap, result);
+                        return;
                     }
                     var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
                     if (bindExpression == null)
@@ -219,6 +205,13 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
+        private static void ThrowCannotMap(IMemberMap propertyMap, ExpressionResolutionResult result)
+        {
+            var message =
+                $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationType.Name}.{propertyMap.DestinationName} ({propertyMap.DestinationType})";
+            throw new AutoMapperMappingException(message, null, propertyMap.TypeMap.Types, propertyMap.TypeMap, propertyMap);
+        }
+
         private static int GetDepth(ExpressionRequest request, TypePairCount typePairCount)
         {
             if (typePairCount.TryGetValue(request, out int visitCount))
@@ -229,7 +222,7 @@ namespace AutoMapper.QueryableExtensions
             return visitCount;
         }
 
-        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
+        private LambdaExpression DestinationConstructorExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
             var ctorExpr = typeMap.CustomCtorExpression;
             if (ctorExpr != null)
@@ -237,31 +230,43 @@ namespace AutoMapper.QueryableExtensions
                 return ctorExpr;
             }
             var newExpression = typeMap.ConstructorMap?.CanResolve == true
-                ? typeMap.ConstructorMap.NewExpression(instanceParameter, letPropertyMaps)
+                ? NewExpression(typeMap.ConstructorMap, request, instanceParameter, typePairCount, letPropertyMaps)
                 : New(typeMap.DestinationTypeToUse);
-
             return Lambda(newExpression);
         }
 
-        private class NewFinderVisitor : ExpressionVisitor
-        {
-            public NewExpression NewExpression { get; private set; }
 
-            protected override Expression VisitNew(NewExpression node)
+        public Expression NewExpression(ConstructorMap constructorMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
+        {
+            var parameters = constructorMap.CtorParams.Select(map =>
             {
-                NewExpression = node;
-                return base.VisitNew(node);
-            }
+                var resolvedSource = ResolveExpression(map, request.SourceType, instanceParameter, letPropertyMaps);
+                var types = new TypePair(resolvedSource.Type, map.DestinationType);
+                var typeMap = _configurationProvider.ResolveTypeMap(types);
+                if (typeMap == null)
+                {
+                    if (types.DestinationType.IsAssignableFrom(types.SourceType))
+                    {
+                        return resolvedSource.ResolutionExpression;
+                    }
+                    ThrowCannotMap(map, resolvedSource);
+                }
+                var newRequest = new ExpressionRequest(types.SourceType, types.DestinationType, request.MembersToExpand, request);
+                return CreateMapExpressionCore(newRequest, resolvedSource.ResolutionExpression, typePairCount, typeMap, letPropertyMaps);
+            });
+            return New(constructorMap.Ctor, parameters);
         }
 
-        private ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
+        private ExpressionResolutionResult ResolveExpression(IMemberMap propertyMap, Type currentType, Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
-
             var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
-            result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps) 
-                ?? throw new Exception("Can't resolve this to Queryable Expression");
-
+            if (matchingExpressionConverter == null)
+            {
+                ThrowCannotMap(propertyMap, result);
+                return null;
+            }
+            result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps);
             if(propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
                 var currentChild = result.ResolutionExpression;
