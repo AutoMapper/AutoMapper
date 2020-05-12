@@ -43,8 +43,7 @@ namespace AutoMapper.Configuration
         {
             foreach(var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
             {
-                var attrs = destProperty.GetCustomAttributes(true);
-                if(attrs.Any(x => x is IgnoreMapAttribute))
+                if(destProperty.Has<IgnoreMapAttribute>())
                 {
                     IgnoreDestinationMember(destProperty);
                     var sourceProperty = typeMap.SourceType.GetInheritedMember(destProperty.Name);
@@ -58,20 +57,7 @@ namespace AutoMapper.Configuration
                     IgnoreDestinationMember(destProperty);
                 }
             }
-
-            var destTypeInfo = typeMap.DestinationTypeDetails;
-            if(!typeMap.DestinationType.IsAbstract)
-            {
-                foreach(var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
-                {
-                    if(typeMap.Profile.MapDestinationCtorToSource(typeMap, this, destCtor, CtorParamConfigurations))
-                    {
-                        break;
-                    }
-                }
-            }
-
-
+            MapDestinationCtorToSource(typeMap, CtorParamConfigurations);
             foreach (var action in TypeMapActions)
             {
                 action(typeMap);
@@ -112,6 +98,49 @@ namespace AutoMapper.Configuration
                 }
                 ReverseIncludedMembers(typeMap);
             }
+        }
+
+        private void MapDestinationCtorToSource(TypeMap typeMap, List<ICtorParameterConfiguration> ctorParamConfigurations)
+        {
+            var ctorMap = typeMap.ConstructorMap;
+            if (ctorMap != null)
+            {
+                foreach (var paramMap in ctorMap.CtorParams)
+                {
+                    paramMap.CanResolveValue = paramMap.CanResolveValue || IsConfigured(paramMap.Parameter);
+                }
+                return;
+            }
+            if (typeMap.DestinationType.IsAbstract || !typeMap.Profile.ConstructorMappingEnabled)
+            {
+                return;
+            }
+            foreach (var destCtor in typeMap.DestinationTypeDetails.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
+            {
+                var ctorParameters = destCtor.GetParameters();
+                if (ctorParameters.Length == 0)
+                {
+                    break;
+                }
+                ctorMap = new ConstructorMap(destCtor, typeMap);
+                foreach (var parameter in ctorParameters)
+                {
+                    var resolvers = new LinkedList<MemberInfo>();
+                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, IsReverseMap);
+                    if ((!canResolve && parameter.IsOptional) || IsConfigured(parameter))
+                    {
+                        canResolve = true;
+                    }
+                    ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
+                }
+                typeMap.ConstructorMap = ctorMap;
+                if (ctorMap.CanResolve)
+                {
+                    break;
+                }
+            }
+            return;
+            bool IsConfigured(ParameterInfo parameter) => ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name);
         }
 
         protected IEnumerable<IPropertyMapConfiguration> MapToSourceMembers() =>

@@ -231,44 +231,14 @@ namespace AutoMapper
             }
         }
 
-        public bool MapDestinationCtorToSource(TypeMap typeMap,
-            ITypeMapConfiguration typeMapConfiguration,
-            ConstructorInfo destCtor, 
-            List<ICtorParameterConfiguration> ctorParamConfigurations)
-        {
-            var ctorParameters = destCtor.GetParameters();
-
-            if (ctorParameters.Length == 0 || !ConstructorMappingEnabled)
-                return false;
-
-            var ctorMap = new ConstructorMap(destCtor, typeMap);
-
-            foreach (var parameter in ctorParameters)
-            {
-                var resolvers = new LinkedList<MemberInfo>();
-
-                var canResolve = MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, typeMapConfiguration.IsReverseMap);
-                if ((!canResolve && parameter.IsOptional) || ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name))
-                {
-                    canResolve = true;
-                }
-                ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
-            }
-
-            typeMap.ConstructorMap = ctorMap;
-
-            return ctorMap.CanResolve;
-        }
-
         public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members, bool reverseNamingConventions)
         {
             if (string.IsNullOrEmpty(destMemberInfo))
             {
                 return false;
             }
-            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
+            return MemberConfigurations.Any(memberConfig => memberConfig.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
         }
-
     }
 
     public readonly struct IncludedMember
