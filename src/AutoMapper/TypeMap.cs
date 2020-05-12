@@ -32,13 +32,12 @@ namespace AutoMapper
         private readonly List<IncludedMember> _includedMembersTypeMaps = new List<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile, bool isReverseMap)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
         {
             SourceTypeDetails = sourceType;
             DestinationTypeDetails = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
-            IsReverseMap = isReverseMap;
         }
 
         private IEnumerable<SourceMemberConfig> SourceMemberConfigs => _sourceMemberConfigs.Values;
@@ -72,8 +71,6 @@ namespace AutoMapper
 
         public Type SourceType => SourceTypeDetails.Type;
         public Type DestinationType => DestinationTypeDetails.Type;
-
-        public bool IsReverseMap { get; }
 
         public ProfileMap Profile { get; }
 

@@ -13,7 +13,7 @@ namespace AutoMapper
             var sourceTypeInfo = options.CreateTypeDetails(sourceType);
             var destTypeInfo = options.CreateTypeDetails(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, options, isReverseMap);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, options);
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {

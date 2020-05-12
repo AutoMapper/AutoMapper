@@ -99,8 +99,7 @@ namespace AutoMapper
 
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, isReverseMap: true);
-
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
                 }
             }
         }
@@ -117,9 +116,9 @@ namespace AutoMapper
             }
         }
 
-        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config, bool isReverseMap = false)
+        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
         {
-            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, isReverseMap);
+            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.IsReverseMap);
 
             config.Configure(typeMap);
 
@@ -232,7 +231,10 @@ namespace AutoMapper
             }
         }
 
-        public bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, List<ICtorParameterConfiguration> ctorParamConfigurations)
+        public bool MapDestinationCtorToSource(TypeMap typeMap,
+            ITypeMapConfiguration typeMapConfiguration,
+            ConstructorInfo destCtor, 
+            List<ICtorParameterConfiguration> ctorParamConfigurations)
         {
             var ctorParameters = destCtor.GetParameters();
 
@@ -245,7 +247,7 @@ namespace AutoMapper
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
-                var canResolve = MapDestinationPropertyToSource(sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, typeMap.IsReverseMap);
+                var canResolve = MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, typeMapConfiguration.IsReverseMap);
                 if ((!canResolve && parameter.IsOptional) || ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name))
                 {
                     canResolve = true;
