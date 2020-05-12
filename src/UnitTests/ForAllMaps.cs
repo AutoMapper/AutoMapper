@@ -68,4 +68,32 @@ namespace AutoMapper.UnitTests.Bug
             _destination2.Number.ShouldBe(-1);
         }
     }
+    public class ForAllMapsWithConstructors : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+            public Destination(int first, int second)
+            {
+                First = first;
+                Second = second;
+            }
+            public int First { get; }
+            public int Second { get; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.ForAllMaps((_, c) => c.ForCtorParam("second", o => o.MapFrom(s => 2)));
+            cfg.CreateMap<Source, Destination>().ForCtorParam("first", o => o.MapFrom(s => 1));
+        });
+        [Fact]
+        public void Should_map_ok()
+        {
+            var result = Map<Destination>(new Source());
+            result.First.ShouldBe(1);
+            result.Second.ShouldBe(2);
+        }
+    }
 }
