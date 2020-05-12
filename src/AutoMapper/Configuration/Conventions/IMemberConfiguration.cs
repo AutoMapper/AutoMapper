@@ -14,6 +14,6 @@ namespace AutoMapper.Configuration.Conventions
             where TNameMapper : ISourceToDestinationNameMapper, new();
 
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers);
+        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, bool isReverseMap);
     }
 }

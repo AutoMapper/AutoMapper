@@ -6,6 +6,6 @@ namespace AutoMapper.Configuration.Conventions
 {
     public interface IChildMemberConfiguration
     {
-        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent);
+        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap);
     }
 }

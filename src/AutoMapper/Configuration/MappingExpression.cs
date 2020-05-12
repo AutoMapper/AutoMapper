@@ -17,7 +17,10 @@ namespace AutoMapper.Configuration
         public IMappingExpression ReverseMap()
         {
             var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
-            var reverseMap = new MappingExpression(reversedTypes, MemberList.None);
+            var reverseMap = new MappingExpression(reversedTypes, MemberList.None)
+            {
+                IsReverseMap = true
+            };
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembers(MapToSourceMembers().Select(m => m.DestinationMember.Name).ToArray());
@@ -286,7 +289,11 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var reverseMap = new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType);
+            var reverseMap =
+                new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType)
+                {
+                    IsReverseMap = true
+                };
             reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
             ReverseMapExpression = reverseMap;
             reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());

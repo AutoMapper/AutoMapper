@@ -118,7 +118,7 @@ namespace AutoMapper
 
         private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
         {
-            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this);
+            var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.IsReverseMap);
 
             config.Configure(typeMap);
 
@@ -231,7 +231,10 @@ namespace AutoMapper
             }
         }
 
-        public bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, List<ICtorParameterConfiguration> ctorParamConfigurations)
+        public bool MapDestinationCtorToSource(TypeMap typeMap,
+            ITypeMapConfiguration typeMapConfiguration,
+            ConstructorInfo destCtor, 
+            List<ICtorParameterConfiguration> ctorParamConfigurations)
         {
             var ctorParameters = destCtor.GetParameters();
 
@@ -244,7 +247,7 @@ namespace AutoMapper
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
-                var canResolve = MapDestinationPropertyToSource(sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
+                var canResolve = MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, typeMapConfiguration.IsReverseMap);
                 if ((!canResolve && parameter.IsOptional) || ctorParamConfigurations.Any(c => c.CtorParamName == parameter.Name))
                 {
                     canResolve = true;
@@ -257,13 +260,13 @@ namespace AutoMapper
             return ctorMap.CanResolve;
         }
 
-        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members)
+        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members, bool reverseNamingConventions)
         {
             if (string.IsNullOrEmpty(destMemberInfo))
             {
                 return false;
             }
-            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
+            return MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
         }
 
     }

@@ -26,6 +26,7 @@ namespace AutoMapper.Configuration
         }
         public TypePair Types { get; }
         public bool IsOpenGeneric { get; }
+        public bool IsReverseMap { get; set; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
         public Features<IMappingFeature> Features { get; } = new Features<IMappingFeature>();
@@ -63,7 +64,7 @@ namespace AutoMapper.Configuration
             {
                 foreach(var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
                 {
-                    if(typeMap.Profile.MapDestinationCtorToSource(typeMap, destCtor, typeMap.SourceTypeDetails, CtorParamConfigurations))
+                    if(typeMap.Profile.MapDestinationCtorToSource(typeMap, this, destCtor, CtorParamConfigurations))
                     {
                         break;
                     }

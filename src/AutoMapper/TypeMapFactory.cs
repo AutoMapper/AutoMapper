@@ -8,7 +8,7 @@ namespace AutoMapper
 {
     public static class TypeMapFactory
     {
-        public static TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options)
+        public static TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, bool isReverseMap = false)
         {
             var sourceTypeInfo = options.CreateTypeDetails(sourceType);
             var destTypeInfo = options.CreateTypeDetails(destinationType);
@@ -19,7 +19,7 @@ namespace AutoMapper
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
-                if (options.MapDestinationPropertyToSource(sourceTypeInfo, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers))
+                if (options.MapDestinationPropertyToSource(sourceTypeInfo, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers, isReverseMap))
                 {
                     typeMap.AddPropertyMap(destProperty, resolvers);
                 }
