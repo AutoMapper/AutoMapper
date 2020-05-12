@@ -126,7 +126,7 @@ namespace AutoMapper.Configuration
                 foreach (var parameter in ctorParameters)
                 {
                     var resolvers = new LinkedList<MemberInfo>();
-                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
+                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, IsReverseMap);
                     if ((!canResolve && parameter.IsOptional) || IsConfigured(parameter))
                     {
                         canResolve = true;
