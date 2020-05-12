@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace AutoMapper.Configuration
 {
-    public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
+    public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
     {
         public string CtorParamName { get; }
         public Type SourceType { get; }
@@ -23,14 +23,14 @@ namespace AutoMapper.Configuration
 
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
-            Expression<Func<TSource, ResolutionContext, TMember>> resolverExpression = (src, ctxt) => resolver(src, ctxt);
+            Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
             _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
         }
 
         public void MapFrom(string sourceMemberName)
         {
             SourceType.GetFieldOrProperty(sourceMemberName);
-            _ctorParamActions.Add(cpm => cpm.SourceMemberName = sourceMemberName);
+            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMemberName));
         }
 
         public void Configure(TypeMap typeMap)

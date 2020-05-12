@@ -18,6 +18,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
+    <ApiCompatExcludeAttributeList>AttributeExclusions.txt</ApiCompatExcludeAttributeList>
   </PropertyGroup>
 
   <ItemGroup>

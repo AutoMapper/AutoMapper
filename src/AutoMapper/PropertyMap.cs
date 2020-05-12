@@ -105,21 +105,6 @@ namespace AutoMapper
         public bool IsResolveConfigured => ValueResolverConfig != null || CustomMapFunction != null ||
                                          CustomMapExpression != null || ValueConverterConfig != null;
 
-        public void MapFrom(LambdaExpression sourceMember)
-        {
-            CustomMapExpression = sourceMember;
-            Ignored = false;
-        }
-
-        public void MapFrom(string propertyOrField)
-        {
-            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
-                                                // just a placeholder so the member is mapped
-                                                Lambda(Constant(null)) :
-                                                MemberAccessLambda(TypeMap.SourceType, propertyOrField);
-            MapFrom(mapExpression);
-        }
-
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
     }
