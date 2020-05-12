@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Projection
                 new EntitySource[0].AsQueryable().ProjectTo<EntityDestination>(config));
 
             // Assert
-            Assert.Contains("object notSupported", exception.Message, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("parameter notSupported", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         class EntitySource

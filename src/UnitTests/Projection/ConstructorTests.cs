@@ -1,7 +1,8 @@
 ﻿namespace AutoMapper.UnitTests.Projection
 {
     using System.Linq;
-    using QueryableExtensions;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Shouldly;
     using Xunit;
 
@@ -54,5 +55,35 @@
         {
             _dest[0].Other.ShouldBe(15);
         }
+    }
+    public class NestedConstructors : AutoMapperSpecBase
+    {
+        public class A
+        {
+            public int Id { get; set; }
+            public B B { get; set; }
+        }
+        public class B
+        {
+            public int Id { get; set; }
+        }
+        public class DtoA
+        {
+            public DtoB B { get; }
+            public DtoA(DtoB b) => B = b;
+        }
+        public class DtoB
+        {
+            public int Id { get; }
+            public DtoB(int id) => Id = id;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<A, DtoA>();
+            cfg.CreateMap<B, DtoB>();
+        });
+        [Fact]
+        public void Should_project_ok() =>
+            ProjectTo<DtoA>(new[] { new A { B = new B { Id = 3 } } }.AsQueryable()).FirstOrDefault().B.Id.ShouldBe(3);
     }
 }
