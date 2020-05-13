@@ -1,11 +1,11 @@
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace AutoMapper
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TypeMapFactory
     {
         public static TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, bool isReverseMap = false)

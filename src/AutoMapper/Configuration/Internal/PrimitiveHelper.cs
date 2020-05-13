@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
 namespace AutoMapper.Configuration.Internal
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class PrimitiveHelper
     {
         public static TValue GetOrDefault<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)

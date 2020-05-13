@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
@@ -12,6 +13,7 @@ namespace AutoMapper.Execution
     using static Internal.ExpressionFactory;
     using static ElementTypeHelper;
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class DelegateFactory
     {
         private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);

@@ -1,6 +1,7 @@
 using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,6 +13,7 @@ namespace AutoMapper
     /// <summary>
     /// Member maps with default values. Used in dynamic/dictionary scenarios when source/destination members do not exist.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class DefaultMemberMap : IMemberMap
     {
         protected DefaultMemberMap() { }

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace AutoMapper.Configuration.Conventions
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IMemberConfiguration
     {
         IList<IChildMemberConfiguration> MemberMappers { get; }

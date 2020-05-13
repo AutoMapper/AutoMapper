@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IMemberMap
     {
         TypeMap TypeMap { get; }

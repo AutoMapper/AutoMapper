@@ -11,12 +11,14 @@ namespace AutoMapper
 {
     using AutoMapper.Features;
     using Internal;
+    using System.ComponentModel;
     using static Expression;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
     [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeMap
     {
         private readonly HashSet<LambdaExpression> _afterMapActions = new HashSet<LambdaExpression>();

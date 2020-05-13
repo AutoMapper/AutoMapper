@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace AutoMapper.Configuration
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
     {
         public string CtorParamName { get; }

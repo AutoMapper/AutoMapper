@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,6 +11,7 @@ using AutoMapper.Configuration.Conventions;
 namespace AutoMapper
 {
     [DebuggerDisplay("{Name}")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProfileMap
     {
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;

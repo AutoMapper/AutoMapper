@@ -1,7 +1,9 @@
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
         public ExpressionResolutionResult GetExpressionResolutionResult(
