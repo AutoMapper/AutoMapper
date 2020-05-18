@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace AutoMapper
 {
     using Internal;
+    using System.ComponentModel;
 
     [DebuggerDisplay("{DestinationExpression}")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class PathMap : DefaultMemberMap
     {
-        public PathMap(PathMap pathMap, TypeMap typeMap, LambdaExpression customSource) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
+        public PathMap(PathMap pathMap, TypeMap typeMap, IncludedMember includedMember) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
         {
-            CustomSource = customSource;
+            IncludedMember = includedMember;
             CustomMapExpression = pathMap.CustomMapExpression;
             Condition = pathMap.Condition;
             Ignored = pathMap.Ignored;
@@ -30,7 +29,7 @@ namespace AutoMapper
         public override TypeMap TypeMap { get; }
 
         public override Type SourceType => CustomMapExpression.ReturnType;
-        public override LambdaExpression CustomSource { get; set; }
+        public override IncludedMember IncludedMember { get; set; }
         public LambdaExpression DestinationExpression { get; }
         public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }

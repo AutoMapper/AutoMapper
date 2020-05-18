@@ -79,7 +79,7 @@ namespace AutoMapper
                 var context = new ValidationContext(types, memberMap, typeMap);
                 _config.Validate(context);
 
-                if(typeMap.CustomMapExpression != null || typeMap.CustomMapFunction != null || typeMap.TypeConverterType != null)
+                if(!typeMap.ShouldCheckForValid)
                 {
                     return;
                 }

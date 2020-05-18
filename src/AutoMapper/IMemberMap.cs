@@ -13,6 +13,7 @@ namespace AutoMapper
         Type SourceType { get; }
         IReadOnlyCollection<MemberInfo> SourceMembers { get; }
         LambdaExpression CustomSource { get; }
+        IncludedMember IncludedMember { get; }
         Type DestinationType { get; }
         string DestinationName { get; }
         TypePair Types { get; }

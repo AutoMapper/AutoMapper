@@ -16,7 +16,7 @@ namespace AutoMapper.Internal
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            _members.AddRange(node.GetMembers().Select(e => e.Member));
+            _members.AddRange(node.GetMemberExpressions().Select(e => e.Member));
             return node;
         }
 

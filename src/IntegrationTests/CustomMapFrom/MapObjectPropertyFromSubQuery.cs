@@ -351,20 +351,6 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        class FirstOrDefaultCounter : ExpressionVisitor
-        {
-            public int Count;
-
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                if(node.Method.Name == "FirstOrDefault")
-                {
-                    Count++;
-                }
-                return base.VisitMethodCall(node);
-            }
-        }
-
         public class ProductArticle
         {
             public int Id { get; set; }

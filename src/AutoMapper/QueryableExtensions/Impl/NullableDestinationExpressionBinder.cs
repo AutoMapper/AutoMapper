@@ -20,7 +20,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             var destinationType = propertyMap.DestinationType;
             var expressionToBind =
-                result.ResolutionExpression.GetMembers().Reverse().Aggregate(
+                result.ResolutionExpression.GetMemberExpressions().Reverse().Aggregate(
                     ExpressionFactory.ToType(result.ResolutionExpression, destinationType),
                     (accumulator, current) => current.IfNullElse(Constant(null, destinationType), accumulator));
             return Bind(propertyMap.DestinationMember, expressionToBind);

@@ -122,8 +122,9 @@ namespace AutoMapper.Internal
 
         public static LambdaExpression Concat(LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression NullCheck(Expression expression, Type destinationType)
+        public static Expression NullCheck(Expression expression, Type destinationType = null)
         {
+            destinationType = destinationType ?? expression.Type;
             var target = expression;
             Expression nullConditions = Constant(false);
             do
