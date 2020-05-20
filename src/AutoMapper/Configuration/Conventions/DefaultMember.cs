@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace AutoMapper.Configuration.Conventions
 {
     // Source Destination Mapper
-
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class DefaultMember : IChildMemberConfiguration
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConstructorParameterMap : DefaultMemberMap
     {
         public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
 namespace AutoMapper
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConstructorMap
     {
         private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace AutoMapper.Configuration.Conventions
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class NameSplitMember : IChildMemberConfiguration
     {
         public INamingConvention SourceMemberNamingConvention { get; set; }

@@ -18,7 +18,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
-    <ApiCompatExcludeAttributeList>AttributeExclusions.txt</ApiCompatExcludeAttributeList>
+    <AdditionalApiCompatOptions>--exclude-non-browsable --exclude-compiler-generated</AdditionalApiCompatOptions>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.20201.1" PrivateAssets="All" />  
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.20262.5" PrivateAssets="All" />  
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
