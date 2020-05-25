@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -124,54 +125,35 @@ namespace AutoMapper.Internal
 
         public static Expression NullCheck(Expression expression, Type destinationType = null)
         {
-            destinationType = destinationType ?? expression.Type;
-            var target = expression;
-            Expression nullConditions = Constant(false);
-            do
+            destinationType ??= expression.Type;
+            var chain = expression.GetChain().ToArray();
+            if (!(chain.FirstOrDefault().Target is ParameterExpression parameter))
             {
-                if (target is MemberExpression member)
-                {
-                    target = member.Expression;
-                    NullCheck();
-                }
-                else if (target is MethodCallExpression methodCall)
-                {
-                    var isStatic = methodCall.Method.IsStatic;
-                    if (isStatic)
-                    {
-                        var parameters = methodCall.Method.GetParameters();
-                        if (parameters.Length == 0 || !methodCall.Method.Has<ExtensionAttribute>())
-                        {
-                            return expression;
-                        }
-                        target = methodCall.Arguments[0];
-                    }
-                    else
-                    {
-                        target = methodCall.Object;
-                    }
-                    NullCheck();
-                }
-                else if (target?.NodeType == ExpressionType.Parameter)
-                {
-                    var returnType = Nullable.GetUnderlyingType(destinationType) == expression.Type ? destinationType : expression.Type;
-                    var nullCheck = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
-                    return nullCheck;
-                }
-                else
-                {
-                    return expression;
-                }
+                return expression;
             }
-            while (true);
-            void NullCheck()
+            var variables = new List<ParameterExpression> { parameter };
+            var nullConditions = new Stack<Expression>();
+            var name = parameter.Name;
+            foreach (var member in chain)
             {
-                if (target == null || target.Type.IsValueType)
-                {
-                    return;
-                }
-                nullConditions = OrElse(Equal(target, Constant(null, target.Type)), nullConditions);
+                var variable = Variable(member.Target.Type, name);
+                name += member.MemberInfo.Name;
+                var assignment = Assign(variable, UpdateTarget(member.Target, variables[variables.Count - 1]));
+                variables.Add(variable);
+                nullConditions.Push(variable.Type.IsValueType ? (Expression) Block(assignment, Constant(false)) : Equal(assignment, Constant(null, variable.Type)));
             }
+            var returnType = Nullable.GetUnderlyingType(destinationType) == expression.Type ? destinationType : expression.Type;
+            var nullCheck = nullConditions.Aggregate((Expression)Constant(false), (left, right) => OrElse(right, left));
+            var nonNullExpression = UpdateTarget(expression, variables[variables.Count - 1]);
+            return Block(variables.Skip(1), Condition(nullCheck, Default(returnType), ToType(nonNullExpression, returnType)));
+            static Expression UpdateTarget(Expression sourceExpression, Expression newTarget) =>
+                sourceExpression switch
+                {
+                    MethodCallExpression methodCall when methodCall.Method.IsStatic => methodCall.Update(null, new[] { newTarget }.Concat(methodCall.Arguments.Skip(1))),
+                    MethodCallExpression methodCall => methodCall.Update(newTarget, methodCall.Arguments),
+                    MemberExpression memberExpression => memberExpression.Update(newTarget),
+                    _ => sourceExpression,
+                };
         }
 
         static readonly Expression<Action<IDisposable>> DisposeExpression = disposable => disposable.Dispose();

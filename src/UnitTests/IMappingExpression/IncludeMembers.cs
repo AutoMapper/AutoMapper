@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
@@ -47,6 +49,74 @@ namespace AutoMapper.UnitTests.IMappingExpression
             destination.Name.ShouldBe("name");
             destination.Description.ShouldBe("description");
             destination.Title.ShouldBe("title");
+        }
+    }
+    public class IncludeMembersWrapperFirstOrDefault : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public List<InnerSourceWrapper> InnerSources { get; set; } = new List<InnerSourceWrapper>();
+            public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
+        }
+        class InnerSourceWrapper
+        {
+            public InnerSource InnerSource { get; set; }
+        }
+        class InnerSource
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Publisher { get; set; }
+        }
+        class OtherInnerSource
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+            public string Author { get; set; }
+        }
+        class Destination
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Title { get; set; }
+            public string Author { get; set; }
+            public string Publisher { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault().InnerSource, s => s.OtherInnerSources.FirstOrDefault()).ReverseMap();
+            cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+            cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        });
+        [Fact]
+        public static void Should_null_check()
+        {
+            Expression<Func<Source, InnerSource>> expression = s => s.InnerSources.FirstOrDefault().InnerSource;
+            var result= expression.Body.NullCheck();
+        }
+        [Fact]
+        public void Should_flatten()
+        {
+            var source = new Source
+            {
+                Name = "name",
+                InnerSources = { new InnerSourceWrapper { InnerSource = new InnerSource { Description = "description", Publisher = "publisher" } } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            var destination = Mapper.Map<Destination>(source);
+            var plan = Configuration.BuildExecutionPlan(typeof(Source), typeof(Destination));
+            FirstOrDefaultCounter.Assert(plan, 2);
+            destination.Name.ShouldBe("name");
+            destination.Description.ShouldBe("description");
+            destination.Title.ShouldBe("title");
+            destination.Author.ShouldBe("author");
+            destination.Publisher.ShouldBe("publisher");
         }
     }
     public class IncludeMembersFirstOrDefault : AutoMapperSpecBase

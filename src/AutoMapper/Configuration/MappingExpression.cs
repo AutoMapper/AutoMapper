@@ -201,7 +201,7 @@ namespace AutoMapper.Configuration
 
         private void IncludeMembersCore(LambdaExpression[] memberExpressions)
         {
-            foreach(var member in memberExpressions.Select(member => member.GetMember()).Where(member => member != null))
+            foreach(var member in memberExpressions.Select(memberExpression => memberExpression.GetMember()).Where(member => member != null))
             {
                 ForSourceMemberCore(member, o => o.DoNotValidate());
             }
