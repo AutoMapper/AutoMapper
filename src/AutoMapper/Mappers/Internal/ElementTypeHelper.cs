@@ -58,6 +58,13 @@ namespace AutoMapper.Mappers.Internal
             return !enumType.IsEnum ? null : enumType;
         }
 
+        public static bool IsEnumToEnum(TypePair context)
+        {
+            var sourceEnumType = GetEnumerationType(context.SourceType);
+            var destEnumType = GetEnumerationType(context.DestinationType);
+            return sourceEnumType != null && destEnumType != null;
+        }
+
         public static bool IsUnderlyingTypeToEnum(TypePair context)
         {
             var destEnumType = GetEnumerationType(context.DestinationType);

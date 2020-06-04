@@ -14,8 +14,6 @@ namespace AutoMapper.Internal
 
     public static class ExpressionFactory
     {
-        public static MemberAssignment MemberAssignment(PropertyMap propertyMap, ExpressionResolutionResult result) => 
-            Bind(propertyMap.DestinationMember, Convert(result.ResolutionExpression, propertyMap.DestinationType));
         public static LambdaExpression MemberAccessLambda(Type type, string propertyOrField) =>
             MemberAccessLambda(type.GetFieldOrProperty(propertyOrField));
 
