@@ -42,7 +42,8 @@ namespace AutoMapper.QueryableExtensions
                 new AssignableExpressionBinder(),
                 new EnumerableExpressionBinder(),
                 new MappedTypeExpressionBinder(),
-                new StringExpressionBinder()
+                new StringExpressionBinder(),
+                new EnumToUnderlyingTypeBinder(),
             };
 
         private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]> _expressionCache;
