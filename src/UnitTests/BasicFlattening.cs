@@ -126,11 +126,11 @@ namespace AutoMapper.UnitTests
         }
         public class Data
         {
-            public int? Value { get; set; }
+            public int? Integer { get; set; }
         }
         public class Destination
         {
-            public int? ParentDataValue { get; set; }
+            public int? ParentDataInteger { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
@@ -146,7 +146,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_handle_inner_nulls()
         {
-            _destination.ParentDataValue.ShouldBeNull();
+            _destination.ParentDataInteger.ShouldBeNull();
         }
     }
 

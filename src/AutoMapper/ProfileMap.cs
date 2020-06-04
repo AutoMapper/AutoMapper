@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -249,8 +250,10 @@ namespace AutoMapper
         {
             TypeMap = typeMap;
             MemberExpression = memberExpression;
+            Variable = Expression.Variable(memberExpression.Body.Type, string.Join("", memberExpression.GetMembersChain().Select(m => m.Name)));
         }
         public TypeMap TypeMap { get; }
         public LambdaExpression MemberExpression { get; }
+        public ParameterExpression Variable { get; }
     }
 }

@@ -17,7 +17,8 @@ namespace AutoMapper
         IMappingExpression IncludeMembers(params string[] memberNames);
 
         /// <summary>
-        /// Create a type mapping from the destination to the source type, using the destination members as validation.
+        /// Create a type mapping from the destination to the source type, with validation disabled.
+        /// This allows for two-way mapping.
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression ReverseMap();
@@ -139,7 +140,8 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> AddTransform<TValue>(Expression<Func<TValue, TValue>> transformer);
 
         /// <summary>
-        /// Create a type mapping from the destination to the source type, using the <typeparamref name="TDestination"/> members as validation
+        /// Create a type mapping from the destination to the source type, with validation disabled.
+        /// This allows for two-way mapping.
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TDestination, TSource> ReverseMap();

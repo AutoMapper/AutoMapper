@@ -23,7 +23,8 @@ namespace AutoMapper
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType => default;
         public virtual IReadOnlyCollection<MemberInfo> SourceMembers => Array.Empty<MemberInfo>();
-        public virtual LambdaExpression CustomSource { get => default; set { } }
+        public LambdaExpression CustomSource => IncludedMember.MemberExpression;
+        public virtual IncludedMember IncludedMember { get => default; set { } }
         public virtual string DestinationName => default;
         public virtual Type DestinationType => default;
         public virtual TypePair Types => new TypePair(SourceType, DestinationType);
@@ -43,17 +44,7 @@ namespace AutoMapper
 
         public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers => Enumerable.Empty<ValueTransformerConfiguration>();
 
-        public MemberInfo SourceMember
-        {
-            get
-            {
-                if (CustomMapExpression?.Body is MemberExpression memberExpression && memberExpression.Expression == CustomMapExpression.Parameters[0])
-                {
-                    return memberExpression.Member;
-                }
-                return SourceMembers.LastOrDefault();
-            }
-        }
+        public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.LastOrDefault();
   
         public void MapFrom(LambdaExpression sourceMember)
         {

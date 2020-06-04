@@ -148,7 +148,7 @@ namespace AutoMapper.Configuration
 
         private void ReverseIncludedMembers(TypeMap typeMap)
         {
-            foreach(var includedMember in typeMap.IncludedMembers)
+            foreach(var includedMember in typeMap.IncludedMembers.Where(i=>i.IsMemberPath()))
             {
                 var memberPath = new MemberPath(includedMember);
                 var newSource = Parameter(typeMap.DestinationType, "source");

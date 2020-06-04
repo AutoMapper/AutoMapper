@@ -28,20 +28,8 @@ namespace AutoMapper
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
             : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
 
-        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, LambdaExpression expression) 
-            : this(includedMemberMap, typeMap) => ApplyIncludedMemberMap(includedMemberMap, expression);
-
-        private void ApplyIncludedMemberMap(PropertyMap includedMemberMap, LambdaExpression expression)
-        {
-            CustomSource = expression;
-            if(includedMemberMap._memberChain.Count > 0)
-            {
-                _memberChain = expression.Body.GetMembers().Select(e => e.Member).Concat(includedMemberMap._memberChain).ToList();
-            }
-            CustomMapExpression = CheckCustomSource(CustomMapExpression);
-        }
-
-        private LambdaExpression CheckCustomSource(LambdaExpression lambda) => CheckCustomSource(lambda, CustomSource);
+        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember) 
+            : this(includedMemberMap, typeMap) => IncludedMember = includedMember;
 
         public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource) =>
             (lambda == null || customSource == null) ?
@@ -55,7 +43,7 @@ namespace AutoMapper
         public override Type DestinationType => DestinationMember.GetMemberType();
 
         public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
-        public override LambdaExpression CustomSource { get; set; }
+        public override IncludedMember IncludedMember { get; set; }
         public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
