@@ -151,20 +151,56 @@ namespace AutoMapper
         IQueryable ProjectTo(IQueryable source, Type destinationType, IDictionary<string, object> parameters = null, params string[] membersToExpand);
     }
 
-    public interface IRuntimeMapper : IMapper
+    public interface IRuntimeMapper
     {
-        [Obsolete(Mapper.NoContextMapperOptions)]
-        new TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);
-        [Obsolete(Mapper.NoContextMapperOptions)]
-        new TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts);
-        [Obsolete(Mapper.NoContextMapperOptions)]
-        new TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts);
-        [Obsolete(Mapper.NoContextMapperOptions)]
-        new object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
-        [Obsolete(Mapper.NoContextMapperOptions)]
-        new object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object.
+        /// The source type is inferred from the source object.
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
+        TDestination Map<TDestination>(object source);
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use, regardless of the runtime type</typeparam>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
+        TDestination Map<TSource, TDestination>(TSource source);
+        /// <summary>
+        /// Execute a mapping from the source object to the existing destination object.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to create</param>
+        /// <returns>Mapped destination object</returns>
+        object Map(object source, Type sourceType, Type destinationType);
+        /// <summary>
+        /// Execute a mapping from the source object to existing destination object with explicit <see cref="System.Type"/> objects
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to use</param>
+        /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+        object Map(object source, object destination, Type sourceType, Type destinationType);
         ResolutionContext DefaultContext { get; }
         object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context, IMemberMap memberMap = null);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, IMemberMap memberMap = null);
+        /// <summary>
+        /// Configuration provider for performing maps
+        /// </summary>
+        IConfigurationProvider ConfigurationProvider { get; }
     }
 }

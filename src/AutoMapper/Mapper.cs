@@ -8,10 +8,8 @@ namespace AutoMapper
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
     using QueryableExtensions;
 
-    public class Mapper : IRuntimeMapper
+    public class Mapper : IMapper, IRuntimeMapper
     {
-        internal const string NoContextMapperOptions = "Set options in the outer Map call instead.";
-
         public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
         {
@@ -24,7 +22,9 @@ namespace AutoMapper
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
 
-        public ResolutionContext DefaultContext { get; }
+        private ResolutionContext DefaultContext { get; }
+
+        ResolutionContext IRuntimeMapper.DefaultContext => DefaultContext;
 
         public Func<Type, object> ServiceCtor { get; }
 
@@ -180,7 +180,7 @@ namespace AutoMapper
             return destination;
         }
 
-        public object Map(object source, object destination, Type sourceType, Type destinationType,
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
@@ -190,7 +190,7 @@ namespace AutoMapper
             return func(source, destination, context);
         }
 
-        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
             ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));

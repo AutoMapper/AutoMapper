@@ -45,8 +45,6 @@ namespace AutoMapper
 
         public IConfigurationProvider ConfigurationProvider => _inner.ConfigurationProvider;
 
-        Func<Type, object> IMapper.ServiceCtor => _inner.ServiceCtor;
-
         ResolutionContext IRuntimeMapper.DefaultContext => _inner.DefaultContext;
 
         /// <summary>
@@ -83,105 +81,22 @@ namespace AutoMapper
             }
         }
 
-        TDestination IMapper.Map<TDestination>(object source)
+        TDestination IRuntimeMapper.Map<TDestination>(object source)
             => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
-
-        TDestination IRuntimeMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts) =>
-            ((IMapper)this).Map<TDestination>(source, opts);
-
-        TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
-        {
-            opts(Options);
-
-            return ((IMapper)this).Map<TDestination>(source);
-        }
-
-        TDestination IMapper.Map<TSource, TDestination>(TSource source)
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
-
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
-            ((IMapper)this).Map<TSource, TDestination>(source, opts);
-
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
-        {
-            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_inner.ServiceCtor);
-
-            opts(typedOptions);
-
-            var destination = default(TDestination);
-
-            typedOptions.BeforeMapAction(source, destination);
-
-            destination = _inner.Map(source, destination, this);
-
-            typedOptions.AfterMapAction(source, destination);
-
-            return destination;
-        }
-
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
-
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
-            ((IMapper)this).Map<TSource, TDestination>(source, destination, opts);
-
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
-        {
-            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_inner.ServiceCtor);
-
-            opts(typedOptions);
-
-            typedOptions.BeforeMapAction(source, destination);
-
-            destination = _inner.Map(source, destination, this);
-
-            typedOptions.AfterMapAction(source, destination);
-
-            return destination;
-        }
-
-        object IMapper.Map(object source, Type sourceType, Type destinationType)
+        object IRuntimeMapper.Map(object source, Type sourceType, Type destinationType)
             => _inner.Map(source, null, sourceType, destinationType, this);
-
-        object IRuntimeMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
-            ((IMapper)this).Map(source, sourceType, destinationType, opts);
-
-        object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
-        {
-            opts(Options);
-
-            return ((IMapper)this).Map(source, sourceType, destinationType);
-        }
-
-        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, sourceType, destinationType, this);
-
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
-            ((IMapper)this).Map(source, destination, sourceType, destinationType, opts);
-
-        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
-        {
-            opts(Options);
-
-            return ((IMapper)this).Map(source, destination, sourceType, destinationType);
-        }
-
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context,
             IMemberMap memberMap)
             => _inner.Map(source, destination, sourceType, destinationType, context, memberMap);
-
         TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
             IMemberMap memberMap)
             => _inner.Map(source, destination, context, memberMap);
-
-        IQueryable<TDestination> IMapper.ProjectTo<TDestination>(IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
-            => _inner.ProjectTo(source, parameters, membersToExpand);
-
-        IQueryable<TDestination> IMapper.ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand)
-            => _inner.ProjectTo<TDestination>(source, parameters, membersToExpand);
-
-        IQueryable IMapper.ProjectTo(IQueryable source, Type destinationType, IDictionary<string, object> parameters, params string[] membersToExpand) 
-            => _inner.ProjectTo(source, destinationType, parameters, membersToExpand);
 
         internal object GetDestination(object source, Type destinationType)
         {
@@ -211,9 +126,6 @@ namespace AutoMapper
 
             return TypeDepth[types];
         }
-
-        internal void ValidateMap(TypeMap typeMap)
-            => ConfigurationProvider.AssertConfigurationIsValid(typeMap);
 
         internal bool IsDefault => this == _inner.DefaultContext;
 
