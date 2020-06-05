@@ -42,6 +42,47 @@ namespace AutoMapper.UnitTests.NullBehavior
             destination.Inner.ShouldBeNull();
         }
     }
+    public class When_mappping_null_with_AllowNull_and_inheritance : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public InnerSource Inner { get; set; }
+            public int[] Collection { get; set; }
+        }
+        class SourceDerived : Source
+        {
+        }
+        public class InnerSource
+        {
+            public int Integer { get; set; }
+        }
+        class Destination
+        {
+            public InnerDestination Inner { get; set; }
+            public int[] Collection { get; set; }
+        }
+        class DestinationDerived : Destination
+        {
+        }
+        public class InnerDestination
+        {
+            public int Integer { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().ForAllMembers(o => o.AllowNull());
+            cfg.CreateMap<SourceDerived, DestinationDerived>().IncludeBase<Source, Destination>();
+            cfg.CreateMap<InnerSource, InnerDestination>();
+            cfg.AllowNullDestinationValues = false;
+        });
+        [Fact]
+        public void Should_map_to_null()
+        {
+            var destination = Mapper.Map<DestinationDerived>(new SourceDerived());
+            destination.Collection.ShouldBeNull();
+            destination.Inner.ShouldBeNull();
+        }
+    }
     public class When_mappping_null_collection_with_AllowNullCollections_false : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => {});

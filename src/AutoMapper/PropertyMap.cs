@@ -75,6 +75,10 @@ namespace AutoMapper
             {
                 Ignored = true;
             }
+            if (inheritedMappedProperty.AllowNull)
+            {
+                AllowNull = true;
+            }
             CustomMapExpression = CustomMapExpression ?? inheritedMappedProperty.CustomMapExpression;
             CustomMapFunction = CustomMapFunction ?? inheritedMappedProperty.CustomMapFunction;
             Condition = Condition ?? inheritedMappedProperty.Condition;
