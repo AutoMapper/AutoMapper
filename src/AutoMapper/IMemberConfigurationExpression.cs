@@ -106,7 +106,7 @@ namespace AutoMapper
         void Ignore();
 
         /// <summary>
-        /// Allow this member to be null. This prevents generating a check condition for it.
+        /// Allow this member to be null. Overrides AllowNullDestinationValues/AllowNullCollection.
         /// </summary>
         void AllowNull();
 

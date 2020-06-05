@@ -246,10 +246,7 @@ namespace AutoMapper.Configuration
                 }
             });
 
-        public void AllowNull()
-        {
-            PropertyMapActions.Add(pm => pm.AllowNull = true);
-        }
+        public void AllowNull() => PropertyMapActions.Add(pm => pm.AllowNull = true);
 
         public void UseDestinationValue() => SetUseDestinationValue(true);
 

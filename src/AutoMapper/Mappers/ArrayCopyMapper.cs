@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Execution;
 using AutoMapper.Internal;
 using AutoMapper.Mappers.Internal;
 
@@ -36,9 +37,9 @@ namespace AutoMapper.Mappers
             if (configurationProvider.FindTypeMapFor(sourceElementType, destElementType) != null)
                 return base.MapExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression);
 
-            var valueIfNullExpr = profileMap.AllowNullCollections
-                ? (Expression) Constant(null, destExpression.Type)
-                : NewArrayBounds(destElementType, Constant(0));
+            var valueIfNullExpr = profileMap.AllowsNullCollectionsFor(memberMap) ? 
+                (Expression) Constant(null, destExpression.Type) : 
+                NewArrayBounds(destElementType, Constant(0));
 
             var dest = Parameter(destExpression.Type, "destArray");
             var sourceLength = Parameter(ArrayLengthProperty.PropertyType, "sourceLength");

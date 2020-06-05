@@ -47,7 +47,7 @@ namespace AutoMapper
         public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
-        public bool AllowNull { get; set; }
+        public override bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
         public override LambdaExpression CustomMapFunction { get; set; }
         public override LambdaExpression Condition { get; set; }

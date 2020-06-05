@@ -6,6 +6,7 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using AutoMapper.Configuration;
     using AutoMapper.Internal;
     using AutoMapper.Mappers.Internal;
@@ -32,23 +33,36 @@ namespace AutoMapper.Execution
             if (destinationParameter == null)
                 destinationParameter = Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
+            Expression mapExpression;
+            bool hasTypeConverter;
             if (typeMap != null)
             {
+                hasTypeConverter = typeMap.HasTypeConverter;
                 if (!typeMap.HasDerivedTypesToInclude())
                 {
                     typeMap.Seal(configurationProvider);
 
-                    return typeMap.MapExpression != null
+                    mapExpression = typeMap.MapExpression != null
                         ? typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter,
                             contextParameter)
                         : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
                 }
-                return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+                else
+                {
+                    mapExpression = ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+                }
             }
-            var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
-                sourceParameter, contextParameter, propertyMap, destinationParameter);
-            var nullCheckSource = NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression, propertyMap);
-            return ExpressionFactory.ToType(nullCheckSource, typePair.DestinationType);
+            else
+            {
+                hasTypeConverter = false;
+                mapExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
+                    sourceParameter, contextParameter, propertyMap, destinationParameter);
+            }
+            if (!hasTypeConverter)
+            {
+                mapExpression = NullCheckSource(profileMap, sourceParameter, destinationParameter, mapExpression, propertyMap);
+            }
+            return ExpressionFactory.ToType(mapExpression, typePair.DestinationType);
         }
 
         public static Expression NullCheckSource(ProfileMap profileMap,
@@ -59,7 +73,7 @@ namespace AutoMapper.Execution
         {
             var declaredDestinationType = destinationParameter.Type;
             var destinationType = objectMapperExpression.Type;
-            var defaultDestination = DefaultDestination(destinationType, declaredDestinationType, profileMap);
+            var defaultDestination = DefaultDestination();
             var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
                 : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
@@ -77,21 +91,20 @@ namespace AutoMapper.Execution
                     Condition(OrElse(Equal(destinationVariable, Constant(null)), isReadOnly), Empty(), clear),
                     destination);
             }
-        }
-
-        private static Expression DefaultDestination(Type destinationType, Type declaredDestinationType, ProfileMap profileMap)
-        {
-            var isCollection = destinationType.IsNonStringEnumerable();
-            if ((isCollection && profileMap.AllowNullCollections) || (!isCollection && profileMap.AllowNullDestinationValues))
+            Expression DefaultDestination()
             {
-                return Default(declaredDestinationType);
+                var isCollection = destinationType.IsNonStringEnumerable();
+                if ((isCollection && profileMap.AllowsNullCollectionsFor(memberMap)) || (!isCollection && profileMap.AllowsNullDestinationValuesFor(memberMap)))
+                {
+                    return Default(declaredDestinationType);
+                }
+                if (destinationType.IsArray)
+                {
+                    var destinationElementType = destinationType.GetElementType();
+                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+                }
+                return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
             }
-            if(destinationType.IsArray)
-            {
-                var destinationElementType = destinationType.GetElementType();
-                return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
-            }
-            return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
         }
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
@@ -132,5 +145,17 @@ namespace AutoMapper.Execution
                     Constant(typeMap.MaxDepth)
                 ) :
                 null;
+
+        public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, IMemberMap memberMap = null) =>
+            memberMap?.AllowNull == true || profile.AllowNullDestinationValues;
+
+        public static bool AllowsNullCollectionsFor(this ProfileMap profile, IMemberMap memberMap = null) =>
+            memberMap?.AllowNull == true || profile.AllowNullCollections;
+
+        public static bool AllowsNullDestinationValues(this IMemberMap memberMap) => 
+            memberMap.TypeMap.Profile.AllowsNullDestinationValuesFor(memberMap);
+
+        public static bool AllowsNullCollections(this IMemberMap memberMap) =>
+            memberMap.TypeMap.Profile.AllowsNullCollectionsFor(memberMap);
     }
 }
