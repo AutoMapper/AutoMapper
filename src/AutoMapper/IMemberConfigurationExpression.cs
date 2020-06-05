@@ -111,6 +111,11 @@ namespace AutoMapper
         void AllowNull();
 
         /// <summary>
+        /// Don't allow this member to be null. Overrides AllowNullDestinationValues/AllowNullCollection.
+        /// </summary>
+        void DoNotAllowNull();
+
+        /// <summary>
         /// Supply a custom mapping order instead of what the .NET runtime returns
         /// </summary>
         /// <param name="mappingOrder">Mapping order value</param>

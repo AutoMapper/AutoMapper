@@ -32,6 +32,6 @@ namespace AutoMapper
         MemberInfo SourceMember { get; }
         bool IsMapped { get; }
         bool CanBeSet { get; }
-        bool AllowNull { get; }
+        bool? AllowNull { get; }
     }
 }

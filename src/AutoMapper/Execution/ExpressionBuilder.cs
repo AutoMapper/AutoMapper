@@ -147,10 +147,10 @@ namespace AutoMapper.Execution
                 null;
 
         public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, IMemberMap memberMap = null) =>
-            memberMap?.AllowNull == true || profile.AllowNullDestinationValues;
+            memberMap?.AllowNull ?? profile.AllowNullDestinationValues;
 
         public static bool AllowsNullCollectionsFor(this ProfileMap profile, IMemberMap memberMap = null) =>
-            memberMap?.AllowNull == true || profile.AllowNullCollections;
+            memberMap?.AllowNull ?? profile.AllowNullCollections;
 
         public static bool AllowsNullDestinationValues(this IMemberMap memberMap) => 
             memberMap.TypeMap.Profile.AllowsNullDestinationValuesFor(memberMap);
