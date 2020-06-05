@@ -512,7 +512,7 @@ namespace AutoMapper.Execution
                 var nullSubstitute = Constant(memberMap.NullSubstitute);
                 valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
-            else if (!memberMap.TypeMap.Profile.AllowNullDestinationValues)
+            else if (!memberMap.AllowsNullDestinationValues())
             {
                 var toCreate = memberMap.SourceType ?? destinationPropertyType;
                 if (!toCreate.IsAbstract && toCreate.IsClass && !toCreate.IsArray)

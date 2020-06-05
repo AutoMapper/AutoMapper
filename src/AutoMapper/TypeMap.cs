@@ -130,10 +130,13 @@ namespace AutoMapper
             && !ConstructDestinationUsingServiceLocator
             && (ConstructorMap?.CanResolve ?? false);
 
+        public bool HasTypeConverter =>
+            CustomMapFunction != null
+            || CustomMapExpression != null
+            || TypeConverterType != null;
+
         public bool ShouldCheckForValid =>
-            CustomMapFunction == null
-            && CustomMapExpression == null
-            && TypeConverterType == null
+            !HasTypeConverter
             && DestinationTypeOverride == null
             && ConfiguredMemberList != MemberList.None
             && !(IsValid ?? false);
