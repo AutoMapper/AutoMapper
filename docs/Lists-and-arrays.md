@@ -60,6 +60,7 @@ var configuration = new MapperConfiguration(cfg => {
     cfg.CreateMap<Source, Destination>();
 });
 ```
+The setting can be applied globally and can be overridden per profile and per member with `AllowNull` and `DoNotAllowNull`.
 
 ## Polymorphic element types in collections
 
