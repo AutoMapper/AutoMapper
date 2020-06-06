@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -26,7 +27,7 @@ namespace AutoMapper
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
-            DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName { Member = mi, Possibles = PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray() });
+            DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName(mi, PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray()));
         }
 
         private IEnumerable<string> PossibleNames(string memberName, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
@@ -74,11 +75,16 @@ namespace AutoMapper
                 }
             };
         }
-
-        public struct DestinationMemberName
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public readonly struct DestinationMemberName
         {
-            public MemberInfo Member { get; set; }
-            public string[] Possibles { get; set; }
+            public DestinationMemberName(MemberInfo member, string[] possibles)
+            {
+                Member = member;
+                Possibles = possibles;
+            }
+            public MemberInfo Member { get; }
+            public string[] Possibles { get; }
         }
 
         public Type Type { get; }

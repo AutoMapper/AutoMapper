@@ -490,7 +490,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             => new QueryExpressions(projection);
 
-        public struct PropertyPath
+        public readonly struct PropertyPath
         {
             public PropertyPath(PropertyExpression[] properties, LambdaExpression letExpression)
             {
@@ -508,7 +508,7 @@ namespace AutoMapper.QueryableExtensions
         }
     }
 
-    public struct QueryExpressions
+    public readonly struct QueryExpressions
     {
         public QueryExpressions(Expression first, Expression second = null, ParameterExpression secondParameter = null)
         {

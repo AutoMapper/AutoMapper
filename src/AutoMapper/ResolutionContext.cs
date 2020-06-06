@@ -137,7 +137,7 @@ namespace AutoMapper
         }
     }
 
-    public struct ContextCacheKey : IEquatable<ContextCacheKey>
+    public readonly struct ContextCacheKey : IEquatable<ContextCacheKey>
     {
         public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);

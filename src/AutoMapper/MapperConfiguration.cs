@@ -444,7 +444,7 @@ namespace AutoMapper
         public void RegisterTypeMap(TypeMap typeMap) => _typeMapRegistry[typeMap.Types] = typeMap;
     }
 
-    public struct ValidationContext
+    public readonly struct ValidationContext
     {
         public IObjectMapper ObjectMapper { get; }
         public IMemberMap MemberMap { get; }

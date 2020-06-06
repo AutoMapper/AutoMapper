@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration.Conventions
             return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(typeInfo, d.Member, destType, destMemberType, nameToSearch)).Member;
         }
 
-        struct SourceMember
+        readonly struct SourceMember
         {
             public SourceMember(MemberInfo sourceMember)
             {

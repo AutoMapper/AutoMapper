@@ -7,7 +7,7 @@ using System.Reflection;
 namespace AutoMapper
 {
     [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
-    public struct MapRequest : IEquatable<MapRequest>
+    public readonly struct MapRequest : IEquatable<MapRequest>
     {
         public TypePair RequestedTypes { get; }
         public TypePair RuntimeTypes { get; }
@@ -45,7 +45,7 @@ namespace AutoMapper
     }
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public struct TypePair : IEquatable<TypePair>
+    public readonly struct TypePair : IEquatable<TypePair>
     {
         public static bool operator ==(TypePair left, TypePair right) => left.Equals(right);
         public static bool operator !=(TypePair left, TypePair right) => !left.Equals(right);

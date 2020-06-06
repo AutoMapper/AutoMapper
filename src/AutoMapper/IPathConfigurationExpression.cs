@@ -27,7 +27,7 @@ namespace AutoMapper
         void Condition(Func<ConditionParameters<TSource, TDestination, TMember>, bool> condition);
     }
 
-    public struct ConditionParameters<TSource, TDestination, TMember>
+    public readonly struct ConditionParameters<TSource, TDestination, TMember>
     {
         public ConditionParameters(TSource source, TDestination destination, TMember sourceMember, TMember destinationMember, ResolutionContext context)
         {

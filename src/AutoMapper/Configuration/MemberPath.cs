@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-    public struct MemberPath : IEquatable<MemberPath>
+    public readonly struct MemberPath : IEquatable<MemberPath>
     {
         private readonly MemberInfo[] _members;
         public IEnumerable<MemberInfo> Members => _members;
