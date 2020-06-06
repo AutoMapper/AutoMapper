@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
+
     public interface IMapperBase
     {
         /// <summary>
@@ -59,7 +61,7 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);
+        TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts);
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with supplied mapping options.
         /// </summary>
@@ -87,7 +89,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to create</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        object Map(object source, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
         /// <summary>
         /// Execute a mapping from the source object to existing destination object with supplied mapping options and explicit <see cref="System.Type"/> objects
         /// </summary>
@@ -97,7 +99,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
         /// <summary>
         /// Configuration provider for performing maps
         /// </summary>
@@ -140,8 +142,7 @@ namespace AutoMapper
     }
     internal interface IInternalRuntimeMapper : IRuntimeMapper
     {
-        object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context, IMemberMap memberMap = null);
-        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, IMemberMap memberMap = null);
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, IMemberMap memberMap = null, Type sourceType = null, Type destinationType = null);
         ResolutionContext DefaultContext { get; }
     }
 }

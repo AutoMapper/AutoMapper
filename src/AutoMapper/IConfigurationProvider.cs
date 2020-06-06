@@ -131,8 +131,8 @@ namespace AutoMapper
         /// <returns>The mapper instance</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
 
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types, IMemberMap memberMap = null);
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(TypePair types, IMemberMap memberMap = null);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest);
 
         /// <summary>
         /// Compile all underlying mapping expressions to cached delegates.
@@ -140,9 +140,7 @@ namespace AutoMapper
         /// </summary>
         void CompileMappings();
 
-        Delegate GetMapperFunc(MapRequest request);
-
-        Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
+        Delegate GetExecutionPlan(MapRequest request);
 
         void RegisterTypeMap(TypeMap typeMap);
 

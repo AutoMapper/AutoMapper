@@ -7,6 +7,7 @@ namespace AutoMapper
 {
     using QueryableExtensions;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
+    using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
 
     public class Mapper : IMapper, IInternalRuntimeMapper
     {
@@ -32,19 +33,34 @@ namespace AutoMapper
 
         public TDestination Map<TDestination>(object source) => Map<object, TDestination>(source);
 
-        public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts) => Map(source, default(TDestination), opts);
+        public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts) => Map(source, default, opts);
 
         public TDestination Map<TSource, TDestination>(TSource source) => Map(source, default(TDestination));
 
         public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
-            Map(source, default(TDestination), opts);
+            Map(source, default, opts);
 
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination) =>
             ((IInternalRuntimeMapper)this).Map(source, destination, DefaultContext);
 
-        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
+            MapWithOptions(source, destination, opts);
+
+        public object Map(object source, Type sourceType, Type destinationType) => Map(source, null, sourceType, destinationType);
+
+        public object Map(object source, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
+            Map(source, null, sourceType, destinationType, opts);
+
+        public object Map(object source, object destination, Type sourceType, Type destinationType) =>
+            ((IInternalRuntimeMapper)this).Map(source, destination, DefaultContext, null, sourceType, destinationType);
+
+        public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
+            MapWithOptions(source, destination, opts, sourceType, destinationType);
+
+        private TDestination MapWithOptions<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts,
+            Type sourceType = null, Type destinationType = null)
         {
-            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
+            var types = TypePair.Create(source, destination, sourceType ?? typeof(TSource), destinationType ?? typeof(TDestination));
             var key = new TypePair(typeof(TSource), typeof(TDestination));
 
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
@@ -53,7 +69,7 @@ namespace AutoMapper
 
             var mapRequest = new MapRequest(key, types);
 
-            var func = ConfigurationProvider.GetMapperFunc<TSource, TDestination>(mapRequest);
+            var func = ConfigurationProvider.GetExecutionPlan<TSource, TDestination>(mapRequest);
 
             typedOptions.BeforeMapAction(source, destination);
 
@@ -66,52 +82,12 @@ namespace AutoMapper
             return destination;
         }
 
-        public object Map(object source, Type sourceType, Type destinationType) => Map(source, null, sourceType, destinationType);
-
-        public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts) =>
-            Map(source, null, sourceType, destinationType, opts);
-
-        public object Map(object source, object destination, Type sourceType, Type destinationType) =>
-            ((IInternalRuntimeMapper)this).Map(source, destination, sourceType, destinationType, DefaultContext);
-
-        public object Map(object source, object destination, Type sourceType, Type destinationType,
-            Action<IMappingOperationOptions> opts)
-        {
-            var types = TypePair.Create(source, destination, sourceType, destinationType);
-
-            var options = new ObjectMappingOperationOptions(ServiceCtor);
-
-            opts(options);
-
-            var func = ConfigurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
-
-            options.BeforeMapAction(source, destination);
-
-            var context = new ResolutionContext(options, this);
-
-            destination = func(source, destination, context);
-
-            options.AfterMapAction(source, destination);
-
-            return destination;
-        }
-
-        object IInternalRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType,
-            ResolutionContext context, IMemberMap memberMap)
-        {
-            var types = TypePair.Create(source, destination, sourceType, destinationType);
-
-            var func = ConfigurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types, memberMap));
-
-            return func(source, destination, context);
-        }
-
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
-            ResolutionContext context, IMemberMap memberMap)
+            ResolutionContext context, IMemberMap memberMap, Type sourceType, Type destinationType)
         {
-            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
+            var types = TypePair.Create(source, destination, sourceType ?? typeof(TSource), destinationType ?? typeof(TDestination));
 
-            var func = ConfigurationProvider.GetMapperFunc<TSource, TDestination>(types, memberMap);
+            var func = ConfigurationProvider.GetExecutionPlan<TSource, TDestination>(types, memberMap);
 
             return func(source, destination, context);
         }

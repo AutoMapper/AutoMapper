@@ -42,9 +42,7 @@ namespace AutoMapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
 
-        internal ResolutionContext DefaultContext => _inner.DefaultContext;
-
-        ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
+        ResolutionContext IInternalRuntimeMapper.DefaultContext => _inner.DefaultContext;
 
         /// <summary>
         /// Instance cache for resolving circular references
@@ -86,15 +84,12 @@ namespace AutoMapper
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
         object IMapperBase.Map(object source, Type sourceType, Type destinationType)
-            => _inner.Map(source, null, sourceType, destinationType, this);
+            => _inner.Map(source, (object)null, this, null, sourceType, destinationType);
         object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
-            => _inner.Map(source, destination, sourceType, destinationType, this);
-        object IInternalRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context,
-            IMemberMap memberMap)
-            => _inner.Map(source, destination, sourceType, destinationType, context, memberMap);
+            => _inner.Map(source, destination, this, null, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
-            IMemberMap memberMap)
-            => _inner.Map(source, destination, context, memberMap);
+            IMemberMap memberMap, Type sourceType, Type destinationType)
+            => _inner.Map(source, destination, context, memberMap, sourceType, destinationType);
 
         internal object GetDestination(object source, Type destinationType)
         {
@@ -125,13 +120,13 @@ namespace AutoMapper
             return TypeDepth[types];
         }
 
-        internal bool IsDefault => this == DefaultContext;
+        internal bool IsDefault => this == _inner.DefaultContext;
 
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
             => _inner.Map(source, destination, this, memberMap);
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType, IMemberMap memberMap)
-            => _inner.Map(source, destination, sourceType, destinationType, this, memberMap);
+            => _inner.Map(source, destination, this, memberMap, sourceType, destinationType);
 
         private void CheckDefault()
         {
