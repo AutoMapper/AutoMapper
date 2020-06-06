@@ -81,15 +81,15 @@ namespace AutoMapper
             }
         }
 
-        TDestination IRuntimeMapper.Map<TDestination>(object source)
+        TDestination IMapperBase.Map<TDestination>(object source)
             => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source)
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
-        object IRuntimeMapper.Map(object source, Type sourceType, Type destinationType)
+        object IMapperBase.Map(object source, Type sourceType, Type destinationType)
             => _inner.Map(source, null, sourceType, destinationType, this);
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType)
+        object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, sourceType, destinationType, this);
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context,
             IMemberMap memberMap)
