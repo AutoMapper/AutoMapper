@@ -43,8 +43,6 @@ namespace AutoMapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
 
-        public IConfigurationProvider ConfigurationProvider => _inner.ConfigurationProvider;
-
         ResolutionContext IRuntimeMapper.DefaultContext => _inner.DefaultContext;
 
         /// <summary>

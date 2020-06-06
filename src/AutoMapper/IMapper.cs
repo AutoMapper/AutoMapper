@@ -49,10 +49,6 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         object Map(object source, object destination, Type sourceType, Type destinationType);
-        /// <summary>
-        /// Configuration provider for performing maps
-        /// </summary>
-        IConfigurationProvider ConfigurationProvider { get; }
     }
     public interface IMapper : IMapperBase
     {
@@ -102,6 +98,10 @@ namespace AutoMapper
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        /// <summary>
+        /// Configuration provider for performing maps
+        /// </summary>
+        IConfigurationProvider ConfigurationProvider { get; }
         /// <summary>
         /// Factory method for creating runtime instances of converters, resolvers etc.
         /// </summary>

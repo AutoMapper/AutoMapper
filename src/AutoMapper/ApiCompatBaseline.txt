@@ -1,8 +1,6 @@
 Compat issues with assembly AutoMapper:
 InterfacesShouldHaveSameMembers : Interface member 'public System.Int32 AutoMapper.IConfigurationProvider.RecursiveQueriesMaxDepth' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Int32 AutoMapper.IConfigurationProvider.RecursiveQueriesMaxDepth.get()' is present in the implementation but not in the contract.
-InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.IConfigurationProvider AutoMapper.IMapper.ConfigurationProvider' is present in the contract but not in the implementation.
-InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.IConfigurationProvider AutoMapper.IMapper.ConfigurationProvider.get()' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Object AutoMapper.IMapper.Map(System.Object, System.Object, System.Type, System.Type)' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Object AutoMapper.IMapper.Map(System.Object, System.Type, System.Type)' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public TDestination AutoMapper.IMapper.Map<TDestination>(System.Object)' is present in the contract but not in the implementation.
@@ -17,6 +15,7 @@ MembersMustExist : Member 'public System.Object AutoMapper.Mapper.Map(System.Obj
 MembersMustExist : Member 'public TDestination AutoMapper.Mapper.Map<TSource, TDestination>(TSource, TDestination, AutoMapper.ResolutionContext, AutoMapper.IMemberMap)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.MemberFinderVisitor' does not exist in the implementation but it does exist in the contract.
 CannotRemoveBaseTypeOrInterface : Type 'AutoMapper.ResolutionContext' does not implement interface 'AutoMapper.IMapper' in the implementation but it does in the contract.
+MembersMustExist : Member 'public AutoMapper.IConfigurationProvider AutoMapper.ResolutionContext.ConfigurationProvider.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.CtorParamConfigurationExpression<TSource>' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Boolean AutoMapper.QueryableExtensions.IExpressionResultConverter.CanGetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.ConstructorParameterMap)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.Boolean AutoMapper.QueryableExtensions.IExpressionResultConverter.CanGetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.ConstructorParameterMap)' does not exist in the implementation but it does exist in the contract.
@@ -28,4 +27,4 @@ MembersMustExist : Member 'public AutoMapper.QueryableExtensions.ExpressionResol
 InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.QueryableExtensions.ExpressionResolutionResult AutoMapper.QueryableExtensions.IExpressionResultConverter.GetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.IMemberMap, AutoMapper.QueryableExtensions.LetPropertyMaps)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.QueryableExtensions.ExpressionResolutionResult AutoMapper.QueryableExtensions.IExpressionResultConverter.GetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.PropertyMap, AutoMapper.QueryableExtensions.LetPropertyMaps)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public AutoMapper.QueryableExtensions.ExpressionResolutionResult AutoMapper.QueryableExtensions.IExpressionResultConverter.GetExpressionResolutionResult(AutoMapper.QueryableExtensions.ExpressionResolutionResult, AutoMapper.PropertyMap, AutoMapper.QueryableExtensions.LetPropertyMaps)' does not exist in the implementation but it does exist in the contract.
-Total Issues: 29
+Total Issues: 28
