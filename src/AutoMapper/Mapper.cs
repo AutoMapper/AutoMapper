@@ -8,7 +8,7 @@ namespace AutoMapper
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
     using QueryableExtensions;
 
-    public class Mapper : IMapper, IRuntimeMapper
+    public class Mapper : IMapper, IInternalRuntimeMapper
     {
         public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
@@ -178,7 +178,7 @@ namespace AutoMapper
             return destination;
         }
 
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType,
+        object IInternalRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
@@ -188,7 +188,7 @@ namespace AutoMapper
             return func(source, destination, context);
         }
 
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
+        TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
             ResolutionContext context, IMemberMap memberMap)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));

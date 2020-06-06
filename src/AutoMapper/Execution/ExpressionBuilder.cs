@@ -17,7 +17,7 @@ namespace AutoMapper.Execution
         private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
             ctxt => ctxt.GetTypeDepth(default);
 
-        private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
+        private static readonly Expression<Func<IInternalRuntimeMapper, ResolutionContext>> CreateContext =
             mapper => new ResolutionContext(((ResolutionContext)mapper).DefaultContext.Options, mapper);
 
         private static readonly MethodInfo ContextMapMethod =
@@ -132,7 +132,7 @@ namespace AutoMapper.Execution
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
-                var mapper = Property(context, "Mapper");
+                var mapper = Convert(Property(context, "Mapper"), typeof(IInternalRuntimeMapper));
                 return IfThen(Property(context, "IsDefault"), Assign(context, Invoke(CreateContext, mapper)));
             }
             return null;

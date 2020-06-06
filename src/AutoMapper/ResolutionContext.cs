@@ -6,13 +6,13 @@ namespace AutoMapper
     /// <summary>
     /// Context information regarding resolution of a destination value
     /// </summary>
-    public class ResolutionContext : IRuntimeMapper
+    public class ResolutionContext : IInternalRuntimeMapper
     {
         private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
-        private readonly IRuntimeMapper _inner;
+        private readonly IInternalRuntimeMapper _inner;
 
-        public ResolutionContext(IMappingOperationOptions options, IRuntimeMapper mapper)
+        internal ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
         {
             Options = options;
             _inner = mapper;
@@ -86,10 +86,10 @@ namespace AutoMapper
             => _inner.Map(source, null, sourceType, destinationType, this);
         object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, sourceType, destinationType, this);
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context,
+        object IInternalRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context,
             IMemberMap memberMap)
             => _inner.Map(source, destination, sourceType, destinationType, context, memberMap);
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
+        TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
             IMemberMap memberMap)
             => _inner.Map(source, destination, context, memberMap);
 
