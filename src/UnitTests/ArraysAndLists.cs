@@ -253,7 +253,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             dynamic book2 = new ExpandoObject();
             book2.Name = "Oliver Twist";
             authorDynamic.Books = new List<object> { book1, book2 };
-            mappedAuthor = Mapper.Map<Author>(authorDynamic);
+            mappedAuthor = Mapper.Map<Author>((object)authorDynamic);
         }
 
         [Fact]

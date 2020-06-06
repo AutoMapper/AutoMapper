@@ -18,6 +18,8 @@ namespace AutoMapper
             _inner = mapper;
         }
 
+        internal ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
+
         /// <summary>
         /// Mapping operation options
         /// </summary>
@@ -40,7 +42,9 @@ namespace AutoMapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
 
-        internal ResolutionContext DefaultContext => _inner is Mapper mapper ? mapper.DefaultContext : ((ResolutionContext)_inner).DefaultContext;
+        internal ResolutionContext DefaultContext => _inner.DefaultContext;
+
+        ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
 
         /// <summary>
         /// Instance cache for resolving circular references
@@ -76,8 +80,7 @@ namespace AutoMapper
             }
         }
 
-        TDestination IMapperBase.Map<TDestination>(object source)
-            => (TDestination)_inner.Map(source, null, source?.GetType() ?? typeof(object), typeof(TDestination), this);
+        TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)

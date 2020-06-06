@@ -41,8 +41,8 @@ namespace AutoMapper.UnitTests.Bug
             overrideSettings.SubSettings = new ExpandoObject();
             overrideSettings.SubSettings.SubTimeout = 22;
 
-            _settings = Mapper.Map<Settings>(baseSettings);
-            Mapper.Map(overrideSettings, _settings);
+            _settings = Mapper.Map<Settings>((object)baseSettings);
+            Mapper.Map((object)overrideSettings, _settings);
         }
 
         [Fact]
