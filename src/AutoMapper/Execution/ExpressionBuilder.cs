@@ -18,7 +18,7 @@ namespace AutoMapper.Execution
             ctxt => ctxt.GetTypeDepth(default);
 
         private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
-            mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
+            mapper => new ResolutionContext(((ResolutionContext)mapper).DefaultContext.Options, mapper);
 
         private static readonly MethodInfo ContextMapMethod =
             ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();            

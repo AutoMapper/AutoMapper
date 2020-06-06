@@ -22,9 +22,7 @@ namespace AutoMapper
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
 
-        private ResolutionContext DefaultContext { get; }
-
-        ResolutionContext IRuntimeMapper.DefaultContext => DefaultContext;
+        internal ResolutionContext DefaultContext { get; }
 
         public Func<Type, object> ServiceCtor { get; }
 

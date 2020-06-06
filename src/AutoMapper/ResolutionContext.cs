@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using AutoMapper.Execution;
 
 namespace AutoMapper
 {
@@ -43,7 +40,7 @@ namespace AutoMapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
 
-        ResolutionContext IRuntimeMapper.DefaultContext => _inner.DefaultContext;
+        internal ResolutionContext DefaultContext => _inner is Mapper mapper ? mapper.DefaultContext : ((ResolutionContext)_inner).DefaultContext;
 
         /// <summary>
         /// Instance cache for resolving circular references
@@ -125,7 +122,7 @@ namespace AutoMapper
             return TypeDepth[types];
         }
 
-        internal bool IsDefault => this == _inner.DefaultContext;
+        internal bool IsDefault => this == DefaultContext;
 
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
             => _inner.Map(source, destination, this, memberMap);

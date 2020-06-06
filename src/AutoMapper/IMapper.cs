@@ -137,7 +137,6 @@ namespace AutoMapper
     }
     public interface IRuntimeMapper : IMapperBase
     {
-        ResolutionContext DefaultContext { get; }
         object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context, IMemberMap memberMap = null);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, IMemberMap memberMap = null);
     }

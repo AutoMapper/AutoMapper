@@ -48,8 +48,7 @@ namespace AutoMapper.UnitTests
                 IntValue = 13,
             };
             var plan = Configuration.BuildExecutionPlan(typeof(Model), typeof(Dto));
-            var context = ((IRuntimeMapper)Mapper).DefaultContext;
-            _destination = ((Func<Model, Dto, ResolutionContext, Dto>)plan.Compile())(_source, null, context);
+            _destination = ((Func<Model, Dto, ResolutionContext, Dto>)plan.Compile())(_source, null, null);
         }
 
         [Fact]
