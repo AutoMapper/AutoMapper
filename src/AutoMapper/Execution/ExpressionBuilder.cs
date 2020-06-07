@@ -1,16 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.Execution
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using AutoMapper.Configuration;
-    using AutoMapper.Internal;
-    using AutoMapper.Mappers.Internal;
-    using static System.Linq.Expressions.Expression;
+    using Configuration;
+    using Internal;
+    using Mappers.Internal;
+    using static Expression;
 
     public static class ExpressionBuilder
     {

@@ -131,7 +131,6 @@ namespace AutoMapper
         /// <returns>The mapper instance</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
 
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(TypePair types, IMemberMap memberMap = null);
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest);
 
         /// <summary>
@@ -139,8 +138,6 @@ namespace AutoMapper
         /// Use if you want AutoMapper to compile all mappings up front instead of deferring expression compilation for each first map.
         /// </summary>
         void CompileMappings();
-
-        Delegate GetExecutionPlan(MapRequest request);
 
         void RegisterTypeMap(TypeMap typeMap);
 

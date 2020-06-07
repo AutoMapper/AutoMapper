@@ -92,14 +92,6 @@ namespace AutoMapper
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(
-            TypePair types, IMemberMap memberMap = null)
-        {
-            var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, types, memberMap);
-            return GetExecutionPlan<TSource, TDestination>(mapRequest);
-        }
-
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest) 
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetExecutionPlan(mapRequest);
 
@@ -111,7 +103,7 @@ namespace AutoMapper
             }
         }
 
-        public Delegate GetExecutionPlan(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest);
+        private Delegate GetExecutionPlan(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest);
 
         private Delegate CompileExecutionPlan(MapRequest mapRequest) => BuildExecutionPlan(mapRequest).Compile();
 

@@ -23,11 +23,7 @@ namespace AutoMapper
         public bool Equals(MapRequest other) => 
             RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) && Equals(MemberMap, other.MemberMap);
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is MapRequest && Equals((MapRequest) obj);
-        }
+        public override bool Equals(object obj) => obj is MapRequest other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -56,35 +52,13 @@ namespace AutoMapper
             DestinationType = destinationType;
         }
 
-        public static TypePair Create<TSource>(TSource source, Type sourceType, Type destinationType)
-        {
-            if(source != null)
-            {
-                sourceType = source.GetType();
-            }
-            return new TypePair(sourceType, destinationType);
-        }
-
-        public static TypePair Create<TSource, TDestination>(TSource source, TDestination destination, Type sourceType, Type destinationType)
-        {
-            if(source != null)
-            {
-                sourceType = source.GetType();
-            }
-            if(destination != null)
-            {
-                destinationType = destination.GetType();
-            }
-            return new TypePair(sourceType, destinationType);
-        }
-
         public Type SourceType { get; }
 
         public Type DestinationType { get; }
 
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
-        public override bool Equals(object other) => other is TypePair && Equals((TypePair)other);
+        public override bool Equals(object other) => other is TypePair otherPair && Equals(otherPair);
 
         public override int GetHashCode() => HashCodeCombiner.Combine(SourceType, DestinationType);
 

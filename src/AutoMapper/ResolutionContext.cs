@@ -1,3 +1,4 @@
+using AutoMapper.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -52,12 +53,7 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                if(_instanceCache != null)
-                {
-                    return _instanceCache;
-                }
-                _instanceCache = new Dictionary<ContextCacheKey, object>();
-                return _instanceCache;
+                return _instanceCache ??= new Dictionary<ContextCacheKey, object>(); ;
             }
         }
 
@@ -69,12 +65,7 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                if(_typeDepth != null)
-                {
-                    return _typeDepth;
-                }
-                _typeDepth = new Dictionary<TypePair, int>();
-                return _typeDepth;
+                return _typeDepth ??= new Dictionary<TypePair, int>();
             }
         }
 
@@ -84,49 +75,31 @@ namespace AutoMapper
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)
             => _inner.Map(source, destination, this);
         object IMapperBase.Map(object source, Type sourceType, Type destinationType)
-            => _inner.Map(source, (object)null, this, null, sourceType, destinationType);
+            => _inner.Map(source, (object)null, this, sourceType, destinationType);
         object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
-            => _inner.Map(source, destination, this, null, sourceType, destinationType);
+            => _inner.Map(source, destination, this, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
-            IMemberMap memberMap, Type sourceType, Type destinationType)
-            => _inner.Map(source, destination, context, memberMap, sourceType, destinationType);
+            Type sourceType, Type destinationType, IMemberMap memberMap)
+            => _inner.Map(source, destination, context, sourceType, destinationType, memberMap);
 
-        internal object GetDestination(object source, Type destinationType)
-        {
-            InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out object destination);
-            return destination;
-        }
+        internal object GetDestination(object source, Type destinationType) => InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
 
-        internal void CacheDestination(object source, Type destinationType, object destination)
-        {
+        internal void CacheDestination(object source, Type destinationType, object destination) => 
             InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
-        }
 
-        internal void IncrementTypeDepth(TypePair types)
-        {
-            TypeDepth[types]++;
-        }
+        internal void IncrementTypeDepth(TypePair types) => TypeDepth[types]++;
 
-        internal void DecrementTypeDepth(TypePair types)
-        {
-            TypeDepth[types]--;
-        }
+        internal void DecrementTypeDepth(TypePair types) => TypeDepth[types]--;
 
-        internal int GetTypeDepth(TypePair types)
-        {
-            if (!TypeDepth.ContainsKey(types))
-                TypeDepth[types] = 1;
-
-            return TypeDepth[types];
-        }
+        internal int GetTypeDepth(TypePair types) => TypeDepth.TryGetValue(types, out int depth) ? depth : TypeDepth[types] = 1;
 
         internal bool IsDefault => this == _inner.DefaultContext;
 
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
-            => _inner.Map(source, destination, this, memberMap);
+            => _inner.Map(source, destination, this, memberMap: memberMap);
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType, IMemberMap memberMap)
-            => _inner.Map(source, destination, this, memberMap, sourceType, destinationType);
+            => _inner.Map(source, destination, this, sourceType, destinationType, memberMap);
 
         private void CheckDefault()
         {
@@ -136,27 +109,19 @@ namespace AutoMapper
             }
         }
     }
-
     public readonly struct ContextCacheKey : IEquatable<ContextCacheKey>
     {
         public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
         private readonly Type _destinationType;
-
         public ContextCacheKey(object source, Type destinationType)
         {
             Source = source;
             _destinationType = destinationType;
         }
-
         public object Source { get; }
-
         public override int GetHashCode() => HashCodeCombiner.Combine(Source, _destinationType);
-
-        public bool Equals(ContextCacheKey other) =>
-            Source == other.Source && _destinationType == other._destinationType;
-
-        public override bool Equals(object other) => 
-            other is ContextCacheKey && Equals((ContextCacheKey)other);
+        public bool Equals(ContextCacheKey other) => Source == other.Source && _destinationType == other._destinationType;
+        public override bool Equals(object other) => other is ContextCacheKey otherKey && Equals(otherKey);
     }
 }
