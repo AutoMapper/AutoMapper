@@ -350,6 +350,6 @@ namespace AutoMapper.Configuration
             return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceExpression, GetDestinationExpression());
         }
 
-        public void DontUseDestinationValue() => SetUseDestinationValue(false);
+        public void DoNotUseDestinationValue() => SetUseDestinationValue(false);
     }
 }

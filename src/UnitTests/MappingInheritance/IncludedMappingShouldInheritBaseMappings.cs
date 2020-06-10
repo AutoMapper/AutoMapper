@@ -13,7 +13,7 @@ namespace AutoMapper.UnitTests
                 .ForMember(d => d.CodeList, o => o.MapFrom(s => s.CodeList))
                 .ForMember(d => d.KeyValuesOtherName, o => o.MapFrom(s => new[] { new KeyValueModel { Key = "key1", Value = "value1" } }))
                 .Include<DomainModel, Model>();
-            cfg.CreateMap<DomainModel, Model>().ForAllMembers(o => o.DontUseDestinationValue());
+            cfg.CreateMap<DomainModel, Model>().ForAllMembers(o => o.DoNotUseDestinationValue());
         });
         public class DomainModelBase
         {

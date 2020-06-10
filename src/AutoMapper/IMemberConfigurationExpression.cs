@@ -124,7 +124,7 @@ namespace AutoMapper
         /// <summary>
         /// Reset UseDestinationValue.
         /// </summary>
-        void DontUseDestinationValue();
+        void DoNotUseDestinationValue();
 
         /// <summary>
         /// Use the destination value instead of mapping from the source value or creating a new instance
