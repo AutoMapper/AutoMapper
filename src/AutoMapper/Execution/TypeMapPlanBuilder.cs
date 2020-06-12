@@ -506,11 +506,9 @@ namespace AutoMapper.Execution
             {
                 valueResolverFunc = defaultValue ?? Throw(Constant(new Exception("I done blowed up")));
             }
-
             if (memberMap.NullSubstitute != null)
             {
-                var nullSubstitute = Constant(memberMap.NullSubstitute);
-                valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
+                valueResolverFunc = memberMap.NullSubstitute(valueResolverFunc);
             }
             else if (!memberMap.AllowsNullDestinationValues())
             {

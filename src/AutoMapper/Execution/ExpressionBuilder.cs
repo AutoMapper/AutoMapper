@@ -9,6 +9,7 @@ namespace AutoMapper.Execution
     using Configuration;
     using Internal;
     using Mappers.Internal;
+    using static Internal.ExpressionFactory;
     using static Expression;
 
     public static class ExpressionBuilder
@@ -156,5 +157,8 @@ namespace AutoMapper.Execution
 
         public static bool AllowsNullCollections(this IMemberMap memberMap) =>
             memberMap.TypeMap.Profile.AllowsNullCollectionsFor(memberMap);
+
+        public static Expression NullSubstitute(this IMemberMap memberMap, Expression sourceExpression) =>
+            Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
     }
 }

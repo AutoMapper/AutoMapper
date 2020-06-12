@@ -268,45 +268,12 @@ namespace AutoMapper.QueryableExtensions
                 return null;
             }
             result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps);
-            if(propertyMap.NullSubstitute != null && result.Type.IsNullableType())
+            if(propertyMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string)))
             {
-                var currentChild = result.ResolutionExpression;
-                var currentChildType = result.Type;
-                var nullSubstitute = propertyMap.NullSubstitute;
-
-                var newParameter = result.ResolutionExpression;
-                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
-
-                currentChild = converter.Visit(currentChild);
-                currentChildType = currentChildType.GetTypeOfNullable();
-
-                return new ExpressionResolutionResult(currentChild, currentChildType);
+                return new ExpressionResolutionResult(propertyMap.NullSubstitute(result.ResolutionExpression));
             }
-
             return result;
         }
-
-        private class NullSubstitutionConversionVisitor : ExpressionVisitor
-        {
-            private readonly Expression _newParameter;
-            private readonly object _nullSubstitute;
-
-            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
-            {
-                _newParameter = newParameter;
-                _nullSubstitute = nullSubstitute;
-            }
-
-            protected override Expression VisitMember(MemberExpression node) => node == _newParameter ? NullCheck(node) : node;
-
-            private Expression NullCheck(Expression input)
-            {
-                var underlyingType = input.Type.GetTypeOfNullable();
-                var nullSubstitute = ToType(Constant(_nullSubstitute), underlyingType);
-                return Condition(Property(input, "HasValue"), Property(input, "Value"), nullSubstitute, underlyingType);
-            }
-        }
-
         private abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
             public static ParameterExpressionVisitor Create(object parameters) =>
