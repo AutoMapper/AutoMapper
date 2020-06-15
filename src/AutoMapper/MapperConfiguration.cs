@@ -105,7 +105,11 @@ namespace AutoMapper
 
         private Delegate GetExecutionPlan(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest);
 
-        private Delegate CompileExecutionPlan(MapRequest mapRequest) => BuildExecutionPlan(mapRequest).Compile();
+        private Delegate CompileExecutionPlan(MapRequest mapRequest)
+        {
+            var executionPlan = BuildExecutionPlan(mapRequest);
+            return executionPlan.Compile(); // breakpoint here to inspect all execution plans
+        }
 
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
