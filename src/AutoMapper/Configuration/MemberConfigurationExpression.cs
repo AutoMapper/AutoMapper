@@ -332,7 +332,7 @@ namespace AutoMapper.Configuration
         }
 
         public LambdaExpression SourceExpression { get; private set; }
-        public LambdaExpression GetDestinationExpression() => MemberAccessLambda(DestinationMember);
+        public LambdaExpression GetDestinationExpression() => DestinationMember.Lambda();
 
         public IPropertyMapConfiguration Reverse()
         {

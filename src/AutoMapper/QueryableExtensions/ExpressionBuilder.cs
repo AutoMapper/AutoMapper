@@ -200,7 +200,7 @@ namespace AutoMapper.QueryableExtensions
                         .Concat(typeMap.ValueTransformers)
                         .Concat(typeMap.Profile.ValueTransformers)
                         .Where(vt => vt.IsMatch(propertyMap))
-                        .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
+                        .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
 
                     bindExpression = bindExpression.Update(rhs);
 

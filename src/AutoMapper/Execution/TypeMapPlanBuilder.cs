@@ -398,7 +398,7 @@ namespace AutoMapper.Execution
                 .Concat(_typeMap.ValueTransformers)
                 .Concat(_typeMap.Profile.ValueTransformers)
                 .Where(vt => vt.IsMatch(memberMap))
-                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
