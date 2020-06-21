@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -11,21 +12,17 @@ using AutoMapper.QueryableExtensions;
 namespace AutoMapper.Internal
 {
     using static Expression;
-
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
-        public static LambdaExpression MemberAccessLambda(Type type, string propertyOrField) =>
-            MemberAccessLambda(type.GetFieldOrProperty(propertyOrField));
+        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) =>
+            MemberAccessLambda(ReflectionHelper.GetMemberPath(type, memberPath));
 
-        public static LambdaExpression MemberAccessLambda(MemberInfo propertyOrField)
+        public static LambdaExpression MemberAccessLambda(params MemberInfo[] members)
         {
-            var source = Parameter(propertyOrField.DeclaringType, "source");
-            return Lambda(MakeMemberAccess(source, propertyOrField), source);
+            var source = Parameter(members[0].DeclaringType, "source");
+            return Lambda(members.MemberAccesses(source), source);
         }
-
-
-        public static MemberExpression MemberAccesses(string members, Expression obj) =>
-            (MemberExpression)ReflectionHelper.GetMemberPath(obj.Type, members).MemberAccesses(obj);
 
         public static Expression GetSetter(MemberExpression memberExpression)
         {

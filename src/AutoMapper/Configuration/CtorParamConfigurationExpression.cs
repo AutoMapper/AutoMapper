@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper.Internal;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -29,10 +30,10 @@ namespace AutoMapper.Configuration
             _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
         }
 
-        public void MapFrom(string sourceMemberName)
+        public void MapFrom(string sourceMembersPath)
         {
-            SourceType.GetFieldOrProperty(sourceMemberName);
-            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMemberName));
+            ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
+            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath));
         }
 
         public void Configure(TypeMap typeMap)

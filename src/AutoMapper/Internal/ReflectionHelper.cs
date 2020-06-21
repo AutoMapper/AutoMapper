@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace AutoMapper.Internal
 {
     using Configuration;
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
         public static bool CanBeSet(MemberInfo propertyOrField)
@@ -70,13 +72,17 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
+        public static MemberInfo[] GetMemberPath(Type type, string fullMemberName)
         {
-            MemberInfo property = null;
-            foreach (var memberName in fullMemberName.Split('.'))
+            return GetMemberPathCore().ToArray();
+            IEnumerable<MemberInfo> GetMemberPathCore()
             {
-                var currentType = GetCurrentType(property, type);
-                yield return property = currentType.GetFieldOrProperty(memberName);
+                MemberInfo property = null;
+                foreach (var memberName in fullMemberName.Split('.'))
+                {
+                    var currentType = GetCurrentType(property, type);
+                    yield return property = currentType.GetFieldOrProperty(memberName);
+                }
             }
         }
 

@@ -6,10 +6,10 @@ namespace AutoMapper
     public interface ICtorParamConfigurationExpression
     {
         /// <summary>
-        /// Specify the source member to map from. Can only reference a member on the source type.
+        /// Specify the source member(s) to map from.
         /// </summary>
-        /// <param name="sourceMemberName">Property name referencing the source member to map against.</param>
-        void MapFrom(string sourceMemberName);
+        /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
+        void MapFrom(string sourceMembersPath);
     }
     public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
     {

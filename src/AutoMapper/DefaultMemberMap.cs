@@ -53,12 +53,12 @@ namespace AutoMapper
             Ignored = false;
         }
 
-        public void MapFrom(string propertyOrField)
+        public void MapFrom(string sourceMembersPath)
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
                                                 // just a placeholder so the member is mapped
                                                 Lambda(Constant(null)) :
-                                                ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, propertyOrField);
+                                                ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
             MapFrom(mapExpression);
         }
     }

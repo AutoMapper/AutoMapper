@@ -89,4 +89,23 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             _destination.ShortDescription.ShouldBe("mappedFrom");
         }
     }
+    public class When_mapping_from_chained_properties : AutoMapperSpecBase
+    {
+        class Model
+        {
+            public InnerModel Inner { get; set; }
+        }
+        class InnerModel
+        {
+            public string Value { get; set; }
+        }
+        class Dto
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<Model, Dto>().ForMember(d => d.Value, o => o.MapFrom("Inner.Value")));
+        [Fact]
+        public void Should_map_ok() =>
+            Map<Dto>(new Model { Inner = new InnerModel { Value = "mappedFrom" } }).Value.ShouldBe("mappedFrom");
+    }
 }
