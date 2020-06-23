@@ -6,8 +6,26 @@ using System;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_an_extension_method_is_for_a_base_class : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
+        {
+            c.IncludeSourceExtensionMethods(typeof(BarExtensions));
+            c.CreateMap<Source, Destination>();
+        });
+        [Fact]
+        public void It_should_be_used() => Map<Destination>(new Source()).Value.ShouldBe(12);
+    }
     public static class BarExtensions
     {
+        public static int GetValue(this object obj) => 12;
         public static string GetSimpleName(this When_null_is_passed_to_an_extension_method.Bar source)
         {
             if(source == null)
