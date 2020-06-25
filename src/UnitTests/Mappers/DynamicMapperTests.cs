@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Bar = "Bar";
             source.Jack = "Jack";
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<Destination>(source);
+            _destination = config.CreateMapper().Map<Destination>((object)source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
             _destination.Jack.ShouldBeNull();
@@ -111,7 +111,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Bar = "Bar";
             source.Jack = "Jack";
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<Destination>(source);
+            _destination = config.CreateMapper().Map<Destination>((object)source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
             _destination.Jack.ShouldBeNull();
@@ -128,7 +128,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<Destination>(source);
+            _destination = config.CreateMapper().Map<Destination>((object)source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
         }
@@ -145,7 +145,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Foo = "Foo";
             source.Baz = null;
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<Destination>(source);
+            _destination = config.CreateMapper().Map<Destination>((object)source);
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
             _destination.Baz.ShouldBe(0);
@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Foo = "Foo";
             source.Bar = "Bar";
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<DynamicDictionary>(source);
+            _destination = config.CreateMapper().Map<DynamicDictionary>((object)source);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
         }
@@ -184,7 +184,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.StringValue = "Test";
             source.NullIntValue = 5;
             var config = new MapperConfiguration(cfg => { });
-            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            var destination = config.CreateMapper().Map<DestinationWithNullable>((object)source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal(5, destination.NullIntValue);
         }
@@ -195,7 +195,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.StringValue = "Test";
             var config = new MapperConfiguration(cfg => { });
-            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            var destination = config.CreateMapper().Map<DestinationWithNullable>((object)source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal((int?)null, destination.NullIntValue);
         }
@@ -207,7 +207,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.StringValue = "Test";
             source.NullIntValue = null;
             var config = new MapperConfiguration(cfg => { });
-            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            var destination = config.CreateMapper().Map<DestinationWithNullable>((object)source);
             Assert.Equal("Test", destination.StringValue);
             Assert.Equal((int?)null, destination.NullIntValue);
         }

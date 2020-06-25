@@ -6,80 +6,61 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests
 {
+    using System;
     using UnitTests;
-        
-    public class NullSubstitute : AutoMapperSpecBase
+
+    public class EnumToUnderlyingType : AutoMapperSpecBase
     {
         public class Customer
         {
-            [Key]
             public int Id { get; set; }
-
-            public double? Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public ConsoleColor ConsoleColor { get; set; }
         }
-
         public class CustomerViewModel
         {
-            public double Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public int ConsoleColor { get; set; }
         }
-
         public class Context : DbContext
         {
-            public Context()
-            {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
-            }
-
+            public Context() =>  Database.SetInitializer(new DatabaseInitializer());
             public DbSet<Customer> Customers { get; set; }
         }
-
         public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
         {
             protected override void Seed(Context context)
             {
-                context.Customers.Add(new Customer
-                {
-                    Id = 1,
-                    FirstName = "Bob",
-                    LastName = "Smith",
-                });
-
+                context.Customers.Add(new Customer { Id = 1, FirstName = "Bob", LastName = "Smith", ConsoleColor = ConsoleColor.Yellow });
                 base.Seed(context);
             }
         }
-
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Customer, CustomerViewModel>().ForMember(d => d.Value, o => o.NullSubstitute(5));
-        });
-
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {
             using (var context = new Context())
             {
-                ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBe(5);
+                ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe((int)ConsoleColor.Yellow);
             }
         }
     }
-    public class NullSubstituteWithStrings : AutoMapperSpecBase
+    public class UnderlyingTypeToEnum : AutoMapperSpecBase
     {
         public class Customer
         {
             public int Id { get; set; }
-            public string Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public int ConsoleColor { get; set; }
         }
         public class CustomerViewModel
         {
-            public string Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public ConsoleColor ConsoleColor { get; set; }
         }
         public class Context : DbContext
         {
@@ -90,68 +71,55 @@ namespace AutoMapper.IntegrationTests
         {
             protected override void Seed(Context context)
             {
-                context.Customers.Add(new Customer { Id = 1, FirstName = "Bob", LastName = "Smith" });
+                context.Customers.Add(new Customer { Id = 1, FirstName = "Bob", LastName = "Smith", ConsoleColor = (int)ConsoleColor.Yellow });
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-            cfg.CreateMap<Customer, CustomerViewModel>().ForMember(d => d.Value, o => o.NullSubstitute("5")));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {
             using (var context = new Context())
             {
-                ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBe("5");
+                ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe(ConsoleColor.Yellow);
             }
         }
     }
-    public class NullSubstituteWithEntity : AutoMapperSpecBase
+    public class EnumToEnum : AutoMapperSpecBase
     {
-        class Customer
+        public class Customer
         {
             public int Id { get; set; }
-            public Value Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public DayOfWeek ConsoleColor { get; set; }
         }
-        class Value
+        public class CustomerViewModel
         {
-            public int Id { get; set; }
-        }
-        class CustomerViewModel
-        {
-            public ValueViewModel Value { get; set; }
             public string FirstName { get; set; }
             public string LastName { get; set; }
+            public ConsoleColor ConsoleColor { get; set; }
         }
-        class ValueViewModel
-        {
-            public int Id { get; set; }
-        }
-        class Context : DbContext
+        public class Context : DbContext
         {
             public Context() => Database.SetInitializer(new DatabaseInitializer());
             public DbSet<Customer> Customers { get; set; }
         }
-        class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+        public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
         {
             protected override void Seed(Context context)
             {
-                context.Customers.Add(new Customer { Id = 1, FirstName = "Bob", LastName = "Smith" });
+                context.Customers.Add(new Customer { Id = 1, FirstName = "Bob", LastName = "Smith", ConsoleColor = DayOfWeek.Saturday });
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Customer, CustomerViewModel>().ForMember(d => d.Value, o => o.NullSubstitute(new Value()));
-            cfg.CreateMap<Value, ValueViewModel>();
-        });
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {
             using (var context = new Context())
             {
-                ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBeNull();
+                ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe(ConsoleColor.DarkYellow);
             }
         }
     }

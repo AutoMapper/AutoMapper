@@ -14,7 +14,6 @@ namespace AutoMapper
     using static Expression;
     using static ExpressionFactory;
     using static Execution.ExpressionBuilder;
-    using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
     using Validator = Action<ValidationContext>;
 
     public class MapperConfiguration : IConfigurationProvider
@@ -25,7 +24,7 @@ namespace AutoMapper
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly Dictionary<TypePair, TypeMap> _typeMapRegistry = new Dictionary<TypePair, TypeMap>();
         private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
-        private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
+        private readonly LockingConcurrentDictionary<MapRequest, Delegate> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
         private readonly MapperConfigurationExpressionValidator _expressionValidator;
 
@@ -33,7 +32,7 @@ namespace AutoMapper
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
-            _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
+            _mapPlanCache = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
             Validators = configurationExpression.Advanced.GetValidators();
             _validator = new ConfigurationValidator(this);
             _expressionValidator = new MapperConfigurationExpressionValidator(configurationExpression);
@@ -93,30 +92,24 @@ namespace AutoMapper
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
-            TypePair types, IMemberMap memberMap = null)
-        {
-            var key = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(key, types, memberMap);
-            return GetMapperFunc<TSource, TDestination>(mapRequest);
-        }
-
-        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(MapRequest mapRequest) 
-            => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest) 
+            => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetExecutionPlan(mapRequest);
 
         public void CompileMappings()
         {
             foreach (var request in _typeMapPlanCache.Keys.Where(t=>!t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types)).ToArray())
             {
-                GetMapperFunc(request);
+                GetExecutionPlan(request);
             }
         }
 
-        public Delegate GetMapperFunc(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest).Typed;
+        private Delegate GetExecutionPlan(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest);
 
-        public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest).Untyped;
-
-        private MapperFuncs CreateMapperFuncs(MapRequest mapRequest) => new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
+        private Delegate CompileExecutionPlan(MapRequest mapRequest)
+        {
+            var executionPlan = BuildExecutionPlan(mapRequest);
+            return executionPlan.Compile(); // breakpoint here to inspect all execution plans
+        }
 
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
@@ -445,38 +438,9 @@ namespace AutoMapper
         public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
 
         public void RegisterTypeMap(TypeMap typeMap) => _typeMapRegistry[typeMap.Types] = typeMap;
-
-        internal struct MapperFuncs
-        {
-            public Delegate Typed { get; }
-            public UntypedMapperFunc Untyped { get; }
-
-            public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
-            {
-                Typed = typedExpression.Compile();
-                Untyped = Wrap(mapRequest, Typed).Compile();
-            }
-
-            private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, Delegate typedDelegate)
-            {
-                var sourceParameter = Parameter(typeof(object), "source");
-                var destinationParameter = Parameter(typeof(object), "destination");
-                var contextParameter = Parameter(typeof(ResolutionContext), "context");
-                var requestedSourceType = mapRequest.RequestedTypes.SourceType;
-                var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
-
-                var destination = requestedDestinationType.IsValueType ? Coalesce(destinationParameter, New(requestedDestinationType)) : (Expression)destinationParameter;
-                // Invoking a delegate here
-                return Lambda<UntypedMapperFunc>(
-                            ToType(
-                                Invoke(Constant(typedDelegate), ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
-                                , typeof(object)),
-                          sourceParameter, destinationParameter, contextParameter);
-            }
-        }
     }
 
-    public struct ValidationContext
+    public readonly struct ValidationContext
     {
         public IObjectMapper ObjectMapper { get; }
         public IMemberMap MemberMap { get; }

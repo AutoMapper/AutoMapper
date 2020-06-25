@@ -122,7 +122,7 @@ namespace AutoMapper.QueryableExtensions
         static Expression Fallback(Type type)
         {
             // default values for generic collections
-            if (type.GetIsConstructedGenericType() && type.GetTypeInfo().GenericTypeArguments.Length == 1)
+            if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
             {
                 return CollectionFallback(typeof(List<>), type)
                     ?? CollectionFallback(typeof(HashSet<>), type);

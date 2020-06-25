@@ -42,7 +42,10 @@ namespace AutoMapper.QueryableExtensions
                 new AssignableExpressionBinder(),
                 new EnumerableExpressionBinder(),
                 new MappedTypeExpressionBinder(),
-                new StringExpressionBinder()
+                new StringExpressionBinder(),
+                new EnumToUnderlyingTypeBinder(),
+                new UnderlyingTypeToEnumBinder(),
+                new EnumToEnumBinder(),
             };
 
         private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]> _expressionCache;
@@ -197,7 +200,7 @@ namespace AutoMapper.QueryableExtensions
                         .Concat(typeMap.ValueTransformers)
                         .Concat(typeMap.Profile.ValueTransformers)
                         .Where(vt => vt.IsMatch(propertyMap))
-                        .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
+                        .Aggregate(bindExpression.Expression, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), propertyMap.DestinationType));
 
                     bindExpression = bindExpression.Update(rhs);
 
@@ -268,45 +271,12 @@ namespace AutoMapper.QueryableExtensions
                 return null;
             }
             result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps);
-            if(propertyMap.NullSubstitute != null && result.Type.IsNullableType())
+            if(propertyMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string)))
             {
-                var currentChild = result.ResolutionExpression;
-                var currentChildType = result.Type;
-                var nullSubstitute = propertyMap.NullSubstitute;
-
-                var newParameter = result.ResolutionExpression;
-                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
-
-                currentChild = converter.Visit(currentChild);
-                currentChildType = currentChildType.GetTypeOfNullable();
-
-                return new ExpressionResolutionResult(currentChild, currentChildType);
+                return new ExpressionResolutionResult(propertyMap.NullSubstitute(result.ResolutionExpression));
             }
-
             return result;
         }
-
-        private class NullSubstitutionConversionVisitor : ExpressionVisitor
-        {
-            private readonly Expression _newParameter;
-            private readonly object _nullSubstitute;
-
-            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
-            {
-                _newParameter = newParameter;
-                _nullSubstitute = nullSubstitute;
-            }
-
-            protected override Expression VisitMember(MemberExpression node) => node == _newParameter ? NullCheck(node) : node;
-
-            private Expression NullCheck(Expression input)
-            {
-                var underlyingType = input.Type.GetTypeOfNullable();
-                var nullSubstitute = ToType(Constant(_nullSubstitute), underlyingType);
-                return Condition(Property(input, "HasValue"), Property(input, "Value"), nullSubstitute, underlyingType);
-            }
-        }
-
         private abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
             public static ParameterExpressionVisitor Create(object parameters) =>
@@ -490,7 +460,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             => new QueryExpressions(projection);
 
-        public struct PropertyPath
+        public readonly struct PropertyPath
         {
             public PropertyPath(PropertyExpression[] properties, LambdaExpression letExpression)
             {
@@ -508,7 +478,7 @@ namespace AutoMapper.QueryableExtensions
         }
     }
 
-    public struct QueryExpressions
+    public readonly struct QueryExpressions
     {
         public QueryExpressions(Expression first, Expression second = null, ParameterExpression secondParameter = null)
         {

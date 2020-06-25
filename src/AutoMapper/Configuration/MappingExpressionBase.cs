@@ -162,7 +162,7 @@ namespace AutoMapper.Configuration
             foreach(var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Count > 1 && !p.SourceMembers.Any(s => s is MethodInfo)))
             {
                 var memberPath = new MemberPath(propertyMap.SourceMembers);
-                var customExpression = ExpressionFactory.MemberAccessLambda(propertyMap.DestinationMember);
+                var customExpression = propertyMap.DestinationMember.Lambda();
                 ReverseSourceMembers(memberPath, customExpression);
             }
         }

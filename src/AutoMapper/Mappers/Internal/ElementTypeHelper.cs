@@ -58,6 +58,25 @@ namespace AutoMapper.Mappers.Internal
             return !enumType.IsEnum ? null : enumType;
         }
 
+        public static bool IsEnumToEnum(TypePair context)
+        {
+            var sourceEnumType = GetEnumerationType(context.SourceType);
+            var destEnumType = GetEnumerationType(context.DestinationType);
+            return sourceEnumType != null && destEnumType != null;
+        }
+
+        public static bool IsUnderlyingTypeToEnum(TypePair context)
+        {
+            var destEnumType = GetEnumerationType(context.DestinationType);
+            return destEnumType != null && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(destEnumType));
+        }
+
+        public static bool IsEnumToUnderlyingType(TypePair context)
+        {
+            var sourceEnumType = GetEnumerationType(context.SourceType);
+            return sourceEnumType != null && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(sourceEnumType));
+        }
+
         internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)
         {
             return type.GetRuntimeMethods().Where(m => m.IsStatic);

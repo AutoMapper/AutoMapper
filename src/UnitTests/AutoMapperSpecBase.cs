@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests
         protected abstract MapperConfiguration Configuration { get; }
         protected IConfigurationProvider ConfigProvider => Configuration;
 
-        protected IMapper Mapper => mapper ?? (mapper = Configuration.CreateMapper());
+        protected IMapper Mapper => mapper ??= Configuration.CreateMapper();
 
         protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
 

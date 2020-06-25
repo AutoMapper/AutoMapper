@@ -95,10 +95,10 @@ namespace AutoMapper
         void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression);
 
         /// <summary>
-        /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
+        /// Specify the source member(s) to map from.
         /// </summary>
-        /// <param name="sourceMemberName">Property name referencing the source member to map against</param>
-        void MapFrom(string sourceMemberName);
+        /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
+        void MapFrom(string sourceMembersPath);
 
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
@@ -124,7 +124,7 @@ namespace AutoMapper
         /// <summary>
         /// Reset UseDestinationValue.
         /// </summary>
-        void DontUseDestinationValue();
+        void DoNotUseDestinationValue();
 
         /// <summary>
         /// Use the destination value instead of mapping from the source value or creating a new instance

@@ -75,16 +75,16 @@ namespace AutoMapper
             {
                 Ignored = true;
             }
-            AllowNull = AllowNull ?? inheritedMappedProperty.AllowNull;
-            CustomMapExpression = CustomMapExpression ?? inheritedMappedProperty.CustomMapExpression;
-            CustomMapFunction = CustomMapFunction ?? inheritedMappedProperty.CustomMapFunction;
-            Condition = Condition ?? inheritedMappedProperty.Condition;
-            PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
-            NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
-            MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
-            ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
-            ValueConverterConfig = ValueConverterConfig ?? inheritedMappedProperty.ValueConverterConfig;
-            UseDestinationValue = UseDestinationValue ?? inheritedMappedProperty.UseDestinationValue;
+            AllowNull ??= inheritedMappedProperty.AllowNull;
+            CustomMapExpression ??= inheritedMappedProperty.CustomMapExpression;
+            CustomMapFunction ??= inheritedMappedProperty.CustomMapFunction;
+            Condition ??= inheritedMappedProperty.Condition;
+            PreCondition ??= inheritedMappedProperty.PreCondition;
+            NullSubstitute ??= inheritedMappedProperty.NullSubstitute;
+            MappingOrder ??= inheritedMappedProperty.MappingOrder;
+            ValueResolverConfig ??= inheritedMappedProperty.ValueResolverConfig;
+            ValueConverterConfig ??= inheritedMappedProperty.ValueConverterConfig;
+            UseDestinationValue ??= inheritedMappedProperty.UseDestinationValue;
             _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             _memberChain = _memberChain.Count == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }

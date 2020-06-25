@@ -5,7 +5,7 @@ using System.Reflection;
 namespace AutoMapper.Execution
 {
     [DebuggerDisplay("{Name}-{Type.Name}")]
-    public struct PropertyDescription : IEquatable<PropertyDescription>
+    public readonly struct PropertyDescription : IEquatable<PropertyDescription>
     {
         internal static PropertyDescription[] Empty = new PropertyDescription[0];
 

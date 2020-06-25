@@ -398,7 +398,7 @@ namespace AutoMapper.Execution
                 .Concat(_typeMap.ValueTransformers)
                 .Concat(_typeMap.Profile.ValueTransformers)
                 .Where(vt => vt.IsMatch(memberMap))
-                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
@@ -506,11 +506,9 @@ namespace AutoMapper.Execution
             {
                 valueResolverFunc = defaultValue ?? Throw(Constant(new Exception("I done blowed up")));
             }
-
             if (memberMap.NullSubstitute != null)
             {
-                var nullSubstitute = Constant(memberMap.NullSubstitute);
-                valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
+                valueResolverFunc = memberMap.NullSubstitute(valueResolverFunc);
             }
             else if (!memberMap.AllowsNullDestinationValues())
             {

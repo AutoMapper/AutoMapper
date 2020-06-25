@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AutoMapper.Execution
 {
-    public struct TypeDescription : IEquatable<TypeDescription>
+    public readonly struct TypeDescription : IEquatable<TypeDescription>
     {
         public TypeDescription(Type type) : this(type, PropertyDescription.Empty)
         {

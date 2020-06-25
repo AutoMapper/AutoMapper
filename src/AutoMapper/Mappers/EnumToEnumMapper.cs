@@ -32,12 +32,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToEnumMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public bool IsMatch(TypePair context)
-        {
-            var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
-            var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);
-            return sourceEnumType != null && destEnumType != null;
-        }
+        public bool IsMatch(TypePair context) => ElementTypeHelper.IsEnumToEnum(context);
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,

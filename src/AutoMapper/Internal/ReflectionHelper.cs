@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace AutoMapper.Internal
 {
     using Configuration;
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
         public static bool CanBeSet(MemberInfo propertyOrField)
@@ -19,7 +21,7 @@ namespace AutoMapper.Internal
                         ((PropertyInfo)propertyOrField).CanWrite;
         }
 
-        public static object GetDefaultValue(ParameterInfo parameter)
+        public static object GetDefaultValue(this ParameterInfo parameter)
         {
             if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType)
             {
@@ -28,18 +30,18 @@ namespace AutoMapper.Internal
             return parameter.DefaultValue;
         }
 
-        public static object MapMember(ResolutionContext context, MemberInfo member, object value, object destination = null)
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination = null)
         {
             var memberType = GetMemberType(member);
             var destValue = destination == null ? null : GetMemberValue(member, destination);
             return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, DefaultMemberMap.Instance);
         }
 
-        public static bool IsDynamic(object obj) => obj is IDynamicMetaObjectProvider;
+        public static bool IsDynamic(this object obj) => obj is IDynamicMetaObjectProvider;
 
-        public static bool IsDynamic(Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
+        public static bool IsDynamic(this Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
 
-        public static void SetMemberValue(MemberInfo propertyOrField, object target, object value)
+        public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {
             if (propertyOrField is PropertyInfo property)
             {
@@ -57,7 +59,7 @@ namespace AutoMapper.Internal
         private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
             => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
 
-        public static object GetMemberValue(MemberInfo propertyOrField, object target)
+        public static object GetMemberValue(this MemberInfo propertyOrField, object target)
         {
             if (propertyOrField is PropertyInfo property)
             {
@@ -70,13 +72,17 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
+        public static MemberInfo[] GetMemberPath(Type type, string fullMemberName)
         {
-            MemberInfo property = null;
-            foreach (var memberName in fullMemberName.Split('.'))
+            return GetMemberPathCore().ToArray();
+            IEnumerable<MemberInfo> GetMemberPathCore()
             {
-                var currentType = GetCurrentType(property, type);
-                yield return property = currentType.GetFieldOrProperty(memberName);
+                MemberInfo property = null;
+                foreach (var memberName in fullMemberName.Split('.'))
+                {
+                    var currentType = GetCurrentType(property, type);
+                    yield return property = currentType.GetFieldOrProperty(memberName);
+                }
             }
         }
 
@@ -138,7 +144,7 @@ namespace AutoMapper.Internal
                 "Custom configuration for members is only supported for top-level individual members on a type.");
         }
 
-        public static Type GetMemberType(MemberInfo memberInfo)
+        public static Type GetMemberType(this MemberInfo memberInfo)
         {
             switch (memberInfo)
             {
@@ -164,7 +170,7 @@ namespace AutoMapper.Internal
         /// <param name="oldType"></param>
         /// <param name="newType"></param>
         /// <returns></returns>
-        public static Type ReplaceItemType(Type targetType, Type oldType, Type newType)
+        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
         {
             if (targetType == oldType)
                 return newType;

@@ -10,7 +10,12 @@ namespace AutoMapper.UnitTests
     {
         public class Destination
         {
-            public Destination(string key1, string value1) => (Key, Value) = (key1, value1);
+            public Destination(string key1, string value1)
+            {
+                Key = key1;
+                Value = value1;
+            }
+
             public string Key { get; }
             public string Value { get; }
         }

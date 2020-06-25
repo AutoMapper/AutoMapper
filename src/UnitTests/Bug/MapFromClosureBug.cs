@@ -1,15 +1,16 @@
-﻿using FakeItEasy;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
     using System;
     using Shouldly;
 
     public class MapFromClosureBug : SpecBaseBase
     {
-        private static readonly IDateProvider _dateProvider;
+        private static readonly IDateProvider _dateProvider = new DateProvider();
 
-        static MapFromClosureBug() => _dateProvider = A.Fake<IDateProvider>();
+        class DateProvider : IDateProvider
+        {
+            public DateTime CurrentRestaurantTime(Restaurant restaurant) => DateTime.Now;
+        }
 
         public interface IDateProvider
         {
