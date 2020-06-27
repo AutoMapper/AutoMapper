@@ -92,7 +92,7 @@ namespace AutoMapper.Configuration
             return expression;
         }
 
-        internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+        public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
             public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
                 : base(destinationMember, sourceType)

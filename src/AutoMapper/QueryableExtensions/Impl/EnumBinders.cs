@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper.Internal;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using static Mappers.Internal.ElementTypeHelper;
     using static Expression;
     public abstract class EnumBinder : IExpressionBinder
     {
@@ -13,14 +13,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     }
     public class EnumToUnderlyingTypeBinder : EnumBinder
     {
-        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => IsEnumToUnderlyingType(propertyMap.Types);
+        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsEnumToUnderlyingType();
     }
     public class UnderlyingTypeToEnumBinder : EnumBinder
     {
-        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => IsUnderlyingTypeToEnum(propertyMap.Types);
+        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsUnderlyingTypeToEnum();
     }
     public class EnumToEnumBinder : EnumBinder
     {
-        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => IsEnumToEnum(propertyMap.Types);
+        public override bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsEnumToEnum();
     }
 }

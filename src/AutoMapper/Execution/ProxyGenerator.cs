@@ -1,14 +1,15 @@
+using AutoMapper.Internal;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text.RegularExpressions;
+
 namespace AutoMapper.Execution
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using System.Text.RegularExpressions;
-
     public static class ProxyGenerator
     {
         private static readonly byte[] privateKey =

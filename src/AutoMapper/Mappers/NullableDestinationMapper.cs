@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
 using AutoMapper.Execution;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {

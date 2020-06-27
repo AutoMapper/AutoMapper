@@ -6,9 +6,7 @@ using System.Reflection;
 
 namespace AutoMapper.Execution
 {
-    using Configuration;
     using Internal;
-    using Mappers.Internal;
     using static Internal.ExpressionFactory;
     using static Expression;
 

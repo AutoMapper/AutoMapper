@@ -2,11 +2,11 @@ using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Configuration;
-using static System.Linq.Expressions.Expression;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
+    using static Expression;
     public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
