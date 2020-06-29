@@ -24,7 +24,7 @@ namespace AutoMapper.Mappers
                 MapMethodInfo.MakeGenericMethod(destExpression.Type),
                 sourceExpression,
                 Condition(
-                    Equal(ToObject(destExpression), Constant(null)),
+                    Equal(destExpression.ToObject(), Constant(null)),
                     DelegateFactory.GenerateConstructorExpression(destExpression.Type),
                     destExpression),
                 contextExpression,

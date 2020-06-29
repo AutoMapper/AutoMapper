@@ -1,31 +1,26 @@
 using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
-    using static Enum;
     public class EnumToEnumMapper : IObjectMapper
     {
-        private static readonly MethodInfo MapMethodInfo = typeof(EnumToEnumMapper).GetMethod(nameof(Map));
-        public static TDestination Map<TSource, TDestination>(TSource source) where TDestination : struct
-        {
-            if (!IsDefined(typeof(TSource), source))
-            {
-                return ToDestination();
-            }
-            if (TryParse(source.ToString(), ignoreCase: true, out TDestination destination))
-            {
-                return destination;
-            }
-            return ToDestination();
-            TDestination ToDestination() => (TDestination)ToObject(typeof(TDestination), source);
-        }
         public bool IsMatch(TypePair context) => context.IsEnumToEnum();
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
-            Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            var destinationType = destExpression.Type;
+            var sourceToObject = sourceExpression.ToObject();
+            var toObject = Call(typeof(Enum), "ToObject", Type.EmptyTypes, Constant(destinationType), sourceToObject);
+            var castToObject = Convert(toObject, destinationType);
+            var isDefined = Call(typeof(Enum), "IsDefined", Type.EmptyTypes, Constant(sourceExpression.Type), sourceToObject);
+            var sourceToString = Call(sourceExpression, "ToString", Type.EmptyTypes);
+            var result = Variable(destinationType, "destinationEnumValue");
+            var ignoreCase = Constant(true);
+            var tryParse = Call(typeof(Enum), "TryParse", new[] { destinationType }, sourceToString, ignoreCase, result);
+            return Block(new[] { result }, Condition(isDefined, Condition(tryParse, result, castToObject), castToObject));
+        }
     }
 }

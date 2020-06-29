@@ -56,7 +56,7 @@ namespace AutoMapper.Mappers
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
                 sourceExpression,
                 ToType(
-                    Coalesce(ToObject(destExpression),
+                    Coalesce(destExpression.ToObject(),
                         DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
                 contextExpression,
                 Constant(profileMap));
