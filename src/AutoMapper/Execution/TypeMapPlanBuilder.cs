@@ -302,7 +302,7 @@ namespace AutoMapper.Execution
             if(_typeMap.DestinationTypeToUse.IsInterface)
             {
                 var ctor = Call(null,
-                    typeof(DelegateFactory).GetDeclaredMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
+                    typeof(DelegateFactory).GetRuntimeMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
                     Call(null,
                         typeof(ProxyGenerator).GetDeclaredMethod(nameof(ProxyGenerator.GetProxyType)),
                         Constant(_typeMap.DestinationTypeToUse)));

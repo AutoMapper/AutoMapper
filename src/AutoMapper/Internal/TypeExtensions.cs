@@ -13,8 +13,7 @@ namespace AutoMapper.Internal
 
         public static bool IsNonStringEnumerable(this Type type) => type != typeof(string) && type.IsEnumerableType();
 
-        public static bool IsSetType(this Type type)
-            => type.ImplementsGenericInterface(typeof(ISet<>));
+        public static bool IsSetType(this Type type) => type.ImplementsGenericInterface(typeof(ISet<>));
 
         private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
             type.GetTypeInheritance().Concat(type.GetInterfaces()).SelectMany(i => i.GetDeclaredMembers());
@@ -27,49 +26,32 @@ namespace AutoMapper.Internal
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
             => type.GetInheritedMember(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
-        public static bool IsNullableType(this Type type)
-            => type.IsGenericType(typeof(Nullable<>));
+        public static bool IsNullableType(this Type type) => type.IsGenericType(typeof(Nullable<>));
 
-        public static Type GetTypeOfNullable(this Type type)
-            => type.GetTypeInfo().GenericTypeArguments[0];
+        public static Type GetTypeOfNullable(this Type type) => type.GenericTypeArguments[0];
 
-        public static bool IsCollectionType(this Type type)
-            => type.ImplementsGenericInterface(typeof(ICollection<>));
+        public static bool IsCollectionType(this Type type) => type.ImplementsGenericInterface(typeof(ICollection<>));
 
-        public static bool IsEnumerableType(this Type type)
-            => typeof(IEnumerable).IsAssignableFrom(type);
+        public static bool IsEnumerableType(this Type type) => typeof(IEnumerable).IsAssignableFrom(type);
 
-        public static bool IsQueryableType(this Type type)
-            => typeof(IQueryable).IsAssignableFrom(type);
+        public static bool IsListType(this Type type) => typeof(IList).IsAssignableFrom(type);
 
-        public static bool IsListType(this Type type)
-            => typeof(IList).IsAssignableFrom(type);
+        public static bool IsDictionaryType(this Type type) => type.GetDictionaryType() != null;
 
-        public static bool IsDictionaryType(this Type type)
-            => type.ImplementsGenericInterface(typeof(IDictionary<,>));
-
-        public static bool IsReadOnlyDictionaryType(this Type type)
-            => type.ImplementsGenericInterface(typeof(IReadOnlyDictionary<,>));
+        public static bool IsReadOnlyDictionaryType(this Type type) => type.GetReadOnlyDictionaryType() != null;
 
         public static bool ImplementsGenericInterface(this Type type, Type interfaceType) => type.GetGenericInterface(interfaceType) != null;
 
-        public static bool IsGenericType(this Type type, Type genericType)
-            => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
+        public static bool IsGenericType(this Type type, Type genericType) => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
 
-        public static Type GetIEnumerableType(this Type type)
-            => type.GetGenericInterface(typeof(IEnumerable<>));
+        public static Type GetIEnumerableType(this Type type) => type.GetGenericInterface(typeof(IEnumerable<>));
 
-        public static Type GetDictionaryType(this Type type)
-            => type.GetGenericInterface(typeof(IDictionary<,>));
+        public static Type GetDictionaryType(this Type type) => type.GetGenericInterface(typeof(IDictionary<,>));
 
-        public static Type GetReadOnlyDictionaryType(this Type type)
-            => type.GetGenericInterface(typeof(IReadOnlyDictionary<,>));
+        public static Type GetReadOnlyDictionaryType(this Type type) => type.GetGenericInterface(typeof(IReadOnlyDictionary<,>));
 
         public static Type GetGenericInterface(this Type type, Type genericInterface) =>
             type.IsGenericType(genericInterface) ? type : type.GetInterfaces().FirstOrDefault(t => t.IsGenericType(genericInterface));
-
-        public static Type GetGenericElementType(this Type type)
-            => type.HasElementType ? type.GetElementType() : type.GenericTypeArguments[0];
 
         public static Type GetTypeDefinitionIfGeneric(this Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
@@ -93,23 +75,14 @@ namespace AutoMapper.Internal
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetAllMethods().SingleOrDefault(mi => mi.Name == name);
+        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetRuntimeMethods().SingleOrDefault(mi => mi.Name == name);
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters) =>
-            type.GetAllMethods().Where(mi => mi.Name == name).MatchParameters(parameters);
-
-        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) =>
-            type.GetDeclaredConstructors().MatchParameters(parameters);
+        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) => type.GetDeclaredConstructors().MatchParameters(parameters);
 
         private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
             methods.SingleOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
 
-        public static IEnumerable<MethodInfo> GetAllMethods(this Type type) => type.GetRuntimeMethods();
-
-        public static PropertyInfo GetDeclaredProperty(this Type type, string name) 
-            => type.GetTypeInfo().GetDeclaredProperty(name);
-
-        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) =>
+        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) => 
             type.GetRuntimeProperties().Where(pm => pm.HasAnInaccessibleSetter());
 
         /// <summary>

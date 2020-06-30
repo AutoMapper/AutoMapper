@@ -196,7 +196,7 @@ namespace AutoMapper
 
         private MethodInfo[] BuildPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod)
         {
-            return Type.GetAllMethods()
+            return Type.GetRuntimeMethods()
                 .Where(shouldMapMethod)
                 .Where(mi => mi.IsPublic && !mi.IsStatic && mi.DeclaringType != typeof(object))
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))

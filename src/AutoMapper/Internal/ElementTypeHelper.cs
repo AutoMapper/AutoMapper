@@ -12,8 +12,6 @@ namespace AutoMapper.Internal
         public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None) => 
             GetElementTypes(enumerableType, null, flags);
 
-        public static Type GetElementType(Type enumerableType, IEnumerable enumerable) => GetElementTypes(enumerableType, enumerable)[0];
-
         public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
             ElementTypeFlags flags = ElementTypeFlags.None)
         {

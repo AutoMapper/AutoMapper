@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
@@ -34,7 +35,7 @@ namespace AutoMapper.Mappers
 
         static LambdaExpression ConvertExpression(Type sourceType, Type destinationType)
         {
-            var convertMethod = typeof(Convert).GetDeclaredMethod("To" + destinationType.Name, new[] { sourceType });
+            var convertMethod = typeof(Convert).GetRuntimeMethod("To" + destinationType.Name, new[] { sourceType });
             var sourceParameter = Parameter(sourceType, "source");
             return Lambda(Call(convertMethod, sourceParameter), sourceParameter);
         }

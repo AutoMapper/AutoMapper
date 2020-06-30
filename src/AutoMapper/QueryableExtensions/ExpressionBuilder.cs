@@ -311,7 +311,7 @@ namespace AutoMapper.QueryableExtensions
 
                 protected override Expression GetValue(string name)
                 {
-                    var matchingMember = _parameters.GetType().GetDeclaredProperty(name);
+                    var matchingMember = _parameters.GetType().GetProperty(name);
                     return matchingMember != null ? Property(Constant(_parameters), matchingMember) : null;
                 }
             }
@@ -382,7 +382,7 @@ namespace AutoMapper.QueryableExtensions
                 {
                     foreach(var letMapInfo in letMapInfos)
                     {
-                        var letProperty = letType.GetDeclaredProperty(letMapInfo.Property.Name);
+                        var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                         var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty);
                         letPropertyMap.CustomMapExpression = Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter);
                         projection = projection.Replace(letMapInfo.Marker, MakeMemberAccess(secondParameter, letProperty));

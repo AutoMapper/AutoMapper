@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -39,12 +38,7 @@ namespace AutoMapper.Internal
 
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.GetCustomAttribute<TAttribute>() != null;
 
-        public static bool CanBeSet(MemberInfo propertyOrField)
-        {
-            return propertyOrField is FieldInfo field ? 
-                        !field.IsInitOnly : 
-                        ((PropertyInfo)propertyOrField).CanWrite;
-        }
+        public static bool CanBeSet(this MemberInfo propertyOrField) => propertyOrField is FieldInfo field ? !field.IsInitOnly : ((PropertyInfo)propertyOrField).CanWrite;
 
         public static object GetDefaultValue(this ParameterInfo parameter)
         {
@@ -61,8 +55,6 @@ namespace AutoMapper.Internal
             var destValue = destination == null ? null : GetMemberValue(member, destination);
             return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, DefaultMemberMap.Instance);
         }
-
-        public static bool IsDynamic(this object obj) => obj is IDynamicMetaObjectProvider;
 
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {
@@ -117,14 +109,6 @@ namespace AutoMapper.Internal
                 memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
             }
             return memberType;
-        }
-
-        public static MemberInfo GetFieldOrProperty(LambdaExpression expression)
-        {
-            var memberExpression = expression.Body as MemberExpression;
-            return memberExpression != null
-                ? memberExpression.Member
-                : throw new ArgumentOutOfRangeException(nameof(expression), "Expected a property/field access expression, not " + expression);
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)

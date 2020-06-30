@@ -18,9 +18,9 @@ namespace AutoMapper.Execution
 
         private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 
-        private static readonly MethodInfo delegate_Combine = typeof(Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Combine = typeof(Delegate).GetRuntimeMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
 
-        private static readonly MethodInfo delegate_Remove = typeof(Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Remove = typeof(Delegate).GetRuntimeMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
             typeof(INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
