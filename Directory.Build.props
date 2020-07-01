@@ -1,12 +1,11 @@
 <Project>
 
-    <PropertyGroup>
-        <VersionPrefix>10.0.0</VersionPrefix>
-        <Authors>Jimmy Bogard</Authors>
-        <LangVersion>latest</LangVersion>
-        <WarningsAsErrors>true</WarningsAsErrors>
-        <NoWarn>$(NoWarn);1701;1702;1591</NoWarn>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Authors>Jimmy Bogard</Authors>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1701;CS1702;CS1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Features>strict</Features>
+  </PropertyGroup>
 
 </Project>

@@ -10,13 +10,19 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>AutoMapper</PackageId>
-    <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/AutoMapper/AutoMapper</RepositoryUrl>
+
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <IncludeSymbols>true</IncludeSymbols>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
     <AdditionalApiCompatOptions>--exclude-non-browsable --exclude-compiler-generated</AdditionalApiCompatOptions>
   </PropertyGroup>
@@ -24,7 +30,11 @@
   <ItemGroup>
     <ResolvedMatchingContract Include="..\LastMajorVersionBinary\AutoMapper.dll" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <None Include="..\..\icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
@@ -35,12 +45,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.20262.5" PrivateAssets="All" />  
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(VersionPrefix)" />
+  <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">
+    <Exec Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(Version)" />
   </Target>
 
 </Project>

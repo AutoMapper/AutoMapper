@@ -62,5 +62,8 @@ dotnet_naming_style.camel_case_style.capitalization = camel_case
 [*.xml]
 indent_size = 2
 
+[*.props]
+indent_size = 2
+
 [*.csproj]
 indent_size = 2
