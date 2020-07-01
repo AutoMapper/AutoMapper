@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using AutoMapper.Configuration;
 
 namespace AutoMapper.Internal
 {
@@ -179,7 +178,7 @@ namespace AutoMapper.Internal
             return loop;
         }
 
-        public static Expression ToObject(Expression expression) => ToType(expression, typeof(object));
+        public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
 
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
 

@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Configuration;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
                 .GetDeclaredMethods()
                 .FirstOrDefault(mi => mi.IsPublic && mi.IsStatic && mi.Name == "op_Implicit" && mi.ReturnType == destinationType);
 
-            return sourceTypeMethod ?? destinationType.GetDeclaredMethod("op_Implicit", new[] { context.SourceType });
+            return sourceTypeMethod ?? destinationType.GetRuntimeMethod("op_Implicit", new[] { context.SourceType });
         }
 
 

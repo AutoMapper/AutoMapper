@@ -1,4 +1,4 @@
-﻿using AutoMapper.Configuration;
+﻿using AutoMapper.Internal;
 
 namespace AutoMapper.Features
 {

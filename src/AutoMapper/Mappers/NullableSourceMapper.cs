@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
 using AutoMapper.Execution;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
                 ExpressionBuilder.MapExpression(configurationProvider, profileMap,
                     new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
-                    Property(sourceExpression, sourceExpression.Type.GetDeclaredProperty("Value")),
+                    Property(sourceExpression, sourceExpression.Type.GetProperty("Value")),
                     contextExpression,
                     memberMap,
                     destExpression

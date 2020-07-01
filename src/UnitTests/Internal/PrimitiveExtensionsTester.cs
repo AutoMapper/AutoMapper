@@ -1,17 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using AutoMapper.Configuration.Internal;
 using Xunit;
 using Shouldly;
+using AutoMapper.Internal;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace AutoMapper.UnitTests
 {
-    using AutoMapper.Internal;
-    using Configuration;
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-
     public class PrimitiveExtensionsTester
     {
         interface Interface
@@ -29,10 +24,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Should_find_explicitly_implemented_member()
-        {
-            PrimitiveHelper.GetFieldOrProperty(typeof(DestinationClass), "Value").ShouldNotBeNull();
-        }
+        public void Should_find_explicitly_implemented_member() => typeof(DestinationClass).GetFieldOrProperty("Value").ShouldNotBeNull();
 
         [Fact]
         public void GetMembersChain()

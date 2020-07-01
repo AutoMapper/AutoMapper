@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using AutoMapper.Configuration;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -197,7 +196,7 @@ namespace AutoMapper
 
         private MethodInfo[] BuildPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod)
         {
-            return Type.GetAllMethods()
+            return Type.GetRuntimeMethods()
                 .Where(shouldMapMethod)
                 .Where(mi => mi.IsPublic && !mi.IsStatic && mi.DeclaringType != typeof(object))
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))

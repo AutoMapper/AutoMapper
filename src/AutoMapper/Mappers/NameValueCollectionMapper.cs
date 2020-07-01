@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {

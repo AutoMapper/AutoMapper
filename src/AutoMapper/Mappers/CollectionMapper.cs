@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
-using AutoMapper.Mappers.Internal;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {

@@ -1,44 +1,26 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Mappers.Internal;
-using static System.Linq.Expressions.Expression;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
+    using static Expression;
     public class EnumToEnumMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source)
-        {
-            var sourceEnumType = ElementTypeHelper.GetEnumerationType(typeof(TSource));
-            var destEnumType = ElementTypeHelper.GetEnumerationType(typeof(TDestination));
-
-            if (!Enum.IsDefined(sourceEnumType, source))
-            {
-                return (TDestination)Enum.ToObject(destEnumType, source);
-            }
-
-            if (!Enum.GetNames(destEnumType).Contains(source.ToString(), StringComparer.OrdinalIgnoreCase))
-            {
-                var underlyingSourceType = Enum.GetUnderlyingType(sourceEnumType);
-                var underlyingSourceValue = System.Convert.ChangeType(source, underlyingSourceType);
-
-                return (TDestination)Enum.ToObject(destEnumType, underlyingSourceValue);
-            }
-
-            return (TDestination)Enum.Parse(destEnumType, Enum.GetName(sourceEnumType, source), true);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(EnumToEnumMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public bool IsMatch(TypePair context) => ElementTypeHelper.IsEnumToEnum(context);
-
+        public bool IsMatch(TypePair context) => context.IsEnumToEnum();
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
-                sourceExpression);
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            var destinationType = destExpression.Type;
+            var sourceToObject = sourceExpression.ToObject();
+            var toObject = Call(typeof(Enum), "ToObject", Type.EmptyTypes, Constant(destinationType), sourceToObject);
+            var castToObject = Convert(toObject, destinationType);
+            var isDefined = Call(typeof(Enum), "IsDefined", Type.EmptyTypes, Constant(sourceExpression.Type), sourceToObject);
+            var sourceToString = Call(sourceExpression, "ToString", Type.EmptyTypes);
+            var result = Variable(destinationType, "destinationEnumValue");
+            var ignoreCase = Constant(true);
+            var tryParse = Call(typeof(Enum), "TryParse", new[] { destinationType }, sourceToString, ignoreCase, result);
+            return Block(new[] { result }, Condition(isDefined, Condition(tryParse, result, castToObject), castToObject));
+        }
     }
 }

@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AutoMapper.Configuration;
 
-namespace AutoMapper.Mappers.Internal
+namespace AutoMapper.Internal
 {
     public static class ElementTypeHelper
     {
@@ -13,8 +11,6 @@ namespace AutoMapper.Mappers.Internal
 
         public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None) => 
             GetElementTypes(enumerableType, null, flags);
-
-        public static Type GetElementType(Type enumerableType, IEnumerable enumerable) => GetElementTypes(enumerableType, enumerable)[0];
 
         public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
             ElementTypeFlags flags = ElementTypeFlags.None)
@@ -52,37 +48,7 @@ namespace AutoMapper.Mappers.Internal
             throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.",
                 nameof(enumerableType));
         }
-
-        public static Type GetEnumerationType(Type enumType)
-        {
-            return !enumType.IsEnum ? null : enumType;
-        }
-
-        public static bool IsEnumToEnum(TypePair context)
-        {
-            var sourceEnumType = GetEnumerationType(context.SourceType);
-            var destEnumType = GetEnumerationType(context.DestinationType);
-            return sourceEnumType != null && destEnumType != null;
-        }
-
-        public static bool IsUnderlyingTypeToEnum(TypePair context)
-        {
-            var destEnumType = GetEnumerationType(context.DestinationType);
-            return destEnumType != null && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(destEnumType));
-        }
-
-        public static bool IsEnumToUnderlyingType(TypePair context)
-        {
-            var sourceEnumType = GetEnumerationType(context.SourceType);
-            return sourceEnumType != null && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(sourceEnumType));
-        }
-
-        internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)
-        {
-            return type.GetRuntimeMethods().Where(m => m.IsStatic);
-        }
     }
-
     public enum ElementTypeFlags
     {
         None = 0,

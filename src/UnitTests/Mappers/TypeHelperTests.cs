@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using AutoMapper.Mappers.Internal;
+using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
