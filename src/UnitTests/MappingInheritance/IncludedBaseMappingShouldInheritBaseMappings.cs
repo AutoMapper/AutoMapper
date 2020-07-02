@@ -3,6 +3,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    using AutoMapper;
     using CustomMapping;
 
     public class IncludedMappingShouldInheritBaseMappings : SpecBase
@@ -326,5 +327,26 @@ namespace AutoMapper.UnitTests.Bug
 
             dest.BaseString.ShouldBe("12345");
         }
+    }
+
+    public class OverrideDifferentMapFrom : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+        class DestinationDerived : Destination
+        {
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom((s, d) => 1));
+            cfg.CreateMap<Source, DestinationDerived>().IncludeBase<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(s => 2));
+        });
+        [Fact]
+        public void Should_use_derived_mapfrom() => Map<DestinationDerived>(new Source()).Value.ShouldBe(2);
     }
 }
