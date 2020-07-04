@@ -130,27 +130,23 @@ namespace AutoMapper
 
         private static LambdaExpression GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
         {
-            var mapExpression = typeMap.MapExpression;
-            var typeMapSourceParameter = mapExpression.Parameters[0];
-            var typeMapDestinationParameter = mapExpression.Parameters[1];
-            var requestedSourceType = mapRequest.RequestedTypes.SourceType;
-            var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
-
-            if (typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
+            if (mapRequest.RequestedTypes == typeMap.Types)
             {
-                var requestedSourceParameter = Parameter(requestedSourceType, "source");
-                var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
-                var contextParameter = Parameter(typeof(ResolutionContext), "context");
-
-                mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                    ToType(requestedSourceParameter, typeMapSourceParameter.Type),
-                    ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
-                    contextParameter
-                    ), mapRequest.RuntimeTypes.DestinationType),
-                    requestedSourceParameter, requestedDestinationParameter, contextParameter);
+                return typeMap.MapExpression;
             }
-
-            return mapExpression;
+            var mapDestinationType = typeMap.DestinationType;
+            var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
+            var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
+            var destination = Parameter(requestedDestinationType, "typeMapDestination");
+            var checkNullValueTypeDest = 
+                !requestedDestinationType.IsValueType && mapDestinationType.IsValueType ? Coalesce(destination, New(mapDestinationType)) : (Expression)destination;
+            var context = typeMap.MapExpression.Parameters.Last();
+            return
+                Lambda(
+                    ToType(
+                        Invoke(typeMap.MapExpression, ToType(source, typeMap.SourceType), ToType(checkNullValueTypeDest, mapDestinationType), context),
+                        requestedDestinationType), 
+                source, destination, context);
         }
 
         private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse)
