@@ -37,6 +37,8 @@ namespace AutoMapper.Internal
 
         public bool ContainsKey(TKey key) => _dictionary.ContainsKey(key);
 
-        public ICollection<TKey> Keys => _dictionary.Keys;        
+        public ICollection<TKey> Keys => _dictionary.Keys;
+
+        public TValue GetOrDefault(TKey key) => TryGetValue(key, out var value) ? value : default;
     }
 }

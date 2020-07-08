@@ -77,6 +77,14 @@ namespace AutoMapper.UnitTests.Mappers
             _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBe("Bar");
         }
+        [Fact]
+        public void Should_map_non_generic()
+        {
+            var source = new StringDictionary() { { "Foo", "Foo" }, { "Bar", "Bar" } };
+            var destination = (Destination) Mapper.Map(source, null, typeof(Destination));
+            destination.Foo.ShouldBe("Foo");
+            destination.Bar.ShouldBe("Bar");
+        }
     }
 
     public class When_mapping_from_StringDictionary_with_missing_property : NonValidatingSpecBase
