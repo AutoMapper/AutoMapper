@@ -14,27 +14,23 @@ namespace AutoMapper
     using static Expression;
     using static ExpressionFactory;
     using static Execution.ExpressionBuilder;
-    using Validator = Action<ValidationContext>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
         private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetDeclaredConstructors().Single(c => c.GetParameters().Length == 3);
 
-        private readonly IEnumerable<IObjectMapper> _mappers;
+        private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps = new Dictionary<TypePair, TypeMap>();
         private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
-        private readonly MapperConfigurationExpressionValidator _expressionValidator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
-            Validators = configurationExpression.Advanced.GetValidators();
-            _validator = new ConfigurationValidator(this);
-            _expressionValidator = new MapperConfigurationExpressionValidator(configurationExpression);
+            _validator = new ConfigurationValidator(this, configurationExpression);
             ExpressionBuilder = new ExpressionBuilder(this);
 
             ServiceCtor = configurationExpression.ServiceCtor;
@@ -54,22 +50,17 @@ namespace AutoMapper
             Seal();
         }
 
-
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
             : this(Build(configure))
         {
         }
 
-
-        public void Validate(ValidationContext context)
+        private static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
         {
-            foreach (var validator in Validators)
-            {
-                validator(context);
-            }
+            var expr = new MapperConfigurationExpression();
+            configure(expr);
+            return expr;
         }
-
-        private Validator[] Validators { get; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -157,8 +148,7 @@ namespace AutoMapper
             Expression fullExpression;
             if (mapperToUse == null)
             {
-                var message = Constant("Missing type map configuration or unsupported mapping.");
-                fullExpression = Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType));
+                fullExpression = Throw("Missing type map configuration or unsupported mapping.", Constant(null, typeof(Exception)));
             }
             else
             {
@@ -169,17 +159,14 @@ namespace AutoMapper
                                                                         ToType(checkNullValueTypeDest, runtimeDestinationType), 
                                                                         context);
                 var exception = Parameter(typeof(Exception), "ex");
-                fullExpression =
-                    TryCatch(ToType(map, destinationType),
-                    MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
-                        Default(destination.Type)), null));
+                fullExpression = TryCatch(ToType(map, destinationType), Catch(exception, Throw("Error mapping types.", exception)));
             }
             var profileMap = mapRequest.MemberMap?.TypeMap?.Profile ?? Configuration;
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, context);
+            BlockExpression Throw(string message, Expression innerException) =>
+                Block(Expression.Throw(New(ExceptionConstructor, Constant(message), innerException, Constant(mapRequest.RequestedTypes))), Default(destinationType));
         }
-
         public TypeMap[] GetAllTypeMaps() => _configuredMaps.Values.ToArray();
 
         public TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
@@ -233,39 +220,11 @@ namespace AutoMapper
 
         private TypeMap GetCachedMap(TypePair types) => _resolvedMaps.GetOrDefault(types);
 
-        public void AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(new[] { typeMap });
-
-        public void AssertConfigurationIsValid(string profileName)
-        {
-            if (Profiles.All(x => x.Name != profileName))
-            {
-                throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
-            }
-
-            _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
-        }
-
-        public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => AssertConfigurationIsValid(new TProfile().ProfileName);
-
-        public void AssertConfigurationIsValid()
-        {
-            _expressionValidator.AssertConfigurationExpressionIsValid();
-
-            _validator.AssertConfigurationIsValid(_configuredMaps.Values);
-        }
-
         public IMapper CreateMapper() => new Mapper(this);
 
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
 
         public IEnumerable<IObjectMapper> GetMappers() => _mappers;
-
-        private static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
-        {
-            var expr = new MapperConfigurationExpression();
-            configure(expr);
-            return expr;
-        }
 
         private void Seal()
         {
@@ -386,7 +345,6 @@ namespace AutoMapper
                 {
                     return cachedMap;
                 }
-
                 genericMap = cachedMap.Profile.GetGenericMap(cachedMap.Types);
                 profile = cachedMap.Profile;
                 typePair = cachedMap.Types.CloseGenericTypes(typePair);
@@ -417,32 +375,33 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
+        public IObjectMapper FindMapper(TypePair types)
+        {
+            foreach (var mapper in _mappers)
+            {
+                if (mapper.IsMatch(types))
+                {
+                    return mapper;
+                }
+            }
+            return null;
+        }
 
         public void RegisterTypeMap(TypeMap typeMap) => _configuredMaps[typeMap.Types] = typeMap;
-    }
 
-    public readonly struct ValidationContext
-    {
-        public IObjectMapper ObjectMapper { get; }
-        public IMemberMap MemberMap { get; }
-        public TypeMap TypeMap { get; }
-        public TypePair Types { get; }
+        public void AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(new[] { typeMap });
 
-        public ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
+        public void AssertConfigurationIsValid(string profileName)
         {
+            if (Profiles.All(x => x.Name != profileName))
+            {
+                throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
+            }
+            _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
 
-        public ValidationContext(TypePair types, IMemberMap memberMap, TypeMap typeMap) : this(types, memberMap, null, typeMap)
-        {
-        }
+        public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => AssertConfigurationIsValid(new TProfile().ProfileName);
 
-        private ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper, TypeMap typeMap)
-        {
-            ObjectMapper = objectMapper;
-            TypeMap = typeMap;
-            Types = types;
-            MemberMap = memberMap;
-        }
+        public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(_configuredMaps.Values);
     }
 }

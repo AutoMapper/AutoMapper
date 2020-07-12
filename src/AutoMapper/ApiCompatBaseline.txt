@@ -1,1 +1,6 @@
-Total Issues: 0
+Compat issues with assembly AutoMapper:
+InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.MapperConfigurationExpressionValidator' does not exist in the implementation but it does exist in the contract.
+Total Issues: 4

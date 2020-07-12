@@ -1,15 +1,53 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
+    using Validator = Action<ValidationContext>;
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConfigurationValidator
     {
         private readonly IConfigurationProvider _config;
+        private readonly MapperConfigurationExpression _expression;
+        private readonly Validator[] _validators;
 
-        public ConfigurationValidator(IConfigurationProvider config) => _config = config;
+        public ConfigurationValidator(IConfigurationProvider config, MapperConfigurationExpression expression)
+        {
+            _validators = expression.Advanced.GetValidators();
+            _config = config;
+            _expression = expression;
+        }
+
+        private void Validate(ValidationContext context)
+        {
+            foreach (var validator in _validators)
+            {
+                validator(context);
+            }
+        }
+
+        public void AssertConfigurationExpressionIsValid(IEnumerable<TypeMap> typeMaps)
+        {
+            if (!_expression.Advanced.AllowAdditiveTypeMapCreation)
+            {
+                var duplicateTypeMapConfigs = Enumerable.Concat(new[] { _expression }, _expression.Profiles)
+                    .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => new { profile, typeMap })
+                    .GroupBy(x => x.typeMap.Types)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => new { TypePair = g.Key, ProfileNames = g.Select(tmc => tmc.profile.ProfileName).ToArray() })
+                    .Select(g => new DuplicateTypeMapConfigurationException.TypeMapConfigErrors(g.TypePair, g.ProfileNames))
+                    .ToArray();
+                if (duplicateTypeMapConfigs.Any())
+                {
+                    throw new DuplicateTypeMapConfigurationException(duplicateTypeMapConfigs);
+                }
+            }
+            AssertConfigurationIsValid(typeMaps);
+        }
 
         public void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
         {
@@ -77,7 +115,7 @@ namespace AutoMapper
                 typeMapsChecked.Add(typeMap);
 
                 var context = new ValidationContext(types, memberMap, typeMap);
-                _config.Validate(context);
+                Validate(context);
 
                 if(!typeMap.ShouldCheckForValid)
                 {
@@ -95,7 +133,7 @@ namespace AutoMapper
                     throw new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap };
                 }
                 var context = new ValidationContext(types, memberMap, mapperToUse);
-                _config.Validate(context);
+                Validate(context);
                 if(mapperToUse is IObjectMapperInfo mapperInfo)
                 {
                     var newTypePair = mapperInfo.GetAssociatedTypes(types);
@@ -124,6 +162,29 @@ namespace AutoMapper
                 var destinationType = memberMap.DestinationType;
                 DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, memberMap);
             }
+        }
+    }
+    public readonly struct ValidationContext
+    {
+        public IObjectMapper ObjectMapper { get; }
+        public IMemberMap MemberMap { get; }
+        public TypeMap TypeMap { get; }
+        public TypePair Types { get; }
+
+        public ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
+        {
+        }
+
+        public ValidationContext(TypePair types, IMemberMap memberMap, TypeMap typeMap) : this(types, memberMap, null, typeMap)
+        {
+        }
+
+        private ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper, TypeMap typeMap)
+        {
+            ObjectMapper = objectMapper;
+            TypeMap = typeMap;
+            Types = types;
+            MemberMap = memberMap;
         }
     }
 }
