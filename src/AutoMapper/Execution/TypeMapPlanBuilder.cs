@@ -467,7 +467,7 @@ namespace AutoMapper.Execution
             }
             else if (memberMap.ValueResolverConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap), destinationPropertyType);
+                valueResolverFunc = BuildResolveCall(destValueExpr, memberMap);
             }
             else if (memberMap.CustomMapFunction != null)
             {
