@@ -151,11 +151,12 @@ namespace AutoMapper
             type.MakeGenericType(SourceType.GenericTypeArguments.Concat(DestinationType.GenericTypeArguments).Take(type.GetGenericParameters().Length).ToArray()) :
             type;
 
+        public IEnumerable<LambdaExpression> GetAllIncludedMembers() => IncludedMembers.Concat(GetUntypedIncludedMembers());
 
-        public LambdaExpression[] GetUntypedIncludedMembers() =>
+        private IEnumerable<LambdaExpression> GetUntypedIncludedMembers() =>
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
-                IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name)).ToArray();
+                IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name));
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;

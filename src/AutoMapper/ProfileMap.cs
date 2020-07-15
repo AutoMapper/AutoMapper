@@ -210,17 +210,12 @@ namespace AutoMapper
             }
         }
 
-        private void ApplyMemberMaps(TypeMap mainMap, IConfigurationProvider configurationProvider)
+        private void ApplyMemberMaps(TypeMap currentMap, IConfigurationProvider configurationProvider)
         {
-            AddMemberMaps(mainMap.IncludedMembers, mainMap, configurationProvider);
-            AddMemberMaps(mainMap.GetUntypedIncludedMembers(), mainMap, configurationProvider);
-        }
-
-        private void AddMemberMaps(LambdaExpression[] includedMembers, TypeMap mainMap, IConfigurationProvider configurationProvider)
-        {
-            foreach(var includedMember in configurationProvider.GetIncludedTypeMaps(includedMembers.Select(m => new TypePair(m.Body.Type, mainMap.DestinationType))).Zip(includedMembers, (memberMap, expression) => new IncludedMember(memberMap, expression)))
+            foreach (var includedMemberExpression in currentMap.GetAllIncludedMembers())
             {
-                mainMap.AddMemberMap(includedMember);
+                var includedMap = configurationProvider.GetIncludedTypeMaps(new[] { new TypePair(includedMemberExpression.Body.Type, currentMap.DestinationType) }).Single();
+                currentMap.AddMemberMap(new IncludedMember(includedMap, includedMemberExpression));
             }
         }
 
@@ -243,17 +238,40 @@ namespace AutoMapper
             return MemberConfigurations.Any(memberConfig => memberConfig.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
         }
     }
-
     public readonly struct IncludedMember
     {
-        public IncludedMember(TypeMap typeMap, LambdaExpression memberExpression)
+        public IncludedMember(TypeMap typeMap, LambdaExpression memberExpression) : this(typeMap, memberExpression,
+            Expression.Variable(memberExpression.Body.Type, string.Join("", memberExpression.GetMembersChain().Select(m => m.Name))))
+        {
+        }
+        private IncludedMember(TypeMap typeMap, LambdaExpression memberExpression, ParameterExpression variable)
         {
             TypeMap = typeMap;
             MemberExpression = memberExpression;
-            Variable = Expression.Variable(memberExpression.Body.Type, string.Join("", memberExpression.GetMembersChain().Select(m => m.Name)));
+            Variable = variable;
+        }
+        public IncludedMember Inline(IncludedMember other)
+        {
+            if (MemberExpression == null)
+            {
+                return other;
+            }
+            return new IncludedMember(TypeMap, PropertyMap.CheckCustomSource(MemberExpression, other.MemberExpression), null);
         }
         public TypeMap TypeMap { get; }
         public LambdaExpression MemberExpression { get; }
         public ParameterExpression Variable { get; }
+        public Expression GetCustomSource(Expression source)
+        {
+            if (MemberExpression == null)
+            {
+                return source;
+            }
+            if (Variable != null)
+            {
+                return Variable;
+            }
+            return MemberExpression.ReplaceParameters(source);
+        }
     }
 }

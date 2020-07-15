@@ -523,7 +523,7 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember.Variable ?? Source;
+        private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember.GetCustomSource(Source);
 
         private Expression Chain(IMemberMap memberMap, Type destinationType) =>
                 memberMap.SourceMembers.MemberAccesses(GetCustomSource(memberMap)).NullCheck(destinationType);
