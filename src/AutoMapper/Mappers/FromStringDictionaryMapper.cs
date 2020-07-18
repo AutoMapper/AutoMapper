@@ -9,49 +9,64 @@ using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.Mappers
 {
-    using static ExpressionFactory;
-
     public class FromStringDictionaryMapper : IObjectMapper
     {
-        private static readonly MethodInfo MapMethodInfo =
-            typeof(FromStringDictionaryMapper).GetDeclaredMethod(nameof(Map));
-
+        private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetDeclaredMethod(nameof(MapDynamic)); 
         public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
-
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(null,
-                MapMethodInfo.MakeGenericMethod(destExpression.Type),
-                sourceExpression,
-                Condition(
-                    Equal(destExpression.ToObject(), Constant(null)),
-                    DelegateFactory.GenerateConstructorExpression(destExpression.Type),
-                    destExpression),
-                contextExpression,
-                Constant(profileMap));
-
-        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
+            Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
+                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), contextExpression, Constant(profileMap));
+        private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            var destTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
-
-            var memberMatches = from member in destTypeDetails.PublicWriteAccessors
-                                join key in source.Keys on member.Name equals key.Trim() into matchingKeys
-                                where matchingKeys.Any()
-                                select new { member, sourceNames = matchingKeys };
-
-            object boxedDestination = destination;
-            foreach (var match in memberMatches)
+            boxedDestination ??= DelegateFactory.CreateInstance(destinationType);
+            int matchedCount = 0;
+            foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors.Where(m => source.ContainsKey(m.Name)))
             {
-                if (match.sourceNames.Count() > 1)
-                {
-                    throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {match.member}.", null, new TypePair(typeof(StringDictionary), typeof(TDestination)));
-                }
-
-                var value = context.MapMember(match.member, source[match.sourceNames.First()], boxedDestination);
-                match.member.SetMemberValue(boxedDestination, value);
+                var value = context.MapMember(member, source[member.Name], boxedDestination);
+                member.SetMemberValue(boxedDestination, value);
+                matchedCount++;
             }
-            return (TDestination)boxedDestination;
+            if (matchedCount < source.Count)
+            {
+                MapInnerProperties();
+            }
+            return boxedDestination;
+            void MapInnerProperties()
+            {
+                MemberInfo[] innerMembers;
+                foreach (var memberPath in source.Keys.Where(k => k.Contains('.')))
+                {
+                    innerMembers = ReflectionHelper.GetMemberPath(destinationType, memberPath);
+                    var innerDestination = GetInnerDestination();
+                    if (innerDestination == null)
+                    {
+                        continue;
+                    }
+                    var lastMember = innerMembers[innerMembers.Length - 1];
+                    var value = context.MapMember(lastMember, source[memberPath], innerDestination);
+                    lastMember.SetMemberValue(innerDestination, value);
+                }
+                return;
+                object GetInnerDestination()
+                {
+                    var currentDestination = boxedDestination;
+                    foreach (var member in innerMembers.Take(innerMembers.Length - 1))
+                    {
+                        var newDestination = member.GetMemberValue(currentDestination);
+                        if (newDestination == null)
+                        {
+                            if (!member.CanBeSet())
+                            {
+                                return null;
+                            }
+                            newDestination = DelegateFactory.CreateInstance(member.GetMemberType());
+                            member.SetMemberValue(currentDestination, newDestination);
+                        }
+                        currentDestination = newDestination;
+                    }
+                    return currentDestination;
+                }
+            }
         }
     }
 }

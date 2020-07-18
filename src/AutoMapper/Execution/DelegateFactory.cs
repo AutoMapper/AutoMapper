@@ -17,7 +17,7 @@ namespace AutoMapper.Execution
     {
         private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
 
-        public static Func<object> CreateCtor(Type type) => CtorCache.GetOrAdd(type);
+        public static object CreateInstance(Type type) => CtorCache.GetOrAdd(type)();
 
         private static Func<object> GenerateConstructor(Type type)
         {
