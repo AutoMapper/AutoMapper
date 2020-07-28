@@ -128,8 +128,8 @@ namespace AutoMapper
             var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
             var destination = Parameter(requestedDestinationType, "typeMapDestination");
+            var context = Parameter(typeof(ResolutionContext), "context");
             var checkNullValueTypeDest = CheckNullValueType(destination, mapDestinationType);
-            var context = typeMap.MapExpression.Parameters.Last();
             return
                 Lambda(
                     ToType(

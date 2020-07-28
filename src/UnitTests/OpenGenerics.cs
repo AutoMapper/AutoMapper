@@ -8,6 +8,21 @@
     using System.Linq;
     using Xunit;
 
+    public class GenericMapWithUntypedMap : AutoMapperSpecBase
+    {
+        class Source<T>
+        {
+            public T Value;
+        }
+        class Destination<T>
+        {
+            public T Value;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>cfg.CreateMap(typeof(Source<>), typeof(Destination<>)));
+        [Fact]
+        public void Should_work() => new Action(() => Mapper.Map(new Source<int>(), null, typeof(Destination<>)))
+            .ShouldThrow<ArgumentException>().Message.ShouldStartWith($"Type {typeof(Destination<>).FullName}[T] is a generic type definition");
+    }
     public class GenericValueResolverTypeMismatch : AutoMapperSpecBase
     {
         class Source<T>
