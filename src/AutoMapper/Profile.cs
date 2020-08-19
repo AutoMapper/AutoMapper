@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
@@ -13,7 +12,7 @@ namespace AutoMapper
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public abstract class Profile : IProfileExpression, IProfileConfiguration
+    public abstract class Profile : MarshalByRefObject, IProfileExpression, IProfileConfiguration
     {
         private readonly List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions =
             new List<Action<PropertyMap, IMemberConfigurationExpression>>();
