@@ -3,4 +3,5 @@ InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IConf
 MembersMustExist : Member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.MapperConfigurationExpressionValidator' does not exist in the implementation but it does exist in the contract.
-Total Issues: 4
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
+Total Issues: 5

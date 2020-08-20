@@ -37,7 +37,6 @@ namespace AutoMapper.QueryableExtensions
             new List<IExpressionBinder>
             {
                 new CustomProjectionExpressionBinder(),
-                new NullableDestinationExpressionBinder(),
                 new NullableSourceExpressionBinder(),
                 new AssignableExpressionBinder(),
                 new EnumerableExpressionBinder(),
