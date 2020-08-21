@@ -99,12 +99,21 @@ namespace AutoMapper.Internal
                 throw new ArgumentOutOfRangeException(name, "Only member accesses are allowed. " + exp);
             }
         }
-
-        public static bool IsMemberPath(this LambdaExpression exp) => exp.Body.GetMemberExpressions().FirstOrDefault()?.Expression == exp.Parameters.First();
-
+        public static bool IsMemberPath(this LambdaExpression lambda)
+        {
+            Expression currentExpression = null;
+            foreach (var member in lambda.Body.GetChain())
+            {
+                currentExpression = member.Expression;
+                if (!(currentExpression is MemberExpression))
+                {
+                    return false;
+                }
+            }
+            return currentExpression == lambda.Body;
+        }
         public static LambdaExpression MemberAccessLambda(Type type, string memberPath) =>
             ReflectionHelper.GetMemberPath(type, memberPath).Lambda();
-
         public static Expression GetSetter(MemberExpression memberExpression)
         {
             var propertyOrField = memberExpression.Member;

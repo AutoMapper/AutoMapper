@@ -33,5 +33,17 @@ namespace AutoMapper.UnitTests
             var chain = e.GetMembersChain().Select(m => m.Name).ToArray();
             chain.ShouldBe(new[] { "Date", "AddDays", "Date", "AddHours", "AddMinutes", "Date", "DayOfWeek" });
         }
+        [Fact]
+        public void IsMemberPath()
+        {
+            Expression<Func<DateTime, DayOfWeek>> e = x => x.Date.AddDays(1).Date.AddHours(2).AddMinutes(2).Date.DayOfWeek;
+            e.IsMemberPath().ShouldBeFalse();
+            e = x => x.Date.Date.DayOfWeek;
+            e.IsMemberPath().ShouldBeTrue();
+            e = x => x.DayOfWeek;
+            e.IsMemberPath().ShouldBeTrue();
+            e = x => x.AddDays(1).Date.DayOfWeek;
+            e.IsMemberPath().ShouldBeFalse();
+        }
     }
 }
