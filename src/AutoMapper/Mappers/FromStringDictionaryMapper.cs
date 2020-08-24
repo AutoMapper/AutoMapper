@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
@@ -37,12 +38,17 @@ namespace AutoMapper.Mappers
             var memberMatches = from member in destTypeDetails.PublicWriteAccessors
                                 join key in source.Keys on member.Name equals key.Trim() into matchingKeys
                                 where matchingKeys.Any()
-                                select new { member, sourceName = matchingKeys.OrderBy(n => n.Length).First() };
+                                select new { member, sourceNames = matchingKeys };
 
             object boxedDestination = destination;
             foreach (var match in memberMatches)
             {
-                var value = context.MapMember(match.member, source[match.sourceName], boxedDestination);
+                if (match.sourceNames.Count() > 1)
+                {
+                    throw new InvalidOperationException($"Multiple matching keys were found in the source dictionary for {match.member.Name}.");
+                }
+
+                var value = context.MapMember(match.member, source[match.sourceNames.First()], boxedDestination);
                 match.member.SetMemberValue(boxedDestination, value);
             }
             return (TDestination)boxedDestination;

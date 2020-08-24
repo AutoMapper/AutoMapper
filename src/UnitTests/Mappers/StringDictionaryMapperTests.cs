@@ -141,24 +141,24 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_prefer_shortest : NonValidatingSpecBase
+    public class When_mapping_from_StringDictionary_multiple_matching_keys : NonValidatingSpecBase
     {
-        Destination _destination;
+        StringDictionary _source;
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
-            var source = new StringDictionary() { { "Foo", "Foo0" }, { " Foo", "Foo1" }, { "  Foo", "Foo2" }, { "Bar", "Bar" }, { "Baz", 2 } };
-            _destination = Mapper.Map<Destination>(source);
+            _source = new StringDictionary() { { "Foo", "Foo0" }, { " Foo", "Foo1" }, { "  Foo", "Foo2" }, { "Bar", "Bar" }, { "Baz", 2 } };
         }
 
         [Fact]
-        public void Should_map_with_closest_match()
+        public void Should_throw_when_mapping()
         {
-            _destination.Foo.ShouldBe("Foo0");
-            _destination.Bar.ShouldBe("Bar");
-            _destination.Baz.ShouldBe(2);
+            Should.Throw<AutoMapperMappingException>(() =>
+            {
+                Mapper.Map<Destination>(_source);
+            });
         }
     }
 
