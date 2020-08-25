@@ -45,7 +45,7 @@ namespace AutoMapper.Mappers
             {
                 if (match.sourceNames.Count() > 1)
                 {
-                    throw new InvalidOperationException($"Multiple matching keys were found in the source dictionary for {match.member.Name}.");
+                    throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {match.member}.", null, new TypePair(typeof(StringDictionary), typeof(TDestination)));
                 }
 
                 var value = context.MapMember(match.member, source[match.sourceNames.First()], boxedDestination);

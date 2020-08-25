@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Shouldly;
 using Xunit;
 using StringDictionary = System.Collections.Generic.Dictionary<string, object>;
@@ -158,7 +159,7 @@ namespace AutoMapper.UnitTests.Mappers
             Should.Throw<AutoMapperMappingException>(() =>
             {
                 Mapper.Map<Destination>(_source);
-            });
+            }).InnerException.ShouldBeOfType<AutoMapperMappingException>().Types.ShouldBe(new TypePair(typeof(IDictionary<string, object>), typeof(Destination)));
         }
     }
 
