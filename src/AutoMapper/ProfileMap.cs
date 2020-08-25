@@ -42,8 +42,12 @@ namespace AutoMapper
 
             MemberConfigurations = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>()).ToArray();
 
-            MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = profile.SourceMemberNamingConvention);
-            MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention);
+            var nameSplitMember = MemberConfigurations.First().MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
+            if (nameSplitMember != null)
+            {
+                nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention;
+                nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention;
+            }
 
             GlobalIgnores = profile.GlobalIgnores.Concat(configuration?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(configuration?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
