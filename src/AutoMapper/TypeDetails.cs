@@ -16,6 +16,7 @@ namespace AutoMapper
     public class TypeDetails
     {
         private readonly Dictionary<string, MemberInfo> _nameToMember = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<MemberInfo> _allMembers;
 
         public TypeDetails(Type type, ProfileMap config)
         {
@@ -28,13 +29,13 @@ namespace AutoMapper
             PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
-            AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
+            _allMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
             PossibleNames(config);
         }
         public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
         private void PossibleNames(ProfileMap config)
         {
-            foreach (var member in AllMembers)
+            foreach (var member in _allMembers)
             {
                 foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
                 {
@@ -77,7 +78,7 @@ namespace AutoMapper
         }
 
         private static Func<MemberInfo, bool> MembersToMap(
-            Func<PropertyInfo, bool> shouldMapProperty, 
+            Func<PropertyInfo, bool> shouldMapProperty,
             Func<FieldInfo, bool> shouldMapField)
         {
             return m =>
@@ -106,7 +107,7 @@ namespace AutoMapper
 
         public IEnumerable<MethodInfo> PublicNoArgExtensionMethods { get; }
 
-        public IEnumerable<MemberInfo> AllMembers { get; }
+        public IEnumerable<MemberInfo> AllMembers => _allMembers;
 
         private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
@@ -157,12 +158,12 @@ namespace AutoMapper
                 .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
                 .ToArray();
 
-        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap) 
+        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
-        
+
         private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
             => Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
 
