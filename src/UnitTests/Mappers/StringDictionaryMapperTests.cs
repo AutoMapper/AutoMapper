@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Shouldly;
 using Xunit;
 using StringDictionary = System.Collections.Generic.Dictionary<string, object>;
@@ -120,7 +121,49 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_to_StringDictionary: NonValidatingSpecBase
+    public class When_mapping_from_StringDictionary_with_whitespace : NonValidatingSpecBase
+    {
+        Destination _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+        protected override void Because_of()
+        {
+            var source = new StringDictionary() { { " Foo", "Foo" }, { " Bar", "Bar" }, { " Baz ", 2 } };
+            _destination = Mapper.Map<Destination>(source);
+        }
+
+        [Fact]
+        public void Should_map()
+        {
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBe("Bar");
+            _destination.Baz.ShouldBe(2);
+        }
+    }
+
+    public class When_mapping_from_StringDictionary_multiple_matching_keys : NonValidatingSpecBase
+    {
+        StringDictionary _source;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+        protected override void Because_of()
+        {
+            _source = new StringDictionary() { { "Foo", "Foo0" }, { " Foo", "Foo1" }, { "  Foo", "Foo2" }, { "Bar", "Bar" }, { "Baz", 2 } };
+        }
+
+        [Fact]
+        public void Should_throw_when_mapping()
+        {
+            Should.Throw<AutoMapperMappingException>(() =>
+            {
+                Mapper.Map<Destination>(_source);
+            }).InnerException.ShouldBeOfType<AutoMapperMappingException>().Types.ShouldBe(new TypePair(typeof(IDictionary<string, object>), typeof(Destination)));
+        }
+    }
+
+    public class When_mapping_from_StringDictionary_to_StringDictionary : NonValidatingSpecBase
     {
         StringDictionary _destination;
 
@@ -128,7 +171,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         protected override void Because_of()
         {
-            var source = new StringDictionary() { { "Foo", "Foo" }, { "Bar", "Bar" } };
+            var source = new StringDictionary() { { "Foo", "Foo" }, { "Bar", "Bar" }, { "Bar ", "Bar_" } };
             _destination = Mapper.Map<StringDictionary>(source);
         }
 
@@ -137,6 +180,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             _destination["Foo"].ShouldBe("Foo");
             _destination["Bar"].ShouldBe("Bar");
+            _destination["Bar "].ShouldBe("Bar_");
         }
     }
 
@@ -248,10 +292,9 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_throw()
         {
-            new Action(()=>Mapper.Map<SomeBase>(new StringDictionary()))
-                .ShouldThrowException<AutoMapperMappingException>(ex=>
+            new Action(() => Mapper.Map<SomeBase>(new StringDictionary()))
+                .ShouldThrowException<AutoMapperMappingException>(ex =>
                     ex.InnerException.Message.ShouldStartWith($"Cannot create an instance of abstract type {typeof(SomeBase)}."));
-
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
@@ -33,16 +34,24 @@ namespace AutoMapper.Mappers
         private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
             var destTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
-            var members = from name in source.Keys
-                          join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
-                          select member;
+
+            var memberMatches = from member in destTypeDetails.PublicWriteAccessors
+                                join key in source.Keys on member.Name equals key.Trim() into matchingKeys
+                                where matchingKeys.Any()
+                                select new { member, sourceNames = matchingKeys };
+
             object boxedDestination = destination;
-            foreach (var member in members)
+            foreach (var match in memberMatches)
             {
-                var value = context.MapMember(member, source[member.Name], boxedDestination);
-                member.SetMemberValue(boxedDestination, value);
+                if (match.sourceNames.Count() > 1)
+                {
+                    throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {match.member}.", null, new TypePair(typeof(StringDictionary), typeof(TDestination)));
+                }
+
+                var value = context.MapMember(match.member, source[match.sourceNames.First()], boxedDestination);
+                match.member.SetMemberValue(boxedDestination, value);
             }
-            return (TDestination) boxedDestination;
+            return (TDestination)boxedDestination;
         }
     }
 }
