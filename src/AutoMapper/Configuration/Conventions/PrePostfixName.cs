@@ -34,7 +34,7 @@ namespace AutoMapper.Configuration.Conventions
             {
                 return member;
             }
-            foreach (var possibleSourceName in PossibleNames(nameToSearch))
+            foreach (var possibleSourceName in TypeDetails.PossibleNames(nameToSearch, _destinationPrefixes, _destinationPostfixes))
             {
                 if ((member = typeInfo.GetMember(possibleSourceName)) != null)
                 {
@@ -42,34 +42,6 @@ namespace AutoMapper.Configuration.Conventions
                 }
             }
             return null;
-        }
-
-        private IEnumerable<string> PossibleNames(string memberName)
-        {
-            foreach (var withoutPrefix in _destinationPrefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
-            {
-                yield return withoutPrefix;
-                foreach (var s in PostFixes(withoutPrefix))
-                {
-                    yield return s;
-                }
-            }
-            foreach (var s in PostFixes(memberName))
-            {
-                yield return s;
-            }
-        }
-
-        private IEnumerable<string> PostFixes(string name)
-        {
-            foreach (var postfix in _destinationPostfixes)
-            {
-                if (!name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-                yield return name.Remove(name.Length - postfix.Length);
-            }
         }
     }
 }

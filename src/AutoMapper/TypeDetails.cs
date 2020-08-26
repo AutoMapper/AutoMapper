@@ -42,7 +42,7 @@ namespace AutoMapper
                 }
             }
         }
-        private IEnumerable<string> PossibleNames(string memberName, string[] prefixes, string[] postfixes)
+        public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
             yield return memberName;
             foreach (var prefix in prefixes)
@@ -64,7 +64,7 @@ namespace AutoMapper
             }
         }
 
-        private static IEnumerable<string> PostFixes(string[] postfixes, string name)
+        private static IEnumerable<string> PostFixes(List<string> postfixes, string name)
         {
             foreach (var postfix in postfixes)
             {

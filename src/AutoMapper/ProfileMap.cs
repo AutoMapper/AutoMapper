@@ -61,7 +61,7 @@ namespace AutoMapper
                     .SelectMany(m => m.NamedMappers)
                     .OfType<PrePostfixName>()
                     .SelectMany(m => m.Prefixes)
-                    .ToArray();
+                    .ToList();
 
             Postfixes =
                 profile.MemberConfigurations
@@ -69,7 +69,7 @@ namespace AutoMapper
                     .SelectMany(m => m.NamedMappers)
                     .OfType<PrePostfixName>()
                     .SelectMany(m => m.Postfixes)
-                    .ToArray();
+                    .ToList();
 
             _typeMapConfigs = profile.TypeMapConfigs.ToArray();
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
@@ -91,8 +91,8 @@ namespace AutoMapper
         public IEnumerable<string> GlobalIgnores { get; }
         public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
-        public string[] Prefixes { get; }
-        public string[] Postfixes { get; }
+        public List<string> Prefixes { get; }
+        public List<string> Postfixes { get; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
 
         public TypeDetails CreateTypeDetails(Type type) => _typeDetails.GetOrAdd(type);
