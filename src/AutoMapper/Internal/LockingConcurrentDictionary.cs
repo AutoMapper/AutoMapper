@@ -39,6 +39,10 @@ namespace AutoMapper.Internal
 
         public ICollection<TKey> Keys => _dictionary.Keys;
 
-        public TValue GetOrDefault(TKey key) => TryGetValue(key, out var value) ? value : default;
+        public TValue GetOrDefault(TKey key)
+        {
+            TryGetValue(key, out var value);
+            return value;
+        }
     }
 }

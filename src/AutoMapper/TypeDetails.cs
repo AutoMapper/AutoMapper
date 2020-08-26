@@ -12,8 +12,11 @@ namespace AutoMapper
     /// Contains cached reflection information for easy retrieval
     /// </summary>
     [DebuggerDisplay("{Type}")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeDetails
     {
+        private readonly Dictionary<string, MemberInfo> _nameToMember = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
+
         public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
@@ -26,36 +29,52 @@ namespace AutoMapper
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
             AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
-            DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName(mi, PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray()));
+            PossibleNames(config);
         }
-
-        private IEnumerable<string> PossibleNames(string memberName, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
+        public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
+        private void PossibleNames(ProfileMap config)
+        {
+            foreach (var member in AllMembers)
+            {
+                foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
+                {
+                    _nameToMember[memberName] = member;
+                }
+            }
+        }
+        private IEnumerable<string> PossibleNames(string memberName, string[] prefixes, string[] postfixes)
         {
             yield return memberName;
-
-            if (!postfixes.Any())
+            foreach (var prefix in prefixes)
             {
-                foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
+                if (!memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return withoutPrefix;
+                    continue;
                 }
-                yield break;
-            }
-
-            foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
-            {
+                var withoutPrefix = memberName.Substring(prefix.Length);
                 yield return withoutPrefix;
                 foreach (var s in PostFixes(postfixes, withoutPrefix))
+                {
                     yield return s;
+                }
             }
             foreach (var s in PostFixes(postfixes, memberName))
+            {
                 yield return s;
+            }
         }
 
-        private static IEnumerable<string> PostFixes(IEnumerable<string> postfixes, string name) =>
-            postfixes
-                .Where(postfix => name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
-                .Select(postfix => name.Remove(name.Length - postfix.Length));
+        private static IEnumerable<string> PostFixes(string[] postfixes, string name)
+        {
+            foreach (var postfix in postfixes)
+            {
+                if (!name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                yield return name.Remove(name.Length - postfix.Length);
+            }
+        }
 
         private static Func<MemberInfo, bool> MembersToMap(
             Func<PropertyInfo, bool> shouldMapProperty, 
@@ -74,17 +93,6 @@ namespace AutoMapper
                 }
             };
         }
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public readonly struct DestinationMemberName
-        {
-            public DestinationMemberName(MemberInfo member, string[] possibles)
-            {
-                Member = member;
-                Possibles = possibles;
-            }
-            public MemberInfo Member { get; }
-            public string[] Possibles { get; }
-        }
 
         public Type Type { get; }
 
@@ -99,8 +107,6 @@ namespace AutoMapper
         public IEnumerable<MethodInfo> PublicNoArgExtensionMethods { get; }
 
         public IEnumerable<MemberInfo> AllMembers { get; }
-
-        public IEnumerable<DestinationMemberName> DestinationMemberNames { get; set; }
 
         private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {

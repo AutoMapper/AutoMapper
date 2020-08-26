@@ -18,6 +18,7 @@ namespace AutoMapper
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
         private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
         private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
+        private readonly IMemberConfiguration[] _memberConfigurations;
 
         public ProfileMap(IProfileConfiguration profile)
             : this(profile, null)
@@ -40,9 +41,9 @@ namespace AutoMapper
 
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
 
-            MemberConfigurations = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>()).ToArray();
+            _memberConfigurations = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>()).ToArray();
 
-            var nameSplitMember = MemberConfigurations.First().MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
+            var nameSplitMember = _memberConfigurations[0].MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
             if (nameSplitMember != null)
             {
                 nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention;
@@ -88,10 +89,10 @@ namespace AutoMapper
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         public IEnumerable<string> GlobalIgnores { get; }
-        public IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
-        public IEnumerable<string> Prefixes { get; }
-        public IEnumerable<string> Postfixes { get; }
+        public string[] Prefixes { get; }
+        public string[] Postfixes { get; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
 
         public TypeDetails CreateTypeDetails(Type type) => _typeDetails.GetOrAdd(type);
@@ -174,7 +175,7 @@ namespace AutoMapper
 
             Configure(closedMap, configurationProvider);
 
-            if(closedMap.TypeConverterType != null)
+            if (closedMap.TypeConverterType != null)
             {
                 var typeParams =
                     (openMapConfig.SourceType.IsGenericTypeDefinition ? closedTypes.SourceType.GetGenericArguments() : Type.EmptyTypes)
@@ -184,7 +185,7 @@ namespace AutoMapper
                 var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
                 closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
             }
-            if(closedMap.DestinationTypeOverride?.IsGenericTypeDefinition == true)
+            if (closedMap.DestinationTypeOverride?.IsGenericTypeDefinition == true)
             {
                 var neededParameters = closedMap.DestinationTypeOverride.GetGenericParameters().Length;
                 closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GetGenericArguments().Take(neededParameters).ToArray());
@@ -239,7 +240,14 @@ namespace AutoMapper
             {
                 return false;
             }
-            return MemberConfigurations.Any(memberConfig => memberConfig.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions));
+            foreach (var memberConfiguration in _memberConfigurations)
+            {
+                if (memberConfiguration.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
     public readonly struct IncludedMember
