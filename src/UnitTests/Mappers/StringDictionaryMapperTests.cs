@@ -177,7 +177,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         protected override void Because_of()
         {
-            _source = new StringDictionary() { { "Foo", "Foo0" }, { " Foo", "Foo1" }, { "  Foo", "Foo2" }, { "Bar", "Bar" }, { "Baz", 2 } };
+            _source = new StringDictionary() { { " Foo", "Foo1" }, { "  Foo", "Foo2" }, { "Bar", "Bar" }, { "Baz", 2 } };
         }
 
         [Fact]

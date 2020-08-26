@@ -16,13 +16,27 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
             Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
                 Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), contextExpression, Constant(profileMap));
+        struct Match
+        {
+            public object Value;
+            public int Count;
+        }
         private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
             boxedDestination ??= DelegateFactory.CreateInstance(destinationType);
             int matchedCount = 0;
-            foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors.Where(m => source.ContainsKey(m.Name)))
+            foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors)
             {
-                var value = context.MapMember(member, source[member.Name], boxedDestination);
+                var match = MatchSource(member.Name);
+                if (match.Count == 0)
+                {
+                    continue;
+                }
+                if (match.Count > 1)
+                {
+                    throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {member}.", null, new TypePair(typeof(StringDictionary), destinationType));
+                }
+                var value = context.MapMember(member, match.Value, boxedDestination);
                 member.SetMemberValue(boxedDestination, value);
                 matchedCount++;
             }
@@ -31,6 +45,19 @@ namespace AutoMapper.Mappers
                 MapInnerProperties();
             }
             return boxedDestination;
+            Match MatchSource(string name)
+            {
+                if (source.TryGetValue(name, out var value))
+                {
+                    return new Match { Value = value, Count = 1 };
+                }
+                var matches = source.Where(s => s.Key.Trim() == name).Select(s=>s.Value).ToArray();
+                if (matches.Length == 1)
+                {
+                    return new Match { Value = matches[0], Count = 1 };
+                }
+                return new Match { Count = matches.Length };
+            }
             void MapInnerProperties()
             {
                 MemberInfo[] innerMembers;
