@@ -163,10 +163,8 @@ namespace AutoMapper.UnitTests
         {
             public string B { get; }
 
-
             static Destination()
             {
-
             }
 
             public Destination(string b)
