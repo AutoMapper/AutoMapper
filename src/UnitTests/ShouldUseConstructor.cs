@@ -157,7 +157,7 @@ namespace AutoMapper.UnitTests
             new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
     }
 
-    public class ShouldIgnorePresenceOfStaticConstructor : NonValidatingSpecBase
+    public class ShouldIgnoreExplicitStaticConstructor : NonValidatingSpecBase
     {
         class Destination
         {
