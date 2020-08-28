@@ -122,7 +122,7 @@ namespace AutoMapper
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition
             || DestinationTypeToUse.IsValueType
-            || DestinationTypeDetails.Constructors.FirstOrDefault(c => !c.IsStatic && c.GetParameters().All(p => p.IsOptional)) != null;
+            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
         public bool IsConstructorMapping =>
             CustomCtorExpression == null
