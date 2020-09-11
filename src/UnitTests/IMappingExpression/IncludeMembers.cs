@@ -1631,4 +1631,40 @@ namespace AutoMapper.UnitTests.IMappingExpression
             dest.Level1Field.ShouldBe(3);
         }
     }
+    public class IncludeMembersWithCascadedIncludeBase : AutoMapperSpecBase
+    {
+        class Item
+        {
+            public int Id { get; set; }
+            public MetaData MetaData { get; set; }
+            public string Signature { get; set; }
+        }
+        class MetaData
+        {
+            public string Hash { get; set; }
+        }
+        class ExpiredItem : Item
+        {
+            public DateTime Expired { get; set; }
+        }
+        class Response
+        {
+            public int Id { get; set; }
+            public string Hash { get; set; }
+        }
+        class SignedResponse : Response
+        {
+            public string Signature { get; set; }
+            public DateTime Expired { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<MetaData, Response>(MemberList.None);
+            cfg.CreateMap<Item, Response>().IncludeMembers(src => src.MetaData);
+            cfg.CreateMap<Item, SignedResponse>().IncludeBase<Item, Response>().ForMember(dest => dest.Expired, opt => opt.Ignore());
+            cfg.CreateMap<ExpiredItem, SignedResponse>().IncludeBase<Item, SignedResponse>();
+        });
+        [Fact]
+        public void Should_inherit_IncludeMembers() => Mapper.Map<SignedResponse>(new ExpiredItem { MetaData = new MetaData { Hash = "hash" } }).Hash.ShouldBe("hash");
+    }
 }

@@ -18,11 +18,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 return new ExpressionResolutionResult(mapFrom.ReplaceParameters(propertyMap.CheckCustomSource(expressionResolutionResult, letPropertyMaps)));
             }
-            if (propertyMap.CustomSource == null)
+            var customSource = propertyMap.ProjectToCustomSource;
+            if (customSource == null)
             {
                 return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(mapFrom), mapFrom);
             }
-            var newMapFrom = Lambda(mapFrom.ReplaceParameters(propertyMap.CustomSource.Body), propertyMap.CustomSource.Parameters);
+            var newMapFrom = IncludedMember.SetSource(mapFrom, customSource);
             return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(newMapFrom), newMapFrom);
             bool IsSubQuery()
             {

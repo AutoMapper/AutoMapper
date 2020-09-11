@@ -11,6 +11,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using static Expression;
     [DebuggerDisplay("{Name}")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProfileMap
@@ -220,7 +221,15 @@ namespace AutoMapper
             foreach (var includedMemberExpression in currentMap.GetAllIncludedMembers())
             {
                 var includedMap = configurationProvider.GetIncludedTypeMaps(new[] { new TypePair(includedMemberExpression.Body.Type, currentMap.DestinationType) }).Single();
-                currentMap.AddMemberMap(new IncludedMember(includedMap, includedMemberExpression));
+                var includedMember = new IncludedMember(includedMap, includedMemberExpression);
+                if (currentMap.AddMemberMap(includedMember))
+                {
+                    ApplyMemberMaps(includedMap, configurationProvider);
+                    foreach (var inheritedIncludedMember in includedMap.IncludedMembersTypeMaps)
+                    {
+                        currentMap.AddMemberMap(includedMember.SetSourceIn(inheritedIncludedMember));
+                    }
+                }
             }
         }
 
@@ -250,40 +259,36 @@ namespace AutoMapper
             return false;
         }
     }
-    public readonly struct IncludedMember
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class IncludedMember : IEquatable<IncludedMember>
     {
         public IncludedMember(TypeMap typeMap, LambdaExpression memberExpression) : this(typeMap, memberExpression,
-            Expression.Variable(memberExpression.Body.Type, string.Join("", memberExpression.GetMembersChain().Select(m => m.Name))))
+            Variable(memberExpression.Body.Type, string.Join("", memberExpression.GetMembersChain().Select(m => m.Name))), memberExpression)
         {
         }
-        private IncludedMember(TypeMap typeMap, LambdaExpression memberExpression, ParameterExpression variable)
+        private IncludedMember(TypeMap typeMap, LambdaExpression memberExpression, ParameterExpression variable, LambdaExpression projectToCustomSource)
         {
             TypeMap = typeMap;
             MemberExpression = memberExpression;
             Variable = variable;
+            ProjectToCustomSource = projectToCustomSource;
         }
-        public IncludedMember Inline(IncludedMember other)
+        public IncludedMember SetSourceIn(IncludedMember other)
         {
-            if (MemberExpression == null)
+            if (other == null)
             {
-                return other;
+                return this;
             }
-            return new IncludedMember(TypeMap, PropertyMap.CheckCustomSource(MemberExpression, other.MemberExpression), null);
+            return new IncludedMember(other.TypeMap, SetSourceIn(other.MemberExpression), other.Variable, SetSource(other.MemberExpression, MemberExpression));
         }
+        public static LambdaExpression SetSource(LambdaExpression lambda, LambdaExpression customSource) => 
+            Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters);
         public TypeMap TypeMap { get; }
         public LambdaExpression MemberExpression { get; }
         public ParameterExpression Variable { get; }
-        public Expression GetCustomSource(Expression source)
-        {
-            if (MemberExpression == null)
-            {
-                return source;
-            }
-            if (Variable != null)
-            {
-                return Variable;
-            }
-            return MemberExpression.ReplaceParameters(source);
-        }
+        public LambdaExpression ProjectToCustomSource { get; }
+        public LambdaExpression SetSourceIn(LambdaExpression lambda) => Lambda(lambda.ReplaceParameters(Variable), lambda.Parameters);
+        public bool Equals(IncludedMember other) => TypeMap == other?.TypeMap;
+        public override int GetHashCode() => TypeMap.GetHashCode();
     }
 }

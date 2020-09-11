@@ -31,7 +31,7 @@ namespace AutoMapper
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         private readonly HashSet<TypeMap> _inheritedTypeMaps = new HashSet<TypeMap>();
-        private readonly List<IncludedMember> _includedMembersTypeMaps = new List<IncludedMember>();
+        private readonly HashSet<IncludedMember> _includedMembersTypeMaps = new HashSet<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
@@ -270,10 +270,7 @@ namespace AutoMapper
 
         public void AddAfterMapAction(LambdaExpression afterMap) => _afterMapActions.Add(afterMap);
 
-        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
-        {
-            _valueTransformerConfigs.Add(valueTransformerConfiguration);
-        }
+        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) => _valueTransformerConfigs.Add(valueTransformerConfiguration);
 
         public void Seal(IConfigurationProvider configurationProvider)
         {
@@ -283,7 +280,7 @@ namespace AutoMapper
             }
             _sealed = true;
 
-            _inheritedTypeMaps.ForAll(tm => _includedMembersTypeMaps.AddRange(tm._includedMembersTypeMaps));
+            _inheritedTypeMaps.ForAll(tm => _includedMembersTypeMaps.UnionWith(tm._includedMembersTypeMaps));
             foreach (var includedMemberTypeMap in _includedMembersTypeMaps)
             {
                 includedMemberTypeMap.TypeMap.Seal(configurationProvider);
@@ -306,7 +303,7 @@ namespace AutoMapper
 
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
 
-        public void AddMemberMap(IncludedMember includedMember) => _includedMembersTypeMaps.Add(includedMember);
+        public bool AddMemberMap(IncludedMember includedMember) => _includedMembersTypeMaps.Add(includedMember);
 
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
@@ -326,7 +323,6 @@ namespace AutoMapper
         private void ApplyIncludedMemberTypeMap(IncludedMember includedMember)
         {
             var typeMap = includedMember.TypeMap;
-            var expression = includedMember.MemberExpression;
             var memberMaps = typeMap.PropertyMaps.
                 Where(m => m.CanResolveValue && GetPropertyMap(m)==null)
                 .Select(p => new PropertyMap(p, this, includedMember))
@@ -344,11 +340,9 @@ namespace AutoMapper
                     p.AddValueTransformation(transformer);
                 }
             });
-            _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(CheckCustomSource));
-            _afterMapActions.UnionWith(typeMap._afterMapActions.Select(CheckCustomSource));
+            _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(includedMember.SetSourceIn));
+            _afterMapActions.UnionWith(typeMap._afterMapActions.Select(includedMember.SetSourceIn));
             notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, includedMember) { CustomMapExpression = p.CustomMapExpression }));
-            return;
-            LambdaExpression CheckCustomSource(LambdaExpression lambda) => PropertyMap.CheckCustomSource(lambda, expression);
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)

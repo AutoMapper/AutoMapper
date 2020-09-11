@@ -29,12 +29,7 @@ namespace AutoMapper
             : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
 
         public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
-            : this(includedMemberMap, typeMap) => IncludedMember = includedMemberMap.IncludedMember.Inline(includedMember);
-
-        public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource) =>
-            (lambda == null || customSource == null) ?
-                lambda :
-                Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters.Concat(lambda.Parameters.Skip(1)));
+            : this(includedMemberMap, typeMap) => IncludedMember = includedMember.SetSourceIn(includedMemberMap.IncludedMember);
 
         public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
