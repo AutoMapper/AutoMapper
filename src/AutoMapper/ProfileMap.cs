@@ -260,6 +260,7 @@ namespace AutoMapper
         }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [DebuggerDisplay("{MemberExpression}, {TypeMap}")]
     public class IncludedMember : IEquatable<IncludedMember>
     {
         public IncludedMember(TypeMap typeMap, LambdaExpression memberExpression) : this(typeMap, memberExpression,
