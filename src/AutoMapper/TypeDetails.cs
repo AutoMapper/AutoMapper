@@ -15,8 +15,8 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeDetails
     {
-        private readonly Dictionary<string, MemberInfo> _nameToMember = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
-        private readonly List<MemberInfo> _allMembers;
+        private readonly Dictionary<string, MemberInfo> _nameToMember;
+        private readonly MemberInfo[] _allMembers;
 
         public TypeDetails(Type type, ProfileMap config)
         {
@@ -29,7 +29,8 @@ namespace AutoMapper
             PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
-            _allMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
+            _allMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToArray();
+            _nameToMember = new Dictionary<string, MemberInfo>(_allMembers.Length, StringComparer.OrdinalIgnoreCase);
             PossibleNames(config);
         }
         public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
