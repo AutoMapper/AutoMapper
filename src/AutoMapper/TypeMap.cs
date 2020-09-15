@@ -340,8 +340,8 @@ namespace AutoMapper
                     p.AddValueTransformation(transformer);
                 }
             });
-            _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(includedMember.SetSourceIn));
-            _afterMapActions.UnionWith(typeMap._afterMapActions.Select(includedMember.SetSourceIn));
+            _beforeMapActions.UnionWith(typeMap._beforeMapActions.Select(includedMember.Chain));
+            _afterMapActions.UnionWith(typeMap._afterMapActions.Select(includedMember.Chain));
             notOverridenPathMaps.ForEach(p=>AddPathMap(new PathMap(p, this, includedMember) { CustomMapExpression = p.CustomMapExpression }));
         }
 

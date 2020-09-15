@@ -29,7 +29,7 @@ namespace AutoMapper
             : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
 
         public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
-            : this(includedMemberMap, typeMap) => IncludedMember = includedMember.SetSourceIn(includedMemberMap.IncludedMember);
+            : this(includedMemberMap, typeMap) => IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
 
         public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }

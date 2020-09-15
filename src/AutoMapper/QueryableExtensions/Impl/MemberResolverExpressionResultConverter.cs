@@ -23,7 +23,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(mapFrom), mapFrom);
             }
-            var newMapFrom = IncludedMember.SetSource(mapFrom, customSource);
+            var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
             return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(newMapFrom), newMapFrom);
             bool IsSubQuery()
             {

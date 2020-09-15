@@ -227,7 +227,7 @@ namespace AutoMapper
                     ApplyMemberMaps(includedMap, configurationProvider);
                     foreach (var inheritedIncludedMember in includedMap.IncludedMembersTypeMaps)
                     {
-                        currentMap.AddMemberMap(includedMember.SetSourceIn(inheritedIncludedMember));
+                        currentMap.AddMemberMap(includedMember.Chain(inheritedIncludedMember));
                     }
                 }
             }
@@ -274,21 +274,21 @@ namespace AutoMapper
             Variable = variable;
             ProjectToCustomSource = projectToCustomSource;
         }
-        public IncludedMember SetSourceIn(IncludedMember other)
+        public IncludedMember Chain(IncludedMember other)
         {
             if (other == null)
             {
                 return this;
             }
-            return new IncludedMember(other.TypeMap, SetSourceIn(other.MemberExpression), other.Variable, SetSource(other.MemberExpression, MemberExpression));
+            return new IncludedMember(other.TypeMap, Chain(other.MemberExpression), other.Variable, Chain(MemberExpression, other.MemberExpression));
         }
-        public static LambdaExpression SetSource(LambdaExpression lambda, LambdaExpression customSource) => 
+        public static LambdaExpression Chain(LambdaExpression customSource, LambdaExpression lambda) => 
             Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters);
         public TypeMap TypeMap { get; }
         public LambdaExpression MemberExpression { get; }
         public ParameterExpression Variable { get; }
         public LambdaExpression ProjectToCustomSource { get; }
-        public LambdaExpression SetSourceIn(LambdaExpression lambda) => Lambda(lambda.ReplaceParameters(Variable), lambda.Parameters);
+        public LambdaExpression Chain(LambdaExpression lambda) => Lambda(lambda.ReplaceParameters(Variable), lambda.Parameters);
         public bool Equals(IncludedMember other) => TypeMap == other?.TypeMap;
         public override int GetHashCode() => TypeMap.GetHashCode();
     }

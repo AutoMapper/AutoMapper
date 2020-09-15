@@ -13,7 +13,7 @@ namespace AutoMapper
     {
         public PathMap(PathMap pathMap, TypeMap typeMap, IncludedMember includedMember) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
         {
-            IncludedMember = includedMember.SetSourceIn(pathMap.IncludedMember);
+            IncludedMember = includedMember.Chain(pathMap.IncludedMember);
             CustomMapExpression = pathMap.CustomMapExpression;
             Condition = pathMap.Condition;
             Ignored = pathMap.Ignored;
