@@ -139,8 +139,19 @@ namespace AutoMapper.QueryableExtensions
             {
                 var bindings = new List<MemberBinding>();
                 foreach (var propertyMap in typeMap.PropertyMaps
-                                                   .Where(pm => (!pm.ExplicitExpansion || request.MembersToExpand.Contains(pm.DestinationMember)) &&
-                                                                pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
+                                                   .Where
+                                                   (
+                                                        pm =>
+                                                        (
+                                                            !pm.ExplicitExpansion
+                                                            || request.MembersToExpand.Any
+                                                                (
+                                                                    member => member.Equals(pm.DestinationMember)
+                                                                    && member.ReflectedType == typeMap.DestinationType
+                                                                )
+                                                        )
+                                                        && pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember)
+                                                   )
                                                    .OrderBy(pm => pm.DestinationName))
                 {
                     var propertyExpression = new PropertyExpression(propertyMap);

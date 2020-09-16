@@ -24,13 +24,13 @@ namespace AutoMapper.QueryableExtensions
         }
 
         public IQueryable<TResult> To<TResult>(ParameterBag parameters, string[] membersToExpand) =>
-            ToCore<TResult>(parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMemberPath(typeof(TResult), memberName)));
+            ToCore<TResult>(parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMapMemberPath(typeof(TResult), memberName)));
 
         public IQueryable<TResult> To<TResult>(object parameters, Expression<Func<TResult, object>>[] membersToExpand) =>
-            ToCore<TResult>(parameters, membersToExpand.Select(MemberVisitor.GetMemberPath));
+            ToCore<TResult>(parameters, membersToExpand.Select(MapMemberVisitor.GetMemberPath));
 
         public IQueryable To(Type destinationType, object parameters, string[] membersToExpand) =>
-            ToCore(destinationType, parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMemberPath(destinationType, memberName)));
+            ToCore(destinationType, parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMapMemberPath(destinationType, memberName)));
 
         private IQueryable<TResult> ToCore<TResult>(object parameters, MemberPaths memberPathsToExpand) =>
             (IQueryable<TResult>)ToCore(typeof(TResult), parameters, memberPathsToExpand);
