@@ -28,13 +28,8 @@ namespace AutoMapper
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
             : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
 
-        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember) 
-            : this(includedMemberMap, typeMap) => IncludedMember = includedMember;
-
-        public static LambdaExpression CheckCustomSource(LambdaExpression lambda, LambdaExpression customSource) =>
-            (lambda == null || customSource == null) ?
-                lambda :
-                Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters.Concat(lambda.Parameters.Skip(1)));
+        public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
+            : this(includedMemberMap, typeMap) => IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
 
         public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
@@ -43,7 +38,7 @@ namespace AutoMapper
         public override Type DestinationType => DestinationMember.GetMemberType();
 
         public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
-        public override IncludedMember IncludedMember { get; set; }
+        public override IncludedMember IncludedMember { get; }
         public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }

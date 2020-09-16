@@ -9,7 +9,7 @@ var executionPlan = configuration.BuildExecutionPlan(typeof(Foo), typeof(Bar));
 
 Be sure to remove all such code before release.
 
-For ProjectTo, you need to inspect IQueryable.Expression.
+For ProjectTo, you need to inspect `IQueryable.Expression`.
 
 ```c#
 var expression = context.Entities.ProjectTo<Dto>().Expression;

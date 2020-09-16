@@ -42,6 +42,8 @@ namespace AutoMapper.QueryableExtensions
     {
         static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(Fallback);
 
+        public static Expression NullCheck(Expression expression) => new NullsafeQueryRewriter().Visit(expression);
+
         /// <inheritdoc />
         protected override Expression VisitMember(MemberExpression node)
         {

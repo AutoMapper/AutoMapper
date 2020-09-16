@@ -13,7 +13,7 @@ namespace AutoMapper
     {
         public PathMap(PathMap pathMap, TypeMap typeMap, IncludedMember includedMember) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
         {
-            IncludedMember = includedMember;
+            IncludedMember = includedMember.Chain(pathMap.IncludedMember);
             CustomMapExpression = pathMap.CustomMapExpression;
             Condition = pathMap.Condition;
             Ignored = pathMap.Ignored;
@@ -29,7 +29,7 @@ namespace AutoMapper
         public override TypeMap TypeMap { get; }
 
         public override Type SourceType => CustomMapExpression.ReturnType;
-        public override IncludedMember IncludedMember { get; set; }
+        public override IncludedMember IncludedMember { get; }
         public LambdaExpression DestinationExpression { get; }
         public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }

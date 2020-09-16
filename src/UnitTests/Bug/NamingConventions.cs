@@ -1,11 +1,37 @@
+using AutoMapper.Configuration.Conventions;
 using Shouldly;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
     namespace NamingConventions
     {
+        public class RemoveNameSplitMapper : NonValidatingSpecBase
+        {
+            class Source
+            {
+                public InnerSource InnerSource { get; set; }
+            }
+            class InnerSource
+            {
+                public int Value { get; set; }
+            }
+            class Destination
+            {
+                public int InnerSourceValue { get; set; }
+            }
+            protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+            {
+                var mappers = ((Profile)c).DefaultMemberConfig.MemberMappers;
+                mappers.Remove(mappers.OfType<NameSplitMember>().Single());
+                c.CreateMap<Source, Destination>();
+            });
+            [Fact]
+            public void Should_not_validate() => Should.Throw<AutoMapperConfigurationException>(() => Configuration.AssertConfigurationIsValid())
+                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe(nameof(Destination.InnerSourceValue));
+        }
         public class ExactMatchNamingConvention : NonValidatingSpecBase
         {
             class Source

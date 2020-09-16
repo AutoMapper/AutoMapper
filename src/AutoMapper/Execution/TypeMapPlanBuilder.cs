@@ -301,13 +301,8 @@ namespace AutoMapper.Execution
             }
             if(_typeMap.DestinationTypeToUse.IsInterface)
             {
-                var ctor = Call(null,
-                    typeof(DelegateFactory).GetRuntimeMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
-                    Call(null,
-                        typeof(ProxyGenerator).GetDeclaredMethod(nameof(ProxyGenerator.GetProxyType)),
-                        Constant(_typeMap.DestinationTypeToUse)));
-                // We're invoking a delegate here to make it have the right accessibility
-                return Invoke(ctor);
+                var proxyType = Call(typeof(ProxyGenerator), nameof(ProxyGenerator.GetProxyType), null, Constant(_typeMap.DestinationTypeToUse));
+                return Call(typeof(DelegateFactory), nameof(DelegateFactory.CreateInstance), null, proxyType);
             }
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
@@ -467,7 +462,7 @@ namespace AutoMapper.Execution
             }
             else if (memberMap.ValueResolverConfig != null)
             {
-                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, memberMap), destinationPropertyType);
+                valueResolverFunc = BuildResolveCall(destValueExpr, memberMap);
             }
             else if (memberMap.CustomMapFunction != null)
             {
@@ -523,7 +518,7 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember.Variable ?? Source;
+        private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
 
         private Expression Chain(IMemberMap memberMap, Type destinationType) =>
                 memberMap.SourceMembers.MemberAccesses(GetCustomSource(memberMap)).NullCheck(destinationType);

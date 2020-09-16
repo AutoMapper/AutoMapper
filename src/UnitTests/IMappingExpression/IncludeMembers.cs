@@ -1557,4 +1557,114 @@ namespace AutoMapper.UnitTests.IMappingExpression
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
         });
     }
+    public class CascadedIncludeMembers : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Id;
+            public Level1 FieldLevel1;
+        }
+        public class Level1
+        {
+            public Level2 FieldLevel2;
+            public long Level1Field;
+        }
+        public class Level2
+        {
+            public long TheField;
+        }
+        public class Destination
+        {
+            public int Id;
+            public long TheField;
+            public long Level1Field;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
+            cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
+            cfg.CreateMap<Level2, Destination>(MemberList.None);
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var dest = Map<Destination>(new Source { Id = 1, FieldLevel1 = new Level1 { Level1Field = 3, FieldLevel2 = new Level2 { TheField = 2 } } });
+            dest.Id.ShouldBe(1);
+            dest.TheField.ShouldBe(2);
+            dest.Level1Field.ShouldBe(3);
+        }
+    }
+    public class CascadedIncludeMembersForPath : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Id;
+            public Level1 FieldLevel1;
+        }
+        public class Level1
+        {
+            public Level2 FieldLevel2;
+            public long Level1Field;
+        }
+        public class Level2
+        {
+            public long TheField;
+        }
+        public class Destination
+        {
+            public int Id;
+            public long TheField;
+            public long Level1Field;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
+            cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
+            cfg.CreateMap<Level2, Destination>(MemberList.None).ForPath(d => d.TheField, o => o.MapFrom(s => s.TheField));
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var dest = Map<Destination>(new Source { Id = 1, FieldLevel1 = new Level1 { Level1Field = 3, FieldLevel2 = new Level2 { TheField = 2 } } });
+            dest.Id.ShouldBe(1);
+            dest.TheField.ShouldBe(2);
+            dest.Level1Field.ShouldBe(3);
+        }
+    }
+    public class IncludeMembersWithCascadedIncludeBase : AutoMapperSpecBase
+    {
+        class Item
+        {
+            public int Id { get; set; }
+            public MetaData MetaData { get; set; }
+            public string Signature { get; set; }
+        }
+        class MetaData
+        {
+            public string Hash { get; set; }
+        }
+        class ExpiredItem : Item
+        {
+            public DateTime Expired { get; set; }
+        }
+        class Response
+        {
+            public int Id { get; set; }
+            public string Hash { get; set; }
+        }
+        class SignedResponse : Response
+        {
+            public string Signature { get; set; }
+            public DateTime Expired { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<MetaData, Response>(MemberList.None);
+            cfg.CreateMap<Item, Response>().IncludeMembers(src => src.MetaData);
+            cfg.CreateMap<Item, SignedResponse>().IncludeBase<Item, Response>().ForMember(dest => dest.Expired, opt => opt.Ignore());
+            cfg.CreateMap<ExpiredItem, SignedResponse>().IncludeBase<Item, SignedResponse>();
+        });
+        [Fact]
+        public void Should_inherit_IncludeMembers() => Mapper.Map<SignedResponse>(new ExpiredItem { MetaData = new MetaData { Hash = "hash" } }).Hash.ShouldBe("hash");
+    }
 }

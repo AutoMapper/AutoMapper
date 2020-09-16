@@ -225,7 +225,6 @@ namespace AutoMapper.IntegrationTests
                 sqlSelect.ShouldContain("JOIN");
                 sqlSelect.ShouldContain(nameof(ctx.SourceInners));
                 sqlSelect.ShouldContain("JOIN"); // ???
-                sqlSelect.ShouldContain(nameof(ctx.SourceDeepInners)); // ???
                 sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Name));   dto.Name.ShouldBeNull();
                 sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc));   dto.Desc.ShouldBeNull();
             }

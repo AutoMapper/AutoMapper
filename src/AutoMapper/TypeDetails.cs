@@ -12,8 +12,12 @@ namespace AutoMapper
     /// Contains cached reflection information for easy retrieval
     /// </summary>
     [DebuggerDisplay("{Type}")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeDetails
     {
+        private readonly Dictionary<string, MemberInfo> _nameToMember;
+        private readonly MemberInfo[] _allMembers;
+
         public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
@@ -25,40 +29,57 @@ namespace AutoMapper
             PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
-            AllMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToList();
-            DestinationMemberNames = AllMembers.Select(mi => new DestinationMemberName(mi, PossibleNames(mi.Name, config.Prefixes, config.Postfixes).ToArray()));
+            _allMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToArray();
+            _nameToMember = new Dictionary<string, MemberInfo>(_allMembers.Length, StringComparer.OrdinalIgnoreCase);
+            PossibleNames(config);
         }
-
-        private IEnumerable<string> PossibleNames(string memberName, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
+        public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
+        private void PossibleNames(ProfileMap config)
+        {
+            foreach (var member in _allMembers)
+            {
+                foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
+                {
+                    _nameToMember[memberName] = member;
+                }
+            }
+        }
+        public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
             yield return memberName;
-
-            if (!postfixes.Any())
+            foreach (var prefix in prefixes)
             {
-                foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
+                if (!memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return withoutPrefix;
+                    continue;
                 }
-                yield break;
-            }
-
-            foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
-            {
+                var withoutPrefix = memberName.Substring(prefix.Length);
                 yield return withoutPrefix;
                 foreach (var s in PostFixes(postfixes, withoutPrefix))
+                {
                     yield return s;
+                }
             }
             foreach (var s in PostFixes(postfixes, memberName))
+            {
                 yield return s;
+            }
         }
 
-        private static IEnumerable<string> PostFixes(IEnumerable<string> postfixes, string name) =>
-            postfixes
-                .Where(postfix => name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
-                .Select(postfix => name.Remove(name.Length - postfix.Length));
+        private static IEnumerable<string> PostFixes(List<string> postfixes, string name)
+        {
+            foreach (var postfix in postfixes)
+            {
+                if (!name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                yield return name.Remove(name.Length - postfix.Length);
+            }
+        }
 
         private static Func<MemberInfo, bool> MembersToMap(
-            Func<PropertyInfo, bool> shouldMapProperty, 
+            Func<PropertyInfo, bool> shouldMapProperty,
             Func<FieldInfo, bool> shouldMapField)
         {
             return m =>
@@ -74,17 +95,6 @@ namespace AutoMapper
                 }
             };
         }
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public readonly struct DestinationMemberName
-        {
-            public DestinationMemberName(MemberInfo member, string[] possibles)
-            {
-                Member = member;
-                Possibles = possibles;
-            }
-            public MemberInfo Member { get; }
-            public string[] Possibles { get; }
-        }
 
         public Type Type { get; }
 
@@ -98,9 +108,7 @@ namespace AutoMapper
 
         public IEnumerable<MethodInfo> PublicNoArgExtensionMethods { get; }
 
-        public IEnumerable<MemberInfo> AllMembers { get; }
-
-        public IEnumerable<DestinationMemberName> DestinationMemberNames { get; set; }
+        public IEnumerable<MemberInfo> AllMembers => _allMembers;
 
         private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
@@ -151,12 +159,12 @@ namespace AutoMapper
                 .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
                 .ToArray();
 
-        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap) 
+        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
-        
+
         private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
             => Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
 

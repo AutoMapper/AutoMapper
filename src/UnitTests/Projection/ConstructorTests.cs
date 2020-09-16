@@ -1,11 +1,47 @@
-﻿namespace AutoMapper.UnitTests.Projection
-{
-    using System.Linq;
-    using AutoMapper;
-    using AutoMapper.QueryableExtensions;
-    using Shouldly;
-    using Xunit;
+﻿using System.Collections.Generic;
+using System.Linq;
+using AutoMapper.QueryableExtensions;
+using Shouldly;
+using Xunit;
 
+namespace AutoMapper.UnitTests.Projection
+{
+    public class ConstructorsWithCollections : AutoMapperSpecBase
+    {
+        class Addresses
+        {
+            public int Id { get; set; }
+            public string Address { get; set; }
+            public ICollection<Users> Users { get; set; }
+        }
+        class Users
+        {
+            public int Id { get; set; }
+            public Addresses FkAddress { get; set; }
+        }
+        class AddressDto
+        {
+            public int Id { get; }
+            public string Address { get; }
+            public AddressDto(int id, string address)
+            {
+                Id = id;
+                Address = address;
+            }
+        }
+        class UserDto
+        {
+            public int Id { get; set; }
+            public AddressDto AddressDto { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        {
+            cfg.CreateMap<Users, UserDto>().ForMember(d => d.AddressDto, e => e.MapFrom(s => s.FkAddress));
+            cfg.CreateMap<Addresses, AddressDto>().ConstructUsing(a => new AddressDto(a.Id, a.Address));
+        });
+        [Fact]
+        public void Should_work() => ProjectTo<UserDto>(new[] { new Users { FkAddress = new Addresses { Address = "address" }  } }.AsQueryable()).First().AddressDto.Address.ShouldBe("address");
+    }
     public class ConstructorTests : AutoMapperSpecBase
     {
         private Dest[] _dest;

@@ -10,13 +10,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public static Expression CheckCustomSource(this IMemberMap memberMap, ExpressionResolutionResult expressionResolutionResult, LetPropertyMaps letPropertyMaps)
         {
-            if (memberMap.CustomSource == null)
+            var customSource = memberMap.ProjectToCustomSource;
+            if (customSource == null)
             {
                 return expressionResolutionResult.ResolutionExpression;
             }
-            return memberMap.CustomSource.IsMemberPath() ?
-                memberMap.CustomSource.ReplaceParameters(expressionResolutionResult.ResolutionExpression) :
-                letPropertyMaps.GetSubQueryMarker(memberMap.CustomSource);
+            return customSource.IsMemberPath() ?
+                customSource.ReplaceParameters(expressionResolutionResult.ResolutionExpression) :
+                letPropertyMaps.GetSubQueryMarker(customSource);
         }
 
         public static PropertyMap GetPropertyMap(this IConfigurationProvider config, MemberInfo sourceMemberInfo, Type destinationMemberType)

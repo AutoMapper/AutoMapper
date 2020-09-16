@@ -955,4 +955,61 @@ namespace AutoMapper.IntegrationTests
             }
         }
     }
+    public class CascadedIncludeMembers : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Id{ get; set; }
+            public Level1 FieldLevel1{ get; set; }
+        }
+        public class Level1
+        {
+            public int Id{ get; set; }
+            public Level2 FieldLevel2{ get; set; }
+        }
+        public class Level2
+        {
+            public int Id{ get; set; }
+            public long TheField{ get; set; }
+        }
+        public class Destination
+        {
+            public int Id{ get; set; }
+            public long TheField{ get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
+            cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
+            cfg.CreateMap<Level2, Destination>(MemberList.None);
+        });
+        class Context : DbContext
+        {
+            public Context()
+            {
+                Database.SetInitializer(new DatabaseInitializer());
+            }
+            public DbSet<Source> Sources { get; set; }
+        }
+        class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+        {
+            protected override void Seed(Context context)
+            {
+                var source = new Source { Id = 1, FieldLevel1 = new Level1 { FieldLevel2 = new Level2 { TheField = 2 } } };
+                context.Sources.Add(source);
+                base.Seed(context);
+            }
+        }
+        [Fact]
+        public void Should_flatten()
+        {
+            using (var context = new Context())
+            {
+                var projectTo = ProjectTo<Destination>(context.Sources);
+                var result = projectTo.Single();
+                result.Id.ShouldBe(1);
+                result.TheField.ShouldBe(2);
+            }
+        }
+    }
 }
