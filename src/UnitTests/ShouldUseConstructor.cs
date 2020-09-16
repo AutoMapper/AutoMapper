@@ -131,7 +131,6 @@ namespace AutoMapper.UnitTests
         }
     }
 
-
     public class ShouldUseConstructorDefault : AutoMapperSpecBase
     {
         class Destination
@@ -156,5 +155,66 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration { get; } =
             new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
+    }
+
+    public class ShouldIgnoreExplicitStaticConstructor : NonValidatingSpecBase
+    {
+        class Destination
+        {
+            public string B { get; }
+
+            static Destination()
+            {
+            }
+
+            public Destination(string b)
+            {
+                B = b;
+            }
+        }
+
+        class Source
+        {
+            public string A { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = 
+            new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
+
+        [Fact]
+        public void Should_ignore_static_constructor()
+        {
+            Should.Throw<AutoMapperConfigurationException>(() =>
+                Configuration.AssertConfigurationIsValid());
+        }
+    }
+
+    public class ShouldIgnoreImplicitStaticConstructor : NonValidatingSpecBase
+    {
+        class Destination
+        {
+            public static string C { get; } = "C";
+            public string B { get; }
+
+            public Destination(string b)
+            {
+                B = b;
+            }
+        }
+
+        class Source
+        {
+            public string A { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } =
+            new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
+
+        [Fact]
+        public void Should_ignore_implicit_static_constructor()
+        {
+            Should.Throw<AutoMapperConfigurationException>(() =>
+                Configuration.AssertConfigurationIsValid());
+        }
     }
 }
