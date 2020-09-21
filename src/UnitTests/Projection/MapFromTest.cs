@@ -5,6 +5,7 @@ using System.Reflection;
 using Shouldly;
 using Xunit;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.Projection.MapFromTest
 {
@@ -31,8 +32,8 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
                     .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(null, typeof(UserDto), new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), null, new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(null, typeof(UserDto), new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), null, new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
             typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
         }
 

@@ -24,20 +24,20 @@ namespace AutoMapper.QueryableExtensions
         }
 
         public IQueryable<TResult> To<TResult>(ParameterBag parameters, string[] membersToExpand) =>
-            ToCore<TResult>(parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMapMemberPath(typeof(TResult), memberName)));
+            ToCore<TResult>(parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMemberPath(typeof(TResult), memberName)));
 
         public IQueryable<TResult> To<TResult>(object parameters, Expression<Func<TResult, object>>[] membersToExpand) =>
-            ToCore<TResult>(parameters, membersToExpand.Select(MapMemberVisitor.GetMemberPath));
+            ToCore<TResult>(parameters, membersToExpand.Select(MemberVisitor.GetMemberPath));
 
         public IQueryable To(Type destinationType, object parameters, string[] membersToExpand) =>
-            ToCore(destinationType, parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMapMemberPath(destinationType, memberName)));
+            ToCore(destinationType, parameters, membersToExpand.Select(memberName => ReflectionHelper.GetMemberPath(destinationType, memberName)));
 
         private IQueryable<TResult> ToCore<TResult>(object parameters, MemberPaths memberPathsToExpand) =>
             (IQueryable<TResult>)ToCore(typeof(TResult), parameters, memberPathsToExpand);
 
         private IQueryable ToCore(Type destinationType, object parameters, MemberPaths memberPathsToExpand)
         {
-            var members = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
+            var members = memberPathsToExpand.Select(m=>new MemberPath(m)).ToArray();
             return _builder.GetMapExpression(_source.ElementType, destinationType, parameters, members).Aggregate(_source, Select);
         }
 

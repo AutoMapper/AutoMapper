@@ -101,21 +101,6 @@ namespace AutoMapper.Internal
             }
         }
 
-        public static MapMemberInfo[] GetMapMemberPath(Type type, string fullMemberName)
-        {
-            return GetMemberPathCore().ToArray();
-            IEnumerable<MapMemberInfo> GetMemberPathCore()
-            {
-                MemberInfo property = null;
-                foreach (var memberName in fullMemberName.Split('.'))
-                {
-                    var currentType = GetCurrentType(property, type);
-                    property = currentType.GetFieldOrProperty(memberName);
-                    yield return new MapMemberInfo(property, currentType);
-                }
-            }
-        }
-
         private static Type GetCurrentType(MemberInfo member, Type type)
         {
             var memberType = member?.GetMemberType() ?? type;

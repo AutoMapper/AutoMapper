@@ -50,5 +50,21 @@ namespace AutoMapper.Internal
         public static bool operator==(MemberPath left, MemberPath right) => left.Equals(right);
 
         public static bool operator!=(MemberPath left, MemberPath right) => !left.Equals(right);
+
+        public bool StartsWith(MemberPath path)
+        {
+            if (path.Length > Length)
+            {
+                return false;
+            }
+            for (int index = 0; index < path.Length; index++)
+            {
+                if (_members[index] != path._members[index])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

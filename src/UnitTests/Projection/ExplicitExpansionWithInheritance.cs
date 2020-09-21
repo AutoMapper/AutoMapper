@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Projection
 {
-    public class ExplicitExpansionWithIncludeBase : AutoMapperSpecBase
+    public class ExplicitExpansionWithInheritance : AutoMapperSpecBase
     {
         abstract class EntityBase
         {
@@ -23,6 +23,7 @@ namespace AutoMapper.UnitTests.Projection
         class Script : EntityBase
         {
             public Computer Computer { get; set; }
+            public Computer OtherComputer { get; set; }
         }
 
         class EntityBaseModel
@@ -37,6 +38,7 @@ namespace AutoMapper.UnitTests.Projection
         class ScriptModel : EntityBaseModel
         {
             public ComputerModel Computer { get; set; }
+            public ComputerModel OtherComputer { get; set; }
         }
 
         private Script _source;
@@ -45,15 +47,12 @@ namespace AutoMapper.UnitTests.Projection
         {
             cfg.CreateMap<User, UserModel>();
             cfg.CreateMap<EntityBase, EntityBaseModel>()
-                .MaxDepth(1)
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());
             cfg.CreateMap<Computer, ComputerModel>()
-                .MaxDepth(1)
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());
             cfg.CreateMap<Script, ScriptModel>()
-                .MaxDepth(1)
                 .ForMember(d => d.Computer, o => o.ExplicitExpansion())
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());
@@ -66,6 +65,11 @@ namespace AutoMapper.UnitTests.Projection
                 CreatedBy = new User(),
                 ModifiedBy = new User(),
                 Computer = new Computer()
+                {
+                    CreatedBy = new User(),
+                    ModifiedBy = new User(),
+                },
+                OtherComputer = new Computer()
                 {
                     CreatedBy = new User(),
                     ModifiedBy = new User(),
@@ -94,6 +98,7 @@ namespace AutoMapper.UnitTests.Projection
 
             // assert
             Assert.NotNull(scriptModel.Computer.CreatedBy);
+            Assert.Null(scriptModel.OtherComputer.CreatedBy);
             Assert.Null(scriptModel.CreatedBy);
         }
 

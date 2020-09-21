@@ -3,5 +3,10 @@ InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IConf
 MembersMustExist : Member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.MapperConfigurationExpressionValidator' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.ExpressionRequest..ctor(System.Type, System.Type, System.Reflection.MemberInfo[], AutoMapper.QueryableExtensions.ExpressionRequest)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Reflection.MemberInfo[] AutoMapper.QueryableExtensions.ExpressionRequest.MembersToExpand.get()' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Linq.Expressions.LambdaExpression[] AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Object, AutoMapper.Internal.MemberPath[])' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Linq.Expressions.LambdaExpression[] AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Object, System.Reflection.MemberInfo[])' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public System.Linq.Expressions.LambdaExpression[] AutoMapper.QueryableExtensions.IExpressionBuilder.GetMapExpression(System.Type, System.Type, System.Object, System.Reflection.MemberInfo[])' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 5
+Total Issues: 10

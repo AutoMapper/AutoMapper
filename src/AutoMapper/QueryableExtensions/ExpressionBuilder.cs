@@ -18,7 +18,7 @@ namespace AutoMapper.QueryableExtensions
 
     public interface IExpressionBuilder
     {
-        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberInfo[] membersToExpand);
+        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
         LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
     }
@@ -55,7 +55,7 @@ namespace AutoMapper.QueryableExtensions
             _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]>(CreateMapExpression);
         }
 
-        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberInfo[] membersToExpand)
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand)
         {
             var expressionRequest = new ExpressionRequest(
                 sourceType ?? throw new ArgumentNullException(nameof(sourceType)),
@@ -139,26 +139,15 @@ namespace AutoMapper.QueryableExtensions
             {
                 var bindings = new List<MemberBinding>();
                 foreach (var propertyMap in typeMap.PropertyMaps
-                                                   .Where
-                                                   (
-                                                        pm =>
-                                                        (
-                                                            !pm.ExplicitExpansion
-                                                            || request.MembersToExpand.Any
-                                                                (
-                                                                    member => member.Equals(pm.DestinationMember)
-                                                                    && member.ReflectedType == typeMap.DestinationType
-                                                                )
-                                                        )
-                                                        && pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember)
-                                                   )
-                                                   .OrderBy(pm => pm.DestinationName))
+                    .Where(pm => pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember))
+                    .OrderBy(pm => pm.DestinationName))
                 {
                     var propertyExpression = new PropertyExpression(propertyMap);
-                    letPropertyMaps.Push(propertyExpression);
-
-                    CreateMemberBinding(propertyExpression);
-
+                    var currentPath = letPropertyMaps.Push(propertyExpression);
+                    if (!propertyMap.ExplicitExpansion || request.ShouldExpand(currentPath))
+                    {
+                        CreateMemberBinding(propertyExpression);
+                    }
                     letPropertyMaps.Pop();
                 }
                 return bindings;
@@ -300,8 +289,11 @@ namespace AutoMapper.QueryableExtensions
         {
             readonly Stack<PropertyExpression> _currentPath = new Stack<PropertyExpression>();
             readonly List<PropertyPath> _savedPaths = new List<PropertyPath>();
-
-            public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider) : base(configurationProvider) { }
+            readonly IEnumerable<MemberInfo> _parentMembers;
+            public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider, IEnumerable<MemberInfo> parentMembers = null) : base(configurationProvider)
+            {
+                _parentMembers = parentMembers ?? Array.Empty<MemberInfo>();
+            }
 
             public override Expression GetSubQueryMarker(LambdaExpression letExpression)
             {
@@ -315,13 +307,19 @@ namespace AutoMapper.QueryableExtensions
                 return propertyPath.Marker;
             }
 
-            public override void Push(PropertyExpression propertyExpression) => _currentPath.Push(propertyExpression);
+            public override MemberPath Push(PropertyExpression propertyExpression)
+            {
+                _currentPath.Push(propertyExpression);
+                return new MemberPath(_parentMembers.Concat(CurrentMembers()));
+            }
+
+            private IEnumerable<MemberInfo> CurrentMembers() => _currentPath.Reverse().Select(p => p.PropertyMap.DestinationMember);
 
             public override void Pop() => _currentPath.Pop();
 
             public override int Count => _savedPaths.Count;
 
-            public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(ConfigurationProvider);
+            public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(ConfigurationProvider, CurrentMembers());
 
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
@@ -417,7 +415,7 @@ namespace AutoMapper.QueryableExtensions
 
         public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
 
-        public virtual void Push(PropertyExpression propertyExpression) {}
+        public virtual MemberPath Push(PropertyExpression propertyExpression) => new MemberPath(Array.Empty<MemberInfo>());
 
         public virtual void Pop() {}
 
@@ -462,7 +460,7 @@ namespace AutoMapper.QueryableExtensions
     public static class ExpressionBuilderExtensions
     {
         public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(this IExpressionBuilder expressionBuilder) => 
-            (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource), typeof(TDestination), null, new MemberInfo[0])[0];
+            (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource), typeof(TDestination), null, Array.Empty<MemberPath>())[0];
     }
     public class PropertyExpression
     {

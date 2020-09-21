@@ -1,5 +1,6 @@
 
 
+using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace AutoMapper.QueryableExtensions
 
         public Type DestinationType { get; }
 
-        public MemberInfo[] MembersToExpand { get; }
+        public MemberPath[] MembersToExpand { get; }
 
         internal ICollection<ExpressionRequest> PreviousRequests { get; }
 
@@ -23,11 +24,11 @@ namespace AutoMapper.QueryableExtensions
 
         internal bool AlreadyExists => PreviousRequests.Contains(this);
 
-        public ExpressionRequest(Type sourceType, Type destinationType, MemberInfo[] membersToExpand, ExpressionRequest parentRequest)
+        public ExpressionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ExpressionRequest parentRequest)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            MembersToExpand = membersToExpand.OrderBy(p => p.Name).ToArray();
+            MembersToExpand = membersToExpand;
 
             PreviousRequests = parentRequest == null 
                 ? new HashSet<ExpressionRequest>() 
@@ -63,5 +64,17 @@ namespace AutoMapper.QueryableExtensions
         public static bool operator ==(ExpressionRequest left, ExpressionRequest right) => Equals(left, right);
 
         public static bool operator !=(ExpressionRequest left, ExpressionRequest right) => !Equals(left, right);
+
+        public bool ShouldExpand(MemberPath currentPath)
+        {
+            foreach (var memberToExpand in MembersToExpand)
+            {
+                if (memberToExpand.StartsWith(currentPath))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
