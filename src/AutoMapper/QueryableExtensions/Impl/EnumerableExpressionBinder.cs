@@ -23,7 +23,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
                 var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount, letPropertyMaps.New());
-                if(transformedExpressions == null)
+                if(transformedExpressions.Empty)
                 {
                     return null;
                 }
