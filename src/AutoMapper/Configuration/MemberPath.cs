@@ -6,10 +6,12 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-    public readonly struct MemberPath : IEquatable<MemberPath>
+    public struct MemberPath : IEquatable<MemberPath>
     {
         private readonly MemberInfo[] _members;
-        public IEnumerable<MemberInfo> Members => _members;
+        public IReadOnlyCollection<MemberInfo> Members => _members;
+
+        public static readonly MemberPath Empty = new MemberPath(Array.Empty<MemberInfo>());
 
         public MemberPath(Expression destinationExpression) : this(MemberVisitor.GetMemberPath(destinationExpression))
         {
@@ -66,5 +68,7 @@ namespace AutoMapper.Internal
             }
             return true;
         }
+
+        public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new MemberPath(_members.Concat(memberInfos));
     }
 }

@@ -72,7 +72,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         private QueryExpressions CreateMapExpression(ExpressionRequest request) => 
-            CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
+            CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider, MemberPath.Empty));
 
         public QueryExpressions CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
@@ -135,8 +135,8 @@ namespace AutoMapper.QueryableExtensions
                     .OrderBy(pm => pm.DestinationName))
                 {
                     var propertyExpression = new PropertyExpression(propertyMap);
-                    var currentPath = letPropertyMaps.Push(propertyExpression);
-                    if (!propertyMap.ExplicitExpansion || request.ShouldExpand(currentPath))
+                    letPropertyMaps.Push(propertyExpression);
+                    if (propertyMap.ExplicitExpansion != true || request.ShouldExpand(letPropertyMaps.GetCurrentPath()))
                     {
                         CreateMemberBinding(propertyExpression);
                     }
@@ -281,11 +281,9 @@ namespace AutoMapper.QueryableExtensions
         {
             readonly Stack<PropertyExpression> _currentPath = new Stack<PropertyExpression>();
             readonly List<PropertyPath> _savedPaths = new List<PropertyPath>();
-            readonly IEnumerable<MemberInfo> _parentMembers;
-            public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider, IEnumerable<MemberInfo> parentMembers = null) : base(configurationProvider)
-            {
-                _parentMembers = parentMembers ?? Array.Empty<MemberInfo>();
-            }
+            readonly MemberPath _parentPath;
+            public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider, MemberPath parentPath) : base(configurationProvider) =>
+                _parentPath = parentPath;
 
             public override Expression GetSubQueryMarker(LambdaExpression letExpression)
             {
@@ -299,19 +297,15 @@ namespace AutoMapper.QueryableExtensions
                 return propertyPath.Marker;
             }
 
-            public override MemberPath Push(PropertyExpression propertyExpression)
-            {
-                _currentPath.Push(propertyExpression);
-                return new MemberPath(_parentMembers.Concat(CurrentMembers()));
-            }
+            public override void Push(PropertyExpression propertyExpression) => _currentPath.Push(propertyExpression);
 
-            private IEnumerable<MemberInfo> CurrentMembers() => _currentPath.Reverse().Select(p => p.PropertyMap.DestinationMember);
+            public override MemberPath GetCurrentPath() => _parentPath.Concat(_currentPath.Reverse().Select(p => p.PropertyMap.DestinationMember));
 
             public override void Pop() => _currentPath.Pop();
 
             public override int Count => _savedPaths.Count;
 
-            public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(ConfigurationProvider, CurrentMembers());
+            public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(ConfigurationProvider, GetCurrentPath());
 
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, ParameterExpression instanceParameter, TypePairCount typePairCount)
             {
@@ -407,7 +401,9 @@ namespace AutoMapper.QueryableExtensions
 
         public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
 
-        public virtual MemberPath Push(PropertyExpression propertyExpression) => new MemberPath(Array.Empty<MemberInfo>());
+        public virtual void Push(PropertyExpression propertyExpression) { }
+
+        public virtual MemberPath GetCurrentPath() => MemberPath.Empty;
 
         public virtual void Pop() {}
 
