@@ -1,30 +1,3 @@
-# Dependency Injection
-
-AutoMapper supports the ability to construct [Custom Value Resolvers](Custom-value-resolvers.html), [Custom Type Converters](Custom-type-converters.html), and [Value Converters](Value-converters.html) using static service location:
-
-```c#
-var configuration = new MapperConfiguration(cfg =>
-{
-    cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
-
-    cfg.CreateMap<Source, Destination>();
-});
-```
-
-Or dynamic service location, to be used in the case of instance-based containers (including child/nested containers):
-
-```c#
-var mapper = new Mapper(configuration, childContainer.GetInstance);
-
-var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
-```
-
-### Queryable Extensions
-
-Starting with 8.0 you can use IMapper.ProjectTo. For older versions you need to pass the configuration to the extension method ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
-
-Note that IQueryable.ProjectTo is [more limited](Queryable-Extensions.html#supported-mapping-options) than IMapper.Map, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with Map.
-
 ## Examples
 
 ### ASP.NET Core
@@ -230,3 +203,29 @@ public class EmployeesController {
 	// use _mapper.Map or _mapper.ProjectTo
 }
 ```
+## Low level API-s
+
+AutoMapper supports the ability to construct [Custom Value Resolvers](Custom-value-resolvers.html), [Custom Type Converters](Custom-type-converters.html), and [Value Converters](Value-converters.html) using static service location:
+
+```c#
+var configuration = new MapperConfiguration(cfg =>
+{
+    cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
+
+    cfg.CreateMap<Source, Destination>();
+});
+```
+
+Or dynamic service location, to be used in the case of instance-based containers (including child/nested containers):
+
+```c#
+var mapper = new Mapper(configuration, childContainer.GetInstance);
+
+var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
+```
+
+## Queryable Extensions
+
+Starting with 8.0 you can use `IMapper.ProjectTo`. For older versions you need to pass the configuration to the extension method ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
+
+Note that `ProjectTo` is [more limited](Queryable-Extensions.html#supported-mapping-options) than `Map`, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with `Map`.

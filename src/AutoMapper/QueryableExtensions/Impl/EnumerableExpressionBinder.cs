@@ -27,7 +27,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     return null;
                 }
-                expression = transformedExpressions.Aggregate(expression, Select);
+                expression = transformedExpressions.Chain(expression, Select);
             }
             if (!propertyMap.DestinationType.IsAssignableFrom(expression.Type))
             {

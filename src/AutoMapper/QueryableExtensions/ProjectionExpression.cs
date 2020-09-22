@@ -38,7 +38,7 @@ namespace AutoMapper.QueryableExtensions
         private IQueryable ToCore(Type destinationType, object parameters, MemberPaths memberPathsToExpand)
         {
             var members = memberPathsToExpand.Select(m=>new MemberPath(m)).ToArray();
-            return _builder.GetMapExpression(_source.ElementType, destinationType, parameters, members).Aggregate(_source, Select);
+            return _builder.GetMapExpression(_source.ElementType, destinationType, parameters, members).Chain(_source, Select);
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(

@@ -77,14 +77,10 @@ namespace AutoMapper.QueryableExtensions
         public QueryExpressions CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
-            var firstExpression = CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap);
-            if (firstExpression == null)
-            {
-                return new QueryExpressions();
-            }
+            var projection = CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap);
             return letPropertyMaps.Count > 0 ?
-                letPropertyMaps.GetSubQueryExpression(this, firstExpression, typeMap, request, instanceParameter, typePairCount) :
-                new QueryExpressions(Lambda(firstExpression, instanceParameter));
+                letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter, typePairCount) :
+                new QueryExpressions(projection, instanceParameter);
         }
 
         public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps) =>
@@ -103,8 +99,8 @@ namespace AutoMapper.QueryableExtensions
                 return typeMap.CustomMapExpression.ReplaceParameters(instanceParameter);
             }
             var memberBindings = new List<MemberBinding>();
-            var depth = GetDepth();
-            if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
+            int depth;
+            if(OverMaxDepth())
             {
                 if(typeMap.Profile.AllowNullDestinationValues)
                 {
@@ -118,14 +114,14 @@ namespace AutoMapper.QueryableExtensions
             var constructorExpression = CreateDestination();
             var expression = MemberInit(constructorExpression, memberBindings);
             return expression;
-            int GetDepth()
+            bool OverMaxDepth()
             {
-                if (typePairCount.TryGetValue(request, out int visitCount))
+                if (typePairCount.TryGetValue(request, out depth))
                 {
-                    visitCount++;
+                    depth++;
                 }
-                typePairCount[request] = visitCount;
-                return visitCount;
+                typePairCount[request] = depth;
+                return typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth;
             }
             List<MemberBinding> CreateMemberBindings()
             {
@@ -329,8 +325,8 @@ namespace AutoMapper.QueryableExtensions
 
                 ReplaceSubQueries();
 
-                var firstExpression = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, letTypeMap, base.New());
-                return new QueryExpressions(Lambda(firstExpression, instanceParameter), Lambda(projection, secondParameter));
+                var letClause = builder.CreateMapExpressionCore(request, instanceParameter, typePairCount, letTypeMap, base.New());
+                return new QueryExpressions(Lambda(projection, secondParameter), Lambda(letClause, instanceParameter));
 
                 void ReplaceSubQueries()
                 {
@@ -414,7 +410,7 @@ namespace AutoMapper.QueryableExtensions
         public virtual LetPropertyMaps New() => new LetPropertyMaps(ConfigurationProvider);
 
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, ParameterExpression instanceParameter, TypePairCount typePairCount)
-            => new QueryExpressions(Lambda(projection, instanceParameter));
+            => new QueryExpressions(projection, instanceParameter);
 
         public readonly struct PropertyPath
         {
@@ -435,25 +431,23 @@ namespace AutoMapper.QueryableExtensions
     }
     public readonly struct QueryExpressions
     {
-        public QueryExpressions(LambdaExpression first, LambdaExpression second = null)
+        public QueryExpressions(Expression projection, ParameterExpression parameter) : this(projection == null ? null : Lambda(projection, parameter)) { }
+        public QueryExpressions(LambdaExpression projection, LambdaExpression letClause  = null)
         {
-            First = first;
-            Second = second;
+            LetClause = letClause;
+            Projection = projection;
         }
-        public LambdaExpression First { get; }
-        public LambdaExpression Second { get; }
-        public bool Empty => First == null;
-        public QueryExpressions Transform(Func<LambdaExpression, LambdaExpression> func) => new QueryExpressions(func(First), func(Second));
-        public T Aggregate<T>(T seed, Func<T, LambdaExpression, T> select)
-        {
-            var first = select(seed, First);
-            return Second == null ? first : select(first, Second);
-        }
+        public LambdaExpression LetClause { get; }
+        public LambdaExpression Projection { get; }
+        public bool Empty => Projection == null;
+        public QueryExpressions Transform(Func<LambdaExpression, LambdaExpression> func) => new QueryExpressions(func(Projection), func(LetClause));
+        public T Chain<T>(T source, Func<T, LambdaExpression, T> select) => 
+            LetClause == null ? select(source, Projection) : select(select(source, LetClause), Projection);
     }
     public static class ExpressionBuilderExtensions
     {
         public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(this IExpressionBuilder expressionBuilder) => 
-            (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource), typeof(TDestination), null, Array.Empty<MemberPath>()).First;
+            (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource), typeof(TDestination), null, Array.Empty<MemberPath>()).Projection;
     }
     public class PropertyExpression
     {
