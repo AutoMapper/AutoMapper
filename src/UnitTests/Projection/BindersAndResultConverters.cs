@@ -8,6 +8,7 @@ using Xunit;
 using Shouldly;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.UnitTests.Projection
 {

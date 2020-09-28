@@ -1,11 +1,13 @@
 using AutoMapper.Internal;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class QueryMapperHelper
     {
         public static Expression CheckCustomSource(this IMemberMap memberMap, ExpressionResolutionResult expressionResolutionResult, LetPropertyMaps letPropertyMaps)

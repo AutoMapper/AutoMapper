@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions.Impl
 {
     using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
     using ParameterBag = IDictionary<string, object>;

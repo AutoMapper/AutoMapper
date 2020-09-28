@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IExpressionBinder
     {
         bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result);

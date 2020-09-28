@@ -1,9 +1,11 @@
 using AutoMapper.Internal;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class CustomProjectionExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) 

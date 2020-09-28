@@ -3,7 +3,7 @@
     namespace NestedAndArraysTests
     {
         using System.Collections.Generic;
-        using QueryableExtensions;
+        using QueryableExtensions.Impl;
         using Xunit;
         using System.Linq;
 

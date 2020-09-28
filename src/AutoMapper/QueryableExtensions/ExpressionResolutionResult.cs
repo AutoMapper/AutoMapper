@@ -1,8 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class ExpressionResolutionResult
     {
         private readonly Expression _nonMarkerExpression;

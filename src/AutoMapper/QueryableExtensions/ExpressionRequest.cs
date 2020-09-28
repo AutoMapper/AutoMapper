@@ -1,14 +1,13 @@
-
-
 using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions.Impl
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {

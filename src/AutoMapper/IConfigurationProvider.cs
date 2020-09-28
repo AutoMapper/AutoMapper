@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {

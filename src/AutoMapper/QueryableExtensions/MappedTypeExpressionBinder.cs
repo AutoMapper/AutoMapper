@@ -1,13 +1,13 @@
-using AutoMapper.Configuration;
 using AutoMapper.Execution;
 using AutoMapper.Internal;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
-
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => 

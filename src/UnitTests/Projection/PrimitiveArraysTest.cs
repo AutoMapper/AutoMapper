@@ -9,6 +9,7 @@ namespace AutoMapper.UnitTests.Projection
     namespace PrimitiveArrays
     {
         using QueryableExtensions;
+        using QueryableExtensions.Impl;
 
         public class PrimitiveArraysExpressionTest
         {

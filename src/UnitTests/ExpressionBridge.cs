@@ -10,6 +10,7 @@ namespace AutoMapper.UnitTests
     namespace ExpressionBridge
     {
         using QueryableExtensions;
+        using QueryableExtensions.Impl;
 
         public class SimpleProductDto
         {

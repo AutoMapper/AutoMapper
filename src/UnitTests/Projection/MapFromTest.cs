@@ -5,6 +5,7 @@ using System.Reflection;
 using Shouldly;
 using Xunit;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
 using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.Projection.MapFromTest

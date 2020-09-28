@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.Internal
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public struct MemberPath : IEquatable<MemberPath>
     {
         private readonly MemberInfo[] _members;

@@ -7,15 +7,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Execution;
 using AutoMapper.Internal;
-using AutoMapper.QueryableExtensions.Impl;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
     using static ExpressionFactory;
     using ParameterBag = IDictionary<string, object>;
     using TypePairCount = IDictionary<ExpressionRequest, int>;
-
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IExpressionBuilder
     {
         QueryExpressions GetMapExpression(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
@@ -429,6 +428,7 @@ namespace AutoMapper.QueryableExtensions
                 Properties.Take(Properties.Length - 1).Zip(other.Properties, (left, right) => left.PropertyMap == right.PropertyMap).All(item => item);
         }
     }
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct QueryExpressions
     {
         public QueryExpressions(Expression projection, ParameterExpression parameter) : this(projection == null ? null : Lambda(projection, parameter)) { }
