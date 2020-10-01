@@ -237,7 +237,7 @@ namespace AutoMapper.Execution
                 ? (Expression)
                 Throw(Constant(new NullReferenceException(
                     $"{memberExpression} cannot be null because it's used by ForPath.")))
-                : Assign(setter, DelegateFactory.GenerateConstructorExpression(memberExpression.Type));
+                : Assign(setter, ObjectFactory.GenerateConstructorExpression(memberExpression.Type));
             return memberExpression.IfNullElse(ifNull);
         }
 
@@ -302,9 +302,9 @@ namespace AutoMapper.Execution
             if(_typeMap.DestinationTypeToUse.IsInterface)
             {
                 var proxyType = Call(typeof(ProxyGenerator), nameof(ProxyGenerator.GetProxyType), null, Constant(_typeMap.DestinationTypeToUse));
-                return Call(typeof(DelegateFactory), nameof(DelegateFactory.CreateInstance), null, proxyType);
+                return Call(typeof(ObjectFactory), nameof(ObjectFactory.CreateInstance), null, proxyType);
             }
-            return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
+            return ObjectFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 
         private Expression CreateNewDestinationExpression(ConstructorMap constructorMap)
@@ -511,7 +511,7 @@ namespace AutoMapper.Execution
                 if (!toCreate.IsAbstract && toCreate.IsClass && !toCreate.IsArray)
                     valueResolverFunc = Coalesce(
                         valueResolverFunc,
-                        ToType(DelegateFactory.GenerateNonNullConstructorExpression(toCreate), memberMap.SourceType)
+                        ToType(ObjectFactory.GenerateNonNullConstructorExpression(toCreate), memberMap.SourceType)
                     );
             }
 

@@ -55,7 +55,7 @@ namespace AutoMapper.Mappers
                 sourceExpression,
                 ToType(
                     Coalesce(destExpression.ToObject(),
-                        DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
+                        ObjectFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
                 contextExpression,
                 Constant(profileMap));
     }

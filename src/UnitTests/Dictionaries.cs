@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Shouldly;
 using Xunit;
@@ -483,4 +484,107 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<BaseClassWithDictionary, DerivedClassWithDictionary>());
         }
     }
+
+    public class When_mapping_from_a_list_of_object_to_IReadOnly_dictionary : AutoMapperSpecBase
+    {
+        private FooObject _result;
+
+        public class FooDto
+        {
+            public DestinationValuePair[] Values { get; set; }
+        }
+
+        public class FooObject
+        {
+            public IReadOnlyDictionary<string, string> Values { get; set; }
+        }
+
+        public class DestinationValuePair
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<FooDto, FooObject>();
+            cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
+                .ConvertUsing(src => new KeyValuePair<string, string>(src.Key, src.Value));
+        });
+
+        protected override void Because_of()
+        {
+            var source = new FooDto
+            {
+                Values = new List<DestinationValuePair>
+                    {
+                        new DestinationValuePair {Key = "Key1", Value = "Value1"},
+                        new DestinationValuePair {Key = "Key2", Value = "Value2"}
+                    }.ToArray()
+            };
+
+            _result = Mapper.Map<FooDto, FooObject>(source);
+        }
+
+        [Fact]
+        public void Should_perform_mapping_for_individual_values()
+        {
+            _result.Values.Count.ShouldBe(2);
+
+            _result.Values["Key1"].ShouldBe("Value1");
+            _result.Values["Key2"].ShouldBe("Value2");
+        }
+    }
+
+    public class When_mapping_from_a_list_of_object_to_readonly_dictionary : AutoMapperSpecBase
+    {
+        private FooObject _result;
+
+        public class FooDto
+        {
+            public DestinationValuePair[] Values { get; set; }
+        }
+
+        public class FooObject
+        {
+            public ReadOnlyDictionary<string, string> Values { get; set; }
+        }
+
+        public class DestinationValuePair
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<FooDto, FooObject>();
+            cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
+                .ConvertUsing(src => new KeyValuePair<string, string>(src.Key, src.Value));
+        });
+
+        protected override void Because_of()
+        {
+            var source = new FooDto
+            {
+                Values = new List<DestinationValuePair>
+                    {
+                        new DestinationValuePair {Key = "Key1", Value = "Value1"},
+                        new DestinationValuePair {Key = "Key2", Value = "Value2"}
+                    }.ToArray()
+            };
+
+            _result = Mapper.Map<FooDto, FooObject>(source);
+        }
+
+        [Fact]
+        public void Should_perform_mapping_for_individual_values()
+        {
+            _result.Values.Count.ShouldBe(2);
+
+            _result.Values["Key1"].ShouldBe("Value1");
+            _result.Values["Key2"].ShouldBe("Value2");
+        }
+    }
+
 }

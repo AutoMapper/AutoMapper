@@ -101,7 +101,7 @@ namespace AutoMapper.Execution
                     var destinationElementType = destinationType.GetElementType();
                     return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
                 }
-                return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
+                return ObjectFactory.GenerateNonNullConstructorExpression(destinationType);
             }
         }
 

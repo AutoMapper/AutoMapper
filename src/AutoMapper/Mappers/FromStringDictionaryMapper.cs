@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
         }
         private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            boxedDestination ??= DelegateFactory.CreateInstance(destinationType);
+            boxedDestination ??= ObjectFactory.CreateInstance(destinationType);
             int matchedCount = 0;
             foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors)
             {
@@ -86,7 +86,7 @@ namespace AutoMapper.Mappers
                             {
                                 return null;
                             }
-                            newDestination = DelegateFactory.CreateInstance(member.GetMemberType());
+                            newDestination = ObjectFactory.CreateInstance(member.GetMemberType());
                             member.SetMemberValue(currentDestination, newDestination);
                         }
                         currentDestination = newDestination;

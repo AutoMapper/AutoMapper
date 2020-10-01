@@ -13,7 +13,8 @@ namespace AutoMapper.Execution
     using static ElementTypeHelper;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class DelegateFactory
+    public static class ObjectFactory
+
     {
         private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
 

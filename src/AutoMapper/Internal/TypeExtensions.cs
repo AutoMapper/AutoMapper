@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -38,7 +39,7 @@ namespace AutoMapper.Internal
 
         public static bool IsDictionaryType(this Type type) => type.GetDictionaryType() != null;
 
-        public static bool IsReadOnlyDictionaryType(this Type type) => type.GetReadOnlyDictionaryType() != null;
+        public static bool IsReadOnlyDictionaryType(this Type type) => type.IsGenericType(typeof(IReadOnlyDictionary<,>)) || type.IsGenericType(typeof(ReadOnlyDictionary<,>));
 
         public static bool ImplementsGenericInterface(this Type type, Type interfaceType) => type.GetGenericInterface(interfaceType) != null;
 

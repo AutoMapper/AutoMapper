@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Execution;
@@ -18,6 +19,22 @@ namespace AutoMapper.Internal
             Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
 
+        public static Expression MapToReadOnlyDictionary(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression, MapItem mapItem)
+        {
+            var dictionaryTypes = GetElementTypes(destExpression.Type, ElementTypeFlags.BreakKeyValuePair);
+            var dictType = typeof(Dictionary<,>).MakeGenericType(dictionaryTypes);
+            var dict = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(dictType), contextExpression, typeof(Dictionary<,>), mapItem);
+
+            var readOnlyDictType = destExpression.Type.IsInterface
+                ? typeof(ReadOnlyDictionary<,>).MakeGenericType(dictionaryTypes)
+                : destExpression.Type;
+
+            var ctor = readOnlyDictType.GetDeclaredConstructors()
+                .First(ci => ci.GetParameters().Length == 1 && ci.GetParameters()[0].ParameterType.IsAssignableFrom(dictType));
+
+            return New(ctor, dict);
+        }
         public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression, Type ifInterfaceType, MapItem mapItem)
@@ -92,7 +109,7 @@ namespace AutoMapper.Internal
                 ? New(
                     ifInterfaceType.MakeGenericType(GetElementTypes(baseType,
                         ElementTypeFlags.BreakKeyValuePair)))
-                : DelegateFactory.GenerateConstructorExpression(baseType);
+                : ObjectFactory.GenerateConstructorExpression(baseType);
             return newExpr;
         }
 
