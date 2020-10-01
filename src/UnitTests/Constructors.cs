@@ -8,6 +8,18 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class ConstructorValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+            public Destination(int value = 2) => Value = value;
+            public int Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
+    }
     public class Nullable_enum_default_value : AutoMapperSpecBase
     {
         public enum SourceEnum { A, B }

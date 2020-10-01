@@ -159,7 +159,7 @@ namespace AutoMapper
                 IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name));
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
-            ConstructorMap?.CtorParams.Any(c => !c.HasDefaultValue && string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+            ConstructorMap.CtorParams.Any(c => string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase));
 
         public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
         {
@@ -184,6 +184,10 @@ namespace AutoMapper
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
+                if (IsConstructorMapping)
+                {
+                    properties = properties.Where(p => !ConstructorParameterMatches(p));
+                }
             }
             else
             {
@@ -377,13 +381,6 @@ namespace AutoMapper
 
         internal void CopyInheritedMapsTo(TypeMap typeMap) => typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
 
-        private IEnumerable<IMemberMap> GetConstructorMemberMaps()
-            => CustomCtorExpression != null
-               || CustomCtorFunction != null
-               || ConstructDestinationUsingServiceLocator
-               || ConstructorMap?.CanResolve != true
-                ? Enumerable.Empty<IMemberMap>()
-                : ConstructorMap?.CtorParams ?? Enumerable.Empty<IMemberMap>();
-
+        private IEnumerable<IMemberMap> GetConstructorMemberMaps() => IsConstructorMapping ? ConstructorMap.CtorParams : Enumerable.Empty<IMemberMap>();
     }
 }
