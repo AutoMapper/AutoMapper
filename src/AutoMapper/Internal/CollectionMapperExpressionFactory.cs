@@ -30,9 +30,7 @@ namespace AutoMapper.Internal
                 ? typeof(ReadOnlyDictionary<,>).MakeGenericType(dictionaryTypes)
                 : destExpression.Type;
 
-            var ctor = readOnlyDictType.GetDeclaredConstructors()
-                .First(ci => ci.GetParameters().Length == 1 && ci.GetParameters()[0].ParameterType.IsAssignableFrom(dictType));
-
+            var ctor = (from c in readOnlyDictType.GetConstructors() let p = c.GetParameters() where p.Length == 1 && p[0].ParameterType.IsAssignableFrom(dictType) select c).First();
             return New(ctor, dict);
         }
         public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider,
