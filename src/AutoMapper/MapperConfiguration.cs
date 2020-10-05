@@ -33,27 +33,28 @@ namespace AutoMapper
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
 
-        public MapperConfiguration(IGlobalConfigurationExpression configurationExpression)
+        public MapperConfiguration(IMapperConfigurationExpression configurationExpression)
         {
-            _mappers = configurationExpression.Mappers.ToArray();
+            var configuration = (IGlobalConfigurationExpression)configurationExpression;
+            _mappers = configuration.Mappers.ToArray();
             _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
-            _validator = new ConfigurationValidator(this, configurationExpression);
+            _validator = new ConfigurationValidator(this, configuration);
             _expressionBuilder = new ExpressionBuilder(this);
 
-            _serviceCtor = configurationExpression.ServiceCtor;
-            _enableNullPropagationForQueryMapping = configurationExpression.EnableNullPropagationForQueryMapping ?? false;
-            _maxExecutionPlanDepth = configurationExpression.MaxExecutionPlanDepth + 1;
-            _resultConverters = configurationExpression.QueryableResultConverters.ToArray();
-            _binders = configurationExpression.QueryableBinders.ToArray();
-            _recursiveQueriesMaxDepth = configurationExpression.RecursiveQueriesMaxDepth;
+            _serviceCtor = configuration.ServiceCtor;
+            _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
+            _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
+            _resultConverters = configuration.QueryableResultConverters.ToArray();
+            _binders = configuration.QueryableBinders.ToArray();
+            _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
-            Configuration = new ProfileMap((Profile)configurationExpression);
-            Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
+            Configuration = new ProfileMap((Profile)configuration);
+            Profiles = new[] { Configuration }.Concat(configuration.Profiles.Select(p => new ProfileMap(p, configuration))).ToArray();
 
-            configurationExpression.Features.Configure(this);
+            configuration.Features.Configure(this);
 
-            foreach (var beforeSealAction in configurationExpression.BeforeSealActions)
+            foreach (var beforeSealAction in configuration.BeforeSealActions)
                 beforeSealAction?.Invoke(this);
             Seal();
         }

@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests.ForAllMembers
             public MyProfile()
             {
                 CreateMap<Source, Dest>();
-                ((IProfileExpressionInternal)this).ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"), (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
+                this.Internal().ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"), (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
             }
         }
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
