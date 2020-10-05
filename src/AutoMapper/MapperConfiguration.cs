@@ -390,7 +390,7 @@ namespace AutoMapper
             _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
 
-        void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(new TProfile().ProfileName);
+        void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
 
         IEnumerable<ProfileMap> IGlobalConfiguration.GetProfiles() => Profiles;
     }
