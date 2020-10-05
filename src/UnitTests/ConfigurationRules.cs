@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
@@ -45,7 +46,7 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.CreateMap<Source, Dest>();
-                cfg.Advanced.AllowAdditiveTypeMapCreation = true;
+                cfg.Internal().AllowAdditiveTypeMapCreation = true;
             });
 
             typeof(DuplicateTypeMapConfigurationException).ShouldNotBeThrownBy(() => config.AssertConfigurationIsValid());
@@ -70,7 +71,7 @@ namespace AutoMapper.UnitTests
             {
                 cfg.AddProfile<Profile1>();
                 cfg.AddProfile<Profile2>();
-                cfg.Advanced.AllowAdditiveTypeMapCreation = true;
+                cfg.Internal().AllowAdditiveTypeMapCreation = true;
             });
 
             typeof(DuplicateTypeMapConfigurationException).ShouldNotBeThrownBy(() => config.AssertConfigurationIsValid());

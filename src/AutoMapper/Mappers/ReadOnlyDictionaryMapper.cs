@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     public class ReadOnlyDictionaryMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context) => context.SourceType.IsReadOnlyDictionaryType() && context.DestinationType.IsReadOnlyDictionaryType();
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
             MapToReadOnlyDictionary(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression, MapKeyPairValueExpr);
     }

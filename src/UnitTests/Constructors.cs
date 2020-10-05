@@ -576,7 +576,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            var typeMap = Configuration.FindTypeMapFor<Person, PersonDto>();
+            var typeMap = FindTypeMapFor<Person, PersonDto>();
             _destination.Name.ShouldBe("John");
         }
     }

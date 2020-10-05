@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
@@ -11,10 +12,10 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<PlaceHolder, PlaceHolder>();
-            cfg.Advanced.BeforeSeal(SetSealed);
+            cfg.Internal().BeforeSeal(SetSealed);
         });
 
-        private static void SetSealed(IConfigurationProvider cfg)
+        private static void SetSealed(IGlobalConfiguration cfg)
         {
             // If sealed _typeMapCache is filled and should be able to Resolve tye TypeMap
             // If not sealed _typeMapCache is empty and should return null

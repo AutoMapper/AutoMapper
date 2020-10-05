@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_load_internal_profiles()
             {
-                Configuration.Profiles.Where(t => t.Name == InternalProfile.Name).ShouldNotBeEmpty();
+                Configuration.GetProfiles().Where(t => t.Name == InternalProfile.Name).ShouldNotBeEmpty();
             }
         }
 

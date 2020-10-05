@@ -30,7 +30,7 @@ namespace AutoMapper
         /// <param name="destExpression">Destination parameter</param>
         /// <param name="contextExpression">ResolutionContext parameter</param>
         /// <returns>Map expression</returns>
-        Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression);
     }
 
@@ -61,7 +61,7 @@ namespace AutoMapper
         /// <returns>Destination object</returns>
         public abstract TDestination Map(TSource source, TDestination destination, Type sourceType, Type destinationType, ResolutionContext context);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
             Call(

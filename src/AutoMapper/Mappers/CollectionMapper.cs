@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
         public override bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && 
             (context.DestinationType.IsCollectionType() || context.DestinationType.IsListType());
 
-        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression, typeof(List<>), MapItemExpr);
     }

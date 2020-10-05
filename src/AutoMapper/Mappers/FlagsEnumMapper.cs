@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context) => 
             context.IsEnumToEnum() && context.SourceType.Has<FlagsAttribute>() && context.DestinationType.Has<FlagsAttribute>();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
                 ToType(

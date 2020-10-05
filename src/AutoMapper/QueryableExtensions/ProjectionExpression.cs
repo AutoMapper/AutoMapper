@@ -17,10 +17,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IQueryable _source;
         private readonly IExpressionBuilder _builder;
 
-        public ProjectionExpression(IQueryable source, IExpressionBuilder builder)
+        public ProjectionExpression(IQueryable source, IConfigurationProvider configuration)
         {
             _source = source;
-            _builder = builder;
+            _builder = configuration.Internal().ExpressionBuilder;
         }
 
         public IQueryable<TResult> To<TResult>(ParameterBag parameters, string[] membersToExpand) =>

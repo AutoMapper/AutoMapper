@@ -9,7 +9,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class EnumBinder : IExpressionBinder
     {
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
+        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
             => Bind(propertyMap.DestinationMember, Convert(result.ResolutionExpression, propertyMap.DestinationType));
         public abstract bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result);
     }

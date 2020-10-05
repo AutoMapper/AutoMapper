@@ -8,11 +8,12 @@ namespace AutoMapper
     using QueryableExtensions;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
     using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
+    using AutoMapper.Internal;
 
     public class Mapper : IMapper, IInternalRuntimeMapper
     {
         public Mapper(IConfigurationProvider configurationProvider)
-            : this(configurationProvider, configurationProvider.ServiceCtor)
+            : this(configurationProvider, configurationProvider.Internal().ServiceCtor)
         {
         }
 
@@ -91,7 +92,7 @@ namespace AutoMapper
         private TDestination MapCore<TSource, TDestination>(
             TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, IMemberMap memberMap = null)
         {
-            return ConfigurationProvider.GetExecutionPlan<TSource, TDestination>(MapRequest())(source, destination, context);
+            return ConfigurationProvider.Internal().GetExecutionPlan<TSource, TDestination>(MapRequest())(source, destination, context);
             MapRequest MapRequest()
             {
                 var runtimeTypes = new TypePair(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));

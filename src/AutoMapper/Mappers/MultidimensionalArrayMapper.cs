@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 
     public class MultidimensionalArrayMapper : IObjectMapper
     {
-        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, IConfigurationProvider configurationProvider)
+        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, IGlobalConfiguration configurationProvider)
             where TSource : IEnumerable
         {
             var sourceArray = source as Array;
@@ -45,7 +45,7 @@ namespace AutoMapper.Mappers
             return destinationRank > 1 && destinationRank == context.SourceType.GetArrayRank();
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
             Call(null,

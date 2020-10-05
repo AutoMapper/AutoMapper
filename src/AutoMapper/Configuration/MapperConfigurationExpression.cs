@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Features;
+using AutoMapper.Internal;
 using AutoMapper.Mappers;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.Configuration
 {
-    public class MapperConfigurationExpression : Profile, IMapperConfigurationExpression, IConfiguration
+    using Validator = Action<ValidationContext>;
+    public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
     {
         private readonly IList<Profile> _profiles = new List<Profile>();
+        private readonly List<Validator> _validators = new List<Validator>();
+        private readonly IList<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
 
         public MapperConfigurationExpression() : base()
         {
@@ -18,6 +23,43 @@ namespace AutoMapper.Configuration
             Mappers = MapperRegistry.Mappers();
         }
 
+        IEnumerable<Action<IGlobalConfiguration>> IGlobalConfigurationExpression.BeforeSealActions => _beforeSealActions;
+
+        /// <summary>
+        /// Add Action called against the IGlobalConfiguration before it gets sealed
+        /// </summary>
+        void IGlobalConfigurationExpression.BeforeSeal(Action<IGlobalConfiguration> action) => _beforeSealActions.Add(action);
+
+        /// <summary>
+        /// Add an action to be called when validating the configuration.
+        /// </summary>
+        /// <param name="validator">the validation callback</param>
+        void IGlobalConfigurationExpression.Validator(Validator validator) => _validators.Add(validator);
+
+        /// <summary>
+        /// Allow the same map to exist in different profiles.
+        /// The default is to throw an exception, true means the maps are merged.
+        /// </summary>
+        bool IGlobalConfigurationExpression.AllowAdditiveTypeMapCreation { get; set; }
+
+        /// <summary>
+        /// How many levels deep should AutoMapper try to inline the execution plan for child classes.
+        /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the docs</a> for details.
+        /// </summary>
+        int IGlobalConfigurationExpression.MaxExecutionPlanDepth { get; set; } = 1;
+
+        Validator[] IGlobalConfigurationExpression.GetValidators() => _validators.ToArray();
+
+        List<IExpressionResultConverter> IGlobalConfigurationExpression.QueryableResultConverters { get; } = ExpressionBuilder.DefaultResultConverters();
+
+        List<IExpressionBinder> IGlobalConfigurationExpression.QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
+
+        /// <summary>
+        /// How many levels deep should recursive queries be expanded.
+        /// Must be zero for EF6. Can be greater than zero for EF Core.
+        /// </summary>
+        int IGlobalConfigurationExpression.RecursiveQueriesMaxDepth { get; set; }
+
         public IEnumerable<IProfileConfiguration> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = Activator.CreateInstance;
 
@@ -25,8 +67,6 @@ namespace AutoMapper.Configuration
             => AddProfile(new NamedProfile(profileName, config));
 
         public IList<IObjectMapper> Mappers { get; }
-
-        public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
 
         public Features<IGlobalFeature> Features { get; } = new Features<IGlobalFeature>();
 

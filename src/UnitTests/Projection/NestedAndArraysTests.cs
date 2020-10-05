@@ -6,6 +6,7 @@
         using QueryableExtensions.Impl;
         using Xunit;
         using System.Linq;
+        using AutoMapper.Internal;
 
         public class LinqTests
         {
@@ -54,7 +55,7 @@
                         .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
                 });
 
-                var expression = config.ExpressionBuilder.GetMapExpression<Entity, EntityViewModel>();
+                var expression = config.Internal().ExpressionBuilder.GetMapExpression<Entity, EntityViewModel>();
 
                 var entity = new Entity
                 {
@@ -88,7 +89,7 @@
                     cfg.CreateMap<Entity, EntityDetailledViewModel>();
                 });
 
-                var expression = config.ExpressionBuilder.GetMapExpression<Entity, EntityDetailledViewModel>();
+                var expression = config.Internal().ExpressionBuilder.GetMapExpression<Entity, EntityDetailledViewModel>();
 
                 var entity = new Entity
                 {

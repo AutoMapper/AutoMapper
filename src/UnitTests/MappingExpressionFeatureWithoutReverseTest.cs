@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Features;
+using AutoMapper.Internal;
 using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
@@ -291,7 +292,7 @@ namespace AutoMapper.UnitTests
                 Value = value;
             }
 
-            void IRuntimeFeature.Seal(IConfigurationProvider configurationProvider)
+            void IRuntimeFeature.Seal(IGlobalConfiguration configurationProvider)
             {
                 SealedCount++;
             }

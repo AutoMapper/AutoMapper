@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context)
             => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression, typeof(HashSet<>), MapItemExpr);
 

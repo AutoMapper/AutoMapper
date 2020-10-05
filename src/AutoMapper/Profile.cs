@@ -12,7 +12,7 @@ namespace AutoMapper
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public abstract class Profile : IProfileExpression, IProfileConfiguration
+    public abstract class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
         private readonly List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions =
             new List<Action<PropertyMap, IMemberConfigurationExpression>>();
@@ -82,19 +82,13 @@ namespace AutoMapper
             ConstructorMappingEnabled = false;
         }
 
-        public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
-        {
-            _allTypeMapActions.Add(configuration);
-        }
+        void IProfileExpressionInternal.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _allTypeMapActions.Add(configuration);
 
-        public void ForAllPropertyMaps(Func<PropertyMap, bool> condition,
-            Action<PropertyMap, IMemberConfigurationExpression> configuration)
-        {
+        void IProfileExpressionInternal.ForAllPropertyMaps(Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> configuration) =>
             _allPropertyMapActions.Add((pm, cfg) =>
             {
                 if (condition(pm)) configuration(pm, cfg);
             });
-        }
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() => 
             CreateMap<TSource, TDestination>(MemberList.Destination);

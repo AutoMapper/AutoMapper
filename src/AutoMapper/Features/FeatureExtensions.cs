@@ -6,7 +6,7 @@ namespace AutoMapper.Features
     {
         public static IMapperConfigurationExpression SetFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
         {
-            configuration.Features.Set(feature);
+            configuration.Internal().Features.Set(feature);
             return configuration;
         }
 
@@ -29,7 +29,7 @@ namespace AutoMapper.Features
 
         internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap) => features.ForAll(feature => feature.Configure(typeMap));
 
-        internal static void Seal(this Features<IRuntimeFeature> features, IConfigurationProvider configurationProvider)
+        internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configurationProvider)
         {
             features.ForAll(feature => feature.Seal(configurationProvider));
             features.MakeReadOnly();

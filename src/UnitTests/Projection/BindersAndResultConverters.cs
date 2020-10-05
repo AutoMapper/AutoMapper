@@ -9,6 +9,7 @@ using Shouldly;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.QueryableExtensions.Impl;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -28,7 +29,7 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.Advanced.QueryableBinders.Add(new EnumToUnderlyingTypeBinder());
+            cfg.Internal().QueryableBinders.Add(new EnumToUnderlyingTypeBinder());
             cfg.CreateMap<Source, Destination>();
         });
 
@@ -41,7 +42,7 @@ namespace AutoMapper.UnitTests.Projection
 
         private class EnumToUnderlyingTypeBinder : IExpressionBinder
         {
-            public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
+            public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
                 Bind(propertyMap.DestinationMember, Convert(result.ResolutionExpression, propertyMap.DestinationType));
 
             public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
@@ -63,7 +64,7 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.Advanced.QueryableResultConverters.Insert(0, new EnumToUnderlyingTypeResultConverter());
+            cfg.Internal().QueryableResultConverters.Insert(0, new EnumToUnderlyingTypeResultConverter());
             cfg.CreateMap<Source, Destination>();
         });
 

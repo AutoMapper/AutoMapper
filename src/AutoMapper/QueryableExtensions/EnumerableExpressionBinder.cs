@@ -12,10 +12,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
             propertyMap.DestinationType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
             => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
 
-        private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
+        private static MemberAssignment BindEnumerableExpression(IGlobalConfiguration configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);

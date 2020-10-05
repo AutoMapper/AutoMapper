@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using AutoMapper.Internal;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace AutoMapper.UnitTests.Projection
         protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
         {
             c.CreateMap<Source, Destination>();
-            c.Advanced.RecursiveQueriesMaxDepth = 1;
+            c.Internal().RecursiveQueriesMaxDepth = 1;
         });
         [Fact]
         public void Should_work()

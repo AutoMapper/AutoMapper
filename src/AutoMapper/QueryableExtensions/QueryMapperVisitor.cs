@@ -19,7 +19,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly MemberAccessQueryMapperVisitor _memberVisitor;
 
 
-        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery, IConfigurationProvider config)
+        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery, IGlobalConfiguration config)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
@@ -28,7 +28,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _memberVisitor = new MemberAccessQueryMapperVisitor(this, config);
         }
 
-        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config)
+        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IGlobalConfiguration config)
         {
             var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, config);
             var expr = visitor.Visit(sourceQuery.Expression);

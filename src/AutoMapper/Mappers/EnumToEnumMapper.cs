@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     public class EnumToEnumMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context) => context.IsEnumToEnum();
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var destinationType = destExpression.Type;

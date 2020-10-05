@@ -42,7 +42,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var typeMap = new TypePair(sourceExpression.Type, destExpression.Type);

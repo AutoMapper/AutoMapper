@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
         public override bool IsMatch(TypePair context) => 
             context.SourceType.IsEnumerableType() && (context.DestinationType.IsInterface && context.DestinationType.IsEnumerableType());
 
-        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             if(destExpression.Type.IsInterface)

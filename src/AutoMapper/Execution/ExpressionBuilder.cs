@@ -21,7 +21,7 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo ContextMapMethod =
             ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();            
 
-        public static Expression MapExpression(IConfigurationProvider configurationProvider,
+        public static Expression MapExpression(IGlobalConfiguration configurationProvider,
             ProfileMap profileMap,
             TypePair typePair,
             Expression sourceParameter,
@@ -105,7 +105,7 @@ namespace AutoMapper.Execution
             }
         }
 
-        private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
+        private static Expression ObjectMapperExpression(IGlobalConfiguration configurationProvider,
             ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter,
             IMemberMap propertyMap, Expression destinationParameter)
         {

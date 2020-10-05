@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
             return sourceTypeMethod ?? destTypeMethod;
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var implicitOperator = GetExplicitConversionOperator(new TypePair(sourceExpression.Type, destExpression.Type));

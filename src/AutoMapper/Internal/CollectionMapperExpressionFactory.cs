@@ -15,11 +15,11 @@ namespace AutoMapper.Internal
 
     public static class CollectionMapperExpressionFactory
     {
-        public delegate Expression MapItem(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public delegate Expression MapItem(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
 
-        public static Expression MapToReadOnlyDictionary(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
+        public static Expression MapToReadOnlyDictionary(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression, MapItem mapItem)
         {
             var dictionaryTypes = GetElementTypes(destExpression.Type, ElementTypeFlags.BreakKeyValuePair);
@@ -33,7 +33,7 @@ namespace AutoMapper.Internal
             var ctor = (from c in readOnlyDictType.GetConstructors() let p = c.GetParameters() where p.Length == 1 && p[0].ParameterType.IsAssignableFrom(dictType) select c).First();
             return New(ctor, dict);
         }
-        public static Expression MapCollectionExpression(IConfigurationProvider configurationProvider,
+        public static Expression MapCollectionExpression(IGlobalConfiguration configurationProvider,
             ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression, Type ifInterfaceType, MapItem mapItem)
         {
@@ -111,7 +111,7 @@ namespace AutoMapper.Internal
             return newExpr;
         }
 
-        public static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
+        public static Expression MapItemExpr(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementType = GetElementType(sourceType);
             var destElementType = GetElementType(destType);
@@ -123,7 +123,7 @@ namespace AutoMapper.Internal
             return ToType(itemExpr, destElementType);
         }
 
-        public static Expression MapKeyPairValueExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
+        public static Expression MapKeyPairValueExpr(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementTypes = GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
             var destElementTypes = GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);

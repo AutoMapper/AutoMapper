@@ -8,6 +8,7 @@ using Shouldly;
 using System.Linq;
 using System.Dynamic;
 using System.Linq.Expressions;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
@@ -131,13 +132,13 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public bool IsMatch(TypePair context)
                 => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
 
-            public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
                 IMemberMap memberMap,
                 Expression sourceExpression, Expression destExpression, Expression contextExpression)
                 => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Mappers.Insert(0, new IntToIntMapper()));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Internal().Mappers.Insert(0, new IntToIntMapper()));
 
         protected override void Because_of()
         {

@@ -4,6 +4,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.ForAllMembers
 {
+    using Internal;
     public class When_conditionally_applying_a_resolver_globally : AutoMapperSpecBase
     {
         public class Source
@@ -65,7 +66,7 @@ namespace AutoMapper.UnitTests.ForAllMembers
             public MyProfile()
             {
                 CreateMap<Source, Dest>();
-                ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"), (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
+                ((IProfileExpressionInternal)this).ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"), (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
             }
         }
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());

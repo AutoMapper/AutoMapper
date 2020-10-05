@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
         }
 
         public abstract bool IsMatch(TypePair context);
-        public abstract Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public abstract Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression);
     }
 }

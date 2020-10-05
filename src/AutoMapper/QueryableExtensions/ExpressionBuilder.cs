@@ -46,9 +46,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             };
 
         private readonly LockingConcurrentDictionary<ExpressionRequest, QueryExpressions> _expressionCache;
-        private readonly IConfigurationProvider _configurationProvider;
+        private readonly IGlobalConfiguration _configurationProvider;
 
-        public ExpressionBuilder(IConfigurationProvider configurationProvider)
+        public ExpressionBuilder(IGlobalConfiguration configurationProvider)
         {
             _configurationProvider = configurationProvider;
             _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, QueryExpressions>(CreateMapExpression);
@@ -277,7 +277,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             readonly Stack<PropertyExpression> _currentPath = new Stack<PropertyExpression>();
             readonly List<PropertyPath> _savedPaths = new List<PropertyPath>();
             readonly MemberPath _parentPath;
-            public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider, MemberPath parentPath) : base(configurationProvider) =>
+            public FirstPassLetPropertyMaps(IGlobalConfiguration configurationProvider, MemberPath parentPath) : base(configurationProvider) =>
                 _parentPath = parentPath;
 
             public override Expression GetSubQueryMarker(LambdaExpression letExpression)
@@ -392,7 +392,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class LetPropertyMaps
     {
-        protected LetPropertyMaps(IConfigurationProvider configurationProvider) => ConfigurationProvider = configurationProvider;
+        protected LetPropertyMaps(IGlobalConfiguration configurationProvider) => ConfigurationProvider = configurationProvider;
 
         public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
 
@@ -404,7 +404,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public virtual int Count => 0;
 
-        public IConfigurationProvider ConfigurationProvider { get; }
+        public IGlobalConfiguration ConfigurationProvider { get; }
 
         public virtual LetPropertyMaps New() => new LetPropertyMaps(ConfigurationProvider);
 

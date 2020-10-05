@@ -4,20 +4,20 @@ using System.ComponentModel;
 using System.Linq;
 using AutoMapper.Configuration;
 
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
     using Validator = Action<ValidationContext>;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConfigurationValidator
     {
-        private readonly IConfigurationProvider _config;
-        private readonly MapperConfigurationExpression _expression;
+        private readonly IGlobalConfiguration _config;
+        private readonly IGlobalConfigurationExpression _expression;
         private readonly Validator[] _validators;
 
-        public ConfigurationValidator(IConfigurationProvider config, MapperConfigurationExpression expression)
+        public ConfigurationValidator(IGlobalConfiguration config, IGlobalConfigurationExpression expression)
         {
-            _validators = expression.Advanced.GetValidators();
+            _validators = expression.GetValidators();
             _config = config;
             _expression = expression;
         }
@@ -32,9 +32,9 @@ namespace AutoMapper
 
         public void AssertConfigurationExpressionIsValid(IEnumerable<TypeMap> typeMaps)
         {
-            if (!_expression.Advanced.AllowAdditiveTypeMapCreation)
+            if (!_expression.AllowAdditiveTypeMapCreation)
             {
-                var duplicateTypeMapConfigs = Enumerable.Concat(new[] { _expression }, _expression.Profiles)
+                var duplicateTypeMapConfigs = _expression.Profiles.Concat(new[] { (Profile)_expression })
                     .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => new { profile, typeMap })
                     .GroupBy(x => x.typeMap.Types)
                     .Where(g => g.Count() > 1)

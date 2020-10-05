@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetDeclaredMethod(nameof(MapDynamic)); 
         public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
             Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
                 Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), contextExpression, Constant(profileMap));
         struct Match

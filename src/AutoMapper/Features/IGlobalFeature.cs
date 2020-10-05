@@ -1,7 +1,9 @@
-﻿namespace AutoMapper.Features
+﻿using AutoMapper.Internal;
+
+namespace AutoMapper.Features
 {
     public interface IGlobalFeature
     {
-        void Configure(IConfigurationProvider configurationProvider);
+        void Configure(IGlobalConfiguration configurationProvider);
     }
 }

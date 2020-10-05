@@ -26,15 +26,15 @@ namespace AutoMapper
         {
         }
 
-        public ProfileMap(IProfileConfiguration profile, IConfiguration configuration)
+        public ProfileMap(IProfileConfiguration profile, IGlobalConfigurationExpression configuration)
         {
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory);
-
+            var globalProfile = (IProfileConfiguration)configuration;
             Name = profile.ProfileName;
             AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
             AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
             EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
-            ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
+            ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? globalProfile?.ConstructorMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
             ShouldMapMethod = profile.ShouldMapMethod ?? configuration?.ShouldMapMethod ?? (p => true);
@@ -42,7 +42,7 @@ namespace AutoMapper
 
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers ?? Enumerable.Empty<ValueTransformerConfiguration>()).ToArray();
 
-            _memberConfigurations = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>()).ToArray();
+            _memberConfigurations = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>()).ToArray();
 
             var nameSplitMember = _memberConfigurations[0].MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
             if (nameSplitMember != null)
@@ -51,10 +51,10 @@ namespace AutoMapper
                 nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention;
             }
 
-            GlobalIgnores = profile.GlobalIgnores.Concat(configuration?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
-            SourceExtensionMethods = profile.SourceExtensionMethods.Concat(configuration?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
-            AllPropertyMapActions = profile.AllPropertyMapActions.Concat(configuration?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
-            AllTypeMapActions = profile.AllTypeMapActions.Concat(configuration?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
+            GlobalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
+            SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
+            AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
+            AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
 
             Prefixes =
                 profile.MemberConfigurations
@@ -100,7 +100,7 @@ namespace AutoMapper
 
         private TypeDetails TypeDetailsFactory(Type type) => new TypeDetails(type, this);
 
-        public void Register(IConfigurationProvider configurationProvider)
+        public void Register(IGlobalConfiguration configurationProvider)
         {
             foreach (var config in _typeMapConfigs)
             {
@@ -113,7 +113,7 @@ namespace AutoMapper
             }
         }
 
-        public void Configure(IConfigurationProvider configurationProvider)
+        public void Configure(IGlobalConfiguration configurationProvider)
         {
             foreach (var typeMapConfiguration in _typeMapConfigs)
             {
@@ -125,7 +125,7 @@ namespace AutoMapper
             }
         }
 
-        private void BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)
+        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config)
         {
             var typeMap = TypeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.IsReverseMap);
 
@@ -134,13 +134,13 @@ namespace AutoMapper
             configurationProvider.RegisterTypeMap(typeMap);
         }
 
-        private void Configure(ITypeMapConfiguration typeMapConfiguration, IConfigurationProvider configurationProvider)
+        private void Configure(ITypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
         {
             var typeMap = configurationProvider.FindTypeMapFor(typeMapConfiguration.Types);
             Configure(typeMap, configurationProvider);
         }
 
-        private void Configure(TypeMap typeMap, IConfigurationProvider configurationProvider)
+        private void Configure(TypeMap typeMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var action in AllTypeMapActions)
             {
@@ -168,7 +168,7 @@ namespace AutoMapper
             ApplyMemberMaps(typeMap, configurationProvider);
         }
 
-        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IConfigurationProvider configurationProvider)
+        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IGlobalConfiguration configurationProvider)
         {
             var closedMap = TypeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
             closedMap.IsClosedGeneric = true;
@@ -206,7 +206,7 @@ namespace AutoMapper
                 .FirstOrDefault();
         }
 
-        private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IConfigurationProvider configurationProvider)
+        private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))
             {
@@ -216,7 +216,7 @@ namespace AutoMapper
             }
         }
 
-        private void ApplyMemberMaps(TypeMap currentMap, IConfigurationProvider configurationProvider)
+        private void ApplyMemberMaps(TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var includedMemberExpression in currentMap.GetAllIncludedMembers())
             {
@@ -233,7 +233,7 @@ namespace AutoMapper
             }
         }
 
-        private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IConfigurationProvider configurationProvider)
+        private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var derivedMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {

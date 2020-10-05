@@ -9,7 +9,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     internal class NullableSourceExpressionBinder : IExpressionBinder
     {
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
+        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var defaultDestination = Activator.CreateInstance(propertyMap.DestinationType);
             return Bind(propertyMap.DestinationMember, Coalesce(result.ResolutionExpression, Constant(defaultDestination)));

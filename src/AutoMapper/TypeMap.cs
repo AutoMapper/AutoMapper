@@ -276,7 +276,7 @@ namespace AutoMapper
 
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) => _valueTransformerConfigs.Add(valueTransformerConfiguration);
 
-        public void Seal(IConfigurationProvider configurationProvider)
+        public void Seal(IGlobalConfiguration configurationProvider)
         {
             if(_sealed)
             {
@@ -300,7 +300,7 @@ namespace AutoMapper
             Features.Seal(configurationProvider);
         }
 
-        internal LambdaExpression CreateMapperLambda(IConfigurationProvider configurationProvider, HashSet<TypeMap> typeMapsPath) =>
+        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath) =>
             Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
         private PropertyMap GetPropertyMap(string name) => _propertyMaps.GetOrDefault(name);

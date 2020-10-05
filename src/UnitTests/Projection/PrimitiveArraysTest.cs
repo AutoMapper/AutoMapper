@@ -8,6 +8,7 @@ namespace AutoMapper.UnitTests.Projection
 {
     namespace PrimitiveArrays
     {
+        using AutoMapper.Internal;
         using QueryableExtensions;
         using QueryableExtensions.Impl;
 
@@ -21,7 +22,7 @@ namespace AutoMapper.UnitTests.Projection
                     cfg.CreateMap<Source, Destination>();
                 });
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<Source, Destination>());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression<Source, Destination>());
             }
 
             [Fact]

@@ -1,13 +1,25 @@
 using System;
 using Xunit;
+using AutoMapper.Internal;
+using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace AutoMapper.UnitTests
 {
-    using QueryableExtensions;
-    using Shouldly;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
+    static class Utils
+    {
+        public static TypeMap FindTypeMapFor<TSource, TDestination>(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().FindTypeMapFor<TSource, TDestination>();
+        public static TypeMap[] GetAllTypeMaps(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetAllTypeMaps();
+        public static TypeMap ResolveTypeMap(this IConfigurationProvider configurationProvider, Type sourceType, Type destinationType) => configurationProvider.Internal().ResolveTypeMap(sourceType, destinationType);
+        public static void AssertConfigurationIsValid(this IConfigurationProvider configurationProvider, string profileName) => configurationProvider.Internal().AssertConfigurationIsValid(profileName);
+        public static void AssertConfigurationIsValid<TProfile>(this IConfigurationProvider configurationProvider) where TProfile : Profile, new() => configurationProvider.Internal().AssertConfigurationIsValid<TProfile>();
+        public static IEnumerable<ProfileMap> GetProfiles(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetProfiles();
+        public static void ForAllMaps(this IMapperConfigurationExpression configurationProvider, Action<TypeMap, AutoMapper.IMappingExpression> configuration) => configurationProvider.Internal().ForAllMaps(configuration);
+        public static void ForAllPropertyMaps(this IMapperConfigurationExpression configurationProvider, Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> memberOptions) => 
+            configurationProvider.Internal().ForAllPropertyMaps(condition, memberOptions);
+    }
 
     public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     {
@@ -24,11 +36,16 @@ namespace AutoMapper.UnitTests
         private IMapper mapper;
 
         protected abstract MapperConfiguration Configuration { get; }
-        protected IConfigurationProvider ConfigProvider => Configuration;
+        protected IGlobalConfiguration ConfigProvider => Configuration;
 
         protected IMapper Mapper => mapper ??= Configuration.CreateMapper();
 
         protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
+
+        protected TypeMap FindTypeMapFor<TSource, TDestination>() => ConfigProvider.FindTypeMapFor<TSource, TDestination>();
+
+        protected void AssertConfigurationIsValid<TSource, TDestination>() => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor<TSource, TDestination>());
+        protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor(sourceType, destinationType));
 
         protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
             Mapper.ProjectTo(source, parameters, membersToExpand);

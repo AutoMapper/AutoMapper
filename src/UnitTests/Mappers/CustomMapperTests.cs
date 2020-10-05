@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.Mappers;
 using Xunit;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.Mappers
 {
@@ -14,7 +15,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
-            cfg.Mappers.Add(new TestObjectMapper());
+            cfg.Internal().Mappers.Add(new TestObjectMapper());
         });
 
         [Fact]
@@ -36,7 +37,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
 
-            public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
                 IMemberMap memberMap,
                 Expression sourceExpression, Expression destExpression, Expression contextExpression)
             {
@@ -75,7 +76,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
-            cfg.Mappers.Add(new TestObjectMapper());
+            cfg.Internal().Mappers.Add(new TestObjectMapper());
         });
 
         protected override void Because_of()
@@ -164,7 +165,7 @@ namespace AutoMapper.UnitTests.Mappers
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-            cfg.Mappers.Insert(0, new EnumMapper());
+            cfg.Internal().Mappers.Insert(0, new EnumMapper());
         });
 
         protected override void Because_of()

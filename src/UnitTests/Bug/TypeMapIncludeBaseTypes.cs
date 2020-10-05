@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using AutoMapper.Internal;
+using Shouldly;
 using System.Linq;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class IncludeFromBase : TypeMapIncludeBaseTypes
         {
-            protected override IConfigurationProvider CreateConfigurationProvider()
+            protected override IGlobalConfiguration CreateConfigurationProvider()
             {
                 return new MapperConfiguration(cfg =>
                 {
@@ -32,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class IncludeFromDerived : TypeMapIncludeBaseTypes
         {
-            protected override IConfigurationProvider CreateConfigurationProvider()
+            protected override IGlobalConfiguration CreateConfigurationProvider()
             {
                 return new MapperConfiguration(cfg =>
                 {
@@ -74,6 +75,6 @@ namespace AutoMapper.UnitTests.Bug
             typeMap.IncludedBaseTypes.SequenceEqual(typePairs).ShouldBeTrue();
         }
 
-        protected abstract IConfigurationProvider CreateConfigurationProvider();
+        protected abstract IGlobalConfiguration CreateConfigurationProvider();
     }
 }

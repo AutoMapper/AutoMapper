@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap,
                 Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, typeof(Dictionary<,>),

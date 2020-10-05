@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -5,9 +6,9 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MemberAccessQueryMapperVisitor : ExpressionVisitor
     {
         private readonly ExpressionVisitor _rootVisitor;
-        private readonly IConfigurationProvider _config;
+        private readonly IGlobalConfiguration _config;
 
-        public MemberAccessQueryMapperVisitor(ExpressionVisitor rootVisitor, IConfigurationProvider config)
+        public MemberAccessQueryMapperVisitor(ExpressionVisitor rootVisitor, IGlobalConfiguration config)
         {
             _rootVisitor = rootVisitor;
             _config = config;

@@ -23,12 +23,12 @@ namespace AutoMapper.Execution
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo =
             ctxt => ctxt.DecrementTypeDepth(default);
 
-        private readonly IConfigurationProvider _configurationProvider;
+        private readonly IGlobalConfiguration _configurationProvider;
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
         private readonly TypeMap _typeMap;
 
-        public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMap typeMap)
+        public TypeMapPlanBuilder(IGlobalConfiguration configurationProvider, TypeMap typeMap)
         {
             _configurationProvider = configurationProvider;
             _typeMap = typeMap;

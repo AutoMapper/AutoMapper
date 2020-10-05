@@ -9,6 +9,7 @@ namespace AutoMapper.UnitTests
 {
     namespace ExpressionBridge
     {
+        using AutoMapper.Internal;
         using QueryableExtensions;
         using QueryableExtensions.Impl;
 
@@ -124,9 +125,9 @@ namespace AutoMapper.UnitTests
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
-                _simpleProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {

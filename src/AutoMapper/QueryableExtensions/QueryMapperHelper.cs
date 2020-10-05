@@ -22,7 +22,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 letPropertyMaps.GetSubQueryMarker(customSource);
         }
 
-        public static PropertyMap GetPropertyMap(this IConfigurationProvider config, MemberInfo sourceMemberInfo, Type destinationMemberType)
+        public static PropertyMap GetPropertyMap(this IGlobalConfiguration config, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
             var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
@@ -45,7 +45,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyMap;
         }
 
-        public static TypeMap CheckIfMapExists(this IConfigurationProvider config, Type sourceType, Type destinationType)
+        public static TypeMap CheckIfMapExists(this IGlobalConfiguration config, Type sourceType, Type destinationType)
         {
             var typeMap = config.ResolveTypeMap(sourceType, destinationType);
             if(typeMap == null)
