@@ -15,12 +15,14 @@ namespace AutoMapper.Configuration
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly List<Validator> _validators = new List<Validator>();
         private readonly IList<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
+        private readonly IList<IObjectMapper> _mappers;
+        private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
         public MapperConfigurationExpression() : base()
         {
             IncludeSourceExtensionMethods(typeof(Enumerable));
 
-            Mappers = MapperRegistry.Mappers();
+            _mappers = MapperRegistry.Mappers();
         }
 
         IEnumerable<Action<IGlobalConfiguration>> IGlobalConfigurationExpression.BeforeSealActions => _beforeSealActions;
@@ -60,15 +62,15 @@ namespace AutoMapper.Configuration
         /// </summary>
         int IGlobalConfigurationExpression.RecursiveQueriesMaxDepth { get; set; }
 
-        public IEnumerable<IProfileConfiguration> Profiles => _profiles;
-        public Func<Type, object> ServiceCtor { get; private set; } = Activator.CreateInstance;
+        IEnumerable<IProfileConfiguration> IGlobalConfigurationExpression.Profiles => _profiles;
+        Func<Type, object> IGlobalConfigurationExpression.ServiceCtor => _serviceCtor;
 
         public void CreateProfile(string profileName, Action<IProfileExpression> config)
             => AddProfile(new NamedProfile(profileName, config));
 
-        public IList<IObjectMapper> Mappers { get; }
+        IList<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
 
-        public Features<IGlobalFeature> Features { get; } = new Features<IGlobalFeature>();
+        Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
 
         private class NamedProfile : Profile
         {
@@ -81,10 +83,7 @@ namespace AutoMapper.Configuration
             }
         }
 
-        public void AddProfile(Profile profile)
-        {
-            _profiles.Add(profile);
-        }
+        public void AddProfile(Profile profile) => _profiles.Add(profile);
 
         public void AddProfile<TProfile>() where TProfile : Profile, new() => AddProfile(new TProfile());
 
@@ -147,6 +146,6 @@ namespace AutoMapper.Configuration
             AddProfile(autoMapAttributeProfile);
         }
 
-        public void ConstructServicesUsing(Func<Type, object> constructor) => ServiceCtor = constructor;
+        public void ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor;
     }
 }

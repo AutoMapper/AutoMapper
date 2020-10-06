@@ -105,10 +105,6 @@ namespace AutoMapper
         /// </summary>
         IConfigurationProvider ConfigurationProvider { get; }
         /// <summary>
-        /// Factory method for creating runtime instances of converters, resolvers etc.
-        /// </summary>
-        Func<Type, object> ServiceCtor { get; }
-        /// <summary>
         /// Project the input queryable.
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>

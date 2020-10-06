@@ -20,15 +20,12 @@ namespace AutoMapper
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
-            ServiceCtor = serviceCtor ?? throw new ArgumentNullException(nameof(serviceCtor));
-            DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
+            DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor ?? throw new NullReferenceException(nameof(serviceCtor))), this);
         }
 
         internal ResolutionContext DefaultContext { get; }
 
         ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext; 
-
-        public Func<Type, object> ServiceCtor { get; }
 
         public IConfigurationProvider ConfigurationProvider { get; }
 
@@ -74,7 +71,7 @@ namespace AutoMapper
         private TDestination MapWithOptions<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts,
             Type sourceType = null, Type destinationType = null)
         {
-            var typedOptions = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
+            var typedOptions = new MappingOperationOptions<TSource, TDestination>(DefaultContext.Options.ServiceCtor);
 
             opts(typedOptions);
 

@@ -113,12 +113,6 @@ namespace AutoMapper
         bool? AllowNullCollections { get; set; }
 
         /// <summary>
-        /// Allows to enable null-value propagation for query mapping. 
-        /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
-        /// </summary>
-        bool? EnableNullPropagationForQueryMapping { get; set; }
-
-        /// <summary>
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }
@@ -134,7 +128,6 @@ namespace AutoMapper
         Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
         
         string ProfileName { get; }
-        IMemberConfiguration AddMemberConfiguration();
 
         /// <summary>
         /// Include extension methods against source members for matching destination members to. Default source extension methods from <see cref="System.Linq.Enumerable"/>

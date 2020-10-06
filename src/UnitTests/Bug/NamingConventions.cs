@@ -1,4 +1,5 @@
 using AutoMapper.Configuration.Conventions;
+using AutoMapper.Internal;
 using Shouldly;
 using System;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace AutoMapper.UnitTests.Bug
             }
             protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
             {
-                var mappers = ((Profile)c).DefaultMemberConfig.MemberMappers;
+                var mappers = c.Internal().DefaultMemberConfig.MemberMappers;
                 mappers.Remove(mappers.OfType<NameSplitMember>().Single());
                 c.CreateMap<Source, Destination>();
             });

@@ -9,6 +9,7 @@ using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests.Tests
 {
+    using AutoMapper.Internal;
     using System;
     using Assembly = System.Reflection.Assembly;
 
@@ -95,7 +96,7 @@ namespace AutoMapper.UnitTests.Tests
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
             var profile = new TestProfile();
-            profile.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = namingConvention;
                 _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
@@ -145,7 +146,7 @@ namespace AutoMapper.UnitTests.Tests
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
             var profile = new TestProfile();
-            profile.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
                 _.DestinationMemberNamingConvention = namingConvention;

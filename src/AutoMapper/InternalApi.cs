@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
+using AutoMapper.Configuration.Conventions;
 using AutoMapper.Features;
 using AutoMapper.QueryableExtensions.Impl;
 
@@ -160,6 +161,13 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression
     {
+        IMemberConfiguration DefaultMemberConfig { get; }
+        IMemberConfiguration AddMemberConfiguration();
+        /// <summary>
+        /// Allows to enable null-value propagation for query mapping. 
+        /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
+        /// </summary>
+        bool? EnableNullPropagationForQueryMapping { get; set; }
         /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>
