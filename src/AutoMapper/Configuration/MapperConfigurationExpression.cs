@@ -12,9 +12,9 @@ namespace AutoMapper.Configuration
     using Validator = Action<ValidationContext>;
     public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
     {
-        private readonly IList<Profile> _profiles = new List<Profile>();
+        private readonly List<Profile> _profiles = new List<Profile>();
         private readonly List<Validator> _validators = new List<Validator>();
-        private readonly IList<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
+        private readonly List<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
         private readonly IList<IObjectMapper> _mappers;
         private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
@@ -62,7 +62,7 @@ namespace AutoMapper.Configuration
         /// </summary>
         int IGlobalConfigurationExpression.RecursiveQueriesMaxDepth { get; set; }
 
-        IEnumerable<IProfileConfiguration> IGlobalConfigurationExpression.Profiles => _profiles;
+        IReadOnlyCollection<IProfileConfiguration> IGlobalConfigurationExpression.Profiles => _profiles;
         Func<Type, object> IGlobalConfigurationExpression.ServiceCtor => _serviceCtor;
 
         public void CreateProfile(string profileName, Action<IProfileExpression> config)

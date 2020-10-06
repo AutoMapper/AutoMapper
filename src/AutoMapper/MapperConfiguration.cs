@@ -6,7 +6,6 @@ using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
-using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper

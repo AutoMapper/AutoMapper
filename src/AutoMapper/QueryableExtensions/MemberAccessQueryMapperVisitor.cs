@@ -27,6 +27,5 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             return node;
         }
-
     }
 }

@@ -14,9 +14,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             propertyTypeMap != null && propertyTypeMap.CustomMapExpression == null;
 
         public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
-            => BindMappedTypeExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
-
-        private static MemberAssignment BindMappedTypeExpression(IGlobalConfiguration configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(request, result.ResolutionExpression, typePairCount, letPropertyMaps);
             if(transformedExpression == null)
@@ -28,7 +25,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }
-
             return Bind(propertyMap.DestinationMember, transformedExpression);
         }
     }

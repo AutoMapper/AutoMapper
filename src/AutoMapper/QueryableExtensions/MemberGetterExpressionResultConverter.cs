@@ -1,6 +1,5 @@
 using AutoMapper.Internal;
 using System.ComponentModel;
-using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {

@@ -184,5 +184,4 @@ TypesMustExist : Type 'AutoMapper.QueryableExtensions.PropertyExpression' does n
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.QueryExpressions' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor..ctor(System.Linq.Expressions.ExpressionVisitor, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Impl.QueryMapperVisitor.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
-Total Issues: 186
+Total Issues: 185

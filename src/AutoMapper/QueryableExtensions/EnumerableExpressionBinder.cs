@@ -13,9 +13,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             propertyMap.DestinationType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
 
         public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
-            => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
-
-        private static MemberAssignment BindEnumerableExpression(IGlobalConfiguration configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
@@ -39,9 +36,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return Expression.Bind(propertyMap.DestinationMember, expression);
         }
 
-        private static Expression Select(Expression source, LambdaExpression lambda)
-        {
-            return Expression.Call(typeof(Enumerable), nameof(Enumerable.Select), new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
-        }
+        private static Expression Select(Expression source, LambdaExpression lambda) =>
+            Expression.Call(typeof(Enumerable), nameof(Enumerable.Select), new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
     }
 }

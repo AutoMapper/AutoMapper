@@ -8,7 +8,7 @@ namespace AutoMapper
     using QueryableExtensions;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
     using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
-    using AutoMapper.Internal;
+    using Internal;
 
     public class Mapper : IMapper, IInternalRuntimeMapper
     {

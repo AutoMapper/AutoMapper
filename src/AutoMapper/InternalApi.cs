@@ -15,13 +15,13 @@ namespace AutoMapper.Internal
     {
         public static IGlobalConfiguration Internal(this IConfigurationProvider configuration) => (IGlobalConfiguration)configuration;
         public static IGlobalConfigurationExpression Internal(this IMapperConfigurationExpression configuration) => (IGlobalConfigurationExpression)configuration;
-        public static IProfileExpressionInternal Internal<TProfile>(this TProfile profile) where TProfile : Profile => profile;
+        public static IProfileExpressionInternal Internal(this Profile profile) => profile;
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IGlobalConfigurationExpression : IMapperConfigurationExpression, IProfileExpressionInternal
     {
         Func<Type, object> ServiceCtor { get; }
-        IEnumerable<IProfileConfiguration> Profiles { get; }
+        IReadOnlyCollection<IProfileConfiguration> Profiles { get; }
         /// <summary>
         /// Get the features collection.
         /// </summary>

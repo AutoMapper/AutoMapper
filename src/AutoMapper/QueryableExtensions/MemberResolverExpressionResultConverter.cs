@@ -5,8 +5,6 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using static Expression;
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {

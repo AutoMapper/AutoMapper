@@ -11,10 +11,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) 
             => propertyTypeMap?.CustomMapExpression != null;
 
-        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
-            => BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
-
-        private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) 
+        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
             => Expression.Bind(propertyMap.DestinationMember, propertyTypeMap.CustomMapExpression.ReplaceParameters(result.ResolutionExpression));
     }
 }
