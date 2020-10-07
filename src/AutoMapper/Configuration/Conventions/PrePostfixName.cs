@@ -27,7 +27,7 @@ namespace AutoMapper.Configuration.Conventions
             return this;
         }
 
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             var member = typeInfo.GetMember(nameToSearch);
             if (member != null)

@@ -3,9 +3,8 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration.Conventions
 {
-    public class DefaultName : CaseSensitiveName
+    public sealed class DefaultName : ISourceToDestinationNameMapper
     {
-        public override MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch) =>
-            typeInfo.GetMember(nameToSearch);
+        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch) => typeInfo.GetMember(nameToSearch);
     }
 }
