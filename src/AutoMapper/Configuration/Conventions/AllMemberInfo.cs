@@ -12,8 +12,8 @@ namespace AutoMapper.Configuration.Conventions
         public IEnumerable<MemberInfo> GetMemberInfos(TypeDetails typeInfo)
         {
             return !_predicates.Any() 
-                ? typeInfo.AllMembers 
-                : typeInfo.AllMembers.Where(m => _predicates.All(p => p(m))).ToList();
+                ? typeInfo.PublicReadAccessors 
+                : typeInfo.PublicReadAccessors.Where(m => _predicates.All(p => p(m))).ToArray();
         }
 
         public IGetTypeInfoMembers AddCondition(Func<MemberInfo, bool> predicate)

@@ -16,7 +16,6 @@ namespace AutoMapper
     public class TypeDetails
     {
         private readonly Dictionary<string, MemberInfo> _nameToMember;
-        private readonly MemberInfo[] _allMembers;
 
         public TypeDetails(Type type, ProfileMap config)
         {
@@ -26,17 +25,16 @@ namespace AutoMapper
             var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
-            PublicNoArgMethods = BuildPublicNoArgMethods(config.ShouldMapMethod);
             Constructors = GetAllConstructors(config.ShouldUseConstructor);
-            PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
-            _allMembers = PublicReadAccessors.Concat(PublicNoArgMethods).Concat(PublicNoArgExtensionMethods).ToArray();
-            _nameToMember = new Dictionary<string, MemberInfo>(_allMembers.Length, StringComparer.OrdinalIgnoreCase);
+            _nameToMember = new Dictionary<string, MemberInfo>(PublicReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
             PossibleNames(config);
         }
         public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
         private void PossibleNames(ProfileMap config)
         {
-            foreach (var member in _allMembers)
+            var publicNoArgMethods = GetPublicNoArgMethods(config.ShouldMapMethod);
+            var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
+            foreach (var member in PublicReadAccessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods))
             {
                 foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
                 {
@@ -98,19 +96,13 @@ namespace AutoMapper
 
         public Type Type { get; }
 
-        public IEnumerable<ConstructorInfo> Constructors { get; }
+        public ConstructorInfo[] Constructors { get; }
 
-        public IEnumerable<MemberInfo> PublicReadAccessors { get; }
+        public MemberInfo[] PublicReadAccessors { get; }
 
-        public IEnumerable<MemberInfo> PublicWriteAccessors { get; }
+        public MemberInfo[] PublicWriteAccessors { get; }
 
-        public IEnumerable<MethodInfo> PublicNoArgMethods { get; }
-
-        public IEnumerable<MethodInfo> PublicNoArgExtensionMethods { get; }
-
-        public IEnumerable<MemberInfo> AllMembers => _allMembers;
-
-        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        private IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType.IsAssignableFrom(Type));
 
@@ -138,7 +130,7 @@ namespace AutoMapper
                 from methodMatch in matchedMethods
                 where methodMatch.GetParameters()[0].ParameterType.IsAssignableFrom(genericInterface)
                 select methodMatch
-            ).ToArray();
+            );
         }
 
         private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers) =>
@@ -165,7 +157,7 @@ namespace AutoMapper
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
 
-        private IEnumerable<ConstructorInfo> GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
+        private ConstructorInfo[] GetAllConstructors(Func<ConstructorInfo, bool> shouldUseConstructor)
             => Type.GetDeclaredConstructors().Where(shouldUseConstructor).ToArray();
 
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
@@ -202,13 +194,10 @@ namespace AutoMapper
                 );
         }
 
-        private MethodInfo[] BuildPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod)
-        {
-            return Type.GetRuntimeMethods()
+        private IEnumerable<MethodInfo> GetPublicNoArgMethods(Func<MethodInfo, bool> shouldMapMethod) =>
+            Type.GetRuntimeMethods()
                 .Where(shouldMapMethod)
                 .Where(mi => mi.IsPublic && !mi.IsStatic && mi.DeclaringType != typeof(object))
-                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
-                .ToArray();
-        }
+                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0));
     }
 }
