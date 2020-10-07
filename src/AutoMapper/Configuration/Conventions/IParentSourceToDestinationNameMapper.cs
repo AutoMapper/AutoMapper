@@ -7,6 +7,6 @@ namespace AutoMapper.Configuration.Conventions
     public interface IParentSourceToDestinationNameMapper
     {
         ICollection<ISourceToDestinationNameMapper> NamedMappers { get; }
-        MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch);
+        MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch);
     }
 }

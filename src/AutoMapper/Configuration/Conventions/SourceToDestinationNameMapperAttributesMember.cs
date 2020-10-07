@@ -10,14 +10,14 @@ namespace AutoMapper.Configuration.Conventions
         private static readonly SourceMember[] Empty = new SourceMember[0];
         private readonly Dictionary<TypeDetails, SourceMember[]> _allSourceMembers = new Dictionary<TypeDetails, SourceMember[]>();
 
-        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
-            if (!_allSourceMembers.TryGetValue(typeInfo, out SourceMember[] sourceMembers))
+            if (!_allSourceMembers.TryGetValue(sourceTypeDetails, out SourceMember[] sourceMembers))
             {
-                sourceMembers = typeInfo.PublicReadAccessors.Select(sourceMember => new SourceMember(sourceMember)).Where(s => s.Attribute != null).ToArray();
-                _allSourceMembers[typeInfo] = sourceMembers.Length == 0 ? Empty : sourceMembers;
+                sourceMembers = sourceTypeDetails.PublicReadAccessors.Select(sourceMember => new SourceMember(sourceMember)).Where(s => s.Attribute != null).ToArray();
+                _allSourceMembers[sourceTypeDetails] = sourceMembers.Length == 0 ? Empty : sourceMembers;
             }
-            return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(typeInfo, d.Member, destType, destMemberType, nameToSearch)).Member;
+            return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(sourceTypeDetails, d.Member, destType, destMemberType, nameToSearch)).Member;
         }
 
         readonly struct SourceMember

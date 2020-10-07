@@ -243,7 +243,7 @@ namespace AutoMapper
             }
         }
 
-        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members, bool reverseNamingConventions)
+        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberInfo, LinkedList<MemberInfo> members, bool reverseNamingConventions)
         {
             if (string.IsNullOrEmpty(destMemberInfo))
             {
@@ -251,7 +251,7 @@ namespace AutoMapper
             }
             foreach (var memberConfiguration in _memberConfigurations)
             {
-                if (memberConfiguration.MapDestinationPropertyToSource(this, sourceTypeInfo, destType, destMemberType, destMemberInfo, members, reverseNamingConventions))
+                if (memberConfiguration.MapDestinationPropertyToSource(this, sourceTypeDetails, destType, destMemberType, destMemberInfo, members, reverseNamingConventions))
                 {
                     return true;
                 }

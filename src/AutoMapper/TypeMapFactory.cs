@@ -11,16 +11,16 @@ namespace AutoMapper
     {
         public static TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, bool isReverseMap = false)
         {
-            var sourceTypeInfo = options.CreateTypeDetails(sourceType);
+            var sourceTypeDetails = options.CreateTypeDetails(sourceType);
             var destTypeInfo = options.CreateTypeDetails(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, options);
+            var typeMap = new TypeMap(sourceTypeDetails, destTypeInfo, options);
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {
                 var resolvers = new LinkedList<MemberInfo>();
 
-                if (options.MapDestinationPropertyToSource(sourceTypeInfo, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers, isReverseMap))
+                if (options.MapDestinationPropertyToSource(sourceTypeDetails, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers, isReverseMap))
                 {
                     typeMap.AddPropertyMap(destProperty, resolvers);
                 }

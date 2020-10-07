@@ -27,16 +27,16 @@ namespace AutoMapper.Configuration.Conventions
             return this;
         }
 
-        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
-            var member = typeInfo.GetMember(nameToSearch);
+            var member = sourceTypeDetails.GetMember(nameToSearch);
             if (member != null)
             {
                 return member;
             }
             foreach (var possibleSourceName in TypeDetails.PossibleNames(nameToSearch, _destinationPrefixes, _destinationPostfixes))
             {
-                if ((member = typeInfo.GetMember(possibleSourceName)) != null)
+                if ((member = sourceTypeDetails.GetMember(possibleSourceName)) != null)
                 {
                     return member;
                 }
