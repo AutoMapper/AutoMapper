@@ -5,9 +5,17 @@ using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.UnitTests
 {
+    /// <summary>
+    /// Ignore this member for validation and skip during mapping
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class IgnoreMapAttribute : Attribute
+    {
+    }
     static class Utils
     {
         public static TypeMap FindTypeMapFor<TSource, TDestination>(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().FindTypeMapFor<TSource, TDestination>();
@@ -16,9 +24,21 @@ namespace AutoMapper.UnitTests
         public static void AssertConfigurationIsValid(this IConfigurationProvider configurationProvider, string profileName) => configurationProvider.Internal().AssertConfigurationIsValid(profileName);
         public static void AssertConfigurationIsValid<TProfile>(this IConfigurationProvider configurationProvider) where TProfile : Profile, new() => configurationProvider.Internal().AssertConfigurationIsValid<TProfile>();
         public static IEnumerable<ProfileMap> GetProfiles(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetProfiles();
-        public static void ForAllMaps(this IMapperConfigurationExpression configurationProvider, Action<TypeMap, AutoMapper.IMappingExpression> configuration) => configurationProvider.Internal().ForAllMaps(configuration);
+        public static void ForAllMaps(this IMapperConfigurationExpression configurationProvider, Action<TypeMap, IMappingExpression> configuration) => configurationProvider.Internal().ForAllMaps(configuration);
         public static void ForAllPropertyMaps(this IMapperConfigurationExpression configurationProvider, Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> memberOptions) => 
             configurationProvider.Internal().ForAllPropertyMaps(condition, memberOptions);
+        public static void AddIgnoreMapAttribute(this IMapperConfigurationExpression configuration)
+        {
+            configuration.ForAllMaps((typeMap, mapExpression) => mapExpression.ForAllMembers(memberOptions =>
+            {
+                if (memberOptions.DestinationMember.Has<IgnoreMapAttribute>())
+                {
+                    memberOptions.Ignore();
+                }
+            }));
+            configuration.ForAllPropertyMaps(propertyMap => propertyMap.SourceMember?.Has<IgnoreMapAttribute>() == true, 
+                (_, memberOptions) => memberOptions.Ignore());
+        }
     }
 
     public abstract class AutoMapperSpecBase : NonValidatingSpecBase

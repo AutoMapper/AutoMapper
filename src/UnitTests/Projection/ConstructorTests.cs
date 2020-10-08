@@ -69,6 +69,7 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.AddIgnoreMapAttribute();
             cfg.CreateMap<Source, Dest>()
                 .ConstructUsing(src => new Dest(src.Value + 10));
         });

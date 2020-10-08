@@ -8,7 +8,7 @@ using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests.IMappingExpression
+namespace AutoMapper.UnitTests
 {
     public class IncludeMembers : AutoMapperSpecBase
     {

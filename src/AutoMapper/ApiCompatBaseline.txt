@@ -57,6 +57,7 @@ InterfacesShouldHaveSameMembers : Interface member 'public System.Func<System.Ty
 MembersMustExist : Member 'public System.Func<System.Type, System.Object> AutoMapper.IConfigurationProvider.ServiceCtor.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public void AutoMapper.IConfigurationProvider.Validate(AutoMapper.ValidationContext)' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.IgnoreMapAttribute' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Func<System.Type, System.Object> AutoMapper.IMapper.ServiceCtor' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Func<System.Type, System.Object> AutoMapper.IMapper.ServiceCtor.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.Func<System.Type, System.Object> AutoMapper.IMapper.ServiceCtor.get()' does not exist in the implementation but it does exist in the contract.
@@ -202,4 +203,4 @@ TypesMustExist : Type 'AutoMapper.QueryableExtensions.PropertyExpression' does n
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.QueryExpressions' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor..ctor(System.Linq.Expressions.ExpressionVisitor, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 203
+Total Issues: 204

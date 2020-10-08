@@ -42,15 +42,6 @@ namespace AutoMapper.Configuration
         {
             foreach(var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
             {
-                if(destProperty.Has<IgnoreMapAttribute>())
-                {
-                    IgnoreDestinationMember(destProperty);
-                    var sourceProperty = typeMap.SourceType.GetInheritedMember(destProperty.Name);
-                    if(sourceProperty != null)
-                    {
-                        ReverseMapExpression?.IgnoreDestinationMember(sourceProperty);
-                    }
-                }
                 if(typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
                     IgnoreDestinationMember(destProperty);

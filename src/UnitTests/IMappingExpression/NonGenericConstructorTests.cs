@@ -34,8 +34,8 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Expression<Func<object, object>> constructor = src => new Dest(((Source) src).Value + 10);
-            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructUsing(constructor);
+            cfg.AddIgnoreMapAttribute();
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructUsing(src => new Dest(((Source)src).Value + 10));
         });
 
         protected override void Because_of()
@@ -52,9 +52,6 @@
         }
 
         [Fact]
-        public void Should_construct_correctly()
-        {
-            _dest[0].Other.ShouldBe(15);
-        }
+        public void Should_construct_correctly() => _dest[0].Other.ShouldBe(15);
     }
 }

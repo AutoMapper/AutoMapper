@@ -1,5 +1,6 @@
 ﻿namespace AutoMapper.IntegrationTests.Net4
 {
+    using AutoMapper.UnitTests;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Data.Entity;
