@@ -207,6 +207,7 @@ Not all mapping options can be supported, as the expression generated must be in
 * Ignore
 * NullSubstitute
 * Value transformers
+* IncludeMembers
 
 Not supported:
 * Condition
