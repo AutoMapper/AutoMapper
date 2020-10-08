@@ -238,12 +238,10 @@
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
 
         [Fact]
-        public void Should_report_unmapped_property()
-        {
-            new Action(()=> Configuration.AssertConfigurationIsValid<MyProfile>())
+        public void Should_report_unmapped_property() =>
+            new Action(()=> AssertConfigurationIsValid<MyProfile>())
                 .ShouldThrow<AutoMapperConfigurationException>()
-                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A"); ;
-        }
+                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A");
     }
 
     public class OpenGenericsProfileValidation : AutoMapperSpecBase

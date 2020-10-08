@@ -15,10 +15,12 @@ namespace AutoMapper.UnitTests.Constructors
         }
         class Destination
         {
-            public Destination(int value = 2) => Value = value;
+            public Destination(int otherValue, int value = 2) { }
             public int Value { get; set; }
+            public int OtherValue { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+            c.CreateMap<Source, Destination>().ForCtorParam("otherValue", o=>o.MapFrom(s=>0)));
     }
     public class Nullable_enum_default_value : AutoMapperSpecBase
     {
