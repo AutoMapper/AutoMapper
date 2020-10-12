@@ -56,7 +56,7 @@ namespace AutoMapper
                 if (MemberMap != null)
                 {
                     message = message + newLine + newLine + "Destination Member:";
-                    message += newLine + $"{MemberMap.DestinationName}" + newLine;
+                    message += newLine + $"{MemberMap}" + newLine;
                 }
 
                 return message;

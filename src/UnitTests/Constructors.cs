@@ -1001,7 +1001,7 @@ namespace AutoMapper.UnitTests.Constructors
         public void Should_say_what_parameter_fails()
         {
             new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
-                  ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
+                  ex.MemberMap.ToString().ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
         }
     }
 

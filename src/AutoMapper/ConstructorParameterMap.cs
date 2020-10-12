@@ -34,7 +34,7 @@ namespace AutoMapper
         public override Type DestinationType => Parameter.ParameterType;
 
         public override IReadOnlyCollection<MemberInfo> SourceMembers { get; }
-        public override string DestinationName => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
+        public override string DestinationName => Parameter.Name;
 
         public bool HasDefaultValue => Parameter.IsOptional;
 
@@ -46,5 +46,7 @@ namespace AutoMapper
         public override bool Inline { get; set; }
 
         public Expression DefaultValue() => Expression.Constant(Parameter.GetDefaultValue());
+
+        public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }
 }

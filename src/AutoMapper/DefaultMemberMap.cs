@@ -61,5 +61,6 @@ namespace AutoMapper
                                                 ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
             MapFrom(mapExpression);
         }
+        public override string ToString() => DestinationName;
     }
 }

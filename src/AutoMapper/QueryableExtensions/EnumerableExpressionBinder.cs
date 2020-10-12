@@ -9,10 +9,10 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
+        public bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
             propertyMap.DestinationType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
 
-        public MemberAssignment Build(IGlobalConfiguration configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
@@ -33,7 +33,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 var convertFunction = propertyMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
                 expression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, expression);
             }
-            return Expression.Bind(propertyMap.DestinationMember, expression);
+            return expression;
         }
 
         private static Expression Select(Expression source, LambdaExpression lambda) =>
