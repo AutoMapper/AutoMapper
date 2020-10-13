@@ -158,5 +158,12 @@ namespace AutoMapper.Execution
 
         public static Expression NullSubstitute(this IMemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
+
+        public static Expression ApplyTransformers(this IMemberMap memberMap, Expression source) =>
+            memberMap.ValueTransformers
+            .Concat(memberMap.TypeMap.ValueTransformers)
+            .Concat(memberMap.TypeMap.Profile.ValueTransformers)
+            .Where(vt => vt.IsMatch(memberMap))
+            .Aggregate(source, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
     }
 }

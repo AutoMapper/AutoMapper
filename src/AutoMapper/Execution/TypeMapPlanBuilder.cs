@@ -389,11 +389,7 @@ namespace AutoMapper.Execution
                     memberMap, destValueExpr)
                 : ContextMap(typePair, valueResolverExpr, Context, destValueExpr, memberMap);
 
-            valueResolverExpr = memberMap.ValueTransformers
-                .Concat(_typeMap.ValueTransformers)
-                .Concat(_typeMap.Profile.ValueTransformers)
-                .Where(vt => vt.IsMatch(memberMap))
-                .Aggregate(valueResolverExpr, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+            valueResolverExpr = memberMap.ApplyTransformers(valueResolverExpr);
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;

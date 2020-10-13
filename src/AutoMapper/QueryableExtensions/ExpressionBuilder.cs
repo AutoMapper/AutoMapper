@@ -157,13 +157,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         ThrowCannotMap(memberMap, resolvedSource);
                     }
                     var mappedExpression = binder.Build(_configurationProvider, memberMap, propertyTypeMap, propertyRequest, resolvedSource, typePairCount, letPropertyMaps);
-                    return mappedExpression == null ?
-                        null :
-                        memberMap.ValueTransformers
-                            .Concat(typeMap.ValueTransformers)
-                            .Concat(typeMap.Profile.ValueTransformers)
-                            .Where(vt => vt.IsMatch(memberMap))
-                            .Aggregate(mappedExpression, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+                    return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     ExpressionResolutionResult ResolveSource()
                     {
                         var result = new ExpressionResolutionResult(instanceParameter, request.SourceType);
