@@ -135,8 +135,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             Expression TryProjectMember(IMemberMap memberMap, bool? explicitExpansion = null)
             {
-                var propertyExpression = new PropertyExpression(memberMap);
-                letPropertyMaps.Push(propertyExpression);
+                var memberProjection = new MemberProjection(memberMap);
+                letPropertyMaps.Push(memberProjection);
                 var memberExpression = ShouldExpand() ? ProjectMemberCore() : null;
                 letPropertyMaps.Pop();
                 return memberExpression;
@@ -144,7 +144,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 Expression ProjectMemberCore()
                 {
                     var resolvedSource = ResolveSource();
-                    propertyExpression.Expression = resolvedSource.NonMarkerExpression;
+                    memberProjection.Expression = resolvedSource.NonMarkerExpression;
                     var propertyRequest = new ExpressionRequest(resolvedSource.Type, memberMap.DestinationType, request.MembersToExpand, request);
                     if (propertyRequest.AlreadyExists && depth >= _configurationProvider.RecursiveQueriesMaxDepth)
                     {
@@ -247,7 +247,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         [EditorBrowsable(EditorBrowsableState.Never)]
         public class FirstPassLetPropertyMaps : LetPropertyMaps
         {
-            readonly Stack<PropertyExpression> _currentPath = new Stack<PropertyExpression>();
+            readonly Stack<MemberProjection> _currentPath = new Stack<MemberProjection>();
             readonly List<PropertyPath> _savedPaths = new List<PropertyPath>();
             readonly MemberPath _parentPath;
             public FirstPassLetPropertyMaps(IGlobalConfiguration configurationProvider, MemberPath parentPath) : base(configurationProvider) =>
@@ -265,10 +265,10 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return propertyPath.Marker;
             }
 
-            public override void Push(PropertyExpression propertyExpression) => _currentPath.Push(propertyExpression);
+            public override void Push(MemberProjection memberProjection) => _currentPath.Push(memberProjection);
 
             public override MemberPath GetCurrentPath() => _parentPath.Concat(
-                _currentPath.Reverse().Select(p => (p.PropertyMap as PropertyMap)?.DestinationMember).Where(p => p != null));
+                _currentPath.Reverse().Select(p => (p.MemberMap as PropertyMap)?.DestinationMember).Where(p => p != null));
 
             public override void Pop() => _currentPath.Pop();
 
@@ -370,7 +370,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
 
-        public virtual void Push(PropertyExpression propertyExpression) { }
+        public virtual void Push(MemberProjection memberProjection) { }
 
         public virtual MemberPath GetCurrentPath() => MemberPath.Empty;
 
@@ -387,19 +387,19 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public readonly struct PropertyPath
         {
-            public PropertyPath(PropertyExpression[] properties, LambdaExpression letExpression)
+            public PropertyPath(MemberProjection[] properties, LambdaExpression letExpression)
             {
                 Properties = properties;
                 Marker = Default(letExpression.Body.Type);
                 LetExpression = letExpression;
             }
-            private PropertyExpression[] Properties { get; }
+            private MemberProjection[] Properties { get; }
             public Expression Marker { get; }
             public LambdaExpression LetExpression { get; }
             public Expression GetSourceExpression(Expression parameter) => Properties.Take(Properties.Length - 1).Select(p=>p.Expression).Chain(parameter);
-            public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", Properties.Select(p => p.PropertyMap.DestinationName)), LetExpression.Body.Type);
+            public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", Properties.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
             internal bool IsEquivalentTo(PropertyPath other) => LetExpression == other.LetExpression && Properties.Length == other.Properties.Length &&
-                Properties.Take(Properties.Length - 1).Zip(other.Properties, (left, right) => left.PropertyMap == right.PropertyMap).All(item => item);
+                Properties.Take(Properties.Length - 1).Zip(other.Properties, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
         }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -423,10 +423,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(this IExpressionBuilder expressionBuilder) => 
             (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource), typeof(TDestination), null, Array.Empty<MemberPath>()).Projection;
     }
-    public class PropertyExpression
+    public class MemberProjection
     {
-        public PropertyExpression(IMemberMap propertyMap) => PropertyMap = propertyMap;
+        public MemberProjection(IMemberMap propertyMap) => MemberMap = propertyMap;
         public Expression Expression { get; set; }
-        public IMemberMap PropertyMap { get; }
+        public IMemberMap MemberMap { get; }
     }
 }

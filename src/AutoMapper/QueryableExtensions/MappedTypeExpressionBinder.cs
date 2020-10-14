@@ -10,10 +10,10 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => 
-            propertyTypeMap != null && propertyTypeMap.CustomMapExpression == null;
+        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) =>
+            memberTypeMap != null && memberTypeMap.CustomMapExpression == null;
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
         {
             var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(request, result.ResolutionExpression, typePairCount, letPropertyMaps);
             if(transformedExpression == null)
@@ -21,7 +21,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return null;
             }
             // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
-            if (propertyMap.AllowsNullDestinationValues() && !(result.ResolutionExpression is ParameterExpression) && !result.ResolutionExpression.Type.IsCollectionType())
+            if (memberMap.AllowsNullDestinationValues() && !(result.ResolutionExpression is ParameterExpression) && !result.ResolutionExpression.Type.IsCollectionType())
             {
                 transformedExpression = result.ResolutionExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }

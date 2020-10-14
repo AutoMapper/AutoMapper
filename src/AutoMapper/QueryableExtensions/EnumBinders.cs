@@ -9,23 +9,23 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class EnumBinder : IExpressionBinder
     {
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
-            => Convert(result.ResolutionExpression, propertyMap.DestinationType);
-        public abstract bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result);
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
+            => Convert(result.ResolutionExpression, memberMap.DestinationType);
+        public abstract bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumToUnderlyingTypeBinder : EnumBinder
     {
-        public override bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsEnumToUnderlyingType();
+        public override bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) => memberMap.Types.IsEnumToUnderlyingType();
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class UnderlyingTypeToEnumBinder : EnumBinder
     {
-        public override bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsUnderlyingTypeToEnum();
+        public override bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) => memberMap.Types.IsUnderlyingTypeToEnum();
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumToEnumBinder : EnumBinder
     {
-        public override bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => propertyMap.Types.IsEnumToEnum();
+        public override bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) => memberMap.Types.IsEnumToEnum();
     }
 }

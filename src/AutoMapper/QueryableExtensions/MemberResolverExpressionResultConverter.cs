@@ -9,14 +9,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
         public ExpressionResolutionResult GetExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap, LetPropertyMaps letPropertyMaps)
+            ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap, LetPropertyMaps letPropertyMaps)
         {
-            var mapFrom = propertyMap.CustomMapExpression;
-            if (!IsSubQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationType) == null)
+            var mapFrom = memberMap.CustomMapExpression;
+            if (!IsSubQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType) == null)
             {
-                return new ExpressionResolutionResult(mapFrom.ReplaceParameters(propertyMap.CheckCustomSource(expressionResolutionResult, letPropertyMaps)));
+                return new ExpressionResolutionResult(mapFrom.ReplaceParameters(memberMap.CheckCustomSource(expressionResolutionResult, letPropertyMaps)));
             }
-            var customSource = propertyMap.ProjectToCustomSource;
+            var customSource = memberMap.ProjectToCustomSource;
             if (customSource == null)
             {
                 return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(mapFrom), mapFrom);
@@ -33,6 +33,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return method.IsStatic && method.DeclaringType == typeof(Enumerable);
             }
         }
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) => propertyMap.CustomMapExpression != null;
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap) => memberMap.CustomMapExpression != null;
     }
 }

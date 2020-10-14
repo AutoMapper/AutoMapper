@@ -9,13 +9,13 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            propertyMap.DestinationType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType();
+        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) =>
+            memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
         {
-            var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationType);
-            var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
+            var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
+            var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
             var expression = result.ResolutionExpression;
 
             if (sourceListType != destinationListType)
@@ -28,9 +28,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 expression = transformedExpressions.Chain(expression, Select);
             }
-            if (!propertyMap.DestinationType.IsAssignableFrom(expression.Type))
+            if (!memberMap.DestinationType.IsAssignableFrom(expression.Type))
             {
-                var convertFunction = propertyMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
+                var convertFunction = memberMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
                 expression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, expression);
             }
             return expression;

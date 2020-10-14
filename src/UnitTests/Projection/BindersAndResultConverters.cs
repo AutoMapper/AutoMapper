@@ -42,11 +42,11 @@ namespace AutoMapper.UnitTests.Projection
 
         private class EnumToUnderlyingTypeBinder : IExpressionBinder
         {
-            public Expression Build(IGlobalConfiguration configuration, IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
-                Convert(result.ResolutionExpression, propertyMap.DestinationType);
+            public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
+                Convert(result.ResolutionExpression, memberMap.DestinationType);
 
-            public bool IsMatch(IMemberMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationType;
+            public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) =>
+                memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
         }
     }
 
@@ -77,13 +77,13 @@ namespace AutoMapper.UnitTests.Projection
 
         private class EnumToUnderlyingTypeResultConverter : IExpressionResultConverter
         {
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap) =>
-                propertyMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(propertyMap.SourceType) == propertyMap.DestinationType;
+            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap) =>
+                memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
 
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap propertyMap, LetPropertyMaps letPropertyMaps) =>
+            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap, LetPropertyMaps letPropertyMaps) =>
                 new ExpressionResolutionResult(
-                    Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, propertyMap.SourceMember), propertyMap.DestinationType), 
-                    propertyMap.DestinationType);
+                    Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, memberMap.SourceMember), memberMap.DestinationType), 
+                    memberMap.DestinationType);
         }
     }
 }
