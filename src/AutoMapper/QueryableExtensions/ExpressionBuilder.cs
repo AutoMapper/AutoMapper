@@ -185,7 +185,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({result.Type}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})";
             throw new AutoMapperMappingException(message, null, memberMap.TypeMap.Types, memberMap.TypeMap, memberMap);
         }
-        private abstract class ParameterExpressionVisitor : ExpressionVisitor
+        abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
             public static Expression SetParameters(object parameters, Expression expression)
             {
@@ -213,7 +213,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 return ToType(parameterValue, node.Member.GetMemberType());
             }
-            private class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
+            class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
             {
                 private readonly object _parameters;
                 public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
@@ -223,7 +223,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     return matchingMember != null ? Property(Constant(_parameters), matchingMember) : null;
                 }
             }
-            private class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
+            class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
             {
                 private readonly ParameterBag _paramValues;
                 public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;
@@ -232,7 +232,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
         }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public class FirstPassLetPropertyMaps : LetPropertyMaps
+        class FirstPassLetPropertyMaps : LetPropertyMaps
         {
             readonly Stack<MemberProjection> _currentPath = new Stack<MemberProjection>();
             readonly List<SubQueryPath> _savedPaths = new List<SubQueryPath>();
@@ -288,6 +288,22 @@ namespace AutoMapper.QueryableExtensions.Impl
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
+            readonly struct SubQueryPath
+            {
+                public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression)
+                {
+                    Members = members;
+                    Marker = Default(letExpression.Body.Type);
+                    LetExpression = letExpression;
+                }
+                private MemberProjection[] Members { get; }
+                public Expression Marker { get; }
+                public LambdaExpression LetExpression { get; }
+                public Expression GetSourceExpression(Expression parameter) => Members.Take(Members.Length - 1).Select(p => p.Expression).Chain(parameter);
+                public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
+                internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
+                    Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
+            }
             class GetMemberAccessesVisitor : ExpressionVisitor
             {
                 private readonly Expression _target;
@@ -340,22 +356,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         public virtual LetPropertyMaps New() => new LetPropertyMaps(ConfigurationProvider);
         public virtual QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, ParameterExpression instanceParameter, TypePairCount typePairCount)
             => new QueryExpressions(projection, instanceParameter);
-        public readonly struct SubQueryPath
-        {
-            public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression)
-            {
-                Members = members;
-                Marker = Default(letExpression.Body.Type);
-                LetExpression = letExpression;
-            }
-            private MemberProjection[] Members { get; }
-            public Expression Marker { get; }
-            public LambdaExpression LetExpression { get; }
-            public Expression GetSourceExpression(Expression parameter) => Members.Take(Members.Length - 1).Select(p=>p.Expression).Chain(parameter);
-            public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
-            internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
-                Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
-        }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct QueryExpressions
