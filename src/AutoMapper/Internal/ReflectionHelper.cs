@@ -77,18 +77,12 @@ namespace AutoMapper.Internal
         private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
             => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
 
-        public static object GetMemberValue(this MemberInfo propertyOrField, object target)
+        public static object GetMemberValue(this MemberInfo propertyOrField, object target) => propertyOrField switch
         {
-            if (propertyOrField is PropertyInfo property)
-            {
-                return property.GetValue(target, null);
-            }
-            if (propertyOrField is FieldInfo field)
-            {
-                return field.GetValue(target);
-            }
-            throw Expected(propertyOrField);
-        }
+            PropertyInfo property => property.GetValue(target, null),
+            FieldInfo field => field.GetValue(target),
+            _ => throw Expected(propertyOrField)
+        };
 
         public static MemberInfo[] GetMemberPath(Type type, string fullMemberName)
         {
@@ -154,21 +148,13 @@ namespace AutoMapper.Internal
                 "Custom configuration for members is only supported for top-level individual members on a type.");
         }
 
-        public static Type GetMemberType(this MemberInfo memberInfo)
+        public static Type GetMemberType(this MemberInfo member) => member switch
         {
-            switch (memberInfo)
-            {
-                case MethodInfo mInfo:
-                    return mInfo.ReturnType;
-                case PropertyInfo pInfo:
-                    return pInfo.PropertyType;
-                case FieldInfo fInfo:
-                    return fInfo.FieldType;
-                case null:
-                    throw new ArgumentNullException(nameof(memberInfo));
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(memberInfo));
-            }
-        }
+            MethodInfo method => method.ReturnType,
+            PropertyInfo property => property.PropertyType,
+            FieldInfo field => field.FieldType,
+            null => throw new ArgumentNullException(nameof(member)),
+            _ => throw new ArgumentOutOfRangeException(nameof(member))
+        };
     }
 }

@@ -31,7 +31,7 @@ namespace AutoMapper
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
 
-        public MapperConfiguration(IMapperConfigurationExpression configurationExpression)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             var configuration = (IGlobalConfigurationExpression)configurationExpression;
             _mappers = configuration.Mappers.ToArray();

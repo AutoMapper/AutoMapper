@@ -13,15 +13,7 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
-        public static bool IsSubQuery(this Expression expression)
-        {
-            if (!(expression is MethodCallExpression methodCall))
-            {
-                return false;
-            }
-            var method = methodCall.Method;
-            return method.IsStatic && method.DeclaringType == typeof(Enumerable);
-        }
+        public static bool IsQuery(this Expression expression) => expression is MethodCallExpression { Method: var method } && method.IsStatic && method.DeclaringType == typeof(Enumerable);
         public static Expression Chain(this IEnumerable<Expression> expressions, Expression parameter) => expressions.Aggregate(parameter,
             (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().FirstOrDefault().Target, left));
         public static LambdaExpression Lambda(this MemberInfo member) => new[] { member }.Lambda();
@@ -55,12 +47,12 @@ namespace AutoMapper.Internal
                 {
                     var member = expression switch
                     {
-                        MemberExpression { Expression: var target, Member: var memberInfo } when !memberInfo.IsStatic() => 
-                            new Member(expression, memberInfo, target),
-                        MethodCallExpression { Method: var extensionMethod } methodCall when methodCall.Arguments.Count > 0 && extensionMethod.IsExtensionMethod() =>
-                            new Member(expression, extensionMethod, methodCall.Arguments[0]),
-                        MethodCallExpression { Method: var instanceMethod } instanceMethodCall when !instanceMethod.IsStatic => 
-                            new Member(expression, instanceMethod, instanceMethodCall.Object),
+                        MemberExpression { Expression: var target, Member: var propertyOrField } when !propertyOrField.IsStatic() => 
+                            new Member(expression, propertyOrField, target),
+                        MethodCallExpression { Method: var extensionMethod, Arguments: var arguments } when arguments.Count > 0 && extensionMethod.IsExtensionMethod() =>
+                            new Member(expression, extensionMethod, arguments[0]),
+                        MethodCallExpression { Method: var instanceMethod, Object: var target } when !instanceMethod.IsStatic => 
+                            new Member(expression, instanceMethod, target),
                         _ => default
                     };
                     if (member.Expression == null)

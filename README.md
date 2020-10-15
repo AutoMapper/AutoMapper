@@ -1,8 +1,8 @@
 <img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
 
-[![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/automapper/automapper/workflows/CI)
+[![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/AutoMapper/AutoMapper/actions?query=workflow%3ACI)
 [![NuGet](http://img.shields.io/nuget/v/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
-[![MyGet (dev)](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](http://myget.org/gallery/automapperdev)
+[![MyGet (dev)](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](https://myget.org/feed/automapperdev/package/nuget/AutoMapper)
 
 ### What is AutoMapper?
 

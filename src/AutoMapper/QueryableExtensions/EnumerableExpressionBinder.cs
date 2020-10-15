@@ -9,14 +9,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult result) =>
+        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult resolvedSource) =>
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
-            var expression = result.ResolutionExpression;
+            var sourceExpression = resolvedSource.ResolutionExpression;
 
             if (sourceListType != destinationListType)
             {
@@ -26,14 +26,14 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     return null;
                 }
-                expression = transformedExpressions.Chain(expression, Select);
+                sourceExpression = transformedExpressions.Chain(sourceExpression, Select);
             }
-            if (!memberMap.DestinationType.IsAssignableFrom(expression.Type))
+            if (!memberMap.DestinationType.IsAssignableFrom(sourceExpression.Type))
             {
                 var convertFunction = memberMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
-                expression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, expression);
+                sourceExpression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, sourceExpression);
             }
-            return expression;
+            return sourceExpression;
         }
 
         private static Expression Select(Expression source, LambdaExpression lambda) =>

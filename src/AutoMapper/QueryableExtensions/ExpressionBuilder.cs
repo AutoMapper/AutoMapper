@@ -146,7 +146,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     ExpressionResolutionResult ResolveSource()
                     {
-                        var result = memberMap switch
+                        var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
                             { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => new ExpressionResolutionResult(sourceMembers.MemberAccesses(CheckCustomSource())),
@@ -154,12 +154,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                         };
                         if (NullSubstitute())
                         {
-                            return new ExpressionResolutionResult(memberMap.NullSubstitute(result.ResolutionExpression));
+                            return new ExpressionResolutionResult(memberMap.NullSubstitute(resolvedSource.ResolutionExpression));
                         }
-                        return result;
+                        return resolvedSource;
                         ExpressionResolutionResult MapFromExpression(LambdaExpression mapFrom)
                         {
-                            if (!mapFrom.Body.IsSubQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType) == null)
+                            if (!mapFrom.Body.IsQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType) == null)
                             {
                                 return new ExpressionResolutionResult(mapFrom.ReplaceParameters(CheckCustomSource()));
                             }
@@ -171,7 +171,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
                             return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(newMapFrom), newMapFrom);
                         }
-                        bool NullSubstitute() => memberMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string));
+                        bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource.ResolutionExpression is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                         Expression CheckCustomSource()
                         {
                             var customSource = memberMap.ProjectToCustomSource;

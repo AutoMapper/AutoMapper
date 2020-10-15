@@ -85,7 +85,6 @@ MembersMustExist : Member 'public void AutoMapper.IProfileExpression.ForAllMaps(
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IProfileExpression.ForAllPropertyMaps(System.Func<AutoMapper.PropertyMap, System.Boolean>, System.Action<AutoMapper.PropertyMap, AutoMapper.IMemberConfigurationExpression>)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public void AutoMapper.IProfileExpression.ForAllPropertyMaps(System.Func<AutoMapper.PropertyMap, System.Boolean>, System.Action<AutoMapper.PropertyMap, AutoMapper.IMemberConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Func<System.Type, System.Object> AutoMapper.Mapper.ServiceCtor.get()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public void AutoMapper.MapperConfiguration..ctor(AutoMapper.Configuration.MapperConfigurationExpression)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.AssertConfigurationIsValid(AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.AssertConfigurationIsValid(System.String)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.MapperConfiguration.AssertConfigurationIsValid<TProfile>()' does not exist in the implementation but it does exist in the contract.
@@ -203,4 +202,4 @@ TypesMustExist : Type 'AutoMapper.QueryableExtensions.PropertyExpression' does n
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.QueryExpressions' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor..ctor(System.Linq.Expressions.ExpressionVisitor, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 204
+Total Issues: 203
