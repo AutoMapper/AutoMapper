@@ -51,7 +51,6 @@ namespace AutoMapper.Internal
         /// </summary>
         int MaxExecutionPlanDepth { get; set; }
         Validator[] GetValidators();
-        List<IExpressionResultConverter> QueryableResultConverters { get; }
         List<IExpressionBinder> QueryableBinders { get; }
         /// <summary>
         /// How many levels deep should recursive queries be expanded.
@@ -132,7 +131,6 @@ namespace AutoMapper.Internal
         /// <returns>the matching mapper or null</returns>
         IObjectMapper FindMapper(TypePair types);
         IExpressionBuilder ExpressionBuilder { get; }
-        IEnumerable<IExpressionResultConverter> ResultConverters { get; }
         IEnumerable<IExpressionBinder> Binders { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);

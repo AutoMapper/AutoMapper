@@ -52,8 +52,6 @@ namespace AutoMapper.Configuration
 
         Validator[] IGlobalConfigurationExpression.GetValidators() => _validators.ToArray();
 
-        List<IExpressionResultConverter> IGlobalConfigurationExpression.QueryableResultConverters { get; } = ExpressionBuilder.DefaultResultConverters();
-
         List<IExpressionBinder> IGlobalConfigurationExpression.QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
 
         /// <summary>

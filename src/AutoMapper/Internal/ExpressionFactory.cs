@@ -9,9 +9,19 @@ using System.Runtime.CompilerServices;
 namespace AutoMapper.Internal
 {
     using static Expression;
+
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
+        public static bool IsSubQuery(this Expression expression)
+        {
+            if (!(expression is MethodCallExpression methodCall))
+            {
+                return false;
+            }
+            var method = methodCall.Method;
+            return method.IsStatic && method.DeclaringType == typeof(Enumerable);
+        }
         public static Expression Chain(this IEnumerable<Expression> expressions, Expression parameter) => expressions.Aggregate(parameter,
             (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().FirstOrDefault().Target, left));
         public static LambdaExpression Lambda(this MemberInfo member) => new[] { member }.Lambda();

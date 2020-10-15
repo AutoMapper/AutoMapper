@@ -25,12 +25,6 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ExpressionBuilder : IExpressionBuilder
     {
-        internal static List<IExpressionResultConverter> DefaultResultConverters() =>
-            new List<IExpressionResultConverter>
-            {
-                new MemberResolverExpressionResultConverter(),
-                new MemberGetterExpressionResultConverter()
-            };
         internal static List<IExpressionBinder> DefaultBinders() =>
             new List<IExpressionBinder>
             {
@@ -146,24 +140,47 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var binder = _configurationProvider.Binders.FirstOrDefault(b => b.IsMatch(memberMap, memberTypeMap, resolvedSource));
                     if (binder == null)
                     {
-                        ThrowCannotMap(memberMap, resolvedSource);
+                        throw CannotMap(memberMap, resolvedSource.Type);
                     }
                     var mappedExpression = binder.Build(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, typePairCount, letPropertyMaps);
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     ExpressionResolutionResult ResolveSource()
                     {
-                        var result = new ExpressionResolutionResult(instanceParameter, request.SourceType);
-                        var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, memberMap));
-                        if (matchingExpressionConverter == null)
+                        var result = memberMap switch
                         {
-                            ThrowCannotMap(memberMap, result);
-                        }
-                        result = matchingExpressionConverter.GetExpressionResolutionResult(result, memberMap, letPropertyMaps);
-                        if (memberMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string)))
+                            { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
+                            { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => new ExpressionResolutionResult(sourceMembers.MemberAccesses(CheckCustomSource())),
+                            _ => throw CannotMap(memberMap, request.SourceType)
+                        };
+                        if (NullSubstitute())
                         {
                             return new ExpressionResolutionResult(memberMap.NullSubstitute(result.ResolutionExpression));
                         }
                         return result;
+                        ExpressionResolutionResult MapFromExpression(LambdaExpression mapFrom)
+                        {
+                            if (!mapFrom.Body.IsSubQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType) == null)
+                            {
+                                return new ExpressionResolutionResult(mapFrom.ReplaceParameters(CheckCustomSource()));
+                            }
+                            var customSource = memberMap.ProjectToCustomSource;
+                            if (customSource == null)
+                            {
+                                return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(mapFrom), mapFrom);
+                            }
+                            var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
+                            return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(newMapFrom), newMapFrom);
+                        }
+                        bool NullSubstitute() => memberMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string));
+                        Expression CheckCustomSource()
+                        {
+                            var customSource = memberMap.ProjectToCustomSource;
+                            if (customSource == null)
+                            {
+                                return instanceParameter;
+                            }
+                            return customSource.IsMemberPath() ? customSource.ReplaceParameters(instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
+                        }
                     }
                 }
             }
@@ -179,12 +196,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                     New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map) ?? Default(map.DestinationType)));
             }
         }
-        private static void ThrowCannotMap(IMemberMap memberMap, ExpressionResolutionResult result)
-        {
-            var message =
-                $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({result.Type}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})";
-            throw new AutoMapperMappingException(message, null, memberMap.TypeMap.Types, memberMap.TypeMap, memberMap);
-        }
+        private static AutoMapperMappingException CannotMap(IMemberMap memberMap, Type sourceType) => new AutoMapperMappingException(
+            $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
+            null, memberMap.TypeMap.Types, memberMap.TypeMap, memberMap);
         abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
             public static Expression SetParameters(object parameters, Expression expression)

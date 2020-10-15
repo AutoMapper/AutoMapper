@@ -10,18 +10,6 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class QueryMapperHelper
     {
-        public static Expression CheckCustomSource(this IMemberMap memberMap, ExpressionResolutionResult expressionResolutionResult, LetPropertyMaps letPropertyMaps)
-        {
-            var customSource = memberMap.ProjectToCustomSource;
-            if (customSource == null)
-            {
-                return expressionResolutionResult.ResolutionExpression;
-            }
-            return customSource.IsMemberPath() ?
-                customSource.ReplaceParameters(expressionResolutionResult.ResolutionExpression) :
-                letPropertyMaps.GetSubQueryMarker(customSource);
-        }
-
         public static PropertyMap GetPropertyMap(this IGlobalConfiguration config, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
             var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);

@@ -27,7 +27,6 @@ namespace AutoMapper
         private readonly Features<IRuntimeFeature> _features = new Features<IRuntimeFeature>();
         private readonly int _recursiveQueriesMaxDepth;
         private readonly IEnumerable<IExpressionBinder> _binders;
-        private readonly IEnumerable<IExpressionResultConverter> _resultConverters;
         private readonly int _maxExecutionPlanDepth;
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
@@ -44,7 +43,6 @@ namespace AutoMapper
             _serviceCtor = configuration.ServiceCtor;
             _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
             _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
-            _resultConverters = configuration.QueryableResultConverters.ToArray();
             _binders = configuration.QueryableBinders.ToArray();
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
@@ -101,7 +99,6 @@ namespace AutoMapper
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
         internal IEnumerable<ProfileMap> Profiles { get; }
-        IEnumerable<IExpressionResultConverter> IGlobalConfiguration.ResultConverters => _resultConverters;
         IEnumerable<IExpressionBinder> IGlobalConfiguration.Binders => _binders;
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;

@@ -49,41 +49,4 @@ namespace AutoMapper.UnitTests.Projection
                 memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
         }
     }
-
-    public class QueryableResultConverters : AutoMapperSpecBase
-    {
-        class Source
-        {
-            public ConsoleColor Color { get; set; }
-        }
-
-        class Destination
-        {
-            public int Color { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-        {
-            cfg.Internal().QueryableResultConverters.Insert(0, new EnumToUnderlyingTypeResultConverter());
-            cfg.CreateMap<Source, Destination>();
-        });
-
-        [Fact]
-        public void Should_work_with_projections()
-        {
-            var destination = new[] { new Source { Color = ConsoleColor.Cyan } }.AsQueryable().ProjectTo<Destination>(Configuration).First();
-            destination.Color.ShouldBe(11);
-        }
-
-        private class EnumToUnderlyingTypeResultConverter : IExpressionResultConverter
-        {
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap) =>
-                memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
-
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IMemberMap memberMap, LetPropertyMaps letPropertyMaps) =>
-                new ExpressionResolutionResult(
-                    Convert(MakeMemberAccess(expressionResolutionResult.ResolutionExpression, memberMap.SourceMember), memberMap.DestinationType), 
-                    memberMap.DestinationType);
-        }
-    }
 }
