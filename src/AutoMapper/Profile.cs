@@ -138,11 +138,6 @@ namespace AutoMapper
         }
 
         public void IncludeSourceExtensionMethods(Type type) =>
-            _sourceExtensionMethods.AddRange(
-                type.GetDeclaredMethods()
-                    .Where(
-                        m =>
-                            m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
-                            m.GetParameters().Length == 1));
+            _sourceExtensionMethods.AddRange(type.GetDeclaredMethods().Where(m => m.IsExtensionMethod() && m.GetParameters().Length == 1));
     }
 }

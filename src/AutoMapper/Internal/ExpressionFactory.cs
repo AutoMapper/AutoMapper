@@ -51,33 +51,24 @@ namespace AutoMapper.Internal
             return GetMembersCore().Reverse();
             IEnumerable<Member> GetMembersCore()
             {
-                Expression target;
-                MemberInfo memberInfo;
                 while (expression != null)
                 {
-                    switch (expression)
+                    var member = expression switch
                     {
-                        case MemberExpression member:
-                            target = member.Expression;
-                            memberInfo = member.Member;
-                            break;
-                        case MethodCallExpression methodCall when methodCall.Method.IsStatic:
-                            if (methodCall.Arguments.Count == 0 || !methodCall.Method.Has<ExtensionAttribute>())
-                            {
-                                yield break;
-                            }
-                            target = methodCall.Arguments[0];
-                            memberInfo = methodCall.Method;
-                            break;
-                        case MethodCallExpression methodCall:
-                            target = methodCall.Object;
-                            memberInfo = methodCall.Method;
-                            break;
-                        default:
-                            yield break;
+                        MemberExpression { Expression: var target, Member: var memberInfo } when !memberInfo.IsStatic() => 
+                            new Member(expression, memberInfo, target),
+                        MethodCallExpression { Method: var extensionMethod } methodCall when methodCall.Arguments.Count > 0 && extensionMethod.IsExtensionMethod() =>
+                            new Member(expression, extensionMethod, methodCall.Arguments[0]),
+                        MethodCallExpression { Method: var instanceMethod } instanceMethodCall when !instanceMethod.IsStatic => 
+                            new Member(expression, instanceMethod, instanceMethodCall.Object),
+                        _ => default
+                    };
+                    if (member.Expression == null)
+                    {
+                        yield break;
                     }
-                    yield return new Member(expression, memberInfo, target);
-                    expression = target;
+                    yield return member;
+                    expression = member.Target;
                 }
             }
         }

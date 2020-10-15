@@ -6,12 +6,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace AutoMapper.Internal
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
+        public static bool IsExtensionMethod(this MethodInfo method) => method.IsStatic && method.Has<ExtensionAttribute>();
+
         public static bool IsStatic(this FieldInfo fieldInfo) => fieldInfo?.IsStatic ?? false;
 
         public static bool IsStatic(this PropertyInfo propertyInfo) => propertyInfo?.GetGetMethod(true)?.IsStatic
