@@ -7,6 +7,20 @@ using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.Projection
 {
+    public class NonNullableToNullable : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Id { get; set; }
+        }
+        class Destination
+        {
+            public int? Id { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+        [Fact]
+        public void Should_project() => ProjectTo<Destination>(new[] { new Source() }.AsQueryable()).First().Id.ShouldBe(0);
+    }
     public class InMemoryMapObjectPropertyFromSubQuery : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
