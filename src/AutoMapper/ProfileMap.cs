@@ -58,18 +58,22 @@ namespace AutoMapper
 
             Prefixes =
                 profile.MemberConfigurations
+                    .Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
                     .Select(m => m.NameMapper)
                     .SelectMany(m => m.NamedMappers)
                     .OfType<PrePostfixName>()
                     .SelectMany(m => m.Prefixes)
+                    .Distinct()
                     .ToList();
 
             Postfixes =
                 profile.MemberConfigurations
+                    .Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
                     .Select(m => m.NameMapper)
                     .SelectMany(m => m.NamedMappers)
                     .OfType<PrePostfixName>()
                     .SelectMany(m => m.Postfixes)
+                    .Distinct()
                     .ToList();
 
             _typeMapConfigs = profile.TypeMapConfigs.ToArray();
