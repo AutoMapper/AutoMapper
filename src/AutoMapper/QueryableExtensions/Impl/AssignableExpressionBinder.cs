@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -12,6 +13,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             => BindAssignableExpression(propertyMap, result);
 
         private static MemberAssignment BindAssignableExpression(PropertyMap propertyMap, ExpressionResolutionResult result) 
-            => Expression.Bind(propertyMap.DestinationMember, result.ResolutionExpression);
+            => Expression.Bind(propertyMap.DestinationMember, ExpressionFactory.ToType(result.ResolutionExpression, propertyMap.DestinationType));
     }
 }
