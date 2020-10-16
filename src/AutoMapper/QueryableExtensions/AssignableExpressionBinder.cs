@@ -12,6 +12,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             => memberTypeMap == null && memberMap.DestinationType.IsAssignableFrom(resolvedSource.Type);
 
         public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
-            => resolvedSource.ResolutionExpression;
+            => ExpressionFactory.ToType(resolvedSource.ResolutionExpression, memberMap.DestinationType);
     }
 }
