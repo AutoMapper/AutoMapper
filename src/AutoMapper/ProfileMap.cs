@@ -56,31 +56,17 @@ namespace AutoMapper
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(configuration?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(configuration?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
 
-            Prefixes =
-                profile.MemberConfigurations
-                    .Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
-                    .Select(m => m.NameMapper)
-                    .SelectMany(m => m.NamedMappers)
-                    .OfType<PrePostfixName>()
-                    .SelectMany(m => m.Prefixes)
-                    .Distinct()
-                    .ToList();
-
-            Postfixes =
-                profile.MemberConfigurations
-                    .Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
-                    .Select(m => m.NameMapper)
-                    .SelectMany(m => m.NamedMappers)
-                    .OfType<PrePostfixName>()
-                    .SelectMany(m => m.Postfixes)
-                    .Distinct()
-                    .ToList();
+            var prePostFixes = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
+                                        .Select(m => m.NameMapper)
+                                        .SelectMany(m => m.NamedMappers)
+                                        .OfType<PrePostfixName>()
+                                        .ToArray();
+            Prefixes = prePostFixes.SelectMany(m => m.Prefixes).Distinct().ToList();
+            Postfixes = prePostFixes.SelectMany(m => m.Postfixes).Distinct().ToList();
 
             _typeMapConfigs = profile.TypeMapConfigs.ToArray();
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
         }
-
-
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
