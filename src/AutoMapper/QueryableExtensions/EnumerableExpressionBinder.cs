@@ -12,7 +12,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
@@ -21,7 +21,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (sourceListType != destinationListType)
             {
                 var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
-                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount, letPropertyMaps.New());
+                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, letPropertyMaps.New());
                 if(transformedExpressions.Empty)
                 {
                     return null;

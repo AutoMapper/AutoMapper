@@ -13,9 +13,9 @@ namespace AutoMapper.QueryableExtensions.Impl
         public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
             memberTypeMap != null && memberTypeMap.CustomMapExpression == null;
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
-            var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(request, resolvedSource, typePairCount, letPropertyMaps);
+            var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(request, resolvedSource, letPropertyMaps);
             if(transformedExpression == null)
             {
                 return null;

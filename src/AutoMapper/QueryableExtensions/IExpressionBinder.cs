@@ -9,6 +9,6 @@ namespace AutoMapper.QueryableExtensions.Impl
     public interface IExpressionBinder
     {
         bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource);
-        Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps);
+        Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
 }
