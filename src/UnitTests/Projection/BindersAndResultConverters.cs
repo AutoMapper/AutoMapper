@@ -42,10 +42,10 @@ namespace AutoMapper.UnitTests.Projection
 
         private class EnumToUnderlyingTypeBinder : IExpressionBinder
         {
-            public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
-                Convert(resolvedSource.ResolutionExpression, memberMap.DestinationType);
+            public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) =>
+                Convert(resolvedSource, memberMap.DestinationType);
 
-            public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult resolvedSource) =>
+            public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
                 memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
         }
     }

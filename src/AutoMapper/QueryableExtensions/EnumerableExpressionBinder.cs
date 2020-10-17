@@ -9,14 +9,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, ExpressionResolutionResult resolvedSource) =>
+        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, ExpressionResolutionResult resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
-            var sourceExpression = resolvedSource.ResolutionExpression;
+            var sourceExpression = resolvedSource;
 
             if (sourceListType != destinationListType)
             {

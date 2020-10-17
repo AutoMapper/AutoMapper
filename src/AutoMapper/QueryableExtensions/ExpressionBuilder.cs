@@ -130,7 +130,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 Expression ProjectMemberCore()
                 {
                     var resolvedSource = ResolveSource();
-                    memberProjection.Expression = resolvedSource.NonMarkerExpression;
+                    memberProjection.Expression ??= resolvedSource;
                     var memberRequest = new ExpressionRequest(resolvedSource.Type, memberMap.DestinationType, request.MembersToExpand, request);
                     if (memberRequest.AlreadyExists && depth >= _configurationProvider.RecursiveQueriesMaxDepth)
                     {
@@ -144,34 +144,36 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                     var mappedExpression = binder.Build(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, typePairCount, letPropertyMaps);
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
-                    ExpressionResolutionResult ResolveSource()
+                    Expression ResolveSource()
                     {
                         var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                            { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => new ExpressionResolutionResult(sourceMembers.MemberAccesses(CheckCustomSource())),
+                            { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => sourceMembers.MemberAccesses(CheckCustomSource()),
                             _ => throw CannotMap(memberMap, request.SourceType)
                         };
                         if (NullSubstitute())
                         {
-                            return new ExpressionResolutionResult(memberMap.NullSubstitute(resolvedSource.ResolutionExpression));
+                            return memberMap.NullSubstitute(resolvedSource);
                         }
                         return resolvedSource;
-                        ExpressionResolutionResult MapFromExpression(LambdaExpression mapFrom)
+                        Expression MapFromExpression(LambdaExpression mapFrom)
                         {
                             if (!mapFrom.Body.IsQuery() || letPropertyMaps.ConfigurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType) == null)
                             {
-                                return new ExpressionResolutionResult(mapFrom.ReplaceParameters(CheckCustomSource()));
+                                return mapFrom.ReplaceParameters(CheckCustomSource());
                             }
                             var customSource = memberMap.ProjectToCustomSource;
                             if (customSource == null)
                             {
-                                return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(mapFrom), mapFrom);
+                                memberProjection.Expression = mapFrom;
+                                return letPropertyMaps.GetSubQueryMarker(mapFrom);
                             }
                             var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
-                            return new ExpressionResolutionResult(letPropertyMaps.GetSubQueryMarker(newMapFrom), newMapFrom);
+                            memberProjection.Expression = newMapFrom;
+                            return letPropertyMaps.GetSubQueryMarker(newMapFrom);
                         }
-                        bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource.ResolutionExpression is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
+                        bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                         Expression CheckCustomSource()
                         {
                             var customSource = memberMap.ProjectToCustomSource;
