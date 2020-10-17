@@ -2,7 +2,6 @@ using AutoMapper.Internal;
 using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -20,15 +19,6 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             if (propertyMap == null)
                 throw PropertyConfigurationException(typeMap, sourceMemberInfo.Name);
-
-            return propertyMap;
-        }
-
-        public static PropertyMap GetPropertyMapByDestinationProperty(this TypeMap typeMap, string destinationPropertyName)
-        {
-            var propertyMap = typeMap.PropertyMaps.SingleOrDefault(item => item.DestinationName == destinationPropertyName);
-            if (propertyMap == null)
-                throw PropertyConfigurationException(typeMap, destinationPropertyName);
 
             return propertyMap;
         }

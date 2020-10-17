@@ -9,7 +9,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public class ExpressionRequest : IEquatable<ExpressionRequest>
+    public class ProjectionRequest : IEquatable<ProjectionRequest>
     {
         public Type SourceType { get; }
 
@@ -17,24 +17,24 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public MemberPath[] MembersToExpand { get; }
 
-        internal ICollection<ExpressionRequest> PreviousRequests { get; }
+        internal ICollection<ProjectionRequest> PreviousRequests { get; }
 
-        internal IEnumerable<ExpressionRequest> GetPreviousRequestsAndSelf() => PreviousRequests.Concat(new[] { this });
+        internal IEnumerable<ProjectionRequest> GetPreviousRequestsAndSelf() => PreviousRequests.Concat(new[] { this });
 
         internal bool AlreadyExists => PreviousRequests.Contains(this);
 
-        public ExpressionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ExpressionRequest parentRequest)
+        public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ProjectionRequest parentRequest)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
             MembersToExpand = membersToExpand;
 
             PreviousRequests = parentRequest == null 
-                ? new HashSet<ExpressionRequest>() 
-                : new HashSet<ExpressionRequest>(parentRequest.GetPreviousRequestsAndSelf());
+                ? new HashSet<ProjectionRequest>() 
+                : new HashSet<ProjectionRequest>(parentRequest.GetPreviousRequestsAndSelf());
         }
 
-        public bool Equals(ExpressionRequest other)
+        public bool Equals(ProjectionRequest other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -47,7 +47,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((ExpressionRequest) obj);
+            return Equals((ProjectionRequest) obj);
         }
 
         public override int GetHashCode()
@@ -60,9 +60,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             return hashCode;
         }
 
-        public static bool operator ==(ExpressionRequest left, ExpressionRequest right) => Equals(left, right);
+        public static bool operator ==(ProjectionRequest left, ProjectionRequest right) => Equals(left, right);
 
-        public static bool operator !=(ExpressionRequest left, ExpressionRequest right) => !Equals(left, right);
+        public static bool operator !=(ProjectionRequest left, ProjectionRequest right) => !Equals(left, right);
 
         public bool ShouldExpand(MemberPath currentPath)
         {

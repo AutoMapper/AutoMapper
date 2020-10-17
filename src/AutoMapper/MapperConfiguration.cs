@@ -21,12 +21,12 @@ namespace AutoMapper
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps = new Dictionary<TypePair, TypeMap>();
         private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
-        private readonly IExpressionBuilder _expressionBuilder;
+        private readonly IProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
         private readonly Features<IRuntimeFeature> _features = new Features<IRuntimeFeature>();
         private readonly int _recursiveQueriesMaxDepth;
-        private readonly IEnumerable<IExpressionBinder> _binders;
+        private readonly IEnumerable<IProjectionMapper> _projectionMappers;
         private readonly int _maxExecutionPlanDepth;
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
@@ -38,12 +38,12 @@ namespace AutoMapper
             _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
             _validator = new ConfigurationValidator(this, configuration);
-            _expressionBuilder = new ExpressionBuilder(this);
+            _projectionBuilder = new ProjectionBuilder(this);
 
             _serviceCtor = configuration.ServiceCtor;
             _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
             _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
-            _binders = configuration.QueryableBinders.ToArray();
+            _projectionMappers = configuration.ProjectionMappers.ToArray();
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
             Configuration = new ProfileMap((Profile)configuration);
@@ -93,13 +93,13 @@ namespace AutoMapper
             return expr;
         }
 
-        IExpressionBuilder IGlobalConfiguration.ExpressionBuilder => _expressionBuilder;
+        IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder;
         Func<Type, object> IGlobalConfiguration.ServiceCtor => _serviceCtor;
         bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
         internal IEnumerable<ProfileMap> Profiles { get; }
-        IEnumerable<IExpressionBinder> IGlobalConfiguration.Binders => _binders;
+        IEnumerable<IProjectionMapper> IGlobalConfiguration.ProjectionMappers => _projectionMappers;
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest)

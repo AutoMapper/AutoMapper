@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Projection
                     cfg.CreateMap<Source, Destination>();
                 });
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression<Source, Destination>());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ProjectionBuilder.GetMapExpression<Source, Destination>());
             }
 
             [Fact]

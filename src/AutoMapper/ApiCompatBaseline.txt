@@ -200,6 +200,15 @@ TypesMustExist : Type 'AutoMapper.QueryableExtensions.IExpressionResultConverter
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.ProjectionExpression' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.PropertyExpression' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.QueryExpressions' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.AssignableExpressionBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.CustomProjectionExpressionBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.EnumBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.EnumerableExpressionBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.EnumToEnumBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.EnumToUnderlyingTypeBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MappedTypeExpressionBinder' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor..ctor(System.Linq.Expressions.ExpressionVisitor, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 203
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
+Total Issues: 212

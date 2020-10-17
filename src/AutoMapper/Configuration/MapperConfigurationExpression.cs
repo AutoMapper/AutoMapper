@@ -52,7 +52,7 @@ namespace AutoMapper.Configuration
 
         Validator[] IGlobalConfigurationExpression.GetValidators() => _validators.ToArray();
 
-        List<IExpressionBinder> IGlobalConfigurationExpression.QueryableBinders { get; } = ExpressionBuilder.DefaultBinders();
+        List<IProjectionMapper> IGlobalConfigurationExpression.ProjectionMappers { get; } = ProjectionBuilder.DefaultProjectionMappers();
 
         /// <summary>
         /// How many levels deep should recursive queries be expanded.

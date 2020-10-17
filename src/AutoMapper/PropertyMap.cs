@@ -9,9 +9,6 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
-    using static Internal.ExpressionFactory;
-    using static Expression;
-
     [DebuggerDisplay("{DestinationMember.Name}")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class PropertyMap : DefaultMemberMap

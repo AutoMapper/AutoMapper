@@ -10,17 +10,17 @@ namespace AutoMapper.QueryableExtensions.Impl
     using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
     using ParameterBag = IDictionary<string, object>;
 
-    public class ProjectionExpression
+    public readonly struct ProjectionExpression
     {
         private static readonly MethodInfo QueryableSelectMethod = FindQueryableSelectMethod();
 
         private readonly IQueryable _source;
-        private readonly IExpressionBuilder _builder;
+        private readonly IProjectionBuilder _builder;
 
         public ProjectionExpression(IQueryable source, IConfigurationProvider configuration)
         {
             _source = source;
-            _builder = configuration.Internal().ExpressionBuilder;
+            _builder = configuration.Internal().ProjectionBuilder;
         }
 
         public IQueryable<TResult> To<TResult>(ParameterBag parameters, string[] membersToExpand) =>
@@ -38,7 +38,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private IQueryable ToCore(Type destinationType, object parameters, MemberPaths memberPathsToExpand)
         {
             var members = memberPathsToExpand.Select(m=>new MemberPath(m)).ToArray();
-            return _builder.GetMapExpression(_source.ElementType, destinationType, parameters, members).Chain(_source, Select);
+            return _builder.GetProjection(_source.ElementType, destinationType, parameters, members).Chain(_source, Select);
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(

@@ -51,7 +51,7 @@ namespace AutoMapper.Internal
         /// </summary>
         int MaxExecutionPlanDepth { get; set; }
         Validator[] GetValidators();
-        List<IExpressionBinder> QueryableBinders { get; }
+        List<IProjectionMapper> ProjectionMappers { get; }
         /// <summary>
         /// How many levels deep should recursive queries be expanded.
         /// Must be zero for EF6. Can be greater than zero for EF Core.
@@ -130,8 +130,8 @@ namespace AutoMapper.Internal
         /// <param name="types">the types to match</param>
         /// <returns>the matching mapper or null</returns>
         IObjectMapper FindMapper(TypePair types);
-        IExpressionBuilder ExpressionBuilder { get; }
-        IEnumerable<IExpressionBinder> Binders { get; }
+        IProjectionBuilder ProjectionBuilder { get; }
+        IEnumerable<IProjectionMapper> ProjectionMappers { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
         IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes);

@@ -125,9 +125,9 @@ namespace AutoMapper.UnitTests
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
-                _simpleProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = _config.Internal().ExpressionBuilder.GetMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {

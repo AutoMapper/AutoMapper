@@ -7,12 +7,12 @@ using AutoMapper.Internal;
 namespace AutoMapper.QueryableExtensions.Impl
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class EnumerableExpressionBinder : IExpressionBinder
+    public class EnumerableProjectionMapper : IProjectionMapper
     {
         public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
 
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
+        public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
             var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
@@ -20,8 +20,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             if (sourceListType != destinationListType)
             {
-                var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
-                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, letPropertyMaps.New());
+                var listTypePair = new ProjectionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
+                var transformedExpressions = configuration.ProjectionBuilder.CreateProjection(listTypePair, letPropertyMaps.New());
                 if(transformedExpressions.Empty)
                 {
                     return null;

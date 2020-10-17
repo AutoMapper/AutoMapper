@@ -1,9 +1,6 @@
 ﻿using System;
 using AutoMapper.QueryableExtensions;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 using Shouldly;
 using System.Linq.Expressions;
@@ -15,7 +12,7 @@ namespace AutoMapper.UnitTests.Projection
 {
     using static Expression;
 
-    public class QueryableBinders : AutoMapperSpecBase
+    public class ProjectionMappers : AutoMapperSpecBase
     {
         class Source
         {
@@ -29,7 +26,7 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.Internal().QueryableBinders.Add(new EnumToUnderlyingTypeBinder());
+            cfg.Internal().ProjectionMappers.Add(new EnumToUnderlyingTypeProjectionMapper());
             cfg.CreateMap<Source, Destination>();
         });
 
@@ -40,9 +37,9 @@ namespace AutoMapper.UnitTests.Projection
             destination.Color.ShouldBe(11);
         }
 
-        private class EnumToUnderlyingTypeBinder : IExpressionBinder
+        private class EnumToUnderlyingTypeProjectionMapper : IProjectionMapper
         {
-            public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) =>
+            public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) =>
                 Convert(resolvedSource, memberMap.DestinationType);
 
             public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>

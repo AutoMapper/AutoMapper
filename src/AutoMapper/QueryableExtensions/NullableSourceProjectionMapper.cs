@@ -6,9 +6,9 @@ using AutoMapper.Internal;
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
-    internal class NullableSourceExpressionBinder : IExpressionBinder
+    internal class NullableSourceProjectionMapper : IProjectionMapper
     {
-        public Expression Build(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ExpressionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+        public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
         {
             var defaultDestination = Activator.CreateInstance(memberMap.DestinationType);
             return Coalesce(resolvedSource, Constant(defaultDestination));

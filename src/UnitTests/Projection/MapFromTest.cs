@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
                                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
-            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
+            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ProjectionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
         }
 
         [Fact]
@@ -33,9 +33,9 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
                     .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression(null, typeof(UserDto), new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression(typeof(UserModel), null, new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(null, typeof(UserDto), new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(typeof(UserModel), null, new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
         }
 
         [Fact]

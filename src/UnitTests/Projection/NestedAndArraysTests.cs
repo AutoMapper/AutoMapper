@@ -55,7 +55,7 @@
                         .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
                 });
 
-                var expression = config.Internal().ExpressionBuilder.GetMapExpression<Entity, EntityViewModel>();
+                var expression = config.Internal().ProjectionBuilder.GetMapExpression<Entity, EntityViewModel>();
 
                 var entity = new Entity
                 {
@@ -89,7 +89,7 @@
                     cfg.CreateMap<Entity, EntityDetailledViewModel>();
                 });
 
-                var expression = config.Internal().ExpressionBuilder.GetMapExpression<Entity, EntityDetailledViewModel>();
+                var expression = config.Internal().ProjectionBuilder.GetMapExpression<Entity, EntityDetailledViewModel>();
 
                 var entity = new Entity
                 {
