@@ -10,6 +10,29 @@ namespace AutoMapper.UnitTests
 {
     namespace MemberResolution
     {
+        public class When_multiple_source_members_match : AutoMapperSpecBase
+        {
+            class Source
+            {
+                public int Value { get; set; }
+                public int GetValue() => 10;
+                public int OtherValue { get; set; }
+                public int GetOtherValue { get; set; }
+            }
+            class Destination
+            {
+                public int Value { get; set; }
+                public int OtherValue { get; set; }
+            }
+            protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+            [Fact]
+            public void Should_prefer_the_property()
+            {
+                var destination = Map<Destination>(new Source { Value = 42, OtherValue = 42 });
+                destination.Value.ShouldBe(42);
+                destination.OtherValue.ShouldBe(42);
+            }
+        }
         public class When_mapping_derived_classes_in_arrays : AutoMapperSpecBase
         {
             private DtoObject[] _result;

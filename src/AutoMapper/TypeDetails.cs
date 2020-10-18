@@ -38,7 +38,10 @@ namespace AutoMapper
             {
                 foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
                 {
-                    _nameToMember[memberName] = member;
+                    if (!_nameToMember.ContainsKey(memberName))
+                    {
+                        _nameToMember.Add(memberName, member);
+                    }
                 }
             }
         }
