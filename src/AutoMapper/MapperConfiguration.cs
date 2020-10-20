@@ -34,6 +34,10 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             var configuration = (IGlobalConfigurationExpression)configurationExpression;
+            foreach (var extensionMehodsType in configuration.SourceExtensionMethodsTypes ?? new[] { typeof(Enumerable) })
+            {
+                configuration.IncludeSourceExtensionMethods(extensionMehodsType);
+            }
             _mappers = configuration.Mappers.ToArray();
             _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);

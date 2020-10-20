@@ -18,12 +18,7 @@ namespace AutoMapper.Configuration
         private readonly IList<IObjectMapper> _mappers;
         private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
-        public MapperConfigurationExpression() : base()
-        {
-            IncludeSourceExtensionMethods(typeof(Enumerable));
-
-            _mappers = MapperRegistry.Mappers();
-        }
+        public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
 
         IEnumerable<Action<IGlobalConfiguration>> IGlobalConfigurationExpression.BeforeSealActions => _beforeSealActions;
 
@@ -69,6 +64,7 @@ namespace AutoMapper.Configuration
         IList<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
 
         Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
+        IReadOnlyCollection<Type> IGlobalConfigurationExpression.SourceExtensionMethodsTypes { get; set; }
 
         private class NamedProfile : Profile
         {
