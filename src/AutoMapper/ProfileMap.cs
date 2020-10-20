@@ -56,7 +56,7 @@ namespace AutoMapper
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
 
-            var prePostFixes = profile.MemberConfigurations.Concat(configuration?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
+            var prePostFixes = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations ?? Enumerable.Empty<IMemberConfiguration>())
                                         .Select(m => m.NameMapper)
                                         .SelectMany(m => m.NamedMappers)
                                         .OfType<PrePostfixName>()
