@@ -1251,6 +1251,57 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_source_members_configured_in_a_root_profile_contain_prefixes : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int FooValue { get; set; }
+                public int GetOtherValue()
+                {
+                    return 10;
+                }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+                public int OtherValue { get; set; }
+            }
+
+            public class ChildProfile : Profile
+            {
+                public ChildProfile()
+                {
+                    CreateMap<Source, Destination>();
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.RecognizePrefixes("Foo");
+                cfg.AddProfile<ChildProfile>();                
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { FooValue = 5 });
+            }
+
+            [Fact]
+            public void Registered_prefixes_ignored()
+            {
+                _destination.Value.ShouldBe(5);
+            }
+
+            [Fact]
+            public void Default_prefix_included()
+            {
+                _destination.OtherValue.ShouldBe(10);
+            }
+        }
+
         public class When_source_members_contain_prefixes : AutoMapperSpecBase
         {
             private Destination _destination;
@@ -1380,6 +1431,59 @@ namespace AutoMapper.UnitTests
                 _destination.OtherValue.ShouldBe(10);
             }
         }
+
+        public class When_source_members_configured_in_a_root_profile_contain_postfixes_and_prefixes : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int FooValueBar { get; set; }
+                public int GetOtherValue()
+                {
+                    return 10;
+                }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+                public int OtherValue { get; set; }
+            }
+
+            public class ChildProfile : Profile
+            {
+                public ChildProfile()
+                {
+                    CreateMap<Source, Destination>();
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.RecognizePrefixes("Foo");
+                cfg.RecognizePostfixes("Bar");
+                cfg.AddProfile<ChildProfile>();
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { FooValueBar = 5 });
+            }
+
+            [Fact]
+            public void Registered_prefixes_ignored()
+            {
+                _destination.Value.ShouldBe(5);
+            }
+
+            [Fact]
+            public void Default_prefix_included()
+            {
+                _destination.OtherValue.ShouldBe(10);
+            }
+        }
+
 
         public class When_source_members_contain_postfixes_and_prefixes : AutoMapperSpecBase
         {
