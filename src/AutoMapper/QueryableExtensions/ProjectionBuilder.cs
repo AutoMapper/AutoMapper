@@ -142,6 +142,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     Expression ResolveSource()
                     {
+                        var customSource = memberMap.IncludedMember?.ProjectToCustomSource;
                         var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
@@ -159,7 +160,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                             {
                                 return mapFrom.ReplaceParameters(CheckCustomSource());
                             }
-                            var customSource = memberMap.ProjectToCustomSource;
                             if (customSource == null)
                             {
                                 memberProjection.Expression = mapFrom;
@@ -172,7 +172,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                         bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                         Expression CheckCustomSource()
                         {
-                            var customSource = memberMap.ProjectToCustomSource;
                             if (customSource == null)
                             {
                                 return instanceParameter;

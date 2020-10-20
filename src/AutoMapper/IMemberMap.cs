@@ -12,7 +12,6 @@ namespace AutoMapper
         TypeMap TypeMap { get; }
         Type SourceType { get; }
         IReadOnlyCollection<MemberInfo> SourceMembers { get; }
-        LambdaExpression ProjectToCustomSource { get; }
         IncludedMember IncludedMember { get; }
         Type DestinationType { get; }
         string DestinationName { get; }
