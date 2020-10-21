@@ -52,7 +52,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static MethodInfo FindQueryableSelectMethod()
         {
             Expression<Func<IQueryable<object>>> select = () => default(IQueryable<object>).Select(default(Expression<Func<object, object>>));
-            var method = ((MethodCallExpression)select.Body).Method.GetGenericMethodDefinition();
+            var method = select.Method().GetGenericMethodDefinition();
             return method;
         }
     }

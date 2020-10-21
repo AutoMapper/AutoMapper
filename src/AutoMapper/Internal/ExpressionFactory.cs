@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace AutoMapper.Internal
 {
@@ -24,12 +23,10 @@ namespace AutoMapper.Internal
         }
 
         public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
-            members
-                .Aggregate(
-                        obj,
-                        (inner, getter) => getter is MethodInfo method ?
-                            (getter.IsStatic() ? Call(null, method, inner) : (Expression)Call(inner, method)) :
-                            MakeMemberAccess(getter.IsStatic() ? null : inner, getter));
+            members.Aggregate(obj,
+                        (target, getter) => getter is MethodInfo method ?
+                            (Expression)(method.IsStatic ? Call(null, method, target) : Call(target, method)) :
+                            MakeMemberAccess(getter.IsStatic() ? null : target, getter));
 
         public static IEnumerable<MemberInfo> GetMembersChain(this LambdaExpression lambda) => lambda.Body.GetMembersChain();
 
@@ -115,11 +112,11 @@ namespace AutoMapper.Internal
                         null;
         }
 
-        public static MethodInfo Method<T>(Expression<Func<T>> expression) => GetExpressionBodyMethod(expression);
+        public static MethodInfo Method<T>(Expression<Func<T>> expression) => expression.Method();
 
-        public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression) => GetExpressionBodyMethod(expression);
+        public static MethodInfo Method<TType, TResult>(Expression<Func<TType, TResult>> expression) => expression.Method();
 
-        private static MethodInfo GetExpressionBodyMethod(LambdaExpression expression) => ((MethodCallExpression)expression.Body).Method;
+        public static MethodInfo Method(this LambdaExpression expression) => ((MethodCallExpression)expression.Body).Method;
 
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {

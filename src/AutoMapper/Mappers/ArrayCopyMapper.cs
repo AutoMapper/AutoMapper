@@ -13,8 +13,8 @@ namespace AutoMapper.Mappers
         private static readonly Expression<Action> ArrayCopyExpression = () => Array.Copy(default, default, default(long));
         private static readonly Expression<Func<Array, long>> ArrayLengthExpression = arr => arr.LongLength;
 
-        private static readonly MethodInfo ArrayCopyMethod = ((MethodCallExpression)ArrayCopyExpression.Body).Method;
-        private static readonly PropertyInfo ArrayLengthProperty = (PropertyInfo) ((MemberExpression)ArrayLengthExpression.Body).Member;
+        private static readonly MethodInfo ArrayCopyMethod = ArrayCopyExpression.Method();
+        private static readonly PropertyInfo ArrayLengthProperty = (PropertyInfo) ArrayLengthExpression.GetMember();
 
         public override bool IsMatch(TypePair context) =>
             context.DestinationType.IsArray

@@ -139,7 +139,7 @@ namespace AutoMapper.Execution
         public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap) =>
             typeMap?.MaxDepth > 0 ?
                 GreaterThan(
-                    Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
+                    Call(context, GetTypeDepthInfo.Method(), Constant(typeMap.Types)),
                     Constant(typeMap.MaxDepth)
                 ) :
                 null;

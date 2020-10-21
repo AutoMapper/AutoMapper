@@ -5,7 +5,6 @@ namespace AutoMapper.Execution
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Configuration;
     using static System.Linq.Expressions.Expression;
     using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
@@ -199,17 +198,13 @@ namespace AutoMapper.Execution
             actions.Insert(0, destinationFunc);
             if (_typeMap.MaxDepth > 0)
             {
-                actions.Insert(0,
-                    Call(Context, ((MethodCallExpression) IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
+                actions.Insert(0, Call(Context, IncTypeDepthInfo.Method(), Constant(_typeMap.Types)));
             }
-            actions.AddRange(
-                _typeMap.AfterMapActions.Select(
-                    afterMapAction => afterMapAction.ReplaceParameters(Source, _destination, Context)));
-
+            actions.AddRange(_typeMap.AfterMapActions.Select(afterMapAction => afterMapAction.ReplaceParameters(Source, _destination, Context)));
             if (_typeMap.MaxDepth > 0)
-                actions.Add(Call(Context, ((MethodCallExpression) DecTypeDepthInfo.Body).Method,
-                    Constant(_typeMap.Types)));
-
+            {
+                actions.Add(Call(Context, DecTypeDepthInfo.Method(), Constant(_typeMap.Types)));
+            }
             actions.Add(_destination);
 
             return Block(includedMembersVariables, actions);
