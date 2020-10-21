@@ -156,6 +156,7 @@ namespace AutoMapper.Internal
         int MaxExecutionPlanDepth { get; }
         int RecursiveQueriesMaxDepth { get; }
         IEnumerable<ProfileMap> GetProfiles();
+        TypeMap GetIncludedTypeMap(TypePair typePair);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression

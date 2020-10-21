@@ -1,13 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AutoMapper.Mappers;
 using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
+    public class AsWithMissingMap : NonValidatingSpecBase
+    {
+        interface TInterface
+        {
+            string Value { get; set; }
+        }
+        class TConcrete : TInterface
+        {
+            public string Value { get; set; }
+        }
+        class TModel
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<TModel, TInterface>().As<TConcrete>());
+        [Fact]
+        public void Should_report_missing_map() => new Action(() => Configuration.CompileMappings()).ShouldThrow<InvalidOperationException>().Message.ShouldBe(
+            "Missing map from AutoMapper.UnitTests.MappingInheritance.AsWithMissingMap+TModel to AutoMapper.UnitTests.MappingInheritance.AsWithMissingMap+TConcrete. Create using CreateMap<TModel, TConcrete>.");
+    }
     public class AsShouldWorkOnlyWithDerivedTypesWithGenerics : AutoMapperSpecBase
     {
         class Source<T>
@@ -22,7 +37,11 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)).As(typeof(Override<>)));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap(typeof(Source<>), typeof(Override<>));
+            c.CreateMap(typeof(Source<>), typeof(Destination<>)).As(typeof(Override<>));
+        });
     }
 
     public class AsShouldWorkOnlyWithDerivedTypes

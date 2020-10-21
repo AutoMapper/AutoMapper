@@ -255,13 +255,11 @@ namespace AutoMapper
                 }
                 derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
             }
+            IGlobalConfiguration globalConfiguration = this;
             foreach (var redirectedType in redirectedTypes)
             {
-                var derivedMap = FindTypeMapFor(redirectedType.Item2);
-                if (derivedMap != null)
-                {
-                    _resolvedMaps[redirectedType.Item1] = derivedMap;
-                }
+                var derivedMap = globalConfiguration.GetIncludedTypeMap(redirectedType.Item2);
+                _resolvedMaps[redirectedType.Item1] = derivedMap;
             }
             foreach (var derivedMap in derivedMaps.Where(derivedMap => !_resolvedMaps.ContainsKey(derivedMap.Item1)))
             {
@@ -288,28 +286,25 @@ namespace AutoMapper
             }
         }
 
-        IEnumerable<TypeMap> IGlobalConfiguration.GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes)
+        IEnumerable<TypeMap> IGlobalConfiguration.GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes) => includedTypes.Select(this.Internal().GetIncludedTypeMap);
+        TypeMap IGlobalConfiguration.GetIncludedTypeMap(TypePair pair)
         {
-            foreach (var pair in includedTypes)
+            var typeMap = FindTypeMapFor(pair);
+            if (typeMap != null)
             {
-                var typeMap = FindTypeMapFor(pair);
-                if (typeMap != null)
+                return typeMap;
+            }
+            else
+            {
+                typeMap = ResolveTypeMap(pair);
+                // we want the exact map the user included, but we could instantiate an open generic
+                if (typeMap == null || typeMap.Types != pair)
                 {
-                    yield return typeMap;
+                    throw QueryMapperHelper.MissingMapException(pair);
                 }
-                else
-                {
-                    typeMap = ResolveTypeMap(pair);
-                    // we want the exact map the user included, but we could instantiate an open generic
-                    if (typeMap == null || typeMap.Types != pair)
-                    {
-                        throw QueryMapperHelper.MissingMapException(pair);
-                    }
-                    yield return typeMap;
-                }
+                return typeMap;
             }
         }
-
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
             var genericTypePair = typePair.GetOpenGenericTypePair();

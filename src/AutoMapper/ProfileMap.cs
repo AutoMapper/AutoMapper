@@ -210,7 +210,7 @@ namespace AutoMapper
         {
             foreach (var includedMemberExpression in currentMap.GetAllIncludedMembers())
             {
-                var includedMap = configurationProvider.GetIncludedTypeMaps(new[] { new TypePair(includedMemberExpression.Body.Type, currentMap.DestinationType) }).Single();
+                var includedMap = configurationProvider.GetIncludedTypeMap(new TypePair(includedMemberExpression.Body.Type, currentMap.DestinationType));
                 var includedMember = new IncludedMember(includedMap, includedMemberExpression);
                 if (currentMap.AddMemberMap(includedMember))
                 {
