@@ -28,4 +28,52 @@
             _destination.ShouldBeOfType<A>();
         }
     }
+    public class OverrideInclude : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+        }
+        class SourceDerived : Source
+        {
+        }
+        class DestinationDerived : Destination
+        {
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>().Include<SourceDerived, DestinationDerived>();
+            c.CreateMap<SourceDerived, DestinationDerived>();
+            c.CreateMap<SourceDerived, Destination>();
+        });
+        [Fact]
+        public void ExplicitMapShouldApply() => Map<Destination>(new SourceDerived()).ShouldBeOfType<Destination>();
+    }
+    public class IncludeAs : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        abstract class Destination
+        {
+        }
+        class SourceDerived : Source
+        {
+        }
+        class DestinationDerived : Destination
+        {
+        }
+        class DestinationConcrete : Destination { }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>().Include<SourceDerived, DestinationDerived>();
+            c.CreateMap<SourceDerived, Destination>().As<DestinationConcrete>();
+            c.CreateMap<SourceDerived, DestinationDerived>();
+            c.CreateMap<SourceDerived, DestinationConcrete>();
+        });
+        [Fact]
+        public void RedirectedMapShouldApply() => Map<Destination>(new SourceDerived()).ShouldBeOfType<DestinationConcrete>();
+    }
 }

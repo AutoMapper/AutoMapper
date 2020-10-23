@@ -219,58 +219,52 @@ namespace AutoMapper
 
         private void Seal()
         {
-            var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
-            var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
-
             foreach (var profile in Profiles)
             {
                 profile.Register(this);
             }
-
             foreach (var typeMap in _configuredMaps.Values.Where(tm => tm.IncludeAllDerivedTypes))
             {
                 foreach (var derivedMap in _configuredMaps
                     .Where(tm =>
+                        typeMap != tm.Value &&
                         typeMap.SourceType.IsAssignableFrom(tm.Key.SourceType) &&
-                        typeMap.DestinationType.IsAssignableFrom(tm.Key.DestinationType) &&
-                        typeMap != tm.Value)
+                        typeMap.DestinationType.IsAssignableFrom(tm.Key.DestinationType))
                     .Select(tm => tm.Value))
                 {
                     typeMap.IncludeDerivedTypes(derivedMap.SourceType, derivedMap.DestinationType);
                 }
             }
-
             foreach (var profile in Profiles)
             {
                 profile.Configure(this);
             }
-
+            IGlobalConfiguration globalConfiguration = this;
             foreach (var typeMap in _configuredMaps.Values)
             {
-                _resolvedMaps[typeMap.Types] = typeMap;
-
                 if (typeMap.DestinationTypeOverride != null)
                 {
-                    redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
+                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.SourceType, typeMap.DestinationTypeOverride);
+                    _resolvedMaps[typeMap.Types] = derivedMap;
                 }
-                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+                else
+                {
+                    _resolvedMaps[typeMap.Types] = typeMap;
+                }
+                var derivedMaps = GetDerivedTypeMaps(typeMap);
+                foreach (var derivedMap in derivedMaps)
+                {
+                    var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
+                    if (!_resolvedMaps.ContainsKey(includedPair))
+                    {
+                        _resolvedMaps[includedPair] = derivedMap;
+                    }
+                }
             }
-            IGlobalConfiguration globalConfiguration = this;
-            foreach (var redirectedType in redirectedTypes)
-            {
-                var derivedMap = globalConfiguration.GetIncludedTypeMap(redirectedType.Item2);
-                _resolvedMaps[redirectedType.Item1] = derivedMap;
-            }
-            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_resolvedMaps.ContainsKey(derivedMap.Item1)))
-            {
-                _resolvedMaps[derivedMap.Item1] = derivedMap.Item2;
-            }
-
             foreach (var typeMap in _configuredMaps.Values)
             {
                 typeMap.Seal(this);
             }
-
             _features.Seal(this);
         }
 
@@ -287,6 +281,7 @@ namespace AutoMapper
         }
 
         IEnumerable<TypeMap> IGlobalConfiguration.GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes) => includedTypes.Select(this.Internal().GetIncludedTypeMap);
+        TypeMap IGlobalConfiguration.GetIncludedTypeMap(Type sourceType, Type destinationType) => this.Internal().GetIncludedTypeMap(new TypePair(sourceType, destinationType));
         TypeMap IGlobalConfiguration.GetIncludedTypeMap(TypePair pair)
         {
             var typeMap = FindTypeMapFor(pair);
