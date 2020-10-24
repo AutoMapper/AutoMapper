@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 {
     public class NullableDestinationMapper : IObjectMapperInfo
     {
-        public bool IsMatch(TypePair context) => context.DestinationType.IsNullableType();
+        public bool IsMatch(in TypePair context) => context.DestinationType.IsNullableType();
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,

@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var sourceTypeConverter = GetTypeConverter(context.SourceType);
             var destTypeConverter = GetTypeConverter(context.DestinationType);

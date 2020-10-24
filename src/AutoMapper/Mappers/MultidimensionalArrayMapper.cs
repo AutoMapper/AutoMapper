@@ -35,7 +35,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             if (!context.DestinationType.IsArray || !context.SourceType.IsArray)
             {

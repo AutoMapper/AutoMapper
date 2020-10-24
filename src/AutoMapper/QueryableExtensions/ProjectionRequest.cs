@@ -9,46 +9,27 @@ namespace AutoMapper.QueryableExtensions.Impl
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public class ProjectionRequest : IEquatable<ProjectionRequest>
+    public readonly struct ProjectionRequest : IEquatable<ProjectionRequest>
     {
         public Type SourceType { get; }
-
         public Type DestinationType { get; }
-
         public MemberPath[] MembersToExpand { get; }
-
-        internal ICollection<ProjectionRequest> PreviousRequests { get; }
-
-        internal IEnumerable<ProjectionRequest> GetPreviousRequestsAndSelf() => PreviousRequests.Concat(new[] { this });
-
+        private ICollection<ProjectionRequest> PreviousRequests { get; }
         internal bool AlreadyExists => PreviousRequests.Contains(this);
-
-        public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ProjectionRequest parentRequest)
+        public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ICollection<ProjectionRequest> previousRequests)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
             MembersToExpand = membersToExpand;
-
-            PreviousRequests = parentRequest == null 
-                ? new HashSet<ProjectionRequest>() 
-                : new HashSet<ProjectionRequest>(parentRequest.GetPreviousRequestsAndSelf());
+            PreviousRequests = previousRequests;
         }
+        
+        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(PreviousRequests.Concat(new[] { this }));
 
-        public bool Equals(ProjectionRequest other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return MembersToExpand.SequenceEqual(other.MembersToExpand) &&
-                   SourceType == other.SourceType && DestinationType == other.DestinationType;
-        }
+        public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
+                MembersToExpand.SequenceEqual(other.MembersToExpand);
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((ProjectionRequest) obj);
-        }
+        public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
 
         public override int GetHashCode()
         {

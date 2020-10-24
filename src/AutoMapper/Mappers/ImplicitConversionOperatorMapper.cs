@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 {
     public class ImplicitConversionOperatorMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             var methodInfo = GetImplicitConversionOperator(context);
 

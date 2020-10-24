@@ -47,8 +47,8 @@ namespace AutoMapper
             var nameSplitMember = _memberConfigurations[0].MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
             if (nameSplitMember != null)
             {
-                nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention;
-                nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention;
+                nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
+                nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
             }
 
             GlobalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();

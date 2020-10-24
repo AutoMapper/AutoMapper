@@ -51,7 +51,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 sourceType ?? throw new ArgumentNullException(nameof(sourceType)),
                 destinationType ?? throw new ArgumentNullException(nameof(destinationType)),
                 membersToExpand ?? throw new ArgumentNullException(nameof(membersToExpand)),
-                null);
+                Array.Empty<ProjectionRequest>());
             var cachedExpressions = _projectionCache.GetOrAdd(projectionRequest);
             return cachedExpressions.Transform(Prepare);
             LambdaExpression Prepare(Expression cachedExpression)
@@ -128,7 +128,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var memberTypeMap = _configurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType);
                     var resolvedSource = ResolveSource();
                     memberProjection.Expression ??= resolvedSource;
-                    var memberRequest = new ProjectionRequest(resolvedSource.Type, memberMap.DestinationType, request.MembersToExpand, request);
+                    var memberRequest = new ProjectionRequest(resolvedSource.Type, memberMap.DestinationType, request.MembersToExpand, request.GetPreviousRequestsAndSelf());
                     if (memberRequest.AlreadyExists && depth >= _configurationProvider.RecursiveQueriesMaxDepth)
                     {
                         return null;
@@ -146,7 +146,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                            { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => sourceMembers.MemberAccesses(CheckCustomSource()),
+                            { SourceMembers: var sourceMembers } when sourceMembers.Count > 0 => sourceMembers.Chain(CheckCustomSource()),
                             _ => throw CannotMap(memberMap, request.SourceType)
                         };
                         if (NullSubstitute())

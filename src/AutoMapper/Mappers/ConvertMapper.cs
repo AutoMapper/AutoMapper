@@ -40,7 +40,7 @@ namespace AutoMapper.Mappers
             return Lambda(Call(convertMethod, sourceParameter), sourceParameter);
         }
 
-        public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
+        public bool IsMatch(in TypePair types) => _converters.ContainsKey(types);
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

@@ -79,7 +79,7 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap FindTypeMapFor(TypePair typePair);
+        TypeMap FindTypeMapFor(in TypePair typePair);
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type
         /// </summary>
@@ -99,7 +99,7 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(TypePair typePair);
+        TypeMap ResolveTypeMap(in TypePair typePair);
         /// <summary>
         /// Dry run single type map
         /// </summary>
@@ -130,10 +130,10 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="types">the types to match</param>
         /// <returns>the matching mapper or null</returns>
-        IObjectMapper FindMapper(TypePair types);
+        IObjectMapper FindMapper(in TypePair types);
         IProjectionBuilder ProjectionBuilder { get; }
         IEnumerable<IProjectionMapper> ProjectionMappers { get; }
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(MapRequest mapRequest);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
         IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes);
         /// <summary>
@@ -143,7 +143,7 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="mapRequest">The source/destination map request</param>
         /// <returns>the execution plan</returns>
-        LambdaExpression BuildExecutionPlan(MapRequest mapRequest);
+        LambdaExpression BuildExecutionPlan(in MapRequest mapRequest);
         /// <summary>
         /// Allows to enable null-value propagation for query mapping.
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>

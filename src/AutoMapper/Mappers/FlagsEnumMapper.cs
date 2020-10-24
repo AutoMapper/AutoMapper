@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo EnumParseMethod = Method(() => Enum.Parse(null, null, true));
 
-        public bool IsMatch(TypePair context) => 
+        public bool IsMatch(in TypePair context) => 
             context.IsEnumToEnum() && context.SourceType.Has<FlagsAttribute>() && context.DestinationType.Has<FlagsAttribute>();
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,

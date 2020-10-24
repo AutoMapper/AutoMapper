@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 
     public class StringMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+        public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string) && context.SourceType != typeof(string);
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

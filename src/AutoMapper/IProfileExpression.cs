@@ -70,14 +70,6 @@ namespace AutoMapper
         void RecognizePostfixes(params string[] postfixes);
 
         /// <summary>
-        /// Provide an alias for a member name when matching source member names
-        /// </summary>
-        /// <param name="original">Original member name</param>
-        /// <param name="alias">Alias to match against</param>
-        void RecognizeAlias(string original, string alias);
-
-
-        /// <summary>
         /// Provide a new value for a part of a members name
         /// </summary>
         /// <param name="original">Original member value</param>

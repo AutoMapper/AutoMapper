@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context) => context.SourceType == typeof (NameValueCollection) &&
+        public bool IsMatch(in TypePair context) => context.SourceType == typeof (NameValueCollection) &&
                                                  context.DestinationType == typeof (NameValueCollection);
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,

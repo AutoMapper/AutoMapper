@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration.Conventions
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public IList<IChildMemberConfiguration> MemberMappers { get; } = new Collection<IChildMemberConfiguration>();
+        public List<IChildMemberConfiguration> MemberMappers { get; } = new List<IChildMemberConfiguration>();
 
         public IMemberConfiguration AddMember<TMemberMapper>(Action<TMemberMapper> setupAction = null)
             where TMemberMapper : IChildMemberConfiguration, new()

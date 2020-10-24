@@ -8,7 +8,7 @@ namespace AutoMapper.Configuration.Conventions
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IMemberConfiguration
     {
-        IList<IChildMemberConfiguration> MemberMappers { get; }
+        List<IChildMemberConfiguration> MemberMappers { get; }
         IMemberConfiguration AddMember<TMemberMapper>(Action<TMemberMapper> setupAction = null)
             where TMemberMapper : IChildMemberConfiguration, new();
 

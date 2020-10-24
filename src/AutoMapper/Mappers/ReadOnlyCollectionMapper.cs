@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
+        public bool IsMatch(in TypePair context)
         {
             if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType))
                 return false;

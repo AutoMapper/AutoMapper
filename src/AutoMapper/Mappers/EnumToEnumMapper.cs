@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     using static Expression;
     public class EnumToEnumMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.IsEnumToEnum();
+        public bool IsMatch(in TypePair context) => context.IsEnumToEnum();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {

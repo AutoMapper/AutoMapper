@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class NullableSourceMapper : IObjectMapperInfo
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsNullableType();
+        public bool IsMatch(in TypePair context) => context.SourceType.IsNullableType();
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,

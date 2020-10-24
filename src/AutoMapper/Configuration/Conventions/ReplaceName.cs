@@ -8,13 +8,11 @@ namespace AutoMapper.Configuration.Conventions
 {
     public class ReplaceName : ISourceToDestinationNameMapper
     {
-        private ICollection<MemberNameReplacer> MemberNameReplacers { get; }
-
-        public ReplaceName() => MemberNameReplacers = new Collection<MemberNameReplacer>();
+        private readonly List<MemberNameReplacer> _memberNameReplacers = new List<MemberNameReplacer>();
 
         public ReplaceName AddReplace(string original, string newValue)
         {
-            MemberNameReplacers.Add(new MemberNameReplacer(original, newValue));
+            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
             return this;
         }
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
@@ -36,8 +34,8 @@ namespace AutoMapper.Configuration.Conventions
         private IEnumerable<string> PossibleNames(string nameToSearch)
         {
             return 
-                MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
-                    .Concat(new[] { MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
+                _memberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
+                    .Concat(new[] { _memberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
                     .ToList();
         }
     }

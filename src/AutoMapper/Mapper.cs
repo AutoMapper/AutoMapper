@@ -12,22 +12,16 @@ namespace AutoMapper
 
     public class Mapper : IMapper, IInternalRuntimeMapper
     {
-        public Mapper(IConfigurationProvider configurationProvider)
-            : this(configurationProvider, configurationProvider.Internal().ServiceCtor)
-        {
-        }
-
+        private readonly IGlobalConfiguration _configurationProvider;
+        public Mapper(IConfigurationProvider configurationProvider) : this(configurationProvider, configurationProvider.Internal().ServiceCtor) {}
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
-            ConfigurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
+            _configurationProvider = (IGlobalConfiguration)configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
             DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor ?? throw new NullReferenceException(nameof(serviceCtor))), this);
         }
-
         internal ResolutionContext DefaultContext { get; }
-
-        ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext; 
-
-        public IConfigurationProvider ConfigurationProvider { get; }
+        ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
+        public IConfigurationProvider ConfigurationProvider => _configurationProvider;
 
         public TDestination Map<TDestination>(object source) => Map(source, default(TDestination));
 
@@ -89,13 +83,10 @@ namespace AutoMapper
         private TDestination MapCore<TSource, TDestination>(
             TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, IMemberMap memberMap = null)
         {
-            return ConfigurationProvider.Internal().GetExecutionPlan<TSource, TDestination>(MapRequest())(source, destination, context);
-            MapRequest MapRequest()
-            {
-                var runtimeTypes = new TypePair(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
-                var requestedTypes = new TypePair(typeof(TSource), typeof(TDestination));
-                return new MapRequest(requestedTypes, runtimeTypes, memberMap);
-            }
+            var runtimeTypes = new TypePair(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
+            var requestedTypes = new TypePair(typeof(TSource), typeof(TDestination));
+            var mapRequest = new MapRequest(requestedTypes, runtimeTypes, memberMap);
+            return _configurationProvider.GetExecutionPlan<TSource, TDestination>(mapRequest)(source, destination, context);
         }
     }
 }

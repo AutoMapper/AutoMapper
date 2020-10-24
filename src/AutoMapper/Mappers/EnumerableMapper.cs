@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class EnumerableMapper : EnumerableMapperBase
     {
-        public override bool IsMatch(TypePair context) => 
+        public override bool IsMatch(in TypePair context) => 
             context.SourceType.IsEnumerableType() && (context.DestinationType.IsInterface && context.DestinationType.IsEnumerableType());
 
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,

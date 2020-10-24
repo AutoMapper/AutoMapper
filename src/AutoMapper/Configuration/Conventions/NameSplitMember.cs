@@ -14,12 +14,6 @@ namespace AutoMapper.Configuration.Conventions
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
 
-        public NameSplitMember()
-        {
-            SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-        }
-
         public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
         {
             var destinationMemberNamingConvention = isReverseMap 
@@ -30,15 +24,13 @@ namespace AutoMapper.Configuration.Conventions
                 : SourceMemberNamingConvention;
 
             var matches = destinationMemberNamingConvention.SplittingExpression
-                .Matches(nameToSearch)
+                ?.Matches(nameToSearch)
                 .Cast<Match>()
                 .Select(m => sourceMemberNamingConvention.ReplaceValue(m))
-                .ToArray();
+                .ToArray() 
+                ?? Array.Empty<string>();
 
             MemberInfo matchingMemberInfo = null;
-
-            string SplitMembers(string value) => sourceMemberNamingConvention.SplittingExpression.Replace(value, sourceMemberNamingConvention.ReplaceValue);
-
             for (var i = 1; i <= matches.Length; i++)
             {
                 var first = string.Join(
@@ -64,6 +56,7 @@ namespace AutoMapper.Configuration.Conventions
                 }
             }
             return matchingMemberInfo != null;
+            string SplitMembers(string value) => sourceMemberNamingConvention.SplittingExpression.Replace(value, sourceMemberNamingConvention.ReplaceValue);
         }
     }
 }

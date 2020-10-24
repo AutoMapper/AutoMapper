@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
 
     public class ArrayMapper : EnumerableMapperBase
     {
-        public override bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
+        public override bool IsMatch(in TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
 
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

@@ -18,7 +18,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
-        bool IsMatch(TypePair context);
+        bool IsMatch(in TypePair context);
 
         /// <summary>
         /// Builds a mapping expression equivalent to the base Map method
@@ -48,7 +48,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
-        public abstract bool IsMatch(TypePair context);
+        public abstract bool IsMatch(in TypePair context);
 
         /// <summary>
         /// Performs conversion from source to destination type

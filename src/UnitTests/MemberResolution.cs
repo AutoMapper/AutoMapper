@@ -1576,7 +1576,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.RecognizeAlias("Foo", "Bar");
+                cfg.ReplaceMemberName("Foo", "Bar");
                 cfg.CreateMap<Source, Destination>();
             });
 

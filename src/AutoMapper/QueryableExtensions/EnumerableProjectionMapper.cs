@@ -20,7 +20,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             if (sourceListType != destinationListType)
             {
-                var listTypePair = new ProjectionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
+                var listTypePair = new ProjectionRequest(sourceListType, destinationListType, request.MembersToExpand, request.GetPreviousRequestsAndSelf());
                 var transformedExpressions = configuration.ProjectionBuilder.CreateProjection(listTypePair, letPropertyMaps.New());
                 if(transformedExpressions.Empty)
                 {

@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper : EnumerableMapperBase
     {
-        public override bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && 
+        public override bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && 
             (context.DestinationType.IsCollectionType() || context.DestinationType.IsListType());
 
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,

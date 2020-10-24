@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
 
     public class StringToEnumMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
+        public bool IsMatch(in TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,

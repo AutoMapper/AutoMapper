@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
         private static readonly MethodInfo MembersDictionaryMethodInfo =
             typeof(ToStringDictionaryMapper).GetDeclaredMethod(nameof(MembersDictionary));
 
-        public bool IsMatch(TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
+        public bool IsMatch(in TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

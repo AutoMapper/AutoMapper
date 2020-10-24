@@ -512,7 +512,7 @@ namespace AutoMapper.Execution
         private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
 
         private Expression Chain(IMemberMap memberMap, Type destinationType) =>
-                memberMap.SourceMembers.MemberAccesses(GetCustomSource(memberMap)).NullCheck(destinationType);
+                memberMap.SourceMembers.Chain(GetCustomSource(memberMap)).NullCheck(destinationType);
 
         private Expression CreateInstance(Type type)
             => Call(Property(Context, nameof(ResolutionContext.Options)),

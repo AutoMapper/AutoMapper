@@ -92,6 +92,10 @@ namespace AutoMapper.Configuration
 
         private void MapDestinationCtorToSource(TypeMap typeMap, List<ICtorParameterConfiguration> ctorParamConfigurations)
         {
+            if (typeMap.DestinationType.IsAbstract || !typeMap.Profile.ConstructorMappingEnabled)
+            {
+                return;
+            }
             var ctorMap = typeMap.ConstructorMap;
             if (ctorMap != null)
             {
@@ -99,10 +103,6 @@ namespace AutoMapper.Configuration
                 {
                     paramMap.CanResolveValue = paramMap.CanResolveValue || IsConfigured(paramMap.Parameter);
                 }
-                return;
-            }
-            if (typeMap.DestinationType.IsAbstract || !typeMap.Profile.ConstructorMappingEnabled)
-            {
                 return;
             }
             foreach (var destCtor in typeMap.DestinationTypeDetails.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
@@ -162,7 +162,7 @@ namespace AutoMapper.Configuration
             ReverseMapExpression.TypeMapActions.Add(reverseTypeMap =>
             {
                 var newDestination = Parameter(reverseTypeMap.DestinationType, "destination");
-                var path = memberPath.Members.MemberAccesses(newDestination);
+                var path = memberPath.Members.Chain(newDestination);
                 var forPathLambda = Lambda(path, newDestination);
 
                 var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);

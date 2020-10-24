@@ -19,10 +19,10 @@ namespace AutoMapper.Internal
         public static LambdaExpression Lambda(this IEnumerable<MemberInfo> members)
         {
             var source = Parameter(members.First().DeclaringType, "source");
-            return Expression.Lambda(members.MemberAccesses(source), source);
+            return Expression.Lambda(members.Chain(source), source);
         }
 
-        public static Expression MemberAccesses(this IEnumerable<MemberInfo> members, Expression obj) =>
+        public static Expression Chain(this IEnumerable<MemberInfo> members, Expression obj) =>
             members.Aggregate(obj,
                         (target, getter) => getter is MethodInfo method ?
                             (Expression)(method.IsStatic ? Call(null, method, target) : Call(target, method)) :

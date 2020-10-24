@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
 
     public class EnumerableToDictionaryMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsDictionaryType();
+        public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsDictionaryType();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
             MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression, typeof(Dictionary<,>), MapItemExpr);

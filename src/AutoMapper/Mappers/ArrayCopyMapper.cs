@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
         private static readonly MethodInfo ArrayCopyMethod = ArrayCopyExpression.Method();
         private static readonly PropertyInfo ArrayLengthProperty = (PropertyInfo) ArrayLengthExpression.GetMember();
 
-        public override bool IsMatch(TypePair context) =>
+        public override bool IsMatch(in TypePair context) =>
             context.DestinationType.IsArray
             && context.SourceType.IsArray
             && ElementTypeHelper.GetElementType(context.DestinationType) == ElementTypeHelper.GetElementType(context.SourceType)
