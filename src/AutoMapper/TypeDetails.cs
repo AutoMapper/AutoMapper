@@ -130,7 +130,7 @@ namespace AutoMapper
         const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
         private IEnumerable<Type> GetTypeInheritance() => Type.GetTypeInheritance().Concat(Type.IsInterface ? Type.GetInterfaces() : Type.EmptyTypes);
         private IEnumerable<PropertyInfo> GetProperties(Func<PropertyInfo, bool> propertyAvailableFor) =>
-            GetTypeInheritance().SelectMany(type => type.GetProperties(Flags).Where(property => propertyAvailableFor(property) && Config.ShouldMapProperty(property) && property.GetIndexParameters().Length == 0));
+            GetTypeInheritance().SelectMany(type => type.GetProperties(Flags).Where(property => propertyAvailableFor(property) && Config.ShouldMapProperty(property)));
         private IEnumerable<MemberInfo> GetFields(Func<FieldInfo, bool> fieldAvailableFor) =>
             GetTypeInheritance().SelectMany(type => type.GetFields(Flags).Where(field => fieldAvailableFor(field) && Config.ShouldMapField(field)));
         private IEnumerable<MethodInfo> GetPublicNoArgMethods() =>
