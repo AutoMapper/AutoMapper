@@ -8,6 +8,8 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using SourceMembers = Dictionary<string, MemberInfo>;
+
     /// <summary>
     /// Contains cached reflection information for easy retrieval
     /// </summary>
@@ -15,35 +17,38 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeDetails
     {
-        private readonly Dictionary<string, MemberInfo> _nameToMember;
-
+        private readonly Lazy<SourceMembers> _nameToMember;
+        private readonly Lazy<ConstructorInfo[]> _constructors;
+        private readonly Lazy<MemberInfo[]> _publicReadAccessors;
+        private readonly Lazy<MemberInfo[]> _publicWriteAccessors;
         public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
             var membersToMap = MembersToMap(config.ShouldMapProperty, config.ShouldMapField);
             var publicReadableMembers = GetAllPublicReadableMembers(membersToMap);
             var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
-            PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
-            PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
-            Constructors = GetAllConstructors(config.ShouldUseConstructor);
-            _nameToMember = new Dictionary<string, MemberInfo>(PublicReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
-            PossibleNames(config);
+            _publicReadAccessors = new Lazy<MemberInfo[]>(() => BuildPublicReadAccessors(publicReadableMembers));
+            _publicWriteAccessors = new Lazy<MemberInfo[]>(() => BuildPublicWriteAccessors(publicWritableMembers));
+            _constructors = new Lazy<ConstructorInfo[]>(()=>GetAllConstructors(config.ShouldUseConstructor), isThreadSafe: false);
+            _nameToMember = new Lazy<SourceMembers>(()=>PossibleNames(config), isThreadSafe: false);
         }
-        public MemberInfo GetMember(string name) => _nameToMember.GetOrDefault(name);
-        private void PossibleNames(ProfileMap config)
+        public MemberInfo GetMember(string name) => _nameToMember.Value.GetOrDefault(name);
+        private SourceMembers PossibleNames(ProfileMap config)
         {
+            var nameToMember = new SourceMembers(PublicReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
             var publicNoArgMethods = GetPublicNoArgMethods(config.ShouldMapMethod);
             var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(config.SourceExtensionMethods.Where(config.ShouldMapMethod));
             foreach (var member in PublicReadAccessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods))
             {
                 foreach (var memberName in PossibleNames(member.Name, config.Prefixes, config.Postfixes))
                 {
-                    if (!_nameToMember.ContainsKey(memberName))
+                    if (!nameToMember.ContainsKey(memberName))
                     {
-                        _nameToMember.Add(memberName, member);
+                        nameToMember.Add(memberName, member);
                     }
                 }
             }
+            return nameToMember;
         }
         public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
@@ -99,11 +104,11 @@ namespace AutoMapper
 
         public Type Type { get; }
 
-        public ConstructorInfo[] Constructors { get; }
+        public ConstructorInfo[] Constructors => _constructors.Value;
 
-        public MemberInfo[] PublicReadAccessors { get; }
+        public MemberInfo[] PublicReadAccessors => _publicReadAccessors.Value;
 
-        public MemberInfo[] PublicWriteAccessors { get; }
+        public MemberInfo[] PublicWriteAccessors => _publicWriteAccessors.Value;
 
         private IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
@@ -145,7 +150,7 @@ namespace AutoMapper
                 .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
                 .ToArray();
 
-        private static MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers) =>
+        private static MemberInfo[] BuildPublicWriteAccessors(IEnumerable<MemberInfo> allMembers) =>
             // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             allMembers
                 .OfType<PropertyInfo>()
