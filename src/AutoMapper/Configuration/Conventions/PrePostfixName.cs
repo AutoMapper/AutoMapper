@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace AutoMapper.Configuration.Conventions
@@ -11,14 +10,9 @@ namespace AutoMapper.Configuration.Conventions
         public List<string> Postfixes { get; } = new List<string>();
         public List<string> DestinationPrefixes { get; } = new List<string>();
         public List<string> DestinationPostfixes { get; } = new List<string>();
-
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
-            var member = sourceTypeDetails.GetMember(nameToSearch);
-            if (member != null)
-            {
-                return member;
-            }
+            MemberInfo member;
             foreach (var possibleSourceName in TypeDetails.PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes))
             {
                 if ((member = sourceTypeDetails.GetMember(possibleSourceName)) != null)

@@ -285,15 +285,19 @@ namespace AutoMapper
                 return;
             }
             _sealed = true;
-
-            _inheritedTypeMaps.ForAll(tm => _includedMembersTypeMaps.UnionWith(tm._includedMembersTypeMaps));
+            foreach (var inheritedTypeMap in _inheritedTypeMaps)
+            {
+                _includedMembersTypeMaps.UnionWith(inheritedTypeMap._includedMembersTypeMaps);
+            }
             foreach (var includedMemberTypeMap in _includedMembersTypeMaps)
             {
                 includedMemberTypeMap.TypeMap.Seal(configurationProvider);
                 ApplyIncludedMemberTypeMap(includedMemberTypeMap);
             }
-            _inheritedTypeMaps.ForAll(tm => ApplyInheritedTypeMap(tm));
-
+            foreach (var inheritedTypeMap in _inheritedTypeMaps)
+            {
+                ApplyInheritedTypeMap(inheritedTypeMap);
+            }
             _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
             _propertyMaps.Clear();
 

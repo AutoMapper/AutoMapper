@@ -25,13 +25,15 @@ namespace AutoMapper.Configuration
         /// <summary>
         /// Add Action called against the IGlobalConfiguration before it gets sealed
         /// </summary>
-        void IGlobalConfigurationExpression.BeforeSeal(Action<IGlobalConfiguration> action) => _beforeSealActions.Add(action);
+        void IGlobalConfigurationExpression.BeforeSeal(Action<IGlobalConfiguration> action) => 
+            _beforeSealActions.Add(action ?? throw new ArgumentNullException(nameof(action)));
 
         /// <summary>
         /// Add an action to be called when validating the configuration.
         /// </summary>
         /// <param name="validator">the validation callback</param>
-        void IGlobalConfigurationExpression.Validator(Validator validator) => _validators.Add(validator);
+        void IGlobalConfigurationExpression.Validator(Validator validator) => 
+            _validators.Add(validator ?? throw new ArgumentNullException(nameof(validator)));
 
         /// <summary>
         /// Allow the same map to exist in different profiles.

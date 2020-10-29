@@ -53,7 +53,7 @@ namespace AutoMapper.Configuration
         IEnumerable<string> GlobalIgnores { get; }
         INamingConvention SourceMemberNamingConvention { get; }
         INamingConvention DestinationMemberNamingConvention { get; }
-        IEnumerable<ITypeMapConfiguration> TypeMapConfigs { get; }
+        IReadOnlyCollection<ITypeMapConfiguration> TypeMapConfigs { get; }
         IEnumerable<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
         IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
     }

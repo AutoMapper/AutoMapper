@@ -133,11 +133,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         return null;
                     }
-                    var projectionMapper = _configurationProvider.ProjectionMappers.FirstOrDefault(b => b.IsMatch(memberMap, memberTypeMap, resolvedSource));
-                    if (projectionMapper == null)
-                    {
-                        throw CannotMap(memberMap, resolvedSource.Type);
-                    }
+                    var projectionMapper = GetProjectionMapper();
                     var mappedExpression = projectionMapper.Project(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, letPropertyMaps);
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     Expression ResolveSource()
@@ -178,6 +174,17 @@ namespace AutoMapper.QueryableExtensions.Impl
                             }
                             return customSource.IsMemberPath() ? customSource.ReplaceParameters(instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
                         }
+                    }
+                    IProjectionMapper GetProjectionMapper()
+                    {
+                        foreach (var mapper in _configurationProvider.ProjectionMappers)
+                        {
+                            if (mapper.IsMatch(memberMap, memberTypeMap, resolvedSource))
+                            {
+                                return mapper;
+                            }
+                        }
+                        throw CannotMap(memberMap, resolvedSource.Type);
                     }
                 }
             }

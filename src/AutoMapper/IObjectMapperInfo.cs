@@ -2,6 +2,6 @@
 {
     public interface IObjectMapperInfo : IObjectMapper
     {
-        TypePair GetAssociatedTypes(TypePair initialTypes);
+        TypePair GetAssociatedTypes(in TypePair initialTypes);
     }
 }

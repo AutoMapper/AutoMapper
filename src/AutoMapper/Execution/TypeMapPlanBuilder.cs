@@ -70,18 +70,14 @@ namespace AutoMapper.Execution
 
         private void CheckForCycles(HashSet<TypeMap> typeMapsPath)
         {
+            typeMapsPath ??= new HashSet<TypeMap>();
             var inlineWasChecked = _typeMap.WasInlineChecked;
             _typeMap.WasInlineChecked = true;
-            if (typeMapsPath == null)
-            {
-                typeMapsPath = new HashSet<TypeMap>();
-            }
             typeMapsPath.Add(_typeMap);
             var members = 
                 _typeMap.MemberMaps
-                .Concat(_typeMap.IncludedDerivedTypes.Select(ResolveTypeMap).SelectMany(tm=>tm.MemberMaps))
+                .Concat(_typeMap.IncludedDerivedTypes.Select(tp=>ResolveTypeMap(tp)).SelectMany(tm=>tm.MemberMaps))
                 .Where(pm=>pm.CanResolveValue)
-                .ToArray()
                 .Select(pm=> new { MemberTypeMap = ResolveMemberTypeMap(pm), MemberMap = pm })
                 .Where(p => p.MemberTypeMap != null && !p.MemberTypeMap.PreserveReferences && p.MemberTypeMap.MapExpression == null);
             foreach(var item in members)
@@ -105,7 +101,7 @@ namespace AutoMapper.Execution
                         return;
                     }
                     SetPreserveReferences(memberTypeMap);
-                    foreach(var derivedTypeMap in memberTypeMap.IncludedDerivedTypes.Select(ResolveTypeMap))
+                    foreach(var derivedTypeMap in memberTypeMap.IncludedDerivedTypes.Select(tp => ResolveTypeMap(tp)))
                     {
                         SetPreserveReferences(derivedTypeMap);
                     }
@@ -114,24 +110,21 @@ namespace AutoMapper.Execution
             }
             typeMapsPath.Remove(_typeMap);
             return;
-
             void SetPreserveReferences(TypeMap memberTypeMap)
             {
                 Debug.WriteLine($"Setting PreserveReferences: {_typeMap.SourceType} - {_typeMap.DestinationType} => {memberTypeMap.SourceType} - {memberTypeMap.DestinationType}");
                 memberTypeMap.PreserveReferences = true;
             }
-
             TypeMap ResolveMemberTypeMap(IMemberMap memberMap)
             {
-                if(memberMap.SourceType == null || memberMap.Types.ContainsGenericParameters)
+                var types = memberMap.Types;
+                if (memberMap.SourceType == null || types.ContainsGenericParameters)
                 {
                     return null;
                 }
-                var types = new TypePair(memberMap.SourceType, memberMap.DestinationType);
                 return ResolveTypeMap(types);
             }
-
-            TypeMap ResolveTypeMap(TypePair types)
+            TypeMap ResolveTypeMap(in TypePair types)
             {
                 var typeMap = _configurationProvider.ResolveTypeMap(types);
                 if(typeMap == null && _configurationProvider.FindMapper(types) is IObjectMapperInfo mapper)

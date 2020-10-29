@@ -19,14 +19,14 @@ namespace AutoMapper
         private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetDeclaredConstructors().Single(c => c.GetParameters().Length == 3);
 
         private readonly IObjectMapper[] _mappers;
-        private readonly Dictionary<TypePair, TypeMap> _configuredMaps = new Dictionary<TypePair, TypeMap>();
+        private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
         private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
         private readonly IProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
         private readonly Features<IRuntimeFeature> _features = new Features<IRuntimeFeature>();
         private readonly int _recursiveQueriesMaxDepth;
-        private readonly IEnumerable<IProjectionMapper> _projectionMappers;
+        private readonly IProjectionMapper[] _projectionMappers;
         private readonly int _maxExecutionPlanDepth;
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
@@ -39,7 +39,6 @@ namespace AutoMapper
                 configuration.IncludeSourceExtensionMethods(extensionMehodsType);
             }
             _mappers = configuration.Mappers.ToArray();
-            _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
             _validator = new ConfigurationValidator(this, configuration);
             _projectionBuilder = new ProjectionBuilder(this);
@@ -51,12 +50,22 @@ namespace AutoMapper
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
             Configuration = new ProfileMap((Profile)configuration);
-            Profiles = new[] { Configuration }.Concat(configuration.Profiles.Select(p => new ProfileMap(p, configuration))).ToArray();
-
+            var profileMaps = new List<ProfileMap>(configuration.Profiles.Count + 1){ Configuration };
+            int typeMapsCount = 0;
+            foreach (var profile in configuration.Profiles)
+            {
+                typeMapsCount += profile.TypeMapConfigs.Count;
+                profileMaps.Add(new ProfileMap(profile, configuration));
+            }
+            Profiles = profileMaps;
+            _configuredMaps = new Dictionary<TypePair, TypeMap>(typeMapsCount);
+            _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap, typeMapsCount);
             configuration.Features.Configure(this);
 
             foreach (var beforeSealAction in configuration.BeforeSealActions)
-                beforeSealAction?.Invoke(this);
+            {
+                beforeSealAction.Invoke(this);
+            }
             Seal();
         }
 
@@ -102,8 +111,8 @@ namespace AutoMapper
         bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
-        internal IEnumerable<ProfileMap> Profiles { get; }
-        IEnumerable<IProjectionMapper> IGlobalConfiguration.ProjectionMappers => _projectionMappers;
+        internal IReadOnlyCollection<ProfileMap> Profiles { get; }
+        IProjectionMapper[] IGlobalConfiguration.ProjectionMappers => _projectionMappers;
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
@@ -170,7 +179,7 @@ namespace AutoMapper
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(new TypePair(typeof(TSource), typeof(TDestination)));
         TypeMap IGlobalConfiguration.FindTypeMapFor(in TypePair typePair) => FindTypeMapFor(typePair);
-        TypeMap FindTypeMapFor(TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
+        TypeMap FindTypeMapFor(in TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
         TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new TypePair(sourceType, destinationType));
         TypeMap IGlobalConfiguration.ResolveTypeMap(in TypePair typePair) => ResolveTypeMap(typePair);
         TypeMap ResolveTypeMap(in TypePair typePair)

@@ -16,8 +16,8 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProfileMap
     {
-        private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
-        private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
+        private readonly ITypeMapConfiguration[] _typeMapConfigs;
+        private readonly ITypeMapConfiguration[] _openTypeMapConfigs;
         private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
         private readonly IMemberConfiguration[] _memberConfigurations;
 
