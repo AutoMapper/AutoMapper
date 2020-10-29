@@ -315,7 +315,7 @@ namespace AutoMapper.Configuration
 
             if(destMember.DeclaringType.IsGenericTypeDefinition)
             {
-                destMember = typeMap.DestinationTypeDetails.PublicWriteAccessors.Single(m => m.Name == destMember.Name);
+                destMember = typeMap.DestinationTypeDetails.WriteAccessors.Single(m => m.Name == destMember.Name);
             }
 
             var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);

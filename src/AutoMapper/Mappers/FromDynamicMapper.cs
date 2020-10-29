@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
         {
             object boxedDestination = destination;
             var destinationTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
-            foreach (var member in destinationTypeDetails.PublicWriteAccessors)
+            foreach (var member in destinationTypeDetails.WriteAccessors)
             {
                 object sourceMemberValue;
                 try

@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
         {
             boxedDestination ??= ObjectFactory.CreateInstance(destinationType);
             int matchedCount = 0;
-            foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors)
+            foreach (var member in profileMap.CreateTypeDetails(destinationType).WriteAccessors)
             {
                 var match = MatchSource(member.Name);
                 if (match.Count == 0)

@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)
         {
             var sourceTypeDetails = profileMap.CreateTypeDetails(source.GetType());
-            var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name, p => p.GetMemberValue(source));
+            var membersDictionary = sourceTypeDetails.ReadAccessors.ToDictionary(p => p.Name, p => p.GetMemberValue(source));
             return membersDictionary;
         }
     }

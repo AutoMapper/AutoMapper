@@ -40,7 +40,7 @@ namespace AutoMapper.Configuration
 
         public void Configure(TypeMap typeMap)
         {
-            foreach(var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
+            foreach(var destProperty in typeMap.DestinationTypeDetails.WriteAccessors)
             {
                 if(typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
@@ -105,7 +105,7 @@ namespace AutoMapper.Configuration
                 }
                 return;
             }
-            foreach (var destCtor in typeMap.DestinationTypeDetails.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
+            foreach (var destCtor in typeMap.GetDestinationConstructors().OrderByDescending(ci => ci.GetParameters().Length))
             {
                 var ctorParameters = destCtor.GetParameters();
                 if (ctorParameters.Length == 0)

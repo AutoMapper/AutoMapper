@@ -50,7 +50,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicWriteAccessors)
+                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors)
                 {
                     ForMember(accessor, memberOptions);
                 }
@@ -61,7 +61,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicWriteAccessors.Where(m =>
+                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors.Where(m =>
                     GetDestinationMemberConfiguration(m) == null))
                 {
                     ForMember(accessor, memberOptions);
@@ -232,7 +232,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicWriteAccessors.Where(m => GetDestinationMemberConfiguration(m) == null))
+                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors.Where(m => GetDestinationMemberConfiguration(m) == null))
                 {
                     ForDestinationMember(accessor, memberOptions);
                 }
@@ -243,7 +243,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicWriteAccessors)
+                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors)
                 {
                     ForDestinationMember(accessor, memberOptions);
                 }

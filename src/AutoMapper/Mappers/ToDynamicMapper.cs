@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
             var sourceTypeDetails = profileMap.CreateTypeDetails(typeof(TSource));
-            foreach (var member in sourceTypeDetails.PublicReadAccessors)
+            foreach (var member in sourceTypeDetails.ReadAccessors)
             {
                 object sourceMemberValue;
                 try

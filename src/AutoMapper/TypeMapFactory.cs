@@ -16,7 +16,7 @@ namespace AutoMapper
 
             var typeMap = new TypeMap(sourceTypeDetails, destTypeInfo, options);
 
-            foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
+            foreach (var destProperty in destTypeInfo.WriteAccessors)
             {
                 var resolvers = new LinkedList<MemberInfo>();
 

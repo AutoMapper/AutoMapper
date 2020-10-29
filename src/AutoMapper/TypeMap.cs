@@ -59,6 +59,8 @@ namespace AutoMapper
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 
+        public IEnumerable<ConstructorInfo> GetDestinationConstructors() => DestinationType.GetDeclaredConstructors().Where(Profile.ShouldUseConstructor);
+
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
 
@@ -122,7 +124,7 @@ namespace AutoMapper
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition
             || DestinationTypeToUse.IsValueType
-            || DestinationTypeDetails.Constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
+            || GetDestinationConstructors().FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
 
         public bool IsConstructorMapping =>
             CustomCtorExpression == null
@@ -180,7 +182,7 @@ namespace AutoMapper
 
             if(ConfiguredMemberList == MemberList.Destination)
             {
-                properties = DestinationTypeDetails.PublicWriteAccessors
+                properties = DestinationTypeDetails.WriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
@@ -199,7 +201,7 @@ namespace AutoMapper
                    .Where(smc => smc.IsIgnored())
                    .Select(pm => pm.SourceMember.Name);
 
-                properties = SourceTypeDetails.PublicReadAccessors
+                properties = SourceTypeDetails.ReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(redirectedSourceMembers)

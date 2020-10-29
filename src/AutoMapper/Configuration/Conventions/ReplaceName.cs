@@ -18,7 +18,7 @@ namespace AutoMapper.Configuration.Conventions
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
-            var possibleDestNames = sourceTypeDetails.PublicReadAccessors.Select(mi => new { mi, possibles = PossibleNames(mi.Name) });
+            var possibleDestNames = sourceTypeDetails.ReadAccessors.Select(mi => new { mi, possibles = PossibleNames(mi.Name) });
 
             var all =
                 from sourceName in possibleSourceNames

@@ -16,7 +16,7 @@ namespace AutoMapper.Internal
 
         public static bool IsSetType(this Type type) => type.ImplementsGenericInterface(typeof(ISet<>));
 
-        private static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
+        public static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
             type.GetTypeInheritance().Concat(type.GetInterfaces()).SelectMany(i => i.GetDeclaredMembers());
 
         public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
