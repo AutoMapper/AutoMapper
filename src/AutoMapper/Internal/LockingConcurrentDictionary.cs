@@ -44,5 +44,7 @@ namespace AutoMapper.Internal
             TryGetValue(key, out var value);
             return value;
         }
+
+        public void Clear() => _dictionary.Clear();
     }
 }

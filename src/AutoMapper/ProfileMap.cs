@@ -16,7 +16,7 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProfileMap
     {
-        private readonly ITypeMapConfiguration[] _typeMapConfigs;
+        private ITypeMapConfiguration[] _typeMapConfigs;
         private readonly ITypeMapConfiguration[] _openTypeMapConfigs;
         private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
         private readonly IMemberConfiguration[] _memberConfigurations;
@@ -66,6 +66,11 @@ namespace AutoMapper
 
             _typeMapConfigs = profile.TypeMapConfigs.ToArray();
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
+        }
+        internal void Clear()
+        {
+            _typeDetails.Clear();
+            _typeMapConfigs = null;
         }
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }

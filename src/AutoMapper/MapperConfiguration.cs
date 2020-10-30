@@ -67,6 +67,10 @@ namespace AutoMapper
                 beforeSealAction.Invoke(this);
             }
             Seal();
+            foreach (var profile in Profiles)
+            {
+                profile.Clear();
+            }
         }
 
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
@@ -111,7 +115,7 @@ namespace AutoMapper
         bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
-        internal IReadOnlyCollection<ProfileMap> Profiles { get; }
+        internal List<ProfileMap> Profiles { get; }
         IProjectionMapper[] IGlobalConfiguration.ProjectionMappers => _projectionMappers;
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
