@@ -105,18 +105,19 @@ namespace AutoMapper.Configuration
                 }
                 return;
             }
-            foreach (var destCtor in typeMap.GetDestinationConstructors().OrderByDescending(ci => ci.GetParameters().Length))
+            foreach (var destCtor in typeMap.GetDestinationConstructors().Select(c=>new { Constructor = c, Parameters = c.GetParameters() }).OrderByDescending(s=>s.Parameters.Length))
             {
-                var ctorParameters = destCtor.GetParameters();
+                var ctorParameters = destCtor.Parameters;
                 if (ctorParameters.Length == 0)
                 {
                     break;
                 }
-                ctorMap = new ConstructorMap(destCtor, typeMap);
+                var constructor = destCtor.Constructor;
+                ctorMap = new ConstructorMap(constructor, typeMap);
                 foreach (var parameter in ctorParameters)
                 {
                     var resolvers = new LinkedList<MemberInfo>();
-                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, IsReverseMap);
+                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, constructor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, IsReverseMap);
                     if ((!canResolve && parameter.IsOptional) || IsConfigured(parameter))
                     {
                         canResolve = true;
