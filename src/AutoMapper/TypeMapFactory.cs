@@ -12,11 +12,11 @@ namespace AutoMapper
         public static TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, bool isReverseMap = false)
         {
             var sourceTypeDetails = options.CreateTypeDetails(sourceType);
-            var destTypeInfo = options.CreateTypeDetails(destinationType);
+            var destinationTypeDetails = options.CreateTypeDetails(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeDetails, destTypeInfo, options);
+            var typeMap = new TypeMap(sourceType, destinationType, options);
 
-            foreach (var destProperty in destTypeInfo.WriteAccessors)
+            foreach (var destProperty in destinationTypeDetails.WriteAccessors)
             {
                 var resolvers = new LinkedList<MemberInfo>();
 

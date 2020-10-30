@@ -34,11 +34,9 @@ namespace AutoMapper
         private readonly HashSet<IncludedMember> _includedMembersTypeMaps = new HashSet<IncludedMember>();
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, ProfileMap profile)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile)
         {
-            SourceTypeDetails = sourceType;
-            DestinationTypeDetails = destinationType;
-            Types = new TypePair(sourceType.Type, destinationType.Type);
+            Types = new TypePair(sourceType, destinationType);
             Profile = profile;
         }
 
@@ -68,11 +66,11 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; set; }
 
-        public TypeDetails SourceTypeDetails { get; }
-        private TypeDetails DestinationTypeDetails { get; }
+        public TypeDetails SourceTypeDetails => Profile.GetTypeDetails(SourceType);
+        private TypeDetails DestinationTypeDetails => Profile.GetTypeDetails(DestinationType);
 
-        public Type SourceType => SourceTypeDetails.Type;
-        public Type DestinationType => DestinationTypeDetails.Type;
+        public Type SourceType => Types.SourceType;
+        public Type DestinationType => Types.DestinationType;
 
         public ProfileMap Profile { get; }
 
@@ -122,7 +120,7 @@ namespace AutoMapper
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition
             || DestinationTypeToUse.IsValueType
-            || DestinationConstructors.Any(c => c.AllParametersOptional());
+            || Profile.CreateTypeDetails(DestinationType).Constructors.Any(c => c.AllParametersOptional());
 
         public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;
         public ConstructorParameters[] DestinationConstructors => DestinationTypeDetails.Constructors;
@@ -183,7 +181,7 @@ namespace AutoMapper
 
             if(ConfiguredMemberList == MemberList.Destination)
             {
-                properties = DestinationSetters
+                properties = Profile.CreateTypeDetails(DestinationType).WriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
@@ -202,7 +200,7 @@ namespace AutoMapper
                    .Where(smc => smc.IsIgnored())
                    .Select(pm => pm.SourceMember.Name);
 
-                properties = SourceTypeDetails.ReadAccessors
+                properties = Profile.CreateTypeDetails(SourceType).ReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(redirectedSourceMembers)

@@ -90,7 +90,7 @@ namespace AutoMapper
         public List<string> Prefixes { get; }
         public List<string> Postfixes { get; }
         public IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
-
+        public TypeDetails GetTypeDetails(Type type) => _typeDetails.GetOrDefault(type);
         public TypeDetails CreateTypeDetails(Type type) => _typeDetails.GetOrAdd(type);
 
         private TypeDetails TypeDetailsFactory(Type type) => new TypeDetails(type, this);
