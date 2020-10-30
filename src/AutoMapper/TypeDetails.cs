@@ -20,6 +20,7 @@ namespace AutoMapper
         private readonly Lazy<SourceMembers> _nameToMember;
         private readonly Lazy<MemberInfo[]> _readAccessors;
         private readonly Lazy<MemberInfo[]> _writeAccessors;
+        private readonly Lazy<ConstructorParameters[]> _constructors;
         public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
@@ -27,7 +28,10 @@ namespace AutoMapper
             _readAccessors = new Lazy<MemberInfo[]>(BuildReadAccessors);
             _writeAccessors = new Lazy<MemberInfo[]>(BuildWriteAccessors);
             _nameToMember = new Lazy<SourceMembers>(PossibleNames, isThreadSafe: false);
+            _constructors = new Lazy<ConstructorParameters[]>(GetConstructors, isThreadSafe: false);
         }
+        private ConstructorParameters[] GetConstructors() => 
+            Type.GetDeclaredConstructors().Where(Config.ShouldUseConstructor).Select(c => new ConstructorParameters(c)).OrderByDescending(c => c.ParametersCount).ToArray();
         public MemberInfo GetMember(string name) => _nameToMember.Value.GetOrDefault(name);
         private SourceMembers PossibleNames()
         {
@@ -82,6 +86,7 @@ namespace AutoMapper
         public ProfileMap Config { get; }
         public MemberInfo[] ReadAccessors => _readAccessors.Value;
         public MemberInfo[] WriteAccessors => _writeAccessors.Value;
+        public ConstructorParameters[] Constructors => _constructors.Value;
         private IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType.IsAssignableFrom(Type));
@@ -136,5 +141,17 @@ namespace AutoMapper
         private IEnumerable<MethodInfo> GetPublicNoArgMethods() =>
             Type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
             .Where(m => m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && Config.ShouldMapMethod(m) && m.GetParameters().Length == 0);
+    }
+    public readonly struct ConstructorParameters
+    {
+        public ConstructorParameters(ConstructorInfo constructor)
+        {
+            Constructor = constructor;
+            Parameters = constructor.GetParameters();
+        }
+        public ConstructorInfo Constructor { get; }
+        public ParameterInfo[] Parameters { get; }
+        public int ParametersCount => Parameters.Length;
+        public bool AllParametersOptional() => Parameters.All(p => p.IsOptional);
     }
 }

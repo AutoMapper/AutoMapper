@@ -50,7 +50,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors)
+                foreach (var accessor in typeMap.DestinationSetters)
                 {
                     ForMember(accessor, memberOptions);
                 }
@@ -220,7 +220,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(typeMap =>
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors)
+                foreach (var accessor in typeMap.DestinationSetters)
                 {
                     ForDestinationMember(accessor, memberOptions);
                 }

@@ -59,8 +59,6 @@ namespace AutoMapper
 
         public Features<IRuntimeFeature> Features { get; } = new Features<IRuntimeFeature>();
 
-        public IEnumerable<ConstructorInfo> GetDestinationConstructors() => DestinationType.GetDeclaredConstructors().Where(Profile.ShouldUseConstructor);
-
         public PathMap FindPathMapByDestinationPath(string destinationFullPath) =>
             PathMaps.SingleOrDefault(item => string.Join(".", item.MemberPath.Members.Select(m => m.Name)) == destinationFullPath);
 
@@ -71,7 +69,7 @@ namespace AutoMapper
         public ConstructorMap ConstructorMap { get; set; }
 
         public TypeDetails SourceTypeDetails { get; }
-        public TypeDetails DestinationTypeDetails { get; }
+        private TypeDetails DestinationTypeDetails { get; }
 
         public Type SourceType => SourceTypeDetails.Type;
         public Type DestinationType => DestinationTypeDetails.Type;
@@ -124,7 +122,10 @@ namespace AutoMapper
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition
             || DestinationTypeToUse.IsValueType
-            || GetDestinationConstructors().FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional)) != null;
+            || DestinationConstructors.Any(c => c.AllParametersOptional());
+
+        public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;
+        public ConstructorParameters[] DestinationConstructors => DestinationTypeDetails.Constructors;
 
         public bool IsConstructorMapping =>
             CustomCtorExpression == null
@@ -182,7 +183,7 @@ namespace AutoMapper
 
             if(ConfiguredMemberList == MemberList.Destination)
             {
-                properties = DestinationTypeDetails.WriteAccessors
+                properties = DestinationSetters
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));

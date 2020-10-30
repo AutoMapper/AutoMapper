@@ -40,7 +40,7 @@ namespace AutoMapper.Configuration
 
         public void Configure(TypeMap typeMap)
         {
-            foreach(var destProperty in typeMap.DestinationTypeDetails.WriteAccessors)
+            foreach(var destProperty in typeMap.DestinationSetters)
             {
                 if(typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && GetDestinationMemberConfiguration(destProperty) == null)
                 {
@@ -105,16 +105,15 @@ namespace AutoMapper.Configuration
                 }
                 return;
             }
-            foreach (var destCtor in typeMap.GetDestinationConstructors().Select(c=>new { Constructor = c, Parameters = c.GetParameters() }).OrderByDescending(s=>s.Parameters.Length))
+            foreach (var destCtor in typeMap.DestinationConstructors)
             {
-                var ctorParameters = destCtor.Parameters;
-                if (ctorParameters.Length == 0)
+                if (destCtor.ParametersCount == 0)
                 {
                     break;
                 }
                 var constructor = destCtor.Constructor;
                 ctorMap = new ConstructorMap(constructor, typeMap);
-                foreach (var parameter in ctorParameters)
+                foreach (var parameter in destCtor.Parameters)
                 {
                     var resolvers = new LinkedList<MemberInfo>();
                     var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, constructor.DeclaringType, parameter.GetType(), parameter.Name, resolvers, IsReverseMap);

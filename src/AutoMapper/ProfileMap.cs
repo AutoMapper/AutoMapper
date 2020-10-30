@@ -28,7 +28,6 @@ namespace AutoMapper
 
         public ProfileMap(IProfileConfiguration profile, IGlobalConfigurationExpression configuration)
         {
-            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory);
             var globalProfile = (IProfileConfiguration)configuration;
             Name = profile.ProfileName;
             AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
@@ -66,6 +65,7 @@ namespace AutoMapper
 
             _typeMapConfigs = profile.TypeMapConfigs.ToArray();
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
+            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2*(_typeMapConfigs.Length+_openTypeMapConfigs.Length));
         }
         internal void Clear()
         {
