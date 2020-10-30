@@ -57,18 +57,6 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions)
-        {
-            TypeMapActions.Add(typeMap =>
-            {
-                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors.Where(m =>
-                    GetDestinationMemberConfiguration(m) == null))
-                {
-                    ForMember(accessor, memberOptions);
-                }
-            });
-        }
-
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
             var member = DestinationType.GetFieldOrProperty(name);
@@ -226,17 +214,6 @@ namespace AutoMapper.Configuration
         {
             var member = DestinationType.GetFieldOrProperty(name);
             return ForDestinationMember(member, memberOptions);
-        }
-
-        public void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
-        {
-            TypeMapActions.Add(typeMap =>
-            {
-                foreach (var accessor in typeMap.DestinationTypeDetails.WriteAccessors.Where(m => GetDestinationMemberConfiguration(m) == null))
-                {
-                    ForDestinationMember(accessor, memberOptions);
-                }
-            });
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)

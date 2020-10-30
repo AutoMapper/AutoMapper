@@ -70,6 +70,10 @@ InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.Features.F
 MembersMustExist : Member 'public AutoMapper.Features.Features<AutoMapper.Features.IGlobalFeature> AutoMapper.IMapperConfigurationExpression.Features.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IList<AutoMapper.IObjectMapper> AutoMapper.IMapperConfigurationExpression.Mappers.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.Collections.Generic.IList<AutoMapper.IObjectMapper> AutoMapper.IMapperConfigurationExpression.Mappers.get()' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpression.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression>)' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public void AutoMapper.IMappingExpression.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpression<TSource, TDestination>.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression<TSource, TDestination, System.Object>>)' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public void AutoMapper.IMappingExpression<TSource, TDestination>.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression<TSource, TDestination, System.Object>>)' does not exist in the implementation but it does exist in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'context' on method 'AutoMapper.IObjectMapper.IsMatch(AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Linq.Expressions.Expression AutoMapper.IObjectMapper.MapExpression(AutoMapper.IConfigurationProvider, AutoMapper.ProfileMap, AutoMapper.IMemberMap, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.Linq.Expressions.Expression AutoMapper.IObjectMapper.MapExpression(AutoMapper.IConfigurationProvider, AutoMapper.ProfileMap, AutoMapper.IMemberMap, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
@@ -136,6 +140,8 @@ MembersMustExist : Member 'public AutoMapper.Features.Features<AutoMapper.Featur
 MembersMustExist : Member 'public System.Collections.Generic.IList<AutoMapper.IObjectMapper> AutoMapper.Configuration.MapperConfigurationExpression.Mappers.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<AutoMapper.Configuration.IProfileConfiguration> AutoMapper.Configuration.MapperConfigurationExpression.Profiles.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Func<System.Type, System.Object> AutoMapper.Configuration.MapperConfigurationExpression.ServiceCtor.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public void AutoMapper.Configuration.MappingExpression.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public void AutoMapper.Configuration.MappingExpression<TSource, TDestination>.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression<TSource, TDestination, System.Object>>)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.AllMemberInfo' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.CaseInsensitiveName' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.CaseSensitiveName' does not exist in the implementation but it does exist in the contract.
@@ -269,4 +275,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 270
+Total Issues: 276

@@ -30,12 +30,6 @@ namespace AutoMapper
         void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions);
 
         /// <summary>
-        /// Customize configuration for members not previously configured
-        /// </summary>
-        /// <param name="memberOptions">Callback for member options</param>
-        void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
-
-        /// <summary>
         /// Customize individual members
         /// </summary>
         /// <param name="name">Name of the member</param>
@@ -67,12 +61,6 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions);
-
-        /// <summary>
-        /// Customize configuration for members not previously configured
-        /// </summary>
-        /// <param name="memberOptions">Callback for member options</param>
-        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member
