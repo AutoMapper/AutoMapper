@@ -103,11 +103,6 @@ namespace AutoMapper.Internal
             }
             if (typeMap != null)
             {
-                if (typeMap.IsClosedGeneric)
-                {
-                    // it was already validated
-                    return;
-                }
                 if (typeMapsChecked.Contains(typeMap))
                 {
                     return;

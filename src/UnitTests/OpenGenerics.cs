@@ -208,7 +208,7 @@
         [Fact]
         public void Should_report_unmapped_property()
         {
-            new Action(()=> Mapper.Map<Dest<int>>(new Source<int>{ Value = 5 }))
+            new Action(Configuration.AssertConfigurationIsValid)
                 .ShouldThrow<AutoMapperConfigurationException>()
                 .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A");
         }

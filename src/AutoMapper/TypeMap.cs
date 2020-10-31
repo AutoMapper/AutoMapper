@@ -142,7 +142,6 @@ namespace AutoMapper
             && ConfiguredMemberList != MemberList.None
             && !(IsValid ?? false);
 
-        public bool IsClosedGeneric { get; internal set; }
         public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
 

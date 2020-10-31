@@ -195,10 +195,6 @@ namespace AutoMapper
                 lock (typeMap)
                 {
                     typeMap.Seal(this);
-                    if (typeMap.IsClosedGeneric)
-                    {
-                        this.Internal().AssertConfigurationIsValid(typeMap);
-                    }
                 }
             }
             return typeMap;

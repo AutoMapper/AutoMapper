@@ -166,7 +166,6 @@ namespace AutoMapper
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IGlobalConfiguration configurationProvider)
         {
             var closedMap = TypeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
-            closedMap.IsClosedGeneric = true;
             openMapConfig.Configure(closedMap);
 
             Configure(closedMap, configurationProvider);
