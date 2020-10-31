@@ -18,7 +18,7 @@ namespace AutoMapper
     {
         private ITypeMapConfiguration[] _typeMapConfigs;
         private readonly ITypeMapConfiguration[] _openTypeMapConfigs;
-        private readonly LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
+        private LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
         private readonly IMemberConfiguration[] _memberConfigurations;
 
         public ProfileMap(IProfileConfiguration profile)
@@ -69,7 +69,7 @@ namespace AutoMapper
         }
         internal void Clear()
         {
-            _typeDetails.Clear();
+            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2 * _openTypeMapConfigs.Length);
             _typeMapConfigs = null;
         }
         public bool AllowNullCollections { get; }
