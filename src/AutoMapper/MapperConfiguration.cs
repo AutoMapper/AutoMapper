@@ -49,17 +49,18 @@ namespace AutoMapper
             _projectionMappers = configuration.ProjectionMappers.ToArray();
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
-            Configuration = new ProfileMap((Profile)configuration);
+            Configuration = new ProfileMap((IProfileConfiguration)configuration);
             var profileMaps = new List<ProfileMap>(configuration.Profiles.Count + 1){ Configuration };
-            int typeMapsCount = 0;
+            int typeMapsCount = Configuration.TypeMapsCount;
             foreach (var profile in configuration.Profiles)
             {
-                typeMapsCount += profile.TypeMapConfigs.Count;
-                profileMaps.Add(new ProfileMap(profile, configuration));
+                var profileMap = new ProfileMap(profile, configuration);
+                typeMapsCount += profileMap.TypeMapsCount;
+                profileMaps.Add(profileMap);
             }
             Profiles = profileMaps;
             _configuredMaps = new Dictionary<TypePair, TypeMap>(typeMapsCount);
-            _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap, typeMapsCount);
+            _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap, 2*typeMapsCount);
             configuration.Features.Configure(this);
 
             foreach (var beforeSealAction in configuration.BeforeSealActions)
@@ -190,7 +191,7 @@ namespace AutoMapper
         {
             var typeMap = _resolvedMaps.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && typeMap.MapExpression == null && _configuredMaps.GetOrDefault(typePair) == null)
+            if (typeMap != null && typeMap.MapExpression == null && !_configuredMaps.ContainsKey(typePair))
             {
                 lock (typeMap)
                 {

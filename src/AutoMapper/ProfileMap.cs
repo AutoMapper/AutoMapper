@@ -63,10 +63,27 @@ namespace AutoMapper
             Prefixes = prePostFixes.SelectMany(m => m.Prefixes).Distinct().ToList();
             Postfixes = prePostFixes.SelectMany(m => m.Postfixes).Distinct().ToList();
 
-            _typeMapConfigs = profile.TypeMapConfigs.ToArray();
+            SetTypeMapConfigs();
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2*(_typeMapConfigs.Length+_openTypeMapConfigs.Length));
+            return;
+            void SetTypeMapConfigs()
+            {
+                _typeMapConfigs = new ITypeMapConfiguration[profile.TypeMapConfigs.Count];
+                var index = 0;
+                var reverseMapsCount = 0;
+                foreach (var typeMapConfig in profile.TypeMapConfigs)
+                {
+                    _typeMapConfigs[index++] = typeMapConfig;
+                    if (typeMapConfig.ReverseTypeMap != null)
+                    {
+                        reverseMapsCount++;
+                    }
+                }
+                TypeMapsCount = index + reverseMapsCount;
+            }
         }
+        public int TypeMapsCount { get; private set; }
         internal void Clear()
         {
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2 * _openTypeMapConfigs.Length);
