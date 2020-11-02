@@ -20,14 +20,10 @@ jobs:
     - name: Build and Test
       run: ./Build.ps1
       shell: pwsh
-    - name: Push to MyGet
+    - name: echo name
       env:
         NUGET_URL: https://www.myget.org/F/automapperdev/api/v3/index.json
         NUGET_API_KEY: ${{ secrets.MYGET_CI_API_KEY }}
-      run: ./Push.ps1
-      shell: pwsh
-    - name: Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts/**/*
+      run: |
+        df -hl
+        echo "hello god"
