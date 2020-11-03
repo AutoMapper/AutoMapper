@@ -361,11 +361,7 @@ namespace AutoMapper
             {
                 return null;
             }
-            TypeMap typeMap;
-            lock (this)
-            {
-                typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
-            }
+            var typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
             cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
         }
