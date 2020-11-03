@@ -317,8 +317,8 @@ namespace AutoMapper
             {
                 return null;
             }
-            ITypeMapConfiguration genericMap;
-            ProfileMap profile;
+            ITypeMapConfiguration genericMap = null;
+            ProfileMap profile = null;
             TypeMap cachedMap = null;
             var userMap = FindTypeMapFor(genericTypePair.Value);
             if (userMap?.DestinationTypeOverride != null)
@@ -342,15 +342,19 @@ namespace AutoMapper
             }
             else if (userMap == null)
             {
-                var item = Profiles
-                    .Select(p => new { GenericMap = p.GetGenericMap(typePair), Profile = p })
-                    .FirstOrDefault(p => p.GenericMap != null);
-                genericMap = item?.GenericMap;
-                profile = item?.Profile;
+                foreach (var currentProfile in Profiles)
+                {
+                    genericMap = currentProfile.GetGenericMap(genericTypePair.Value);
+                    if (genericMap != null)
+                    {
+                        profile = currentProfile;
+                        break;
+                    }
+                }
             }
             else
             {
-                genericMap = userMap.Profile.GetGenericMap(typePair);
+                genericMap = userMap.Profile.GetGenericMap(genericTypePair.Value);
                 profile = userMap.Profile;
             }
             if (genericMap == null)

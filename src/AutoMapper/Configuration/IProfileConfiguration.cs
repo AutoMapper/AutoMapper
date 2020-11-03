@@ -54,7 +54,7 @@ namespace AutoMapper.Configuration
         INamingConvention SourceMemberNamingConvention { get; }
         INamingConvention DestinationMemberNamingConvention { get; }
         IReadOnlyCollection<ITypeMapConfiguration> TypeMapConfigs { get; }
-        IEnumerable<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
+        IReadOnlyCollection<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
         IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }

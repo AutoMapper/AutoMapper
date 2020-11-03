@@ -17,7 +17,7 @@ namespace AutoMapper
     public class ProfileMap
     {
         private ITypeMapConfiguration[] _typeMapConfigs;
-        private readonly ITypeMapConfiguration[] _openTypeMapConfigs;
+        private Dictionary<TypePair, ITypeMapConfiguration> _openTypeMapConfigs;
         private LockingConcurrentDictionary<Type, TypeDetails> _typeDetails;
         private readonly IMemberConfiguration[] _memberConfigurations;
 
@@ -64,8 +64,8 @@ namespace AutoMapper
             Postfixes = prePostFixes.SelectMany(m => m.Postfixes).Distinct().ToList();
 
             SetTypeMapConfigs();
-            _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
-            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2*(_typeMapConfigs.Length+_openTypeMapConfigs.Length));
+            SetOpenTypeMapConfigs();
+            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2*_typeMapConfigs.Length);
             return;
             void SetTypeMapConfigs()
             {
@@ -82,11 +82,26 @@ namespace AutoMapper
                 }
                 TypeMapsCount = index + reverseMapsCount;
             }
+            void SetOpenTypeMapConfigs()
+            {
+                _openTypeMapConfigs = new Dictionary<TypePair, ITypeMapConfiguration>(profile.OpenTypeMapConfigs.Count);
+                foreach (var openTypeMapConfig in profile.OpenTypeMapConfigs)
+                {
+                    AddOpenTypeMapConfig(openTypeMapConfig);
+                    var reverseMap = openTypeMapConfig.ReverseTypeMap;
+                    if (reverseMap != null)
+                    {
+                        AddOpenTypeMapConfig(reverseMap);
+                    }
+                }
+            }
+            void AddOpenTypeMapConfig(ITypeMapConfiguration typeMapConfiguration) => 
+                _openTypeMapConfigs.Add(typeMapConfiguration.Types.GetOpenGenericTypePair().Value, typeMapConfiguration);
         }
         public int TypeMapsCount { get; private set; }
         internal void Clear()
         {
-            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2 * _openTypeMapConfigs.Length);
+            _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory, 2 * _openTypeMapConfigs.Count);
             _typeMapConfigs = null;
         }
         public bool AllowNullCollections { get; }
@@ -205,17 +220,7 @@ namespace AutoMapper
             return closedMap;
         }
 
-        public ITypeMapConfiguration GetGenericMap(TypePair closedTypes)
-        {
-            return _openTypeMapConfigs
-                .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })
-                .Where(tm =>
-                    tm.Types.SourceType.GetTypeDefinitionIfGeneric() == closedTypes.SourceType.GetTypeDefinitionIfGeneric() &&
-                    tm.Types.DestinationType.GetTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetTypeDefinitionIfGeneric())
-                .OrderByDescending(tm => tm.DestinationType == closedTypes.DestinationType) // Favor more specific destination matches,
-                .ThenByDescending(tm => tm.SourceType == closedTypes.SourceType) // then more specific source matches
-                .FirstOrDefault();
-        }
+        public ITypeMapConfiguration GetGenericMap(in TypePair genericPair) => _openTypeMapConfigs.GetOrDefault(genericPair);
 
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {

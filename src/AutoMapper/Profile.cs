@@ -51,7 +51,7 @@ namespace AutoMapper
         IEnumerable<IMemberConfiguration> IProfileConfiguration.MemberConfigurations => _memberConfigurations;
         IEnumerable<MethodInfo> IProfileConfiguration.SourceExtensionMethods => _sourceExtensionMethods;
         IReadOnlyCollection<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
-        IEnumerable<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
+        IReadOnlyCollection<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs;
         IEnumerable<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs;
 
         public virtual string ProfileName { get; }

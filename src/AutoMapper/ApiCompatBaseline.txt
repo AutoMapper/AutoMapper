@@ -131,6 +131,9 @@ MembersMustExist : Member 'public void AutoMapper.Profile.ForAllPropertyMaps(Sys
 MembersMustExist : Member 'public void AutoMapper.Profile.RecognizeAlias(System.String, System.String)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ValidationContext' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.IConfiguration' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IReadOnlyCollection<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.OpenTypeMapConfigs.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IEnumerable<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.OpenTypeMapConfigs.get()' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.OpenTypeMapConfigs.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IReadOnlyCollection<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.TypeMapConfigs.get()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IEnumerable<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.TypeMapConfigs.get()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.TypeMapConfigs.get()' does not exist in the implementation but it does exist in the contract.
@@ -275,4 +278,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 276
+Total Issues: 279
