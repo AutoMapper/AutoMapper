@@ -192,7 +192,7 @@ namespace AutoMapper
         {
             var typeMap = _resolvedMaps.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && typeMap.MapExpression == null && !_configuredMaps.ContainsKey(typePair))
+            if (typeMap != null && typeMap.MapExpression == null && !_configuredMaps.ContainsKey(typeMap.Types))
             {
                 lock (typeMap)
                 {
