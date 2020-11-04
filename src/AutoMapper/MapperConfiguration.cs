@@ -290,7 +290,8 @@ namespace AutoMapper
             }
         }
 
-        IEnumerable<TypeMap> IGlobalConfiguration.GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes) => includedTypes.Select(this.Internal().GetIncludedTypeMap);
+        IEnumerable<TypeMap> IGlobalConfiguration.GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes) =>
+            includedTypes.Count == 0 ? Enumerable.Empty<TypeMap>() : includedTypes.Select(this.Internal().GetIncludedTypeMap);
         TypeMap IGlobalConfiguration.GetIncludedTypeMap(Type sourceType, Type destinationType) => this.Internal().GetIncludedTypeMap(new TypePair(sourceType, destinationType));
         TypeMap IGlobalConfiguration.GetIncludedTypeMap(TypePair pair)
         {

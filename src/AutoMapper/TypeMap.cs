@@ -88,8 +88,8 @@ namespace AutoMapper
 
         public MemberList ConfiguredMemberList { get; set; }
 
-        public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
-        public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
+        public IReadOnlyCollection<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
+        public IReadOnlyCollection<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
         public IEnumerable<LambdaExpression> BeforeMapActions => _beforeMapActions;
         public IEnumerable<LambdaExpression> AfterMapActions => _afterMapActions;

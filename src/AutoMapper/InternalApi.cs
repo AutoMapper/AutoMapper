@@ -135,7 +135,7 @@ namespace AutoMapper.Internal
         IProjectionMapper[] ProjectionMappers { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
-        IEnumerable<TypeMap> GetIncludedTypeMaps(IEnumerable<TypePair> includedTypes);
+        IEnumerable<TypeMap> GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
