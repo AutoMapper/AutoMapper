@@ -8,6 +8,49 @@
     using System.Linq;
     using Xunit;
 
+    public class GenericMapsAsNonGeneric : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Value;
+        }
+        class Destination<T>
+        {
+            public T Value;
+        }
+        class NonGenericDestination : Destination<string>
+        {
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source), typeof(Destination<>)).As(typeof(NonGenericDestination));
+            cfg.CreateMap(typeof(Source), typeof(NonGenericDestination));
+        });
+        [Fact]
+        public void Should_work() => Mapper.Map<Destination<string>>(new Source { Value = 42 }).Value.ShouldBe("42");
+    }
+    public class RelatedGenericMaps : AutoMapperSpecBase
+    {
+        class Source<T>
+        {
+            public T Value;
+        }
+        class Destination<T>
+        {
+            public T Value;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<int>));
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<string>));
+        });
+        [Fact]
+        public void Should_work()
+        {
+            Mapper.Map<Destination<int>>(new Source<int> { Value = 42 }).Value.ShouldBe(42);
+            Mapper.Map<Destination<string>>(new Source<string> { Value = "42" }).Value.ShouldBe("42");
+        }
+    }
     public class GenericMapWithUntypedMap : AutoMapperSpecBase
     {
         class Source<T>

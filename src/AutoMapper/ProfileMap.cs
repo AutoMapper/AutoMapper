@@ -96,7 +96,7 @@ namespace AutoMapper
                 }
             }
             void AddOpenTypeMapConfig(ITypeMapConfiguration typeMapConfiguration) => 
-                _openTypeMapConfigs.Add(typeMapConfiguration.Types.GetOpenGenericTypePair().Value, typeMapConfiguration);
+                _openTypeMapConfigs.Add(typeMapConfiguration.Types, typeMapConfiguration);
         }
         public int TypeMapsCount { get; private set; }
         internal void Clear()

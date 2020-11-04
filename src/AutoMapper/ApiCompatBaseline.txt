@@ -129,6 +129,7 @@ MembersMustExist : Member 'public void AutoMapper.Profile.EnableNullPropagationF
 MembersMustExist : Member 'public void AutoMapper.Profile.ForAllMaps(System.Action<AutoMapper.TypeMap, AutoMapper.IMappingExpression>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Profile.ForAllPropertyMaps(System.Func<AutoMapper.PropertyMap, System.Boolean>, System.Action<AutoMapper.PropertyMap, AutoMapper.IMemberConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Profile.RecognizeAlias(System.String, System.String)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Nullable<AutoMapper.TypePair> AutoMapper.TypePair.GetOpenGenericTypePair()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ValidationContext' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.IConfiguration' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IReadOnlyCollection<AutoMapper.Configuration.ITypeMapConfiguration> AutoMapper.Configuration.IProfileConfiguration.OpenTypeMapConfigs.get()' is present in the implementation but not in the contract.
@@ -278,4 +279,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 279
+Total Issues: 280

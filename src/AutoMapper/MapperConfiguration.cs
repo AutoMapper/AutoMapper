@@ -181,9 +181,10 @@ namespace AutoMapper
                 Block(Expression.Throw(New(ExceptionConstructor, Constant(message), innerException, Constant(mapRequest.RequestedTypes))), Default(mapRequest.RequestedTypes.DestinationType));
         }
         TypeMap[] IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values.ToArray();
-        TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
-        TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(new TypePair(typeof(TSource), typeof(TDestination)));
+        TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);
+        TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
         TypeMap IGlobalConfiguration.FindTypeMapFor(in TypePair typePair) => FindTypeMapFor(typePair);
+        TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
         TypeMap FindTypeMapFor(in TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
         TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new TypePair(sourceType, destinationType));
         TypeMap IGlobalConfiguration.ResolveTypeMap(in TypePair typePair) => ResolveTypeMap(typePair);
@@ -314,49 +315,33 @@ namespace AutoMapper
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
             var genericTypePair = typePair.GetOpenGenericTypePair();
-            if (genericTypePair == null)
+            if (genericTypePair.IsEmpty)
             {
                 return null;
             }
-            ITypeMapConfiguration genericMap = null;
-            ProfileMap profile = null;
-            TypeMap cachedMap = null;
-            var userMap = FindTypeMapFor(genericTypePair.Value);
-            if (userMap?.DestinationTypeOverride != null)
+            var userMap =
+                FindTypeMapFor(genericTypePair) ??
+                FindTypeMapFor(genericTypePair.SourceType, typePair.DestinationType) ??
+                FindTypeMapFor(typePair.SourceType, genericTypePair.DestinationType);
+            ITypeMapConfiguration genericMap;
+            ProfileMap profile;
+            TypeMap cachedMap;
+            if (userMap != null && userMap.DestinationTypeOverride == null)
             {
-                genericTypePair = new TypePair(genericTypePair.Value.SourceType, userMap.DestinationTypeOverride).GetOpenGenericTypePair();
-                if (genericTypePair == null)
-                {
-                    return null;
-                }
-                userMap = null;
+                genericMap = userMap.Profile.GetGenericMap(userMap.Types);
+                profile = userMap.Profile;
+                cachedMap = null;
             }
-            if (userMap == null && (cachedMap = GetCachedMap(genericTypePair.Value)) != null)
+            else
             {
-                if (!cachedMap.Types.IsGeneric)
+                cachedMap = GetCachedMap(genericTypePair);
+                if (cachedMap?.Types.ContainsGenericParameters != true)
                 {
                     return cachedMap;
                 }
                 genericMap = cachedMap.Profile.GetGenericMap(cachedMap.Types);
                 profile = cachedMap.Profile;
                 typePair = cachedMap.Types.CloseGenericTypes(typePair);
-            }
-            else if (userMap == null)
-            {
-                foreach (var currentProfile in Profiles)
-                {
-                    genericMap = currentProfile.GetGenericMap(genericTypePair.Value);
-                    if (genericMap != null)
-                    {
-                        profile = currentProfile;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                genericMap = userMap.Profile.GetGenericMap(genericTypePair.Value);
-                profile = userMap.Profile;
             }
             if (genericMap == null)
             {
