@@ -29,7 +29,7 @@
         [Fact]
         public void Should_work() => Mapper.Map<Destination<string>>(new Source { Value = 42 }).Value.ShouldBe("42");
     }
-    public class RelatedGenericMaps : AutoMapperSpecBase
+    public class GenericMapsPriority : AutoMapperSpecBase
     {
         class Source<T>
         {
@@ -41,8 +41,10 @@
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap(typeof(Source<>), typeof(Destination<int>));
             cfg.CreateMap(typeof(Source<>), typeof(Destination<string>));
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<>)).ForAllMembers(o=>o.Ignore());
+            cfg.CreateMap(typeof(Source<string>), typeof(Destination<>)).ForAllMembers(o => o.Ignore());
+            cfg.CreateMap(typeof(Source<int>), typeof(Destination<>));
         });
         [Fact]
         public void Should_work()

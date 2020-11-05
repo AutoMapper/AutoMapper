@@ -320,15 +320,15 @@ namespace AutoMapper
                 return null;
             }
             var userMap =
-                FindTypeMapFor(genericTypePair) ??
                 FindTypeMapFor(genericTypePair.SourceType, typePair.DestinationType) ??
-                FindTypeMapFor(typePair.SourceType, genericTypePair.DestinationType);
-            ITypeMapConfiguration genericMap;
+                FindTypeMapFor(typePair.SourceType, genericTypePair.DestinationType) ??
+                FindTypeMapFor(genericTypePair);
+            ITypeMapConfiguration genericMapConfig;
             ProfileMap profile;
             TypeMap cachedMap;
             if (userMap != null && userMap.DestinationTypeOverride == null)
             {
-                genericMap = userMap.Profile.GetGenericMap(userMap.Types);
+                genericMapConfig = userMap.Profile.GetGenericMap(userMap.Types);
                 profile = userMap.Profile;
                 cachedMap = null;
             }
@@ -339,15 +339,15 @@ namespace AutoMapper
                 {
                     return cachedMap;
                 }
-                genericMap = cachedMap.Profile.GetGenericMap(cachedMap.Types);
+                genericMapConfig = cachedMap.Profile.GetGenericMap(cachedMap.Types);
                 profile = cachedMap.Profile;
                 typePair = cachedMap.Types.CloseGenericTypes(typePair);
             }
-            if (genericMap == null)
+            if (genericMapConfig == null)
             {
                 return null;
             }
-            var typeMap = profile.CreateClosedGenericTypeMap(genericMap, typePair, this);
+            var typeMap = profile.CreateClosedGenericTypeMap(genericMapConfig, typePair, this);
             cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
         }
