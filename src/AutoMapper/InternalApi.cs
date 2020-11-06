@@ -66,7 +66,7 @@ namespace AutoMapper.Internal
         /// Get all configured type maps created
         /// </summary>
         /// <returns>All configured type maps</returns>
-        TypeMap[] GetAllTypeMaps();
+        IReadOnlyCollection<TypeMap> GetAllTypeMaps();
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type
         /// </summary>

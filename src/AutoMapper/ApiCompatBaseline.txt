@@ -146,6 +146,7 @@ MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<AutoMap
 MembersMustExist : Member 'public System.Func<System.Type, System.Object> AutoMapper.Configuration.MapperConfigurationExpression.ServiceCtor.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Configuration.MappingExpression.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Configuration.MappingExpression<TSource, TDestination>.ForAllOtherMembers(System.Action<AutoMapper.IMemberConfigurationExpression<TSource, TDestination, System.Object>>)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'protected void AutoMapper.Configuration.MappingExpressionBase.CheckIsDerived(System.Type, System.Type)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.AllMemberInfo' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.CaseInsensitiveName' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.CaseSensitiveName' does not exist in the implementation but it does exist in the contract.
@@ -279,4 +280,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 280
+Total Issues: 281

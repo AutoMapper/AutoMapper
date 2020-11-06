@@ -559,7 +559,7 @@ namespace AutoMapper.UnitTests
 
         public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecBase
         {
-            private TypeMap[] _allTypeMaps;
+            private IReadOnlyCollection<TypeMap> _allTypeMaps;
             private Source _source;
 
             public class Source

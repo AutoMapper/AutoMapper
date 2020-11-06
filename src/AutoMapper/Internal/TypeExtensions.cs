@@ -10,6 +10,14 @@ namespace AutoMapper.Internal
 {
     public static class TypeExtensions
     {
+        public static void CheckIsDerivedFrom(this Type derivedType, Type baseType)
+        {
+            if (!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
+            {
+                throw new ArgumentOutOfRangeException(nameof(derivedType), $"{derivedType} is not derived from {baseType}.");
+            }
+        }
+
         public static bool IsDynamic(this Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
 
         public static bool IsNonStringEnumerable(this Type type) => type != typeof(string) && type.IsEnumerableType();

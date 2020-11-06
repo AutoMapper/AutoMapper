@@ -180,7 +180,7 @@ namespace AutoMapper
             static BlockExpression Throw(in MapRequest mapRequest, string message, Expression innerException) =>
                 Block(Expression.Throw(New(ExceptionConstructor, Constant(message), innerException, Constant(mapRequest.RequestedTypes))), Default(mapRequest.RequestedTypes.DestinationType));
         }
-        TypeMap[] IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values.ToArray();
+        IReadOnlyCollection<TypeMap> IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values;
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
         TypeMap IGlobalConfiguration.FindTypeMapFor(in TypePair typePair) => FindTypeMapFor(typePair);
@@ -233,18 +233,6 @@ namespace AutoMapper
             foreach (var profile in Profiles)
             {
                 profile.Register(this);
-            }
-            foreach (var typeMap in _configuredMaps.Values.Where(tm => tm.IncludeAllDerivedTypes))
-            {
-                foreach (var derivedMap in _configuredMaps
-                    .Where(tm =>
-                        typeMap != tm.Value &&
-                        typeMap.SourceType.IsAssignableFrom(tm.Key.SourceType) &&
-                        typeMap.DestinationType.IsAssignableFrom(tm.Key.DestinationType))
-                    .Select(tm => tm.Value))
-                {
-                    typeMap.IncludeDerivedTypes(derivedMap.SourceType, derivedMap.DestinationType);
-                }
             }
             foreach (var profile in Profiles)
             {

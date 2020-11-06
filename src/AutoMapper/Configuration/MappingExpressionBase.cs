@@ -187,26 +187,19 @@ namespace AutoMapper.Configuration
             SourceMemberConfigurations.Add(srcConfig);
         }
 
-        protected void IncludeCore(Type otherSourceType, Type otherDestinationType)
+        protected void IncludeCore(Type derivedSourceType, Type derivedDestinationType)
         {
-            CheckIsDerived(otherSourceType, Types.SourceType);
-            CheckIsDerived(otherDestinationType, Types.DestinationType);
-            TypeMapActions.Add(tm => tm.IncludeDerivedTypes(otherSourceType, otherDestinationType));
+            var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
+            derivedTypes.CheckIsDerivedFrom(Types);
+            TypeMapActions.Add(tm => tm.IncludeDerivedTypes(derivedTypes));
         }
 
-        protected void CheckIsDerived(Type derivedType, Type baseType)
-        {
-            if(!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
-            {
-                throw new ArgumentOutOfRangeException(nameof(derivedType), $"{derivedType} is not derived from {baseType}.");
-            }
-        }
 
         protected void IncludeBaseCore(Type sourceBase, Type destinationBase)
         {
-            CheckIsDerived(Types.SourceType, sourceBase);
-            CheckIsDerived(Types.DestinationType, destinationBase);
-            TypeMapActions.Add(tm => tm.IncludeBaseTypes(sourceBase, destinationBase));
+            var baseTypes = new TypePair(sourceBase, destinationBase);
+            Types.CheckIsDerivedFrom(baseTypes);
+            TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
         }
 
         protected IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
@@ -374,7 +367,7 @@ namespace AutoMapper.Configuration
 
         public void As(Type typeOverride)
         {
-            CheckIsDerived(typeOverride, Types.DestinationType);
+            typeOverride.CheckIsDerivedFrom(Types.DestinationType);
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 

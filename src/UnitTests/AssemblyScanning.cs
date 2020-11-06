@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_load_profiles()
             {
-                Configuration.GetAllTypeMaps().Length.ShouldBeGreaterThan(0);
+                Configuration.GetAllTypeMaps().Count.ShouldBeGreaterThan(0);
             }
 
             [Fact]
@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_load_profiles()
             {
-                Configuration.GetAllTypeMaps().Length.ShouldBeGreaterThan(0);
+                Configuration.GetAllTypeMaps().Count.ShouldBeGreaterThan(0);
             }
         }
 
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_load_profiles()
             {
-                Configuration.GetAllTypeMaps().Length.ShouldBeGreaterThan(0);
+                Configuration.GetAllTypeMaps().Count.ShouldBeGreaterThan(0);
             }
         }
     }

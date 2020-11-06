@@ -164,6 +164,16 @@ namespace AutoMapper
         private void Configure(ITypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
         {
             var typeMap = configurationProvider.FindTypeMapFor(typeMapConfiguration.Types);
+            if (typeMap.IncludeAllDerivedTypes)
+            {
+                foreach (var derivedMap in configurationProvider.GetAllTypeMaps().Where(tm =>
+                        typeMap != tm &&
+                        typeMap.SourceType.IsAssignableFrom(tm.SourceType) &&
+                        typeMap.DestinationType.IsAssignableFrom(tm.DestinationType)))
+                {
+                    typeMap.IncludeDerivedTypes(derivedMap.Types);
+                }
+            }
             Configure(typeMap, configurationProvider);
         }
 
@@ -230,7 +240,7 @@ namespace AutoMapper
         {
             foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))
             {
-                baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
+                baseMap.IncludeDerivedTypes(currentMap.Types);
                 derivedMap.AddInheritedMap(baseMap);
                 ApplyBaseMaps(derivedMap, baseMap, configurationProvider);
             }
@@ -257,7 +267,7 @@ namespace AutoMapper
         {
             foreach (var derivedMap in configurationProvider.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
             {
-                derivedMap.IncludeBaseTypes(typeMap.SourceType, typeMap.DestinationType);
+                derivedMap.IncludeBaseTypes(typeMap.Types);
                 derivedMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(baseMap, derivedMap, configurationProvider);
             }

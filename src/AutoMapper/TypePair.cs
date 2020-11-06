@@ -99,6 +99,12 @@ namespace AutoMapper
             return new TypePair(closedSourceType, closedDestinationType);
         }
 
+        public void CheckIsDerivedFrom(in TypePair baseTypes)
+        {
+            SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
+            DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
+        }
+
         public IEnumerable<TypePair> GetRelatedTypePairs()
         {
             var @this = this;

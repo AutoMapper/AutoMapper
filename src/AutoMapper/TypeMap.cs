@@ -228,23 +228,23 @@ namespace AutoMapper
             return propertyMap;
         }
 
-        public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
+        public void IncludeDerivedTypes(in TypePair derivedTypes)
         {
-            var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
-            if (derivedTypes.Equals(Types))
-            {
-                throw new InvalidOperationException("You cannot include a type map into itself.");
-            }
+            CheckDifferent(derivedTypes);
             _includedDerivedTypes.Add(derivedTypes);
         }
 
-        public void IncludeBaseTypes(Type baseSourceType, Type baseDestinationType)
+        private void CheckDifferent(in TypePair types)
         {
-            var baseTypes = new TypePair(baseSourceType, baseDestinationType);
-            if (baseTypes.Equals(Types))
+            if (types == Types)
             {
                 throw new InvalidOperationException("You cannot include a type map into itself.");
             }
+        }
+
+        public void IncludeBaseTypes(in TypePair baseTypes)
+        {
+            CheckDifferent(baseTypes);
             _includedBaseTypes.Add(baseTypes);
         }
 
