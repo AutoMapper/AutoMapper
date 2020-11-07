@@ -193,23 +193,26 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class When_disabling_LINQ_methods : NonValidatingSpecBase
+    public class When_disabling_method_maping : NonValidatingSpecBase
     {
         public class Source
         {
             public IEnumerable<int> Values { get; set; }
+            public int OtherValue() => 42;
         }
         public class Destination
         {
             public int ValuesCount { get; set; }
+            public int OtherValue { get; set; }
         }
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.Internal().SourceExtensionMethodsTypes = Array.Empty<Type>();
+            cfg.Internal().MethodMappingEnabled = false;
             cfg.CreateMap<Source, Destination>();
         });
         [Fact]
-        public void Should_fail_validation() => new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames.ShouldBe(new[] {"ValuesCount"});
+        public void Should_fail_validation() => new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
+            .UnmappedPropertyNames.ShouldBe(new[] {"ValuesCount", "OtherValue"});
     }
 
     public class When_a_static_method_has_first_parameter_null : AutoMapperSpecBase

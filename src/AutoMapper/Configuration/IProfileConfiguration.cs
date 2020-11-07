@@ -12,6 +12,7 @@ namespace AutoMapper.Configuration
     public interface IProfileConfiguration
     {
         IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        bool? MethodMappingEnabled { get; }
         bool? ConstructorMappingEnabled { get; }
         bool? AllowNullDestinationValues { get; }
         bool? AllowNullCollections { get; }
@@ -41,7 +42,6 @@ namespace AutoMapper.Configuration
         /// By default all eligible methods are mapped.
         /// </summary>
         Func<MethodInfo, bool> ShouldMapMethod { get; }
-
 
         /// <summary>
         /// Specify which constructors should be considered for the destination objects.

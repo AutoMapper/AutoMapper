@@ -34,6 +34,7 @@ namespace AutoMapper
             AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
             EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
             ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? globalProfile?.ConstructorMappingEnabled ?? true;
+            MethodMappingEnabled = profile.MethodMappingEnabled ?? globalProfile?.MethodMappingEnabled ?? true;
             ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic);
             ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
             ShouldMapMethod = profile.ShouldMapMethod ?? configuration?.ShouldMapMethod ?? (p => !p.IsSpecialName);
@@ -108,6 +109,7 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
         public bool EnableNullPropagationForQueryMapping { get; }
+        public bool MethodMappingEnabled { get; }
         public string Name { get; }
         public Func<FieldInfo, bool> ShouldMapField { get; }
         public Func<PropertyInfo, bool> ShouldMapProperty { get; }

@@ -36,9 +36,14 @@ namespace AutoMapper
         private SourceMembers PossibleNames()
         {
             var nameToMember = new SourceMembers(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
-            var publicNoArgMethods = GetPublicNoArgMethods();
-            var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(Config.ShouldMapMethod));
-            foreach (var member in ReadAccessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods))
+            IEnumerable<MemberInfo> accessors = ReadAccessors;
+            if (Config.MethodMappingEnabled)
+            {
+                var publicNoArgMethods = GetPublicNoArgMethods();
+                var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(Config.ShouldMapMethod));
+                accessors = accessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods);
+            }
+            foreach (var member in accessors)
             {
                 foreach (var memberName in PossibleNames(member.Name, Config.Prefixes, Config.Postfixes))
                 {

@@ -66,7 +66,6 @@ namespace AutoMapper.Configuration
         IList<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
 
         Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
-        IReadOnlyCollection<Type> IGlobalConfigurationExpression.SourceExtensionMethodsTypes { get; set; }
 
         private class NamedProfile : Profile
         {

@@ -20,7 +20,6 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IGlobalConfigurationExpression : IMapperConfigurationExpression, IProfileExpressionInternal
     {
-        IReadOnlyCollection<Type> SourceExtensionMethodsTypes { get; set; }
         Func<Type, object> ServiceCtor { get; }
         IReadOnlyCollection<IProfileConfiguration> Profiles { get; }
         /// <summary>
@@ -169,6 +168,10 @@ namespace AutoMapper.Internal
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>
         bool? EnableNullPropagationForQueryMapping { get; set; }
+        /// <summary>
+        /// Disable method mapping. Use this if you don't intend to have AutoMapper try to map from methods.
+        /// </summary>
+        bool? MethodMappingEnabled { get; set; }
         /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>
