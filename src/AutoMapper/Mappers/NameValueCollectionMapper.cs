@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
             return nvc;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetStaticMethod(nameof(Map));
 
         public bool IsMatch(in TypePair context) => context.SourceType == typeof (NameValueCollection) &&
                                                  context.DestinationType == typeof (NameValueCollection);

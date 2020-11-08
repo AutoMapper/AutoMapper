@@ -50,14 +50,14 @@ namespace AutoMapper.Configuration.Conventions
 
         public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, bool isReverseMap)
         {
-            var foundMap = false;
             foreach (var memberMapper in MemberMappers)
             {
-                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, destMemberType, nameToSearch, resolvers, this, isReverseMap);
-                if (foundMap)
-                    break;
+                if (memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, destMemberType, nameToSearch, resolvers, this, isReverseMap))
+                {
+                    return true;
+                }
             }
-            return foundMap;
+            return false;
         }
     }
 }

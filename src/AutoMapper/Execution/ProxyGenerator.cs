@@ -25,8 +25,7 @@ namespace AutoMapper.Execution
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
             typeof(INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
-        private static readonly ConstructorInfo proxyBase_ctor =
-            typeof(ProxyBase).GetDeclaredConstructor(Type.EmptyTypes);
+        private static readonly ConstructorInfo proxyBase_ctor = typeof(ProxyBase).GetConstructor(Type.EmptyTypes);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 

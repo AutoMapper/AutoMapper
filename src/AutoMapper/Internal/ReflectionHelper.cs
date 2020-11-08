@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -13,6 +11,17 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
+        public static MethodInfo GetConversionOperator(this TypePair context, string name)
+        {
+            foreach (MethodInfo sourceMethod in context.SourceType.GetMember(name, MemberTypes.Method, TypeExtensions.StaticFlags))
+            {
+                if (sourceMethod.ReturnType == context.DestinationType)
+                {
+                    return sourceMethod;
+                }
+            }
+            return context.DestinationType.GetMethod(name, TypeExtensions.StaticFlags, null, new[] { context.SourceType }, null);
+        }
         public static bool IsExtensionMethod(this MethodInfo method) => method.IsStatic && method.Has<ExtensionAttribute>();
 
         public static bool IsStatic(this FieldInfo fieldInfo) => fieldInfo?.IsStatic ?? false;
@@ -86,16 +95,16 @@ namespace AutoMapper.Internal
 
         public static MemberInfo[] GetMemberPath(Type type, string fullMemberName)
         {
-            return GetMemberPathCore().ToArray();
-            IEnumerable<MemberInfo> GetMemberPathCore()
+            var memberNames = fullMemberName.Split('.');
+            var members = new MemberInfo[memberNames.Length];
+            MemberInfo property = null;
+            for(int index = 0; index < memberNames.Length; index++)
             {
-                MemberInfo property = null;
-                foreach (var memberName in fullMemberName.Split('.'))
-                {
-                    var currentType = GetCurrentType(property, type);
-                    yield return property = currentType.GetFieldOrProperty(memberName);
-                }
+                var currentType = GetCurrentType(property, type);
+                property = currentType.GetInheritedMember(memberNames[index]);
+                members[index] = property;
             }
+            return members;
         }
 
         private static Type GetCurrentType(MemberInfo member, Type type)

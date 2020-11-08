@@ -25,16 +25,6 @@ namespace AutoMapper
 
         public void AfterMap(Action<TSource, TDestination> afterFunction) => AfterMapAction = afterFunction;
 
-        public T CreateInstance<T>()
-        {
-            var service = ServiceCtor(typeof(T));
-            if(service == null)
-            {
-                throw new AutoMapperMappingException("Cannot create an instance of type " + typeof(T));
-            }
-            return (T) service;
-        }
-
         public void ConstructServicesUsing(Func<Type, object> constructor)
         {
             var ctor = ServiceCtor;

@@ -12,14 +12,14 @@ namespace AutoMapper.Execution
 
     public static class ExpressionBuilder
     {
-        private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo =
-            ctxt => ctxt.GetTypeDepth(default);
-
-        private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext =
-            mapper => new ResolutionContext((IInternalRuntimeMapper)mapper);
-
-        private static readonly MethodInfo ContextMapMethod =
-            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();            
+        public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.IncrementTypeDepth), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.DecrementTypeDepth), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CreateInstance), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo GetTypeDepthMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.GetTypeDepth), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CacheDestination), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.GetDestination), TypeExtensions.InstanceFlags);
+        public static readonly ConstructorInfo CreateContext = typeof(ResolutionContext).GetConstructor(TypeExtensions.InstanceFlags, null, new[] { typeof(IInternalRuntimeMapper) }, null);
+        public static readonly MethodInfo ContextMapMethod = Method(()=> default(ResolutionContext).Map<object, object>(null, null, null)).GetGenericMethodDefinition();
 
         public static Expression MapExpression(IGlobalConfiguration configurationProvider,
             ProfileMap profileMap,
@@ -36,7 +36,7 @@ namespace AutoMapper.Execution
             if (typeMap != null)
             {
                 hasTypeConverter = typeMap.HasTypeConverter;
-                if (!typeMap.HasDerivedTypesToInclude())
+                if (!typeMap.HasDerivedTypesToInclude)
                 {
                     typeMap.Seal(configurationProvider);
 
@@ -75,18 +75,17 @@ namespace AutoMapper.Execution
             var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
                 : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
-            var ifSourceNull = destinationParameter.Type.IsCollectionType() ? ClearDestinationCollection() : destination;
+            var destinationCollectionType = destinationParameter.Type.GetCollectionType();
+            var ifSourceNull = destinationCollectionType != null ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
             Expression ClearDestinationCollection()
             {
-                var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
-                var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clear = Call(destinationVariable, destinationCollectionType.GetDeclaredMethod("Clear"));
+                var clear = Call(destinationVariable, destinationCollectionType.GetMethod("Clear"));
                 var isReadOnly = Property(destinationVariable, "IsReadOnly");
                 return Block(new[] {destinationVariable},
-                    Assign(destinationVariable, ExpressionFactory.ToType(destinationParameter, destinationCollectionType)),
-                    Condition(OrElse(Equal(destinationVariable, Constant(null)), isReadOnly), Empty(), clear),
+                    Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
+                    Condition(OrElse(Equal(destinationVariable, Null), isReadOnly), ExpressionFactory.Empty, clear),
                     destination);
             }
             Expression DefaultDestination()
@@ -131,7 +130,7 @@ namespace AutoMapper.Execution
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
                 var mapper = Property(context, "Mapper");
-                return IfThen(Property(context, "IsDefault"), Assign(context, Invoke(CreateContext, mapper)));
+                return IfThen(Property(context, "IsDefault"), Assign(context, New(CreateContext, Convert(mapper, typeof(IInternalRuntimeMapper)))));
             }
             return null;
         }
@@ -139,7 +138,7 @@ namespace AutoMapper.Execution
         public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap) =>
             typeMap?.MaxDepth > 0 ?
                 GreaterThan(
-                    Call(context, GetTypeDepthInfo.Method(), Constant(typeMap.Types)),
+                    Call(context, GetTypeDepthMethod, Constant(typeMap.Types)),
                     Constant(typeMap.MaxDepth)
                 ) :
                 null;
@@ -159,11 +158,20 @@ namespace AutoMapper.Execution
         public static Expression NullSubstitute(this IMemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
 
-        public static Expression ApplyTransformers(this IMemberMap memberMap, Expression source) =>
-            memberMap.ValueTransformers
-            .Concat(memberMap.TypeMap.ValueTransformers)
-            .Concat(memberMap.TypeMap.Profile.ValueTransformers)
-            .Where(vt => vt.IsMatch(memberMap))
-            .Aggregate(source, (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+        public static Expression ApplyTransformers(this IMemberMap memberMap, Expression source)
+        {
+            var perMember = memberMap.ValueTransformers;
+            var perMap = memberMap.TypeMap.ValueTransformers;
+            var perProfile = memberMap.TypeMap.Profile.ValueTransformers;
+            if (perMember.Count == 0 && perMap.Count == 0 && perProfile.Count == 0)
+            {
+                return source;
+            }
+            var transformers = perMember.Concat(perMap).Concat(perProfile);
+            return Apply(transformers, memberMap, source);
+            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, IMemberMap memberMap, Expression source) => 
+                transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source,
+                    (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+        }
     }
 }

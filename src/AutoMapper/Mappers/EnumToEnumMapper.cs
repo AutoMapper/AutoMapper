@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
             var isDefined = Call(typeof(Enum), "IsDefined", null, Constant(sourceExpression.Type), sourceToObject);
             var sourceToString = Call(sourceExpression, "ToString", null);
             var result = Variable(destinationType, "destinationEnumValue");
-            var ignoreCase = Constant(true);
+            var ignoreCase = ExpressionFactory.True;
             var tryParse = Call(typeof(Enum), "TryParse", new[] { destinationType }, sourceToString, ignoreCase, result);
             return Block(new[] { result }, Condition(isDefined, Condition(tryParse, result, castToObject), castToObject));
         }

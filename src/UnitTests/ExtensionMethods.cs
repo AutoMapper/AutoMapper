@@ -199,20 +199,28 @@ namespace AutoMapper.UnitTests
         {
             public IEnumerable<int> Values { get; set; }
             public int OtherValue() => 42;
+            public string StringValue;
         }
         public class Destination
         {
             public int ValuesCount { get; set; }
             public int OtherValue { get; set; }
+            public string StringValue;
+            public string AnotherStringValue;
         }
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.Internal().FieldMappingEnabled = false;
             cfg.Internal().MethodMappingEnabled = false;
             cfg.CreateMap<Source, Destination>();
         });
         [Fact]
-        public void Should_fail_validation() => new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
-            .UnmappedPropertyNames.ShouldBe(new[] {"ValuesCount", "OtherValue"});
+        public void Should_fail_validation()
+        {
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
+                .UnmappedPropertyNames.ShouldBe(new[] { "ValuesCount", "OtherValue" });
+            Mapper.Map<Destination>(new Source { StringValue = "42" }).StringValue.ShouldBeNull();
+        }
     }
 
     public class When_a_static_method_has_first_parameter_null : AutoMapperSpecBase

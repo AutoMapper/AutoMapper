@@ -13,8 +13,8 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class PropertyMap : DefaultMemberMap
     {
-        private List<MemberInfo> _memberChain = new List<MemberInfo>();
-        private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
+        private MemberInfo[] _memberChain = Array.Empty<MemberInfo>();
+        private List<ValueTransformerConfiguration> _valueTransformerConfigs;
 
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
         {
@@ -50,7 +50,7 @@ namespace AutoMapper
         public override object NullSubstitute { get; set; }
         public override ValueResolverConfiguration ValueResolverConfig { get; set; }
         public override ValueConverterConfiguration ValueConverterConfig { get; set; }
-        public override IEnumerable<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs;
+        public override IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs ?? (IReadOnlyCollection<ValueTransformerConfiguration>)Array.Empty<ValueTransformerConfiguration>();
 
         public override Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
                                   ?? ValueResolverConfig?.SourceMember?.ReturnType
@@ -58,8 +58,7 @@ namespace AutoMapper
                                   ?? CustomMapExpression?.ReturnType
                                   ?? SourceMember?.GetMemberType();
 
-        public void ChainMembers(IEnumerable<MemberInfo> members) =>
-            _memberChain.AddRange(members as IList<MemberInfo> ?? members.ToList());
+        public void ChainMembers(IEnumerable<MemberInfo> members) => _memberChain = members.ToArray();
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
@@ -81,18 +80,25 @@ namespace AutoMapper
             MappingOrder ??= inheritedMappedProperty.MappingOrder;
             UseDestinationValue ??= inheritedMappedProperty.UseDestinationValue;
             ExplicitExpansion ??= inheritedMappedProperty.ExplicitExpansion;
-            _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
-            _memberChain = _memberChain.Count == 0 ? inheritedMappedProperty._memberChain : _memberChain;
+            if (inheritedMappedProperty._valueTransformerConfigs != null)
+            {
+                _valueTransformerConfigs ??= new();
+                _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
+            }
+            _memberChain = _memberChain.Length == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }
 
         public override bool CanResolveValue => HasSource && !Ignored;
 
-        public bool HasSource => _memberChain.Count > 0 || IsResolveConfigured;
+        public bool HasSource => _memberChain.Length > 0 || IsResolveConfigured;
 
         public bool IsResolveConfigured => ValueResolverConfig != null || CustomMapFunction != null ||
                                          CustomMapExpression != null || ValueConverterConfig != null;
 
-        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration) =>
+        public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
+        {
+            _valueTransformerConfigs ??= new();
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -11,11 +10,9 @@ namespace AutoMapper.Mappers
 
     public class FlagsEnumMapper : IObjectMapper
     {
-        private static readonly MethodInfo EnumParseMethod = Method(() => Enum.Parse(null, null, true));
-
+        private static readonly MethodInfo EnumParseMethod = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string), typeof(bool) });
         public bool IsMatch(in TypePair context) => 
             context.IsEnumToEnum() && context.SourceType.Has<FlagsAttribute>() && context.DestinationType.Has<FlagsAttribute>();
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
@@ -23,7 +20,7 @@ namespace AutoMapper.Mappers
                     Call(EnumParseMethod,
                         Constant(destExpression.Type),
                         Call(sourceExpression, sourceExpression.Type.GetRuntimeMethod("ToString", Type.EmptyTypes)),
-                        Constant(true)
+                        True
                     ),
                     destExpression.Type
                 );

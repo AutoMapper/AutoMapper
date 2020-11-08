@@ -11,26 +11,14 @@ namespace AutoMapper.Mappers
 
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
-        public bool IsMatch(in TypePair context)
-        {
-            if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType))
-                return false;
-
-            var genericType = context.DestinationType.GetGenericTypeDefinition();
-
-            return genericType == typeof (ReadOnlyCollection<>);
-        }
-
+        public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType(typeof(ReadOnlyCollection<>));
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var listType = typeof(List<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
             var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType), contextExpression, typeof(List<>), MapItemExpr);
             var dest = Variable(listType, "dest");
-
-            var ctor = destExpression.Type.GetDeclaredConstructors()
-                .First(ci => ci.GetParameters().Length == 1 && ci.GetParameters()[0].ParameterType.IsAssignableFrom(dest.Type));
-
+            var ctor = destExpression.Type.GetDeclaredConstructors().First();
             return Block(new[] { dest }, 
                 Assign(dest, list), 
                 Condition(NotEqual(dest, Default(listType)), 

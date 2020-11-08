@@ -8,8 +8,6 @@ namespace AutoMapper
     /// </summary>
     public interface IMappingOperationOptions
     {
-        T CreateInstance<T>();
-
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>

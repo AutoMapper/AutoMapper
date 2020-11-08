@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
-            var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
+            var destElementType = destExpression.Type.GetElementType();
 
             var itemExpr = MapItemExpr(configurationProvider, profileMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
 

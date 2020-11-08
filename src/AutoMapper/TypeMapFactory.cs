@@ -16,10 +16,13 @@ namespace AutoMapper
 
             var typeMap = new TypeMap(sourceType, destinationType, options);
 
+            var resolvers = new LinkedList<MemberInfo>();
             foreach (var destProperty in destinationTypeDetails.WriteAccessors)
             {
-                var resolvers = new LinkedList<MemberInfo>();
-
+                if (resolvers.Count > 0)
+                {
+                    resolvers = new LinkedList<MemberInfo>();
+                }
                 if (options.MapDestinationPropertyToSource(sourceTypeDetails, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers, isReverseMap))
                 {
                     typeMap.AddPropertyMap(destProperty, resolvers);

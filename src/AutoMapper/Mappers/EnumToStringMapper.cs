@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -11,16 +10,14 @@ namespace AutoMapper.Mappers
     public class EnumToStringMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string) && context.SourceType.IsEnum;
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
             var sourceType = sourceExpression.Type;
-            var toStringCall = Expression.Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString"));
+            var toStringCall = Expression.Call(sourceExpression, ExpressionFactory.ObjectToString);
             var switchCases = new List<SwitchCase>();
-            var enumNames = sourceType.GetDeclaredMembers();
-            foreach (var memberInfo in enumNames.Where(x => x.IsStatic()))
+            foreach (var memberInfo in sourceType.GetFields())
             {
                 var attribute = memberInfo.GetCustomAttribute(typeof(EnumMemberAttribute)) as EnumMemberAttribute;
                 if (attribute?.Value != null)

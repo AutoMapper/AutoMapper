@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
 
     public class ToDynamicMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
+        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
             var sourceTypeDetails = profileMap.CreateTypeDetails(typeof(TSource));
             foreach (var member in sourceTypeDetails.ReadAccessors)
@@ -45,7 +45,7 @@ namespace AutoMapper.Mappers
             callsite.Target(callsite, target, value);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetStaticMethod(nameof(Map));
 
         public bool IsMatch(in TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
 

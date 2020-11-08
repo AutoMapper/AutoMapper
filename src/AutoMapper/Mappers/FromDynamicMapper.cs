@@ -43,7 +43,7 @@ namespace AutoMapper.Mappers
             return callsite.Target(callsite, target);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetStaticMethod(nameof(Map));
 
         public bool IsMatch(in TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
 

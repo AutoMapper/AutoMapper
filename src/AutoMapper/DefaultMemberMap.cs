@@ -42,7 +42,7 @@ namespace AutoMapper
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueConverterConfiguration ValueConverterConfig { get => default; set { } }
 
-        public virtual IEnumerable<ValueTransformerConfiguration> ValueTransformers => Enumerable.Empty<ValueTransformerConfiguration>();
+        public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
 
         public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.LastOrDefault();
   
@@ -56,7 +56,7 @@ namespace AutoMapper
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
                                                 // just a placeholder so the member is mapped
-                                                Lambda(Constant(null)) :
+                                                Lambda(ExpressionFactory.Null) :
                                                 ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
             MapFrom(mapExpression);
         }

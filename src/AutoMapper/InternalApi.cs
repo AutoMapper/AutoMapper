@@ -134,7 +134,6 @@ namespace AutoMapper.Internal
         IProjectionMapper[] ProjectionMappers { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
-        IEnumerable<TypeMap> GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
@@ -157,6 +156,7 @@ namespace AutoMapper.Internal
         IEnumerable<ProfileMap> GetProfiles();
         TypeMap GetIncludedTypeMap(TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
+        TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression
@@ -172,6 +172,10 @@ namespace AutoMapper.Internal
         /// Disable method mapping. Use this if you don't intend to have AutoMapper try to map from methods.
         /// </summary>
         bool? MethodMappingEnabled { get; set; }
+        /// <summary>
+        /// Disable fields mapping. Use this if you don't intend to have AutoMapper try to map from/to fields.
+        /// </summary>
+        bool? FieldMappingEnabled { get; set; }
         /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>

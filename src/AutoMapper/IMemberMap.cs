@@ -27,7 +27,7 @@ namespace AutoMapper
         LambdaExpression CustomMapFunction { get; }
         ValueResolverConfiguration ValueResolverConfig { get; }
         ValueConverterConfiguration ValueConverterConfig { get; }
-        IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
+        IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
         MemberInfo SourceMember { get; }
         bool IsMapped { get; }
         bool CanBeSet { get; }

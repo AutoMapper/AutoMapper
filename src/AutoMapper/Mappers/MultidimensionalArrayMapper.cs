@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             where TSource : IEnumerable
         {
             var sourceArray = source as Array;
-            var destElementType = ElementTypeHelper.GetElementType(typeof(TDestination));
+            var destElementType = typeof(TDestination).GetElementType();
             if (typeof(TDestination).IsAssignableFrom(typeof(TSource)))
             {
                 var elementTypeMap = configurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
@@ -33,11 +33,11 @@ namespace AutoMapper.Mappers
             return destinationArray;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetStaticMethod(nameof(Map));
 
         public bool IsMatch(in TypePair context)
         {
-            if (!context.DestinationType.IsArray || !context.SourceType.IsArray)
+            if (!context.IsArray)
             {
                 return false;
             }
@@ -50,7 +50,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
-                    ElementTypeHelper.GetElementType(sourceExpression.Type)),
+                    sourceExpression.Type.GetElementType()),
                 sourceExpression,
                 contextExpression,
                 Constant(configurationProvider));

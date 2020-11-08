@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -8,7 +9,7 @@ namespace AutoMapper.Configuration
 {
     public class MappingExpression : MappingExpressionBase<object, object, IMappingExpression>, IMappingExpression
     {
-        public MappingExpression(TypePair types, MemberList memberList) : base(memberList, types)
+        public MappingExpression(in TypePair types, MemberList memberList) : base(memberList, types)
         {
         }
 
@@ -21,16 +22,12 @@ namespace AutoMapper.Configuration
             {
                 IsReverseMap = true
             };
-            reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
-            ReverseMapExpression = reverseMap;
+            ReverseMapCore(reverseMap);
             reverseMap.IncludeMembers(MapToSourceMembers().Select(m => m.DestinationMember.Name).ToArray());
-            foreach(var includedMemberName in IncludedMembersNames)
+            foreach (var includedMemberName in IncludedMembersNames)
             {
                 reverseMap.ForMember(includedMemberName, m => m.MapFrom(s => s));
             }
-
-            ReverseFeatures();
-
             return reverseMap;
         }
 
@@ -160,7 +157,7 @@ namespace AutoMapper.Configuration
         {
         }
 
-        public MappingExpression(MemberList memberList, TypePair types)
+        public MappingExpression(MemberList memberList, in TypePair types)
             : base(memberList, types)
         {
         }
@@ -265,15 +262,12 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var reverseMap =
-                new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType)
-                {
-                    IsReverseMap = true
-                };
-            reverseMap.MemberConfigurations.AddRange(MemberConfigurations.Select(m => m.Reverse()).Where(m => m != null));
-            ReverseMapExpression = reverseMap;
+            var reverseMap = new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType)
+            {
+                IsReverseMap = true
+            };
+            ReverseMapCore(reverseMap);
             reverseMap.IncludeMembersCore(MapToSourceMembers().Select(m => m.GetDestinationExpression()).ToArray());
-            ReverseFeatures();
             return reverseMap;
         }
 

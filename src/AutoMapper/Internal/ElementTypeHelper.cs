@@ -1,57 +1,25 @@
 using System;
-using System.Collections;
-using System.Linq;
-using System.Reflection;
 
 namespace AutoMapper.Internal
 {
     public static class ElementTypeHelper
     {
-        public static Type GetElementType(Type enumerableType) => GetElementTypes(enumerableType, null)[0];
-
-        public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None) => 
-            GetElementTypes(enumerableType, null, flags);
-
-        public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
-            ElementTypeFlags flags = ElementTypeFlags.None)
+        public static Type GetElementType(Type enumerableType) => enumerableType.IsArray ?
+            enumerableType.GetElementType() :
+            enumerableType.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
+        public static Type[] GetElementTypes(Type enumerableType)
         {
-            if (enumerableType.HasElementType)
-            {
-                return new[] {enumerableType.GetElementType()};
-            }
-
             var iDictionaryType = enumerableType.GetDictionaryType();
-            if (iDictionaryType != null && flags.HasFlag(ElementTypeFlags.BreakKeyValuePair))
+            if (iDictionaryType != null)
             {
-                return iDictionaryType.GetTypeInfo().GenericTypeArguments;
+                return iDictionaryType.GenericTypeArguments;
             }
-
             var iReadOnlyDictionaryType = enumerableType.GetReadOnlyDictionaryType();
-            if (iReadOnlyDictionaryType != null && flags.HasFlag(ElementTypeFlags.BreakKeyValuePair))
+            if (iReadOnlyDictionaryType != null)
             {
-                return iReadOnlyDictionaryType.GetTypeInfo().GenericTypeArguments;
+                return iReadOnlyDictionaryType.GenericTypeArguments;
             }
-
-            var iEnumerableType = enumerableType.GetIEnumerableType();
-            if (iEnumerableType != null)
-            {
-                return iEnumerableType.GetTypeInfo().GenericTypeArguments;
-            }
-
-            if (typeof(IEnumerable).IsAssignableFrom(enumerableType))
-            {
-                var first = enumerable?.Cast<object>().FirstOrDefault();
-
-                return new[] {first?.GetType() ?? typeof(object)};
-            }
-
-            throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.",
-                nameof(enumerableType));
+            return new[] { GetElementType(enumerableType) };
         }
-    }
-    public enum ElementTypeFlags
-    {
-        None = 0,
-        BreakKeyValuePair = 1
     }
 }

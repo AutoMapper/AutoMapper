@@ -16,23 +16,56 @@ namespace AutoMapper.Features
             return mapping;
         }
 
-        internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration) => features.ForAll(feature => feature.Configure(mapperConfiguration));
-
-        public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures) => features.ForAll(feature =>
+        internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
         {
-            var reverse = feature.Reverse();
-            if (reverse != null)
+            if (features.Count == 0)
             {
-                reversedFeatures.Set(reverse);
+                return;
             }
-        });
+            foreach (var feature in features)
+            {
+                feature.Configure(mapperConfiguration);
+            }
+        }
 
-        internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap) => features.ForAll(feature => feature.Configure(typeMap));
+        public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
+        {
+            if (features.Count == 0)
+            {
+                return;
+            }
+            foreach (var feature in features)
+            {
+                var reverse = feature.Reverse();
+                if (reverse != null)
+                {
+                    reversedFeatures.Set(reverse);
+                }
+            }
+        }
+
+        internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+        {
+            if (features.Count == 0)
+            {
+                return;
+            }
+            foreach (var feature in features)
+            {
+                feature.Configure(typeMap);
+            }
+        }
 
         internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configurationProvider)
         {
-            features.ForAll(feature => feature.Seal(configurationProvider));
-            features.MakeReadOnly();
+            if (features.Count == 0)
+            {
+                return;
+            }
+            foreach (var feature in features)
+            {
+                feature.Seal(configurationProvider);
+            }
         }
     }
 }

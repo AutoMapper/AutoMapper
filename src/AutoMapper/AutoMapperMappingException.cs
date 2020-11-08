@@ -25,11 +25,11 @@ namespace AutoMapper
         public AutoMapperMappingException(string message, Exception innerException, TypePair types)
             : this(message, innerException) => Types = types;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
-            : this(message, innerException, types) => TypeMap = typeMap;
+        public AutoMapperMappingException(string message, Exception innerException, TypeMap typeMap)
+            : this(message, innerException, typeMap.Types) => TypeMap = typeMap;
 
-        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, IMemberMap memberMap)
-            : this(message, innerException, types, typeMap) => MemberMap = memberMap;
+        public AutoMapperMappingException(string message, Exception innerException, IMemberMap memberMap)
+            : this(message, innerException, memberMap.TypeMap) => MemberMap = memberMap;
 
         public TypePair? Types { get; set; }
         public TypeMap TypeMap { get; set; }

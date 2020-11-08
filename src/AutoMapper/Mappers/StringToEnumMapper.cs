@@ -12,18 +12,17 @@ namespace AutoMapper.Mappers
 
     public class StringToEnumMapper : IObjectMapper
     {
+        private static readonly MethodInfo EqualsMethodInfo = typeof(StringToEnumMapper).GetMethod("StringCompareOrdinalIgnoreCase");
         public bool IsMatch(in TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
             var destinationType = destExpression.Type;
             var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),
-                sourceExpression, Expression.Constant(true));
+                sourceExpression, True);
             var switchCases = new List<SwitchCase>();
-            var enumNames = destinationType.GetDeclaredMembers();
-            foreach (var memberInfo in enumNames.Where(x => x.IsStatic()))
+            foreach (var memberInfo in destinationType.GetFields())
             {
                 var attribute = memberInfo.GetCustomAttribute(typeof(EnumMemberAttribute)) as EnumMemberAttribute;
                 if (attribute?.Value != null)
@@ -34,17 +33,12 @@ namespace AutoMapper.Mappers
                     switchCases.Add(switchCase);
                 }
             }
-            var equalsMethodInfo = Method(() => StringCompareOrdinalIgnoreCase(null, null));
             var switchTable = switchCases.Count > 0
-                ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), equalsMethodInfo, switchCases)
+                ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), EqualsMethodInfo, switchCases)
                 : ToType(enumParse, destinationType);
             var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
             return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
         }
-
-        private static bool StringCompareOrdinalIgnoreCase(string x, string y)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(x, y);
-        }
+        public static bool StringCompareOrdinalIgnoreCase(string x, string y) => StringComparer.OrdinalIgnoreCase.Equals(x, y);
     }
 }

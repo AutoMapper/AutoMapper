@@ -53,7 +53,7 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                return _instanceCache ??= new Dictionary<ContextCacheKey, object>(); ;
+                return _instanceCache ??= new Dictionary<ContextCacheKey, object>();
             }
         }
 
@@ -81,26 +81,26 @@ namespace AutoMapper
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
             Type sourceType, Type destinationType, IMemberMap memberMap)
             => _inner.Map(source, destination, context, sourceType, destinationType, memberMap);
-
+        internal object CreateInstance(Type type)
+        {
+            var service = Options.ServiceCtor(type);
+            if (service == null)
+            {
+                throw new AutoMapperMappingException("Cannot create an instance of type " + type);
+            }
+            return service;
+        }
         internal object GetDestination(object source, Type destinationType) => InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
-
         internal void CacheDestination(object source, Type destinationType, object destination) => 
             InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
-
         internal void IncrementTypeDepth(TypePair types) => TypeDepth[types]++;
-
         internal void DecrementTypeDepth(TypePair types) => TypeDepth[types]--;
-
         internal int GetTypeDepth(TypePair types) => TypeDepth.TryGetValue(types, out int depth) ? depth : TypeDepth[types] = 1;
-
         internal bool IsDefault => this == _inner.DefaultContext;
-
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
             => _inner.Map(source, destination, this, memberMap: memberMap);
-
         internal object Map(object source, object destination, Type sourceType, Type destinationType, IMemberMap memberMap)
             => _inner.Map(source, destination, this, sourceType, destinationType, memberMap);
-
         private void CheckDefault()
         {
             if (IsDefault)

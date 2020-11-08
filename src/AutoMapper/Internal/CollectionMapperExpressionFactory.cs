@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.Execution;
 
 namespace AutoMapper.Internal
@@ -15,6 +16,10 @@ namespace AutoMapper.Internal
 
     public static class CollectionMapperExpressionFactory
     {
+        static readonly MethodInfo IListClear = typeof(IList).GetMethod("Clear");
+        static readonly MethodInfo IListAdd = typeof(IList).GetMethod("Add");
+        static readonly PropertyInfo IListIsReadOnly = typeof(IList).GetProperty("IsReadOnly");
+
         public delegate Expression MapItem(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
@@ -22,7 +27,7 @@ namespace AutoMapper.Internal
         public static Expression MapToReadOnlyDictionary(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression, MapItem mapItem)
         {
-            var dictionaryTypes = GetElementTypes(destExpression.Type, ElementTypeFlags.BreakKeyValuePair);
+            var dictionaryTypes = GetElementTypes(destExpression.Type);
             var dictType = typeof(Dictionary<,>).MakeGenericType(dictionaryTypes);
             var dict = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(dictType), contextExpression, typeof(Dictionary<,>), mapItem);
 
@@ -40,76 +45,75 @@ namespace AutoMapper.Internal
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = GetElementType(sourceExpression.Type);
-
-            var itemExpr = mapItem(configurationProvider, profileMap, sourceExpression.Type, passedDestination.Type,
-                contextExpression, out ParameterExpression itemParam);
-
+            var itemExpr = mapItem(configurationProvider, profileMap, sourceExpression.Type, passedDestination.Type, contextExpression, 
+                out ParameterExpression itemParam);
             var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+            MethodInfo addMethod;
             if (!destinationCollectionType.IsAssignableFrom(destExpression.Type))
+            {
                 destinationCollectionType = typeof(IList);
-            var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
-
+                addMethod = IListAdd;
+            }
+            else
+            {
+                addMethod = destinationCollectionType.GetMethod("Add");
+            }
             Expression destination, assignNewExpression;
-
+            var isIList = destExpression.Type.IsListType();
             UseDestinationValue();
-
             var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
             var overMaxDepth = contextExpression.OverMaxDepth(memberMap?.TypeMap);
             if (overMaxDepth != null)
             {
-                addItems = Condition(overMaxDepth, Empty(), addItems);
+                addItems = Condition(overMaxDepth, ExpressionFactory.Empty, addItems);
             }
             var mapExpr = Block(addItems, destination);
-
-            var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var checkNull =
-                Block(new[] { newExpression, passedDestination },
+            var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
+            var checkNull = Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
                     assignNewExpression,
                     Call(destination, clearMethod),
-                    mapExpr
-                );
+                    mapExpr );
             if (memberMap != null)
+            {
                 return checkNull;
+            }
             var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
             if (elementTypeMap == null)
+            {
                 return checkNull;
+            }
             var checkContext = CheckContext(elementTypeMap, contextExpression);
             if (checkContext == null)
+            {
                 return checkNull;
+            }
             return Block(checkContext, checkNull);
             void UseDestinationValue()
             {
                 if(memberMap?.UseDestinationValue == true)
                 {
                     destination = passedDestination;
-                    assignNewExpression = Empty();
+                    assignNewExpression = ExpressionFactory.Empty;
                 }
                 else
                 {
                     destination = newExpression;
                     var createInstance = passedDestination.Type.NewExpr(ifInterfaceType);
-                    var shouldCreateDestination = Equal(passedDestination, Constant(null));
+                    var shouldCreateDestination = Equal(passedDestination, Null);
                     if (memberMap?.CanBeSet == true)
                     {
-                        var isReadOnly = Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
+                        var isReadOnly = isIList ? Property(passedDestination, IListIsReadOnly) : Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
                         shouldCreateDestination = OrElse(shouldCreateDestination, isReadOnly);
                     }
                     assignNewExpression = Assign(newExpression, Condition(shouldCreateDestination, ToType(createInstance, passedDestination.Type), passedDestination));
                 }
             }
         }
-
-        private static Expression NewExpr(this Type baseType, Type ifInterfaceType)
-        {
-            var newExpr = baseType.IsInterface
-                ? New(
-                    ifInterfaceType.MakeGenericType(GetElementTypes(baseType,
-                        ElementTypeFlags.BreakKeyValuePair)))
-                : ObjectFactory.GenerateConstructorExpression(baseType);
-            return newExpr;
-        }
+        private static Expression NewExpr(this Type baseType, Type ifInterfaceType) => baseType.IsInterface ?
+            New(ifInterfaceType.MakeGenericType(GetElementTypes(baseType))) : 
+            ObjectFactory.GenerateConstructorExpression(baseType);
 
         public static Expression MapItemExpr(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
@@ -125,8 +129,8 @@ namespace AutoMapper.Internal
 
         public static Expression MapKeyPairValueExpr(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
-            var sourceElementTypes = GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
-            var destElementTypes = GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
+            var sourceElementTypes = GetElementTypes(sourceType);
+            var destElementTypes = GetElementTypes(destType);
 
             var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
             var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);
@@ -139,7 +143,7 @@ namespace AutoMapper.Internal
                 Property(itemParam, "Key"), contextParam);
             var valueExpr = MapExpression(configurationProvider, profileMap, typePairValue,
                 Property(itemParam, "Value"), contextParam);
-            var keyPair = New(destElementType.GetDeclaredConstructors().First(), keyExpr, valueExpr);
+            var keyPair = New(destElementType.GetConstructor(destElementTypes), keyExpr, valueExpr);
             return keyPair;
         }
     }

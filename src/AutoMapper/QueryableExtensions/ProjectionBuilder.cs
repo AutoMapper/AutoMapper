@@ -29,14 +29,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             new List<IProjectionMapper>
             {
                 new CustomProjectionMapper(),
-                new NullableSourceProjectionMapper(),
+                new MappedTypeProjectionMapper(),
                 new AssignableProjectionMapper(),
                 new EnumerableProjectionMapper(),
-                new MappedTypeProjectionMapper(),
+                new NullableSourceProjectionMapper(),
                 new StringProjectionMapper(),
-                new EnumToUnderlyingTypeProjectionMapper(),
-                new UnderlyingTypeToEnumProjectionMapper(),
-                new EnumToEnumProjectionMapper(),
+                new EnumProjectionMapper(),
             };
         private readonly LockingConcurrentDictionary<ProjectionRequest, QueryExpressions> _projectionCache;
         private readonly IGlobalConfiguration _configurationProvider;
@@ -202,7 +200,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
         private static AutoMapperMappingException CannotMap(IMemberMap memberMap, Type sourceType) => new AutoMapperMappingException(
             $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
-            null, memberMap.TypeMap.Types, memberMap.TypeMap, memberMap);
+            null, memberMap);
         abstract class ParameterExpressionVisitor : ExpressionVisitor
         {
             public static Expression SetParameters(object parameters, Expression expression)

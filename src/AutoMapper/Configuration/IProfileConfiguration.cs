@@ -12,6 +12,7 @@ namespace AutoMapper.Configuration
     public interface IProfileConfiguration
     {
         IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        bool? FieldMappingEnabled { get; }
         bool? MethodMappingEnabled { get; }
         bool? ConstructorMappingEnabled { get; }
         bool? AllowNullDestinationValues { get; }

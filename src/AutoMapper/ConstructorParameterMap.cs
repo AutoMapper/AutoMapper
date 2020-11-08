@@ -16,7 +16,7 @@ namespace AutoMapper
         {
             TypeMap = typeMap;
             Parameter = parameter;
-            SourceMembers = sourceMembers.ToList();
+            SourceMembers = sourceMembers.ToArray();
             CanResolveValue = canResolveValue;
         }
 

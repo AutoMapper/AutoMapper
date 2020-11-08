@@ -65,6 +65,8 @@ namespace AutoMapper
 
         public bool IsGeneric => SourceType.IsGenericType || DestinationType.IsGenericType;
 
+        public bool IsArray => SourceType.IsArray && DestinationType.IsArray;
+
         public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
 
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
@@ -103,74 +105,6 @@ namespace AutoMapper
         {
             SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
             DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
-        }
-
-        public IEnumerable<TypePair> GetRelatedTypePairs()
-        {
-            var @this = this;
-            var subTypePairs =
-                from destinationType in GetAllTypes(DestinationType)
-                from sourceType in GetAllTypes(@this.SourceType)
-                select new TypePair(sourceType, destinationType);
-            return subTypePairs;
-        }
-
-        private static IEnumerable<Type> GetAllTypes(Type type)
-        {
-            var typeInheritance = type.GetTypeInheritance();
-            foreach(var item in typeInheritance)
-            {
-                yield return item;
-            }
-            var interfaceComparer = new InterfaceComparer(type);
-            var allInterfaces = type.GetTypeInfo().ImplementedInterfaces.OrderByDescending(t => t, interfaceComparer);
-            foreach(var interfaceType in allInterfaces)
-            {
-                yield return interfaceType;
-            }
-        }
-
-        private class InterfaceComparer : IComparer<Type>
-        {
-            private readonly List<TypeInfo> _typeInheritance;
-
-            public InterfaceComparer(Type target)
-            {
-                _typeInheritance = target.GetTypeInheritance().Select(type => type.GetTypeInfo()).Reverse().ToList();
-            }
-
-            public int Compare(Type x, Type y)
-            {
-                var xLessOrEqualY = x.IsAssignableFrom(y);
-                var yLessOrEqualX = y.IsAssignableFrom(x);
-
-                if (xLessOrEqualY & !yLessOrEqualX)
-                {
-                    return -1;
-                }
-                if (!xLessOrEqualY & yLessOrEqualX)
-                {
-                    return 1;
-                }
-                if (xLessOrEqualY & yLessOrEqualX)
-                {
-                    return 0;
-                }
-
-                var xFirstIntroduceTypeIndex = _typeInheritance.FindIndex(type => type.ImplementedInterfaces.Contains(x));
-                var yFirstIntroduceTypeIndex = _typeInheritance.FindIndex(type => type.ImplementedInterfaces.Contains(y));
-
-                if (xFirstIntroduceTypeIndex < yFirstIntroduceTypeIndex)
-                {
-                    return -1;
-                }
-                if (yFirstIntroduceTypeIndex > xFirstIntroduceTypeIndex)
-                {
-                    return 1;
-                }
-
-                return 0;
-            }
         }
     }
     public static class HashCodeCombiner

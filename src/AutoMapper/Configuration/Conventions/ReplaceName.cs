@@ -18,25 +18,22 @@ namespace AutoMapper.Configuration.Conventions
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
-            var possibleDestNames = sourceTypeDetails.ReadAccessors.Select(mi => new { mi, possibles = PossibleNames(mi.Name) });
-
-            var all =
-                from sourceName in possibleSourceNames
-                from destName in possibleDestNames
-                select new { sourceName, destName };
-            var match =
-                all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
-
-            return match?.destName.mi;
+            var possibleDestNames = sourceTypeDetails.ReadAccessors.Select(mi => new { mi, possibles = PossibleNames(mi.Name) }).ToArray();
+            foreach (var sourceName in possibleSourceNames)
+            {
+                foreach (var destName in possibleDestNames)
+                {
+                    if (Array.Exists(destName.possibles, name => string.Compare(name, sourceName, StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        return destName.mi;
+                    }
+                }
+            }
+            return null;
         }
-
-        private IEnumerable<string> PossibleNames(string nameToSearch)
-        {
-            return 
+        private string[] PossibleNames(string nameToSearch) =>
                 _memberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
                     .Concat(new[] { _memberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
-                    .ToList();
-        }
+                    .ToArray();
     }
 }

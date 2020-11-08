@@ -240,7 +240,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm =>
             {
                 pm.Ignored = true;
-                if(ignorePaths)
+                if(ignorePaths && pm.TypeMap.PathMaps.Count > 0)
                 {
                     pm.TypeMap.IgnorePaths(DestinationMember);
                 }

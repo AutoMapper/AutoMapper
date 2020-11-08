@@ -10,6 +10,9 @@ namespace AutoMapper.Internal
 {
     public static class TypeExtensions
     {
+        public const BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+        public const BindingFlags StaticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
         public static void CheckIsDerivedFrom(this Type derivedType, Type baseType)
         {
             if (!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
@@ -24,22 +27,41 @@ namespace AutoMapper.Internal
 
         public static bool IsSetType(this Type type) => type.ImplementsGenericInterface(typeof(ISet<>));
 
-        public static IEnumerable<MemberInfo> GetAllMembers(this Type type) =>
-            type.GetTypeInheritance().Concat(type.GetInterfaces()).SelectMany(i => i.GetDeclaredMembers());
+        public static IEnumerable<Type> BaseClassesAndInterfaces(this Type type)
+        {
+            var currentType = type;
+            while (currentType != null)
+            {
+                yield return currentType;
+                currentType = currentType.BaseType;
+            }
+            foreach (var interfaceType in type.GetInterfaces())
+            {
+                yield return interfaceType;
+            }
+        }
 
-        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetAllMembers().FirstOrDefault(mi => mi.Name == name);
+        public static PropertyInfo GetInheritedProperty(this Type type, string name) =>
+            type.BaseClassesAndInterfaces().Select(t => t.GetProperty(name, InstanceFlags)).FirstOrDefault(p => p != null);
 
-        public static MethodInfo GetInheritedMethod(this Type type, string name)
-            => type.GetInheritedMember(name) as MethodInfo ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
+        public static FieldInfo GetInheritedField(this Type type, string name) =>
+            type.BaseClassesAndInterfaces().Select(t => t.GetField(name, InstanceFlags)).FirstOrDefault(f => f != null);
+
+        public static MethodInfo GetInheritedMethod(this Type type, string name) =>
+            type.BaseClassesAndInterfaces().Select(t => t.GetMethod(name, InstanceFlags)).FirstOrDefault(m => m != null)
+            ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
+
+        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetInheritedProperty(name) ?? type.GetInheritedField(name) ?? (MemberInfo)type.GetInheritedMethod(name) ??
+            throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
-            => type.GetInheritedMember(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
+            => type.GetInheritedProperty(name) ?? (MemberInfo)type.GetInheritedField(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
         public static bool IsNullableType(this Type type) => type.IsGenericType(typeof(Nullable<>));
 
-        public static Type GetTypeOfNullable(this Type type) => type.GenericTypeArguments[0];
-
         public static bool IsCollectionType(this Type type) => type.ImplementsGenericInterface(typeof(ICollection<>));
+
+        public static Type GetCollectionType(this Type type) => type.GetGenericInterface(typeof(ICollection<>));
 
         public static bool IsEnumerableType(this Type type) => typeof(IEnumerable).IsAssignableFrom(type);
 
@@ -59,40 +81,40 @@ namespace AutoMapper.Internal
 
         public static Type GetReadOnlyDictionaryType(this Type type) => type.GetGenericInterface(typeof(IReadOnlyDictionary<,>));
 
-        public static Type GetGenericInterface(this Type type, Type genericInterface) =>
-            type.IsGenericType(genericInterface) ? type : type.GetInterfaces().FirstOrDefault(t => t.IsGenericType(genericInterface));
+        public static Type GetGenericInterface(this Type type, Type genericInterface)
+        {
+            if (type.IsGenericType(genericInterface))
+            {
+                return type;
+            }
+            foreach (var interfaceType in type.GetInterfaces())
+            {
+                if (interfaceType.IsGenericType(genericInterface))
+                {
+                    return interfaceType;
+                }
+            }
+            return null;
+        }
 
         public static Type GetTypeDefinitionIfGeneric(this Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
-        public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors.Where(c=>!c.IsStatic);
+        public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetConstructors(InstanceFlags);
 
         public static Type[] GetGenericParameters(this Type type) => type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
 
-        public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type) => type.GetTypeInfo().DeclaredMembers;
-
         public static IEnumerable<Type> GetTypeInheritance(this Type type)
         {
-            yield return type;
-
-            var baseType = type.BaseType;
-            while(baseType != null)
+            while (type != null)
             {
-                yield return baseType;
-                baseType = baseType.BaseType;
+                yield return type;
+                type = type.BaseType;
             }
         }
 
-        public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
+        public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
 
-        public static MethodInfo GetDeclaredMethod(this Type type, string name) => type.GetRuntimeMethods().SingleOrDefault(mi => mi.Name == name);
-
-        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters) => type.GetDeclaredConstructors().MatchParameters(parameters);
-
-        private static TMethod MatchParameters<TMethod>(this IEnumerable<TMethod> methods, Type[] parameters) where TMethod : MethodBase =>
-            methods.SingleOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
-
-        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) => 
-            type.GetRuntimeProperties().Where(pm => pm.HasAnInaccessibleSetter());
+        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) => type.GetRuntimeProperties().Where(pm => pm.HasAnInaccessibleSetter());
 
         /// <summary>
         /// if targetType is oldType, method will return newType

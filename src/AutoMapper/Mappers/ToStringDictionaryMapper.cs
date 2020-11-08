@@ -8,20 +8,15 @@ namespace AutoMapper.Mappers
 {
     using static Expression;
     using static CollectionMapperExpressionFactory;
-
     public class ToStringDictionaryMapper : IObjectMapper
     {
-        private static readonly MethodInfo MembersDictionaryMethodInfo =
-            typeof(ToStringDictionaryMapper).GetDeclaredMethod(nameof(MembersDictionary));
-
+        private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetStaticMethod(nameof(MembersDictionary));
         public bool IsMatch(in TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap,
                 Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, typeof(Dictionary<,>),
                 MapKeyPairValueExpr);
-
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)
         {
             var sourceTypeDetails = profileMap.CreateTypeDetails(source.GetType());
