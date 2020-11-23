@@ -17,9 +17,9 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -133,13 +133,13 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o =>
                 {
                     o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault());
                     o.ExplicitExpansion();
                 });
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -227,9 +227,9 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -321,10 +321,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -421,10 +421,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -526,12 +526,12 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
                 .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Product, ArticlesModel>();
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Product, ArticlesModel>();
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -728,8 +728,8 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
-            cfg.CreateMap<Cable, CableListModel>()
+            cfg.CreateProjection<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
+            cfg.CreateProjection<Cable, CableListModel>()
                 .ForMember(dest => dest.AEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "A")))
                 .ForMember(dest => dest.AnotherEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "B")));
         });
@@ -751,10 +751,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Owner, OwnerDto>();
-            cfg.CreateMap<Brand, BrandDto>()
+            cfg.CreateProjection<Owner, OwnerDto>();
+            cfg.CreateProjection<Brand, BrandDto>()
                 .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owners.FirstOrDefault()));
-            cfg.CreateMap<ProductReview, ProductReviewDto>()
+            cfg.CreateProjection<ProductReview, ProductReviewDto>()
                 .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Product.Brand));
         });
 

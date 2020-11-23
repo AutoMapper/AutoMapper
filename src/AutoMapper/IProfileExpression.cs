@@ -34,6 +34,24 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList);
 
         /// <summary>
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>();
+
+        /// <summary>
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>(MemberList memberList);
+
+        /// <summary>
         /// Create a mapping configuration from the source type to the destination type.
         /// Use this method when the source and destination type are known at runtime and not compile time.
         /// </summary>

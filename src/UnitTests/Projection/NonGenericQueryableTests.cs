@@ -14,8 +14,8 @@
         {
             _config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Movie, MovieDto>();
-                cfg.CreateMap<Actor, ActorDto>();
+                cfg.CreateProjection<Movie, MovieDto>();
+                cfg.CreateProjection<Actor, ActorDto>();
             });
         }
 

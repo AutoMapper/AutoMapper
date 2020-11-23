@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -144,24 +143,13 @@ namespace AutoMapper.Configuration
 
     public class MappingExpression<TSource, TDestination> :
         MappingExpressionBase<TSource, TDestination, IMappingExpression<TSource, TDestination>>,
-        IMappingExpression<TSource, TDestination>
+        IMappingExpression<TSource, TDestination>, IProjectionExpression<TSource, TDestination>
     {
-
-        public MappingExpression(MemberList memberList)
-            : base(memberList)
+        public MappingExpression(MemberList memberList, bool projection = false) : base(memberList)
         {
+            Projection = projection;
         }
-
-        public MappingExpression(MemberList memberList, Type sourceType, Type destinationType)
-            : base(memberList, sourceType, destinationType)
-        {
-        }
-
-        public MappingExpression(MemberList memberList, in TypePair types)
-            : base(memberList, types)
-        {
-        }
-
+        public MappingExpression(MemberList memberList, Type sourceType, Type destinationType) : base(memberList, sourceType, destinationType) { }
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
@@ -284,5 +272,22 @@ namespace AutoMapper.Configuration
 
         protected override void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true) 
             => ForDestinationMember<object>(property, options => options.Ignore(ignorePaths));
+
+        IProjectionExpression<TSource, TDestination> IProjectionExpression<TSource, TDestination>.ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
+            Action<IProjectionMemberConfiguration<TSource, TDestination, TMember>> memberOptions) => 
+            (IProjectionExpression<TSource, TDestination>)ForMember(destinationMember, memberOptions);
+        IProjectionExpression<TSource, TDestination> IProjectionExpression<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.AddTransform<TValue>(
+            Expression<Func<TValue, TValue>> transformer) => (IProjectionExpression<TSource, TDestination>)AddTransform(transformer);
+        IProjectionExpression<TSource, TDestination> IProjectionExpression<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.IncludeMembers(
+            params Expression<Func<TSource, object>>[] memberExpressions) => (IProjectionExpression<TSource, TDestination>)IncludeMembers(memberExpressions);
+        IProjectionExpression<TSource, TDestination> IProjectionExpressionBase<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.MaxDepth(int depth) =>
+            (IProjectionExpression<TSource, TDestination>)MaxDepth(depth);
+        IProjectionExpression<TSource, TDestination> IProjectionExpressionBase<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.ValidateMemberList(
+            MemberList memberList) => (IProjectionExpression<TSource, TDestination>)ValidateMemberList(memberList);
+        IProjectionExpression<TSource, TDestination> IProjectionExpressionBase<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.ConstructUsing(
+            Expression<Func<TSource, TDestination>> ctor) => (IProjectionExpression<TSource, TDestination>)ConstructUsing(ctor);
+        IProjectionExpression<TSource, TDestination> IProjectionExpressionBase<TSource, TDestination, IProjectionExpression<TSource, TDestination>>.ForCtorParam(
+            string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions) =>
+            (IProjectionExpression<TSource, TDestination>)ForCtorParam(ctorParamName, paramOptions);
     }
 }

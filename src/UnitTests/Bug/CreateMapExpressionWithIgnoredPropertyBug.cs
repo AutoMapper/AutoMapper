@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Person, Person>()
+                cfg.CreateProjection<Person, Person>()
                     .ForMember(x => x.Name, x => x.Ignore());
             });
 

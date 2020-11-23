@@ -22,7 +22,7 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 5));
         });
 

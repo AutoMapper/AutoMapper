@@ -71,8 +71,8 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Customer, CustomerViewModel>();
-                cfg.CreateMap<Item, ItemModel>();
+                cfg.CreateProjection<Customer, CustomerViewModel>();
+                cfg.CreateProjection<Item, ItemModel>();
             });
 
         [Fact]

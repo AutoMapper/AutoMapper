@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests.Projection
             {
                 var config = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<Source, Destination>();
+                    cfg.CreateProjection<Source, Destination>();
                 });
 
                 typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ProjectionBuilder.GetMapExpression<Source, Destination>());
@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Projection
             {
                 var config = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<Source, Destination>();
+                    cfg.CreateProjection<Source, Destination>();
                 });
 
                 var sources = new List<Source>

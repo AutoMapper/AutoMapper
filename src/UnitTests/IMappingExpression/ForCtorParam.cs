@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests
             public Destination(string value) => Value = value;
             public string Value { get; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateProjection<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
         [Fact]
         public void Should_map_ok()
         {

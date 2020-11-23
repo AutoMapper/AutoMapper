@@ -18,7 +18,6 @@ namespace AutoMapper.Configuration
         private List<ICtorParameterConfiguration> _ctorParamConfigurations;
         private List<IPropertyMapConfiguration> _memberConfigurations;
         private readonly MemberList _memberList;
-
         protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType) : this(memberList, new TypePair(sourceType, destinationType))
         {
         }
@@ -27,6 +26,7 @@ namespace AutoMapper.Configuration
             _memberList = memberList;
             Types = types;
         }
+        protected bool Projection { get; set; }
         public TypePair Types { get; }
         public bool IsReverseMap { get; set; }
         public Type SourceType => Types.SourceType;
@@ -41,6 +41,7 @@ namespace AutoMapper.Configuration
         protected List<ICtorParameterConfiguration> CtorParamConfigurations => _ctorParamConfigurations ??= new();
         public void Configure(TypeMap typeMap)
         {
+            typeMap.Projection = Projection;
             typeMap.ConfiguredMemberList = _memberList;
             var globalIgnores = typeMap.Profile.GlobalIgnores;
             if (globalIgnores.Count > 0)

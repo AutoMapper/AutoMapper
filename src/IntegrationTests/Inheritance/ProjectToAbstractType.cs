@@ -58,7 +58,7 @@ namespace AutoMapper.IntegrationTests.Net4
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
-            cfg.CreateMap<DbEntityA, ConcreteTypeA>();
+            cfg.CreateProjection<DbEntityA, ConcreteTypeA>();
         });
 
         [Fact]
@@ -335,21 +335,21 @@ namespace AutoMapper.IntegrationTests.Net4
                 DisableConstructorMapping();
 
                 CreateMap<DataLayer.Calendar, ICalendar>().As<Calendar>();
-                CreateMap<DataLayer.Calendar, Calendar>();
+                CreateProjection<DataLayer.Calendar, Calendar>();
 
                 CreateMap<DataLayer.CalendarDay, ICalendarDay>().As<CalendarDay>();
-                CreateMap<DataLayer.CalendarDay, CalendarDay>();
+                CreateProjection<DataLayer.CalendarDay, CalendarDay>();
                 //.ForMember(d => d.DayType, opt => opt.Ignore());
 
                 //Include to mapping -> this causes the exception!
                 CreateMap<DataLayer.ValidityDayType, IValidityDayType>().As<ValidityDayType>();
-                CreateMap<DataLayer.ValidityDayType, ValidityDayType>();
+                CreateProjection<DataLayer.ValidityDayType, ValidityDayType>();
 
-                CreateMap<ICalendar, DataLayer.Calendar>();
+                CreateProjection<ICalendar, DataLayer.Calendar>();
 
-                CreateMap<ICalendarDay, DataLayer.CalendarDay>();
+                CreateProjection<ICalendarDay, DataLayer.CalendarDay>();
 
-                CreateMap<IValidityDayType, DataLayer.ValidityDayType>();
+                CreateProjection<IValidityDayType, DataLayer.ValidityDayType>();
             }
         }
     }

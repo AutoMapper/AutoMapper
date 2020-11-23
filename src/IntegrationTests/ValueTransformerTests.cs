@@ -47,7 +47,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Source, Dest>();
+                cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
             });
 
@@ -100,7 +100,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Source, Dest>();
+                cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
             });
@@ -133,7 +133,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Source, Dest>();
+                cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 cfg.CreateProfile("Other", p => p.ValueTransformers.Add<string>(dest => dest + "! No joke!"));
             });
@@ -210,7 +210,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
-                    p.CreateMap<Source, Dest>();
+                    p.CreateProjection<Source, Dest>();
                     p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
             });
@@ -266,7 +266,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 cfg.ValueTransformers.Add<int>(dest => dest * 2);
                 cfg.CreateProfile("Other", p =>
                 {
-                    p.CreateMap<Source, Dest>();
+                    p.CreateProjection<Source, Dest>();
                     p.ValueTransformers.Add<int>(dest => dest + 3);
                 });
             });
@@ -323,7 +323,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
-                    p.CreateMap<Source, Dest>()
+                    p.CreateProjection<Source, Dest>()
                         .ValueTransformers.Add<string>(dest => dest + ", for real,");
                     p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
                 });
@@ -380,7 +380,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
                 {
-                    p.CreateMap<Source, Dest>()
+                    p.CreateProjection<Source, Dest>()
                         .AddTransform<string>(dest => dest + ", for real,")
                         .ForMember(d => d.Value, opt => opt.AddTransform(d => d + ", seriously"));
                     p.ValueTransformers.Add<string>(dest => dest + " is straight up dope");

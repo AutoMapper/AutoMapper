@@ -34,11 +34,11 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())
                 .ForMember(m => m.Child2, opt => opt.ExplicitExpansion())
                 ;
-            cfg.CreateMap<ChildSource, ChildDest>();
+            cfg.CreateProjection<ChildSource, ChildDest>();
         });
             
 

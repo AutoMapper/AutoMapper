@@ -49,9 +49,9 @@ namespace AutoMapper.UnitTests.Projection
         }
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Destination>().ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault()));
-            cfg.CreateMap<SourceItem, DestinationItem>().ForCtorParam("destinationValue", o=>o.MapFrom(s=>s.Values.FirstOrDefault()));
-            cfg.CreateMap<SourceValue, DestinationValue>();
+            cfg.CreateProjection<Source, Destination>().ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault()));
+            cfg.CreateProjection<SourceItem, DestinationItem>().ForCtorParam("destinationValue", o=>o.MapFrom(s=>s.Values.FirstOrDefault()));
+            cfg.CreateProjection<SourceValue, DestinationValue>();
         });
         [Fact]
         public void Should_construct_correctly()
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Projection
             public Destination(string value) => Value = value;
             public string Value { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateProjection<Source, Destination>());
         [Fact]
         public void Should_construct_correctly() => new[] { new Source { Value = 5 } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
     }
@@ -110,8 +110,8 @@ namespace AutoMapper.UnitTests.Projection
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
-            cfg.CreateMap<Users, UserDto>().ForMember(d => d.AddressDto, e => e.MapFrom(s => s.FkAddress));
-            cfg.CreateMap<Addresses, AddressDto>().ConstructUsing(a => new AddressDto(a.Id, a.Address));
+            cfg.CreateProjection<Users, UserDto>().ForMember(d => d.AddressDto, e => e.MapFrom(s => s.FkAddress));
+            cfg.CreateProjection<Addresses, AddressDto>().ConstructUsing(a => new AddressDto(a.Id, a.Address));
         });
         [Fact]
         public void Should_work() => ProjectTo<UserDto>(new[] { new Users { FkAddress = new Addresses { Address = "address" }  } }.AsQueryable()).First().AddressDto.Address.ShouldBe("address");
@@ -144,7 +144,7 @@ namespace AutoMapper.UnitTests.Projection
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.AddIgnoreMapAttribute();
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ConstructUsing(src => new Dest(src.Value + 10));
         });
 
@@ -190,8 +190,8 @@ namespace AutoMapper.UnitTests.Projection
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<A, DtoA>();
-            cfg.CreateMap<B, DtoB>();
+            cfg.CreateProjection<A, DtoA>();
+            cfg.CreateProjection<B, DtoB>();
         });
         [Fact]
         public void Should_project_ok() =>

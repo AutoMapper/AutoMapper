@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<UserModel, UserDto>()
+                cfg.CreateProjection<UserModel, UserDto>()
                                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<UserModel, UserDto>()
+                cfg.CreateProjection<UserModel, UserDto>()
                     .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             public string ShortDescription { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateProjection<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
 
         protected override void Because_of()
         {

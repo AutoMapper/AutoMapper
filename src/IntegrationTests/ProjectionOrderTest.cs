@@ -57,11 +57,11 @@ namespace AutoMapper.IntegrationTests.ProjectionOrder
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
                                                                                         {
-                                                                                            cfg.CreateMap<Source1, Destination>()
+                                                                                            cfg.CreateProjection<Source1, Destination>()
                                                                                                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Items.Count()))
                                                                                                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date));
 
-                                                                                            cfg.CreateMap<Source2, Destination>()
+                                                                                            cfg.CreateProjection<Source2, Destination>()
                                                                                                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Items.Count()))
                                                                                                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.MinValue));
                                                                                         });

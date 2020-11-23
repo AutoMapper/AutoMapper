@@ -32,7 +32,7 @@
                     .Include<Source, Dest>()
                     .ForMember(d => d.Value, opt => opt.MapFrom(src => src.OtherValue));
 
-                cfg.CreateMap<Source, Dest>();
+                cfg.CreateProjection<Source, Dest>();
             });
 
             protected override void Because_of()

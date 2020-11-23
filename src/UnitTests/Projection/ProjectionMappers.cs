@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Projection
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.Internal().ProjectionMappers.Add(new EnumToUnderlyingTypeProjectionMapper());
-            cfg.CreateMap<Source, Destination>();
+            cfg.CreateProjection<Source, Destination>();
         });
 
         [Fact]

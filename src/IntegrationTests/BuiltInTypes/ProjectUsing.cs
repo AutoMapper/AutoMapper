@@ -16,9 +16,9 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             public MyProfile()
             {
-                CreateMap<MyTable, MyTableModel>();
-                CreateMap<int, MyEnum>().ConvertUsing(x => (MyEnum)x);
-                CreateMap<int?, MyEnum>().ConvertUsing(x => x.HasValue ? (MyEnum)x.Value : MyEnum.Value1);
+                CreateProjection<MyTable, MyTableModel>();
+                CreateProjection<int, MyEnum>().ConvertUsing(x => (MyEnum)x);
+                CreateProjection<int?, MyEnum>().ConvertUsing(x => x.HasValue ? (MyEnum)x.Value : MyEnum.Value1);
             }
         }
 
@@ -124,8 +124,8 @@ namespace AutoMapper.IntegrationTests.Net4
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Parent, ParentVM>();
-            cfg.CreateMap<Children, int>()
+            cfg.CreateProjection<Parent, ParentVM>();
+            cfg.CreateProjection<Children, int>()
                 .ConvertUsing(c => c.ID);
         });
 

@@ -21,8 +21,8 @@ namespace AutoMapper.UnitTests.Projection
         {
             _config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Address, AddressDto>();
-                cfg.CreateMap<Customer, CustomerDto>();
+                cfg.CreateProjection<Address, AddressDto>();
+                cfg.CreateProjection<Customer, CustomerDto>();
             });
         }
 

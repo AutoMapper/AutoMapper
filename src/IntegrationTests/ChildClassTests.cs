@@ -10,6 +10,7 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         using AutoMapper.UnitTests;
         using QueryableExtensions;
+        using System;
 
         public class Base
         {
@@ -71,8 +72,8 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Base, BaseDTO>();
-                cfg.CreateMap<Sub, SubDTO>();
+                cfg.CreateProjection<Base, BaseDTO>();
+                cfg.CreateProjection<Sub, SubDTO>();
             });
 
             [Fact]
@@ -108,6 +109,8 @@ namespace AutoMapper.IntegrationTests.Net4
                     baseDTO.Sub.Sub1.ShouldBe("sub1");
                 }
             }
+            [Fact]
+            public void MapShouldThrow() => new Action(() => Mapper.Map<SubDTO>(new Sub())).ShouldThrow<AutoMapperConfigurationException>().Message.ShouldBe("CreateProjection works with ProjectTo, not with Map!");
         }
 
     }

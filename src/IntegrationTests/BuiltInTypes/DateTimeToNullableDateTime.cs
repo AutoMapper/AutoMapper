@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Projection
             public DateTime? Date { get; set; }
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => 
-            cfg.CreateMap<Parent, ParentDto>().ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.MaxValue)));
+            cfg.CreateProjection<Parent, ParentDto>().ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.MaxValue)));
         public class TestContext : DbContext
         {
             public TestContext(): base() => Database.SetInitializer<TestContext>(new DatabaseInitializer());

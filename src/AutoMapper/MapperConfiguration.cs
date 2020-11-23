@@ -133,6 +133,7 @@ namespace AutoMapper
 
         private static LambdaExpression GenerateTypeMapExpression(in MapRequest mapRequest, TypeMap typeMap)
         {
+            typeMap.CheckProjection();
             if (mapRequest.RequestedTypes == typeMap.Types)
             {
                 return typeMap.MapExpression;

@@ -15,7 +15,7 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            var mappingClass1 = cfg.CreateMap<Class1, Class1DTO>();
+            var mappingClass1 = cfg.CreateProjection<Class1, Class1DTO>();
             mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
             mappingClass1.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
             mappingClass1.ForMember(dest => dest.Class2DTO, opt =>
@@ -24,7 +24,7 @@ namespace AutoMapper.IntegrationTests.Net4
                 opt.ExplicitExpansion();
             });
 
-            var mappingClass2 = cfg.CreateMap<Class2, Class2DTO>();
+            var mappingClass2 = cfg.CreateProjection<Class2, Class2DTO>();
             mappingClass2.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
             mappingClass2.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
             mappingClass2.ForMember(dest => dest.Class3DTO, opt =>
@@ -33,7 +33,7 @@ namespace AutoMapper.IntegrationTests.Net4
                 opt.ExplicitExpansion();
             });
 
-            var mappingClass3 = cfg.CreateMap<Class3, Class3DTO>();
+            var mappingClass3 = cfg.CreateProjection<Class3, Class3DTO>();
             mappingClass3.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
             mappingClass3.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
 

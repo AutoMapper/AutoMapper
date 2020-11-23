@@ -4,14 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Configuration;
-using AutoMapper.Execution;
+using System.ComponentModel;
 
 namespace AutoMapper
 {
-    using AutoMapper.Features;
+    using Execution;
+    using Configuration;
+    using Features;
+    using QueryableExtensions.Impl;
     using Internal;
-    using System.ComponentModel;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -38,6 +39,14 @@ namespace AutoMapper
         {
             Types = new TypePair(sourceType, destinationType);
             Profile = profile;
+        }
+
+        public void CheckProjection()
+        {
+            if (MapExpression == null && !Types.ContainsGenericParameters)
+            {
+                throw new AutoMapperConfigurationException("CreateProjection works with ProjectTo, not with Map.", QueryMapperHelper.MissingMapException(Types));
+            }
         }
 
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
@@ -255,6 +264,8 @@ namespace AutoMapper
 
         public bool HasDerivedTypesToInclude => _includedDerivedTypes?.Count > 0 || DestinationTypeOverride != null;
 
+        public bool Projection { get; set; }
+
         public void AddBeforeMapAction(LambdaExpression beforeMap)
         {
             _beforeMapActions ??= new();
@@ -306,12 +317,15 @@ namespace AutoMapper
                     ApplyInheritedTypeMap(inheritedTypeMap);
                 }
             }
-            if (HasMappingOrder())
+            if (!Projection)
             {
-                _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
-                _propertyMaps.Clear();
+                if (HasMappingOrder())
+                {
+                    _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
+                    _propertyMaps.Clear();
+                }
+                MapExpression = CreateMapperLambda(configurationProvider, null);
             }
-            MapExpression = CreateMapperLambda(configurationProvider, null);
             _features?.Seal(configurationProvider);
         }
 

@@ -53,7 +53,7 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Customer, CustomerViewModel>();
+            cfg.CreateProjection<Customer, CustomerViewModel>();
         });
 
         [Fact]
@@ -113,7 +113,7 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Customer, CustomerViewModel>();
+            cfg.CreateProjection<Customer, CustomerViewModel>();
         });
 
         [Fact]

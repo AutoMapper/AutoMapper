@@ -63,6 +63,6 @@ namespace AutoMapper.IntegrationTests
             _result.FirstOrDefault(dto => dto.Id == "Two").ShouldNotBeNull();
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<IQueryableInterface, QueryableDto>());
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<IQueryableInterface, QueryableDto>());
     }
 }

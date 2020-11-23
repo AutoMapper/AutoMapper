@@ -45,14 +45,14 @@ namespace AutoMapper.UnitTests.Projection
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<User, UserModel>();
-            cfg.CreateMap<EntityBase, EntityBaseModel>()
+            cfg.CreateProjection<User, UserModel>();
+            cfg.CreateProjection<EntityBase, EntityBaseModel>()
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());
-            cfg.CreateMap<Computer, ComputerModel>()
+            cfg.CreateProjection<Computer, ComputerModel>()
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());
-            cfg.CreateMap<Script, ScriptModel>()
+            cfg.CreateProjection<Script, ScriptModel>()
                 .ForMember(d => d.Computer, o => o.ExplicitExpansion())
                 .ForMember(d => d.ModifiedBy, o => o.ExplicitExpansion())
                 .ForMember(d => d.CreatedBy, o => o.ExplicitExpansion());

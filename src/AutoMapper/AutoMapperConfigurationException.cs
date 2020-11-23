@@ -29,7 +29,7 @@ namespace AutoMapper
         {
         }
 
-        protected AutoMapperConfigurationException(string message, Exception inner)
+        public AutoMapperConfigurationException(string message, Exception inner)
             : base(message, inner)
         {
         }

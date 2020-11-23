@@ -80,12 +80,17 @@ namespace AutoMapper
                 if (condition(pm)) configuration(pm, cfg);
             });
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() => 
-            CreateMap<TSource, TDestination>(MemberList.Destination);
-
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
+        public IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>() =>
+            CreateProjection<TSource, TDestination>(MemberList.Destination);
+        public IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>(MemberList memberList) =>
+            (IProjectionExpression<TSource, TDestination>)CreateMapCore<TSource, TDestination>(memberList, projection: true);
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() =>
+            CreateMapCore<TSource, TDestination>(MemberList.Destination);
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList) =>
+            CreateMapCore<TSource, TDestination>(memberList);
+        private IMappingExpression<TSource, TDestination> CreateMapCore<TSource, TDestination>(MemberList memberList, bool projection = false)
         {
-            var mappingExp = new MappingExpression<TSource, TDestination>(memberList);
+            var mappingExp = new MappingExpression<TSource, TDestination>(memberList, projection);
             _typeMapConfigs.Add(mappingExp);
             return mappingExp;
         }

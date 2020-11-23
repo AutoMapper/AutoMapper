@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests.Projection
         {
             // Arrange
             var config = new MapperConfiguration(cfg =>
-                cfg.CreateMap<EntitySource, EntityDestination>());
+                cfg.CreateProjection<EntitySource, EntityDestination>());
 
             // Act
             var exception = Assert.Throws<AutoMapperMappingException>(() =>
