@@ -34,7 +34,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList);
 
         /// <summary>
-        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
+        /// Creates a projection configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
         /// </summary>
         /// <typeparam name="TSource">Source type</typeparam>
         /// <typeparam name="TDestination">Destination type</typeparam>
@@ -42,7 +42,7 @@ namespace AutoMapper
         IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>();
 
         /// <summary>
-        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Creates a projection configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
         /// Specify the member list to validate against during configuration validation.
         /// </summary>
         /// <typeparam name="TSource">Source type</typeparam>

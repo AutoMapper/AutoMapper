@@ -51,11 +51,19 @@ namespace AutoMapper.QueryableExtensions.Impl
                 membersToExpand ?? throw new ArgumentNullException(nameof(membersToExpand)),
                 Array.Empty<ProjectionRequest>());
             var cachedExpressions = _projectionCache.GetOrAdd(projectionRequest);
-            return cachedExpressions.Transform(Prepare);
-            LambdaExpression Prepare(Expression cachedExpression)
+            if (parameters == null && !_configurationProvider.EnableNullPropagationForQueryMapping)
             {
-                var result = parameters == null ? cachedExpression : ParameterExpressionVisitor.SetParameters(parameters, cachedExpression);
-                return (LambdaExpression) (_configurationProvider.EnableNullPropagationForQueryMapping ? NullsafeQueryRewriter.NullCheck(result) : result);
+                return cachedExpressions;
+            }
+            return Transform(cachedExpressions, parameters);
+            QueryExpressions Transform(in QueryExpressions queryExpressions, object parameters)
+            {
+                return queryExpressions.Transform(Prepare);
+                LambdaExpression Prepare(Expression cachedExpression)
+                {
+                    var result = parameters == null ? cachedExpression : ParameterExpressionVisitor.SetParameters(parameters, cachedExpression);
+                    return (LambdaExpression)(_configurationProvider.EnableNullPropagationForQueryMapping ? NullsafeQueryRewriter.NullCheck(result) : result);
+                }
             }
         }
         private QueryExpressions CreateProjection(ProjectionRequest request) => 
