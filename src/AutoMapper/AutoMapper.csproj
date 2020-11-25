@@ -12,6 +12,7 @@
     <PackageId>AutoMapper</PackageId>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
+    <Features Condition=" '$(TargetFramework)' == 'net461' ">peverify-compat</Features>
 
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

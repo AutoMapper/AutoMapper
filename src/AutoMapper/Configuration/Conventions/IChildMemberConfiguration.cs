@@ -8,6 +8,6 @@ namespace AutoMapper.Configuration.Conventions
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IChildMemberConfiguration
     {
-        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap);
+        bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap);
     }
 }

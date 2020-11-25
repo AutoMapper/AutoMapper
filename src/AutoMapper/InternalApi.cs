@@ -61,6 +61,7 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IGlobalConfiguration : IConfigurationProvider
     {
+        TypeMap ResolveAssociatedTypeMap(in TypePair types);
         /// <summary>
         /// Get all configured type maps created
         /// </summary>
@@ -154,7 +155,7 @@ namespace AutoMapper.Internal
         int MaxExecutionPlanDepth { get; }
         int RecursiveQueriesMaxDepth { get; }
         IEnumerable<ProfileMap> GetProfiles();
-        TypeMap GetIncludedTypeMap(TypePair typePair);
+        TypeMap GetIncludedTypeMap(in TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
     }

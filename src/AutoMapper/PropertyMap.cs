@@ -13,28 +13,25 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class PropertyMap : DefaultMemberMap
     {
-        private MemberInfo[] _memberChain = Array.Empty<MemberInfo>();
+        private MemberInfo[] _sourceMembers = Array.Empty<MemberInfo>();
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
-
+        private bool? _canResolveValue;
+        private Type _sourceType;
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
         {
             TypeMap = typeMap;
             DestinationMember = destinationMember;
+            DestinationType = destinationMember.GetMemberType();
         }
-
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
             : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
-
         public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
             : this(includedMemberMap, typeMap) => IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
-
         public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
         public override string DestinationName => DestinationMember.Name;
-
-        public override Type DestinationType => DestinationMember.GetMemberType();
-
-        public override IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
+        public override Type DestinationType { get; protected set; }
+        public override MemberInfo[] SourceMembers => _sourceMembers;
         public override IncludedMember IncludedMember { get; }
         public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
@@ -49,29 +46,47 @@ namespace AutoMapper
         public bool? ExplicitExpansion { get; set; }
         public override object NullSubstitute { get; set; }
         public override ValueResolverConfiguration ValueResolverConfig { get; set; }
-        public override ValueConverterConfiguration ValueConverterConfig { get; set; }
-        public override IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs ?? (IReadOnlyCollection<ValueTransformerConfiguration>)Array.Empty<ValueTransformerConfiguration>();
-
-        public override Type SourceType => ValueConverterConfig?.SourceMember?.ReturnType
-                                  ?? ValueResolverConfig?.SourceMember?.ReturnType
-                                  ?? CustomMapFunction?.ReturnType
-                                  ?? CustomMapExpression?.ReturnType
-                                  ?? SourceMember?.GetMemberType();
-
-        public void ChainMembers(IEnumerable<MemberInfo> members) => _memberChain = members.ToArray();
-
+        public override ValueResolverConfiguration ValueConverterConfig { get; set; }
+        public override IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs.NullCheck();
+        public override Type SourceType
+        {
+            get => _sourceType ??=
+                ValueConverterConfig?.ResolvedType ??
+                ValueResolverConfig?.ResolvedType ??
+                CustomMapFunction?.ReturnType ??
+                CustomMapExpression?.ReturnType ??
+                (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : typeof(object));
+            protected set => _sourceType = value;
+        }
+        public void MapByConvention(IEnumerable<MemberInfo> sourceMembers) => _sourceMembers = sourceMembers.ToArray();
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            if(inheritedMappedProperty.Ignored && !IsResolveConfigured)
+            if (Ignored)
             {
-                Ignored = true;
+                return;
             }
             if (!IsResolveConfigured)
             {
-                CustomMapExpression = inheritedMappedProperty.CustomMapExpression;
-                CustomMapFunction = inheritedMappedProperty.CustomMapFunction;
-                ValueResolverConfig = inheritedMappedProperty.ValueResolverConfig;
-                ValueConverterConfig = inheritedMappedProperty.ValueConverterConfig;
+                if (inheritedMappedProperty.Ignored)
+                {
+                    _canResolveValue = false;
+                    Ignored = true;
+                    return;
+                }
+                _canResolveValue = true;
+                if (inheritedMappedProperty.IsResolveConfigured)
+                {
+                    _sourceType = inheritedMappedProperty._sourceType;
+                    CustomMapExpression = inheritedMappedProperty.CustomMapExpression;
+                    CustomMapFunction = inheritedMappedProperty.CustomMapFunction;
+                    ValueResolverConfig = inheritedMappedProperty.ValueResolverConfig;
+                    ValueConverterConfig = inheritedMappedProperty.ValueConverterConfig;
+                }
+                else if (_sourceMembers.Length == 0)
+                {
+                    _sourceType = inheritedMappedProperty._sourceType;
+                    _sourceMembers = inheritedMappedProperty._sourceMembers;
+                }
             }
             AllowNull ??= inheritedMappedProperty.AllowNull;
             Condition ??= inheritedMappedProperty.Condition;
@@ -85,16 +100,9 @@ namespace AutoMapper
                 _valueTransformerConfigs ??= new();
                 _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             }
-            _memberChain = _memberChain.Length == 0 ? inheritedMappedProperty._memberChain : _memberChain;
         }
-
-        public override bool CanResolveValue => HasSource && !Ignored;
-
-        public bool HasSource => _memberChain.Length > 0 || IsResolveConfigured;
-
-        public bool IsResolveConfigured => ValueResolverConfig != null || CustomMapFunction != null ||
-                                         CustomMapExpression != null || ValueConverterConfig != null;
-
+        public override bool CanResolveValue => _canResolveValue ??= !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
+        private bool IsResolveConfigured => (ValueResolverConfig ?? CustomMapFunction ?? CustomMapExpression ?? (object)ValueConverterConfig) != null;
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();

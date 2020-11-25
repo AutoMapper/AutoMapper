@@ -148,6 +148,6 @@ namespace AutoMapper
         /// <summary>
         /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
         /// </summary>
-        IList<ValueTransformerConfiguration> ValueTransformers { get; }
+        List<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }

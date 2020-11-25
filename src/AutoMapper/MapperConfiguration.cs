@@ -20,16 +20,19 @@ namespace AutoMapper
 
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
-        private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
-        private readonly IProjectionBuilder _projectionBuilder;
+        private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
+        private readonly Dictionary<TypePair, IObjectMapper> _resolvedMappers;
+        private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
+        private readonly ProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
-        private readonly Features<IRuntimeFeature> _features = new Features<IRuntimeFeature>();
+        private readonly Features<IRuntimeFeature> _features = new();
         private readonly int _recursiveQueriesMaxDepth;
         private readonly IProjectionMapper[] _projectionMappers;
         private readonly int _maxExecutionPlanDepth;
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
+        private readonly bool _sealed;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
@@ -39,9 +42,9 @@ namespace AutoMapper
                 configuration.IncludeSourceExtensionMethods(typeof(Enumerable));
             }
             _mappers = configuration.Mappers.ToArray();
-            _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
-            _validator = new ConfigurationValidator(this, configuration);
-            _projectionBuilder = new ProjectionBuilder(this);
+            _executionPlans = new(CompileExecutionPlan);
+            _validator = new(this, configuration);
+            _projectionBuilder = new(this);
 
             _serviceCtor = configuration.ServiceCtor;
             _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
@@ -49,18 +52,22 @@ namespace AutoMapper
             _projectionMappers = configuration.ProjectionMappers.ToArray();
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
-            Configuration = new ProfileMap((IProfileConfiguration)configuration);
+            Configuration = new((IProfileConfiguration)configuration);
             var profileMaps = new List<ProfileMap>(configuration.Profiles.Count + 1){ Configuration };
             int typeMapsCount = Configuration.TypeMapsCount;
+            int openTypeMapsCount = Configuration.OpenTypeMapsCount;
             foreach (var profile in configuration.Profiles)
             {
                 var profileMap = new ProfileMap(profile, configuration);
                 typeMapsCount += profileMap.TypeMapsCount;
+                openTypeMapsCount += profileMap.OpenTypeMapsCount;
                 profileMaps.Add(profileMap);
             }
             Profiles = profileMaps;
-            _configuredMaps = new Dictionary<TypePair, TypeMap>(typeMapsCount);
-            _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap, 2*typeMapsCount);
+            _configuredMaps = new(typeMapsCount);
+            _runtimeMaps = new(GetTypeMap, openTypeMapsCount);
+            _resolvedMaps = new(2 * typeMapsCount);
+            _resolvedMappers = new(typeMapsCount);
             configuration.Features.Configure(this);
 
             foreach (var beforeSealAction in configuration.BeforeSealActions)
@@ -72,8 +79,8 @@ namespace AutoMapper
             {
                 profile.Clear();
             }
+            _sealed = true;
         }
-
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
             : this(Build(configure))
         {
@@ -91,7 +98,7 @@ namespace AutoMapper
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
-            return this.Internal().BuildExecutionPlan(new MapRequest(typePair, typePair));
+            return this.Internal().BuildExecutionPlan(new(typePair, typePair));
         }
         LambdaExpression IGlobalConfiguration.BuildExecutionPlan(in MapRequest mapRequest)
         {
@@ -100,7 +107,7 @@ namespace AutoMapper
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
-            var mapperToUse = ((IGlobalConfiguration)this).FindMapper(mapRequest.RuntimeTypes);
+            var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
             return GenerateObjectMapperExpression(mapRequest, mapperToUse);
         }
 
@@ -131,6 +138,21 @@ namespace AutoMapper
             return executionPlan.Compile(); // breakpoint here to inspect all execution plans
         }
 
+        TypeMap IGlobalConfiguration.ResolveAssociatedTypeMap(in TypePair types)
+        {
+            var typeMap = ResolveTypeMap(types);
+            if (typeMap != null)
+            {
+                return typeMap;
+            }
+            var mapper = FindMapper(types);
+            if (mapper is IObjectMapperInfo objectMapperInfo)
+            {
+                return ResolveTypeMap(objectMapperInfo.GetAssociatedTypes(types));
+            }
+            return null;
+        }
+
         private static LambdaExpression GenerateTypeMapExpression(in MapRequest mapRequest, TypeMap typeMap)
         {
             typeMap.CheckProjection();
@@ -142,14 +164,13 @@ namespace AutoMapper
             var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
             var destination = Parameter(requestedDestinationType, "typeMapDestination");
-            var context = Parameter(typeof(ResolutionContext), "context");
             var checkNullValueTypeDest = CheckNullValueType(destination, mapDestinationType);
             return
                 Lambda(
                     ToType(
-                        Invoke(typeMap.MapExpression, ToType(source, typeMap.SourceType), ToType(checkNullValueTypeDest, mapDestinationType), context),
+                        Invoke(typeMap.MapExpression, ToType(source, typeMap.SourceType), ToType(checkNullValueTypeDest, mapDestinationType), ContextParameter),
                         requestedDestinationType),
-                source, destination, context);
+                source, destination, ContextParameter);
         }
         private static Expression CheckNullValueType(Expression expression, Type runtimeType) =>
             !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, New(runtimeType)) : expression;
@@ -157,7 +178,6 @@ namespace AutoMapper
         {
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
             var destination = Parameter(mapRequest.RequestedTypes.DestinationType, "mapperDestination");
-            var context = Parameter(typeof(ResolutionContext), "context");
             var runtimeDestinationType = mapRequest.RuntimeTypes.DestinationType;
             Expression fullExpression;
             if (mapperToUse == null)
@@ -174,40 +194,50 @@ namespace AutoMapper
                 var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap,
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType),
                                                                         ToType(checkNullValueTypeDest, runtimeDestinationType),
-                                                                        context);
-                var exception = Parameter(typeof(Exception), "ex");
-                var newException = Call(MappingError, exception, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(IMemberMap)));
+                                                                        ContextParameter);
+                var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(IMemberMap)));
                 var throwExpression = Throw(newException, runtimeDestinationType);
-                fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(exception, throwExpression));
+                fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
             }
             var profileMap = mapRequest.MemberMap?.TypeMap?.Profile ?? Configuration;
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
-            return Lambda(nullCheckSource, source, destination, context);
+            return Lambda(nullCheckSource, source, destination, ContextParameter);
         }
         public static AutoMapperMappingException GetMappingError(Exception innerException, TypePair types, IMemberMap memberMap) =>
-            new AutoMapperMappingException("Error mapping types.", innerException, types) { MemberMap = memberMap };
+            new("Error mapping types.", innerException, types) { MemberMap = memberMap };
         IReadOnlyCollection<TypeMap> IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values;
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
         TypeMap IGlobalConfiguration.FindTypeMapFor(in TypePair typePair) => FindTypeMapFor(typePair);
-        TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
+        TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new(sourceType, destinationType));
         TypeMap FindTypeMapFor(in TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
-        TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new TypePair(sourceType, destinationType));
+        TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new(sourceType, destinationType));
         TypeMap IGlobalConfiguration.ResolveTypeMap(in TypePair typePair) => ResolveTypeMap(typePair);
         TypeMap ResolveTypeMap(in TypePair typePair)
         {
-            var typeMap = _resolvedMaps.GetOrAdd(typePair);
-            // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && typeMap.MapExpression == null && !_configuredMaps.ContainsKey(typeMap.Types))
+            if (_resolvedMaps.TryGetValue(typePair, out TypeMap typeMap))
             {
-                lock (typeMap)
+                return typeMap;
+            }
+            if (_sealed)
+            {
+                typeMap = _runtimeMaps.GetOrAdd(typePair);
+                // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
+                if (typeMap != null && typeMap.MapExpression == null)
                 {
-                    typeMap.Seal(this);
+                    lock (typeMap)
+                    {
+                        typeMap.Seal(this);
+                    }
                 }
+            }
+            else
+            {
+                typeMap = GetTypeMap(typePair);
+                _resolvedMaps.Add(typePair, typeMap);
             }
             return typeMap;
         }
-
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
             var typeMap = FindClosedGenericTypeMapFor(initialTypes);
@@ -226,8 +256,7 @@ namespace AutoMapper
                         continue;
                     }
                     var types = new TypePair(sourceType, destinationType);
-                    typeMap = GetCachedMap(types);
-                    if (typeMap != null)
+                    if (_resolvedMaps.TryGetValue(types, out typeMap))
                     {
                         return typeMap;
                     }
@@ -265,9 +294,7 @@ namespace AutoMapper
             }
             return types;
         }
-        private TypeMap GetCachedMap(in TypePair types) => _resolvedMaps.GetOrDefault(types);
         IEnumerable<IObjectMapper> IGlobalConfiguration.GetMappers() => _mappers;
-
         private void Seal()
         {
             foreach (var profile in Profiles)
@@ -279,6 +306,7 @@ namespace AutoMapper
                 profile.Configure(this);
             }
             IGlobalConfiguration globalConfiguration = this;
+            var derivedMaps = new List<TypeMap>();
             foreach (var typeMap in _configuredMaps.Values)
             {
                 if (typeMap.DestinationTypeOverride != null)
@@ -290,7 +318,8 @@ namespace AutoMapper
                 {
                     _resolvedMaps[typeMap.Types] = typeMap;
                 }
-                var derivedMaps = GetDerivedTypeMaps(typeMap);
+                derivedMaps.Clear();
+                GetDerivedTypeMaps(typeMap,derivedMaps);
                 foreach (var derivedMap in derivedMaps)
                 {
                     var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
@@ -307,15 +336,12 @@ namespace AutoMapper
             _features.Seal(this);
         }
 
-        private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
+        private void GetDerivedTypeMaps(TypeMap typeMap, List<TypeMap> typeMaps)
         {
-            foreach (var derivedMap in this.Internal().GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
+            foreach (var derivedMap in this.Internal().GetIncludedTypeMaps(typeMap))
             {
-                yield return derivedMap;
-                foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
-                {
-                    yield return derivedTypeMap;
-                }
+                typeMaps.Add(derivedMap);
+                GetDerivedTypeMaps(derivedMap, typeMaps);
             }
         }
 
@@ -334,9 +360,9 @@ namespace AutoMapper
             }
             return typeMaps;
         }
-        TypeMap IGlobalConfiguration.GetIncludedTypeMap(Type sourceType, Type destinationType) => GetIncludedTypeMap(new TypePair(sourceType, destinationType));
-        TypeMap IGlobalConfiguration.GetIncludedTypeMap(TypePair pair) => GetIncludedTypeMap(pair);
-        TypeMap GetIncludedTypeMap(TypePair pair)
+        TypeMap IGlobalConfiguration.GetIncludedTypeMap(Type sourceType, Type destinationType) => GetIncludedTypeMap(new(sourceType, destinationType));
+        TypeMap IGlobalConfiguration.GetIncludedTypeMap(in TypePair pair) => GetIncludedTypeMap(pair);
+        TypeMap GetIncludedTypeMap(in TypePair pair)
         {
             var typeMap = FindTypeMapFor(pair);
             if (typeMap != null)
@@ -356,11 +382,11 @@ namespace AutoMapper
         }
         private TypeMap FindClosedGenericTypeMapFor(in TypePair typePair)
         {
-            var genericTypePair = typePair.GetOpenGenericTypePair();
-            if (genericTypePair.IsEmpty)
+            if (!typePair.IsGeneric)
             {
                 return null;
             }
+            var genericTypePair = typePair.GetTypeDefinitionIfGeneric();
             var userMap =
                 FindTypeMapFor(genericTypePair.SourceType, typePair.DestinationType) ??
                 FindTypeMapFor(typePair.SourceType, genericTypePair.DestinationType) ??
@@ -378,8 +404,8 @@ namespace AutoMapper
             }
             else
             {
-                cachedMap = GetCachedMap(genericTypePair);
-                if (cachedMap?.Types.ContainsGenericParameters != true)
+                var foundGenericMap = _resolvedMaps.TryGetValue(genericTypePair, out cachedMap) && cachedMap.Types.ContainsGenericParameters;
+                if (!foundGenericMap)
                 {
                     return cachedMap;
                 }
@@ -395,23 +421,28 @@ namespace AutoMapper
             cachedMap?.CopyInheritedMapsTo(typeMap);
             return typeMap;
         }
-
-        IObjectMapper IGlobalConfiguration.FindMapper(in TypePair types)
+        IObjectMapper IGlobalConfiguration.FindMapper(in TypePair types) => FindMapper(types);
+        IObjectMapper FindMapper(in TypePair types)
         {
+            if (_resolvedMappers.TryGetValue(types, out var resolvedMapper))
+            {
+                return resolvedMapper;
+            }
             foreach (var mapper in _mappers)
             {
                 if (mapper.IsMatch(types))
                 {
+                    if (!_sealed)
+                    {
+                        _resolvedMappers.Add(types, mapper);
+                    }
                     return mapper;
                 }
             }
             return null;
         }
-
         void IGlobalConfiguration.RegisterTypeMap(TypeMap typeMap) => _configuredMaps[typeMap.Types] = typeMap;
-
         void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(new[] { typeMap });
-
         void IGlobalConfiguration.AssertConfigurationIsValid(string profileName)
         {
             if (Profiles.All(x => x.Name != profileName))
@@ -420,9 +451,7 @@ namespace AutoMapper
             }
             _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
-
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
-
         IEnumerable<ProfileMap> IGlobalConfiguration.GetProfiles() => Profiles;
     }
 }

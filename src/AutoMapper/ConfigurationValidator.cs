@@ -145,15 +145,12 @@ namespace AutoMapper.Internal
                 {
                     continue;
                 }
-
                 var sourceType = memberMap.SourceType;
-
-                if (sourceType == null) continue;
-
                 // when we don't know what the source type is, bail
-                if (sourceType.IsGenericParameter || sourceType == typeof (object))
+                if (sourceType.IsGenericParameter || sourceType == typeof(object))
+                {
                     return;
-
+                }
                 var destinationType = memberMap.DestinationType;
                 DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, memberMap);
             }
@@ -161,10 +158,10 @@ namespace AutoMapper.Internal
     }
     public readonly struct ValidationContext
     {
-        public IObjectMapper ObjectMapper { get; }
-        public IMemberMap MemberMap { get; }
-        public TypeMap TypeMap { get; }
-        public TypePair Types { get; }
+        public readonly IObjectMapper ObjectMapper { get; }
+        public readonly IMemberMap MemberMap { get; }
+        public readonly TypeMap TypeMap { get; }
+        public readonly TypePair Types { get; }
 
         public ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
         {

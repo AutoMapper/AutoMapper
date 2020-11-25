@@ -7,11 +7,11 @@ namespace AutoMapper.Internal
 {
     public class MemberVisitor : ExpressionVisitor
     {
-        public static IEnumerable<MemberInfo> GetMemberPath(Expression expression)
+        public static MemberInfo[] GetMemberPath(Expression expression)
         {
             var memberVisitor = new MemberVisitor();
             memberVisitor.Visit(expression);
-            return memberVisitor.MemberPath;
+            return memberVisitor.MemberPath.ToArray();
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -21,6 +21,6 @@ namespace AutoMapper.Internal
         }
 
         private readonly List<MemberInfo> _members = new List<MemberInfo>();
-        public IEnumerable<MemberInfo> MemberPath => _members;
+        public IReadOnlyCollection<MemberInfo> MemberPath => _members;
     }
 }

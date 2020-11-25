@@ -120,7 +120,7 @@ namespace AutoMapper.Configuration
             {
                 PropertyMapActions.Add(pm =>
                 {
-                    var config = new ValueConverterConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
+                    var config = new ValueResolverConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
                     {
                         SourceMemberName = sourceMemberName
                     };
@@ -131,7 +131,7 @@ namespace AutoMapper.Configuration
 
             private static void ConvertUsing(PropertyMap propertyMap, Type valueConverterType, string sourceMemberName = null)
             {
-                var config = new ValueConverterConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                var config = new ValueResolverConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
                 {
                     SourceMemberName = sourceMemberName
                 };

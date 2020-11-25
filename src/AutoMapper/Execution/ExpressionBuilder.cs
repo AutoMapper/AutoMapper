@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,21 +8,25 @@ namespace AutoMapper.Execution
     using Internal;
     using static Internal.ExpressionFactory;
     using static Expression;
+    using System.Collections;
 
     public static class ExpressionBuilder
     {
+        public static readonly MethodInfo IListClear = typeof(IList).GetMethod("Clear");
+        public static readonly MethodInfo IListAdd = typeof(IList).GetMethod("Add");
+        public static readonly PropertyInfo IListIsReadOnly = typeof(IList).GetProperty("IsReadOnly");
         public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.IncrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.DecrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CreateInstance), TypeExtensions.InstanceFlags);
-        public static readonly MethodInfo GetTypeDepthMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.GetTypeDepth), TypeExtensions.InstanceFlags);
+        public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.OverTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CacheDestination), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.GetDestination), TypeExtensions.InstanceFlags);
-        public static readonly ConstructorInfo CreateContext = typeof(ResolutionContext).GetConstructor(TypeExtensions.InstanceFlags, null, new[] { typeof(IInternalRuntimeMapper) }, null);
-        public static readonly MethodInfo ContextMapMethod = Method(()=> default(ResolutionContext).Map<object, object>(null, null, null)).GetGenericMethodDefinition();
+        private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
+        private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.MapInternal), TypeExtensions.InstanceFlags);
 
         public static Expression MapExpression(IGlobalConfiguration configurationProvider,
             ProfileMap profileMap,
-            TypePair typePair,
+            in TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
             IMemberMap propertyMap = null, Expression destinationParameter = null)
@@ -40,10 +43,9 @@ namespace AutoMapper.Execution
                 {
                     typeMap.Seal(configurationProvider);
 
-                    mapExpression = typeMap.MapExpression != null
-                        ? typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter,
-                            contextParameter)
-                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+                    mapExpression = typeMap.MapExpression != null ? 
+                        typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter) :
+                        ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
                 }
                 else
                 {
@@ -60,52 +62,52 @@ namespace AutoMapper.Execution
             {
                 mapExpression = NullCheckSource(profileMap, sourceParameter, destinationParameter, mapExpression, propertyMap);
             }
-            return ExpressionFactory.ToType(mapExpression, typePair.DestinationType);
+            return ToType(mapExpression, typePair.DestinationType);
         }
 
         public static Expression NullCheckSource(ProfileMap profileMap,
             Expression sourceParameter,
             Expression destinationParameter,
-            Expression objectMapperExpression,
+            Expression mapExpression,
             IMemberMap memberMap)
         {
-            var declaredDestinationType = destinationParameter.Type;
-            var destinationType = objectMapperExpression.Type;
+            var destinationType = destinationParameter.Type;
+            var isCollection = destinationType.IsNonStringEnumerable();
+            var isIList = isCollection && destinationType.IsListType();
+            var destinationCollectionType = isIList ? typeof(IList) : destinationType.GetCollectionType();
             var defaultDestination = DefaultDestination();
             var destination = memberMap == null
                 ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
                 : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
-            var destinationCollectionType = destinationParameter.Type.GetCollectionType();
             var ifSourceNull = destinationCollectionType != null ? ClearDestinationCollection() : destination;
-            return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
+            return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clear = Call(destinationVariable, destinationCollectionType.GetMethod("Clear"));
-                var isReadOnly = Property(destinationVariable, "IsReadOnly");
+                var clear = Call(destinationVariable, isIList ? IListClear : destinationCollectionType.GetMethod("Clear"));
+                var isReadOnly = isIList ? Property(destinationVariable, IListIsReadOnly) : ExpressionFactory.Property(destinationVariable, "IsReadOnly");
                 return Block(new[] {destinationVariable},
                     Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
-                    Condition(OrElse(Equal(destinationVariable, Null), isReadOnly), ExpressionFactory.Empty, clear),
+                    Condition(OrElse(ReferenceEqual(destinationVariable, Null), isReadOnly), ExpressionFactory.Empty, clear),
                     destination);
             }
             Expression DefaultDestination()
             {
-                var isCollection = destinationType.IsNonStringEnumerable();
                 if ((isCollection && profileMap.AllowsNullCollectionsFor(memberMap)) || (!isCollection && profileMap.AllowsNullDestinationValuesFor(memberMap)))
                 {
-                    return Default(declaredDestinationType);
+                    return Default(destinationType);
                 }
                 if (destinationType.IsArray)
                 {
                     var destinationElementType = destinationType.GetElementType();
                     return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
                 }
-                return ObjectFactory.GenerateNonNullConstructorExpression(destinationType);
+                return ObjectFactory.GenerateConstructorExpression(destinationType);
             }
         }
 
         private static Expression ObjectMapperExpression(IGlobalConfiguration configurationProvider,
-            ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter,
+            ProfileMap profileMap, in TypePair typePair, Expression sourceParameter, Expression contextParameter,
             IMemberMap propertyMap, Expression destinationParameter)
         {
             var match = configurationProvider.FindMapper(typePair);
@@ -118,29 +120,25 @@ namespace AutoMapper.Execution
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
         }
 
-        public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
+        public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression contextParameter,
             Expression destinationParameter, IMemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(IMemberMap)));
         }
 
-        public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
+        public static Expression CheckContext(TypeMap typeMap, Expression context)
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
-                var mapper = Property(context, "Mapper");
-                return IfThen(Property(context, "IsDefault"), Assign(context, New(CreateContext, Convert(mapper, typeof(IInternalRuntimeMapper)))));
+                return Call(CheckContextMethod, context);
             }
             return null;
         }
 
-        public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap) =>
+        public static Expression OverMaxDepth(this Expression context, TypeMap typeMap) =>
             typeMap?.MaxDepth > 0 ?
-                GreaterThan(
-                    Call(context, GetTypeDepthMethod, Constant(typeMap.Types)),
-                    Constant(typeMap.MaxDepth)
-                ) :
+                Call(context, OverTypeDepthMethod, Constant(typeMap.Types), Constant(typeMap.MaxDepth)) :
                 null;
 
         public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, IMemberMap memberMap = null) =>

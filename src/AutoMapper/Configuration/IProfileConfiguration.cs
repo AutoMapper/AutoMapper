@@ -11,20 +11,20 @@ namespace AutoMapper.Configuration
     /// </summary>
     public interface IProfileConfiguration
     {
-        IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        IReadOnlyCollection<IMemberConfiguration> MemberConfigurations { get; }
         bool? FieldMappingEnabled { get; }
         bool? MethodMappingEnabled { get; }
         bool? ConstructorMappingEnabled { get; }
         bool? AllowNullDestinationValues { get; }
         bool? AllowNullCollections { get; }
         bool? EnableNullPropagationForQueryMapping { get; }
-        IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
-        IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+        IReadOnlyCollection<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
+        IReadOnlyCollection<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
 
         /// <summary>
         /// Source extension methods included for search
         /// </summary>
-        IEnumerable<MethodInfo> SourceExtensionMethods { get; }
+        IReadOnlyCollection<MethodInfo> SourceExtensionMethods { get; }
 
         /// <summary>
         /// Specify which properties should be mapped.
@@ -51,11 +51,11 @@ namespace AutoMapper.Configuration
         Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
 
         string ProfileName { get; }
-        IEnumerable<string> GlobalIgnores { get; }
+        IReadOnlyCollection<string> GlobalIgnores { get; }
         INamingConvention SourceMemberNamingConvention { get; }
         INamingConvention DestinationMemberNamingConvention { get; }
         IReadOnlyCollection<ITypeMapConfiguration> TypeMapConfigs { get; }
         IReadOnlyCollection<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
-        IEnumerable<ValueTransformerConfiguration> ValueTransformers { get; }
+        IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
     }
 }

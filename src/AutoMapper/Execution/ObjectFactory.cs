@@ -25,31 +25,17 @@ namespace AutoMapper.Execution
             }
             return Lambda<Func<object>>(constructor).Compile();
         }
-        public static Expression GenerateNonNullConstructorExpression(Type type) => 
-            type.IsValueType ? Default(type) : (type == typeof(string) ? Constant(string.Empty) : GenerateConstructorExpression(type));
-        public static Expression GenerateConstructorExpression(Type type)
+        public static object CreateInterfaceProxy(Type interfaceType) => CreateInstance(ProxyGenerator.GetProxyType(interfaceType));
+        public static Expression GenerateConstructorExpression(Type type) => type switch
         {
-            if (type.IsValueType)
-            {
-                return Default(type);
-            }
-            if (type == typeof(string))
-            {
-                return Constant(null, typeof(string));
-            }
-            if (type.IsInterface)
-            {
-                return
-                    type.IsDictionaryType() ? CreateCollection(type, typeof(Dictionary<,>))
-                    : type.IsReadOnlyDictionaryType() ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>))
-                    : type.IsSetType() ? CreateCollection(type, typeof(HashSet<>))
-                    : type.IsEnumerableType() ? CreateCollection(type, typeof(List<>))
-                    : InvalidInterfaceType(type);
-            }
-            if (type.IsAbstract)
-            {
-                return InvalidType(type, $"Cannot create an instance of abstract type {type}.");
-            }
+            { IsValueType: true } => Default(type),
+            Type stringType when stringType == typeof(string) => Constant(string.Empty),
+            { IsInterface: true } => CreateInterfaceExpression(type),
+            { IsAbstract: true } => InvalidType(type, $"Cannot create an instance of abstract type {type}."),
+            _ => CallConstructor(type)
+        };
+        private static Expression CallConstructor(Type type)
+        {
             var defaultCtor = type.GetConstructor(TypeExtensions.InstanceFlags, null, Type.EmptyTypes, null);
             if (defaultCtor != null)
             {
@@ -62,22 +48,26 @@ namespace AutoMapper.Execution
                 return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args.");
             }
             //get all optional default values
-            var args = ctorWithOptionalArgs.GetParameters().Select(p => Constant(p.GetDefaultValue(), p.ParameterType));
+            var args = ctorWithOptionalArgs.GetParameters().Select(p=>ToType(p.GetDefaultValue(), p.ParameterType));
             //create the ctor expression
             return New(ctorWithOptionalArgs, args);
         }
-        private static Expression CreateCollection(Type type, Type collectionType)
-        {
-            var listType = MakeGenericType(type, collectionType);
-            return type.IsAssignableFrom(listType) ? ToType(New(listType), type) : InvalidInterfaceType(type);
-        }
-        private static Type MakeGenericType(Type type, Type collectionType) =>  collectionType.MakeGenericType(GetElementTypes(type));
+        private static Expression CreateInterfaceExpression(Type type) =>
+            type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
+            type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
+            type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
+            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), GetElementType(type)) : 
+            InvalidInterfaceType(type);
+        private static Expression CreateCollection(Type type, Type collectionType, Type genericArgument = null) => ToType(New(MakeGenericType(type, collectionType, genericArgument)), type);
+        private static Type MakeGenericType(Type type, Type collectionType, Type genericArgument = null) => genericArgument == null ?
+            collectionType.MakeGenericType(type.GenericTypeArguments) :
+            collectionType.MakeGenericType(genericArgument);
         private static Expression CreateReadOnlyCollection(Type type, Type collectionType)
         {
             var listType = MakeGenericType(type, collectionType);
             var ctor = listType.GetConstructors()[0];
             var innerType = ctor.GetParameters()[0].ParameterType;
-            return type.IsAssignableFrom(listType) ? ToType(New(ctor, GenerateConstructorExpression(innerType)), type) : InvalidInterfaceType(type);
+            return ToType(New(ctor, GenerateConstructorExpression(innerType)), type);
         }
         private static Expression InvalidInterfaceType(Type type) => InvalidType(type, $"Cannot create an instance of interface type {type}.");
         private static Expression InvalidType(Type type, string message) => Throw(Constant(new ArgumentException(message, "type")), type);

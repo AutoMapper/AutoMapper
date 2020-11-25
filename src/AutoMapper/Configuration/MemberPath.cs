@@ -10,32 +10,26 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public struct MemberPath : IEquatable<MemberPath>
     {
-        private readonly MemberInfo[] _members;
-        public IReadOnlyCollection<MemberInfo> Members => _members;
-
         public static readonly MemberPath Empty = new MemberPath(Array.Empty<MemberInfo>());
-
+        public readonly MemberInfo[] Members;
         public MemberPath(Expression destinationExpression) : this(MemberVisitor.GetMemberPath(destinationExpression))
         {
         }
 
-        public MemberPath(IEnumerable<MemberInfo> members)
-        {
-            _members = members.ToArray();
-        }
+        public MemberPath(MemberInfo[] members) => Members = members;
 
-        public MemberInfo Last => _members[_members.Length - 1];
+        public MemberInfo Last => Members[Members.Length - 1];
 
-        public MemberInfo First => _members[0];
+        public MemberInfo First => Members[0];
 
-        public int Length => _members.Length;
+        public int Length => Members.Length;
 
         public bool Equals(MemberPath other) => Members.SequenceEqual(other.Members);
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj)) return false;
-            return obj is MemberPath && Equals((MemberPath)obj);
+            if(obj is null) return false;
+            return obj is MemberPath path && Equals(path);
         }
 
         public override int GetHashCode()
@@ -51,11 +45,11 @@ namespace AutoMapper.Internal
         public override string ToString()
             => string.Join(".", Members.Select(mi => mi.Name));
 
-        public static bool operator==(MemberPath left, MemberPath right) => left.Equals(right);
+        public static bool operator==(in MemberPath left, in MemberPath right) => left.Equals(right);
 
-        public static bool operator!=(MemberPath left, MemberPath right) => !left.Equals(right);
+        public static bool operator!=(in MemberPath left, in MemberPath right) => !left.Equals(right);
 
-        public bool StartsWith(MemberPath path)
+        public bool StartsWith(in MemberPath path)
         {
             if (path.Length > Length)
             {
@@ -63,7 +57,7 @@ namespace AutoMapper.Internal
             }
             for (int index = 0; index < path.Length; index++)
             {
-                if (_members[index] != path._members[index])
+                if (Members[index] != path.Members[index])
                 {
                     return false;
                 }
@@ -71,6 +65,6 @@ namespace AutoMapper.Internal
             return true;
         }
 
-        public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new MemberPath(_members.Concat(memberInfos));
+        public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new MemberPath(Members.Concat(memberInfos).ToArray());
     }
 }

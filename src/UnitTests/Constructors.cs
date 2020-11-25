@@ -1242,6 +1242,24 @@ namespace AutoMapper.UnitTests.Constructors
             _dest.Bar.ShouldBe(10);
         }
     }
+    public class When_mapping_with_optional_parameters_and_constructor_mapping_is_disabled : AutoMapperSpecBase
+    {
+        public class Destination
+        {
+            public Destination(Destination destination = null)
+            {
+                Dest = destination;
+            }
+            public Destination Dest { get; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.DisableConstructorMapping();
+            cfg.CreateMap<object, Destination>();
+        });
+        [Fact]
+        public void Should_map_ok() => Mapper.Map<Destination>(new object()).Dest.ShouldBeNull();
+    }
     public class UsingMappingEngineToResolveConstructorArguments
     {
         [Fact]

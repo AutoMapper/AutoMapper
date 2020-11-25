@@ -29,6 +29,11 @@ namespace AutoMapper
 
     public readonly struct ConditionParameters<TSource, TDestination, TMember>
     {
+        public readonly TSource Source { get; }
+        public readonly TDestination Destination { get; }
+        public readonly TMember SourceMember { get; }
+        public readonly TMember DestinationMember { get; }
+        public readonly ResolutionContext Context { get; }
         public ConditionParameters(TSource source, TDestination destination, TMember sourceMember, TMember destinationMember, ResolutionContext context)
         {
             Source = source;
@@ -37,10 +42,5 @@ namespace AutoMapper
             DestinationMember = destinationMember;
             Context = context;
         }
-        public TSource Source { get; }
-        public TDestination Destination { get; }
-        public TMember SourceMember { get; }
-        public TMember DestinationMember { get; }
-        public ResolutionContext Context { get; }
     }
 }

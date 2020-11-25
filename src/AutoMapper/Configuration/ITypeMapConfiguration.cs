@@ -12,5 +12,6 @@ namespace AutoMapper.Configuration
         bool IsReverseMap { get; }
         TypePair Types { get; }
         ITypeMapConfiguration ReverseTypeMap { get; }
+        TypeMap TypeMap { get; }
     }
 }

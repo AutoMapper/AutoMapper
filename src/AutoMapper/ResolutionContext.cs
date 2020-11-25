@@ -90,14 +90,42 @@ namespace AutoMapper
             }
             return service;
         }
-        internal object GetDestination(object source, Type destinationType) => InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
-        internal void CacheDestination(object source, Type destinationType, object destination) => 
+        internal object GetDestination(object source, Type destinationType)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+            return InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
+        }
+        internal void CacheDestination(object source, Type destinationType, object destination)
+        {
+            if (source == null)
+            {
+                return;
+            }
             InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
-        internal void IncrementTypeDepth(TypePair types) => TypeDepth[types]++;
-        internal void DecrementTypeDepth(TypePair types) => TypeDepth[types]--;
-        internal int GetTypeDepth(TypePair types) => TypeDepth.TryGetValue(types, out int depth) ? depth : TypeDepth[types] = 1;
+        }
+        internal void IncrementTypeDepth(in TypePair types) => TypeDepth[types]++;
+        internal void DecrementTypeDepth(in TypePair types) => TypeDepth[types]--;
+        internal bool OverTypeDepth(in TypePair types, int maxDepth)
+        {
+            if (!TypeDepth.TryGetValue(types, out int depth))
+            {
+                TypeDepth[types] = 1;
+                depth = 1;
+            }
+            return depth > maxDepth;
+        }
         internal bool IsDefault => this == _inner.DefaultContext;
-        internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
+        internal static void CheckContext(ref ResolutionContext resolutionContext)
+        {
+            if (resolutionContext.IsDefault)
+            {
+                resolutionContext = new ResolutionContext(resolutionContext._inner);
+            }
+        }
+        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
             => _inner.Map(source, destination, this, memberMap: memberMap);
         internal object Map(object source, object destination, Type sourceType, Type destinationType, IMemberMap memberMap)
             => _inner.Map(source, destination, this, sourceType, destinationType, memberMap);
@@ -111,15 +139,15 @@ namespace AutoMapper
     }
     public readonly struct ContextCacheKey : IEquatable<ContextCacheKey>
     {
-        public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
-        public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
         private readonly Type _destinationType;
+        public readonly object Source;
         public ContextCacheKey(object source, Type destinationType)
         {
             Source = source;
             _destinationType = destinationType;
         }
-        public object Source { get; }
+        public static bool operator ==(in ContextCacheKey left, in ContextCacheKey right) => left.Equals(right);
+        public static bool operator !=(in ContextCacheKey left, in ContextCacheKey right) => !left.Equals(right);
         public override int GetHashCode() => HashCodeCombiner.Combine(Source, _destinationType);
         public bool Equals(ContextCacheKey other) => Source == other.Source && _destinationType == other._destinationType;
         public override bool Equals(object other) => other is ContextCacheKey otherKey && Equals(otherKey);

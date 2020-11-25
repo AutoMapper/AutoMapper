@@ -42,7 +42,7 @@ namespace AutoMapper.Mappers
                 Call(ArrayCopyMethod, sourceExpression, dest, sourceLength),
                 dest
             );
-            return Condition(Equal(sourceExpression, ExpressionFactory.Null), valueIfNullExpr, mapExpr);
+            return Condition(ReferenceEqual(sourceExpression, ExpressionFactory.Null), valueIfNullExpr, mapExpr);
         }
     }
 }

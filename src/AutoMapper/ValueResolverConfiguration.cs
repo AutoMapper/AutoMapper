@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace AutoMapper
@@ -22,5 +23,6 @@ namespace AutoMapper
             Instance = instance;
             InterfaceType = interfaceType;
         }
+        public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
     }
 }

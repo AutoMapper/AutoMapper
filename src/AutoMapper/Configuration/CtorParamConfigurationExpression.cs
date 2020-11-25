@@ -43,18 +43,16 @@ namespace AutoMapper.Configuration
             {
                 throw new AutoMapperConfigurationException($"The type {typeMap.Types.DestinationType.Name} does not have a constructor.\n{typeMap.Types.DestinationType.FullName}");
             }
-
             var parameter = ctorParams.SingleOrDefault(p => p.Parameter.Name == CtorParamName);
             if (parameter == null)
             {
                 throw new AutoMapperConfigurationException($"{typeMap.Types.DestinationType.Name} does not have a constructor with a parameter named '{CtorParamName}'.\n{typeMap.Types.DestinationType.FullName}");
             }
-            parameter.CanResolveValue = true;
-
             foreach (var action in _ctorParamActions)
             {
                 action(parameter);
             }
+            parameter.CanResolveValue = true;
         }
     }
 }

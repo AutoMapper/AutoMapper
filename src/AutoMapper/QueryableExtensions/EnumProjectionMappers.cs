@@ -10,7 +10,10 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
             => Convert(resolvedSource, memberMap.DestinationType);
-        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
-            memberMap.Types.IsEnumToEnum() || memberMap.Types.IsUnderlyingTypeToEnum() || memberMap.Types.IsEnumToUnderlyingType();
+        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource)
+        {
+            var types = memberMap.Types();
+            return types.IsEnumToEnum() || types.IsUnderlyingTypeToEnum() || types.IsEnumToUnderlyingType();
+        }
     }
 }

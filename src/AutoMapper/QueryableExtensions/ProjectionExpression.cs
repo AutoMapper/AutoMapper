@@ -7,7 +7,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
+    using MemberPaths = IEnumerable<MemberInfo[]>;
     using ParameterBag = IDictionary<string, object>;
 
     public readonly struct ProjectionExpression

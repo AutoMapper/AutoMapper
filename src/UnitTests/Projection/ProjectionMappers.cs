@@ -36,14 +36,12 @@ namespace AutoMapper.UnitTests.Projection
             var destination = new[] { new Source { Color = ConsoleColor.Cyan } }.AsQueryable().ProjectTo<Destination>(Configuration).First();
             destination.Color.ShouldBe(11);
         }
-
         private class EnumToUnderlyingTypeProjectionMapper : IProjectionMapper
         {
             public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) =>
                 Convert(resolvedSource, memberMap.DestinationType);
-
             public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
-                memberMap.SourceType.GetTypeInfo().IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
+                memberMap.SourceType.IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
         }
     }
 }

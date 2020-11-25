@@ -10,11 +10,11 @@ namespace AutoMapper
     [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
     public readonly struct MapRequest : IEquatable<MapRequest>
     {
-        public TypePair RequestedTypes { get; }
-        public TypePair RuntimeTypes { get; }
-        public IMemberMap MemberMap { get; }
+        public readonly TypePair RequestedTypes;
+        public readonly TypePair RuntimeTypes;
+        public readonly IMemberMap MemberMap;
 
-        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes, IMemberMap memberMap = null) 
+        public MapRequest(in TypePair requestedTypes, in TypePair runtimeTypes, IMemberMap memberMap = null) 
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;
@@ -36,16 +36,16 @@ namespace AutoMapper
             return hashCode;
         }
 
-        public static bool operator ==(MapRequest left, MapRequest right) => left.Equals(right);
+        public static bool operator ==(in MapRequest left, in MapRequest right) => left.Equals(right);
 
-        public static bool operator !=(MapRequest left, MapRequest right) => !left.Equals(right);
+        public static bool operator !=(in MapRequest left, in MapRequest right) => !left.Equals(right);
     }
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public readonly struct TypePair : IEquatable<TypePair>
     {
-        public static bool operator ==(TypePair left, TypePair right) => left.Equals(right);
-        public static bool operator !=(TypePair left, TypePair right) => !left.Equals(right);
+        public readonly Type SourceType;
+        public readonly Type DestinationType;
 
         public TypePair(Type sourceType, Type destinationType)
         {
@@ -53,9 +53,6 @@ namespace AutoMapper
             DestinationType = destinationType;
         }
 
-        public Type SourceType { get; }
-
-        public Type DestinationType { get; }
 
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
@@ -71,20 +68,7 @@ namespace AutoMapper
 
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
 
-        public TypePair GetOpenGenericTypePair()
-        {
-            if(!IsGeneric)
-            {
-                return default;
-            }
-            var sourceGenericDefinition = SourceType.GetTypeDefinitionIfGeneric();
-            var destinationGenericDefinition = DestinationType.GetTypeDefinitionIfGeneric();
-            return new TypePair(sourceGenericDefinition, destinationGenericDefinition);
-        }
-
-        public bool IsEmpty => SourceType == null;
-
-        public TypePair CloseGenericTypes(TypePair closedTypes)
+        public TypePair CloseGenericTypes(in TypePair closedTypes)
         {
             var sourceArguments = closedTypes.SourceType.GetGenericArguments();
             var destinationArguments = closedTypes.DestinationType.GetGenericArguments();
@@ -101,15 +85,19 @@ namespace AutoMapper
             return new TypePair(closedSourceType, closedDestinationType);
         }
 
+        public TypePair GetTypeDefinitionIfGeneric() => new TypePair(SourceType.GetTypeDefinitionIfGeneric(), DestinationType.GetTypeDefinitionIfGeneric());
+
         public void CheckIsDerivedFrom(in TypePair baseTypes)
         {
             SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
             DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
         }
+        public static bool operator ==(in TypePair left, in TypePair right) => left.Equals(right);
+        public static bool operator !=(in TypePair left, in TypePair right) => !left.Equals(right);
     }
     public static class HashCodeCombiner
     {
-        public static int Combine<T1, T2>(T1 obj1, T2 obj2) => CombineCodes(obj1.GetHashCode(), obj2.GetHashCode());
+        public static int Combine<T1, T2>(in T1 obj1, in T2 obj2) => CombineCodes(obj1.GetHashCode(), obj2.GetHashCode());
         public static int CombineCodes(int h1, int h2)
         {
             // RyuJIT optimizes this to use the ROL instruction

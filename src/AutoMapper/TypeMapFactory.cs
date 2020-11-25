@@ -13,19 +13,14 @@ namespace AutoMapper
         {
             var sourceTypeDetails = options.CreateTypeDetails(sourceType);
             var destinationTypeDetails = options.CreateTypeDetails(destinationType);
-
-            var typeMap = new TypeMap(sourceType, destinationType, options);
-
-            var resolvers = new LinkedList<MemberInfo>();
-            foreach (var destProperty in destinationTypeDetails.WriteAccessors)
+            var typeMap = new TypeMap(sourceTypeDetails, destinationTypeDetails, options);
+            var sourceMembers = new List<MemberInfo>();
+            foreach (var destinationProperty in destinationTypeDetails.WriteAccessors)
             {
-                if (resolvers.Count > 0)
+                sourceMembers.Clear();
+                if (options.MapDestinationPropertyToSource(sourceTypeDetails, destinationType, destinationProperty.GetMemberType(), destinationProperty.Name, sourceMembers, isReverseMap))
                 {
-                    resolvers = new LinkedList<MemberInfo>();
-                }
-                if (options.MapDestinationPropertyToSource(sourceTypeDetails, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers, isReverseMap))
-                {
-                    typeMap.AddPropertyMap(destProperty, resolvers);
+                    typeMap.AddPropertyMap(destinationProperty, sourceMembers);
                 }
             }
             return typeMap;

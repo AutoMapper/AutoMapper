@@ -11,26 +11,22 @@ namespace AutoMapper.QueryableExtensions.Impl
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public readonly struct ProjectionRequest : IEquatable<ProjectionRequest>
     {
-        public Type SourceType { get; }
-        public Type DestinationType { get; }
-        public MemberPath[] MembersToExpand { get; }
-        private ICollection<ProjectionRequest> PreviousRequests { get; }
-        internal bool AlreadyExists => PreviousRequests.Contains(this);
+        public readonly Type SourceType;
+        public readonly Type DestinationType;
+        public readonly MemberPath[] MembersToExpand;
+        private readonly ICollection<ProjectionRequest> _previousRequests;
         public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ICollection<ProjectionRequest> previousRequests)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
             MembersToExpand = membersToExpand;
-            PreviousRequests = previousRequests;
+            _previousRequests = previousRequests;
         }
-        
-        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(PreviousRequests.Concat(new[] { this }));
-
+        internal bool AlreadyExists => _previousRequests.Contains(this);
+        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(_previousRequests.Concat(new[] { this }));
         public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
                 MembersToExpand.SequenceEqual(other.MembersToExpand);
-
         public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
-
         public override int GetHashCode()
         {
             var hashCode = HashCodeCombiner.Combine(SourceType, DestinationType);
@@ -40,12 +36,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             return hashCode;
         }
-
-        public static bool operator ==(ProjectionRequest left, ProjectionRequest right) => Equals(left, right);
-
-        public static bool operator !=(ProjectionRequest left, ProjectionRequest right) => !Equals(left, right);
-
-        public bool ShouldExpand(MemberPath currentPath)
+        public static bool operator ==(in ProjectionRequest left, in ProjectionRequest right) => Equals(left, right);
+        public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);
+        public bool ShouldExpand(in MemberPath currentPath)
         {
             foreach (var memberToExpand in MembersToExpand)
             {

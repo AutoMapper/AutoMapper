@@ -14,7 +14,7 @@ namespace AutoMapper.Configuration.Conventions
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
 
-        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
+        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
         {
             var destinationMemberNamingConvention = isReverseMap 
                 ? SourceMemberNamingConvention 
@@ -44,13 +44,13 @@ namespace AutoMapper.Configuration.Conventions
 
                 if (matchingMemberInfo != null)
                 {
-                    resolvers.AddLast(matchingMemberInfo);
+                    resolvers.Add(matchingMemberInfo);
 
                     var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
                     var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap);
 
                     if (!foundMatch)
-                        resolvers.RemoveLast();
+                        resolvers.RemoveAt(resolvers.Count - 1);
                     else
                         break;
                 }

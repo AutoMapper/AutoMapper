@@ -8,41 +8,6 @@ namespace AutoMapper.UnitTests.Mappers
 {
     public class NameValueCollectionMapperTests
     {
-        public class IsMatch
-        {
-            [Fact]
-            public void ReturnsTrueWhenBothSourceAndDestinationTypesAreNameValueCollection()
-            {
-                var tp = new TypePair(typeof(NameValueCollection), typeof(NameValueCollection));
-                var nvcm = new NameValueCollectionMapper();
-
-                var result = nvcm.IsMatch(tp);
-
-                result.ShouldBeTrue();
-            }
-
-            [Fact]
-            public void ReturnsIsFalseWhenDestinationTypeIsNotNameValueCollection()
-            {
-                var tp = new TypePair(typeof(NameValueCollection), typeof(Object));
-                var nvcm = new NameValueCollectionMapper();
-
-                var result = nvcm.IsMatch(tp);
-
-                result.ShouldBeFalse();
-            }            
-
-            [Fact]
-            public void ReturnsIsFalseWhenSourceTypeIsNotNameValueCollection()
-            {
-                var tp = new TypePair(typeof(Object), typeof(NameValueCollection));
-                var nvcm = new NameValueCollectionMapper();
-
-                var result = nvcm.IsMatch(tp);
-
-                result.ShouldBeFalse();
-            }            
-        }
         public class Map
         {
             [Fact]

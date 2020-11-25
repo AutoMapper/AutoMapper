@@ -11,11 +11,11 @@ namespace AutoMapper
     {
         TypeMap TypeMap { get; }
         Type SourceType { get; }
-        IReadOnlyCollection<MemberInfo> SourceMembers { get; }
+        MemberInfo[] SourceMembers { get; }
         IncludedMember IncludedMember { get; }
         Type DestinationType { get; }
         string DestinationName { get; }
-        TypePair Types { get; }
+        TypePair Types();
         bool CanResolveValue { get; }
         bool Ignored { get; }
         bool Inline { get; set; }
@@ -26,7 +26,7 @@ namespace AutoMapper
         LambdaExpression CustomMapExpression { get; }
         LambdaExpression CustomMapFunction { get; }
         ValueResolverConfiguration ValueResolverConfig { get; }
-        ValueConverterConfiguration ValueConverterConfig { get; }
+        ValueResolverConfiguration ValueConverterConfig { get; }
         IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
         MemberInfo SourceMember { get; }
         bool IsMapped { get; }

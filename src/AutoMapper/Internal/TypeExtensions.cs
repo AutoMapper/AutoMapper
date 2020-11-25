@@ -25,7 +25,7 @@ namespace AutoMapper.Internal
 
         public static bool IsNonStringEnumerable(this Type type) => type != typeof(string) && type.IsEnumerableType();
 
-        public static bool IsSetType(this Type type) => type.ImplementsGenericInterface(typeof(ISet<>));
+        public static bool IsSetType(this Type type) => type.IsGenericType(typeof(ISet<>)) || type.IsGenericType(typeof(HashSet<>));
 
         public static IEnumerable<Type> BaseClassesAndInterfaces(this Type type)
         {
@@ -49,10 +49,7 @@ namespace AutoMapper.Internal
 
         public static MethodInfo GetInheritedMethod(this Type type, string name) =>
             type.BaseClassesAndInterfaces().Select(t => t.GetMethod(name, InstanceFlags)).FirstOrDefault(m => m != null)
-            ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find method {name} of type {type}.");
-
-        public static MemberInfo GetInheritedMember(this Type type, string name) => type.GetInheritedProperty(name) ?? type.GetInheritedField(name) ?? (MemberInfo)type.GetInheritedMethod(name) ??
-            throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
+            ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
             => type.GetInheritedProperty(name) ?? (MemberInfo)type.GetInheritedField(name) ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");

@@ -17,13 +17,8 @@ namespace AutoMapper.Mappers
         {
             var listType = typeof(List<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
             var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType), contextExpression, typeof(List<>), MapItemExpr);
-            var dest = Variable(listType, "dest");
             var ctor = destExpression.Type.GetDeclaredConstructors().First();
-            return Block(new[] { dest }, 
-                Assign(dest, list), 
-                Condition(NotEqual(dest, Default(listType)), 
-                    New(ctor, dest), 
-                    Default(destExpression.Type)));
+            return New(ctor, list);
         }
     }
 }

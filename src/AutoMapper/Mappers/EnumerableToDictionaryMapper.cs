@@ -5,7 +5,6 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers
 {
     using static CollectionMapperExpressionFactory;
-
     public class EnumerableToDictionaryMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsDictionaryType();

@@ -66,17 +66,10 @@ namespace AutoMapper
             Type sourceType = null, Type destinationType = null)
         {
             var typedOptions = new MappingOperationOptions<TSource, TDestination>(DefaultContext.Options.ServiceCtor);
-
             opts(typedOptions);
-
-            typedOptions.BeforeMapAction(source, destination);
-
-            var context = new ResolutionContext(typedOptions, this);
-
-            destination = MapCore(source, destination, context, sourceType, destinationType);
-
-            typedOptions.AfterMapAction(source, destination);
-
+            typedOptions.BeforeMapAction?.Invoke(source, destination);
+            destination = MapCore(source, destination, new ResolutionContext(typedOptions, this), sourceType, destinationType);
+            typedOptions.AfterMapAction?.Invoke(source, destination);
             return destination;
         }
 

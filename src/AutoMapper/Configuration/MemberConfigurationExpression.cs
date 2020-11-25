@@ -286,7 +286,7 @@ namespace AutoMapper.Configuration
             Expression<Func<TSource, TSourceMember>> sourceMember = null,
             string sourceMemberName = null)
         {
-            var config = new ValueConverterConfiguration(typeof(TValueConverter),
+            var config = new ValueResolverConfiguration(typeof(TValueConverter),
                 typeof(IValueConverter<TSourceMember, TMember>))
             {
                 SourceMember = sourceMember,
@@ -299,7 +299,7 @@ namespace AutoMapper.Configuration
         private static void ConvertUsing<TSourceMember>(PropertyMap propertyMap, IValueConverter<TSourceMember, TMember> valueConverter,
             Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null)
         {
-            var config = new ValueConverterConfiguration(valueConverter,
+            var config = new ValueResolverConfiguration(valueConverter,
                 typeof(IValueConverter<TSourceMember, TMember>))
             {
                 SourceMember = sourceMember,

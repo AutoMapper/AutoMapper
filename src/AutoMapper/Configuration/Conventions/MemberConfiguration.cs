@@ -48,7 +48,7 @@ namespace AutoMapper.Configuration.Conventions
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }
 
-        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, bool isReverseMap)
+        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
         {
             foreach (var memberMapper in MemberMappers)
             {

@@ -6,15 +6,13 @@ namespace AutoMapper
 {
     public readonly struct ValueTransformerConfiguration
     {
+        public readonly Type ValueType;
+        public readonly LambdaExpression TransformerExpression;
         public ValueTransformerConfiguration(Type valueType, LambdaExpression transformerExpression)
         {
             ValueType = valueType;
             TransformerExpression = transformerExpression;
         }
-
-        public Type ValueType { get; }
-        public LambdaExpression TransformerExpression { get; }
-
         public bool IsMatch(IMemberMap memberMap) 
             => ValueType.IsAssignableFrom(memberMap.SourceType) && memberMap.DestinationType.IsAssignableFrom(ValueType);
     }
