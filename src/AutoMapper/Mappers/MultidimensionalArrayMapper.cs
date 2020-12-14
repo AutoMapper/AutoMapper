@@ -8,7 +8,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers
 {
     using static Expression;
-
+    using static ExpressionFactory;
     public class MultidimensionalArrayMapper : IObjectMapper
     {
         private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, IGlobalConfiguration configurationProvider)
@@ -46,13 +46,12 @@ namespace AutoMapper.Mappers
         }
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
                     sourceExpression.Type.GetElementType()),
                 sourceExpression,
-                contextExpression,
+                ContextParameter,
                 Constant(configurationProvider));
 
         public class MultidimensionalArrayFiller

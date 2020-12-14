@@ -9,13 +9,14 @@ using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 namespace AutoMapper.Mappers
 {
     using static Expression;
+    using static ExpressionFactory;
     public class FromStringDictionaryMapper : IObjectMapper
     {
         private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
         public bool IsMatch(in TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
-            Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
-                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), contextExpression, Constant(profileMap));
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap,
+            Expression sourceExpression, Expression destExpression) =>
+                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
         struct Match
         {
             public object Value;

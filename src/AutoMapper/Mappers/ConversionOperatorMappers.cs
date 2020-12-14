@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
         public ConversionOperatorMapper(string operatorName) => _operatorName = operatorName;
         public bool IsMatch(in TypePair context) => context.GetConversionOperator(_operatorName) != null;
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var implicitOperator = new TypePair(sourceExpression.Type, destExpression.Type).GetConversionOperator(_operatorName);
             return Expression.Call(implicitOperator, sourceExpression);

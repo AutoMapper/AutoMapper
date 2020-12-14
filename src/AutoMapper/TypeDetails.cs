@@ -155,7 +155,7 @@ namespace AutoMapper
                 .ToArray();
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
         private static bool FieldReadable(FieldInfo fieldInfo) => true;
-        private static bool PropertyWritable(PropertyInfo propertyInfo) => propertyInfo.CanWrite || propertyInfo.PropertyType.IsNonStringEnumerable();
+        private static bool PropertyWritable(PropertyInfo propertyInfo) => propertyInfo.CanWrite || propertyInfo.PropertyType.IsEnumerableType();
         private static bool FieldWritable(FieldInfo fieldInfo) => !fieldInfo.IsInitOnly;
         private IEnumerable<Type> GetTypeInheritance() => Type.IsInterface ? new[] { Type }.Concat(Type.GetInterfaces()) : Type.GetTypeInheritance();
         private IEnumerable<PropertyInfo> GetProperties(Func<PropertyInfo, bool> propertyAvailableFor) =>

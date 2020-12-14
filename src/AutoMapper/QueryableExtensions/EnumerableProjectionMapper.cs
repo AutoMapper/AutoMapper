@@ -12,8 +12,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
         public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
-            var destinationListType = ElementTypeHelper.GetElementType(memberMap.DestinationType);
-            var sourceListType = ElementTypeHelper.GetElementType(memberMap.SourceType);
+            var destinationListType = ReflectionHelper.GetElementType(memberMap.DestinationType);
+            var sourceListType = ReflectionHelper.GetElementType(memberMap.SourceType);
             var sourceExpression = resolvedSource;
             if (sourceListType != destinationListType)
             {

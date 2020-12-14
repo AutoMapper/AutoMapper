@@ -11,8 +11,7 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string) && context.SourceType.IsEnum;
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var sourceType = sourceExpression.Type;
             var toStringCall = Expression.Call(sourceExpression, ExpressionFactory.ObjectToString);

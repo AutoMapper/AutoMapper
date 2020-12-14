@@ -48,15 +48,14 @@ namespace AutoMapper.Mappers
         public bool IsMatch(in TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
                 sourceExpression,
                 ToType(
                     Coalesce(destExpression.ToObject(),
                         ObjectFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
-                contextExpression,
+                ContextParameter,
                 Constant(profileMap));
     }
 }

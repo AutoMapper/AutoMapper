@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(in TypePair context) => context.IsEnumToEnum();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
             var sourceToObject = sourceExpression.ToObject();

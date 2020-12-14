@@ -21,13 +21,13 @@ namespace AutoMapper.Mappers
             return sourceElementType.IsPrimitive && sourceElementType == context.DestinationType.GetElementType();
         }
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destElementType = destExpression.Type.GetElementType();
             var sourceElementType = sourceExpression.Type.GetElementType();
 
             if (configurationProvider.FindTypeMapFor(sourceElementType, destElementType) != null)
-                return base.MapExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression, contextExpression);
+                return base.MapExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression);
 
             var valueIfNullExpr = profileMap.AllowsNullCollectionsFor(memberMap) ? 
                 (Expression) Constant(null, destExpression.Type) : 

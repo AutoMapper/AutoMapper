@@ -46,7 +46,7 @@ namespace AutoMapper.Execution
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
             var mapperFunc = CreateMapperFunc(assignmentFunc);
-            var checkContext = CheckContext(_typeMap, ContextParameter);
+            var checkContext = CheckContext(_typeMap);
             var lambaBody = checkContext != null ? new[] {checkContext, mapperFunc} : new[] {mapperFunc};
             return Lambda(Block(new[] {_destination}, lambaBody), parameters);
             Expression TypeConverter(ParameterExpression[] parameters)
@@ -215,7 +215,7 @@ namespace AutoMapper.Execution
         private Expression CreateMapperFunc(Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
-            var overMaxDepth = ContextParameter.OverMaxDepth(_typeMap);
+            var overMaxDepth = OverMaxDepth(_typeMap);
             if (overMaxDepth != null)
             {
                 mapperFunc = Condition(overMaxDepth, Default(DestinationType), mapperFunc);
@@ -263,7 +263,7 @@ namespace AutoMapper.Execution
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
             var tryMap = Block(new[] {resolvedValue},
                 Assign(resolvedValue, resolvedExpression),
-                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue, ContextParameter));
+                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue));
             return TryMemberMap(ctorParamMap, tryMap);
         }
         private Expression TryPropertyMap(PropertyMap propertyMap)
@@ -340,8 +340,8 @@ namespace AutoMapper.Execution
             {
                 var typePair = new TypePair(resolvedValue.Type, memberMap.DestinationType);
                 var mapMember = memberMap.Inline ?
-                    MapExpression(_configurationProvider, _typeMap.Profile, typePair, resolvedValue, ContextParameter, memberMap, destinationMemberValue) :
-                    ContextMap(typePair, resolvedValue, ContextParameter, destinationMemberValue, memberMap);
+                    MapExpression(_configurationProvider, _typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
+                    ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);
                 mapMember = memberMap.ApplyTransformers(mapMember);
                 return mapMember;
             }

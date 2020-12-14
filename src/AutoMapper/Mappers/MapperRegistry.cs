@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 namespace AutoMapper.Mappers
 {
     internal static class MapperRegistry
@@ -20,21 +19,17 @@ namespace AutoMapper.Mappers
             new MultidimensionalArrayMapper(),
             new ArrayCopyMapper(),
             new ArrayMapper(),
+            new NameValueCollectionMapper(),
             new ReadOnlyDictionaryMapper(),
-            new DictionaryMapper(),
-            new EnumerableToReadOnlyDictionaryMapper(),
-            new EnumerableToDictionaryMapper(),
             new ReadOnlyCollectionMapper(),
-            new HashSetMapper(),
             new CollectionMapper(),
-            new EnumerableMapper(),
             new AssignableMapper(),
-            new FlagsEnumMapper(),
             new StringToEnumMapper(),
             new EnumToStringMapper(),
             new EnumToEnumMapper(),
-            new ConvertMapper(),
             new StringMapper(),
+            new ConvertMapper(),
+            new KeyValueMapper(),
             new ConversionOperatorMapper("op_Implicit"),
             new ConversionOperatorMapper("op_Explicit"),
             new FromStringDictionaryMapper(),

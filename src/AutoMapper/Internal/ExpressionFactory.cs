@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper.Execution;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Runtime.CompilerServices;
 namespace AutoMapper.Internal
 {
     using static Expression;
+    using static ExpressionBuilder;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
@@ -270,6 +273,93 @@ namespace AutoMapper.Internal
         class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
         {
             public override void Replace(Expression oldNode, Expression newNode) => base.Replace(oldNode, ToType(newNode, oldNode.Type));
+        }
+        public static Expression MapCollectionExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        {
+            MethodInfo addMethod;
+            bool isIList;
+            Type destinationCollectionType, destinationElementType;
+            GetDestinationType();
+            var passedDestination = Variable(destExpression.Type, "passedDestination");
+            var newExpression = Variable(passedDestination.Type, "collectionDestination");
+            var sourceElementType = sourceExpression.Type.GetCollectionType()?.GenericTypeArguments[0] ?? ReflectionHelper.GetElementType(sourceExpression.Type);
+            var itemParam = Parameter(sourceElementType, "item");
+            var itemExpr = MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+            Expression destination, assignNewExpression;
+            UseDestinationValue();
+            var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
+            var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
+            if (overMaxDepth != null)
+            {
+                addItems = Condition(overMaxDepth, Empty, addItems);
+            }
+            var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
+            var checkNull = Block(new[] { newExpression, passedDestination },
+                    Assign(passedDestination, destExpression),
+                    assignNewExpression,
+                    Call(destination, clearMethod),
+                    addItems,
+                    destination);
+            if (memberMap != null)
+            {
+                return checkNull;
+            }
+            return CheckContext();
+            void GetDestinationType()
+            {
+                destinationCollectionType = destExpression.Type.GetCollectionType();
+                destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? ReflectionHelper.GetElementType(destExpression.Type);
+                if (destinationCollectionType == null && destExpression.Type.IsInterface)
+                {
+                    destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+                    destExpression = ToType(destExpression, destinationCollectionType);
+                }
+                if (destinationCollectionType == null)
+                {
+                    destinationCollectionType = typeof(IList);
+                    addMethod = IListAdd;
+                    isIList = true;
+                }
+                else
+                {
+                    isIList = destExpression.Type.IsListType();
+                    addMethod = destinationCollectionType.GetMethod("Add");
+                }
+            }
+            void UseDestinationValue()
+            {
+                if (memberMap is { UseDestinationValue: true })
+                {
+                    destination = passedDestination;
+                    assignNewExpression = Empty;
+                }
+                else
+                {
+                    destination = newExpression;
+                    var createInstance = ObjectFactory.GenerateConstructorExpression(passedDestination.Type);
+                    var shouldCreateDestination = ReferenceEqual(passedDestination, Null);
+                    if (memberMap is { CanBeSet: true })
+                    {
+                        var isReadOnly = isIList ? Expression.Property(passedDestination, IListIsReadOnly) : Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
+                        shouldCreateDestination = OrElse(shouldCreateDestination, isReadOnly);
+                    }
+                    assignNewExpression = Assign(newExpression, Condition(shouldCreateDestination, ToType(createInstance, passedDestination.Type), passedDestination));
+                }
+            }
+            Expression CheckContext()
+            {
+                var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
+                if (elementTypeMap == null)
+                {
+                    return checkNull;
+                }
+                var checkContext = ExpressionBuilder.CheckContext(elementTypeMap);
+                if (checkContext == null)
+                {
+                    return checkNull;
+                }
+                return Block(checkContext, checkNull);
+            }
         }
     }
 }

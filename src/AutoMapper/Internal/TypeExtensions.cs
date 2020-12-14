@@ -23,10 +23,6 @@ namespace AutoMapper.Internal
 
         public static bool IsDynamic(this Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
 
-        public static bool IsNonStringEnumerable(this Type type) => type != typeof(string) && type.IsEnumerableType();
-
-        public static bool IsSetType(this Type type) => type.IsGenericType(typeof(ISet<>)) || type.IsGenericType(typeof(HashSet<>));
-
         public static IEnumerable<Type> BaseClassesAndInterfaces(this Type type)
         {
             var currentType = type;
@@ -56,27 +52,19 @@ namespace AutoMapper.Internal
 
         public static bool IsNullableType(this Type type) => type.IsGenericType(typeof(Nullable<>));
 
-        public static bool IsCollectionType(this Type type) => type.ImplementsGenericInterface(typeof(ICollection<>));
+        public static bool IsKeyValue(this Type type) => type.IsGenericType(typeof(KeyValuePair<,>));
 
         public static Type GetCollectionType(this Type type) => type.GetGenericInterface(typeof(ICollection<>));
 
-        public static bool IsEnumerableType(this Type type) => typeof(IEnumerable).IsAssignableFrom(type);
+        public static bool IsEnumerableType(this Type type) => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
 
         public static bool IsListType(this Type type) => typeof(IList).IsAssignableFrom(type);
 
-        public static bool IsDictionaryType(this Type type) => type.GetDictionaryType() != null;
-
         public static bool IsReadOnlyDictionaryType(this Type type) => type.IsGenericType(typeof(IReadOnlyDictionary<,>)) || type.IsGenericType(typeof(ReadOnlyDictionary<,>));
-
-        public static bool ImplementsGenericInterface(this Type type, Type interfaceType) => type.GetGenericInterface(interfaceType) != null;
 
         public static bool IsGenericType(this Type type, Type genericType) => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
 
         public static Type GetIEnumerableType(this Type type) => type.GetGenericInterface(typeof(IEnumerable<>));
-
-        public static Type GetDictionaryType(this Type type) => type.GetGenericInterface(typeof(IDictionary<,>));
-
-        public static Type GetReadOnlyDictionaryType(this Type type) => type.GetGenericInterface(typeof(IReadOnlyDictionary<,>));
 
         public static Type GetGenericInterface(this Type type, Type genericInterface)
         {

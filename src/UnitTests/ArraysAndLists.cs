@@ -134,7 +134,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
 
             public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
                 IMemberMap memberMap,
-                Expression sourceExpression, Expression destExpression, Expression contextExpression)
+                Expression sourceExpression, Expression destExpression)
                 => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
         }
 
@@ -674,71 +674,6 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             _source.Values.ShouldBe(_destination.Values);
         }
     }
-
-    public class When_mapping_to_a_custom_collection_with_the_same_type_not_implementing_IList : AutoMapperSpecBase
-    {
-        private Source _source;
-
-        private Destination _destination;
-
-        public class ValueCollection : IEnumerable<int>
-        {
-            private List<int> implementation = new List<int>();
-
-            public ValueCollection(IEnumerable<int> items)
-            {
-                implementation = items.ToList();
-            }
-
-            public IEnumerator<int> GetEnumerator()
-            {
-                return implementation.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return ((IEnumerable)implementation).GetEnumerator();
-            }
-        }
-
-        public class Source
-        {
-            public ValueCollection Values { get; set; }
-        }
-
-        public class Destination
-        {
-            public ValueCollection Values { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>();
-        });
-
-        protected override void Establish_context()
-        {
-            _source = new Source { Values = new ValueCollection(new[] { 1, 2, 3, 4 }) };
-        }
-
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Source, Destination>(_source);
-        }
-
-        [Fact]
-        public void Should_map_the_list_of_source_items()
-        {
-            // here not the EnumerableMapper is used, but just the AssignableMapper!
-            _destination.Values.ShouldBeSameAs(_source.Values);
-            _destination.Values.ShouldNotBeNull();
-            _destination.Values.ShouldContain(1);
-            _destination.Values.ShouldContain(2);
-            _destination.Values.ShouldContain(3);
-            _destination.Values.ShouldContain(4);
-        }
-    }
-
     public class When_mapping_to_a_collection_with_instantiation_managed_by_the_destination : AutoMapperSpecBase
     {
         private Destination _destination;

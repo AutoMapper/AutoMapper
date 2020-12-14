@@ -15,8 +15,7 @@ namespace AutoMapper.Mappers
         private static readonly MethodInfo EqualsMethodInfo = typeof(StringToEnumMapper).GetMethod("StringCompareOrdinalIgnoreCase");
         public bool IsMatch(in TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
             var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),

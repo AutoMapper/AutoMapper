@@ -9,8 +9,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.Execution
 {
     using static Expression;
-    using static Internal.ExpressionFactory;
-    using static ElementTypeHelper;
+    using static ExpressionFactory;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ObjectFactory
     {
@@ -56,7 +55,7 @@ namespace AutoMapper.Execution
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
             type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
             type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
-            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), GetElementType(type)) : 
+            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), ReflectionHelper.GetElementType(type)) : 
             InvalidInterfaceType(type);
         private static Expression CreateCollection(Type type, Type collectionType, Type genericArgument = null) => ToType(New(MakeGenericType(type, collectionType, genericArgument)), type);
         private static Type MakeGenericType(Type type, Type collectionType, Type genericArgument = null) => genericArgument == null ?

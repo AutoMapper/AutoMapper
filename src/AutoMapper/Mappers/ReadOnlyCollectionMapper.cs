@@ -7,17 +7,17 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers
 {
     using static Expression;
-    using static CollectionMapperExpressionFactory;
+    using static ExpressionFactory;
 
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType(typeof(ReadOnlyCollection<>));
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
-            var listType = typeof(List<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
-            var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType), contextExpression, typeof(List<>), MapItemExpr);
-            var ctor = destExpression.Type.GetDeclaredConstructors().First();
+            var listType = typeof(List<>).MakeGenericType(destExpression.Type.GenericTypeArguments);
+            var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType));
+            var ctor = destExpression.Type.GetConstructors()[0];
             return New(ctor, list);
         }
     }

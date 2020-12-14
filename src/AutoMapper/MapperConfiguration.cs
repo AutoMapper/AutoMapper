@@ -193,8 +193,7 @@ namespace AutoMapper
                 var checkNullValueTypeDest = CheckNullValueType(destination, runtimeDestinationType);
                 var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap,
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType),
-                                                                        ToType(checkNullValueTypeDest, runtimeDestinationType),
-                                                                        ContextParameter);
+                                                                        ToType(checkNullValueTypeDest, runtimeDestinationType));
                 var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(IMemberMap)));
                 var throwExpression = Throw(newException, runtimeDestinationType);
                 fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
