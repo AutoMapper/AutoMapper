@@ -13,10 +13,10 @@ namespace AutoMapper.Configuration
         private LambdaExpression _sourceExpression;
         protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
 
-        public PathConfigurationExpression(LambdaExpression destinationExpression)
+        public PathConfigurationExpression(LambdaExpression destinationExpression, Stack<Member> chain)
         {
             _destinationExpression = destinationExpression;
-            MemberPath = new MemberPath(destinationExpression);
+            MemberPath = new MemberPath(chain);
         }
 
         public MemberPath MemberPath { get; }
@@ -60,11 +60,11 @@ namespace AutoMapper.Configuration
 
         internal static IPropertyMapConfiguration Create(LambdaExpression destination, LambdaExpression source)
         {
-            if (destination == null || !destination.IsMemberPath())
+            if (destination == null || !destination.IsMemberPath(out var chain))
             {
                 return null;
             }
-            var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
+            var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination, chain);
             if (reversed.MemberPath.Length == 1)
             {
                 var reversedMemberExpression = new MemberConfigurationExpression<TSource, TDestination, object>(reversed.DestinationMember, typeof(TSource));

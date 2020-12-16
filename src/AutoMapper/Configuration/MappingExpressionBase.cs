@@ -18,20 +18,22 @@ namespace AutoMapper.Configuration
         private List<ICtorParameterConfiguration> _ctorParamConfigurations;
         private List<IPropertyMapConfiguration> _memberConfigurations;
         private readonly MemberList _memberList;
+        private readonly TypePair _types;
+
         protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType) : this(memberList, new TypePair(sourceType, destinationType))
         {
         }
         protected MappingExpressionBase(MemberList memberList, in TypePair types)
         {
             _memberList = memberList;
-            Types = types;
+            _types = types;
         }
         protected bool Projection { get; set; }
-        public TypePair Types { get; }
+        public TypePair Types => _types;
         public bool IsReverseMap { get; set; }
         public TypeMap TypeMap { get; private set; }
-        public Type SourceType => Types.SourceType;
-        public Type DestinationType => Types.DestinationType;
+        public Type SourceType => _types.SourceType;
+        public Type DestinationType => _types.DestinationType;
         public Features<IMappingFeature> Features => _features ??= new();
         public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
         public IList<ValueTransformerConfiguration> ValueTransformers => _valueTransformers ??= new();
@@ -189,9 +191,10 @@ namespace AutoMapper.Configuration
 
         private void ReverseIncludedMembers(TypeMap typeMap)
         {
-            foreach (var includedMember in typeMap.IncludedMembers.Where(i => i.IsMemberPath()))
+            Stack<Member> chain = null;
+            foreach (var includedMember in typeMap.IncludedMembers.Where(i => i.IsMemberPath(out chain)))
             {
-                var memberPath = new MemberPath(includedMember);
+                var memberPath = new MemberPath(chain);
                 var newSource = Parameter(typeMap.DestinationType, "source");
                 var customExpression = Lambda(newSource, newSource);
                 ReverseSourceMembers(memberPath, customExpression);
@@ -224,7 +227,7 @@ namespace AutoMapper.Configuration
 
         protected void ForSourceMemberCore(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
-            var memberInfo = Types.SourceType.GetFieldOrProperty(sourceMemberName);
+            var memberInfo = SourceType.GetFieldOrProperty(sourceMemberName);
 
             ForSourceMemberCore(memberInfo, memberOptions);
         }
@@ -241,7 +244,7 @@ namespace AutoMapper.Configuration
         protected void IncludeCore(Type derivedSourceType, Type derivedDestinationType)
         {
             var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
-            derivedTypes.CheckIsDerivedFrom(Types);
+            derivedTypes.CheckIsDerivedFrom(_types);
             TypeMapActions.Add(tm => tm.IncludeDerivedTypes(derivedTypes));
         }
 
@@ -249,7 +252,7 @@ namespace AutoMapper.Configuration
         protected void IncludeBaseCore(Type sourceBase, Type destinationBase)
         {
             var baseTypes = new TypePair(sourceBase, destinationBase);
-            Types.CheckIsDerivedFrom(baseTypes);
+            _types.CheckIsDerivedFrom(baseTypes);
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
         }
 
@@ -410,7 +413,7 @@ namespace AutoMapper.Configuration
 
         public void As(Type typeOverride)
         {
-            typeOverride.CheckIsDerivedFrom(Types.DestinationType);
+            typeOverride.CheckIsDerivedFrom(DestinationType);
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 
@@ -481,7 +484,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            foreach(var property in Types.DestinationType.PropertiesWithAnInaccessibleSetter())
+            foreach(var property in DestinationType.PropertiesWithAnInaccessibleSetter())
             {
                 IgnoreDestinationMember(property);
             }
@@ -490,7 +493,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            foreach (var property in Types.SourceType.PropertiesWithAnInaccessibleSetter())
+            foreach (var property in SourceType.PropertiesWithAnInaccessibleSetter())
             {
                 ForSourceMember(property.Name, options => options.DoNotValidate());
             }

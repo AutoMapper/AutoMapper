@@ -48,10 +48,20 @@ namespace AutoMapper.Internal
             }
             return target;
         }
-        public static IEnumerable<MemberInfo> GetMembersChain(this LambdaExpression lambda) => lambda.Body.GetMembersChain();
+        public static MemberInfo[] GetMembersChain(this LambdaExpression lambda) => lambda.Body.GetMembersChain();
         public static MemberInfo GetMember(this LambdaExpression lambda) =>
             (lambda?.Body is MemberExpression memberExpression && memberExpression.Expression == lambda.Parameters[0]) ? memberExpression.Member : null;
-        public static IEnumerable<MemberInfo> GetMembersChain(this Expression expression) => expression.GetChain().Select(m => m.MemberInfo);
+        public static MemberInfo[] GetMembersChain(this Expression expression) => expression.GetChain().ToMemberInfos();
+        public static MemberInfo[] ToMemberInfos(this Stack<Member> chain)
+        {
+            var members = new MemberInfo[chain.Count];
+            int index = 0;
+            foreach (var member in chain)
+            {
+                members[index++] = member.MemberInfo;
+            }
+            return members;
+        }
         public static Stack<Member> GetChain(this Expression expression)
         {
             var stack = new Stack<Member>();
@@ -76,18 +86,6 @@ namespace AutoMapper.Internal
             }
             return stack;
         }
-        public readonly struct Member
-        {
-            public Member(Expression expression, MemberInfo memberInfo, Expression target)
-            {
-                Expression = expression;
-                MemberInfo = memberInfo;
-                Target = target;
-            }
-            public readonly Expression Expression;
-            public readonly MemberInfo MemberInfo;
-            public readonly Expression Target;
-        }
         public static IEnumerable<MemberExpression> GetMemberExpressions(this Expression expression)
         {
             if (expression is not MemberExpression memberExpression)
@@ -96,17 +94,11 @@ namespace AutoMapper.Internal
             }
             return expression.GetChain().Select(m => m.Expression as MemberExpression).TakeWhile(m => m != null);
         }
-        public static void EnsureMemberPath(this LambdaExpression exp, string name)
-        {
-            if (!exp.IsMemberPath())
-            {
-                throw new ArgumentOutOfRangeException(name, "Only member accesses are allowed. " + exp);
-            }
-        }
-        public static bool IsMemberPath(this LambdaExpression lambda)
+        public static bool IsMemberPath(this LambdaExpression lambda, out Stack<Member> members)
         {
             Expression currentExpression = null;
-            foreach (var member in lambda.Body.GetChain())
+            members = lambda.Body.GetChain();
+            foreach (var member in members)
             {
                 currentExpression = member.Expression;
                 if (!(currentExpression is MemberExpression))
@@ -116,9 +108,7 @@ namespace AutoMapper.Internal
             }
             return currentExpression == lambda.Body;
         }
-        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) =>
-            ReflectionHelper.GetMemberPath(type, memberPath).Lambda();
-        public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression)expression.Body).Method;
+        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) => ReflectionHelper.GetMemberPath(type, memberPath).Lambda();
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
             if (collection.Type.IsArray)
@@ -233,23 +223,17 @@ namespace AutoMapper.Internal
             }
             return TryFinally(body, disposeCall);
         }
-        public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
+        public static Expression IfNullElse(this Expression expression, Expression then, Expression @else)
         {
-            var nonNullElse = ToType(@else ?? Default(then.Type), then.Type);
-            Expression nullCheck;
+            var nonNullElse = ToType(@else, then.Type);
             if (expression.Type.IsValueType)
             {
-                if (!expression.Type.IsNullableType())
-                {
-                    return nonNullElse;
-                }
-                nullCheck = Equal(expression, Null);
+                return expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), nonNullElse, then) : nonNullElse;
             }
             else
             {
-                nullCheck = ReferenceEqual(expression, Null);
+                return Condition(ReferenceEqual(expression, Null), then, nonNullElse);
             }
-            return Condition(nullCheck, then, nonNullElse);
         }
         class ReplaceVisitorBase : ExpressionVisitor
         {
@@ -361,5 +345,26 @@ namespace AutoMapper.Internal
                 return Block(checkContext, checkNull);
             }
         }
+        public static Expression MapReadOnlyCollection(Type genericCollectionType, Type genericReadOnlyCollectionType, IGlobalConfiguration configurationProvider,
+            ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        {
+            var destinationTypeArguments = destExpression.Type.GenericTypeArguments;
+            var closedCollectionType = genericCollectionType.MakeGenericType(destinationTypeArguments);
+            var dict = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(closedCollectionType));
+            var readOnlyClosedType = destExpression.Type.IsInterface ? genericReadOnlyCollectionType.MakeGenericType(destinationTypeArguments) : destExpression.Type;
+            return New(readOnlyClosedType.GetConstructors()[0], dict);
+        }
+    }
+    public readonly struct Member
+    {
+        public Member(Expression expression, MemberInfo memberInfo, Expression target)
+        {
+            Expression = expression;
+            MemberInfo = memberInfo;
+            Target = target;
+        }
+        public readonly Expression Expression;
+        public readonly MemberInfo MemberInfo;
+        public readonly Expression Target;
     }
 }

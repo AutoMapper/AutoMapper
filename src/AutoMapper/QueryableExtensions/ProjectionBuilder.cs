@@ -169,7 +169,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             {
                                 return instanceParameter;
                             }
-                            return customSource.IsMemberPath() ? customSource.ReplaceParameters(instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
+                            return customSource.IsMemberPath(out _) ? customSource.ReplaceParameters(instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
                         }
                     }
                     IProjectionMapper GetProjectionMapper()

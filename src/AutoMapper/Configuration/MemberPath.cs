@@ -12,7 +12,7 @@ namespace AutoMapper.Internal
     {
         public static readonly MemberPath Empty = new MemberPath(Array.Empty<MemberInfo>());
         public readonly MemberInfo[] Members;
-        public MemberPath(Expression destinationExpression) : this(MemberVisitor.GetMemberPath(destinationExpression))
+        public MemberPath(Stack<Member> members) : this(members.ToMemberInfos())
         {
         }
 

@@ -200,9 +200,9 @@ namespace AutoMapper.Execution
                 {
                     var setter = GetSetter(memberExpression);
                     var ifNull = setter == null
-                        ? Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath.")))
+                        ? Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath.")), memberExpression.Type)
                         : (Expression)Assign(setter, ObjectFactory.GenerateConstructorExpression(memberExpression.Type));
-                    return memberExpression.IfNullElse(ifNull);
+                    return memberExpression.IfNullElse(ifNull, Default(memberExpression.Type));
                 }
                 static Expression GetSetter(MemberExpression memberExpression) => memberExpression.Member switch
                 {

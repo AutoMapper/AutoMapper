@@ -37,13 +37,13 @@ namespace AutoMapper.UnitTests
         public void IsMemberPath()
         {
             Expression<Func<DateTime, DayOfWeek>> e = x => x.Date.AddDays(1).Date.AddHours(2).AddMinutes(2).Date.DayOfWeek;
-            e.IsMemberPath().ShouldBeFalse();
+            e.IsMemberPath(out _).ShouldBeFalse();
             e = x => x.Date.Date.DayOfWeek;
-            e.IsMemberPath().ShouldBeTrue();
+            e.IsMemberPath(out _).ShouldBeTrue();
             e = x => x.DayOfWeek;
-            e.IsMemberPath().ShouldBeTrue();
+            e.IsMemberPath(out _).ShouldBeTrue();
             e = x => x.AddDays(1).Date.DayOfWeek;
-            e.IsMemberPath().ShouldBeFalse();
+            e.IsMemberPath(out _).ShouldBeFalse();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression ReverseMap()
         {
-            var reversedTypes = new TypePair(Types.DestinationType, Types.SourceType);
+            var reversedTypes = new TypePair(DestinationType, SourceType);
             var reverseMap = new MappingExpression(reversedTypes, MemberList.None)
             {
                 IsReverseMap = true
@@ -67,7 +67,7 @@ namespace AutoMapper.Configuration
 
         internal MemberConfigurationExpression ForMember(MemberInfo destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
         {
-            var expression = new MemberConfigurationExpression(destinationProperty, Types.SourceType);
+            var expression = new MemberConfigurationExpression(destinationProperty, SourceType);
 
             MemberConfigurations.Add(expression);
 
@@ -153,8 +153,11 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            destinationMember.EnsureMemberPath(nameof(destinationMember));
-            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
+            if (!destinationMember.IsMemberPath(out var chain))
+            {
+                throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed. " + destinationMember);
+            }
+            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember, chain);
             var firstMember = expression.MemberPath.First;
             var firstMemberConfig = GetDestinationMemberConfiguration(firstMember);
             if(firstMemberConfig == null)
@@ -250,7 +253,7 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var reverseMap = new MappingExpression<TDestination, TSource>(MemberList.None, Types.DestinationType, Types.SourceType)
+            var reverseMap = new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType)
             {
                 IsReverseMap = true
             };
@@ -261,7 +264,7 @@ namespace AutoMapper.Configuration
 
         private IMappingExpression<TSource, TDestination> ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<MemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            var expression = new MemberConfigurationExpression<TSource, TDestination, TMember>(destinationProperty, Types.SourceType);
+            var expression = new MemberConfigurationExpression<TSource, TDestination, TMember>(destinationProperty, SourceType);
 
             MemberConfigurations.Add(expression);
 

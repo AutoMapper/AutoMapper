@@ -1,7 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Execution;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
@@ -25,24 +24,19 @@ namespace AutoMapper.Mappers
         {
             var destElementType = destExpression.Type.GetElementType();
             var sourceElementType = sourceExpression.Type.GetElementType();
-
             if (configurationProvider.FindTypeMapFor(sourceElementType, destElementType) != null)
+            {
                 return base.MapExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression);
-
-            var valueIfNullExpr = profileMap.AllowsNullCollectionsFor(memberMap) ? 
-                (Expression) Constant(null, destExpression.Type) : 
-                NewArrayBounds(destElementType, Constant(0));
-
+            }
             var dest = Parameter(destExpression.Type, "destArray");
             var sourceLength = Parameter(ArrayLengthProperty.PropertyType, "sourceLength");
-            var mapExpr = Block(
+            return Block(
                 new[] {dest, sourceLength},
                 Assign(sourceLength, Property(sourceExpression, ArrayLengthProperty)),
                 Assign(dest, NewArrayBounds(destElementType, sourceLength)),
                 Call(ArrayCopyMethod, sourceExpression, dest, sourceLength),
                 dest
             );
-            return Condition(ReferenceEqual(sourceExpression, ExpressionFactory.Null), valueIfNullExpr, mapExpr);
         }
     }
 }
