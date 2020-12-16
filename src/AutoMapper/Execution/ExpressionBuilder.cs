@@ -76,9 +76,9 @@ namespace AutoMapper.Execution
             var isIList = isCollection && destinationType.IsListType();
             var destinationCollectionType = isIList ? typeof(IList) : destinationType.GetCollectionType();
             var defaultDestination = DefaultDestination();
-            var destination = memberMap == null
-                ? destinationParameter.IfNullElse(defaultDestination, destinationParameter)
-                : memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
+            var destination = memberMap == null ? 
+                destinationParameter.IfNullElse(defaultDestination, destinationParameter) :
+                memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
             var ifSourceNull = destinationCollectionType != null ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()

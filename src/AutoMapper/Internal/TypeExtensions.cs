@@ -26,10 +26,9 @@ namespace AutoMapper.Internal
         public static IEnumerable<Type> BaseClassesAndInterfaces(this Type type)
         {
             var currentType = type;
-            while (currentType != null)
+            while ((currentType = currentType.BaseType) != null)
             {
                 yield return currentType;
-                currentType = currentType.BaseType;
             }
             foreach (var interfaceType in type.GetInterfaces())
             {
@@ -37,13 +36,13 @@ namespace AutoMapper.Internal
             }
         }
 
-        public static PropertyInfo GetInheritedProperty(this Type type, string name) =>
+        public static PropertyInfo GetInheritedProperty(this Type type, string name) => type.GetProperty(name, InstanceFlags) ??
             type.BaseClassesAndInterfaces().Select(t => t.GetProperty(name, InstanceFlags)).FirstOrDefault(p => p != null);
 
-        public static FieldInfo GetInheritedField(this Type type, string name) =>
+        public static FieldInfo GetInheritedField(this Type type, string name) => type.GetField(name, InstanceFlags) ??
             type.BaseClassesAndInterfaces().Select(t => t.GetField(name, InstanceFlags)).FirstOrDefault(f => f != null);
 
-        public static MethodInfo GetInheritedMethod(this Type type, string name) =>
+        public static MethodInfo GetInheritedMethod(this Type type, string name) => type.GetMethod(name, InstanceFlags) ??
             type.BaseClassesAndInterfaces().Select(t => t.GetMethod(name, InstanceFlags)).FirstOrDefault(m => m != null)
             ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
