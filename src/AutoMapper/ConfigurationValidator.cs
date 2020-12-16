@@ -91,7 +91,7 @@ namespace AutoMapper.Internal
             }
         }
 
-        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, IMemberMap memberMap)
+        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
         {
             if(typeMap == null)
             {
@@ -159,19 +159,19 @@ namespace AutoMapper.Internal
     public readonly struct ValidationContext
     {
         public readonly IObjectMapper ObjectMapper { get; }
-        public readonly IMemberMap MemberMap { get; }
+        public readonly MemberMap MemberMap { get; }
         public readonly TypeMap TypeMap { get; }
         public readonly TypePair Types { get; }
 
-        public ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
+        public ValidationContext(TypePair types, MemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
         {
         }
 
-        public ValidationContext(TypePair types, IMemberMap memberMap, TypeMap typeMap) : this(types, memberMap, null, typeMap)
+        public ValidationContext(TypePair types, MemberMap memberMap, TypeMap typeMap) : this(types, memberMap, null, typeMap)
         {
         }
 
-        private ValidationContext(TypePair types, IMemberMap memberMap, IObjectMapper objectMapper, TypeMap typeMap)
+        private ValidationContext(TypePair types, MemberMap memberMap, IObjectMapper objectMapper, TypeMap typeMap)
         {
             ObjectMapper = objectMapper;
             TypeMap = typeMap;

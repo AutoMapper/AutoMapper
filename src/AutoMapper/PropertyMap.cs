@@ -11,7 +11,7 @@ namespace AutoMapper
 {
     [DebuggerDisplay("{DestinationMember.Name}")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class PropertyMap : DefaultMemberMap
+    public class PropertyMap : MemberMap
     {
         private MemberInfo[] _sourceMembers = Array.Empty<MemberInfo>();
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;

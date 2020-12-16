@@ -9,7 +9,7 @@ using System.Reflection;
 namespace AutoMapper
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class ConstructorParameterMap : DefaultMemberMap
+    public class ConstructorParameterMap : MemberMap
     {
         private readonly MemberInfo[] _sourceMembers;
         private Type _sourceType;

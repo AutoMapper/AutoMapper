@@ -59,7 +59,7 @@ namespace AutoMapper
             => source.ProjectTo(destinationType, ConfigurationProvider, parameters, membersToExpand);
 
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
-            ResolutionContext context, Type sourceType, Type destinationType, IMemberMap memberMap) =>
+            ResolutionContext context, Type sourceType, Type destinationType, MemberMap memberMap) =>
             MapCore(source, destination, context, sourceType, destinationType, memberMap);
 
         private TDestination MapWithOptions<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts,
@@ -74,7 +74,7 @@ namespace AutoMapper
         }
 
         private TDestination MapCore<TSource, TDestination>(
-            TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, IMemberMap memberMap = null)
+            TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, MemberMap memberMap = null)
         {
             var runtimeTypes = new TypePair(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
             var requestedTypes = new TypePair(typeof(TSource), typeof(TDestination));

@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     {
         public override bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsEnumerableType();
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, destExpression);
     }
 }

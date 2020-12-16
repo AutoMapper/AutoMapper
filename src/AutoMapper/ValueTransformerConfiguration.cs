@@ -13,7 +13,7 @@ namespace AutoMapper
             ValueType = valueType;
             TransformerExpression = transformerExpression;
         }
-        public bool IsMatch(IMemberMap memberMap) 
+        public bool IsMatch(MemberMap memberMap) 
             => ValueType.IsAssignableFrom(memberMap.SourceType) && memberMap.DestinationType.IsAssignableFrom(ValueType);
     }
 

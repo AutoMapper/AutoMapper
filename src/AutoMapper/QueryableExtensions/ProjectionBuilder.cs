@@ -112,7 +112,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                 }
             }
-            Expression TryProjectMember(IMemberMap memberMap, bool? explicitExpansion = null)
+            Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null)
             {
                 var memberProjection = new MemberProjection(memberMap);
                 letPropertyMaps.Push(memberProjection);
@@ -193,7 +193,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 _ => New(typeMap.DestinationTypeToUse)
             };
         }
-        private static AutoMapperMappingException CannotMap(IMemberMap memberMap, Type sourceType) => new AutoMapperMappingException(
+        private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new AutoMapperMappingException(
             $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
             null, memberMap);
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -367,9 +367,9 @@ namespace AutoMapper.QueryableExtensions.Impl
     }
     public class MemberProjection
     {
-        public MemberProjection(IMemberMap memberMap) => MemberMap = memberMap;
+        public MemberProjection(MemberMap memberMap) => MemberMap = memberMap;
         public Expression Expression { get; set; }
-        public IMemberMap MemberMap { get; }
+        public MemberMap MemberMap { get; }
     }
     abstract class ParameterExpressionVisitor : ExpressionVisitor
     {

@@ -133,7 +133,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
                 => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
 
             public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-                IMemberMap memberMap,
+                MemberMap memberMap,
                 Expression sourceExpression, Expression destExpression)
                 => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
         }

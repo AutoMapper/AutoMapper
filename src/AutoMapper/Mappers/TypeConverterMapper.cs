@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(in TypePair context) =>
             GetConverter(context.SourceType).CanConvertTo(context.DestinationType) || GetConverter(context.DestinationType).CanConvertFrom(context.SourceType);
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
     }
 }

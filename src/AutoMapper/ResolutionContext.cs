@@ -79,7 +79,7 @@ namespace AutoMapper
         object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
             => _inner.Map(source, destination, this, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
-            Type sourceType, Type destinationType, IMemberMap memberMap)
+            Type sourceType, Type destinationType, MemberMap memberMap)
             => _inner.Map(source, destination, context, sourceType, destinationType, memberMap);
         internal object CreateInstance(Type type)
         {
@@ -125,9 +125,9 @@ namespace AutoMapper
                 resolutionContext = new ResolutionContext(resolutionContext._inner);
             }
         }
-        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, IMemberMap memberMap)
+        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, MemberMap memberMap)
             => _inner.Map(source, destination, this, memberMap: memberMap);
-        internal object Map(object source, object destination, Type sourceType, Type destinationType, IMemberMap memberMap)
+        internal object Map(object source, object destination, Type sourceType, Type destinationType, MemberMap memberMap)
             => _inner.Map(source, destination, this, sourceType, destinationType, memberMap);
         private void CheckDefault()
         {

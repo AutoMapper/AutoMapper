@@ -28,7 +28,7 @@ namespace AutoMapper.Execution
             ProfileMap profileMap,
             in TypePair typePair,
             Expression sourceParameter,
-            IMemberMap propertyMap = null,
+            MemberMap propertyMap = null,
             Expression destinationParameter = null)
         {
             if (destinationParameter == null)
@@ -69,7 +69,7 @@ namespace AutoMapper.Execution
             Expression sourceParameter,
             Expression destinationParameter,
             Expression mapExpression,
-            IMemberMap memberMap)
+            MemberMap memberMap)
         {
             var destinationType = destinationParameter.Type;
             var isCollection = destinationType.IsEnumerableType();
@@ -107,7 +107,7 @@ namespace AutoMapper.Execution
         }
 
         private static Expression ObjectMapperExpression(IGlobalConfiguration configurationProvider,
-            ProfileMap profileMap, in TypePair typePair, Expression sourceParameter, IMemberMap propertyMap,
+            ProfileMap profileMap, in TypePair typePair, Expression sourceParameter, MemberMap propertyMap,
             Expression destinationParameter)
         {
             var match = configurationProvider.FindMapper(typePair);
@@ -120,10 +120,10 @@ namespace AutoMapper.Execution
             return ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
         }
 
-        public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression destinationParameter, IMemberMap memberMap)
+        public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(IMemberMap)));
+            return Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
         }
 
         public static Expression CheckContext(TypeMap typeMap)
@@ -140,22 +140,22 @@ namespace AutoMapper.Execution
                 Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap.Types), Constant(typeMap.MaxDepth)) :
                 null;
 
-        public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, IMemberMap memberMap = null) =>
+        public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, MemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullDestinationValues;
 
-        public static bool AllowsNullCollectionsFor(this ProfileMap profile, IMemberMap memberMap = null) =>
+        public static bool AllowsNullCollectionsFor(this ProfileMap profile, MemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullCollections;
 
-        public static bool AllowsNullDestinationValues(this IMemberMap memberMap) => 
+        public static bool AllowsNullDestinationValues(this MemberMap memberMap) => 
             memberMap.TypeMap.Profile.AllowsNullDestinationValuesFor(memberMap);
 
-        public static bool AllowsNullCollections(this IMemberMap memberMap) =>
+        public static bool AllowsNullCollections(this MemberMap memberMap) =>
             memberMap.TypeMap.Profile.AllowsNullCollectionsFor(memberMap);
 
-        public static Expression NullSubstitute(this IMemberMap memberMap, Expression sourceExpression) =>
+        public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
 
-        public static Expression ApplyTransformers(this IMemberMap memberMap, Expression source)
+        public static Expression ApplyTransformers(this MemberMap memberMap, Expression source)
         {
             var perMember = memberMap.ValueTransformers;
             var perMap = memberMap.TypeMap.ValueTransformers;
@@ -166,7 +166,7 @@ namespace AutoMapper.Execution
             }
             var transformers = perMember.Concat(perMap).Concat(perProfile);
             return Apply(transformers, memberMap, source);
-            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, IMemberMap memberMap, Expression source) => 
+            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, MemberMap memberMap, Expression source) => 
                 transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source,
                     (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
         }

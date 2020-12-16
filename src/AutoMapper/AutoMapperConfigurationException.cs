@@ -8,7 +8,7 @@ namespace AutoMapper
     {
         public TypeMapConfigErrors[] Errors { get; }
         public TypePair? Types { get; }
-        public IMemberMap MemberMap { get; set; }
+        public MemberMap MemberMap { get; set; }
 
         public class TypeMapConfigErrors
         {

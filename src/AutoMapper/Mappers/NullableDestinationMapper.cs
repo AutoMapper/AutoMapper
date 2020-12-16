@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(in TypePair context) => context.DestinationType.IsNullableType();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             ExpressionBuilder.MapExpression(configurationProvider, profileMap,
                 new TypePair(sourceExpression.Type, Nullable.GetUnderlyingType(destExpression.Type)),
                 sourceExpression,

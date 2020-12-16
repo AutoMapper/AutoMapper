@@ -9,8 +9,8 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MappedTypeProjectionMapper : IProjectionMapper
     {
-        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) => memberTypeMap != null;
-        public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
+        public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) => memberTypeMap != null;
+        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
             var transformedExpression = configuration.ProjectionBuilder.CreateInnerProjection(request, resolvedSource, letPropertyMaps);
             if(transformedExpression == null)

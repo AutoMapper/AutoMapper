@@ -46,7 +46,7 @@ namespace AutoMapper.Mappers
         }
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
                     sourceExpression.Type.GetElementType()),

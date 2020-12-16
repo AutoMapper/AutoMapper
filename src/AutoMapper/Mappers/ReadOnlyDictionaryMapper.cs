@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     public class ReadOnlyDictionaryMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsReadOnlyDictionaryType();
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var dictionaryTypes = destExpression.Type.GenericTypeArguments;
             var dictType = typeof(Dictionary<,>).MakeGenericType(dictionaryTypes);

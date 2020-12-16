@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests.Mappers
             }
 
             public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-                IMemberMap memberMap,
+                MemberMap memberMap,
                 Expression sourceExpression, Expression destExpression)
             {
                 Expression<Func<DestinationType>> expr = () => new DestinationType();

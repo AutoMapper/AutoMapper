@@ -6,7 +6,7 @@ namespace AutoMapper
     public class KeyValueMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.SourceType.IsKeyValue() && context.DestinationType.IsKeyValue();
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var sourceType = sourceExpression.Type;
             var destinationType = destExpression.Type;

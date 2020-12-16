@@ -31,7 +31,7 @@ namespace AutoMapper
         /// 
         /// <returns>Map expression</returns>
         Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression);
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ namespace AutoMapper
         public abstract TDestination Map(TSource source, TDestination destination, Type sourceType, Type destinationType, ResolutionContext context);
 
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(
                 Constant(this),
                 MapMethod,

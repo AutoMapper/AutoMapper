@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
         private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetStaticMethod(nameof(MembersDictionary));
         public bool IsMatch(in TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
             => MapCollectionExpression(configurationProvider, profileMap, memberMap,
                 Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression);
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)

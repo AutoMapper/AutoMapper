@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
         public bool IsMatch(in TypePair context) => context.DestinationType.IsAssignableFrom(context.SourceType) ||
             context.IsEnumToUnderlyingType() || context.IsUnderlyingTypeToEnum();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
             => sourceExpression;
     }
 }

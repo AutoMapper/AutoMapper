@@ -28,12 +28,12 @@ namespace AutoMapper
         public AutoMapperMappingException(string message, Exception innerException, TypeMap typeMap)
             : this(message, innerException, typeMap.Types) => TypeMap = typeMap;
 
-        public AutoMapperMappingException(string message, Exception innerException, IMemberMap memberMap)
+        public AutoMapperMappingException(string message, Exception innerException, MemberMap memberMap)
             : this(message, innerException, memberMap.TypeMap) => MemberMap = memberMap;
 
         public TypePair? Types { get; set; }
         public TypeMap TypeMap { get; set; }
-        public IMemberMap MemberMap { get; set; }
+        public MemberMap MemberMap { get; set; }
 
         public override string Message
         {

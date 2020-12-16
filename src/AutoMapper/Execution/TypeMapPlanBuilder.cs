@@ -30,7 +30,7 @@ namespace AutoMapper.Execution
         }
         public Type DestinationType => _destination.Type;
         public ParameterExpression Source { get; }
-        private static AutoMapperMappingException MemberMappingError(Exception innerException, IMemberMap memberMap) => 
+        private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => 
             new AutoMapperMappingException("Error mapping types.", innerException, memberMap);
         public LambdaExpression CreateMapperLambda()
         {
@@ -104,9 +104,9 @@ namespace AutoMapper.Execution
             }
             typeMapsPath.Remove(typeMap);
             return;
-            IEnumerable<IMemberMap> MemberMaps() =>
+            IEnumerable<MemberMap> MemberMaps() =>
                 typeMap.MemberMaps.Concat(configurationProvider.GetIncludedTypeMaps(typeMap).SelectMany(tm => tm.MemberMaps));
-            TypeMap ResolveMemberTypeMap(IMemberMap memberMap)
+            TypeMap ResolveMemberTypeMap(MemberMap memberMap)
             {
                 if (!memberMap.CanResolveValue)
                 {
@@ -271,12 +271,12 @@ namespace AutoMapper.Execution
             var propertyMapExpression = CreatePropertyMapFunc(propertyMap, _destination, propertyMap.DestinationMember);
             return TryMemberMap(propertyMap, propertyMapExpression);
         }
-        private static Expression TryMemberMap(IMemberMap memberMap, Expression memberMapExpression)
+        private static Expression TryMemberMap(MemberMap memberMap, Expression memberMapExpression)
         {
             var newException = Call(MappingError, ExceptionParameter, Constant(memberMap));
             return TryCatch(memberMapExpression, Catch(ExceptionParameter, Throw(newException, memberMapExpression.Type)));
         }
-        private Expression CreatePropertyMapFunc(IMemberMap memberMap, Expression destination, MemberInfo destinationMember)
+        private Expression CreatePropertyMapFunc(MemberMap memberMap, Expression destination, MemberInfo destinationMember)
         {
             Expression destinationMemberAccess, destinationMemberGetter;
             bool destinationMemberReadOnly;
@@ -314,7 +314,7 @@ namespace AutoMapper.Execution
                 Precondition(memberMap);
             }
             return Block(_propertyMapVariables, _propertyMapExpressions);
-            Expression DestinationMemberValue(IMemberMap memberMap, Expression destinationMemberGetter, bool destinationMemberReadOnly)
+            Expression DestinationMemberValue(MemberMap memberMap, Expression destinationMemberGetter, bool destinationMemberReadOnly)
             {
                 if (memberMap is { UseDestinationValue: true } || (memberMap.UseDestinationValue is null && destinationMemberReadOnly))
                 {
@@ -329,14 +329,14 @@ namespace AutoMapper.Execution
                     return Condition(ReferenceEqual(_initialDestination, Null), Default(memberMap.DestinationType), destinationMemberGetter);
                 }
             }
-            void Precondition(IMemberMap memberMap)
+            void Precondition(MemberMap memberMap)
             {
                 var preCondition = memberMap.PreCondition.ConvertReplaceParameters(GetCustomSource(memberMap), _destination, ContextParameter);
                 var ifThen = IfThen(preCondition, Block(_propertyMapExpressions));
                 _propertyMapExpressions.Clear();
                 _propertyMapExpressions.Add(ifThen);
             }
-            Expression MapMember(IMemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
+            Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
             {
                 var typePair = new TypePair(resolvedValue.Type, memberMap.DestinationType);
                 var mapMember = memberMap.Inline ?
@@ -365,7 +365,7 @@ namespace AutoMapper.Execution
                 return mappedMemberVariable;
             }
         }
-        private Expression BuildValueResolverFunc(IMemberMap memberMap, Expression destValueExpr)
+        private Expression BuildValueResolverFunc(MemberMap memberMap, Expression destValueExpr)
         {
             var customSource = GetCustomSource(memberMap);
             var destinationPropertyType = memberMap.DestinationType;
@@ -402,10 +402,10 @@ namespace AutoMapper.Execution
                 return TryCatch(mapFrom, Catch(typeof(NullReferenceException), defaultExpression), Catch(typeof(ArgumentNullException), defaultExpression));
             }
         }
-        private Expression GetCustomSource(IMemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
-        private Expression Chain(Expression source, IMemberMap memberMap, Type destinationType) => memberMap.SourceMembers.Chain(source).NullCheck(destinationType);
+        private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
+        private Expression Chain(Expression source, MemberMap memberMap, Type destinationType) => memberMap.SourceMembers.Chain(source).NullCheck(destinationType);
         private Expression ServiceLocator(Type type) => Call(ContextParameter, ContextCreate, Constant(type));
-        private Expression BuildResolveCall(Expression source, Expression destValueExpr, IMemberMap memberMap)
+        private Expression BuildResolveCall(Expression source, Expression destValueExpr, MemberMap memberMap)
         {
             var typeMap = memberMap.TypeMap;
             var valueResolverConfig = memberMap.ValueResolverConfig;
@@ -428,7 +428,7 @@ namespace AutoMapper.Execution
                 .Concat(new[] {ContextParameter});
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetMethod("Resolve"), parameters);
         }
-        private Expression BuildConvertCall(Expression source, IMemberMap memberMap)
+        private Expression BuildConvertCall(Expression source, MemberMap memberMap)
         {
             var valueConverterConfig = memberMap.ValueConverterConfig;
             var iResolverType = valueConverterConfig.InterfaceType;

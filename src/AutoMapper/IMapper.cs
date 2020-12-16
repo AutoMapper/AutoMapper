@@ -138,7 +138,7 @@ namespace AutoMapper
     }
     internal interface IInternalRuntimeMapper : IRuntimeMapper
     {
-        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, IMemberMap memberMap = null);
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, MemberMap memberMap = null);
         ResolutionContext DefaultContext { get; }
     }
 }

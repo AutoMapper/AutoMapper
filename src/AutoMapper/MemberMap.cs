@@ -9,16 +9,15 @@ using System.Reflection;
 namespace AutoMapper
 {
     using static Expression;
-
     /// <summary>
-    /// Member maps with default values. Used in dynamic/dictionary scenarios when source/destination members do not exist.
+    /// The base class for member maps (property, constructor and path maps).
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class DefaultMemberMap : IMemberMap
+    public class MemberMap
     {
-        protected DefaultMemberMap() { }
+        protected MemberMap() { }
 
-        public static readonly IMemberMap Instance = new DefaultMemberMap();
+        public static readonly MemberMap Instance = new MemberMap();
 
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType { get => default; protected set { } }

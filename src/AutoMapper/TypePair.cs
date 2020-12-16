@@ -12,9 +12,9 @@ namespace AutoMapper
     {
         public readonly TypePair RequestedTypes;
         public readonly TypePair RuntimeTypes;
-        public readonly IMemberMap MemberMap;
+        public readonly MemberMap MemberMap;
 
-        public MapRequest(in TypePair requestedTypes, in TypePair runtimeTypes, IMemberMap memberMap = null) 
+        public MapRequest(in TypePair requestedTypes, in TypePair runtimeTypes, MemberMap memberMap = null) 
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;

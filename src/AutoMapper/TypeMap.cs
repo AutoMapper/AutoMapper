@@ -70,7 +70,7 @@ namespace AutoMapper
         internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator && 
             !CustomConstruction && !HasTypeConverter && DestinationConstructors.Length > 0;
 
-        public TypePair Types { get; }
+        public TypePair Types;
 
         public ConstructorMap ConstructorMap { get; set; }
 
@@ -112,11 +112,11 @@ namespace AutoMapper
         public IReadOnlyCollection<PropertyMap> PropertyMaps => 
             _orderedPropertyMaps ?? (_propertyMaps?.Values).NullCheck();
         public IReadOnlyCollection<PathMap> PathMaps => (_pathMaps?.Values).NullCheck();
-        public IEnumerable<IMemberMap> MemberMaps
+        public IEnumerable<MemberMap> MemberMaps
         {
             get
             {
-                IEnumerable<IMemberMap> maps = PropertyMaps;
+                IEnumerable<MemberMap> maps = PropertyMaps;
                 if (_pathMaps != null)
                 {
                     maps = maps.Concat(_pathMaps.Values);

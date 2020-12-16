@@ -194,7 +194,7 @@ namespace AutoMapper
                 var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap,
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType),
                                                                         ToType(checkNullValueTypeDest, runtimeDestinationType));
-                var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(IMemberMap)));
+                var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(MemberMap)));
                 var throwExpression = Throw(newException, runtimeDestinationType);
                 fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
             }
@@ -202,7 +202,7 @@ namespace AutoMapper
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, ContextParameter);
         }
-        public static AutoMapperMappingException GetMappingError(Exception innerException, TypePair types, IMemberMap memberMap) =>
+        public static AutoMapperMappingException GetMappingError(Exception innerException, TypePair types, MemberMap memberMap) =>
             new("Error mapping types.", innerException, types) { MemberMap = memberMap };
         IReadOnlyCollection<TypeMap> IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values;
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);

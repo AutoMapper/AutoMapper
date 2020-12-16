@@ -274,7 +274,7 @@ namespace AutoMapper.Internal
         {
             public override void Replace(Expression oldNode, Expression newNode) => base.Replace(oldNode, ToType(newNode, oldNode.Type));
         }
-        public static Expression MapCollectionExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        public static Expression MapCollectionExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             MethodInfo addMethod;
             bool isIList;

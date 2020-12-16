@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(in TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType(typeof(ReadOnlyCollection<>));
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var listType = typeof(List<>).MakeGenericType(destExpression.Type.GenericTypeArguments);
             var list = MapCollectionExpression(configurationProvider, profileMap, memberMap, sourceExpression, Default(listType));

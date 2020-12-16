@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
             return sourceElementType.IsPrimitive && sourceElementType == context.DestinationType.GetElementType();
         }
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression)
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destElementType = destExpression.Type.GetElementType();
             var sourceElementType = sourceExpression.Type.GetElementType();

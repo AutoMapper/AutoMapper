@@ -47,7 +47,7 @@ namespace AutoMapper.Internal
         {
             var memberType = GetMemberType(member);
             var destValue = destination == null ? null : GetMemberValue(member, destination);
-            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, DefaultMemberMap.Instance);
+            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, MemberMap.Instance);
         }
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {

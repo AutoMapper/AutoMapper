@@ -8,9 +8,9 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumProjectionMapper : IProjectionMapper
     {
-        public Expression Project(IGlobalConfiguration configuration, IMemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
             => Convert(resolvedSource, memberMap.DestinationType);
-        public bool IsMatch(IMemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource)
+        public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource)
         {
             var types = memberMap.Types();
             return types.IsEnumToEnum() || types.IsUnderlyingTypeToEnum() || types.IsEnumToUnderlyingType();
