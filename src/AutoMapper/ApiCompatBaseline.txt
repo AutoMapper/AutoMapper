@@ -300,11 +300,12 @@ TypesMustExist : Type 'AutoMapper.Internal.CollectionMapperExpressionFactory' do
 TypesMustExist : Type 'AutoMapper.Internal.ElementTypeFlags' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Internal.ElementTypeHelper' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>..ctor(System.Func<TKey, TValue>)' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'key' on method 'AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.ContainsKey(TKey)' are 'in' in the implementation but '<none>' in the contract.
+MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.ContainsKey(TKey)' does not exist in the implementation but it does exist in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'key' on method 'AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.GetOrAdd(TKey)' are 'in' in the implementation but '<none>' in the contract.
 MembersMustExist : Member 'public TValue AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.GetOrAdd(TKey, System.Func<TKey, System.Lazy<TValue>>)' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'key' on method 'AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Item.get(TKey)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'key' on method 'AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Item.set(TKey, TValue)' are 'in' in the implementation but '<none>' in the contract.
+MembersMustExist : Member 'public TValue AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Item.get(TKey)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public void AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Item.set(TKey, TValue)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Collections.Generic.ICollection<TKey> AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Keys.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.TryGetValue(TKey, TValue)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> AutoMapper.Internal.MemberVisitor.GetMemberPath(System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> AutoMapper.Internal.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
@@ -398,4 +399,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 399
+Total Issues: 400
