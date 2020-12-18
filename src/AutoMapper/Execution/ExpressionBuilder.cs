@@ -9,6 +9,7 @@ namespace AutoMapper.Execution
     using static Internal.ExpressionFactory;
     using static Expression;
     using System.Collections;
+    using System;
 
     public static class ExpressionBuilder
     {
@@ -71,14 +72,28 @@ namespace AutoMapper.Execution
             Expression mapExpression,
             MemberMap memberMap)
         {
+            var sourceType = sourceParameter.Type;
+            if (sourceType.IsValueType && !sourceType.IsNullableType())
+            {
+                return mapExpression;
+            }
             var destinationType = destinationParameter.Type;
             var isCollection = destinationType.IsEnumerableType();
-            var isIList = isCollection && destinationType.IsListType();
-            var destinationCollectionType = isIList ? typeof(IList) : destinationType.GetCollectionType();
-            var defaultDestination = DefaultDestination();
+            bool isIList;
+            Type destinationCollectionType;
+            if (isCollection)
+            {
+                isIList = destinationType.IsListType();
+                destinationCollectionType = isIList ? typeof(IList) : destinationType.GetCollectionType();
+            }
+            else
+            {
+                isIList = false;
+                destinationCollectionType = null;
+            }
             var destination = memberMap == null ? 
-                destinationParameter.IfNullElse(defaultDestination, destinationParameter) :
-                memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : defaultDestination;
+                destinationParameter.IfNullElse(DefaultDestination(), destinationParameter) :
+                memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : DefaultDestination();
             var ifSourceNull = destinationCollectionType != null ? ClearDestinationCollection() : destination;
             return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
@@ -100,7 +115,7 @@ namespace AutoMapper.Execution
                 if (destinationType.IsArray)
                 {
                     var destinationElementType = destinationType.GetElementType();
-                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Zero, destinationType.GetArrayRank()));
                 }
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
             }

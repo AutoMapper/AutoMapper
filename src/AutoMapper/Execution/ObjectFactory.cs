@@ -55,15 +55,14 @@ namespace AutoMapper.Execution
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
             type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
             type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
-            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), ReflectionHelper.GetElementType(type)) : 
+            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) : 
             InvalidInterfaceType(type);
-        private static Expression CreateCollection(Type type, Type collectionType, Type genericArgument = null) => ToType(New(MakeGenericType(type, collectionType, genericArgument)), type);
-        private static Type MakeGenericType(Type type, Type collectionType, Type genericArgument = null) => genericArgument == null ?
-            collectionType.MakeGenericType(type.GenericTypeArguments) :
-            collectionType.MakeGenericType(genericArgument);
+        private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? new[] { typeof(object) };
+        private static Expression CreateCollection(Type type, Type collectionType, Type[] genericArguments = null) => 
+            ToType(New(collectionType.MakeGenericType(genericArguments ?? type.GenericTypeArguments)), type);
         private static Expression CreateReadOnlyCollection(Type type, Type collectionType)
         {
-            var listType = MakeGenericType(type, collectionType);
+            var listType = collectionType.MakeGenericType(type.GenericTypeArguments);
             var ctor = listType.GetConstructors()[0];
             var innerType = ctor.GetParameters()[0].ParameterType;
             return ToType(New(ctor, GenerateConstructorExpression(innerType)), type);

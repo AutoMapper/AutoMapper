@@ -12,16 +12,17 @@ namespace AutoMapper.Internal
 {
     using static Expression;
     using static ExpressionBuilder;
+    using static ReflectionHelper;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
-        public static readonly PropertyInfo ArrayLength = typeof(Array).GetProperty("Length");
         public static readonly MethodInfo ObjectToString = typeof(object).GetMethod("ToString");
         private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod("Dispose");
-        public static readonly Expression False = Constant(false);
-        public static readonly Expression True = Constant(true);
-        public static readonly Expression Null = Constant(null);
+        public static readonly Expression False = Constant(false, typeof(bool));
+        public static readonly Expression True = Constant(true, typeof(bool));
+        public static readonly Expression Null = Constant(null, typeof(object));
         public static readonly Expression Empty = Empty();
+        public static readonly Expression Zero = Constant(0, typeof(int));
         public static readonly ParameterExpression ExceptionParameter = Parameter(typeof(Exception), "ex");
         public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
         public static bool IsQuery(this Expression expression) => expression is MethodCallExpression { Method: { IsStatic: true } method } && method.DeclaringType == typeof(Enumerable);
@@ -40,9 +41,9 @@ namespace AutoMapper.Internal
                 target = member switch
                 {
                     PropertyInfo property => Expression.Property(target, property),
-                    MethodInfo { IsStatic: true } getter => Call(getter, target),
+                    MethodInfo { IsStatic: true } getter => Expression.Call(getter, target),
                     FieldInfo field => Field(target, field),
-                    MethodInfo getter => Call(target, getter),
+                    MethodInfo getter => Expression.Call(target, getter),
                     _ => throw new ArgumentOutOfRangeException(nameof(member), member, "Unexpected member.")
                 };
             }
@@ -108,20 +109,20 @@ namespace AutoMapper.Internal
             }
             return currentExpression == lambda.Body;
         }
-        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) => ReflectionHelper.GetMemberPath(type, memberPath).Lambda();
-        public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
+        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) => GetMemberPath(type, memberPath).Lambda();
+        public static Expression ForEach(ParameterExpression loopVar, Expression collection, Expression loopContent)
         {
             if (collection.Type.IsArray)
             {
-                return ForEachArrayItem(collection, loopVar, loopContent);
+                return ForEachArrayItem(loopVar, collection, loopContent);
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
-            var getEnumeratorCall = Call(collection, getEnumerator);
+            var getEnumeratorCall = Expression.Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
-            var moveNextCall = Call(enumeratorVar, moveNext);
+            var moveNextCall = Expression.Call(enumeratorVar, moveNext);
             var breakLabel = Label("LoopBreak");
             var loop = Block(new[] { enumeratorVar, loopVar },
                 enumeratorAssign,
@@ -135,9 +136,8 @@ namespace AutoMapper.Internal
                     breakLabel)));
             return loop;
         }
-        public static Expression ForEachArrayItem(Expression array, ParameterExpression loopVar, Expression loopContent)
+        public static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
         {
-            var length = Expression.Property(array, ArrayLength);
             var breakLabel = Label("LoopBreak");
             var index = Variable(typeof(int), "sourceArrayIndex");
             var initialize = Assign(index, Constant(0, typeof(int)));
@@ -145,7 +145,7 @@ namespace AutoMapper.Internal
                 initialize,
                 Loop(
                     IfThenElse(
-                        LessThan(index, length),
+                        LessThan(index, ArrayLength(array)),
                         Block(Assign(loopVar, ArrayAccess(array, index)), loopContent, PostIncrementAssign(index)),
                         Break(breakLabel)
                     ),
@@ -154,6 +154,51 @@ namespace AutoMapper.Internal
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match
         public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
+        // Expression.Call(string) is inefficient because it does a case insensitive match
+        public static MethodCallExpression Call(Type type, string methodName, Type[] typeArguments, params Expression[] arguments)
+        {
+            var method = FindMethod(type, methodName, arguments);
+            if (typeArguments != null)
+            {
+                method = method.MakeGenericMethod(typeArguments);
+            }
+            return Expression.Call(method, arguments);
+            static MethodInfo FindMethod(Type type, string methodName, Expression[] arguments)
+            {
+                var methods = type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic);
+                if (methods.Length == 1)
+                {
+                    return (MethodInfo)methods[0];
+                }
+                foreach (MethodInfo foundMethod in methods)
+                {
+                    var parameters = foundMethod.GetParameters();
+                    if (parameters.Length != arguments.Length)
+                    {
+                        continue;
+                    }
+                    if (foundMethod.IsGenericMethodDefinition)
+                    {
+                        return foundMethod;
+                    }
+                    int index = 0;
+                    bool match = true;
+                    foreach (var argument in arguments)
+                    {
+                        if (!parameters[index++].ParameterType.IsAssignableFrom(argument.Type))
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match)
+                    {
+                        return foundMethod;
+                    }
+                }
+                throw new ArgumentOutOfRangeException(nameof(methodName), $"Cannot find suitable method {type}.{methodName}({string.Join(", ", arguments.Select(a=>a.Type))} parameters).");
+            }
+        }
         public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
@@ -209,7 +254,7 @@ namespace AutoMapper.Internal
             Expression disposeCall;
             if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
             {
-                disposeCall = Call(disposable, DisposeMethod);
+                disposeCall = Expression.Call(disposable, DisposeMethod);
             }
             else
             {
@@ -219,20 +264,19 @@ namespace AutoMapper.Internal
                 }
                 var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
                 var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
-                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Call(disposableVariable, DisposeMethod)));
+                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Expression.Call(disposableVariable, DisposeMethod)));
             }
             return TryFinally(body, disposeCall);
         }
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else)
         {
-            var nonNullElse = ToType(@else, then.Type);
             if (expression.Type.IsValueType)
             {
-                return expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), nonNullElse, then) : nonNullElse;
+                return expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else;
             }
             else
             {
-                return Condition(ReferenceEqual(expression, Null), then, nonNullElse);
+                return Condition(ReferenceEqual(expression, Null), then, ToType(@else, then.Type));
             }
         }
         class ReplaceVisitorBase : ExpressionVisitor
@@ -266,12 +310,12 @@ namespace AutoMapper.Internal
             GetDestinationType();
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
-            var sourceElementType = sourceExpression.Type.GetCollectionType()?.GenericTypeArguments[0] ?? ReflectionHelper.GetElementType(sourceExpression.Type);
+            var sourceElementType = sourceExpression.Type.GetCollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceExpression.Type);
             var itemParam = Parameter(sourceElementType, "item");
             var itemExpr = MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
             Expression destination, assignNewExpression;
             UseDestinationValue();
-            var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
+            var addItems = ForEach(itemParam, sourceExpression, Expression.Call(destination, addMethod, itemExpr));
             var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
             if (overMaxDepth != null)
             {
@@ -281,7 +325,7 @@ namespace AutoMapper.Internal
             var checkNull = Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
                     assignNewExpression,
-                    Call(destination, clearMethod),
+                    Expression.Call(destination, clearMethod),
                     addItems,
                     destination);
             if (memberMap != null)
@@ -292,7 +336,7 @@ namespace AutoMapper.Internal
             void GetDestinationType()
             {
                 destinationCollectionType = destExpression.Type.GetCollectionType();
-                destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? ReflectionHelper.GetElementType(destExpression.Type);
+                destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? GetEnumerableElementType(destExpression.Type);
                 if (destinationCollectionType == null && destExpression.Type.IsInterface)
                 {
                     destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);

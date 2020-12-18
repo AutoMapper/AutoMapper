@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
                 ExpressionBuilder.MapExpression(configurationProvider, profileMap,
                     new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
-                    Property(sourceExpression, sourceExpression.Type.GetProperty("Value")),
+                    ExpressionFactory.Property(sourceExpression, "Value"),
                     memberMap,
                     destExpression
                 );

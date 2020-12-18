@@ -335,7 +335,8 @@ ParameterModifiersCannotChange : Modifiers on parameter 'types' on method 'AutoM
 MembersMustExist : Member 'public System.Linq.Expressions.Expression AutoMapper.Mappers.ConvertMapper.MapExpression(AutoMapper.IConfigurationProvider, AutoMapper.ProfileMap, AutoMapper.IMemberMap, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.DictionaryMapper' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.EnumerableMapper' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'initialTypes' on method 'AutoMapper.Mappers.EnumerableMapperBase.GetAssociatedTypes(AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
+CannotMakeMemberAbstract : Member 'public AutoMapper.TypePair AutoMapper.Mappers.EnumerableMapperBase.GetAssociatedTypes(AutoMapper.TypePair)' is abstract in the implementation but is not abstract in the contract.
+ParameterModifiersCannotChange : Modifiers on parameter 'context' on method 'AutoMapper.Mappers.EnumerableMapperBase.GetAssociatedTypes(AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'context' on method 'AutoMapper.Mappers.EnumerableMapperBase.IsMatch(AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
 MembersMustExist : Member 'public System.Linq.Expressions.Expression AutoMapper.Mappers.EnumerableMapperBase.MapExpression(AutoMapper.IConfigurationProvider, AutoMapper.ProfileMap, AutoMapper.IMemberMap, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
 CannotAddAbstractMembers : Member 'public System.Linq.Expressions.Expression AutoMapper.Mappers.EnumerableMapperBase.MapExpression(AutoMapper.Internal.IGlobalConfiguration, AutoMapper.ProfileMap, AutoMapper.MemberMap, System.Linq.Expressions.Expression, System.Linq.Expressions.Expression)' is abstract in the implementation but is missing in the contract.
@@ -400,4 +401,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 401
+Total Issues: 402

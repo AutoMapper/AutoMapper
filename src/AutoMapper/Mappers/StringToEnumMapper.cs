@@ -9,7 +9,6 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers
 {
     using static ExpressionFactory;
-
     public class StringToEnumMapper : IObjectMapper
     {
         private static readonly MethodInfo EqualsMethodInfo = typeof(StringToEnumMapper).GetMethod("StringCompareOrdinalIgnoreCase");
@@ -18,7 +17,7 @@ namespace AutoMapper.Mappers
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
-            var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),
+            var enumParse = Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),
                 sourceExpression, True);
             var switchCases = new List<SwitchCase>();
             foreach (var memberInfo in destinationType.GetFields())
@@ -35,7 +34,7 @@ namespace AutoMapper.Mappers
             var switchTable = switchCases.Count > 0
                 ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), EqualsMethodInfo, switchCases)
                 : ToType(enumParse, destinationType);
-            var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
+            var isNullOrEmpty = Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
             return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
         }
         public static bool StringCompareOrdinalIgnoreCase(string x, string y) => StringComparer.OrdinalIgnoreCase.Equals(x, y);

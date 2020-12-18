@@ -245,15 +245,13 @@ namespace AutoMapper.Execution
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType)
         };
         private Expression CreateInterfaceProxy(Type interfaceType) =>
-            Call(typeof(ObjectFactory), nameof(ObjectFactory.CreateInterfaceProxy), null, Constant(interfaceType));
+            ExpressionFactory.Call(typeof(ObjectFactory), nameof(ObjectFactory.CreateInterfaceProxy), null, Constant(interfaceType));
         private Expression ConstructorMapping(ConstructorMap constructorMap)
         {
             var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
             var variables = constructorMap.Ctor.GetParameters().Select(parameter => Variable(parameter.ParameterType, parameter.Name)).ToArray();
-            var body = variables.Zip(ctorArgs,
-                                                (variable, expression) => (Expression) Assign(variable, ToType(expression, variable.Type)))
-                                                .Concat(new[] { CheckReferencesCache(New(constructorMap.Ctor, variables)) })
-                                                .ToArray();
+            var body = variables.Zip(ctorArgs, (variable, expression) => (Expression)Assign(variable, ToType(expression, variable.Type)))
+                .Concat(new[] { CheckReferencesCache(New(constructorMap.Ctor, variables)) });
             return Block(variables, body);
         }
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)

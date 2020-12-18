@@ -5,6 +5,8 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using static ExpressionFactory;
+    using static ReflectionHelper;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableProjectionMapper : IProjectionMapper
     {
@@ -12,8 +14,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
         public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
-            var destinationListType = ReflectionHelper.GetElementType(memberMap.DestinationType);
-            var sourceListType = ReflectionHelper.GetElementType(memberMap.SourceType);
+            var destinationListType = GetElementType(memberMap.DestinationType);
+            var sourceListType = GetElementType(memberMap.SourceType);
             var sourceExpression = resolvedSource;
             if (sourceListType != destinationListType)
             {
@@ -28,11 +30,11 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (!memberMap.DestinationType.IsAssignableFrom(sourceExpression.Type))
             {
                 var convertFunction = memberMap.DestinationType.IsArray ? nameof(Enumerable.ToArray) : nameof(Enumerable.ToList);
-                sourceExpression = Expression.Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, sourceExpression);
+                sourceExpression = Call(typeof(Enumerable), convertFunction, new[] { destinationListType }, sourceExpression);
             }
             return sourceExpression;
         }
         private static Expression Select(Expression source, LambdaExpression lambda) =>
-            Expression.Call(typeof(Enumerable), nameof(Enumerable.Select), new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
+            Call(typeof(Enumerable), nameof(Enumerable.Select), new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
     }
 }

@@ -10,6 +10,8 @@ namespace AutoMapper.Mappers
     {
         private static readonly MethodInfo ArrayCopyMethod = typeof(Array).GetMethod("Copy", new[] { typeof(Array), typeof(Array), typeof(long) });
         private static readonly PropertyInfo ArrayLengthProperty = typeof(Array).GetProperty("LongLength");
+        public override TypePair GetAssociatedTypes(in TypePair context) =>
+            new TypePair(context.SourceType.GetElementType(), context.DestinationType.GetElementType());
         public override bool IsMatch(in TypePair context)
         {
             if (!context.IsArray)

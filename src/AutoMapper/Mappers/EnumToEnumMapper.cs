@@ -13,13 +13,13 @@ namespace AutoMapper.Mappers
         {
             var destinationType = destExpression.Type;
             var sourceToObject = sourceExpression.ToObject();
-            var toObject = Call(typeof(Enum), "ToObject", null, Constant(destinationType), sourceToObject);
+            var toObject = ExpressionFactory.Call(typeof(Enum), "ToObject", null, Constant(destinationType), sourceToObject);
             var castToObject = Convert(toObject, destinationType);
-            var isDefined = Call(typeof(Enum), "IsDefined", null, Constant(sourceExpression.Type), sourceToObject);
-            var sourceToString = Call(sourceExpression, "ToString", null);
+            var isDefined = ExpressionFactory.Call(typeof(Enum), "IsDefined", null, Constant(sourceExpression.Type), sourceToObject);
+            var sourceToString = Call(sourceExpression, ExpressionFactory.ObjectToString);
             var result = Variable(destinationType, "destinationEnumValue");
             var ignoreCase = ExpressionFactory.True;
-            var tryParse = Call(typeof(Enum), "TryParse", new[] { destinationType }, sourceToString, ignoreCase, result);
+            var tryParse = ExpressionFactory.Call(typeof(Enum), "TryParse", new[] { destinationType }, sourceToString, ignoreCase, result);
             return Block(new[] { result }, Condition(isDefined, Condition(tryParse, result, castToObject), castToObject));
         }
     }

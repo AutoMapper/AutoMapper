@@ -10,9 +10,9 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
-        public static Type GetElementType(Type enumerableType) => enumerableType.IsArray ?
-            enumerableType.GetElementType() :
-            enumerableType.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
+        public static Type GetElementType(Type enumerableType) => enumerableType.IsArray ? 
+            enumerableType.GetElementType() : GetEnumerableElementType(enumerableType);
+        public static Type GetEnumerableElementType(Type enumerableType) => enumerableType.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
         public static TypeMap[] GetIncludedTypeMaps(this IGlobalConfiguration configuration, TypeMap typeMap) => 
             configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes);
         public static MethodInfo GetConversionOperator(this TypePair context, string name)

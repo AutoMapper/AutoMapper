@@ -40,6 +40,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
-            Expression.Call(typeof(Queryable),"Select", new[] { source.ElementType, lambda.ReturnType }, source.Expression, Expression.Quote(lambda)));
+            ExpressionFactory.Call(typeof(Queryable),"Select", new[] { source.ElementType, lambda.ReturnType }, source.Expression, Expression.Quote(lambda)));
     }
 }
