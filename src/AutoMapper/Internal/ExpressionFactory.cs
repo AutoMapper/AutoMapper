@@ -16,8 +16,8 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExpressionFactory
     {
-        public static readonly MethodInfo ObjectToString = typeof(object).GetMethod("ToString");
-        private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod("Dispose");
+        public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
+        private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
         public static readonly Expression False = Constant(false, typeof(bool));
         public static readonly Expression True = Constant(true, typeof(bool));
         public static readonly Expression Null = Constant(null, typeof(object));
@@ -41,9 +41,9 @@ namespace AutoMapper.Internal
                 target = member switch
                 {
                     PropertyInfo property => Expression.Property(target, property),
-                    MethodInfo { IsStatic: true } getter => Expression.Call(getter, target),
+                    MethodInfo { IsStatic: true } getter => Call(getter, target),
                     FieldInfo field => Field(target, field),
-                    MethodInfo getter => Expression.Call(target, getter),
+                    MethodInfo getter => Call(target, getter),
                     _ => throw new ArgumentOutOfRangeException(nameof(member), member, "Unexpected member.")
                 };
             }
@@ -117,12 +117,12 @@ namespace AutoMapper.Internal
                 return ForEachArrayItem(loopVar, collection, loopContent);
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
-            var getEnumeratorCall = Expression.Call(collection, getEnumerator);
+            var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
-            var moveNextCall = Expression.Call(enumeratorVar, moveNext);
+            var moveNextCall = Call(enumeratorVar, moveNext);
             var breakLabel = Label("LoopBreak");
             var loop = Block(new[] { enumeratorVar, loopVar },
                 enumeratorAssign,
@@ -154,50 +154,17 @@ namespace AutoMapper.Internal
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match
         public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
-        // Expression.Call(string) is inefficient because it does a case insensitive match
-        public static MethodCallExpression Call(Type type, string methodName, Type[] typeArguments, params Expression[] arguments)
+        // Call(string) is inefficient because it does a case insensitive match
+        public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
         {
-            var method = FindMethod(type, methodName, arguments);
-            if (typeArguments != null)
+            foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic))
             {
-                method = method.MakeGenericMethod(typeArguments);
-            }
-            return Expression.Call(method, arguments);
-            static MethodInfo FindMethod(Type type, string methodName, Expression[] arguments)
-            {
-                var methods = type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic);
-                if (methods.Length == 1)
+                if (foundMethod.IsGenericMethodDefinition && foundMethod.GetParameters().Length == parametersCount)
                 {
-                    return (MethodInfo)methods[0];
+                    return foundMethod;
                 }
-                foreach (MethodInfo foundMethod in methods)
-                {
-                    var parameters = foundMethod.GetParameters();
-                    if (parameters.Length != arguments.Length)
-                    {
-                        continue;
-                    }
-                    if (foundMethod.IsGenericMethodDefinition)
-                    {
-                        return foundMethod;
-                    }
-                    int index = 0;
-                    bool match = true;
-                    foreach (var argument in arguments)
-                    {
-                        if (!parameters[index++].ParameterType.IsAssignableFrom(argument.Type))
-                        {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (match)
-                    {
-                        return foundMethod;
-                    }
-                }
-                throw new ArgumentOutOfRangeException(nameof(methodName), $"Cannot find suitable method {type}.{methodName}({string.Join(", ", arguments.Select(a=>a.Type))} parameters).");
             }
+            throw new ArgumentOutOfRangeException(nameof(methodName), $"Cannot find suitable method {type}.{methodName}({parametersCount} parameters).");
         }
         public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
@@ -254,7 +221,7 @@ namespace AutoMapper.Internal
             Expression disposeCall;
             if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
             {
-                disposeCall = Expression.Call(disposable, DisposeMethod);
+                disposeCall = Call(disposable, DisposeMethod);
             }
             else
             {
@@ -264,21 +231,13 @@ namespace AutoMapper.Internal
                 }
                 var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
                 var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
-                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Expression.Call(disposableVariable, DisposeMethod)));
+                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Call(disposableVariable, DisposeMethod)));
             }
             return TryFinally(body, disposeCall);
         }
-        public static Expression IfNullElse(this Expression expression, Expression then, Expression @else)
-        {
-            if (expression.Type.IsValueType)
-            {
-                return expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else;
-            }
-            else
-            {
-                return Condition(ReferenceEqual(expression, Null), then, ToType(@else, then.Type));
-            }
-        }
+        public static Expression IfNullElse(this Expression expression, Expression then, Expression @else) => expression.Type.IsValueType ?
+            (expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else) :
+            Condition(ReferenceEqual(expression, Null), then, ToType(@else, then.Type));
         class ReplaceVisitorBase : ExpressionVisitor
         {
             protected Expression _oldNode;
@@ -315,7 +274,7 @@ namespace AutoMapper.Internal
             var itemExpr = MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
             Expression destination, assignNewExpression;
             UseDestinationValue();
-            var addItems = ForEach(itemParam, sourceExpression, Expression.Call(destination, addMethod, itemExpr));
+            var addItems = ForEach(itemParam, sourceExpression, Call(destination, addMethod, itemExpr));
             var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
             if (overMaxDepth != null)
             {
@@ -325,7 +284,7 @@ namespace AutoMapper.Internal
             var checkNull = Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
                     assignNewExpression,
-                    Expression.Call(destination, clearMethod),
+                    Call(destination, clearMethod),
                     addItems,
                     destination);
             if (memberMap != null)

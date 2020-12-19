@@ -106,16 +106,16 @@ namespace AutoMapper
             }
             InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
         }
-        internal void IncrementTypeDepth(in TypePair types) => TypeDepth[types]++;
-        internal void DecrementTypeDepth(in TypePair types) => TypeDepth[types]--;
-        internal bool OverTypeDepth(in TypePair types, int maxDepth)
+        internal void IncrementTypeDepth(TypeMap typeMap) => TypeDepth[typeMap.Types]++;
+        internal void DecrementTypeDepth(TypeMap typeMap) => TypeDepth[typeMap.Types]--;
+        internal bool OverTypeDepth(TypeMap typeMap)
         {
-            if (!TypeDepth.TryGetValue(types, out int depth))
+            if (!TypeDepth.TryGetValue(typeMap.Types, out int depth))
             {
-                TypeDepth[types] = 1;
+                TypeDepth[typeMap.Types] = 1;
                 depth = 1;
             }
-            return depth > maxDepth;
+            return depth > typeMap.MaxDepth;
         }
         internal bool IsDefault => this == _inner.DefaultContext;
         internal static void CheckContext(ref ResolutionContext resolutionContext)

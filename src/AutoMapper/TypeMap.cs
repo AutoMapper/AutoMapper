@@ -248,6 +248,8 @@ namespace AutoMapper
             return propertyMap;
         }
 
+        public TypePair GetAsPair() => new TypePair(SourceType, DestinationTypeOverride);
+
         public void IncludeDerivedTypes(in TypePair derivedTypes)
         {
             CheckDifferent(derivedTypes);

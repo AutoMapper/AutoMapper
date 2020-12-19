@@ -11,9 +11,6 @@ namespace AutoMapper.Execution
 {
     public static class ProxyGenerator
     {
-        private static readonly byte[] PrivateKey = StringToByteArray(
-                "002400000480000094000000060200000024000052534131000400000100010079dfef85ed6ba841717e154f13182c0a6029a40794a6ecd2886c7dc38825f6a4c05b0622723a01cd080f9879126708eef58f134accdc99627947425960ac2397162067507e3c627992aa6b92656ad3380999b30b5d5645ba46cc3fcc6a1de5de7afebcf896c65fb4f9547a6c0c6433045fceccb1fa15e960d519d0cd694b29a4");
-        private static readonly byte[] PrivateKeyToken = StringToByteArray("be96cd2c38ef1005");
         private static readonly MethodInfo DelegateCombine = typeof(Delegate).GetMethod(nameof(Delegate.Combine), new[] { typeof(Delegate), typeof(Delegate) });
         private static readonly MethodInfo DelegateRemove = typeof(Delegate).GetMethod(nameof(Delegate.Remove));
         private static readonly EventInfo PropertyChanged = typeof(INotifyPropertyChanged).GetEvent(nameof(INotifyPropertyChanged.PropertyChanged));
@@ -22,16 +19,12 @@ namespace AutoMapper.Execution
         private static readonly LockingConcurrentDictionary<TypeDescription, Type> ProxyTypes = new LockingConcurrentDictionary<TypeDescription, Type>(EmitProxy);
         private static ModuleBuilder CreateProxyModule()
         {
-            var name = new AssemblyName("AutoMapper.Proxies");
-            name.SetPublicKey(PrivateKey);
-            name.SetPublicKeyToken(PrivateKeyToken);
-            var builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+            var builder = AssemblyBuilder.DefineDynamicAssembly(typeof(Mapper).Assembly.GetName(), AssemblyBuilderAccess.Run);
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }
         private static Type EmitProxy(TypeDescription typeDescription)
         {
             var interfaceType = typeDescription.Type;
-            var additionalProperties = typeDescription.AdditionalProperties;
             var typeBuilder = GenerateType();
             GenerateConstructor();
             FieldBuilder propertyChangedField = null;
@@ -40,10 +33,10 @@ namespace AutoMapper.Execution
                 GeneratePropertyChanged();
             }
             GenerateFields();
-            return typeBuilder.CreateType();
+            return typeBuilder.CreateTypeInfo().AsType();
             TypeBuilder GenerateType()
             {
-                var propertyNames = string.Join("_", additionalProperties.Select(p => p.Name));
+                var propertyNames = string.Join("_", typeDescription.AdditionalProperties.Select(p => p.Name));
                 var typeName = $"Proxy_{interfaceType.FullName}_{typeDescription.GetHashCode()}_{propertyNames}";
                 const int MaxTypeNameLength = 1023;
                 typeName = typeName.Substring(0, Math.Min(MaxTypeNameLength, typeName.Length));
@@ -102,7 +95,7 @@ namespace AutoMapper.Execution
                     allInterfaces.Where(intf => intf != typeof(INotifyPropertyChanged))
                         .SelectMany(intf => intf.GetProperties())
                         .Select(p => new PropertyDescription(p))
-                        .Concat(additionalProperties))
+                        .Concat(typeDescription.AdditionalProperties))
                 {
                     if (property.CanWrite)
                     {
@@ -124,24 +117,12 @@ namespace AutoMapper.Execution
                 ctorIl.Emit(OpCodes.Ret);
             }
         }
-        public static Type GetProxyType(Type interfaceType) => interfaceType.IsInterface ?
-            ProxyTypes.GetOrAdd(new TypeDescription(interfaceType)) : throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
+        public static Type GetProxyType(Type interfaceType) => ProxyTypes.GetOrAdd(new TypeDescription(interfaceType));
         public static Type GetSimilarType(Type sourceType, IEnumerable<PropertyDescription> additionalProperties) =>
             ProxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
-        private static byte[] StringToByteArray(string hex)
-        {
-            int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-            {
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            }
-            return bytes;
-        }
         class PropertyEmitter
         {
-            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged =
-                typeof(ProxyBase).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "NotifyPropertyChanged");
+            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetMethod("NotifyPropertyChanged", TypeExtensions.InstanceFlags);
             private readonly FieldBuilder _fieldBuilder;
             private readonly MethodBuilder _getterBuilder;
             private readonly PropertyBuilder _propertyBuilder;
@@ -183,14 +164,6 @@ namespace AutoMapper.Execution
                 _propertyBuilder.SetSetMethod(_setterBuilder);
             }
             public Type PropertyType => _propertyBuilder.PropertyType;
-            public MethodBuilder GetGetter(Type requiredType)
-                => !requiredType.IsAssignableFrom(PropertyType)
-                ? throw new InvalidOperationException("Types are not compatible")
-                : _getterBuilder;
-            public MethodBuilder GetSetter(Type requiredType)
-                => !PropertyType.IsAssignableFrom(requiredType)
-                ? throw new InvalidOperationException("Types are not compatible")
-                : _setterBuilder;
         }
     }
     public abstract class ProxyBase

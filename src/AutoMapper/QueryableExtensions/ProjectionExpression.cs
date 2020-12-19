@@ -12,6 +12,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public readonly struct ProjectionExpression
     {
+        private static readonly MethodInfo SelectMethod = typeof(Queryable).StaticGenericMethod("Select", parametersCount: 2);
+
         private readonly IQueryable _source;
         private readonly IProjectionBuilder _builder;
 
@@ -40,6 +42,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
-            ExpressionFactory.Call(typeof(Queryable),"Select", new[] { source.ElementType, lambda.ReturnType }, source.Expression, Expression.Quote(lambda)));
+            Expression.Call(SelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType), source.Expression, Expression.Quote(lambda)));
     }
 }

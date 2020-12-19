@@ -255,19 +255,19 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             readonly struct SubQueryPath
             {
-                private readonly MemberProjection[] Members;
+                private readonly MemberProjection[] _members;
                 public readonly Expression Marker;
                 public readonly LambdaExpression LetExpression;
                 public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression)
                 {
-                    Members = members;
+                    _members = members;
                     Marker = Default(letExpression.Body.Type);
                     LetExpression = letExpression;
                 }
-                public Expression GetSourceExpression(Expression parameter) => Members.Take(Members.Length - 1).Select(p => p.Expression).Chain(parameter);
-                public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
-                internal bool IsEquivalentTo(in SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
-                    Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
+                public Expression GetSourceExpression(Expression parameter) => _members.Take(_members.Length - 1).Select(p => p.Expression).Chain(parameter);
+                public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", _members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
+                internal bool IsEquivalentTo(in SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
+                    _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
             }
             class GetMemberAccessesVisitor : ExpressionVisitor
             {

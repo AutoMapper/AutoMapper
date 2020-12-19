@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using AutoMapper.Internal;
-
 namespace AutoMapper.Mappers
 {
+    using static Expression;
     public class EnumToStringMapper : IObjectMapper
     {
         public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string) && context.SourceType.IsEnum;
@@ -14,21 +14,18 @@ namespace AutoMapper.Mappers
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var sourceType = sourceExpression.Type;
-            var toStringCall = Expression.Call(sourceExpression, ExpressionFactory.ObjectToString);
             var switchCases = new List<SwitchCase>();
             foreach (var memberInfo in sourceType.GetFields())
             {
-                var attribute = memberInfo.GetCustomAttribute(typeof(EnumMemberAttribute)) as EnumMemberAttribute;
-                if (attribute?.Value != null)
+                var attributeValue = memberInfo.GetCustomAttribute<EnumMemberAttribute>()?.Value;
+                if (attributeValue != null)
                 {
-                    var switchCase = Expression.SwitchCase(Expression.Constant(attribute.Value),
-                        Expression.Constant(Enum.ToObject(sourceType, memberInfo.GetMemberValue(null))));
+                    var switchCase = SwitchCase(Constant(attributeValue), Constant(Enum.ToObject(sourceType, memberInfo.GetValue(null))));
                     switchCases.Add(switchCase);
                 }
             }
-            return switchCases.Count > 0
-                ? (Expression) Expression.Switch(sourceExpression, toStringCall, switchCases.ToArray())
-                : toStringCall;
+            Expression toStringCall = Call(sourceExpression, ExpressionFactory.ObjectToString);
+            return switchCases.Count > 0 ? Switch(sourceExpression, toStringCall, switchCases.ToArray()) : toStringCall;
         }
     }
 }

@@ -57,14 +57,12 @@ namespace AutoMapper
             }
             return nameToMember;
         }
-
         private IEnumerable<MemberInfo> AddMethods(IEnumerable<MemberInfo> accessors)
         {
             var publicNoArgMethods = GetPublicNoArgMethods();
             var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(Config.ShouldMapMethod));
             return accessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods);
         }
-
         private void CheckPrePostfixes(SourceMembers nameToMember, MemberInfo member)
         {
             foreach (var memberName in PossibleNames(member.Name, Config.Prefixes, Config.Postfixes))
@@ -75,7 +73,6 @@ namespace AutoMapper
                 }
             }
         }
-
         public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
             foreach (var prefix in prefixes)
@@ -139,20 +136,30 @@ namespace AutoMapper
                 select methodMatch
             );
         }
-        private MemberInfo[] BuildReadAccessors() =>
+        private MemberInfo[] BuildReadAccessors()
+        {
             // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            GetProperties(PropertyReadable)
+            IEnumerable<MemberInfo> members = GetProperties(PropertyReadable)
                 .GroupBy(x => x.Name) // group properties of the same name together
-                .Select(x => x.First())
-                .Concat(Config.FieldMappingEnabled ? GetFields(FieldReadable) : Array.Empty<MemberInfo>())
-                .ToArray();
-        private MemberInfo[] BuildWriteAccessors() =>
+                .Select(x => x.First());
+            if (Config.FieldMappingEnabled)
+            {
+                members = members.Concat(GetFields(FieldReadable));
+            }
+            return members.ToArray();
+        }
+        private MemberInfo[] BuildWriteAccessors()
+        {
             // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            GetProperties(PropertyWritable)
+            IEnumerable<MemberInfo> members = GetProperties(PropertyWritable)
                 .GroupBy(x => x.Name) // group properties of the same name together
-                .Select(x => x.FirstOrDefault(y => y.CanWrite && y.CanRead) ?? x.First()) // favor the first property that can both read & write - otherwise pick the first one
-                .Concat(Config.FieldMappingEnabled ? GetFields(FieldWritable) : Array.Empty<MemberInfo>())
-                .ToArray();
+                .Select(x => x.FirstOrDefault(y => y.CanWrite && y.CanRead) ?? x.First()); // favor the first property that can both read & write - otherwise pick the first one
+            if (Config.FieldMappingEnabled)
+            {
+                members = members.Concat(GetFields(FieldWritable));
+            }
+            return members.ToArray();
+        }
         private static bool PropertyReadable(PropertyInfo propertyInfo) => propertyInfo.CanRead;
         private static bool FieldReadable(FieldInfo fieldInfo) => true;
         private static bool PropertyWritable(PropertyInfo propertyInfo) => propertyInfo.CanWrite || propertyInfo.PropertyType.IsCollection();

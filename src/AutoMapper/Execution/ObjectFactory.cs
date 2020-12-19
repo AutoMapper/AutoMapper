@@ -55,8 +55,8 @@ namespace AutoMapper.Execution
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
             type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
             type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
-            type.IsCollection() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) : 
-            InvalidInterfaceType(type);
+            type.IsCollection() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) :
+            InvalidType(type, $"Cannot create an instance of interface type {type}.");
         private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? new[] { typeof(object) };
         private static Expression CreateCollection(Type type, Type collectionType, Type[] genericArguments = null) => 
             ToType(New(collectionType.MakeGenericType(genericArguments ?? type.GenericTypeArguments)), type);
@@ -67,7 +67,6 @@ namespace AutoMapper.Execution
             var innerType = ctor.GetParameters()[0].ParameterType;
             return ToType(New(ctor, GenerateConstructorExpression(innerType)), type);
         }
-        private static Expression InvalidInterfaceType(Type type) => InvalidType(type, $"Cannot create an instance of interface type {type}.");
         private static Expression InvalidType(Type type, string message) => Throw(Constant(new ArgumentException(message, "type")), type);
     }
 }

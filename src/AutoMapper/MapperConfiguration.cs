@@ -16,7 +16,7 @@ namespace AutoMapper
 
     public class MapperConfiguration : IGlobalConfiguration
     {
-        private static readonly MethodInfo MappingError = typeof(MapperConfiguration).GetMethod("GetMappingError");
+        private static readonly MethodInfo MappingError = typeof(MapperConfiguration).GetMethod(nameof(GetMappingError));
 
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
@@ -173,7 +173,7 @@ namespace AutoMapper
                 source, destination, ContextParameter);
         }
         private static Expression CheckNullValueType(Expression expression, Type runtimeType) =>
-            !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, New(runtimeType)) : expression;
+            !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, Default(runtimeType)) : expression;
         private LambdaExpression GenerateObjectMapperExpression(in MapRequest mapRequest, IObjectMapper mapperToUse)
         {
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
@@ -194,7 +194,7 @@ namespace AutoMapper
                 var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap,
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType),
                                                                         ToType(checkNullValueTypeDest, runtimeDestinationType));
-                var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest.RuntimeTypes), Constant(mapRequest.MemberMap, typeof(MemberMap)));
+                var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest));
                 var throwExpression = Throw(newException, runtimeDestinationType);
                 fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
             }
@@ -202,8 +202,8 @@ namespace AutoMapper
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, ContextParameter);
         }
-        public static AutoMapperMappingException GetMappingError(Exception innerException, TypePair types, MemberMap memberMap) =>
-            new("Error mapping types.", innerException, types) { MemberMap = memberMap };
+        public static AutoMapperMappingException GetMappingError(Exception innerException, in MapRequest mapRequest) =>
+            new("Error mapping types.", innerException, mapRequest.RuntimeTypes) { MemberMap = mapRequest.MemberMap };
         IReadOnlyCollection<TypeMap> IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values;
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
@@ -310,7 +310,7 @@ namespace AutoMapper
             {
                 if (typeMap.DestinationTypeOverride != null)
                 {
-                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.SourceType, typeMap.DestinationTypeOverride);
+                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.GetAsPair());
                     _resolvedMaps[typeMap.Types] = derivedMap;
                 }
                 else

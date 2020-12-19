@@ -17,11 +17,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 return null;
             }
-            var sourceExpression = resolvedSource;
             // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
-            if (memberMap.AllowsNullDestinationValues() && !(sourceExpression is ParameterExpression) && !sourceExpression.Type.IsCollection())
+            if (memberMap.AllowsNullDestinationValues() && resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
             {
-                transformedExpression = sourceExpression.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
+                transformedExpression = resolvedSource.IfNullElse(Constant(null, transformedExpression.Type), transformedExpression);
             }
             return transformedExpression;
         }

@@ -12,9 +12,9 @@ namespace AutoMapper.Execution
     using static Expression;
     public static class ExpressionBuilder
     {
-        public static readonly MethodInfo IListClear = typeof(IList).GetMethod("Clear");
-        public static readonly MethodInfo IListAdd = typeof(IList).GetMethod("Add");
-        public static readonly PropertyInfo IListIsReadOnly = typeof(IList).GetProperty("IsReadOnly");
+        public static readonly MethodInfo IListClear = typeof(IList).GetMethod(nameof(IList.Clear));
+        public static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
+        public static readonly PropertyInfo IListIsReadOnly = typeof(IList).GetProperty(nameof(IList.IsReadOnly));
         public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.IncrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.DecrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CreateInstance), TypeExtensions.InstanceFlags);
@@ -62,28 +62,35 @@ namespace AutoMapper.Execution
             }
             var destinationType = destinationParameter.Type;
             var isCollection = destinationType.IsCollection();
-            bool isIList;
-            Type destinationCollectionType;
-            if (isCollection)
-            {
-                isIList = destinationType.IsListType();
-                destinationCollectionType = isIList ? typeof(IList) : destinationType.GetICollectionType();
-            }
-            else
-            {
-                isIList = false;
-                destinationCollectionType = null;
-            }
             var destination = memberMap == null ? 
                 destinationParameter.IfNullElse(DefaultDestination(), destinationParameter) :
                 memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : DefaultDestination();
-            var ifSourceNull = destinationCollectionType != null ? ClearDestinationCollection() : destination;
+            var ifSourceNull = isCollection ? (ClearDestinationCollection() ?? destination) : destination;
             return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {
+                Type destinationCollectionType;
+                MethodInfo clearMethod;
+                PropertyInfo isReadOnlyProperty;
+                if (destinationType.IsListType())
+                {
+                    destinationCollectionType = typeof(IList);
+                    clearMethod = IListClear;
+                    isReadOnlyProperty = IListIsReadOnly;
+                }
+                else
+                {
+                    destinationCollectionType = destinationType.GetICollectionType();
+                    if (destinationCollectionType == null)
+                    {
+                        return null;
+                    }
+                    clearMethod = destinationCollectionType.GetMethod("Clear");
+                    isReadOnlyProperty = destinationCollectionType.GetProperty("IsReadOnly");
+                }
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clear = Call(destinationVariable, isIList ? IListClear : destinationCollectionType.GetMethod("Clear"));
-                var isReadOnly = isIList ? Property(destinationVariable, IListIsReadOnly) : ExpressionFactory.Property(destinationVariable, "IsReadOnly");
+                var clear = Call(destinationVariable, clearMethod);
+                var isReadOnly = Property(destinationVariable, isReadOnlyProperty);
                 return Block(new[] {destinationVariable},
                     Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
                     Condition(OrElse(ReferenceEqual(destinationVariable, Null), isReadOnly), ExpressionFactory.Empty, clear),
@@ -93,7 +100,7 @@ namespace AutoMapper.Execution
             {
                 if ((isCollection && profileMap.AllowsNullCollectionsFor(memberMap)) || (!isCollection && profileMap.AllowsNullDestinationValuesFor(memberMap)))
                 {
-                    return Default(destinationType);
+                    return destinationParameter.NodeType == ExpressionType.Default ? destinationParameter : Default(destinationType);
                 }
                 if (destinationType.IsArray)
                 {
@@ -116,9 +123,7 @@ namespace AutoMapper.Execution
             }
             return null;
         }
-        public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ?
-            Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap.Types), Constant(typeMap.MaxDepth)) :
-            null;
+        public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
         public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, MemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullDestinationValues;
         public static bool AllowsNullCollectionsFor(this ProfileMap profile, MemberMap memberMap = null) =>

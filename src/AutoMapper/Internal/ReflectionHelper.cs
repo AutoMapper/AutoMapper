@@ -10,9 +10,8 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
-        public static Type GetElementType(Type enumerableType) => enumerableType.IsArray ? 
-            enumerableType.GetElementType() : GetEnumerableElementType(enumerableType);
-        public static Type GetEnumerableElementType(Type enumerableType) => enumerableType.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
+        public static Type GetElementType(Type type) => type.IsArray ? type.GetElementType() : GetEnumerableElementType(type);
+        public static Type GetEnumerableElementType(Type type) => type.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
         public static TypeMap[] GetIncludedTypeMaps(this IGlobalConfiguration configuration, TypeMap typeMap) => 
             configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes);
         public static MethodInfo GetConversionOperator(this TypePair context, string name)
@@ -26,28 +25,17 @@ namespace AutoMapper.Internal
             }
             return context.DestinationType.GetMethod(name, TypeExtensions.StaticFlags, null, new[] { context.SourceType }, null);
         }
-        public static bool IsPublic(this PropertyInfo propertyInfo) => propertyInfo.GetGetMethod(true)?.IsPublic ?? propertyInfo.GetSetMethod(true).IsPublic;
-        public static bool HasAnInaccessibleSetter(this PropertyInfo property)
-        {
-            var setMethod = property.GetSetMethod(true);
-            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
-        }
-        public static Type CreateType(this TypeBuilder type) => type.CreateTypeInfo().AsType();
+        public static bool IsPublic(this PropertyInfo propertyInfo) => (propertyInfo.GetGetMethod() ?? propertyInfo.GetSetMethod()) != null;
+        public static bool HasAnInaccessibleSetter(this PropertyInfo property) => property.GetSetMethod() == null;
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.IsDefined(typeof(TAttribute));
-        public static bool CanBeSet(this MemberInfo propertyOrField) => propertyOrField is PropertyInfo property ? property.CanWrite : !((FieldInfo)propertyOrField).IsInitOnly;
-        public static Expression GetDefaultValue(this ParameterInfo parameter)
-        {
-            if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType)
-            {
-                return Default(parameter.ParameterType);
-            }
-            return Constant(parameter.DefaultValue);
-        }
-        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination = null)
+        public static bool CanBeSet(this MemberInfo member) => member is PropertyInfo property ? property.CanWrite : !((FieldInfo)member).IsInitOnly;
+        public static Expression GetDefaultValue(this ParameterInfo parameter) =>
+            parameter is { DefaultValue: null, ParameterType: { IsValueType: true } type } ? Default(type) : Constant(parameter.DefaultValue);
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object source, object destination = null)
         {
             var memberType = GetMemberType(member);
             var destValue = destination == null ? null : GetMemberValue(member, destination);
-            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, MemberMap.Instance);
+            return context.Map(source, destValue, null, memberType, MemberMap.Instance);
         }
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {

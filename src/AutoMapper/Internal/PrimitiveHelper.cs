@@ -23,6 +23,11 @@ namespace AutoMapper.Internal
             dictionary.TryGetValue(key, out TValue value);
             return value;
         }
+        public static void CheckIsDerivedFrom(this in TypePair types, in TypePair baseTypes)
+        {
+            types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
+            types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
+        }
         public static bool IsEnumToEnum(this in TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
         public static bool IsUnderlyingTypeToEnum(this in TypePair context) =>
             context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));

@@ -5,11 +5,13 @@ using AutoMapper.Internal;
 namespace AutoMapper.Mappers
 {
     using Execution;
+    using System.Reflection;
     using static Expression;
     using static ExpressionFactory;
     using static ReflectionHelper;
     public class ArrayMapper : EnumerableMapperBase
     {
+        private static readonly MethodInfo CountMethod = typeof(Enumerable).StaticGenericMethod("Count", parametersCount: 1);
         public override TypePair GetAssociatedTypes(in TypePair context) => 
             new TypePair(GetElementType(context.SourceType), context.DestinationType.GetElementType());
         public override bool IsMatch(in TypePair context) => context.DestinationType.IsArray && context.SourceType.IsCollection();
@@ -27,7 +29,7 @@ namespace AutoMapper.Mappers
             else
             {
                 sourceElementType = GetEnumerableElementType(sourceExpression.Type);
-                count = ExpressionFactory.Call(typeof(Enumerable), "Count", new[] { sourceElementType }, sourceExpression);
+                count = Call(CountMethod.MakeGenericMethod(sourceElementType), sourceExpression);
             }
             var destinationElementType = destExpression.Type.GetElementType();
             var itemParam = Parameter(sourceElementType, "sourceItem");

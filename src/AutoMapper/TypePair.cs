@@ -1,9 +1,6 @@
 using AutoMapper.Internal;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 
 namespace AutoMapper
 {
@@ -13,19 +10,15 @@ namespace AutoMapper
         public readonly TypePair RequestedTypes;
         public readonly TypePair RuntimeTypes;
         public readonly MemberMap MemberMap;
-
         public MapRequest(in TypePair requestedTypes, in TypePair runtimeTypes, MemberMap memberMap = null) 
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;
             MemberMap = memberMap;
         }
-
         public bool Equals(MapRequest other) => 
             RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) && Equals(MemberMap, other.MemberMap);
-
         public override bool Equals(object obj) => obj is MapRequest other && Equals(other);
-
         public override int GetHashCode()
         {
             var hashCode = HashCodeCombiner.Combine(RequestedTypes, RuntimeTypes);
@@ -35,39 +28,26 @@ namespace AutoMapper
             }
             return hashCode;
         }
-
         public static bool operator ==(in MapRequest left, in MapRequest right) => left.Equals(right);
-
         public static bool operator !=(in MapRequest left, in MapRequest right) => !left.Equals(right);
     }
-
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public readonly struct TypePair : IEquatable<TypePair>
     {
         public readonly Type SourceType;
         public readonly Type DestinationType;
-
         public TypePair(Type sourceType, Type destinationType)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
         }
-
-
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
-
         public override bool Equals(object other) => other is TypePair otherPair && Equals(otherPair);
-
         public override int GetHashCode() => HashCodeCombiner.Combine(SourceType, DestinationType);
-
         public bool IsGeneric => SourceType.IsGenericType || DestinationType.IsGenericType;
-
         public bool IsArray => SourceType.IsArray && DestinationType.IsArray;
-
         public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
-
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
-
         public TypePair CloseGenericTypes(in TypePair closedTypes)
         {
             var sourceArguments = closedTypes.SourceType.GetGenericArguments();
@@ -84,14 +64,7 @@ namespace AutoMapper
             var closedDestinationType = DestinationType.IsGenericTypeDefinition ? DestinationType.MakeGenericType(destinationArguments) : DestinationType;
             return new TypePair(closedSourceType, closedDestinationType);
         }
-
         public TypePair GetTypeDefinitionIfGeneric() => new TypePair(SourceType.GetTypeDefinitionIfGeneric(), DestinationType.GetTypeDefinitionIfGeneric());
-
-        public void CheckIsDerivedFrom(in TypePair baseTypes)
-        {
-            SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
-            DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
-        }
         public static bool operator ==(in TypePair left, in TypePair right) => left.Equals(right);
         public static bool operator !=(in TypePair left, in TypePair right) => !left.Equals(right);
     }
