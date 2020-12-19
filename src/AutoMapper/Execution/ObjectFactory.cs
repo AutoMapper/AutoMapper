@@ -55,7 +55,7 @@ namespace AutoMapper.Execution
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
             type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
             type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
-            type.IsEnumerableType() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) : 
+            type.IsCollection() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) : 
             InvalidInterfaceType(type);
         private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? new[] { typeof(object) };
         private static Expression CreateCollection(Type type, Type collectionType, Type[] genericArguments = null) => 

@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,9 +10,6 @@ namespace AutoMapper.Execution
     using Internal;
     using static Internal.ExpressionFactory;
     using static Expression;
-    using System.Collections;
-    using System;
-
     public static class ExpressionBuilder
     {
         public static readonly MethodInfo IListClear = typeof(IList).GetMethod("Clear");
@@ -25,17 +24,12 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.MapInternal), TypeExtensions.InstanceFlags);
 
-        public static Expression MapExpression(IGlobalConfiguration configurationProvider,
-            ProfileMap profileMap,
-            in TypePair typePair,
-            Expression sourceParameter,
-            MemberMap propertyMap = null,
-            Expression destinationParameter = null)
+        public static Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, in TypePair typePair, Expression sourceParameter,
+            MemberMap propertyMap = null, Expression destinationParameter = null)
         {
-            if (destinationParameter == null)
-                destinationParameter = Default(typePair.DestinationType);
+            destinationParameter ??= Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
-            Expression mapExpression;
+            Expression mapExpression = null;
             bool hasTypeConverter;
             if (typeMap != null)
             {
@@ -43,34 +37,23 @@ namespace AutoMapper.Execution
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
                     typeMap.Seal(configurationProvider);
-
-                    mapExpression = typeMap.MapExpression != null ? 
-                        typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter) :
-                        ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
-                }
-                else
-                {
-                    mapExpression = ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
+                    mapExpression = typeMap.MapExpression?.ConvertReplaceParameters(sourceParameter, destinationParameter);
                 }
             }
             else
             {
                 hasTypeConverter = false;
-                mapExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
-                    sourceParameter, propertyMap, destinationParameter);
+                var mapper = configurationProvider.FindMapper(typePair);
+                mapExpression = mapper?.MapExpression(configurationProvider, profileMap, propertyMap, sourceParameter, destinationParameter);
             }
+            mapExpression ??= ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
             if (!hasTypeConverter)
             {
                 mapExpression = NullCheckSource(profileMap, sourceParameter, destinationParameter, mapExpression, propertyMap);
             }
             return ToType(mapExpression, typePair.DestinationType);
         }
-
-        public static Expression NullCheckSource(ProfileMap profileMap,
-            Expression sourceParameter,
-            Expression destinationParameter,
-            Expression mapExpression,
-            MemberMap memberMap)
+        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression mapExpression, MemberMap memberMap)
         {
             var sourceType = sourceParameter.Type;
             if (sourceType.IsValueType && !sourceType.IsNullableType())
@@ -78,13 +61,13 @@ namespace AutoMapper.Execution
                 return mapExpression;
             }
             var destinationType = destinationParameter.Type;
-            var isCollection = destinationType.IsEnumerableType();
+            var isCollection = destinationType.IsCollection();
             bool isIList;
             Type destinationCollectionType;
             if (isCollection)
             {
                 isIList = destinationType.IsListType();
-                destinationCollectionType = isIList ? typeof(IList) : destinationType.GetCollectionType();
+                destinationCollectionType = isIList ? typeof(IList) : destinationType.GetICollectionType();
             }
             else
             {
@@ -120,27 +103,11 @@ namespace AutoMapper.Execution
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
             }
         }
-
-        private static Expression ObjectMapperExpression(IGlobalConfiguration configurationProvider,
-            ProfileMap profileMap, in TypePair typePair, Expression sourceParameter, MemberMap propertyMap,
-            Expression destinationParameter)
-        {
-            var match = configurationProvider.FindMapper(typePair);
-            if (match != null)
-            {
-                var mapperExpression = match.MapExpression(configurationProvider, profileMap, propertyMap,
-                    sourceParameter, destinationParameter);
-                return mapperExpression;
-            }
-            return ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
-        }
-
         public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
         }
-
         public static Expression CheckContext(TypeMap typeMap)
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
@@ -149,27 +116,19 @@ namespace AutoMapper.Execution
             }
             return null;
         }
-
-        public static Expression OverMaxDepth(TypeMap typeMap) =>
-            typeMap?.MaxDepth > 0 ?
-                Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap.Types), Constant(typeMap.MaxDepth)) :
-                null;
-
+        public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ?
+            Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap.Types), Constant(typeMap.MaxDepth)) :
+            null;
         public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, MemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullDestinationValues;
-
         public static bool AllowsNullCollectionsFor(this ProfileMap profile, MemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullCollections;
-
         public static bool AllowsNullDestinationValues(this MemberMap memberMap) => 
             memberMap.TypeMap.Profile.AllowsNullDestinationValuesFor(memberMap);
-
         public static bool AllowsNullCollections(this MemberMap memberMap) =>
             memberMap.TypeMap.Profile.AllowsNullCollectionsFor(memberMap);
-
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
-
         public static Expression ApplyTransformers(this MemberMap memberMap, Expression source)
         {
             var perMember = memberMap.ValueTransformers;

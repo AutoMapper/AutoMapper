@@ -11,7 +11,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class EnumerableProjectionMapper : IProjectionMapper
     {
         public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
-            memberMap.DestinationType.IsEnumerableType() && memberMap.SourceType.IsEnumerableType();
+            memberMap.DestinationType.IsCollection() && memberMap.SourceType.IsCollection();
         public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = GetElementType(memberMap.DestinationType);

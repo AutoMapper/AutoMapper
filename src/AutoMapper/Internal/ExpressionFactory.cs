@@ -310,7 +310,7 @@ namespace AutoMapper.Internal
             GetDestinationType();
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
-            var sourceElementType = sourceExpression.Type.GetCollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceExpression.Type);
+            var sourceElementType = sourceExpression.Type.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceExpression.Type);
             var itemParam = Parameter(sourceElementType, "item");
             var itemExpr = MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
             Expression destination, assignNewExpression;
@@ -335,7 +335,7 @@ namespace AutoMapper.Internal
             return CheckContext();
             void GetDestinationType()
             {
-                destinationCollectionType = destExpression.Type.GetCollectionType();
+                destinationCollectionType = destExpression.Type.GetICollectionType();
                 destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? GetEnumerableElementType(destExpression.Type);
                 if (destinationCollectionType == null && destExpression.Type.IsInterface)
                 {

@@ -53,9 +53,9 @@ namespace AutoMapper.Internal
 
         public static bool IsKeyValue(this Type type) => type.IsGenericType(typeof(KeyValuePair<,>));
 
-        public static Type GetCollectionType(this Type type) => type.GetGenericInterface(typeof(ICollection<>));
+        public static Type GetICollectionType(this Type type) => type.GetGenericInterface(typeof(ICollection<>));
 
-        public static bool IsEnumerableType(this Type type) => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
+        public static bool IsCollection(this Type type) => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
 
         public static bool IsListType(this Type type) => typeof(IList).IsAssignableFrom(type);
 

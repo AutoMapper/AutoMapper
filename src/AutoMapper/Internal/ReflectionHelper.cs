@@ -98,7 +98,7 @@ namespace AutoMapper.Internal
                 }
             }
             return members;
-            static Type GetCurrentType(Type type) => type.IsGenericType && type.IsEnumerableType() ? type.GenericTypeArguments[0] : type;
+            static Type GetCurrentType(Type type) => type.IsGenericType && type.IsCollection() ? type.GenericTypeArguments[0] : type;
         }
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {

@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
     {
         public override TypePair GetAssociatedTypes(in TypePair context) => 
             new TypePair(GetElementType(context.SourceType), context.DestinationType.GetElementType());
-        public override bool IsMatch(in TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
+        public override bool IsMatch(in TypePair context) => context.DestinationType.IsArray && context.SourceType.IsCollection();
         public override Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {

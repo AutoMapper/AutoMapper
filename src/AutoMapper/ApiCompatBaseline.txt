@@ -321,6 +321,7 @@ MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.ImplementsGenericInterface(System.Type, System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsCollectionType(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsDictionaryType(System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsEnumerableType(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsNonStringEnumerable(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsSetType(System.Type)' does not exist in the implementation but it does exist in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'context' on method 'AutoMapper.Mappers.ArrayCopyMapper.IsMatch(AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
@@ -401,4 +402,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 402
+Total Issues: 403
