@@ -2,7 +2,7 @@
 using Xunit;
 namespace AutoMapper.UnitTests.Mappers
 {
-    public class ConstructorMapper : AutoMapperSpecBase
+    public class ConstructorMapperTests : AutoMapperSpecBase
     {
         class Destination
         {

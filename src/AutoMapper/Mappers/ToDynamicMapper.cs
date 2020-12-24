@@ -11,12 +11,13 @@ namespace AutoMapper.Mappers
 {
     using static Expression;
     using static ExpressionFactory;
-
     public class ToDynamicMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
+        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetStaticMethod(nameof(Map));
+        private static object Map(object source, object destination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            var sourceTypeDetails = profileMap.CreateTypeDetails(typeof(TSource));
+            destination ??= ObjectFactory.CreateInstance(destinationType);
+            var sourceTypeDetails = profileMap.CreateTypeDetails(source.GetType());
             foreach (var member in sourceTypeDetails.ReadAccessors)
             {
                 object sourceMemberValue;
@@ -33,7 +34,6 @@ namespace AutoMapper.Mappers
             }
             return destination;
         }
-
         private static void SetDynamically(string memberName, object target, object value)
         {
             var binder = Binder.SetMember(CSharpBinderFlags.None, memberName, null,
@@ -44,20 +44,9 @@ namespace AutoMapper.Mappers
             var callsite = CallSite<Func<CallSite, object, object, object>>.Create(binder);
             callsite.Target(callsite, target, value);
         }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetStaticMethod(nameof(Map));
-
         public bool IsMatch(in TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
-            Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
-                sourceExpression,
-                ToType(
-                    Coalesce(destExpression.ToObject(),
-                        ObjectFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
-                ContextParameter,
-                Constant(profileMap));
+            Call(MapMethodInfo, sourceExpression.ToObject(), destExpression, Constant(destExpression.Type), ContextParameter, Constant(profileMap));
     }
 }

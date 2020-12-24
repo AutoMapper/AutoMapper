@@ -14,17 +14,6 @@ namespace AutoMapper.Internal
         public static Type GetEnumerableElementType(Type type) => type.GetIEnumerableType()?.GenericTypeArguments[0] ?? typeof(object);
         public static TypeMap[] GetIncludedTypeMaps(this IGlobalConfiguration configuration, TypeMap typeMap) => 
             configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes);
-        public static MethodInfo GetConversionOperator(this TypePair context, string name)
-        {
-            foreach (MethodInfo sourceMethod in context.SourceType.GetMember(name, MemberTypes.Method, TypeExtensions.StaticFlags))
-            {
-                if (sourceMethod.ReturnType == context.DestinationType)
-                {
-                    return sourceMethod;
-                }
-            }
-            return context.DestinationType.GetMethod(name, TypeExtensions.StaticFlags, null, new[] { context.SourceType }, null);
-        }
         public static bool IsPublic(this PropertyInfo propertyInfo) => (propertyInfo.GetGetMethod() ?? propertyInfo.GetSetMethod()) != null;
         public static bool HasAnInaccessibleSetter(this PropertyInfo property) => property.GetSetMethod() == null;
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.IsDefined(typeof(TAttribute));

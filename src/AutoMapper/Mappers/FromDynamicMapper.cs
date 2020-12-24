@@ -11,13 +11,13 @@ namespace AutoMapper.Mappers
 {
     using static Expression;
     using static ExpressionFactory;
-
     public class FromDynamicMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
+        private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetStaticMethod(nameof(Map));
+        private static object Map(object source, object destination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            object boxedDestination = destination;
-            var destinationTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
+            destination ??= ObjectFactory.CreateInstance(destinationType);
+            var destinationTypeDetails = profileMap.CreateTypeDetails(destinationType);
             foreach (var member in destinationTypeDetails.WriteAccessors)
             {
                 object sourceMemberValue;
@@ -29,12 +29,11 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue, boxedDestination);
-                member.SetMemberValue(boxedDestination, destinationMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, destination);
+                member.SetMemberValue(destination, destinationMemberValue);
             }
-            return (TDestination) boxedDestination;
+            return destination;
         }
-
         private static object GetDynamically(string memberName, object target)
         {
             var binder = Binder.GetMember(CSharpBinderFlags.None, memberName, null,
@@ -42,20 +41,9 @@ namespace AutoMapper.Mappers
             var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
             return callsite.Target(callsite, target);
         }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetStaticMethod(nameof(Map));
-
         public bool IsMatch(in TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
-
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
-            Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
-                sourceExpression,
-                ToType(
-                    Coalesce(destExpression.ToObject(),
-                        ObjectFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
-                ContextParameter,
-                Constant(profileMap));
+            Call(MapMethodInfo, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
     }
 }

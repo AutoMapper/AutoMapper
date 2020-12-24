@@ -22,8 +22,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
         public class ComplexType
         {
-            public string SomeMember { get; }
-            private ComplexType(string someMember)
+            public int SomeMember { get; }
+            private ComplexType(int someMember)
             {
                 SomeMember = someMember;
             }
