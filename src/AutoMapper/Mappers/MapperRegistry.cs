@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
          - Conversion operators
          - "Special" cases
          */
-        public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
+        public static List<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
             new NullableSourceMapper(),
             new NullableDestinationMapper(),

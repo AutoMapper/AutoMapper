@@ -29,7 +29,7 @@ namespace AutoMapper.Internal
         /// <summary>
         /// Object mappers
         /// </summary>
-        IList<IObjectMapper> Mappers { get; }
+        List<IObjectMapper> Mappers { get; }
         IEnumerable<Action<IGlobalConfiguration>> BeforeSealActions { get; }
         /// <summary>
         /// Add Action called against the IGlobalConfiguration before it gets sealed

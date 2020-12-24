@@ -15,7 +15,7 @@ namespace AutoMapper.Configuration
         private readonly List<Profile> _profiles = new List<Profile>();
         private readonly List<Validator> _validators = new List<Validator>();
         private readonly List<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
-        private readonly IList<IObjectMapper> _mappers;
+        private readonly List<IObjectMapper> _mappers;
         private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
         public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
@@ -63,7 +63,7 @@ namespace AutoMapper.Configuration
         public void CreateProfile(string profileName, Action<IProfileExpression> config)
             => AddProfile(new NamedProfile(profileName, config));
 
-        IList<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
+        List<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
 
         Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
 
