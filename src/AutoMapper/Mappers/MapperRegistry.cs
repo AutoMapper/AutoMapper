@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 namespace AutoMapper.Mappers
 {
@@ -29,6 +30,7 @@ namespace AutoMapper.Mappers
             new EnumToEnumMapper(),
             new StringMapper(),
             new ConvertMapper(),
+            new ParseStringMapper(),
             new KeyValueMapper(),
             new ConversionOperatorMapper("op_Implicit"),
             new ConversionOperatorMapper("op_Explicit"),

@@ -56,5 +56,19 @@ namespace AutoMapper.UnitTests.Mappers
         {
             Mapper.Map<string, int?>(null).ShouldBeNull();
         }
+
+        [Fact]
+        public void ParseMapper()
+        {
+            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(Guid))).ShouldBeOfType<ParseStringMapper>();
+            var guid = Guid.NewGuid();
+            Mapper.Map<Guid>(guid.ToString()).ShouldBe(guid);
+            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(TimeSpan))).ShouldBeOfType<ParseStringMapper>();
+            var timeSpan = TimeSpan.FromMinutes(1);
+            Mapper.Map<TimeSpan>(timeSpan.ToString()).ShouldBe(timeSpan);
+            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(DateTimeOffset))).ShouldBeOfType<ParseStringMapper>();
+            var dateTimeOffset = DateTimeOffset.Now;
+            Mapper.Map<DateTimeOffset>(dateTimeOffset.ToString("O")).ShouldBe(dateTimeOffset);
+        }
     }
 }
