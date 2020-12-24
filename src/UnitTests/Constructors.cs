@@ -971,7 +971,7 @@ namespace AutoMapper.UnitTests.Constructors
     {
         public class Source
         {
-            public int Foo { get; set; }
+            public float Foo { get; set; }
             public int Bar { get; set; }
         }
 

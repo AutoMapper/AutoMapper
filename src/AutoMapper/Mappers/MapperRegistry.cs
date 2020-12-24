@@ -32,6 +32,7 @@ namespace AutoMapper.Mappers
             new ConvertMapper(),
             new ParseStringMapper(),
             new KeyValueMapper(),
+            new ConstructorMapper(),
             new ConversionOperatorMapper("op_Implicit"),
             new ConversionOperatorMapper("op_Explicit"),
             new FromStringDictionaryMapper(),
