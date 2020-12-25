@@ -48,7 +48,8 @@ namespace AutoMapper
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
-        public abstract bool IsMatch(in TypePair context);
+        public virtual bool IsMatch(in TypePair context) => 
+            typeof(TSource).IsAssignableFrom(context.SourceType) && typeof(TDestination).IsAssignableFrom(context.DestinationType);
 
         /// <summary>
         /// Performs conversion from source to destination type

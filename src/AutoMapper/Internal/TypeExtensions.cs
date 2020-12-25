@@ -59,8 +59,6 @@ namespace AutoMapper.Internal
 
         public static bool IsListType(this Type type) => typeof(IList).IsAssignableFrom(type);
 
-        public static bool IsReadOnlyDictionaryType(this Type type) => type.IsGenericType(typeof(IReadOnlyDictionary<,>)) || type.IsGenericType(typeof(ReadOnlyDictionary<,>));
-
         public static bool IsGenericType(this Type type, Type genericType) => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
 
         public static Type GetIEnumerableType(this Type type) => type.GetGenericInterface(typeof(IEnumerable<>));

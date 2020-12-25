@@ -190,29 +190,34 @@ namespace AutoMapper.Internal
             {
                 return expression;
             }
-            var variables = new ParameterExpression[chain.Count];
-            var nullCheck = False;
+            var returnType = (destinationType != null && Nullable.GetUnderlyingType(destinationType) == expression.Type) ? destinationType : expression.Type;
+            var defaultReturn = Default(returnType);
+            ParameterExpression[] variables = null;
             var name = parameter.Name;
             int index = 0;
-            foreach (var member in chain)
+            var nullCheckedExpression = NullCheck(parameter);
+            return variables == null ? nullCheckedExpression : Block(variables, nullCheckedExpression);
+            Expression NullCheck(ParameterExpression variable)
             {
-                var variable = Variable(member.Target.Type, name);
+                var member = chain.Pop();
+                if (chain.Count == 0)
+                {
+                    return variable.IfNullElse(defaultReturn, UpdateTarget(expression, variable));
+                }
+                variables ??= new ParameterExpression[chain.Count];
                 name += member.MemberInfo.Name;
-                var target = index == 0 ? parameter : variables[index - 1];
-                var assignment = Assign(variable, UpdateTarget(member.Target, target));
-                variables[index++] = variable;
-                var nullCheckVariable = variable.Type.IsValueType ? (Expression)Block(assignment, False) : ReferenceEqual(assignment, Null);
-                nullCheck = OrElse(nullCheck, nullCheckVariable);
+                var newVariable = Variable(member.Expression.Type, name);
+                variables[index++] = newVariable;
+                var assignment = Assign(newVariable, UpdateTarget(member.Expression, variable));
+                return variable.IfNullElse(defaultReturn, Block(assignment, NullCheck(newVariable)));
             }
-            var nonNullExpression = UpdateTarget(expression, variables[variables.Length - 1]);
-            var returnType = (destinationType != null && Nullable.GetUnderlyingType(destinationType) == expression.Type) ? destinationType : expression.Type;
-            return Block(variables, Condition(nullCheck, Default(returnType), ToType(nonNullExpression, returnType)));
             static Expression UpdateTarget(Expression sourceExpression, Expression newTarget) =>
                 sourceExpression switch
                 {
                     MemberExpression memberExpression => memberExpression.Update(newTarget),
-                    MethodCallExpression { Method: { IsStatic: true } } methodCall => methodCall.Update(null, new[] { newTarget }.Concat(methodCall.Arguments.Skip(1))),
-                    MethodCallExpression methodCall => methodCall.Update(newTarget, methodCall.Arguments),
+                    MethodCallExpression { Method: { IsStatic: true }, Arguments: var args } methodCall when args[0] != newTarget => 
+                        methodCall.Update(null, new[] { newTarget }.Concat(args.Skip(1))),
+                    MethodCallExpression { Method: { IsStatic: false } } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
                     _ => sourceExpression,
                 };
         }

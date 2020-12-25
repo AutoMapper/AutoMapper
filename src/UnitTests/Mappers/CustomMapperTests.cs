@@ -104,11 +104,6 @@ namespace AutoMapper.UnitTests.Mappers
                 destinationType.ShouldBe(typeof(DestinationType));
                 return Instance;
             }
-
-            public override bool IsMatch(in TypePair context)
-            {
-                return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
-            }
         }
 
         public class ClassA
