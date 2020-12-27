@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using Execution;
     using System.Reflection;

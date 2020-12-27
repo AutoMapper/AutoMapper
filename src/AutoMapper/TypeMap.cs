@@ -302,7 +302,7 @@ namespace AutoMapper
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
 
-        public void Seal(IGlobalConfiguration configurationProvider)
+        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath = null)
         {
             if (_sealed)
             {
@@ -324,7 +324,7 @@ namespace AutoMapper
             {
                 foreach (var includedMemberTypeMap in _includedMembersTypeMaps)
                 {
-                    includedMemberTypeMap.TypeMap.Seal(configurationProvider);
+                    includedMemberTypeMap.TypeMap.Seal(configurationProvider, typeMapsPath);
                     ApplyIncludedMemberTypeMap(includedMemberTypeMap);
                 }
             }
@@ -342,7 +342,7 @@ namespace AutoMapper
                     _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
                     _propertyMaps.Clear();
                 }
-                MapExpression = CreateMapperLambda(configurationProvider);
+                MapExpression = CreateMapperLambda(configurationProvider, typeMapsPath);
             }
             _features?.Seal(configurationProvider);
             SourceTypeDetails = null;
@@ -365,8 +365,8 @@ namespace AutoMapper
             }
         }
 
-        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider) =>
-            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda();
+        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath) =>
+            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
 
         private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetOrDefault(name);
 

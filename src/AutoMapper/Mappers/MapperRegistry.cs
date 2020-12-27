@@ -1,6 +1,5 @@
-using System;
 using System.Collections.Generic;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     internal static class MapperRegistry
     {

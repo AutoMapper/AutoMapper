@@ -3,7 +3,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     public class ConstructorMapper : IObjectMapper
     {

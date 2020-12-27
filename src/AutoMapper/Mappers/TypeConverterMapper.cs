@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
     using static TypeDescriptor;

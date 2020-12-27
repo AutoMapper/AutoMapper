@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using Shouldly;
 using Xunit;
 using System.Reflection;

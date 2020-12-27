@@ -6,6 +6,7 @@ using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
+using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
@@ -28,7 +29,6 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
         private readonly Features<IRuntimeFeature> _features = new();
         private readonly int _recursiveQueriesMaxDepth;
-        private readonly IProjectionMapper[] _projectionMappers;
         private readonly int _maxExecutionPlanDepth;
         private readonly bool _enableNullPropagationForQueryMapping;
         private readonly Func<Type, object> _serviceCtor;
@@ -44,12 +44,11 @@ namespace AutoMapper
             _mappers = configuration.Mappers.ToArray();
             _executionPlans = new(CompileExecutionPlan);
             _validator = new(this, configuration);
-            _projectionBuilder = new(this);
+            _projectionBuilder = new(this, configuration.ProjectionMappers.ToArray());
 
             _serviceCtor = configuration.ServiceCtor;
             _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
             _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
-            _projectionMappers = configuration.ProjectionMappers.ToArray();
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
             Configuration = new((IProfileConfiguration)configuration);
@@ -124,7 +123,6 @@ namespace AutoMapper
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
         internal List<ProfileMap> Profiles { get; }
-        IProjectionMapper[] IGlobalConfiguration.ProjectionMappers => _projectionMappers;
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
@@ -226,7 +224,7 @@ namespace AutoMapper
                 {
                     lock (typeMap)
                     {
-                        typeMap.Seal(this);
+                        typeMap.Seal(this, null);
                     }
                 }
             }
@@ -328,9 +326,10 @@ namespace AutoMapper
                     }
                 }
             }
+            var typeMapsPath = new HashSet<TypeMap>();
             foreach (var typeMap in _configuredMaps.Values)
             {
-                typeMap.Seal(this);
+                typeMap.Seal(this, typeMapsPath);
             }
             _features.Seal(this);
         }

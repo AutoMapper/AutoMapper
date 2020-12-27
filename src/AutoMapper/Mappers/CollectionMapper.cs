@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static ExpressionFactory;
     using static ReflectionHelper;

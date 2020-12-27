@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     public class NameValueCollectionMapper : IObjectMapper
     {

@@ -7,7 +7,7 @@ using AutoMapper.Internal;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
     using static ExpressionFactory;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static ExpressionFactory;
     public class ReadOnlyDictionaryMapper : IObjectMapper

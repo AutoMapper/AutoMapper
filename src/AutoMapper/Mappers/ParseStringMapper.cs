@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Internal;
 using System;
 using System.Linq.Expressions;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     public class ParseStringMapper : IObjectMapper
     {

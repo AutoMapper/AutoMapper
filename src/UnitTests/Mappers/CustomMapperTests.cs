@@ -3,7 +3,7 @@ using Shouldly;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using Xunit;
 using AutoMapper.Internal;
 

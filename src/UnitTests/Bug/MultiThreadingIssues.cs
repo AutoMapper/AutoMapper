@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug

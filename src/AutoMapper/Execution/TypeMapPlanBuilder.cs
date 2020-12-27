@@ -32,7 +32,7 @@ namespace AutoMapper.Execution
         public ParameterExpression Source { get; }
         private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => 
             new AutoMapperMappingException("Error mapping types.", innerException, memberMap);
-        public LambdaExpression CreateMapperLambda()
+        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
             var parameters = new[] { Source, _initialDestination, ContextParameter };
             var customExpression = TypeConverter(parameters) ?? (_typeMap.CustomMapFunction ?? _typeMap.CustomMapExpression)?.ReplaceParameters(parameters);
@@ -42,7 +42,15 @@ namespace AutoMapper.Execution
             }
             _propertyMapVariables = new(capacity: 2);
             _propertyMapExpressions = new(capacity: 3);
-            CheckForCycles(_configurationProvider, _typeMap, new HashSet<TypeMap>());
+            if (typeMapsPath == null)
+            {
+                typeMapsPath = new HashSet<TypeMap>();
+            }
+            else
+            {
+                typeMapsPath.Clear();
+            }
+            CheckForCycles(_configurationProvider, _typeMap, typeMapsPath);
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
             var mapperFunc = CreateMapperFunc(assignmentFunc);

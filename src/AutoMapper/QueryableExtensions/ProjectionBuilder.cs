@@ -38,18 +38,16 @@ namespace AutoMapper.QueryableExtensions.Impl
             };
         private readonly LockingConcurrentDictionary<ProjectionRequest, QueryExpressions> _projectionCache;
         private readonly IGlobalConfiguration _configurationProvider;
-        public ProjectionBuilder(IGlobalConfiguration configurationProvider)
+        private readonly IProjectionMapper[] _projectionMappers;
+        public ProjectionBuilder(IGlobalConfiguration configurationProvider, IProjectionMapper[] projectionMappers)
         {
             _configurationProvider = configurationProvider;
+            _projectionMappers = projectionMappers;
             _projectionCache = new LockingConcurrentDictionary<ProjectionRequest, QueryExpressions>(CreateProjection);
         }
         public QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand)
         {
-            var projectionRequest = new ProjectionRequest(
-                sourceType ?? throw new ArgumentNullException(nameof(sourceType)),
-                destinationType ?? throw new ArgumentNullException(nameof(destinationType)),
-                membersToExpand ?? throw new ArgumentNullException(nameof(membersToExpand)),
-                Array.Empty<ProjectionRequest>());
+            var projectionRequest = new ProjectionRequest(sourceType, destinationType, membersToExpand, Array.Empty<ProjectionRequest>());
             var cachedExpressions = _projectionCache.GetOrAdd(projectionRequest);
             if (parameters == null && !_configurationProvider.EnableNullPropagationForQueryMapping)
             {
@@ -174,7 +172,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                     IProjectionMapper GetProjectionMapper()
                     {
-                        foreach (var mapper in _configurationProvider.ProjectionMappers)
+                        foreach (var mapper in _projectionMappers)
                         {
                             if (mapper.IsMatch(memberMap, memberTypeMap, resolvedSource))
                             {

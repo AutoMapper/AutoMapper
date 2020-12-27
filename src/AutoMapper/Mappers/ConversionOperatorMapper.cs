@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     public class ConversionOperatorMapper : IObjectMapper
     {

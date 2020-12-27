@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Features;
+using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.Internal
@@ -132,7 +133,6 @@ namespace AutoMapper.Internal
         /// <returns>the matching mapper or null</returns>
         IObjectMapper FindMapper(in TypePair types);
         IProjectionBuilder ProjectionBuilder { get; }
-        IProjectionMapper[] ProjectionMappers { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
         /// <summary>

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using AutoMapper.Internal;
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
     public class EnumToStringMapper : IObjectMapper

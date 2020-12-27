@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper.Features;
 using AutoMapper.Internal;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.Configuration

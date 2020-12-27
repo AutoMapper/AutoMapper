@@ -1,4 +1,4 @@
-﻿namespace AutoMapper
+﻿namespace AutoMapper.Internal.Mappers
 {
     public interface IObjectMapperInfo : IObjectMapper
     {

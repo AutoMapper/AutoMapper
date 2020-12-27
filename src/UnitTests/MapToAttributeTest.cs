@@ -1,4 +1,4 @@
-﻿using AutoMapper.Mappers;
+﻿using AutoMapper.Internal.Mappers;
 using AutoMapper.Configuration.Conventions;
 using Shouldly;
 using Xunit;

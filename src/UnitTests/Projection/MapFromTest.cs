@@ -25,20 +25,6 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         }
 
         [Fact]
-        public void Should_fail_Untyped()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateProjection<UserModel, UserDto>()
-                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
-            });
-
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(null, typeof(UserDto), new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(typeof(UserModel), null, new Dictionary<string, object>(), new MemberPath[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.Internal().ProjectionBuilder.GetProjection(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
-        }
-
-        [Fact]
         public void Should_map_from_String()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<UserModel, UserDto>()

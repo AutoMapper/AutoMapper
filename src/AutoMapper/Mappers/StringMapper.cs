@@ -1,7 +1,7 @@
 ﻿using AutoMapper.Internal;
 using System.Linq.Expressions;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
     public class StringMapper : IObjectMapper

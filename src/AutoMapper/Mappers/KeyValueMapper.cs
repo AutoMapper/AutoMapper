@@ -1,6 +1,6 @@
 ﻿using AutoMapper.Internal;
 using System.Linq.Expressions;
-namespace AutoMapper
+namespace AutoMapper.Internal.Mappers
 {
     using Execution;
     public class KeyValueMapper : IObjectMapper

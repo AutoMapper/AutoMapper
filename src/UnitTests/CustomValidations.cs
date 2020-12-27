@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using Shouldly;
 using Xunit;
 

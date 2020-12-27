@@ -6,7 +6,7 @@ using AutoMapper.Execution;
 using AutoMapper.Internal;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
     using static ExpressionFactory;
