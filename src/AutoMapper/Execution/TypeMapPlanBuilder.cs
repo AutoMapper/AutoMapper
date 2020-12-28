@@ -354,7 +354,7 @@ namespace AutoMapper.Execution
             }
             Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
             {
-                var typePair = new TypePair(resolvedValue.Type, memberMap.DestinationType);
+                var typePair = memberMap.Types();
                 var mapMember = memberMap.Inline ?
                     MapExpression(_configurationProvider, _typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
                     ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);

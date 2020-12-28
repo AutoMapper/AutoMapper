@@ -3,9 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
-using AutoMapper.Internal;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
-
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;

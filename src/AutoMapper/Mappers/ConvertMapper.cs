@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using AutoMapper.Internal;
-
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;

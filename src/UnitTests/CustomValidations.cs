@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
                     else
                     {
                         _calledForValues = true;
-                        context.ObjectMapper.ShouldBeOfType<ArrayCopyMapper>();
+                        context.ObjectMapper.ShouldBeOfType<ArrayMapper>();
                         context.Types.SourceType.ShouldBe(typeof(int[]));
                         context.Types.DestinationType.ShouldBe(typeof(int[]));
                     }

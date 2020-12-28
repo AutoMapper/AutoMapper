@@ -1,8 +1,6 @@
-﻿using AutoMapper.Internal;
-using System;
+﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-
 namespace AutoMapper.Internal.Mappers
 {
     public class ConstructorMapper : IObjectMapper

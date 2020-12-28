@@ -1,8 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
-
 namespace AutoMapper.Internal.Mappers
 {
     public class ConversionOperatorMapper : IObjectMapper

@@ -48,6 +48,7 @@ namespace AutoMapper
         public bool IsArray => SourceType.IsArray && DestinationType.IsArray;
         public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
+        public bool IsCollection() => SourceType.IsCollection() && DestinationType.IsCollection();
         public TypePair CloseGenericTypes(in TypePair closedTypes)
         {
             var sourceArguments = closedTypes.SourceType.GetGenericArguments();
