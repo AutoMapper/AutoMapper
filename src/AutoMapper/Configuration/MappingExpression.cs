@@ -6,6 +6,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
+    using Execution;
     public class MappingExpression : MappingExpressionBase<object, object, IMappingExpression>, IMappingExpression
     {
         public MappingExpression(in TypePair types, MemberList memberList) : base(memberList, types)

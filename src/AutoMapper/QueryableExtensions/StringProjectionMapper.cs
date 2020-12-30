@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using AutoMapper.Internal;
 using System.ComponentModel;
 using System.Linq.Expressions;
@@ -8,6 +9,6 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) => memberMap.DestinationType == typeof(string);
         public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
-            => Expression.Call(resolvedSource, ExpressionFactory.ObjectToString);
+            => Expression.Call(resolvedSource, ExpressionBuilder.ObjectToString);
     }
 }

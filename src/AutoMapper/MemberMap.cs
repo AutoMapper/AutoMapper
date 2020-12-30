@@ -1,4 +1,3 @@
-using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +8,7 @@ using System.Reflection;
 namespace AutoMapper
 {
     using static Expression;
+    using Execution;
     /// <summary>
     /// The base class for member maps (property, constructor and path maps).
     /// </summary>
@@ -55,8 +55,8 @@ namespace AutoMapper
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
                                                 // just a placeholder so the member is mapped
-                                                Lambda(ExpressionFactory.Null) :
-                                                ExpressionFactory.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
+                                                Lambda(ExpressionBuilder.Null) :
+                                                ExpressionBuilder.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
             MapFrom(mapExpression);
         }
         public override string ToString() => DestinationName;

@@ -7,7 +7,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     using static ReflectionHelper;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class EnumerableProjectionMapper : IProjectionMapper

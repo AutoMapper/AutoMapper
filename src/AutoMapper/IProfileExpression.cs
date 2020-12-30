@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using AutoMapper.Configuration.Conventions;
-
 namespace AutoMapper
 {
     /// <summary>
@@ -149,5 +147,25 @@ namespace AutoMapper
         /// Value transformers. Modify the list directly or use <see cref="ValueTransformerConfigurationExtensions.Add{TValue}"/>
         /// </summary>
         List<ValueTransformerConfiguration> ValueTransformers { get; }
+    }
+    /// <summary>
+    /// Member list to check for configuration validation
+    /// </summary>
+    public enum MemberList
+    {
+        /// <summary>
+        /// Check that all destination members are mapped
+        /// </summary>
+        Destination = 0,
+
+        /// <summary>
+        /// Check that all source members are mapped
+        /// </summary>
+        Source = 1,
+
+        /// <summary>
+        /// Check neither source nor destination members, skipping validation
+        /// </summary>
+        None = 2
     }
 }

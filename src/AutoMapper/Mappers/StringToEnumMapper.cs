@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace AutoMapper.Internal.Mappers
 {
-    using static ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     using static Expression;
     public class StringToEnumMapper : IObjectMapper
     {

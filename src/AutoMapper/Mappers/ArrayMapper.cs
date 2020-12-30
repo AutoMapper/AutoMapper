@@ -6,8 +6,8 @@ namespace AutoMapper.Internal.Mappers
 {
     using Execution;
     using static Expression;
-    using static ExpressionFactory;
     using static ReflectionHelper;
+    using static Execution.ExpressionBuilder;
     public class ArrayMapper : IObjectMapperInfo
     {
         private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", new[] { typeof(Array), typeof(int) });

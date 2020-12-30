@@ -9,7 +9,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.Execution
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static ExpressionBuilder;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ObjectFactory
     {
@@ -53,19 +53,17 @@ namespace AutoMapper.Execution
         }
         private static Expression CreateInterfaceExpression(Type type) =>
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 
-            type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyCollection(type, typeof(ReadOnlyDictionary<,>)) : 
+            type.IsGenericType(typeof(IReadOnlyDictionary<,>)) ? CreateReadOnlyDictionary(type.GenericTypeArguments) : 
             type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
             type.IsCollection() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) :
             InvalidType(type, $"Cannot create an instance of interface type {type}.");
         private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? new[] { typeof(object) };
         private static Expression CreateCollection(Type type, Type collectionType, Type[] genericArguments = null) => 
             ToType(New(collectionType.MakeGenericType(genericArguments ?? type.GenericTypeArguments)), type);
-        private static Expression CreateReadOnlyCollection(Type type, Type collectionType)
+        private static Expression CreateReadOnlyDictionary(Type[] typeArguments)
         {
-            var listType = collectionType.MakeGenericType(type.GenericTypeArguments);
-            var ctor = listType.GetConstructors()[0];
-            var innerType = ctor.GetParameters()[0].ParameterType;
-            return ToType(New(ctor, GenerateConstructorExpression(innerType)), type);
+            var ctor = typeof(ReadOnlyDictionary<,>).MakeGenericType(typeArguments).GetConstructors()[0];
+            return New(ctor, New(typeof(Dictionary<,>).MakeGenericType(typeArguments)));
         }
         private static Expression InvalidType(Type type, string message) => Throw(Constant(new ArgumentException(message, "type")), type);
     }

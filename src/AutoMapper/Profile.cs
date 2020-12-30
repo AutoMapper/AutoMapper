@@ -9,7 +9,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
-    using static Internal.ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>

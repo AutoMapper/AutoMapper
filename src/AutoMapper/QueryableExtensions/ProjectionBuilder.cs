@@ -11,7 +11,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static ExpressionBuilder;
     using ParameterBag = IDictionary<string, object>;
     using TypePairCount = IDictionary<ProjectionRequest, int>;
 

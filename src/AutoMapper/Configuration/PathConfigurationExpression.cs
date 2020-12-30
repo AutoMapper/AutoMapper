@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -7,6 +6,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
+    using Execution;
     public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;

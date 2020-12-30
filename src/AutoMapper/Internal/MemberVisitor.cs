@@ -5,6 +5,7 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
+    using Execution;
     public class MemberVisitor : ExpressionVisitor
     {
         public static MemberInfo[] GetMemberPath(Expression expression)

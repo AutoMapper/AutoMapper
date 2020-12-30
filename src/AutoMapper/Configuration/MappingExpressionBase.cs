@@ -9,7 +9,7 @@ using AutoMapper.Internal;
 namespace AutoMapper.Configuration
 {
     using static Expression;
-
+    using Execution;
     public abstract class MappingExpressionBase : ITypeMapConfiguration
     {
         private List<ValueTransformerConfiguration> _valueTransformers;

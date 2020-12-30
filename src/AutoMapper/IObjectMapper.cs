@@ -1,11 +1,10 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     /// <summary>
     /// Mapping execution strategy, as a chain of responsibility
     /// </summary>
@@ -30,6 +29,10 @@ namespace AutoMapper.Internal.Mappers
         /// <returns>Map expression</returns>
         Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression);
+    }
+    public interface IObjectMapperInfo : IObjectMapper
+    {
+        TypePair GetAssociatedTypes(in TypePair initialTypes);
     }
 
     /// <summary>

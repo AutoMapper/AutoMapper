@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
+using AutoMapper.Execution;
 using AutoMapper.Internal;
 
 namespace AutoMapper

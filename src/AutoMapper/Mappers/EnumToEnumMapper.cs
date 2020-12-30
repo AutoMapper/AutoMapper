@@ -4,7 +4,7 @@ using System.Reflection;
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     public class EnumToEnumMapper : IObjectMapper
     {
         private static readonly MethodInfo ToObjectMethod = typeof(Enum).GetMethod("ToObject", new[] { typeof(Type), typeof(object) });

@@ -7,7 +7,7 @@ using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static ExpressionBuilder;
     public class FromStringDictionaryMapper : IObjectMapper
     {
         private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));

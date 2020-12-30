@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper.Internal
 {
+    using Execution;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public struct MemberPath : IEquatable<MemberPath>
     {

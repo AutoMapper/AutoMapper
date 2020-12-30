@@ -172,7 +172,7 @@ namespace AutoMapper
         private IEnumerable<LambdaExpression> GetUntypedIncludedMembers() =>
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
-                IncludedMembersNames.Select(name => ExpressionFactory.MemberAccessLambda(SourceType, name));
+                IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
 
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap.CtorParams.Any(c => string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase));

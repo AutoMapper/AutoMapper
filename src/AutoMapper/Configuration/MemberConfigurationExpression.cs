@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
-    using static AutoMapper.Internal.ExpressionFactory;
+    using static AutoMapper.Execution.ExpressionBuilder;
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {

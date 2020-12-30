@@ -8,7 +8,7 @@ using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
-    using static ExpressionFactory;
+    using static ExpressionBuilder;
     public class FromDynamicMapper : IObjectMapper
     {
         private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetStaticMethod(nameof(Map));

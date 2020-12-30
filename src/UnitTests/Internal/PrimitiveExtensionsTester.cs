@@ -4,6 +4,7 @@ using AutoMapper.Internal;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Execution;
 
 namespace AutoMapper.UnitTests
 {

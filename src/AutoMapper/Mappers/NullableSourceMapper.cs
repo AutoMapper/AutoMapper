@@ -12,7 +12,7 @@ namespace AutoMapper.Internal.Mappers
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
                 ExpressionBuilder.MapExpression(configurationProvider, profileMap,
                     new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
-                    ExpressionFactory.Property(sourceExpression, "Value"),
+                    ExpressionBuilder.Property(sourceExpression, "Value"),
                     memberMap,
                     destExpression
                 );

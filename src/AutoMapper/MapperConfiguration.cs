@@ -12,7 +12,6 @@ using AutoMapper.QueryableExtensions.Impl;
 namespace AutoMapper
 {
     using static Expression;
-    using static ExpressionFactory;
     using static Execution.ExpressionBuilder;
 
     public class MapperConfiguration : IGlobalConfiguration

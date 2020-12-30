@@ -11,8 +11,8 @@ namespace AutoMapper.Internal.Mappers
             var destinationType = destExpression.Type;
             var typePairKey = new TypePair(sourceType.GenericTypeArguments[0], destinationType.GenericTypeArguments[0]);
             var typePairValue = new TypePair(sourceType.GenericTypeArguments[1], destinationType.GenericTypeArguments[1]);
-            var keyExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, typePairKey, ExpressionFactory.Property(sourceExpression, "Key"));
-            var valueExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, typePairValue, ExpressionFactory.Property(sourceExpression, "Value"));
+            var keyExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, typePairKey, ExpressionBuilder.Property(sourceExpression, "Key"));
+            var valueExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, typePairValue, ExpressionBuilder.Property(sourceExpression, "Value"));
             return Expression.New(destinationType.GetConstructors()[0], keyExpr, valueExpr);
         }
     }

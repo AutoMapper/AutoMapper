@@ -9,7 +9,6 @@ namespace AutoMapper.Internal.Mappers
     using Execution;
     using static Execution.ExpressionBuilder;
     using static Expression;
-    using static ExpressionFactory;
     using static ReflectionHelper;
     public class CollectionMapper : IObjectMapperInfo
     {
@@ -53,7 +52,7 @@ namespace AutoMapper.Internal.Mappers
                 var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
                 if (overMaxDepth != null)
                 {
-                    addItems = Condition(overMaxDepth, ExpressionFactory.Empty, addItems);
+                    addItems = Condition(overMaxDepth, ExpressionBuilder.Empty, addItems);
                 }
                 var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
                 var checkNull = Block(new[] { newExpression, passedDestination },
@@ -93,7 +92,7 @@ namespace AutoMapper.Internal.Mappers
                     if (memberMap is { UseDestinationValue: true })
                     {
                         destination = passedDestination;
-                        assignNewExpression = ExpressionFactory.Empty;
+                        assignNewExpression = ExpressionBuilder.Empty;
                     }
                     else
                     {
@@ -102,7 +101,7 @@ namespace AutoMapper.Internal.Mappers
                         var shouldCreateDestination = ReferenceEqual(passedDestination, Null);
                         if (memberMap is { CanBeSet: true })
                         {
-                            var isReadOnly = isIList ? Property(passedDestination, IListIsReadOnly) : ExpressionFactory.Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
+                            var isReadOnly = isIList ? Property(passedDestination, IListIsReadOnly) : ExpressionBuilder.Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
                             shouldCreateDestination = OrElse(shouldCreateDestination, isReadOnly);
                         }
                         assignNewExpression = Assign(newExpression, Condition(shouldCreateDestination, ToType(createInstance, passedDestination.Type), passedDestination));

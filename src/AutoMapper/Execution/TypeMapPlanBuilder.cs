@@ -7,7 +7,6 @@ using System.Reflection;
 namespace AutoMapper.Execution
 {
     using static Expression;
-    using static Internal.ExpressionFactory;
     using static ExpressionBuilder;
     using Internal;
     public class TypeMapPlanBuilder
@@ -215,7 +214,7 @@ namespace AutoMapper.Execution
             return TryMemberMap(pathMap, pathMapExpression);
             static Expression CreateInnerObjects(Expression destination)
             {
-                return Block(destination.GetMemberExpressions().Select(NullCheck).Concat(new[] { ExpressionFactory.Empty }));
+                return Block(destination.GetMemberExpressions().Select(NullCheck).Concat(new[] { ExpressionBuilder.Empty }));
                 static Expression NullCheck(MemberExpression memberExpression)
                 {
                     var setter = GetSetter(memberExpression);
