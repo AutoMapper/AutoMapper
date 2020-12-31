@@ -2,8 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
-
 namespace AutoMapper.Internal
 {
     using static Expression;
@@ -80,8 +78,7 @@ namespace AutoMapper.Internal
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {
             Expression expressionToCheck = lambdaExpression.Body;
-            var done = false;
-            while (!done)
+            while (true)
             {
                 switch (expressionToCheck)
                 {
@@ -91,13 +88,11 @@ namespace AutoMapper.Internal
                         expressionToCheck = operand;
                         break;
                     default:
-                        done = true;
-                        break;
+                        throw new ArgumentException(
+                            $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. You can use ForPath, a custom resolver on the child type or the AfterMap option instead.",
+                            nameof(lambdaExpression));
                 }
             }
-            throw new ArgumentException(
-                $"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. You can use ForPath, a custom resolver on the child type or the AfterMap option instead.",
-                nameof(lambdaExpression));
         }
         public static Type GetMemberType(this MemberInfo member) => member switch
         {

@@ -5,10 +5,8 @@ namespace AutoMapper.Internal.Mappers
     {
         public static List<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
-            new AssignableMapper(),// except collections, which are copied; most likely match
-            new ArrayMapper(),// set with indices or Array.Copy
-            new NameValueCollectionMapper(),// special case; legacy
             new CollectionMapper(),// matches IEnumerable, requires ICollection<>, IList or read-only collections
+            new AssignableMapper(),// except collections, which are copied; most likely match
             new NullableSourceMapper(),// map from the underlying type
             new ToStringMapper(),// object.ToString, no boxing, special case enums
             new NullableDestinationMapper(),// map to the underlying type

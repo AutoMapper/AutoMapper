@@ -44,11 +44,10 @@ namespace AutoMapper
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
         public override bool Equals(object other) => other is TypePair otherPair && Equals(otherPair);
         public override int GetHashCode() => HashCodeCombiner.Combine(SourceType, DestinationType);
-        public bool IsGeneric => SourceType.IsGenericType || DestinationType.IsGenericType;
+        public bool IsConstructedGenericType => SourceType.IsConstructedGenericType || DestinationType.IsConstructedGenericType;
         public bool IsArray => SourceType.IsArray && DestinationType.IsArray;
         public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
-        public bool IsCollection() => SourceType.IsCollection() && DestinationType.IsCollection();
         public TypePair CloseGenericTypes(in TypePair closedTypes)
         {
             var sourceArguments = closedTypes.SourceType.GetGenericArguments();

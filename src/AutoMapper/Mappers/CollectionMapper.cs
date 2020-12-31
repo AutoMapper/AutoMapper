@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections.Specialized;
+using System.Linq;
 namespace AutoMapper.Internal.Mappers
 {
     using Execution;
@@ -12,11 +14,15 @@ namespace AutoMapper.Internal.Mappers
     using static ReflectionHelper;
     public class CollectionMapper : IObjectMapperInfo
     {
-        public TypePair GetAssociatedTypes(in TypePair context) => new TypePair(GetElementType(context.SourceType), GetEnumerableElementType(context.DestinationType));
-        public bool IsMatch(in TypePair context) => context.IsCollection();
+        public TypePair GetAssociatedTypes(in TypePair context) => new TypePair(GetElementType(context.SourceType), GetElementType(context.DestinationType));
+        public bool IsMatch(in TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
+            if (destinationType.IsArray)
+            {
+                return ArrayMapper.MapToArray(configurationProvider, profileMap, sourceExpression, destinationType);
+            }
             if (destinationType.IsGenericType(typeof(ReadOnlyCollection<>)))
             {
                 return MapReadOnlyCollection(typeof(List<>), typeof(ReadOnlyCollection<>));
@@ -24,6 +30,10 @@ namespace AutoMapper.Internal.Mappers
             if (destinationType.IsGenericType(typeof(ReadOnlyDictionary<,>)) || destinationType.IsGenericType(typeof(IReadOnlyDictionary<,>)))
             {
                 return MapReadOnlyCollection(typeof(Dictionary<,>), typeof(ReadOnlyDictionary<,>));
+            }
+            if (destinationType == sourceExpression.Type && destinationType.Name == nameof(NameValueCollection))
+            {
+                return CreateNameValueCollection(sourceExpression);
             }
             return MapCollectionCore(destExpression);
             Expression MapReadOnlyCollection(Type genericCollectionType, Type genericReadOnlyCollectionType)
@@ -121,6 +131,99 @@ namespace AutoMapper.Internal.Mappers
                     }
                     return Block(checkContext, checkNull);
                 }
+            }
+        }
+        private static Expression CreateNameValueCollection(Expression sourceExpression) =>
+            New(typeof(NameValueCollection).GetConstructor(new[] { typeof(NameValueCollection) }), sourceExpression);
+        static class ArrayMapper
+        {
+            private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", new[] { typeof(Array), typeof(int) });
+            private static readonly MethodInfo CountMethod = typeof(Enumerable).StaticGenericMethod("Count", parametersCount: 1);
+            private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
+            private static Array MapMultidimensional(Array source, Type destinationElementType, ResolutionContext context)
+            {
+                var sourceElementType = source.GetType().GetElementType();
+                var destinationArray = Array.CreateInstance(destinationElementType, Enumerable.Range(0, source.Rank).Select(source.GetLength).ToArray());
+                var filler = new MultidimensionalArrayFiller(destinationArray);
+                foreach (var item in source)
+                {
+                    filler.NewValue(context.Map(item, null, sourceElementType, destinationElementType, null));
+                }
+                return destinationArray;
+            }
+            public static Expression MapToArray(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Expression sourceExpression, Type destinationType)
+            {
+                var destinationElementType = destinationType.GetElementType();
+                if (destinationType.GetArrayRank() > 1)
+                {
+                    return Call(MapMultidimensionalMethod, sourceExpression, Constant(destinationElementType), ContextParameter);
+                }
+                var sourceType = sourceExpression.Type;
+                Type sourceElementType;
+                Expression createDestination;
+                var destination = Parameter(destinationType, "destinationArray");
+                if (sourceType.IsArray)
+                {
+                    sourceElementType = sourceType.GetElementType();
+                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, ArrayLength(sourceExpression)));
+                    if (destinationElementType.IsAssignableFrom(sourceElementType) && configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) == null)
+                    {
+                        return Block(new[] { destination },
+                            createDestination,
+                            Call(sourceExpression, CopyToMethod, destination, Zero),
+                            destination);
+                    }
+                }
+                else
+                {
+                    sourceElementType = GetEnumerableElementType(sourceExpression.Type);
+                    var count = Call(CountMethod.MakeGenericMethod(sourceElementType), sourceExpression);
+                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, count));
+                }
+                var itemParam = Parameter(sourceElementType, "sourceItem");
+                var itemExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+                var indexParam = Parameter(typeof(int), "destinationArrayIndex");
+                var setItem = Assign(ArrayAccess(destination, PostIncrementAssign(indexParam)), itemExpr);
+                return Block(new[] { destination, indexParam },
+                    createDestination,
+                    Assign(indexParam, Zero),
+                    ForEach(itemParam, sourceExpression, setItem),
+                    destination);
+            }
+        }
+    }
+    public class MultidimensionalArrayFiller
+    {
+        private readonly int[] _indices;
+        private readonly Array _destination;
+        public MultidimensionalArrayFiller(Array destination)
+        {
+            _indices = new int[destination.Rank];
+            _destination = destination;
+        }
+        public void NewValue(object value)
+        {
+            var dimension = _destination.Rank - 1;
+            var changedDimension = false;
+            while (_indices[dimension] == _destination.GetLength(dimension))
+            {
+                _indices[dimension] = 0;
+                dimension--;
+                if (dimension < 0)
+                {
+                    throw new InvalidOperationException("Not enough room in destination array " + _destination);
+                }
+                _indices[dimension]++;
+                changedDimension = true;
+            }
+            _destination.SetValue(value, _indices);
+            if (changedDimension)
+            {
+                _indices[dimension + 1]++;
+            }
+            else
+            {
+                _indices[dimension]++;
             }
         }
     }

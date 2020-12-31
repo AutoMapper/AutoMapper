@@ -177,6 +177,7 @@ ParameterModifiersCannotChange : Modifiers on parameter 'closedTypes' on method 
 MembersMustExist : Member 'public System.Type AutoMapper.TypePair.DestinationType.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Nullable<AutoMapper.TypePair> AutoMapper.TypePair.GetOpenGenericTypePair()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<AutoMapper.TypePair> AutoMapper.TypePair.GetRelatedTypePairs()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Boolean AutoMapper.TypePair.IsGeneric.get()' does not exist in the implementation but it does exist in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.TypePair.op_Equality(AutoMapper.TypePair, AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.TypePair.op_Equality(AutoMapper.TypePair, AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
 ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.TypePair.op_Inequality(AutoMapper.TypePair, AutoMapper.TypePair)' are 'in' in the implementation but '<none>' in the contract.
@@ -361,4 +362,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 362
+Total Issues: 363

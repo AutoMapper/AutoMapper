@@ -386,11 +386,11 @@ namespace AutoMapper.Execution
             var destinationPropertyType = memberMap.DestinationType;
             var valueResolverFunc = memberMap switch
             {
-                { ValueConverterConfig: { } } => ToType(BuildConvertCall(customSource, memberMap), destinationPropertyType),
+                { ValueConverterConfig: { } } => ToType(BuildConvertCall(customSource, memberMap, destValueExpr), destinationPropertyType),
                 { ValueResolverConfig: { } } => BuildResolveCall(customSource, destValueExpr, memberMap),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
-                { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType),
-                { SourceMembers: { Length: > 0 } } => Chain(customSource, memberMap, destinationPropertyType),
+                { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
+                { SourceMembers: { Length: > 0 } } => Chain(customSource, memberMap, destinationPropertyType, destValueExpr),
                 _ => destValueExpr
             };
             if (memberMap.NullSubstitute != null)
@@ -406,9 +406,9 @@ namespace AutoMapper.Execution
                 }
             }
             return valueResolverFunc;
-            static Expression CustomMapExpression(Expression mapFrom, Type destinationPropertyType)
+            static Expression CustomMapExpression(Expression mapFrom, Type destinationPropertyType, Expression destValueExpr)
             {
-                var nullCheckedExpression = mapFrom.NullCheck(destinationPropertyType);
+                var nullCheckedExpression = mapFrom.NullCheck(destinationPropertyType, destValueExpr);
                 if (nullCheckedExpression != mapFrom)
                 {
                     return nullCheckedExpression;
@@ -418,7 +418,8 @@ namespace AutoMapper.Execution
             }
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
-        private Expression Chain(Expression source, MemberMap memberMap, Type destinationType) => memberMap.SourceMembers.Chain(source).NullCheck(destinationType);
+        private Expression Chain(Expression source, MemberMap memberMap, Type destinationType, Expression defaultValue) => 
+            memberMap.SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
         private Expression ServiceLocator(Type type) => Call(ContextParameter, ContextCreate, Constant(type));
         private Expression BuildResolveCall(Expression source, Expression destValueExpr, MemberMap memberMap)
         {
@@ -440,7 +441,7 @@ namespace AutoMapper.Execution
                 .Concat(new[] { ContextParameter });
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetMethod("Resolve"), parameters);
         }
-        private Expression BuildConvertCall(Expression source, MemberMap memberMap)
+        private Expression BuildConvertCall(Expression source, MemberMap memberMap, Expression destValueExpr)
         {
             var valueConverterConfig = memberMap.ValueConverterConfig;
             var iResolverType = valueConverterConfig.InterfaceType;
@@ -451,7 +452,9 @@ namespace AutoMapper.Execution
             var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(source) ??
                 (valueConverterConfig.SourceMemberName != null ?
                     PropertyOrField(source, valueConverterConfig.SourceMemberName) : 
-                    memberMap.SourceMembers.Length > 0 ? Chain(source, memberMap, iResolverTypeArgs[1]) : Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
+                    memberMap.SourceMembers.Length > 0 ? 
+                        Chain(source, memberMap, iResolverTypeArgs[1], destValueExpr) : 
+                        Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetMethod("Convert"), ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage() 
                 => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
