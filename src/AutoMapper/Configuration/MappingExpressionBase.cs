@@ -329,7 +329,7 @@ namespace AutoMapper.Configuration
             BeforeMap(CallMapAction<TMappingAction>);
         public TMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination> =>
             AfterMap(CallMapAction<TMappingAction>);
-        void CallMapAction<TMappingAction>(TSource source, TDestination destination, ResolutionContext context) =>
+        private static void CallMapAction<TMappingAction>(TSource source, TDestination destination, ResolutionContext context) =>
             ((IMappingAction<TSource, TDestination>)context.CreateInstance(typeof(TMappingAction))).Process(source, destination, context);
 
         public TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction)

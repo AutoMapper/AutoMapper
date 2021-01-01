@@ -14,19 +14,10 @@ namespace AutoMapper.Configuration
     {
         private readonly List<Profile> _profiles = new List<Profile>();
         private readonly List<Validator> _validators = new List<Validator>();
-        private readonly List<Action<IGlobalConfiguration>> _beforeSealActions = new List<Action<IGlobalConfiguration>>();
         private readonly List<IObjectMapper> _mappers;
         private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
         public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
-
-        IEnumerable<Action<IGlobalConfiguration>> IGlobalConfigurationExpression.BeforeSealActions => _beforeSealActions;
-
-        /// <summary>
-        /// Add Action called against the IGlobalConfiguration before it gets sealed
-        /// </summary>
-        void IGlobalConfigurationExpression.BeforeSeal(Action<IGlobalConfiguration> action) => 
-            _beforeSealActions.Add(action ?? throw new ArgumentNullException(nameof(action)));
 
         /// <summary>
         /// Add an action to be called when validating the configuration.

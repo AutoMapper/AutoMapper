@@ -55,7 +55,7 @@ namespace AutoMapper.Internal.Mappers
                 var newExpression = Variable(passedDestination.Type, "collectionDestination");
                 var sourceElementType = sourceExpression.Type.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceExpression.Type);
                 var itemParam = Parameter(sourceElementType, "item");
-                var itemExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+                var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 Expression destination, assignNewExpression;
                 UseDestinationValue();
                 var addItems = ForEach(itemParam, sourceExpression, Call(destination, addMethod, itemExpr));
@@ -181,7 +181,7 @@ namespace AutoMapper.Internal.Mappers
                     createDestination = Assign(destination, NewArrayBounds(destinationElementType, count));
                 }
                 var itemParam = Parameter(sourceElementType, "sourceItem");
-                var itemExpr = ExpressionBuilder.MapExpression(configurationProvider, profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+                var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 var indexParam = Parameter(typeof(int), "destinationArrayIndex");
                 var setItem = Assign(ArrayAccess(destination, PostIncrementAssign(indexParam)), itemExpr);
                 return Block(new[] { destination, indexParam },

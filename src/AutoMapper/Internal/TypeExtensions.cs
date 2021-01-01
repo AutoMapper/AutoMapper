@@ -13,6 +13,18 @@ namespace AutoMapper.Internal
         public const BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
         public const BindingFlags StaticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
+        public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
+        {
+            foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic))
+            {
+                if (foundMethod.IsGenericMethodDefinition && foundMethod.GetParameters().Length == parametersCount)
+                {
+                    return foundMethod;
+                }
+            }
+            throw new ArgumentOutOfRangeException(nameof(methodName), $"Cannot find suitable method {type}.{methodName}({parametersCount} parameters).");
+        }
+
         public static void CheckIsDerivedFrom(this Type derivedType, Type baseType)
         {
             if (!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)

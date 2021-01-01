@@ -275,6 +275,8 @@ namespace AutoMapper
             }
             return false;
         }
+        public bool AllowsNullDestinationValuesFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullDestinationValues;
+        public bool AllowsNullCollectionsFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullCollections;
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("{MemberExpression}, {TypeMap}")]

@@ -35,7 +35,7 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.MapInternal), TypeExtensions.InstanceFlags);
 
-        public static Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, in TypePair typePair, Expression sourceParameter,
+        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, in TypePair typePair, Expression sourceParameter,
             MemberMap propertyMap = null, Expression destinationParameter = null)
         {
             destinationParameter ??= Default(typePair.DestinationType);
@@ -135,14 +135,6 @@ namespace AutoMapper.Execution
             return null;
         }
         public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
-        public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, MemberMap memberMap = null) =>
-            memberMap?.AllowNull ?? profile.AllowNullDestinationValues;
-        public static bool AllowsNullCollectionsFor(this ProfileMap profile, MemberMap memberMap = null) =>
-            memberMap?.AllowNull ?? profile.AllowNullCollections;
-        public static bool AllowsNullDestinationValues(this MemberMap memberMap) => 
-            memberMap.TypeMap.Profile.AllowsNullDestinationValuesFor(memberMap);
-        public static bool AllowsNullCollections(this MemberMap memberMap) =>
-            memberMap.TypeMap.Profile.AllowsNullCollectionsFor(memberMap);
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
         public static Expression ApplyTransformers(this MemberMap memberMap, Expression source)
@@ -290,17 +282,6 @@ namespace AutoMapper.Execution
         // Expression.Property(string) is inefficient because it does a case insensitive match
         public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
         // Call(string) is inefficient because it does a case insensitive match
-        public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
-        {
-            foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic))
-            {
-                if (foundMethod.IsGenericMethodDefinition && foundMethod.GetParameters().Length == parametersCount)
-                {
-                    return foundMethod;
-                }
-            }
-            throw new ArgumentOutOfRangeException(nameof(methodName), $"Cannot find suitable method {type}.{methodName}({parametersCount} parameters).");
-        }
         public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>

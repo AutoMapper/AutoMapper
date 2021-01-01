@@ -51,28 +51,26 @@ namespace AutoMapper
             _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
 
             Configuration = new((IProfileConfiguration)configuration);
-            var profileMaps = new List<ProfileMap>(configuration.Profiles.Count + 1){ Configuration };
             int typeMapsCount = Configuration.TypeMapsCount;
             int openTypeMapsCount = Configuration.OpenTypeMapsCount;
+            Profiles = new ProfileMap[configuration.Profiles.Count + 1];
+            Profiles[0] = Configuration;
+            int index = 1;
             foreach (var profile in configuration.Profiles)
             {
                 var profileMap = new ProfileMap(profile, configuration);
+                Profiles[index++] = profileMap;
                 typeMapsCount += profileMap.TypeMapsCount;
                 openTypeMapsCount += profileMap.OpenTypeMapsCount;
-                profileMaps.Add(profileMap);
             }
-            Profiles = profileMaps;
             _configuredMaps = new(typeMapsCount);
             _hasOpenMaps = openTypeMapsCount > 0;
             _runtimeMaps = new(GetTypeMap, openTypeMapsCount);
             _resolvedMaps = new(2 * typeMapsCount);
             configuration.Features.Configure(this);
 
-            foreach (var beforeSealAction in configuration.BeforeSealActions)
-            {
-                beforeSealAction.Invoke(this);
-            }
             Seal();
+
             foreach (var profile in Profiles)
             {
                 profile.Clear();
@@ -121,7 +119,8 @@ namespace AutoMapper
         bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
         int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
         private ProfileMap Configuration { get; }
-        internal List<ProfileMap> Profiles { get; }
+        ProfileMap[] IGlobalConfiguration.Profiles => Profiles;
+        internal ProfileMap[] Profiles { get; }
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
@@ -142,8 +141,7 @@ namespace AutoMapper
             {
                 return typeMap;
             }
-            var mapper = FindMapper(types);
-            if (mapper is IObjectMapperInfo objectMapperInfo)
+            if (FindMapper(types) is IObjectMapperInfo objectMapperInfo)
             {
                 return ResolveTypeMap(objectMapperInfo.GetAssociatedTypes(types));
             }
@@ -445,6 +443,5 @@ namespace AutoMapper
             _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
-        IEnumerable<ProfileMap> IGlobalConfiguration.GetProfiles() => Profiles;
     }
 }

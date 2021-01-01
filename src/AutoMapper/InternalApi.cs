@@ -16,7 +16,7 @@ namespace AutoMapper.Internal
     {
         public static IGlobalConfiguration Internal(this IConfigurationProvider configuration) => (IGlobalConfiguration)configuration;
         public static IGlobalConfigurationExpression Internal(this IMapperConfigurationExpression configuration) => (IGlobalConfigurationExpression)configuration;
-        public static IProfileExpressionInternal Internal(this Profile profile) => profile;
+        public static IProfileExpressionInternal Internal(this IProfileExpression profile) => (IProfileExpressionInternal)profile;
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IGlobalConfigurationExpression : IMapperConfigurationExpression, IProfileExpressionInternal
@@ -31,11 +31,6 @@ namespace AutoMapper.Internal
         /// Object mappers
         /// </summary>
         List<IObjectMapper> Mappers { get; }
-        IEnumerable<Action<IGlobalConfiguration>> BeforeSealActions { get; }
-        /// <summary>
-        /// Add Action called against the IGlobalConfiguration before it gets sealed
-        /// </summary>
-        void BeforeSeal(Action<IGlobalConfiguration> action);
         /// <summary>
         /// Add an action to be called when validating the configuration.
         /// </summary>
@@ -154,7 +149,7 @@ namespace AutoMapper.Internal
         Func<Type, object> ServiceCtor { get; }
         int MaxExecutionPlanDepth { get; }
         int RecursiveQueriesMaxDepth { get; }
-        IEnumerable<ProfileMap> GetProfiles();
+        ProfileMap[] Profiles { get; }
         TypeMap GetIncludedTypeMap(in TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);

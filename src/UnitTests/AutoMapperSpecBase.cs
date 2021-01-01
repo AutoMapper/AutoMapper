@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests
             Mapper.ProjectTo(source, parameters, membersToExpand);
         protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
             Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
-        public IEnumerable<ProfileMap> GetProfiles() => Configuration.Internal().GetProfiles();
+        public IEnumerable<ProfileMap> GetProfiles() => Configuration.Internal().Profiles;
     }
 
     public abstract class SpecBaseBase

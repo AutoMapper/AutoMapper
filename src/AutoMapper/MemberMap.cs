@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
 namespace AutoMapper
 {
     using static Expression;
@@ -16,9 +15,7 @@ namespace AutoMapper
     public class MemberMap
     {
         protected MemberMap() { }
-
         public static readonly MemberMap Instance = new MemberMap();
-
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType { get => default; protected set { } }
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
@@ -40,17 +37,13 @@ namespace AutoMapper
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
-
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
-
         public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.LastOrDefault();
-  
         public void MapFrom(LambdaExpression sourceMember)
         {
             CustomMapExpression = sourceMember;
             Ignored = false;
         }
-
         public void MapFrom(string sourceMembersPath)
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
@@ -60,5 +53,9 @@ namespace AutoMapper
             MapFrom(mapExpression);
         }
         public override string ToString() => DestinationName;
+        public Expression ChainSourceMembers(Expression source, Type destinationType, Expression defaultValue) =>
+            SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
+        public bool AllowsNullDestinationValues() => TypeMap.Profile.AllowsNullDestinationValuesFor(this);
+        public bool AllowsNullCollections() => TypeMap.Profile.AllowsNullCollectionsFor(this);
     }
 }
