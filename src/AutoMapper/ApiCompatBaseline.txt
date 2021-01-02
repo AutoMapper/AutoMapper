@@ -294,8 +294,7 @@ MembersMustExist : Member 'public TValue AutoMapper.Internal.LockingConcurrentDi
 MembersMustExist : Member 'public void AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Item.set(TKey, TValue)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.ICollection<TKey> AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.Keys.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.LockingConcurrentDictionary<TKey, TValue>.TryGetValue(TKey, TValue)' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> AutoMapper.Internal.MemberVisitor.GetMemberPath(System.Linq.Expressions.Expression)' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> AutoMapper.Internal.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.Internal.MemberVisitor' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.ConstructorInfo AutoMapper.Internal.TypeExtensions.GetDeclaredConstructor(System.Type, System.Type[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> AutoMapper.Internal.TypeExtensions.GetDeclaredMembers(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.MethodInfo AutoMapper.Internal.TypeExtensions.GetDeclaredMethod(System.Type, System.String)' does not exist in the implementation but it does exist in the contract.
@@ -311,6 +310,7 @@ MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensi
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsNonStringEnumerable(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsReadOnlyDictionaryType(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsSetType(System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.ReplaceItemType(System.Type, System.Type, System.Type)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.ArrayCopyMapper' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.ArrayMapper' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.AssignableMapper' does not exist in the implementation but it does exist in the contract.

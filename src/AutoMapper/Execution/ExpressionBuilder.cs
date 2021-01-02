@@ -34,6 +34,7 @@ namespace AutoMapper.Execution
         public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.GetDestination), TypeExtensions.InstanceFlags);
         private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.MapInternal), TypeExtensions.InstanceFlags);
+        private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
 
         public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, in TypePair typePair, Expression sourceParameter,
             MemberMap propertyMap = null, Expression destinationParameter = null)
@@ -100,7 +101,7 @@ namespace AutoMapper.Execution
                     isReadOnlyProperty = destinationCollectionType.GetProperty("IsReadOnly");
                 }
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clear = Call(destinationVariable, clearMethod);
+                var clear = Expression.Call(destinationVariable, clearMethod);
                 var isReadOnly = Expression.Property(destinationVariable, isReadOnlyProperty);
                 return Block(new[] {destinationVariable},
                     Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
@@ -116,7 +117,10 @@ namespace AutoMapper.Execution
                 if (destinationType.IsArray)
                 {
                     var destinationElementType = destinationType.GetElementType();
-                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Zero, destinationType.GetArrayRank()));
+                    var rank = destinationType.GetArrayRank();
+                    return rank == 1 ? 
+                        Expression.Call(ArrayEmptyMethod.MakeGenericMethod(destinationElementType)) : 
+                        NewArrayBounds(destinationElementType, Enumerable.Repeat(Zero, rank));
                 }
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
             }
@@ -124,17 +128,17 @@ namespace AutoMapper.Execution
         public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
+            return Expression.Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
         }
         public static Expression CheckContext(TypeMap typeMap)
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
-                return Call(CheckContextMethod, ContextParameter);
+                return Expression.Call(CheckContextMethod, ContextParameter);
             }
             return null;
         }
-        public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
+        public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
         public static Expression ApplyTransformers(this MemberMap memberMap, Expression source)
@@ -152,9 +156,6 @@ namespace AutoMapper.Execution
                 transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source,
                     (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
         }
-        public static bool IsQuery(this Expression expression) => expression is MethodCallExpression { Method: { IsStatic: true } method } && method.DeclaringType == typeof(Enumerable);
-        public static Expression Chain(this IEnumerable<Expression> expressions, Expression parameter) => expressions.Aggregate(parameter,
-            (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().FirstOrDefault().Target, left));
         public static LambdaExpression Lambda(this MemberInfo member) => new[] { member }.Lambda();
         public static LambdaExpression Lambda(this MemberInfo[] members)
         {
@@ -168,18 +169,17 @@ namespace AutoMapper.Execution
                 target = member switch
                 {
                     PropertyInfo property => Expression.Property(target, property),
-                    MethodInfo { IsStatic: true } getter => Call(getter, target),
+                    MethodInfo { IsStatic: true } getter => Expression.Call(getter, target),
                     FieldInfo field => Field(target, field),
-                    MethodInfo getter => Call(target, getter),
+                    MethodInfo getter => Expression.Call(target, getter),
                     _ => throw new ArgumentOutOfRangeException(nameof(member), member, "Unexpected member.")
                 };
             }
             return target;
         }
-        public static MemberInfo[] GetMembersChain(this LambdaExpression lambda) => lambda.Body.GetMembersChain();
+        public static MemberInfo[] GetMembersChain(this LambdaExpression lambda) => lambda.Body.GetChain().ToMemberInfos();
         public static MemberInfo GetMember(this LambdaExpression lambda) =>
             (lambda?.Body is MemberExpression memberExpression && memberExpression.Expression == lambda.Parameters[0]) ? memberExpression.Member : null;
-        public static MemberInfo[] GetMembersChain(this Expression expression) => expression.GetChain().ToMemberInfos();
         public static MemberInfo[] ToMemberInfos(this Stack<Member> chain)
         {
             var members = new MemberInfo[chain.Count];
@@ -244,12 +244,12 @@ namespace AutoMapper.Execution
                 return ForEachArrayItem(loopVar, collection, loopContent);
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
-            var getEnumeratorCall = Call(collection, getEnumerator);
+            var getEnumeratorCall = Expression.Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
-            var moveNextCall = Call(enumeratorVar, moveNext);
+            var moveNextCall = Expression.Call(enumeratorVar, moveNext);
             var breakLabel = Label("LoopBreak");
             var loop = Block(new[] { enumeratorVar, loopVar },
                 enumeratorAssign,
@@ -262,26 +262,47 @@ namespace AutoMapper.Execution
                         ),
                     breakLabel)));
             return loop;
-        }
-        public static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
-        {
-            var breakLabel = Label("LoopBreak");
-            var index = Variable(typeof(int), "sourceArrayIndex");
-            var initialize = Assign(index, Constant(0, typeof(int)));
-            var loop = Block(new[] { index, loopVar },
-                initialize,
-                Loop(
-                    IfThenElse(
-                        LessThan(index, ArrayLength(array)),
-                        Block(Assign(loopVar, ArrayAccess(array, index)), loopContent, PostIncrementAssign(index)),
-                        Break(breakLabel)
-                    ),
-                breakLabel));
-            return loop;
+            static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
+            {
+                var breakLabel = Label("LoopBreak");
+                var index = Variable(typeof(int), "sourceArrayIndex");
+                var initialize = Assign(index, Constant(0, typeof(int)));
+                var loop = Block(new[] { index, loopVar },
+                    initialize,
+                    Loop(
+                        IfThenElse(
+                            LessThan(index, ArrayLength(array)),
+                            Block(Assign(loopVar, ArrayAccess(array, index)), loopContent, PostIncrementAssign(index)),
+                            Break(breakLabel)
+                        ),
+                    breakLabel));
+                return loop;
+            }
+            static Expression Using(Expression disposable, Expression body)
+            {
+                Expression disposeCall;
+                if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
+                {
+                    disposeCall = Expression.Call(disposable, DisposeMethod);
+                }
+                else
+                {
+                    if (disposable.Type.IsValueType)
+                    {
+                        return body;
+                    }
+                    var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
+                    var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
+                    disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Expression.Call(disposableVariable, DisposeMethod)));
+                }
+                return TryFinally(body, disposeCall);
+            }
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match
         public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
-        // Call(string) is inefficient because it does a case insensitive match
+        // Expression.Call(string) is inefficient because it does a case insensitive match
+        public static MethodCallExpression Call(Expression target, string name, params Expression[] arguments) =>
+            Expression.Call(target, target.Type.GetMethod(name), arguments); 
         public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
@@ -337,25 +358,6 @@ namespace AutoMapper.Execution
                     MethodCallExpression { Method: { IsStatic: false } } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
                     _ => sourceExpression,
                 };
-        }
-        public static Expression Using(Expression disposable, Expression body)
-        {
-            Expression disposeCall;
-            if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
-            {
-                disposeCall = Call(disposable, DisposeMethod);
-            }
-            else
-            {
-                if (disposable.Type.IsValueType)
-                {
-                    return body;
-                }
-                var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
-                var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
-                disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Call(disposableVariable, DisposeMethod)));
-            }
-            return TryFinally(body, disposeCall);
         }
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else) => expression.Type.IsValueType ?
             (expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else) :

@@ -64,7 +64,7 @@ namespace AutoMapper.Execution
                 }
                 var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, DestinationType);
                 var converter = ServiceLocator(_typeMap.TypeConverterType);
-                return Call(ToType(converter, converterInterfaceType), converterInterfaceType.GetMethod("Convert"), parameters);
+                return Call(ToType(converter, converterInterfaceType), "Convert", parameters);
             }
         }
         private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
@@ -436,8 +436,9 @@ namespace AutoMapper.Execution
             }
             var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
                 .Zip(iResolverType.GetGenericArguments(), ToType)
-                .Concat(new[] { ContextParameter });
-            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetMethod("Resolve"), parameters);
+                .Concat(new[] { ContextParameter })
+                .ToArray();
+            return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
         }
         private Expression BuildConvertCall(Expression source, MemberMap memberMap, Expression destValueExpr)
         {
@@ -453,7 +454,7 @@ namespace AutoMapper.Execution
                     memberMap.SourceMembers.Length > 0 ?
                         memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destValueExpr) : 
                         Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
-            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetMethod("Convert"), ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
+            return Call(ToType(resolverInstance, iResolverType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage() 
                 => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
         }

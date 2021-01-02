@@ -147,7 +147,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         return resolvedSource;
                         Expression MapFromExpression(LambdaExpression mapFrom)
                         {
-                            if (memberTypeMap == null || !mapFrom.Body.IsQuery())
+                            if (memberTypeMap == null || !IsQuery())
                             {
                                 return mapFrom.ReplaceParameters(CheckCustomSource());
                             }
@@ -159,6 +159,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                             var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
                             memberProjection.Expression = newMapFrom;
                             return letPropertyMaps.GetSubQueryMarker(newMapFrom);
+                            bool IsQuery() => mapFrom.Body is MethodCallExpression { Method: { IsStatic: true } method } &&
+                                method.DeclaringType == typeof(Enumerable);
                         }
                         bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                         Expression CheckCustomSource()
@@ -262,7 +264,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                     Marker = Default(letExpression.Body.Type);
                     LetExpression = letExpression;
                 }
-                public Expression GetSourceExpression(Expression parameter) => _members.Take(_members.Length - 1).Select(p => p.Expression).Chain(parameter);
+                public Expression GetSourceExpression(Expression parameter) => _members.Take(_members.Length - 1).Select(p => p.Expression).Aggregate(parameter,
+                    (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().Peek().Target, left));
                 public PropertyDescription GetPropertyDescription() => new PropertyDescription("__" + string.Join("#", _members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
                 internal bool IsEquivalentTo(in SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
                     _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);

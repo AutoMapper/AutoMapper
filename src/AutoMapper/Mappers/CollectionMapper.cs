@@ -137,6 +137,7 @@ namespace AutoMapper.Internal.Mappers
             New(typeof(NameValueCollection).GetConstructor(new[] { typeof(NameValueCollection) }), sourceExpression);
         static class ArrayMapper
         {
+            private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetStaticMethod("ToArray");
             private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", new[] { typeof(Array), typeof(int) });
             private static readonly MethodInfo CountMethod = typeof(Enumerable).StaticGenericMethod("Count", parametersCount: 1);
             private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
@@ -159,24 +160,24 @@ namespace AutoMapper.Internal.Mappers
                     return Call(MapMultidimensionalMethod, sourceExpression, Constant(destinationElementType), ContextParameter);
                 }
                 var sourceType = sourceExpression.Type;
-                Type sourceElementType;
+                Type sourceElementType = typeof(object);
                 Expression createDestination;
                 var destination = Parameter(destinationType, "destinationArray");
                 if (sourceType.IsArray)
                 {
-                    sourceElementType = sourceType.GetElementType();
-                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, ArrayLength(sourceExpression)));
-                    if (destinationElementType.IsAssignableFrom(sourceElementType) && configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) == null)
+                    var mapFromArray = MapFromArray();
+                    if (mapFromArray != null)
                     {
-                        return Block(new[] { destination },
-                            createDestination,
-                            Call(sourceExpression, CopyToMethod, destination, Zero),
-                            destination);
+                        return mapFromArray;
                     }
                 }
                 else
                 {
-                    sourceElementType = GetEnumerableElementType(sourceExpression.Type);
+                    var mapFromIEnumerable = MapFromIEnumerable();
+                    if (mapFromIEnumerable != null)
+                    {
+                        return mapFromIEnumerable;
+                    }
                     var count = Call(CountMethod.MakeGenericMethod(sourceElementType), sourceExpression);
                     createDestination = Assign(destination, NewArrayBounds(destinationElementType, count));
                 }
@@ -189,6 +190,30 @@ namespace AutoMapper.Internal.Mappers
                     Assign(indexParam, Zero),
                     ForEach(itemParam, sourceExpression, setItem),
                     destination);
+                Expression MapFromArray()
+                {
+                    sourceElementType = sourceType.GetElementType();
+                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, ArrayLength(sourceExpression)));
+                    if (!destinationElementType.IsAssignableFrom(sourceElementType) || 
+                        configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null)
+                    {
+                        return null;
+                    }
+                    return Block(new[] { destination },
+                        createDestination,
+                        Call(sourceExpression, CopyToMethod, destination, Zero),
+                        destination);
+                }
+                Expression MapFromIEnumerable()
+                {
+                    var iEnumerableType = sourceType.GetIEnumerableType();
+                    if (iEnumerableType == null || (sourceElementType = iEnumerableType.GenericTypeArguments[0]) != destinationElementType ||
+                        configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null)
+                    {
+                        return null;
+                    }
+                    return Call(ToArrayMethod.MakeGenericMethod(sourceElementType), sourceExpression);
+                }
             }
         }
     }
