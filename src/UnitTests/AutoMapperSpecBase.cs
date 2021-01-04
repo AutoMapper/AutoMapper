@@ -60,7 +60,7 @@ namespace AutoMapper.UnitTests
         protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
 
         protected TypeMap FindTypeMapFor<TSource, TDestination>() => ConfigProvider.FindTypeMapFor<TSource, TDestination>();
-
+        protected void AssertConfigurationIsValid() => ConfigProvider.AssertConfigurationIsValid();
         protected void AssertConfigurationIsValid<TSource, TDestination>() => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor<TSource, TDestination>());
         protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor(sourceType, destinationType));
         public void AssertConfigurationIsValid(string profileName) => Configuration.Internal().AssertConfigurationIsValid(profileName);

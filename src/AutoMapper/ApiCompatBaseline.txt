@@ -91,6 +91,7 @@ MembersMustExist : Member 'public void AutoMapper.IMappingExpression<TSource, TD
 InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.IMappingExpression<TSource, TDestination> AutoMapper.IMappingExpression<TSource, TDestination>.IncludeMembers(System.Linq.Expressions.Expression<System.Func<TSource, System.Object>>[])' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.Features.Features<AutoMapper.Features.IMappingFeature> AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.Features' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IList<AutoMapper.ValueTransformerConfiguration> AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.ValueTransformers' is present in the contract but not in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public TMappingExpression AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.ConstructUsing(System.Linq.Expressions.Expression<System.Func<TSource, TDestination>>)' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.ConvertUsing(System.Linq.Expressions.Expression<System.Func<TSource, TDestination>>)' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public AutoMapper.Features.Features<AutoMapper.Features.IMappingFeature> AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.Features.get()' is present in the contract but not in the implementation.
@@ -362,4 +363,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 363
+Total Issues: 364

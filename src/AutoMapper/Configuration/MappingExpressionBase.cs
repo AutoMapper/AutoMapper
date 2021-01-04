@@ -502,5 +502,14 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>
             TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);
+
+        public void AsProxy()
+        {
+            if (!DestinationType.IsInterface)
+            {
+                throw new InvalidOperationException("Only interfaces can be proxied. " + DestinationType);
+            }
+            TypeMapActions.Add(tm => tm.AsProxy = true);
+        }
     }
 }

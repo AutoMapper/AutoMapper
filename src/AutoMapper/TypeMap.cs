@@ -123,12 +123,12 @@ namespace AutoMapper
         }
         public bool? IsValid { get; set; }
         internal bool WasInlineChecked { get; set; }
+        public bool AsProxy { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation
             || CustomConstruction
             || ConstructDestinationUsingServiceLocator
             || ConstructorMapping
-            || DestinationTypeToUse.IsInterface
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition
             || DestinationTypeToUse.IsValueType

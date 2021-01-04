@@ -259,7 +259,8 @@ namespace AutoMapper.Execution
             { CustomCtorExpression: LambdaExpression constructUsing } => constructUsing.ReplaceParameters(Source),
             { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(Source, ContextParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
-            { DestinationTypeToUse: { IsInterface: true } interfaceType } => Call(CreateProxyMethod, Constant(interfaceType)),
+            { DestinationTypeToUse: { IsInterface: true } interfaceType } => _typeMap.AsProxy ? 
+                Call(CreateProxyMethod, Constant(interfaceType)) : Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
             { ConstructDestinationUsingServiceLocator: true } => ServiceLocator(DestinationType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType)
         };
