@@ -235,7 +235,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 TypeMap letTypeMap;
                 lock(ConfigurationProvider)
                 {
-                    letTypeMap = TypeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile);
+                    letTypeMap = TypeMap.Create(request.SourceType, letType, typeMap.Profile);
                 }
                 var secondParameter = Parameter(letType, "dtoLet");
                 ReplaceSubQueries();

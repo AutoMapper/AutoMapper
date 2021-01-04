@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.Internal.Mappers;
-
-namespace AutoMapper.Internal
+namespace AutoMapper.Configuration
 {
     using Validator = Action<ValidationContext>;
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConfigurationValidator
     {

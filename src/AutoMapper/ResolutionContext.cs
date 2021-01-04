@@ -1,7 +1,6 @@
 using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
-
 namespace AutoMapper
 {
     /// <summary>
@@ -12,20 +11,16 @@ namespace AutoMapper
         private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
         private readonly IInternalRuntimeMapper _inner;
-
         internal ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
         {
             Options = options;
             _inner = mapper;
         }
-
         internal ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
-
         /// <summary>
         /// Mapping operation options
         /// </summary>
         public IMappingOperationOptions Options { get; }
-
         /// <summary>
         /// Context items from <see cref="Options"/>
         /// </summary>
@@ -37,14 +32,11 @@ namespace AutoMapper
                 return Options.Items;
             }
         }
-
         /// <summary>
         /// Current mapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
-
         ResolutionContext IInternalRuntimeMapper.DefaultContext => _inner.DefaultContext;
-
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
@@ -56,7 +48,6 @@ namespace AutoMapper
                 return _instanceCache ??= new Dictionary<ContextCacheKey, object>();
             }
         }
-
         /// <summary>
         /// Instance cache for resolving keeping track of depth
         /// </summary>
@@ -68,7 +59,6 @@ namespace AutoMapper
                 return _typeDepth ??= new Dictionary<TypePair, int>();
             }
         }
-
         TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source)
             => _inner.Map(source, default(TDestination), this);
