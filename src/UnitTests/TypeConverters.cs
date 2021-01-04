@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
 using Shouldly;
 using Xunit;
-
 namespace AutoMapper.UnitTests.CustomMapping
 {
     public class NullableConverter : AutoMapperSpecBase
@@ -296,78 +293,6 @@ namespace AutoMapper.UnitTests.CustomMapping
         public void Should_convert_type_using_expression()
         {
             _result.Value.Type.ShouldBe(5);
-        }
-    }
-    public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
-    {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
-#if NET461
-        public When_specifying_mapping_with_the_BCL_type_converter_class()
-        {
-            // only needed for the xUnitRunner without AppDomains
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                return args.Name == typeof(CustomTypeConverter).Assembly.FullName ? typeof(CustomTypeConverter).Assembly : null;
-            };
-        }
-#endif
-        [TypeConverter(typeof(CustomTypeConverter))]
-        public class Source
-        {
-            public int Value { get; set; }
-        }
-
-        public class Destination
-        {
-            public int OtherValue { get; set; }
-        }
-
-        public class CustomTypeConverter : TypeConverter
-        {
-            public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-            {
-                return destinationType == typeof (Destination);
-            }
-
-            public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
-            {
-                return new Destination
-                    {
-                        OtherValue = ((Source) value).Value + 10
-                    };
-            }
-            public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-            {
-                return sourceType == typeof(Destination);
-            }
-            public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
-            {
-                return new Source {Value = ((Destination) value).OtherValue - 10};
-            }
-        }
-
-        [Fact]
-        public void Should_convert_from_type_using_the_custom_type_converter()
-        {
-            var source = new Source
-                {
-                    Value = 5
-                };
-            var destination = Mapper.Map<Source, Destination>(source);
-
-            destination.OtherValue.ShouldBe(15);
-        }
-
-        [Fact]
-        public void Should_convert_to_type_using_the_custom_type_converter()
-        {
-            var source = new Destination()
-            {
-                OtherValue = 15
-            };
-            var destination = Mapper.Map<Destination, Source>(source);
-
-            destination.Value.ShouldBe(5);
         }
     }
     public class When_specifying_a_type_converter_for_a_non_generic_configuration : NonValidatingSpecBase

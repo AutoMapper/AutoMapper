@@ -23,7 +23,6 @@ namespace AutoMapper.Internal.Mappers
             new ToStringDictionaryMapper(),// typed object to property values
             new FromDynamicMapper(),// dynamic to typed object
             new ToDynamicMapper(),// typed object to dynamic
-            new TypeConverterMapper(),// TypeConverter, the most expensive
         };
     }
 }
