@@ -13,7 +13,7 @@ namespace AutoMapper.Internal
 
         public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
         {
-            foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, TypeExtensions.StaticFlags & ~BindingFlags.NonPublic))
+            foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, StaticFlags & ~BindingFlags.NonPublic))
             {
                 if (foundMethod.IsGenericMethodDefinition && foundMethod.GetParameters().Length == parametersCount)
                 {
@@ -106,6 +106,7 @@ namespace AutoMapper.Internal
 
         public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
 
-        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) => type.GetRuntimeProperties().Where(pm => pm.HasAnInaccessibleSetter());
+        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) =>
+            type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
     }
 }

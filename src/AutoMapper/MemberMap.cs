@@ -39,6 +39,7 @@ namespace AutoMapper
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
         public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.LastOrDefault();
+        public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {
             CustomMapExpression = sourceMember;
@@ -57,5 +58,54 @@ namespace AutoMapper
             SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
         public bool AllowsNullDestinationValues() => TypeMap.Profile.AllowsNullDestinationValuesFor(this);
         public bool AllowsNullCollections() => TypeMap.Profile.AllowsNullCollectionsFor(this);
+    }
+    public class ValueResolverConfiguration
+    {
+        public object Instance { get; }
+        public Type ConcreteType { get; }
+        public Type InterfaceType { get; }
+        public LambdaExpression SourceMember { get; set; }
+        public string SourceMemberName { get; set; }
+
+        public ValueResolverConfiguration(Type concreteType, Type interfaceType)
+        {
+            ConcreteType = concreteType;
+            InterfaceType = interfaceType;
+        }
+
+        public ValueResolverConfiguration(object instance, Type interfaceType)
+        {
+            Instance = instance;
+            InterfaceType = interfaceType;
+        }
+        public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+    }
+    public readonly struct ValueTransformerConfiguration
+    {
+        public readonly Type ValueType;
+        public readonly LambdaExpression TransformerExpression;
+        public ValueTransformerConfiguration(Type valueType, LambdaExpression transformerExpression)
+        {
+            ValueType = valueType;
+            TransformerExpression = transformerExpression;
+        }
+        public bool IsMatch(MemberMap memberMap)
+            => ValueType.IsAssignableFrom(memberMap.SourceType) && memberMap.DestinationType.IsAssignableFrom(ValueType);
+    }
+    public static class ValueTransformerConfigurationExtensions
+    {
+        /// <summary>
+        /// Apply a transformation function after any resolved destination member value with the given type
+        /// </summary>
+        /// <typeparam name="TValue">Value type to match and transform</typeparam>
+        /// <param name="valueTransformers">Value transformer list</param>
+        /// <param name="transformer">Transformation expression</param>
+        public static void Add<TValue>(this IList<ValueTransformerConfiguration> valueTransformers,
+            Expression<Func<TValue, TValue>> transformer)
+        {
+            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
+
+            valueTransformers.Add(config);
+        }
     }
 }

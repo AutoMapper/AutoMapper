@@ -1,3 +1,4 @@
+using AutoMapper.Configuration;
 using System;
 using System.Linq.Expressions;
 
@@ -133,16 +134,5 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IProjectionExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IProjectionMemberConfiguration<TSource, TDestination, TMember>> memberOptions);
-    }
-    /// <summary>
-    /// Source member configuration options
-    /// </summary>
-    public interface ISourceMemberConfigurationExpression
-    {
-        /// <summary>
-        /// Ignore this member when validating source members, MemberList.Source.
-        /// Does not affect validation for the default case, MemberList.Destination.
-        /// </summary>
-        void DoNotValidate();
     }
 }

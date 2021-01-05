@@ -73,35 +73,43 @@ namespace AutoMapper.Execution
             }
             var destinationType = destinationParameter.Type;
             var isCollection = destinationType.IsCollection();
-            var destination = memberMap == null ? 
-                destinationParameter.IfNullElse(DefaultDestination(), destinationParameter) :
-                memberMap.UseDestinationValue.GetValueOrDefault() ? destinationParameter : DefaultDestination();
-            var ifSourceNull = isCollection ? (ClearDestinationCollection() ?? destination) : destination;
+            var mustUseDestination = memberMap is { MustUseDestination: true };
+            var ifSourceNull = memberMap == null ? 
+                destinationParameter.IfNullElse(DefaultDestination(), ClearDestinationCollection()) :
+                mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
             return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {
-                Type destinationCollectionType;
+                if (!isCollection)
+                {
+                    return destinationParameter;
+                }
                 MethodInfo clearMethod;
+                var destinationVariable = Variable(destinationParameter.Type, "collectionDestination");
+                Expression collection = destinationVariable;
                 if (destinationType.IsListType())
                 {
-                    destinationCollectionType = typeof(IList);
                     clearMethod = IListClear;
                 }
                 else
                 {
-                    destinationCollectionType = destinationType.GetICollectionType();
+                    var destinationCollectionType = destinationType.GetICollectionType();
                     if (destinationCollectionType == null)
                     {
-                        return null;
+                        if (!mustUseDestination)
+                        {
+                            return destinationParameter;
+                        }
+                        var destinationElementType = GetEnumerableElementType(destinationType);
+                        destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+                        collection = Convert(collection, destinationCollectionType);
                     }
                     clearMethod = destinationCollectionType.GetMethod("Clear");
                 }
-                var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
-                var clear = Expression.Call(destinationVariable, clearMethod);
-                return Block(new[] {destinationVariable},
-                    Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
-                    Condition(ReferenceEqual(destinationVariable, Null), Empty, clear),
-                    destination);
+                return Block(new[] { destinationVariable },
+                    Assign(destinationVariable, destinationParameter),
+                    Condition(ReferenceEqual(destinationVariable, Null), Empty, Expression.Call(collection, clearMethod)),
+                    destinationVariable);
             }
             Expression DefaultDestination()
             {

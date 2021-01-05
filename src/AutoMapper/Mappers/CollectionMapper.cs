@@ -48,7 +48,7 @@ namespace AutoMapper.Internal.Mappers
             {
                 var destinationType = destExpression.Type;
                 MethodInfo addMethod;
-                bool isIList, mustUseDestination = memberMap != null && (memberMap.UseDestinationValue == true || !memberMap.CanBeSet);
+                bool isIList, mustUseDestination = memberMap is { MustUseDestination: true };
                 Type destinationCollectionType, destinationElementType;
                 GetDestinationType();
                 var passedDestination = Variable(destExpression.Type, "passedDestination");

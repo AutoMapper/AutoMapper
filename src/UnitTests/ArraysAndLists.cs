@@ -812,6 +812,80 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         }
     }
 
+    public class When_mapping_to_getter_only_list_with_existing_items : AutoMapperSpecBase
+    {
+        public class SourceItem
+        {
+            public int Value { get; set; }
+        }
+        public class DestItem
+        {
+            public int Value { get; set; }
+        }
+        public class Source
+        {
+            public List<SourceItem> Values { get; set; }
+            public List<SourceItem> IValues { get; set; }
+        }
+        public class Destination
+        {
+            public List<DestItem> Values { get; } = new();
+            public IEnumerable<DestItem> IValues { get; } = new List<DestItem>();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<SourceItem, DestItem>();
+        });
+        [Fact]
+        public void Should_clear_the_list_before_mapping()
+        {
+            var destination = new Destination { Values = { new DestItem() } };
+            ((List<DestItem>)destination.IValues).Add(new DestItem());
+            Mapper.Map(new Source(), destination);
+            destination.Values.ShouldBeEmpty();
+            destination.IValues.ShouldBeEmpty();
+        }
+    }
+    public class When_mapping_to_list_with_existing_items : AutoMapperSpecBase
+    {
+        public class SourceItem
+        {
+            public int Value { get; set; }
+        }
+        public class DestItem
+        {
+            public int Value { get; set; }
+        }
+        public class Source
+        {
+            public List<SourceItem> Values { get; set; } = new();
+        }
+        public class Destination
+        {
+            public List<DestItem> Values { get; set; } = new();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<SourceItem, DestItem>();
+        });
+        [Fact]
+        public void Should_clear_the_list_before_mapping()
+        {
+            var destination = new Destination { Values = { new DestItem { } } };
+            Mapper.Map(new Source { Values = { new SourceItem { Value = 42 } } }, destination);
+            destination.Values.Single().Value.ShouldBe(42);
+        }
+        [Fact]
+        public void Should_clear_the_list_before_mapping_when_the_source_is_null()
+        {
+            var destination = new Destination { Values = { new DestItem { } } };
+            Mapper.Map(new Source { Values = null }, destination);
+            destination.Values.ShouldBeEmpty();
+        }
+    }
+
     public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase
     {
         const string FirstString = null;

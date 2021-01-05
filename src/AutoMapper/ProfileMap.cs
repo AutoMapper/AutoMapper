@@ -154,7 +154,7 @@ namespace AutoMapper
         }
         private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config)
         {
-            var typeMap = TypeMap.Create(config.SourceType, config.DestinationType, this, config.IsReverseMap);
+            var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config.IsReverseMap);
             config.Configure(typeMap);
             configurationProvider.RegisterTypeMap(typeMap);
         }
@@ -203,7 +203,7 @@ namespace AutoMapper
             TypeMap closedMap;
             lock (configurationProvider)
             {
-                closedMap = TypeMap.Create(closedTypes.SourceType, closedTypes.DestinationType, this);
+                closedMap = new TypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
             }
             openMapConfig.Configure(closedMap);
             Configure(closedMap, configurationProvider);

@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
 namespace AutoMapper.Configuration
 {
     using static AutoMapper.Execution.ExpressionBuilder;
-
+    public interface IPropertyMapConfiguration
+    {
+        void Configure(TypeMap typeMap);
+        MemberInfo DestinationMember { get; }
+        LambdaExpression SourceExpression { get; }
+        LambdaExpression GetDestinationExpression();
+        IPropertyMapConfiguration Reverse();
+    }
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private MemberInfo[] _sourceMembers;
@@ -318,7 +324,7 @@ namespace AutoMapper.Configuration
                 destMember = typeMap.DestinationSetters.Single(m => m.Name == destMember.Name);
             }
 
-            var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
+            var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember, typeof(TMember) == typeof(object) ? destMember.GetMemberType() : typeof(TMember));
 
             Apply(propertyMap);
         }

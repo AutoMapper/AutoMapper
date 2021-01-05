@@ -235,7 +235,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 TypeMap letTypeMap;
                 lock(ConfigurationProvider)
                 {
-                    letTypeMap = TypeMap.Create(request.SourceType, letType, typeMap.Profile);
+                    letTypeMap = new TypeMap(request.SourceType, letType, typeMap.Profile);
                 }
                 var secondParameter = Parameter(letType, "dtoLet");
                 ReplaceSubQueries();
@@ -246,7 +246,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     foreach(var letMapInfo in letMapInfos)
                     {
                         var letProperty = letType.GetProperty(letMapInfo.Property.Name);
-                        var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty);
+                        var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
                         letPropertyMap.CustomMapExpression = Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter);
                         projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                     }

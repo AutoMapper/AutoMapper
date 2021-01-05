@@ -6,10 +6,58 @@ using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
 using AutoMapper.Internal;
-
 namespace AutoMapper
 {
     using static Execution.ExpressionBuilder;
+    public interface IProfileConfiguration
+    {
+        IReadOnlyCollection<IMemberConfiguration> MemberConfigurations { get; }
+        bool? FieldMappingEnabled { get; }
+        bool? MethodMappingEnabled { get; }
+        bool? ConstructorMappingEnabled { get; }
+        bool? AllowNullDestinationValues { get; }
+        bool? AllowNullCollections { get; }
+        bool? EnableNullPropagationForQueryMapping { get; }
+        IReadOnlyCollection<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
+        IReadOnlyCollection<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+
+        /// <summary>
+        /// Source extension methods included for search
+        /// </summary>
+        IReadOnlyCollection<MethodInfo> SourceExtensionMethods { get; }
+
+        /// <summary>
+        /// Specify which properties should be mapped.
+        /// By default only public properties are mapped.
+        /// </summary>
+        Func<PropertyInfo, bool> ShouldMapProperty { get; }
+
+        /// <summary>
+        /// Specify which fields should be mapped.
+        /// By default only public fields are mapped.
+        /// </summary>
+        Func<FieldInfo, bool> ShouldMapField { get; }
+
+        /// <summary>
+        /// Specify which methods, of those that are eligible (public, parameterless, and non-static or extension methods), should be mapped.
+        /// By default all eligible methods are mapped.
+        /// </summary>
+        Func<MethodInfo, bool> ShouldMapMethod { get; }
+
+        /// <summary>
+        /// Specify which constructors should be considered for the destination objects.
+        /// By default all constructors are considered.
+        /// </summary>
+        Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
+
+        string ProfileName { get; }
+        IReadOnlyCollection<string> GlobalIgnores { get; }
+        INamingConvention SourceMemberNamingConvention { get; }
+        INamingConvention DestinationMemberNamingConvention { get; }
+        IReadOnlyCollection<ITypeMapConfiguration> TypeMapConfigs { get; }
+        IReadOnlyCollection<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
+        IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
+    }
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>

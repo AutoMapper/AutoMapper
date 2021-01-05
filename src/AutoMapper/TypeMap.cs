@@ -32,28 +32,22 @@ namespace AutoMapper
         private HashSet<TypeMap> _inheritedTypeMaps;
         private HashSet<IncludedMember> _includedMembersTypeMaps;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
-        public TypeMap(TypeDetails sourceTypeDetails, TypeDetails destinationTypeDetails, ProfileMap profile)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, bool isReverseMap = false)
         {
-            Types = new(sourceTypeDetails.Type, destinationTypeDetails.Type);
-            SourceTypeDetails = sourceTypeDetails;
-            DestinationTypeDetails = destinationTypeDetails;
+            Types = new(sourceType, destinationType);
             Profile = profile;
-        }
-        public static TypeMap Create(Type sourceType, Type destinationType, ProfileMap options, bool isReverseMap = false)
-        {
-            var sourceTypeDetails = options.CreateTypeDetails(sourceType);
-            var destinationTypeDetails = options.CreateTypeDetails(destinationType);
-            var typeMap = new TypeMap(sourceTypeDetails, destinationTypeDetails, options);
+            SourceTypeDetails = profile.CreateTypeDetails(sourceType);
+            DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
             var sourceMembers = new List<MemberInfo>();
-            foreach (var destinationProperty in destinationTypeDetails.WriteAccessors)
+            foreach (var destinationProperty in DestinationTypeDetails.WriteAccessors)
             {
                 sourceMembers.Clear();
-                if (options.MapDestinationPropertyToSource(sourceTypeDetails, destinationType, destinationProperty.GetMemberType(), destinationProperty.Name, sourceMembers, isReverseMap))
+                var propertyType = destinationProperty.GetMemberType();
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, isReverseMap))
                 {
-                    typeMap.AddPropertyMap(destinationProperty, sourceMembers);
+                    AddPropertyMap(destinationProperty, propertyType, sourceMembers);
                 }
             }
-            return typeMap;
         }
         public void CheckProjection()
         {
@@ -157,9 +151,10 @@ namespace AutoMapper
                 IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
         public bool ConstructorParameterMatches(string destinationPropertyName) =>
             ConstructorMap.CtorParams.Any(c => string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase));
-        public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> sourceMembers)
+
+        public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
-            var propertyMap = new PropertyMap(destProperty, this);
+            var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
 
             propertyMap.MapByConvention(sourceMembers);
 
@@ -209,11 +204,14 @@ namespace AutoMapper
                     : pm.SourceMember?.Name ?? pm.DestinationName;
             string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
         }
-        public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
+
+        public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty, Type destinationPropertyType)
         {
             var propertyMap = GetPropertyMap(destinationProperty.Name);
             if (propertyMap != null) return propertyMap;
-            propertyMap = new(destinationProperty, this);
+
+            propertyMap = new(destinationProperty, destinationPropertyType, this);
+
             AddPropertyMap(propertyMap);
             return propertyMap;
         }

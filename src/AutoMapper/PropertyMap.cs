@@ -17,14 +17,14 @@ namespace AutoMapper
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _canResolveValue;
         private Type _sourceType;
-        public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
+        public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap)
         {
             TypeMap = typeMap;
             DestinationMember = destinationMember;
-            DestinationType = destinationMember.GetMemberType();
+            DestinationType = destinationMemberType;
         }
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
-            : this(inheritedMappedProperty.DestinationMember, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
+            : this(inheritedMappedProperty.DestinationMember, inheritedMappedProperty.DestinationType, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
         public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
             : this(includedMemberMap, typeMap) => IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
         public override TypeMap TypeMap { get; }

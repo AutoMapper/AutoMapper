@@ -1,15 +1,26 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Features;
 using AutoMapper.Internal;
-
 namespace AutoMapper.Configuration
 {
     using static Expression;
     using Execution;
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface ITypeMapConfiguration
+    {
+        void Configure(TypeMap typeMap);
+        Type SourceType { get; }
+        Type DestinationType { get; }
+        bool IsReverseMap { get; }
+        TypePair Types { get; }
+        ITypeMapConfiguration ReverseTypeMap { get; }
+        TypeMap TypeMap { get; }
+    }
     public abstract class MappingExpressionBase : ITypeMapConfiguration
     {
         private List<ValueTransformerConfiguration> _valueTransformers;
