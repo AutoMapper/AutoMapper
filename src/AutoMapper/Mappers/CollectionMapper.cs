@@ -48,7 +48,7 @@ namespace AutoMapper.Internal.Mappers
             {
                 var destinationType = destExpression.Type;
                 MethodInfo addMethod;
-                bool isIList;
+                bool isIList, mustUseDestination = memberMap != null && (memberMap.UseDestinationValue == true || !memberMap.CanBeSet);
                 Type destinationCollectionType, destinationElementType;
                 GetDestinationType();
                 var passedDestination = Variable(destExpression.Type, "passedDestination");
@@ -80,26 +80,29 @@ namespace AutoMapper.Internal.Mappers
                 {
                     destinationCollectionType = destinationType.GetICollectionType();
                     destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? GetEnumerableElementType(destinationType);
-                    if (destinationCollectionType == null && destinationType.IsInterface)
-                    {
-                        destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
-                        destExpression = ToType(destExpression, destinationCollectionType);
-                    }
+                    isIList = destExpression.Type.IsListType();
                     if (destinationCollectionType == null)
                     {
-                        destinationCollectionType = typeof(IList);
-                        addMethod = IListAdd;
-                        isIList = true;
+                        if (isIList)
+                        {
+                            destinationCollectionType = typeof(IList);
+                            addMethod = IListAdd;
+                        }
+                        else
+                        {
+                            destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+                            destExpression = Convert(mustUseDestination ? destExpression : Null, destinationCollectionType);
+                            addMethod = destinationCollectionType.GetMethod("Add");
+                        }
                     }
                     else
                     {
-                        isIList = destExpression.Type.IsListType();
                         addMethod = destinationCollectionType.GetMethod("Add");
                     }
                 }
                 void UseDestinationValue()
                 {
-                    if (memberMap is { UseDestinationValue: true })
+                    if (mustUseDestination)
                     {
                         destination = passedDestination;
                         assignNewExpression = ExpressionBuilder.Empty;
@@ -107,14 +110,7 @@ namespace AutoMapper.Internal.Mappers
                     else
                     {
                         destination = newExpression;
-                        var createInstance = ObjectFactory.GenerateConstructorExpression(passedDestination.Type);
-                        var shouldCreateDestination = ReferenceEqual(passedDestination, Null);
-                        if (memberMap is { CanBeSet: true })
-                        {
-                            var isReadOnly = isIList ? Property(passedDestination, IListIsReadOnly) : ExpressionBuilder.Property(ToType(passedDestination, destinationCollectionType), "IsReadOnly");
-                            shouldCreateDestination = OrElse(shouldCreateDestination, isReadOnly);
-                        }
-                        assignNewExpression = Assign(newExpression, Condition(shouldCreateDestination, ToType(createInstance, passedDestination.Type), passedDestination));
+                        assignNewExpression = Assign(newExpression, Coalesce(passedDestination, ObjectFactory.GenerateConstructorExpression(passedDestination.Type)));
                     }
                 }
                 Expression CheckContext()

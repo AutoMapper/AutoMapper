@@ -25,7 +25,6 @@ namespace AutoMapper.Execution
         public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
         public static readonly MethodInfo IListClear = typeof(IList).GetMethod(nameof(IList.Clear));
         public static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
-        public static readonly PropertyInfo IListIsReadOnly = typeof(IList).GetProperty(nameof(IList.IsReadOnly));
         public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.IncrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.DecrementTypeDepth), TypeExtensions.InstanceFlags);
         public static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.CreateInstance), TypeExtensions.InstanceFlags);
@@ -83,12 +82,10 @@ namespace AutoMapper.Execution
             {
                 Type destinationCollectionType;
                 MethodInfo clearMethod;
-                PropertyInfo isReadOnlyProperty;
                 if (destinationType.IsListType())
                 {
                     destinationCollectionType = typeof(IList);
                     clearMethod = IListClear;
-                    isReadOnlyProperty = IListIsReadOnly;
                 }
                 else
                 {
@@ -98,14 +95,12 @@ namespace AutoMapper.Execution
                         return null;
                     }
                     clearMethod = destinationCollectionType.GetMethod("Clear");
-                    isReadOnlyProperty = destinationCollectionType.GetProperty("IsReadOnly");
                 }
                 var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
                 var clear = Expression.Call(destinationVariable, clearMethod);
-                var isReadOnly = Expression.Property(destinationVariable, isReadOnlyProperty);
                 return Block(new[] {destinationVariable},
                     Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
-                    Condition(OrElse(ReferenceEqual(destinationVariable, Null), isReadOnly), Empty, clear),
+                    Condition(ReferenceEqual(destinationVariable, Null), Empty, clear),
                     destination);
             }
             Expression DefaultDestination()

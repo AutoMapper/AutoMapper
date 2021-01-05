@@ -13,6 +13,39 @@ using AutoMapper.Internal.Mappers;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
+    public class When_mapping_to_Existing_IEnumerable : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public IEnumerable<SourceItem> Items { get; set; } = Enumerable.Empty<SourceItem>();
+        }
+        public class Destination
+        {
+            public IEnumerable<DestinationItem> Items { get; set; } = Enumerable.Empty<DestinationItem>();
+        }
+        public class SourceItem
+        {
+            public string Value { get; set; }
+        }
+        public class DestinationItem
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>();
+            c.CreateMap<SourceItem, DestinationItem>();
+        });
+        [Fact]
+        public void Should_overwrite_the_existing_list()
+        {
+            var destination = new Destination();
+            var existingList = destination.Items;
+            Mapper.Map(new Source(), destination);
+            destination.Items.ShouldNotBeSameAs(existingList);
+            destination.Items.ShouldBeEmpty();
+        }
+    }
     public class When_mapping_to_an_array_as_ICollection_with_MapAtRuntime : AutoMapperSpecBase
     {
         Destination _destination;
@@ -478,7 +511,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         {
             cfg.CreateMap<Source, Destination>();
         });
-        protected override void Because_of() => Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } }, _destination);
+        protected override void Because_of() => Mapper.Map(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } }, _destination);
         [Fact]
         public void Should_map_the_list_of_source_items()
         {

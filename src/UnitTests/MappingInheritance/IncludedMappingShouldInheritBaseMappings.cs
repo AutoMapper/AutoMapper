@@ -9,40 +9,27 @@ namespace AutoMapper.UnitTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<DomainModelBase, ModelBase>()
-                .ForMember(d => d.CodeList, o => o.MapFrom(s => s.CodeList))
-                .ForMember(d => d.KeyValuesOtherName, o => o.MapFrom(s => new[] { new KeyValueModel { Key = "key1", Value = "value1" } }))
-                .Include<DomainModel, Model>();
-            cfg.CreateMap<DomainModel, Model>().ForAllMembers(o => o.DoNotUseDestinationValue());
+            cfg.CreateMap<SourceBase, DestinationBase>()
+                .Include<Source, Destination>()
+                .ForMember(d=>d.CodeList, o => o.UseDestinationValue());
+            cfg.CreateMap<Source, Destination>().ForMember(d=>d.CodeList, o => o.DoNotUseDestinationValue());
         });
-        public class DomainModelBase
+        public class SourceBase
         {
             public ICollection<string> CodeList { get; } = new List<string>();
         }
-        public class DomainModel : DomainModelBase
+        public class Source : SourceBase
         {
         }
-        public class ModelBase
+        public class DestinationBase
         {
-            public ICollection<KeyValueModel> KeyValuesOtherName { get; } = new List<KeyValueModel>();
-            public ICollection<string> CodeList { get; } = new List<string>();
+            public ICollection<string> CodeList { get; set; } = new HashSet<string>();
         }
-        public class Model : ModelBase
+        public class Destination : DestinationBase
         {
-        }
-        public class KeyValueModel
-        {
-            public string Key { get; set; }
-            public string Value { get; set; }
         }
         [Fact]
-        public void ShouldMapOk()
-        {
-            var domainModel = new DomainModel { CodeList = { "DMItemCode1" } };
-            var result = Mapper.Map<Model>(domainModel);
-            result.CodeList.ShouldBeEmpty();
-            result.KeyValuesOtherName.ShouldBeEmpty();
-        }
+        public void ShouldMapOk() => Mapper.Map<Destination>(new Source { CodeList = { "DMItemCode1" } }).CodeList.ShouldNotBeOfType<HashSet<string>>();
     }
     public class ReadonlyCollectionProperties : AutoMapperSpecBase
     {
