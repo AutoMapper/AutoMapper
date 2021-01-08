@@ -19,7 +19,7 @@ namespace AutoMapper.Internal.Mappers
         private static Expression EnumToString(Expression sourceExpression, Type sourceType, Expression toStringCall)
         {
             List<SwitchCase> switchCases = null;
-            foreach (var memberInfo in sourceType.GetFields())
+            foreach (var memberInfo in sourceType.GetFields(TypeExtensions.StaticFlags))
             {
                 var attributeValue = memberInfo.GetCustomAttribute<EnumMemberAttribute>()?.Value;
                 if (attributeValue != null)

@@ -138,7 +138,7 @@ namespace AutoMapper
         }
         public static bool operator ==(in ContextCacheKey left, in ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(in ContextCacheKey left, in ContextCacheKey right) => !left.Equals(right);
-        public override int GetHashCode() => HashCodeCombiner.Combine(Source, _destinationType);
+        public override int GetHashCode() => HashCode.Combine(Source, _destinationType);
         public bool Equals(ContextCacheKey other) => Source == other.Source && _destinationType == other._destinationType;
         public override bool Equals(object other) => other is ContextCacheKey otherKey && Equals(otherKey);
     }

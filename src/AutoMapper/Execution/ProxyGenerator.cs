@@ -188,12 +188,13 @@ namespace AutoMapper.Execution
         }
         public override int GetHashCode()
         {
-            var hashCode = Type.GetHashCode();
+            var hashCode = new HashCode();
+            hashCode.Add(Type);
             foreach (var property in AdditionalProperties)
             {
-                hashCode = HashCodeCombiner.CombineCodes(hashCode, property.GetHashCode());
+                hashCode.Add(property);
             }
-            return hashCode;
+            return hashCode.ToHashCode();
         }
         public override bool Equals(object other) => other is TypeDescription description && Equals(description);
         public bool Equals(TypeDescription other) => Type == other.Type && AdditionalProperties.SequenceEqual(other.AdditionalProperties);
@@ -218,11 +219,7 @@ namespace AutoMapper.Execution
             Type = property.PropertyType;
             CanWrite = property.CanWrite;
         }
-        public override int GetHashCode()
-        {
-            var code = HashCodeCombiner.Combine(Name, Type);
-            return HashCodeCombiner.CombineCodes(code, CanWrite.GetHashCode());
-        }
+        public override int GetHashCode() => HashCode.Combine(Name, Type, CanWrite);
         public override bool Equals(object other) => other is PropertyDescription description && Equals(description);
         public bool Equals(PropertyDescription other) => Name == other.Name && Type == other.Type && CanWrite == other.CanWrite;
         public static bool operator ==(in PropertyDescription left, in PropertyDescription right) => left.Equals(right);

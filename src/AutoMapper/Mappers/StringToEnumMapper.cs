@@ -17,19 +17,20 @@ namespace AutoMapper.Internal.Mappers
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
-            var switchCases = new List<SwitchCase>();
-            foreach (var memberInfo in destinationType.GetFields())
+            List<SwitchCase> switchCases = null;
+            foreach (var memberInfo in destinationType.GetFields(TypeExtensions.StaticFlags))
             {
                 var attributeValue = memberInfo.GetCustomAttribute<EnumMemberAttribute>()?.Value;
                 if (attributeValue != null)
                 {
                     var switchCase = SwitchCase(
                         ToType(Constant(Enum.ToObject(destinationType, memberInfo.GetValue(null))), destinationType), Constant(attributeValue));
+                    switchCases ??= new();
                     switchCases.Add(switchCase);
                 }
             }
             var enumParse = ToType(Call(ParseMethod, Constant(destinationType), sourceExpression, True), destinationType);
-            var parse = switchCases.Count > 0 ? Switch(sourceExpression, enumParse, EqualsMethod, switchCases) : enumParse;
+            var parse = switchCases != null ? Switch(sourceExpression, enumParse, EqualsMethod, switchCases) : enumParse;
             return Condition(Call(IsNullOrEmptyMethod, sourceExpression), Default(destinationType), parse);
         }
         public static bool StringCompareOrdinalIgnoreCase(string x, string y) => StringComparer.OrdinalIgnoreCase.Equals(x, y);

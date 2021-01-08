@@ -442,12 +442,14 @@ namespace AutoMapper.QueryableExtensions.Impl
         public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
         public override int GetHashCode()
         {
-            var hashCode = HashCodeCombiner.Combine(SourceType, DestinationType);
+            var hashCode = new HashCode();
+            hashCode.Add(SourceType);
+            hashCode.Add(DestinationType);
             foreach (var member in MembersToExpand)
             {
-                hashCode = HashCodeCombiner.CombineCodes(hashCode, member.GetHashCode());
+                hashCode.Add(member);
             }
-            return hashCode;
+            return hashCode.ToHashCode();
         }
         public static bool operator ==(in ProjectionRequest left, in ProjectionRequest right) => Equals(left, right);
         public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);

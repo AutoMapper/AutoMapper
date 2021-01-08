@@ -34,12 +34,12 @@ namespace AutoMapper.Internal
 
         public override int GetHashCode()
         {
-            var hashCode = 0;
+            var hashCode = new HashCode();
             foreach(var member in Members)
             {
-                hashCode = HashCodeCombiner.CombineCodes(hashCode, member.GetHashCode());
+                hashCode.Add(member);
             }
-            return hashCode;
+            return hashCode.ToHashCode();
         }
 
         public override string ToString()
