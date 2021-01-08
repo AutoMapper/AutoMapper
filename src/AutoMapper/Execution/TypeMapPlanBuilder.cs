@@ -436,7 +436,7 @@ namespace AutoMapper.Execution
                 iResolverType = iResolverType.GetGenericTypeDefinition().MakeGenericType(typeArgs);
             }
             var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
-                .Zip(iResolverType.GetGenericArguments(), ToType)
+                .Zip(iResolverType.GenericTypeArguments, ToType)
                 .Concat(new[] { ContextParameter })
                 .ToArray();
             return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
@@ -445,7 +445,7 @@ namespace AutoMapper.Execution
         {
             var valueConverterConfig = memberMap.ValueConverterConfig;
             var iResolverType = valueConverterConfig.InterfaceType;
-            var iResolverTypeArgs = iResolverType.GetGenericArguments();
+            var iResolverTypeArgs = iResolverType.GenericTypeArguments;
             var resolverInstance = valueConverterConfig.Instance != null ? 
                 Constant(valueConverterConfig.Instance) : 
                 ServiceLocator(valueConverterConfig.ConcreteType);

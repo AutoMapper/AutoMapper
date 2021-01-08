@@ -1,8 +1,6 @@
-using AutoMapper.Internal;
 using System;
 using System.Diagnostics;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
     [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
     public readonly struct MapRequest : IEquatable<MapRequest>
@@ -50,8 +48,8 @@ namespace AutoMapper
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
         public TypePair CloseGenericTypes(in TypePair closedTypes)
         {
-            var sourceArguments = closedTypes.SourceType.GetGenericArguments();
-            var destinationArguments = closedTypes.DestinationType.GetGenericArguments();
+            var sourceArguments = closedTypes.SourceType.GenericTypeArguments;
+            var destinationArguments = closedTypes.DestinationType.GenericTypeArguments;
             if(sourceArguments.Length == 0)
             {
                 sourceArguments = destinationArguments;

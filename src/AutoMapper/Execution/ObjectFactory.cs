@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
-
 namespace AutoMapper.Execution
 {
     using static Expression;
@@ -15,15 +14,8 @@ namespace AutoMapper.Execution
     {
         private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
         public static object CreateInstance(Type type) => CtorCache.GetOrAdd(type)();
-        private static Func<object> GenerateConstructor(Type type)
-        {
-            var constructor = GenerateConstructorExpression(type);
-            if (type.IsValueType)
-            {
-                constructor = Convert(constructor, typeof(object));
-            }
-            return Lambda<Func<object>>(constructor).Compile();
-        }
+        private static Func<object> GenerateConstructor(Type type) =>
+            Lambda<Func<object>>(GenerateConstructorExpression(type).ToObject()).Compile();
         public static object CreateInterfaceProxy(Type interfaceType) => CreateInstance(ProxyGenerator.GetProxyType(interfaceType));
         public static Expression GenerateConstructorExpression(Type type) => type switch
         {

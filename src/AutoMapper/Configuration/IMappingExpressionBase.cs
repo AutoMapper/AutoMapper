@@ -25,7 +25,7 @@ namespace AutoMapper
         /// <summary>
         /// Value transformers, typically configured through explicit or extension methods.
         /// </summary>
-        IList<ValueTransformerConfiguration> ValueTransformers { get; }
+        List<ValueTransformerConfiguration> ValueTransformers { get; }
         /// <summary>
         /// Specify which member list to validate
         /// </summary>

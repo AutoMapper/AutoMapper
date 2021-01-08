@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {

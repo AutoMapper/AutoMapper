@@ -4,12 +4,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using AutoMapper.Internal;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
     using SourceMembers = Dictionary<string, MemberInfo>;
-
     /// <summary>
     /// Contains cached reflection information for easy retrieval
     /// </summary>

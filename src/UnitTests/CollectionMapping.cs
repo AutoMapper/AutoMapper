@@ -7,6 +7,7 @@ using Xunit;
 using Shouldly;
 using System.Collections;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {

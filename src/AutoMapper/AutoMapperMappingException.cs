@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 using System.Linq;
+using AutoMapper.Internal;
+
 namespace AutoMapper
 {
     /// <summary>

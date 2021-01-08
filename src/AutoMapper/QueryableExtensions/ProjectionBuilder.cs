@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Execution;
 using AutoMapper.Internal;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using static Expression;
     using static ExpressionBuilder;
     using ParameterBag = IDictionary<string, object>;
     using TypePairCount = IDictionary<ProjectionRequest, int>;
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProjectionBuilder
     {
         QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
         QueryExpressions CreateProjection(ProjectionRequest request, LetPropertyMaps letPropertyMaps);
         Expression CreateInnerProjection(ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps);
+    }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IProjectionMapper
+    {
+        bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource);
+        Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProjectionBuilder : IProjectionBuilder
@@ -413,6 +418,49 @@ namespace AutoMapper.QueryableExtensions.Impl
             private readonly ParameterBag _paramValues;
             public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;
             protected override Expression GetValue(string name) => _paramValues.TryGetValue(name, out object parameterValue) ? Constant(parameterValue) : null;
+        }
+    }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
+    public readonly struct ProjectionRequest : IEquatable<ProjectionRequest>
+    {
+        public readonly Type SourceType;
+        public readonly Type DestinationType;
+        public readonly MemberPath[] MembersToExpand;
+        private readonly ICollection<ProjectionRequest> _previousRequests;
+        public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ICollection<ProjectionRequest> previousRequests)
+        {
+            SourceType = sourceType;
+            DestinationType = destinationType;
+            MembersToExpand = membersToExpand;
+            _previousRequests = previousRequests;
+        }
+        internal bool AlreadyExists => _previousRequests.Contains(this);
+        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(_previousRequests.Concat(new[] { this }));
+        public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
+                MembersToExpand.SequenceEqual(other.MembersToExpand);
+        public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
+        public override int GetHashCode()
+        {
+            var hashCode = HashCodeCombiner.Combine(SourceType, DestinationType);
+            foreach (var member in MembersToExpand)
+            {
+                hashCode = HashCodeCombiner.CombineCodes(hashCode, member.GetHashCode());
+            }
+            return hashCode;
+        }
+        public static bool operator ==(in ProjectionRequest left, in ProjectionRequest right) => Equals(left, right);
+        public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);
+        public bool ShouldExpand(in MemberPath currentPath)
+        {
+            foreach (var memberToExpand in MembersToExpand)
+            {
+                if (memberToExpand.StartsWith(currentPath))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

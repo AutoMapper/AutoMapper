@@ -8,6 +8,7 @@ namespace AutoMapper
 {
     using static Expression;
     using Execution;
+    using Internal;
     /// <summary>
     /// The base class for member maps (property, constructor and path maps).
     /// </summary>
@@ -100,12 +101,7 @@ namespace AutoMapper
         /// <typeparam name="TValue">Value type to match and transform</typeparam>
         /// <param name="valueTransformers">Value transformer list</param>
         /// <param name="transformer">Transformation expression</param>
-        public static void Add<TValue>(this IList<ValueTransformerConfiguration> valueTransformers,
-            Expression<Func<TValue, TValue>> transformer)
-        {
-            var config = new ValueTransformerConfiguration(typeof(TValue), transformer);
-
-            valueTransformers.Add(config);
-        }
+        public static void Add<TValue>(this List<ValueTransformerConfiguration> valueTransformers, Expression<Func<TValue, TValue>> transformer) => 
+            valueTransformers.Add(new ValueTransformerConfiguration(typeof(TValue), transformer));
     }
 }

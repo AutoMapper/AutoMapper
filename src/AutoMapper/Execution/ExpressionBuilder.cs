@@ -305,8 +305,8 @@ namespace AutoMapper.Execution
         public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
         // Expression.Call(string) is inefficient because it does a case insensitive match
         public static MethodCallExpression Call(Expression target, string name, params Expression[] arguments) =>
-            Expression.Call(target, target.Type.GetMethod(name), arguments); 
-        public static Expression ToObject(this Expression expression) => ToType(expression, typeof(object));
+            Expression.Call(target, target.Type.GetMethod(name), arguments);
+        public static Expression ToObject(this Expression expression) => expression.Type.IsValueType ? Convert(expression, typeof(object)) : expression;
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
             new ParameterReplaceVisitor().Replace(initialLambda, newParameters);

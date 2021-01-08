@@ -47,7 +47,7 @@ namespace AutoMapper.Configuration
         public Type DestinationType => _types.DestinationType;
         public Features<IMappingFeature> Features => _features ??= new();
         public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
-        public IList<ValueTransformerConfiguration> ValueTransformers => _valueTransformers ??= new();
+        public List<ValueTransformerConfiguration> ValueTransformers => _valueTransformers ??= new();
         protected MappingExpressionBase ReverseMapExpression { get; set; }
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
         protected List<IPropertyMapConfiguration> MemberConfigurations => _memberConfigurations ??= new();
