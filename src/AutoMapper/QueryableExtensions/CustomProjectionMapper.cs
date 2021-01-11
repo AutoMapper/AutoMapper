@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class CustomProjectionMapper : IProjectionMapper
     {
         public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) => memberTypeMap?.CustomMapExpression != null;
-        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
             => memberTypeMap.CustomMapExpression.ReplaceParameters(resolvedSource);
     }
 }

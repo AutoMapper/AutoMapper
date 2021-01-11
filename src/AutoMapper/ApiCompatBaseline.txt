@@ -309,9 +309,11 @@ MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.
 MembersMustExist : Member 'public System.Reflection.MethodInfo AutoMapper.Internal.TypeExtensions.GetDeclaredMethod(System.Type, System.String)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.MethodInfo> AutoMapper.Internal.TypeExtensions.GetDeclaredMethods(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.GetDictionaryType(System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Type[] AutoMapper.Internal.TypeExtensions.GetGenericParameters(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.MemberInfo AutoMapper.Internal.TypeExtensions.GetInheritedMember(System.Type, System.String)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.GetReadOnlyDictionaryType(System.Type)' does not exist in the implementation but it does exist in the contract.
-CannotChangeAttribute : Attribute 'System.Runtime.CompilerServices.IteratorStateMachineAttribute' on 'AutoMapper.Internal.TypeExtensions.GetTypeInheritance(System.Type)' changed from '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__24))]' in the contract to '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__21))]' in the implementation.
+MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.GetTypeDefinitionIfGeneric(System.Type)' does not exist in the implementation but it does exist in the contract.
+CannotChangeAttribute : Attribute 'System.Runtime.CompilerServices.IteratorStateMachineAttribute' on 'AutoMapper.Internal.TypeExtensions.GetTypeInheritance(System.Type)' changed from '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__24))]' in the contract to '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__19))]' in the implementation.
 MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.GetTypeOfNullable(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.ImplementsGenericInterface(System.Type, System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsCollectionType(System.Type)' does not exist in the implementation but it does exist in the contract.
@@ -320,6 +322,7 @@ MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensi
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsNonStringEnumerable(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsReadOnlyDictionaryType(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypeExtensions.IsSetType(System.Type)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> AutoMapper.Internal.TypeExtensions.PropertiesWithAnInaccessibleSetter(System.Type)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Type AutoMapper.Internal.TypeExtensions.ReplaceItemType(System.Type, System.Type, System.Type)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.ArrayCopyMapper' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Mappers.ArrayMapper' does not exist in the implementation but it does exist in the contract.
@@ -372,4 +375,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 373
+Total Issues: 376

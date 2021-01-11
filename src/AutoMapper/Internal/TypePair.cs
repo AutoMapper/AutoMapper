@@ -53,7 +53,8 @@ namespace AutoMapper.Internal
             var closedDestinationType = DestinationType.IsGenericTypeDefinition ? DestinationType.MakeGenericType(destinationArguments) : DestinationType;
             return new TypePair(closedSourceType, closedDestinationType);
         }
-        public TypePair GetTypeDefinitionIfGeneric() => new TypePair(SourceType.GetTypeDefinitionIfGeneric(), DestinationType.GetTypeDefinitionIfGeneric());
+        public TypePair GetTypeDefinitionIfGeneric() => new TypePair(GetTypeDefinitionIfGeneric(SourceType), GetTypeDefinitionIfGeneric(DestinationType));
+        private static Type GetTypeDefinitionIfGeneric(Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
         public static bool operator ==(in TypePair left, in TypePair right) => left.Equals(right);
         public static bool operator !=(in TypePair left, in TypePair right) => !left.Equals(right);
     }

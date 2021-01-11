@@ -495,7 +495,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            foreach(var property in DestinationType.PropertiesWithAnInaccessibleSetter())
+            foreach(var property in PropertiesWithAnInaccessibleSetter(DestinationType))
             {
                 IgnoreDestinationMember(property);
             }
@@ -504,12 +504,14 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            foreach (var property in SourceType.PropertiesWithAnInaccessibleSetter())
+            foreach (var property in PropertiesWithAnInaccessibleSetter(SourceType))
             {
                 ForSourceMember(property.Name, options => options.DoNotValidate());
             }
             return this as TMappingExpression;
         }
+
+        private static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(Type type) => type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
 
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>
             TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);

@@ -45,10 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="MinVer" Version="2.4.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="6.0.0-beta.21057.10" PrivateAssets="All" />  
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="6.0.0-beta.21062.10" PrivateAssets="All" />  
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">

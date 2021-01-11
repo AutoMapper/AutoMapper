@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class StringProjectionMapper : IProjectionMapper
     {
         public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) => memberMap.DestinationType == typeof(string);
-        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
             => Expression.Call(resolvedSource, ExpressionBuilder.ObjectToString);
     }
 }

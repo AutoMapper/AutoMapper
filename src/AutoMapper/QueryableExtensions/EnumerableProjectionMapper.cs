@@ -17,7 +17,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetStaticMethod("ToList");
         public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
             memberMap.DestinationType.IsCollection() && memberMap.SourceType.IsCollection();
-        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
+        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
             var destinationListType = GetElementType(memberMap.DestinationType);
             var sourceListType = GetElementType(memberMap.SourceType);

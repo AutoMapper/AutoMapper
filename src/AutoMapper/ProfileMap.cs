@@ -211,12 +211,12 @@ namespace AutoMapper
             {
                 var typeParams = (openMapConfig.SourceType.IsGenericTypeDefinition ? closedTypes.SourceType.GenericTypeArguments : Type.EmptyTypes)
                     .Concat(openMapConfig.DestinationType.IsGenericTypeDefinition ? closedTypes.DestinationType.GenericTypeArguments : Type.EmptyTypes);
-                var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
+                var neededParameters = closedMap.TypeConverterType.GenericParametersCount();
                 closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
             }
             if (closedMap.DestinationTypeOverride is { IsGenericTypeDefinition: true })
             {
-                var neededParameters = closedMap.DestinationTypeOverride.GetGenericParameters().Length;
+                var neededParameters = closedMap.DestinationTypeOverride.GenericParametersCount();
                 closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GenericTypeArguments.Take(neededParameters).ToArray());
             }
             return closedMap;

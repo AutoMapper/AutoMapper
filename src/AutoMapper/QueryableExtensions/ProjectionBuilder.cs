@@ -18,14 +18,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     public interface IProjectionBuilder
     {
         QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
-        QueryExpressions CreateProjection(ProjectionRequest request, LetPropertyMaps letPropertyMaps);
-        Expression CreateInnerProjection(ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps);
+        QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps);
+        Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProjectionMapper
     {
         bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource);
-        Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
+        Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProjectionBuilder : IProjectionBuilder
@@ -62,7 +62,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
         private QueryExpressions CreateProjection(ProjectionRequest request) => 
             CreateProjection(request, new FirstPassLetPropertyMaps(_configurationProvider, MemberPath.Empty, new Dictionary<ProjectionRequest, int>()));
-        public QueryExpressions CreateProjection(ProjectionRequest request, LetPropertyMaps letPropertyMaps)
+        public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
         {
             var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
             var projection = CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var typeMap);
@@ -70,9 +70,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                 letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
                 new QueryExpressions(projection, instanceParameter);
         }
-        public Expression CreateInnerProjection(ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps) =>
+        public Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps) =>
             CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var _);
-        private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
+        private Expression CreateProjectionCore(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
         {
             typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             return CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
@@ -226,7 +226,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             public override void Pop() => _currentPath.Pop();
             public override int Count => _savedPaths.Count;
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(ConfigurationProvider, GetCurrentPath(), BuiltProjections);
-            public override QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, ProjectionRequest request, ParameterExpression instanceParameter)
+            public override QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, in ProjectionRequest request, ParameterExpression instanceParameter)
             {
                 var letMapInfos = _savedPaths.Select(path =>
                 new {
@@ -323,7 +323,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             BuiltProjections = builtProjections;
         }
         protected TypePairCount BuiltProjections { get; }
-        public int IncrementDepth(ProjectionRequest request)
+        public int IncrementDepth(in ProjectionRequest request)
         {
             if (BuiltProjections.TryGetValue(request, out var depth))
             {
@@ -339,7 +339,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public virtual int Count => 0;
         public IGlobalConfiguration ConfigurationProvider { get; }
         public virtual LetPropertyMaps New() => new LetPropertyMaps(ConfigurationProvider, BuiltProjections);
-        public virtual QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, ProjectionRequest request, ParameterExpression instanceParameter)
+        public virtual QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, in ProjectionRequest request, ParameterExpression instanceParameter)
             => default;
     }
     [EditorBrowsable(EditorBrowsableState.Never)]

@@ -61,8 +61,6 @@ namespace AutoMapper.Internal
 
         public static bool IsNullableType(this Type type) => type.IsGenericType(typeof(Nullable<>));
 
-        public static bool IsKeyValue(this Type type) => type.IsGenericType(typeof(KeyValuePair<,>));
-
         public static Type GetICollectionType(this Type type) => type.GetGenericInterface(typeof(ICollection<>));
 
         public static bool IsCollection(this Type type) => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
@@ -89,11 +87,9 @@ namespace AutoMapper.Internal
             return null;
         }
 
-        public static Type GetTypeDefinitionIfGeneric(this Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
-
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetConstructors(InstanceFlags);
 
-        public static Type[] GetGenericParameters(this Type type) => type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
+        public static int GenericParametersCount(this Type type) => type.GetTypeInfo().GenericTypeParameters.Length;
 
         public static IEnumerable<Type> GetTypeInheritance(this Type type)
         {
@@ -105,8 +101,5 @@ namespace AutoMapper.Internal
         }
 
         public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
-
-        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type) =>
-            type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
     }
 }
