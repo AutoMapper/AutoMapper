@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Projection
         });
 
         [Fact]
-        public void Should_cache_the_subquery()
+        public void Should_not_throw_when_executing()
         {
             var orders = new[]
             {
