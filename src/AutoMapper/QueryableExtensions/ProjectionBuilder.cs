@@ -152,7 +152,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         return resolvedSource;
                         Expression MapFromExpression(LambdaExpression mapFrom)
                         {
-                            if (memberTypeMap == null || !IsQuery())
+                            if (memberTypeMap == null || mapFrom.IsMemberPath(out _))
                             {
                                 return mapFrom.ReplaceParameters(CheckCustomSource());
                             }
@@ -164,8 +164,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                             var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
                             memberProjection.Expression = newMapFrom;
                             return letPropertyMaps.GetSubQueryMarker(newMapFrom);
-                            bool IsQuery() => mapFrom.Body is MethodCallExpression { Method: { IsStatic: true } method } &&
-                                method.DeclaringType == typeof(Enumerable);
                         }
                         bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                         Expression CheckCustomSource()
