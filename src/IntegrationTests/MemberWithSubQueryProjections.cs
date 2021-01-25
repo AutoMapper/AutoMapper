@@ -92,6 +92,11 @@ namespace AutoMapper.IntegrationTests
                 var result = resultQuery.Single();
 
                 result.ShouldNotBeNull();
+
+                result.Name.FirstName.ShouldBe("Bob");
+                result.Name.LastName.ShouldBe("Smith");
+                result.FirstItem.Id.ShouldBe(1);
+                result.FirstItem.Code.ShouldBe(1);
             }
         }
     }
