@@ -282,7 +282,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                 public GetMemberAccessesVisitor(Expression target) => _target = target;
                 protected override Expression VisitMember(MemberExpression node)
                 {
-                    if(node.Expression == _target)
+                    if (node.Expression == _target)
+                    {
+                        Members.Add(node.Member);
+                    }
+                    else if (node.Expression is ConditionalExpression conditionalExpression && (conditionalExpression.IfTrue == _target || conditionalExpression.IfFalse == _target))
                     {
                         Members.Add(node.Member);
                     }
@@ -305,11 +309,55 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 protected override Expression VisitMember(MemberExpression node)
                 {
-                    if(node.Expression != _oldObject)
+                        if (node.Expression == _oldObject)
+                        {
+                            return PropertyOrField(_newObject, node.Member.Name);
+                        }
+                        else if (node.Expression is ConditionalExpression conditionalExpression && (conditionalExpression.IfTrue == _oldObject || conditionalExpression.IfFalse == _oldObject))
+                        {
+                            var test = Visit(conditionalExpression.Test);
+                            var ifTrue = conditionalExpression.IfTrue == _oldObject ? _newObject : Visit(conditionalExpression.IfTrue);
+                            var ifFalse = conditionalExpression.IfFalse == _oldObject ? _newObject : Visit(conditionalExpression.IfFalse);
+
+                            if (ifTrue.Type != ifFalse.Type)
+                            {
+                                if (ifTrue == _newObject && ifFalse is ConstantExpression oldConstantExpr)
+                                {
+                                    ifFalse = Constant(oldConstantExpr.Value, _newObject.Type);
+                                }
+                                else if (ifFalse == _newObject && ifTrue is ConstantExpression oldConstantExp)
+                                {
+                                    ifTrue = Constant(oldConstantExp.Value, _newObject.Type);
+                                }
+                            }
+
+                            var result = Condition(test, ifTrue, ifFalse);
+
+                            return PropertyOrField(result, node.Member.Name);
+                        }
+                    return base.VisitMember(node);
+                }
+
+                protected override Expression VisitConditional(ConditionalExpression node)
+                {
+                    var test = Visit(node.Test);
+                    var ifTrue = node.IfTrue == _oldObject ? _newObject : Visit(node.IfTrue);
+                    var ifFalse = node.IfFalse == _oldObject ? _newObject : Visit(node.IfFalse);
+
+                    if (ifTrue.Type != ifFalse.Type)
                     {
-                        return base.VisitMember(node);
+                        if (ifTrue == _newObject && ifFalse is ConstantExpression oldConstantExpr)
+                        {
+                            ifFalse = Constant(oldConstantExpr.Value, _newObject.Type);
+                        }
+                        else if (ifFalse == _newObject && ifTrue is ConstantExpression oldConstantExp)
+                        {
+                            ifTrue = Constant(oldConstantExp.Value, _newObject.Type);
+                        }
                     }
-                    return PropertyOrField(_newObject, node.Member.Name);
+                    var result = Condition(test, ifTrue, ifFalse);
+
+                    return result;
                 }
             }
         }
