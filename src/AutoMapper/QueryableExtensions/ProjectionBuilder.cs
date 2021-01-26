@@ -152,7 +152,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         return resolvedSource;
                         Expression MapFromExpression(LambdaExpression mapFrom)
                         {
-                            if (memberTypeMap == null || mapFrom.IsMemberPath(out _))
+                            if (memberTypeMap == null || mapFrom.IsMemberPath(out _) || mapFrom.Body is ParameterExpression)
                             {
                                 return mapFrom.ReplaceParameters(CheckCustomSource());
                             }
