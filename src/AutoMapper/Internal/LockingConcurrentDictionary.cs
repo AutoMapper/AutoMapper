@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Internal
 {
-    public struct LockingConcurrentDictionary<TKey, TValue>
+    public readonly struct LockingConcurrentDictionary<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
         private readonly Func<TKey, Lazy<TValue>> _valueFactory;
@@ -15,7 +15,7 @@ namespace AutoMapper.Internal
             _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
         }
 
-        public TValue GetOrAdd(TKey key) => _dictionary.GetOrAdd(key, _valueFactory).Value;
+        public readonly TValue GetOrAdd(TKey key) => _dictionary.GetOrAdd(key, _valueFactory).Value;
         public TValue GetOrAdd(TKey key, Func<TKey, Lazy<TValue>> valueFactory) => _dictionary.GetOrAdd(key, valueFactory).Value;
 
         public TValue this[TKey key]

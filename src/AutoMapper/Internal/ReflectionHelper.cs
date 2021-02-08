@@ -34,7 +34,7 @@ namespace AutoMapper.Internal
 
         public static bool IsPublic(this MemberInfo memberInfo) => (memberInfo as FieldInfo)?.IsPublic ?? (memberInfo as PropertyInfo).IsPublic();
 
-        public static Type CreateType(this TypeBuilder type) => type.CreateTypeInfo().AsType();
+        public static Type CreateType(this TypeBuilder type) => type.CreateTypeInfo()?.AsType();
 
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.GetCustomAttribute<TAttribute>() != null;
 

@@ -11,7 +11,7 @@ namespace AutoMapper.Configuration
     {
         private readonly IList<Profile> _profiles = new List<Profile>();
 
-        public MapperConfigurationExpression() : base()
+        public MapperConfigurationExpression()
         {
             IncludeSourceExtensionMethods(typeof(Enumerable));
 

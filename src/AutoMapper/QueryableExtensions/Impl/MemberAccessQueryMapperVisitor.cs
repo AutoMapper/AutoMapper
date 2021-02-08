@@ -16,15 +16,12 @@ namespace AutoMapper.QueryableExtensions.Impl
         protected override Expression VisitMember(MemberExpression node)
         {
             var parentExpr = _rootVisitor.Visit(node.Expression);
-            if (parentExpr != null)
-            {
-                var propertyMap = _config.GetPropertyMap(node.Member, parentExpr.Type);
+            if (parentExpr == null) return node;
+            var propertyMap = _config.GetPropertyMap(node.Member, parentExpr.Type);
                
-                var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationMember);
+            var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationMember);
 
-                return newMember;
-            }
-            return node;
+            return newMember;
         }
 
     }

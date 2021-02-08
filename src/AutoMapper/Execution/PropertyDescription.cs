@@ -7,7 +7,7 @@ namespace AutoMapper.Execution
     [DebuggerDisplay("{Name}-{Type.Name}")]
     public readonly struct PropertyDescription : IEquatable<PropertyDescription>
     {
-        internal static PropertyDescription[] Empty = new PropertyDescription[0];
+        internal static readonly PropertyDescription[] Empty = new PropertyDescription[0];
 
         public PropertyDescription(string name, Type type, bool canWrite = true)
         {

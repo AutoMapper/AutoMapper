@@ -21,7 +21,7 @@ namespace AutoMapper
 
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps = new Dictionary<TypePair, TypeMap>();
-        private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
+        private readonly LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
 

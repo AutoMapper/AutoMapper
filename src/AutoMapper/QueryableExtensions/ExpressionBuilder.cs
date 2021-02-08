@@ -150,7 +150,7 @@ namespace AutoMapper.QueryableExtensions
                                                                     && member.ReflectedType == typeMap.DestinationType
                                                                 )
                                                         )
-                                                        && pm.CanResolveValue && ReflectionHelper.CanBeSet(pm.DestinationMember)
+                                                        && pm.CanResolveValue && pm.DestinationMember.CanBeSet()
                                                    )
                                                    .OrderBy(pm => pm.DestinationName))
                 {
@@ -178,7 +178,8 @@ namespace AutoMapper.QueryableExtensions
                     {
                         ThrowCannotMap(propertyMap, result);
                     }
-                    var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
+
+                    var bindExpression = binder?.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount, letPropertyMaps);
                     if (bindExpression == null)
                     {
                         return;
@@ -197,12 +198,16 @@ namespace AutoMapper.QueryableExtensions
             ExpressionResolutionResult ResolveExpression(IMemberMap propertyMap)
             {
                 var result = new ExpressionResolutionResult(instanceParameter, request.SourceType);
-                var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+                var result1 = result;
+                var matchingExpressionConverter = _configurationProvider.ResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result1, propertyMap));
                 if (matchingExpressionConverter == null)
                 {
                     ThrowCannotMap(propertyMap, result);
                 }
-                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps);
+
+                if (matchingExpressionConverter != null)
+                    result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap,
+                        letPropertyMaps);
                 if (propertyMap.NullSubstitute != null && result.ResolutionExpression is MemberExpression && (result.Type.IsNullableType() || result.Type == typeof(string)))
                 {
                     return new ExpressionResolutionResult(propertyMap.NullSubstitute(result.ResolutionExpression));

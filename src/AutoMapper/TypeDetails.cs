@@ -112,7 +112,8 @@ namespace AutoMapper
 
         private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
-            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType.IsAssignableFrom(Type));
+            var extensionMethodSearch = sourceExtensionMethodSearch as MethodInfo[] ?? sourceExtensionMethodSearch.ToArray();
+            var explicitExtensionMethods = extensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType.IsAssignableFrom(Type));
 
             var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType);
 
@@ -126,11 +127,11 @@ namespace AutoMapper
                 from genericInterface in genericInterfaces
                 let genericInterfaceArguments = genericInterface.GenericTypeArguments
                 let matchedMethods = (
-                    from extensionMethod in sourceExtensionMethodSearch
+                    from extensionMethod in extensionMethodSearch
                     where !extensionMethod.IsGenericMethodDefinition
                     select extensionMethod
                 ).Concat(
-                    from extensionMethod in sourceExtensionMethodSearch
+                    from extensionMethod in extensionMethodSearch
                     where extensionMethod.IsGenericMethodDefinition
                         && extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
                     select extensionMethod.MakeGenericMethod(genericInterfaceArguments)
@@ -141,23 +142,29 @@ namespace AutoMapper
             ).ToArray();
         }
 
-        private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers) =>
-            // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            allMembers
+        private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+        {
+            var memberInfos = allMembers as MemberInfo[] ?? allMembers.ToArray();
+            return memberInfos
                 .OfType<PropertyInfo>()
                 .GroupBy(x => x.Name) // group properties of the same name together
                 .Select(x => x.First())
-                .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
+                .Concat(memberInfos.Where(x => x is FieldInfo)) // add FieldInfo objects back
                 .ToArray();
+        }
 
-        private static MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers) =>
-            // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-            allMembers
+        private static MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers)
+        {
+            var memberInfos = allMembers as MemberInfo[] ?? allMembers.ToArray();
+            return memberInfos
                 .OfType<PropertyInfo>()
                 .GroupBy(x => x.Name) // group properties of the same name together
-                .Select(x => x.FirstOrDefault(y => y.CanWrite && y.CanRead) ?? x.First()) // favor the first property that can both read & write - otherwise pick the first one
-                .Concat(allMembers.Where(x => x is FieldInfo)) // add FieldInfo objects back
+                .Select(x =>
+                    x.FirstOrDefault(y => y.CanWrite && y.CanRead) ??
+                    x.First()) // favor the first property that can both read & write - otherwise pick the first one
+                .Concat(memberInfos.Where(x => x is FieldInfo)) // add FieldInfo objects back
                 .ToArray();
+        }
 
         private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
             => GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
@@ -195,9 +202,9 @@ namespace AutoMapper
                     .Where(mi => mi.DeclaringType != null && mi.DeclaringType == x)
                     .Where(
                         m =>
-                            m is FieldInfo && fieldAvailableFor((FieldInfo)m) ||
-                            m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) &&
-                            !((PropertyInfo)m).GetIndexParameters().Any())
+                            m is FieldInfo info && fieldAvailableFor(info) ||
+                            m is PropertyInfo propertyInfo && propertyAvailableFor(propertyInfo) &&
+                            !propertyInfo.GetIndexParameters().Any())
                     .Where(memberAvailableFor)
                 );
         }

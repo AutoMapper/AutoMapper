@@ -1,4 +1,3 @@
-using AutoMapper.Configuration;
 using AutoMapper.Execution;
 using AutoMapper.Internal;
 using System.Collections.Generic;

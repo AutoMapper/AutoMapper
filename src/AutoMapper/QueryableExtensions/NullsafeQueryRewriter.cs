@@ -132,12 +132,7 @@ namespace AutoMapper.QueryableExtensions
             }
 
             // default value for arrays
-            if (type.IsArray)
-            {
-                return Expression.NewArrayInit(type.GetElementType());
-            }
-
-            return null;
+            return type.IsArray ? Expression.NewArrayInit(type.GetElementType()) : null;
         }
 
         static Expression CollectionFallback(Type definition, Type type)

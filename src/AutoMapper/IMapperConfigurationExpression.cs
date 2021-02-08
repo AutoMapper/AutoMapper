@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using AutoMapper.Configuration;
 using AutoMapper.Features;
 
 namespace AutoMapper

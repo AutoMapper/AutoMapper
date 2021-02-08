@@ -133,8 +133,8 @@ namespace AutoMapper
 
             public int Compare(Type x, Type y)
             {
-                var xLessOrEqualY = x.IsAssignableFrom(y);
-                var yLessOrEqualX = y.IsAssignableFrom(x);
+                var xLessOrEqualY = x is { } && x.IsAssignableFrom(y);
+                var yLessOrEqualX = y is { } && y.IsAssignableFrom(x);
 
                 if (xLessOrEqualY & !yLessOrEqualX)
                 {

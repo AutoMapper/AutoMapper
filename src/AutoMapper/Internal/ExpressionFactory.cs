@@ -41,10 +41,10 @@ namespace AutoMapper.Internal
             return GetMembersCore().Reverse();
             IEnumerable<Member> GetMembersCore()
             {
-                Expression target;
-                MemberInfo memberInfo;
                 while (expression != null)
                 {
+                    Expression target;
+                    MemberInfo memberInfo;
                     switch (expression)
                     {
                         case MemberExpression member:
@@ -117,7 +117,7 @@ namespace AutoMapper.Internal
         public static Expression GetSetter(MemberExpression memberExpression)
         {
             var propertyOrField = memberExpression.Member;
-            return ReflectionHelper.CanBeSet(propertyOrField) ?
+            return propertyOrField.CanBeSet() ?
                         MakeMemberAccess(memberExpression.Expression, propertyOrField) :
                         null;
         }
@@ -304,10 +304,8 @@ namespace AutoMapper.Internal
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                if (node.Object == _oldParam)
-                {
-                    node = Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments);
-                }
+                if (node.Object != _oldParam) return base.VisitMethodCall(node);
+                if (_oldParam != null) node = Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments);
 
                 return base.VisitMethodCall(node);
             }

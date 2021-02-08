@@ -286,7 +286,7 @@ namespace AutoMapper
                 includedMemberTypeMap.TypeMap.Seal(configurationProvider);
                 ApplyIncludedMemberTypeMap(includedMemberTypeMap);
             }
-            _inheritedTypeMaps.ForAll(tm => ApplyInheritedTypeMap(tm));
+            _inheritedTypeMaps.ForAll(ApplyInheritedTypeMap);
 
             _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
             _propertyMaps.Clear();

@@ -28,8 +28,7 @@ namespace AutoMapper.Execution
             Expression contextParameter,
             IMemberMap propertyMap = null, Expression destinationParameter = null)
         {
-            if (destinationParameter == null)
-                destinationParameter = Default(typePair.DestinationType);
+            destinationParameter ??= Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             Expression mapExpression;
             bool hasTypeConverter;

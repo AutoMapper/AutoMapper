@@ -41,7 +41,7 @@ namespace AutoMapper
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
 
-            MemberInfo mInfo = obj as MemberInfo;
+            var mInfo = obj as MemberInfo;
             if (mInfo == null) return false;
 
             return Equals(mInfo);

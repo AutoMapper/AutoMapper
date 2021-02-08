@@ -31,7 +31,7 @@ namespace AutoMapper.Internal
         public override bool Equals(object obj)
         {
             if(ReferenceEquals(null, obj)) return false;
-            return obj is MemberPath && Equals((MemberPath)obj);
+            return obj is MemberPath path && Equals(path);
         }
 
         public override int GetHashCode()

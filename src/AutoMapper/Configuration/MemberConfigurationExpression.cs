@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
-    using static AutoMapper.Internal.ExpressionFactory;
+    using static ExpressionFactory;
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
@@ -313,7 +313,7 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericTypeDefinition)
+            if(destMember.DeclaringType is { } && destMember.DeclaringType.IsGenericTypeDefinition)
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
@@ -347,7 +347,7 @@ namespace AutoMapper.Configuration
                 reversedMemberConfiguration.MapFrom(DestinationMember.Name);
                 return reversedMemberConfiguration;
             }
-            if (destinationType.IsGenericTypeDefinition) // .ForMember("InnerSource", o => o.MapFrom(s => s))
+            if (destinationType is { } && destinationType.IsGenericTypeDefinition) // .ForMember("InnerSource", o => o.MapFrom(s => s))
             {
                 return null;
             }

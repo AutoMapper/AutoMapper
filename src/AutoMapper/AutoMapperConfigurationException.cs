@@ -67,7 +67,8 @@ namespace AutoMapper
 
                     return message + "\n" + base.Message;
                 }
-                if (Errors != null)
+
+                if (Errors == null) return base.Message;
                 {
                     var message =
                         new StringBuilder(
@@ -75,10 +76,17 @@ namespace AutoMapper
 
                     foreach (var error in Errors)
                     {
-                        var len = error.TypeMap.SourceType.FullName.Length +
-                                  error.TypeMap.DestinationType.FullName.Length + 5;
+                        if (error.TypeMap.SourceType.FullName != null)
+                        {
+                            if (error.TypeMap.DestinationType.FullName != null)
+                            {
+                                var len = error.TypeMap.SourceType.FullName.Length +
+                                          error.TypeMap.DestinationType.FullName.Length + 5;
 
-                        message.AppendLine(new string('=', len));
+                                message.AppendLine(new string('=', len));
+                            }
+                        }
+
                         message.AppendLine(error.TypeMap.SourceType.Name + " -> " + error.TypeMap.DestinationType.Name +
                                            " (" +
                                            error.TypeMap.ConfiguredMemberList + " member list)");
@@ -102,7 +110,6 @@ namespace AutoMapper
                     }
                     return message.ToString();
                 }
-                return base.Message;
             }
         }
 

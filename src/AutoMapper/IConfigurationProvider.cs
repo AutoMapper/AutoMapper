@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.QueryableExtensions;
 
@@ -85,7 +84,7 @@ namespace AutoMapper
         /// <summary>
         /// Gets the features collection.
         /// </summary>
-        /// <value>The feature colection.</value>
+        /// <value>The feature collection.</value>
         Features<IRuntimeFeature> Features { get; }
 
         /// <summary>
