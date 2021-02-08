@@ -53,7 +53,7 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                return _instanceCache ??= new Dictionary<ContextCacheKey, object>(); ;
+                return _instanceCache ??= new Dictionary<ContextCacheKey, object>();
             }
         }
 
