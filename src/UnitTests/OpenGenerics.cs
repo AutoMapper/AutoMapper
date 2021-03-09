@@ -1,13 +1,28 @@
-﻿namespace AutoMapper.UnitTests
-{
-    using AutoMapper;
-    using MappingInheritance;
-    using Shouldly;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Xunit;
+﻿using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
+namespace AutoMapper.UnitTests
+{
+    public class OpenGenerics_With_Base_Generic : AutoMapperSpecBase
+    {
+        public class Foo<T>
+        {
+            public T Value1 { get; set; }
+        }
+        public class BarBase<T>
+        {
+            public T Value2 { get; set; }
+        }
+        public class Bar<T> : BarBase<T>
+        {
+        }
+        protected override MapperConfiguration Configuration { get; } = new(mapper => mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1")));
+        [Fact]
+        public void Can_map_base_members() => Map<Bar<int>>(new Foo<int> { Value1 = 5 }).Value2.ShouldBe(5);
+    }
     public class GenericMapsAsNonGeneric : AutoMapperSpecBase
     {
         class Source

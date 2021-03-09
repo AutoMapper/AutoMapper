@@ -319,7 +319,7 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericTypeDefinition)
+            if(destMember.DeclaringType.ContainsGenericParameters)
             {
                 destMember = typeMap.DestinationSetters.Single(m => m.Name == destMember.Name);
             }
