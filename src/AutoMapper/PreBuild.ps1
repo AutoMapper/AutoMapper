@@ -1,4 +1,5 @@
 param([string]$version)
+echo $version
 $versionNumbers = $version.Split(".")
 if($versionNumbers[1] -eq "0" -AND $versionNumbers[2] -eq "0")
 {

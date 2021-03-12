@@ -13,7 +13,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             public Context()
             {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
+                Database.SetInitializer(new DatabaseInitializer());
             }
 
             public DbSet<Entity> Entity { get; set; }

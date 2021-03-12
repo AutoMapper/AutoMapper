@@ -1,25 +1,153 @@
-﻿using System;
-using Shouldly;
+﻿using Shouldly;
 using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.UnitTests;
 using System.Data.Entity;
 using Xunit;
-
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
 namespace AutoMapper.IntegrationTests
 {
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq.Expressions;
-    using QueryableExtensions;
-
+    public class MemberWithSubQueryProjections : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            [Key]
+            public int Id { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public ICollection<Item> Items { get; set; }
+        }
+        public class Item
+        {
+            public int Id { get; set; }
+            public int Code { get; set; }
+        }
+        public class ItemModel
+        {
+            public int Id { get; set; }
+            public int Code { get; set; }
+        }
+        public class CustomerViewModel
+        {
+            public CustomerNameModel Name { get; set; }
+            public ItemModel FirstItem { get; set; }
+        }
+        public class CustomerNameModel
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+        public class Context : DbContext
+        {
+            public Context() => Database.SetInitializer(new DatabaseInitializer());
+            public DbSet<Customer> Customers { get; set; }
+        }
+        public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+        {
+            protected override void Seed(Context context)
+            {
+                context.Customers.Add(new Customer
+                {
+                    Id = 1, FirstName = "Bob", LastName = "Smith", Items = new[] { new Item { Code = 1 }, new Item { Code = 3 }, new Item { Code = 5 } }
+                });
+                base.Seed(context);
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateProjection<Customer, CustomerViewModel>()
+                .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.LastName != null ? src : null))
+                .ForMember(dst => dst.FirstItem, opt => opt.MapFrom(src => src.Items.FirstOrDefault()));
+            cfg.CreateProjection<Customer, CustomerNameModel>();
+            cfg.CreateProjection<Item, ItemModel>();
+        });
+        [Fact]
+        public void Should_work()
+        {
+            using (var context = new Context())
+            {
+                var resultQuery = ProjectTo<CustomerViewModel>(context.Customers);
+                var result = resultQuery.Single();
+                result.Name.FirstName.ShouldBe("Bob");
+                result.Name.LastName.ShouldBe("Smith");
+                result.FirstItem.Id.ShouldBe(1);
+                result.FirstItem.Code.ShouldBe(1);
+            }
+        }
+    }
+    public class MemberWithSubQueryProjectionsNoMap : AutoMapperSpecBase
+    {
+        public class Customer
+        {
+            [Key]
+            public int Id { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public ICollection<Item> Items { get; set; }
+        }
+        public class Item
+        {
+            public int Id { get; set; }
+            public int Code { get; set; }
+        }
+        public class ItemModel
+        {
+            public int Id { get; set; }
+            public int Code { get; set; }
+        }
+        public class CustomerViewModel
+        {
+            public string Name { get; set; }
+            public ItemModel FirstItem { get; set; }
+        }
+        public class Context : DbContext
+        {
+            public Context() => Database.SetInitializer(new DatabaseInitializer());
+            public DbSet<Customer> Customers { get; set; }
+        }
+        public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+        {
+            protected override void Seed(Context context)
+            {
+                context.Customers.Add(new Customer
+                {
+                    Id = 1,
+                    FirstName = "Bob",
+                    LastName = "Smith",
+                    Items = new[] { new Item { Code = 1 }, new Item { Code = 3 }, new Item { Code = 5 } }
+                });
+                base.Seed(context);
+            }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateProjection<Customer, CustomerViewModel>()
+                .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.LastName != null ? src.LastName : null))
+                .ForMember(dst => dst.FirstItem, opt => opt.MapFrom(src => src.Items.FirstOrDefault()));
+            cfg.CreateProjection<Item, ItemModel>();
+        });
+        [Fact]
+        public void Should_work()
+        {
+            using (var context = new Context())
+            {
+                var resultQuery = ProjectTo<CustomerViewModel>(context.Customers);
+                var result = resultQuery.Single();
+                result.Name.ShouldBe("Smith");
+                result.FirstItem.Id.ShouldBe(1);
+                result.FirstItem.Code.ShouldBe(1);
+            }
+        }
+    }
     public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -133,13 +261,13 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o =>
                 {
                     o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault());
                     o.ExplicitExpansion();
                 });
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -227,9 +355,9 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -321,10 +449,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -421,10 +549,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -526,12 +654,12 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ProductArticle, ProductArticleModel>();
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<ProductArticle, ProductArticleModel>();
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
                 .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Product, ArticlesModel>();
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Product, ArticlesModel>();
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 
@@ -728,8 +856,8 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
-            cfg.CreateMap<Cable, CableListModel>()
+            cfg.CreateProjection<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
+            cfg.CreateProjection<Cable, CableListModel>()
                 .ForMember(dest => dest.AEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "A")))
                 .ForMember(dest => dest.AnotherEnd, opt => opt.MapFrom(src => src.Ends.FirstOrDefault(x => x.Name == "B")));
         });
@@ -751,10 +879,10 @@ namespace AutoMapper.IntegrationTests
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Owner, OwnerDto>();
-            cfg.CreateMap<Brand, BrandDto>()
+            cfg.CreateProjection<Owner, OwnerDto>();
+            cfg.CreateProjection<Brand, BrandDto>()
                 .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owners.FirstOrDefault()));
-            cfg.CreateMap<ProductReview, ProductReviewDto>()
+            cfg.CreateProjection<ProductReview, ProductReviewDto>()
                 .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Product.Brand));
         });
 

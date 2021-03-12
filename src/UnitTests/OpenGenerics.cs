@@ -1,13 +1,73 @@
-﻿namespace AutoMapper.UnitTests
-{
-    using AutoMapper;
-    using MappingInheritance;
-    using Shouldly;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Xunit;
+﻿using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
+namespace AutoMapper.UnitTests
+{
+    public class OpenGenerics_With_Base_Generic : AutoMapperSpecBase
+    {
+        public class Foo<T>
+        {
+            public T Value1 { get; set; }
+        }
+        public class BarBase<T>
+        {
+            public T Value2 { get; set; }
+        }
+        public class Bar<T> : BarBase<T>
+        {
+        }
+        protected override MapperConfiguration Configuration { get; } = new(mapper => mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1")));
+        [Fact]
+        public void Can_map_base_members() => Map<Bar<int>>(new Foo<int> { Value1 = 5 }).Value2.ShouldBe(5);
+    }
+    public class GenericMapsAsNonGeneric : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Value;
+        }
+        class Destination<T>
+        {
+            public T Value;
+        }
+        class NonGenericDestination : Destination<string>
+        {
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source), typeof(Destination<>)).As(typeof(NonGenericDestination));
+            cfg.CreateMap(typeof(Source), typeof(NonGenericDestination));
+        });
+        [Fact]
+        public void Should_work() => Mapper.Map<Destination<string>>(new Source { Value = 42 }).Value.ShouldBe("42");
+    }
+    public class GenericMapsPriority : AutoMapperSpecBase
+    {
+        class Source<T>
+        {
+            public T Value;
+        }
+        class Destination<T>
+        {
+            public T Value;
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<string>));
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<>)).ForAllMembers(o=>o.Ignore());
+            cfg.CreateMap(typeof(Source<string>), typeof(Destination<>)).ForAllMembers(o => o.Ignore());
+            cfg.CreateMap(typeof(Source<int>), typeof(Destination<>));
+        });
+        [Fact]
+        public void Should_work()
+        {
+            Mapper.Map<Destination<int>>(new Source<int> { Value = 42 }).Value.ShouldBe(42);
+            Mapper.Map<Destination<string>>(new Source<string> { Value = "42" }).Value.ShouldBe("42");
+        }
+    }
     public class GenericMapWithUntypedMap : AutoMapperSpecBase
     {
         class Source<T>
@@ -208,7 +268,7 @@
         [Fact]
         public void Should_report_unmapped_property()
         {
-            new Action(()=> Mapper.Map<Dest<int>>(new Source<int>{ Value = 5 }))
+            new Action(Configuration.AssertConfigurationIsValid)
                 .ShouldThrow<AutoMapperConfigurationException>()
                 .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A");
         }
@@ -238,12 +298,10 @@
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
 
         [Fact]
-        public void Should_report_unmapped_property()
-        {
-            new Action(()=> Configuration.AssertConfigurationIsValid<MyProfile>())
+        public void Should_report_unmapped_property() =>
+            new Action(()=> AssertConfigurationIsValid<MyProfile>())
                 .ShouldThrow<AutoMapperConfigurationException>()
-                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A"); ;
-        }
+                .Errors.Single().UnmappedPropertyNames.Single().ShouldBe("A");
     }
 
     public class OpenGenericsProfileValidation : AutoMapperSpecBase

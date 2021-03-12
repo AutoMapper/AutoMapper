@@ -4,9 +4,15 @@ using System.ComponentModel;
 using System.Linq;
 using Shouldly;
 using Xunit;
-
 namespace AutoMapper.UnitTests.InterfaceMapping
 {
+    public class MapToInterface : NonValidatingSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<object, IEnumerable<object>>());
+        [Fact]
+        public void Should_throw() => new Action(()=>Mapper.Map<IEnumerable<object>>(new object())).ShouldThrow<AutoMapperMappingException>().Message.ShouldStartWith(
+            "Cannot create interface System.Collections.Generic.IEnumerable`1[System.Object]");
+    }
     public class GenericsAndInterfaces : AutoMapperSpecBase
     {
         MyClass<ContainerClass> source = new MyClass<ContainerClass> { Container = new ContainerClass { MyProperty = 3 } };
@@ -35,7 +41,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             public T Container { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap(typeof(MyClass<>), typeof(IMyInterface<>)));
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap(typeof(MyClass<>), typeof(IMyInterface<>)).AsProxy());
 
         [Fact]
         public void ShouldMapToExistingObject()
@@ -102,7 +108,8 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
             cfg.CreateMap(typeof(IList<>), typeof(IDestinationBase<>))
                     .ForMember(nameof(IDestinationBase<Object>.Items), p_Expression => p_Expression.MapFrom(p_Source => p_Source))
-                    .ForMember("PropertyToMap", o=>o.Ignore()));
+                    .ForMember("PropertyToMap", o=>o.Ignore())
+                    .AsProxy());
 
         [Fact]
         public void Should_work()
@@ -133,7 +140,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             public int Id { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<ISource, IDestination>());
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<ISource, IDestination>().AsProxy());
 
         [Fact]
         public void ShouldMapOk()
@@ -309,10 +316,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, IDestination>();
-        });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>cfg.CreateMap<Source, IDestination>().AsProxy());
 
         protected override void Because_of()
         {
@@ -348,10 +352,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, IDestination>();
-        });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, IDestination>().AsProxy());
 
         protected override void Because_of()
         {

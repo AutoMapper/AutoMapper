@@ -44,7 +44,7 @@
         public void Should_pass_specific_profile_assertion()
         {
             typeof(AutoMapperConfigurationException)
-                .ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid<GoodProfile>);
+                .ShouldNotBeThrownBy(AssertConfigurationIsValid<GoodProfile>);
         }
     }
 }

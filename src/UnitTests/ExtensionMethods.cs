@@ -3,6 +3,7 @@ using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
@@ -189,6 +190,36 @@ namespace AutoMapper.UnitTests
         public void Should_resolve_LINQ_method_automatically()
         {
             _destination.ValuesCount.ShouldBe(10);
+        }
+    }
+
+    public class When_disabling_method_maping : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public IEnumerable<int> Values { get; set; }
+            public int OtherValue() => 42;
+            public string StringValue;
+        }
+        public class Destination
+        {
+            public int ValuesCount { get; set; }
+            public int OtherValue { get; set; }
+            public string StringValue;
+            public string AnotherStringValue;
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.Internal().FieldMappingEnabled = false;
+            cfg.Internal().MethodMappingEnabled = false;
+            cfg.CreateMap<Source, Destination>();
+        });
+        [Fact]
+        public void Should_fail_validation()
+        {
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
+                .UnmappedPropertyNames.ShouldBe(new[] { "ValuesCount", "OtherValue" });
+            Mapper.Map<Destination>(new Source { StringValue = "42" }).StringValue.ShouldBeNull();
         }
     }
 

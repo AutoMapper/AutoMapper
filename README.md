@@ -1,8 +1,8 @@
 <img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
 
-[![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/automapper/automapper/workflows/CI)
+[![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/AutoMapper/AutoMapper/actions?query=workflow%3ACI)
 [![NuGet](http://img.shields.io/nuget/v/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
-[![MyGet (dev)](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](http://myget.org/gallery/automapperdev)
+[![MyGet (dev)](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](https://myget.org/feed/automapperdev/package/nuget/AutoMapper)
 
 ### What is AutoMapper?
 
@@ -10,11 +10,11 @@ AutoMapper is a simple little library built to solve a deceptively complex probl
 
 This is the main repository for AutoMapper, but there's more:
 
+* [Microsoft DI Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection)
+* [Collection Extensions](https://github.com/AutoMapper/AutoMapper.Collection)
+* [Expression Mapping](https://github.com/AutoMapper/AutoMapper.Extensions.ExpressionMapping)
 * [EF6 Extensions](https://github.com/AutoMapper/AutoMapper.EF6)
 * [IDataReader/Record Extensions](https://github.com/AutoMapper/AutoMapper.Data)
-* [Collection Extensions](https://github.com/AutoMapper/AutoMapper.Collection)
-* [Microsoft DI Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.Microsoft.DependencyInjection)
-* [Expression Mapping](https://github.com/AutoMapper/AutoMapper.Extensions.ExpressionMapping)
 * [Enum Extensions](https://github.com/AutoMapper/AutoMapper.Extensions.EnumMapping)
 
 ### How do I get started?

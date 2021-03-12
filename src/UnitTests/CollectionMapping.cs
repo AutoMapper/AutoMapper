@@ -7,6 +7,7 @@ using Xunit;
 using Shouldly;
 using System.Collections;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
@@ -950,13 +951,10 @@ namespace AutoMapper.UnitTests
 
         [Fact]
         public void Should_map_to_NameValueCollection() {
-            // initially results in the following exception:
-            // ----> System.InvalidCastException : Unable to cast object of type 'System.Collections.Specialized.NameValueCollection' to type 'System.Collections.IList'.
-            // this was fixed by adding NameValueCollectionMapper to the MapperRegistry.
             var c = new NameValueCollection();
             var config = new MapperConfiguration(cfg => { });
             var mappedCollection = config.CreateMapper().Map<NameValueCollection, NameValueCollection>(c);
-
+            mappedCollection.ShouldNotBeSameAs(c);
             mappedCollection.ShouldNotBeNull();
         }
     }

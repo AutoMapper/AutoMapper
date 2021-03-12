@@ -8,9 +8,44 @@ using Shouldly;
 using System.Linq;
 using System.Dynamic;
 using System.Linq.Expressions;
+using AutoMapper.Internal;
+using AutoMapper.Internal.Mappers;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
+    public class When_mapping_to_Existing_IEnumerable : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public IEnumerable<SourceItem> Items { get; set; } = Enumerable.Empty<SourceItem>();
+        }
+        public class Destination
+        {
+            public IEnumerable<DestinationItem> Items { get; set; } = Enumerable.Empty<DestinationItem>();
+        }
+        public class SourceItem
+        {
+            public string Value { get; set; }
+        }
+        public class DestinationItem
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>();
+            c.CreateMap<SourceItem, DestinationItem>();
+        });
+        [Fact]
+        public void Should_overwrite_the_existing_list()
+        {
+            var destination = new Destination();
+            var existingList = destination.Items;
+            Mapper.Map(new Source(), destination);
+            destination.Items.ShouldNotBeSameAs(existingList);
+            destination.Items.ShouldBeEmpty();
+        }
+    }
     public class When_mapping_to_an_array_as_ICollection_with_MapAtRuntime : AutoMapperSpecBase
     {
         Destination _destination;
@@ -128,16 +163,16 @@ namespace AutoMapper.UnitTests.ArraysAndLists
 
         private class IntToIntMapper : IObjectMapper
         {
-            public bool IsMatch(TypePair context)
+            public bool IsMatch(in TypePair context)
                 => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
 
-            public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-                IMemberMap memberMap,
-                Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+                MemberMap memberMap,
+                Expression sourceExpression, Expression destExpression)
                 => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Mappers.Insert(0, new IntToIntMapper()));
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Internal().Mappers.Insert(0, new IntToIntMapper()));
 
         protected override void Because_of()
         {
@@ -476,7 +511,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         {
             cfg.CreateMap<Source, Destination>();
         });
-        protected override void Because_of() => Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } }, _destination);
+        protected override void Because_of() => Mapper.Map(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } }, _destination);
         [Fact]
         public void Should_map_the_list_of_source_items()
         {
@@ -673,71 +708,6 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             _source.Values.ShouldBe(_destination.Values);
         }
     }
-
-    public class When_mapping_to_a_custom_collection_with_the_same_type_not_implementing_IList : AutoMapperSpecBase
-    {
-        private Source _source;
-
-        private Destination _destination;
-
-        public class ValueCollection : IEnumerable<int>
-        {
-            private List<int> implementation = new List<int>();
-
-            public ValueCollection(IEnumerable<int> items)
-            {
-                implementation = items.ToList();
-            }
-
-            public IEnumerator<int> GetEnumerator()
-            {
-                return implementation.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return ((IEnumerable)implementation).GetEnumerator();
-            }
-        }
-
-        public class Source
-        {
-            public ValueCollection Values { get; set; }
-        }
-
-        public class Destination
-        {
-            public ValueCollection Values { get; set; }
-        }
-
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>();
-        });
-
-        protected override void Establish_context()
-        {
-            _source = new Source { Values = new ValueCollection(new[] { 1, 2, 3, 4 }) };
-        }
-
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Source, Destination>(_source);
-        }
-
-        [Fact]
-        public void Should_map_the_list_of_source_items()
-        {
-            // here not the EnumerableMapper is used, but just the AssignableMapper!
-            _destination.Values.ShouldBeSameAs(_source.Values);
-            _destination.Values.ShouldNotBeNull();
-            _destination.Values.ShouldContain(1);
-            _destination.Values.ShouldContain(2);
-            _destination.Values.ShouldContain(3);
-            _destination.Values.ShouldContain(4);
-        }
-    }
-
     public class When_mapping_to_a_collection_with_instantiation_managed_by_the_destination : AutoMapperSpecBase
     {
         private Destination _destination;
@@ -839,6 +809,80 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         public void Should_clear_the_list_before_mapping()
         {
             _destination.Values.Count.ShouldBe(2);
+        }
+    }
+
+    public class When_mapping_to_getter_only_list_with_existing_items : AutoMapperSpecBase
+    {
+        public class SourceItem
+        {
+            public int Value { get; set; }
+        }
+        public class DestItem
+        {
+            public int Value { get; set; }
+        }
+        public class Source
+        {
+            public List<SourceItem> Values { get; set; }
+            public List<SourceItem> IValues { get; set; }
+        }
+        public class Destination
+        {
+            public List<DestItem> Values { get; } = new();
+            public IEnumerable<DestItem> IValues { get; } = new List<DestItem>();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<SourceItem, DestItem>();
+        });
+        [Fact]
+        public void Should_clear_the_list_before_mapping()
+        {
+            var destination = new Destination { Values = { new DestItem() } };
+            ((List<DestItem>)destination.IValues).Add(new DestItem());
+            Mapper.Map(new Source(), destination);
+            destination.Values.ShouldBeEmpty();
+            destination.IValues.ShouldBeEmpty();
+        }
+    }
+    public class When_mapping_to_list_with_existing_items : AutoMapperSpecBase
+    {
+        public class SourceItem
+        {
+            public int Value { get; set; }
+        }
+        public class DestItem
+        {
+            public int Value { get; set; }
+        }
+        public class Source
+        {
+            public List<SourceItem> Values { get; set; } = new();
+        }
+        public class Destination
+        {
+            public List<DestItem> Values { get; set; } = new();
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<SourceItem, DestItem>();
+        });
+        [Fact]
+        public void Should_clear_the_list_before_mapping()
+        {
+            var destination = new Destination { Values = { new DestItem { } } };
+            Mapper.Map(new Source { Values = { new SourceItem { Value = 42 } } }, destination);
+            destination.Values.Single().Value.ShouldBe(42);
+        }
+        [Fact]
+        public void Should_clear_the_list_before_mapping_when_the_source_is_null()
+        {
+            var destination = new Destination { Values = { new DestItem { } } };
+            Mapper.Map(new Source { Values = null }, destination);
+            destination.Values.ShouldBeEmpty();
         }
     }
 

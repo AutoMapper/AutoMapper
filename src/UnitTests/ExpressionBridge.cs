@@ -9,7 +9,9 @@ namespace AutoMapper.UnitTests
 {
     namespace ExpressionBridge
     {
+        using AutoMapper.Internal;
         using QueryableExtensions;
+        using QueryableExtensions.Impl;
 
         public class SimpleProductDto
         {
@@ -109,23 +111,23 @@ namespace AutoMapper.UnitTests
             {
                 _config = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<Product, SimpleProductDto>()
+                    cfg.CreateProjection<Product, SimpleProductDto>()
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
-                    cfg.CreateMap<Product, ExtendedProductDto>()
+                    cfg.CreateProjection<Product, ExtendedProductDto>()
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name))
                         .ForMember(m => m.BOM, dst => dst.MapFrom(p => p.BillOfMaterials));
-                    cfg.CreateMap<BillOfMaterials, BillOfMaterialsDto>();
-                    cfg.CreateMap<Product, ComplexProductDto>();
-                    cfg.CreateMap<ProductSubcategory, ProductSubcategoryDto>();
-                    cfg.CreateMap<ProductCategory, ProductCategoryDto>();
-                    cfg.CreateMap<Product, AbstractProductDto>();
+                    cfg.CreateProjection<BillOfMaterials, BillOfMaterialsDto>();
+                    cfg.CreateProjection<Product, ComplexProductDto>();
+                    cfg.CreateProjection<ProductSubcategory, ProductSubcategoryDto>();
+                    cfg.CreateProjection<ProductCategory, ProductCategoryDto>();
+                    cfg.CreateProjection<Product, AbstractProductDto>();
                     cfg.CreateMap<ProductType, ProductTypeDto>()
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
-                _simpleProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = _config.ExpressionBuilder.GetMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = _config.Internal().ProjectionBuilder.GetMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {
@@ -264,8 +266,8 @@ namespace AutoMapper.UnitTests
 
                 protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<BEntity, B>().MaxDepth(3);
-                    cfg.CreateMap<AEntity, A>().MaxDepth(3);
+                    cfg.CreateProjection<BEntity, B>().MaxDepth(3);
+                    cfg.CreateProjection<AEntity, A>().MaxDepth(3);
                 });
 
                 protected override void Because_of()

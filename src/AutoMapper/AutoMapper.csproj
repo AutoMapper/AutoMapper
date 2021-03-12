@@ -12,6 +12,7 @@
     <PackageId>AutoMapper</PackageId>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
+    <Features Condition=" '$(TargetFramework)' == 'net461' ">peverify-compat</Features>
 
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -44,9 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.3.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+    <PackageReference Include="MinVer" Version="2.4.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="5.0.0-beta.20262.5" PrivateAssets="All" />  
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="6.0.0-beta.21062.10" PrivateAssets="All" />  
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">

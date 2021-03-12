@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Projection
         {
             public int? Id { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateProjection<Source, Destination>());
         [Fact]
         public void Should_project() => ProjectTo<Destination>(new[] { new Source() }.AsQueryable()).First().Id.ShouldBe(0);
     }
@@ -25,9 +25,9 @@ namespace AutoMapper.UnitTests.Projection
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Product, ProductModel>()
+            cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
-            cfg.CreateMap<Article, PriceModel>()
+            cfg.CreateProjection<Article, PriceModel>()
                 .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
         });
 

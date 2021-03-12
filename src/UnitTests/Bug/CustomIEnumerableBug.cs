@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using Shouldly;
 using Xunit;
 

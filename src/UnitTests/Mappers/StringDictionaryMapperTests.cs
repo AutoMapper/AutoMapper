@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 using StringDictionary = System.Collections.Generic.Dictionary<string, object>;

@@ -4,11 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper.Execution;
 using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests.IMappingExpression
+namespace AutoMapper.UnitTests
 {
     public class IncludeMembers : AutoMapperSpecBase
     {

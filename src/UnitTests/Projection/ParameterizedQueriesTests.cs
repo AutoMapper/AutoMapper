@@ -27,7 +27,7 @@
             int value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
         });
 
@@ -75,7 +75,7 @@
             int value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
         });
 
@@ -123,7 +123,7 @@
             int value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateMap<Source, Dest>()
+            cfg.CreateProjection<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
         });
 
@@ -187,7 +187,7 @@
         {
             DB db = null;
 
-            cfg.CreateMap<User, UserViewModel>()
+            cfg.CreateProjection<User, UserViewModel>()
                 .ForMember(a => a.position,
                     opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
         });

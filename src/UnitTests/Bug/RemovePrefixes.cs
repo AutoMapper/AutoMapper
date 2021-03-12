@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Shouldly;
 using System;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 
 namespace AutoMapper.UnitTests.Bug
 {

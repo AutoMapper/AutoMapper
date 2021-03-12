@@ -96,7 +96,7 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dto>()
+            cfg.CreateProjection<Source, Dto>()
                 .ForMember(dto => dto.Desc, conf => conf.ExplicitExpansion())
                 .ForMember(dto => dto.Name, conf => conf.ExplicitExpansion())
                 .ForMember(dto => dto.InnerDescFlattened, conf => { conf.ExplicitExpansion(); conf.MapFrom(_ => _.Inner.Ides); })

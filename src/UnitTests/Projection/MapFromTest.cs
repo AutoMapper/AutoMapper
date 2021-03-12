@@ -5,6 +5,8 @@ using System.Reflection;
 using Shouldly;
 using Xunit;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests.Projection.MapFromTest
 {
@@ -15,25 +17,11 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<UserModel, UserDto>()
+                cfg.CreateProjection<UserModel, UserDto>()
                                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
-            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
-        }
-
-        [Fact]
-        public void Should_fail_Untyped()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<UserModel, UserDto>()
-                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
-            });
-
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(null, typeof(UserDto), new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), null, new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
+            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.Internal().ProjectionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
         }
 
         [Fact]
@@ -76,7 +64,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             public string ShortDescription { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateProjection<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
 
         protected override void Because_of()
         {

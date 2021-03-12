@@ -16,8 +16,8 @@ namespace AutoMapper.IntegrationTests.Net4
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             //cfg.AllowNullDestinationValues = false;
-            cfg.CreateMap<TrainingCourse, TrainingCourseDto>().MaxDepth(1);
-            cfg.CreateMap<TrainingContent, TrainingContentDto>();
+            cfg.CreateProjection<TrainingCourse, TrainingCourseDto>().MaxDepth(1);
+            cfg.CreateProjection<TrainingContent, TrainingContentDto>();
         });
 
         protected override void Because_of()

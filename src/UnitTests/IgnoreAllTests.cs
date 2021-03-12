@@ -154,7 +154,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Ignore_On_Source_Field()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddIgnoreMapAttribute();
+                cfg.CreateMap<Source, Destination>();
+            });
             config.AssertConfigurationIsValid();
 
             Source source = new Source
@@ -186,8 +190,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Ignore_On_Source_Field()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
-                .ReverseMap());
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddIgnoreMapAttribute();
+                cfg.CreateMap<Source, Destination>().ReverseMap();
+            });
             config.AssertConfigurationIsValid();
 
             Destination source = new Destination

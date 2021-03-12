@@ -9,7 +9,7 @@ namespace AutoMapper
 
     [DebuggerDisplay("{DestinationExpression}")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class PathMap : DefaultMemberMap
+    public class PathMap : MemberMap
     {
         public PathMap(PathMap pathMap, TypeMap typeMap, IncludedMember includedMember) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
         {

@@ -1,10 +1,57 @@
-﻿using AutoMapper.Mappers;
+﻿using AutoMapper.Internal.Mappers;
 using AutoMapper.Configuration.Conventions;
 using Shouldly;
 using Xunit;
+using System;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    public abstract class SourceToDestinationMapperAttribute : Attribute
+    {
+        public abstract bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, Type destMemberType, string nameToSearch);
+    }
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class MapToAttribute : SourceToDestinationMapperAttribute
+    {
+        public string MatchingName { get; }
+
+        public MapToAttribute(string matchingName)
+            => MatchingName = matchingName;
+
+        public override bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, Type destMemberType, string nameToSearch)
+            => string.Compare(MatchingName, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0;
+    }
+    public class SourceToDestinationNameMapperAttributesMember : ISourceToDestinationNameMapper
+    {
+        private static readonly SourceMember[] Empty = new SourceMember[0];
+        private readonly Dictionary<TypeDetails, SourceMember[]> _allSourceMembers = new Dictionary<TypeDetails, SourceMember[]>();
+
+        public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
+        {
+            if (!_allSourceMembers.TryGetValue(sourceTypeDetails, out SourceMember[] sourceMembers))
+            {
+                sourceMembers = sourceTypeDetails.ReadAccessors.Select(sourceMember => new SourceMember(sourceMember)).Where(s => s.Attribute != null).ToArray();
+                _allSourceMembers[sourceTypeDetails] = sourceMembers.Length == 0 ? Empty : sourceMembers;
+            }
+            return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(sourceTypeDetails, d.Member, destType, destMemberType, nameToSearch)).Member;
+        }
+        readonly struct SourceMember
+        {
+            public SourceMember(MemberInfo sourceMember)
+            {
+                Member = sourceMember;
+                Attribute = sourceMember.GetCustomAttribute<SourceToDestinationMapperAttribute>(inherit: true);
+            }
+
+            public MemberInfo Member { get; }
+            public SourceToDestinationMapperAttribute Attribute { get; }
+        }
+    }
     public class MapToAttributeTest : AutoMapperSpecBase
     {
         public class CategoryDto
@@ -24,6 +71,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.Internal().AddMemberConfiguration().AddName<SourceToDestinationNameMapperAttributesMember>();
             cfg.CreateProfile("New Profile", profile =>
             {
                 profile.CreateMap<Category, CategoryDto>();

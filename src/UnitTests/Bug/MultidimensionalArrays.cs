@@ -1,6 +1,6 @@
 ﻿using Xunit;
 using Shouldly;
-using AutoMapper.Mappers;
+using AutoMapper.Internal.Mappers;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -55,11 +55,11 @@ namespace AutoMapper.UnitTests.Bug
     public class FillMultidimensionalArray : SpecBase
     {
         int[,] _source;
-        MultidimensionalArrayMapper.MultidimensionalArrayFiller _filler;
+        MultidimensionalArrayFiller _filler;
         protected override void Establish_context()
         {
             _source = new int[4,3];
-            _filler = new MultidimensionalArrayMapper.MultidimensionalArrayFiller(_source);
+            _filler = new MultidimensionalArrayFiller(_source);
         }
 
         protected override void Because_of()

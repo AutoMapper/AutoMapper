@@ -1,6 +1,8 @@
 using System;
 using System.Linq.Expressions;
-using AutoMapper.Mappers;
+using AutoMapper.Configuration;
+using AutoMapper.Internal;
+using AutoMapper.Internal.Mappers;
 using Shouldly;
 using Xunit;
 
@@ -37,7 +39,7 @@ namespace AutoMapper.UnitTests
             {
                 var config = new MapperConfiguration(cfg =>
                 {
-                    cfg.Advanced.Validator(Validator);
+                    cfg.Internal().Validator(Validator);
                     cfg.CreateMap<Source, Dest>();
                 });
 
@@ -71,7 +73,7 @@ namespace AutoMapper.UnitTests
                     else
                     {
                         _calledForValues = true;
-                        context.ObjectMapper.ShouldBeOfType<ArrayCopyMapper>();
+                        context.ObjectMapper.ShouldBeOfType<CollectionMapper>();
                         context.Types.SourceType.ShouldBe(typeof(int[]));
                         context.Types.DestinationType.ShouldBe(typeof(int[]));
                     }
@@ -88,7 +90,7 @@ namespace AutoMapper.UnitTests
             {
                 Func<Source, Destination, Destination> mappingFunction = (source, destination) => new Destination();
                 cfg.CreateMap<Source, Destination>().ConvertUsing(mappingFunction);
-                cfg.Advanced.Validator(SetValidated);
+                cfg.Internal().Validator(SetValidated);
             });
 
             private static void SetValidated(ValidationContext context)
@@ -119,7 +121,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>().ConvertUsing<CustomTypeConverter>();
-                cfg.Advanced.Validator(SetValidated);
+                cfg.Internal().Validator(SetValidated);
             });
 
             private static void SetValidated(ValidationContext context)
@@ -158,7 +160,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>().ConvertUsing(new CustomTypeConverter());
-                cfg.Advanced.Validator(SetValidated);
+                cfg.Internal().Validator(SetValidated);
             });
 
             private static void SetValidated(ValidationContext context)
@@ -198,7 +200,7 @@ namespace AutoMapper.UnitTests
             {
                 Expression<Func<Source, Destination>> mappingExpression = source => new Destination();
                 cfg.CreateMap<Source, Destination>().ConvertUsing(mappingExpression);
-                cfg.Advanced.Validator(SetValidated);
+                cfg.Internal().Validator(SetValidated);
             });
 
             private static void SetValidated(ValidationContext context)

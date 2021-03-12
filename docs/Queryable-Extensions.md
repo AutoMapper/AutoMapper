@@ -57,6 +57,8 @@ public List<OrderLineDTO> GetLinesForOrder(int orderId)
 
 The `.ProjectTo<OrderLineDTO>()` will tell AutoMapper's mapping engine to emit a `select` clause to the IQueryable that will inform entity framework that it only needs to query the Name column of the Item table, same as if you manually projected your `IQueryable` to an `OrderLineDTO` with a `Select` clause.
 
+`ProjectTo` must be the last call in the chain. ORMs work with entities, not DTOs. So apply any filtering and sorting on entities and, as the last step, project to DTOs.
+
 Note that for this feature to work, all type conversions must be explicitly handled in your Mapping. For example, you can not rely on the `ToString()` override of the `Item` class to inform entity framework to only select from the `Name` column, and any data type changes, such as `Double` to `Decimal` must be explicitly handled as well.
 
 ### The instance API
@@ -207,6 +209,7 @@ Not all mapping options can be supported, as the expression generated must be in
 * Ignore
 * NullSubstitute
 * Value transformers
+* IncludeMembers
 
 Not supported:
 * Condition

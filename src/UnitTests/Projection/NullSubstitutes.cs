@@ -22,7 +22,7 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
+            cfg.CreateProjection<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
         });
 
         protected override void Because_of()
@@ -55,7 +55,7 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
+            cfg.CreateProjection<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
             {
                 opt.MapFrom(src => src.Value);
                 opt.NullSubstitute(5);

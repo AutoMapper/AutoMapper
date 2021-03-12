@@ -8,6 +8,20 @@ using System.Diagnostics;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class ConstructorValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        class Destination
+        {
+            public Destination(int otherValue, int value = 2) { }
+            public int Value { get; set; }
+            public int OtherValue { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+            c.CreateMap<Source, Destination>().ForCtorParam("otherValue", o=>o.MapFrom(s=>0)));
+    }
     public class Nullable_enum_default_value : AutoMapperSpecBase
     {
         public enum SourceEnum { A, B }
@@ -564,7 +578,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            var typeMap = Configuration.FindTypeMapFor<Person, PersonDto>();
+            var typeMap = FindTypeMapFor<Person, PersonDto>();
             _destination.Name.ShouldBe("John");
         }
     }
@@ -987,7 +1001,7 @@ namespace AutoMapper.UnitTests.Constructors
         public void Should_say_what_parameter_fails()
         {
             new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
-                  ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
+                  ex.MemberMap.ToString().ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(System.DateTime).parameter foo"));
         }
     }
 
@@ -1227,6 +1241,24 @@ namespace AutoMapper.UnitTests.Constructors
             _dest.Foo.ShouldBe(5);
             _dest.Bar.ShouldBe(10);
         }
+    }
+    public class When_mapping_with_optional_parameters_and_constructor_mapping_is_disabled : AutoMapperSpecBase
+    {
+        public class Destination
+        {
+            public Destination(Destination destination = null)
+            {
+                Dest = destination;
+            }
+            public Destination Dest { get; }
+        }
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.DisableConstructorMapping();
+            cfg.CreateMap<object, Destination>();
+        });
+        [Fact]
+        public void Should_map_ok() => Mapper.Map<Destination>(new object()).Dest.ShouldBeNull();
     }
     public class UsingMappingEngineToResolveConstructorArguments
     {

@@ -4,6 +4,21 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
+    public interface ISourceMemberConfiguration
+    {
+        void Configure(TypeMap typeMap);
+    }
+    /// <summary>
+    /// Source member configuration options
+    /// </summary>
+    public interface ISourceMemberConfigurationExpression
+    {
+        /// <summary>
+        /// Ignore this member when validating source members, MemberList.Source.
+        /// Does not affect validation for the default case, MemberList.Destination.
+        /// </summary>
+        void DoNotValidate();
+    }
     public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
     {
         private readonly MemberInfo _sourceMember;
@@ -22,5 +37,20 @@ namespace AutoMapper.Configuration
                 action(sourcePropertyConfig);
             }
         }
+    }
+    /// <summary>
+    /// Contains member configuration relating to source members
+    /// </summary>
+    public class SourceMemberConfig
+    {
+        private bool _ignored;
+
+        public SourceMemberConfig(MemberInfo sourceMember) => SourceMember = sourceMember;
+
+        public MemberInfo SourceMember { get; }
+
+        public void Ignore() => _ignored = true;
+
+        public bool IsIgnored() => _ignored;
     }
 }

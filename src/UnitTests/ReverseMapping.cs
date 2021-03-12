@@ -4,9 +4,23 @@ using System.Linq;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    public class ReverseMapWithStaticField : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public Guid Id { get; set; }
+        }
+        class Destination
+        {
+            public Guid Id { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
+            c.CreateMap<Destination, Source>().ForMember(src => src.Id, opt => opt.MapFrom(_ => Guid.Empty)).ReverseMap());
+    }
     public class InvalidReverseMap : NonValidatingSpecBase
     {
         public class One

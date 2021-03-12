@@ -1,30 +1,15 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper.Execution;
-using AutoMapper.Internal;
-
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
-    using static Expression;
-
     public class NullableSourceMapper : IObjectMapperInfo
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsNullableType();
-
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-                ExpressionBuilder.MapExpression(configurationProvider, profileMap,
-                    new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
-                    Property(sourceExpression, sourceExpression.Type.GetProperty("Value")),
-                    contextExpression,
-                    memberMap,
-                    destExpression
-                );
-
-        public TypePair GetAssociatedTypes(TypePair initialTypes)
-        {
-            return new TypePair(Nullable.GetUnderlyingType(initialTypes.SourceType), initialTypes.DestinationType);
-        }
+        public bool IsMatch(in TypePair context) => context.SourceType.IsNullableType();
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            configurationProvider.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type),
+                    ExpressionBuilder.Property(sourceExpression, "Value"), memberMap, destExpression);
+        public TypePair GetAssociatedTypes(in TypePair initialTypes) => GetAssociatedTypes(initialTypes.SourceType, initialTypes.DestinationType);
+        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new TypePair(Nullable.GetUnderlyingType(sourceType), destinationType);
     }
 }

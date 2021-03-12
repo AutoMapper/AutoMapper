@@ -3,19 +3,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
-using AutoMapper.Internal;
-using static System.Linq.Expressions.Expression;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
-
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
+    using static Expression;
+    using static ExpressionBuilder;
     public class FromStringDictionaryMapper : IObjectMapper
     {
-        private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetDeclaredMethod(nameof(MapDynamic)); 
-        public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, IMemberMap memberMap, 
-            Expression sourceExpression, Expression destExpression, Expression contextExpression) =>
-                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), contextExpression, Constant(profileMap));
+        private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
+        public bool IsMatch(in TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap,
+            Expression sourceExpression, Expression destExpression) =>
+                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
         struct Match
         {
             public object Value;
@@ -23,9 +22,9 @@ namespace AutoMapper.Mappers
         }
         private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            boxedDestination ??= DelegateFactory.CreateInstance(destinationType);
+            boxedDestination ??= ObjectFactory.CreateInstance(destinationType);
             int matchedCount = 0;
-            foreach (var member in profileMap.CreateTypeDetails(destinationType).PublicWriteAccessors)
+            foreach (var member in profileMap.CreateTypeDetails(destinationType).WriteAccessors)
             {
                 var match = MatchSource(member.Name);
                 if (match.Count == 0)
@@ -86,7 +85,7 @@ namespace AutoMapper.Mappers
                             {
                                 return null;
                             }
-                            newDestination = DelegateFactory.CreateInstance(member.GetMemberType());
+                            newDestination = ObjectFactory.CreateInstance(member.GetMemberType());
                             member.SetMemberValue(currentDestination, newDestination);
                         }
                         currentDestination = newDestination;

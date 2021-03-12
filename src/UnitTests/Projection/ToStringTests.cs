@@ -21,7 +21,7 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>();
+            cfg.CreateProjection<Source, Dest>();
         });
 
         protected override void Because_of()
@@ -60,7 +60,7 @@
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Dest>();
+            cfg.CreateProjection<Source, Dest>();
         });
 
         protected override void Because_of()

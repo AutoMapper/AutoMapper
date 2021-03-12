@@ -54,7 +54,7 @@ namespace AutoMapper.IntegrationTests.Parameterization
         new MapperConfiguration(cfg =>
         {
             string username = null;
-            cfg.CreateMap<Entity, EntityDto>()
+            cfg.CreateProjection<Entity, EntityDto>()
                 .ForMember(d => d.UserName, opt => opt.MapFrom(s => username));
         });
 

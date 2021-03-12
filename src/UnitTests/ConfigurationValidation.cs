@@ -22,8 +22,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
         public class ComplexType
         {
-            public string SomeMember { get; }
-            private ComplexType(string someMember)
+            public int SomeMember { get; }
+            private ComplexType(int someMember)
             {
                 SomeMember = someMember;
             }
@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
 
         [Fact]
         public void Should_fail_validation() => new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex=>
-            ex.MemberMap.DestinationName.ShouldBe("AutoMapper.UnitTests.ConfigurationValidation.ConstructorMappingValidation+Destination.Void .ctor(ComplexType).parameter myComplexMember"));
+            ex.MemberMap.ToString().ShouldBe("AutoMapper.UnitTests.ConfigurationValidation.ConstructorMappingValidation+Destination.Void .ctor(ComplexType).parameter myComplexMember"));
     }
 
     public class When_using_a_type_converter : AutoMapperSpecBase
@@ -574,16 +574,11 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         });
 
         [Fact]
-        public void Should_ignore_bad_dtos_in_other_profiles()
-        {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid("Good"));
-        }
-
+        public void Should_ignore_bad_dtos_in_other_profiles() =>
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => AssertConfigurationIsValid("Good"));
         [Fact]
-        public void Should_throw_when_profile_name_does_not_exist()
-        {
-            typeof(ArgumentOutOfRangeException).ShouldBeThrownBy(() => Configuration.AssertConfigurationIsValid("Does not exist"));
-        }
+        public void Should_throw_when_profile_name_does_not_exist() =>
+            typeof(ArgumentOutOfRangeException).ShouldBeThrownBy(() => AssertConfigurationIsValid("Does not exist"));
     }
 
     public class When_testing_a_dto_with_mismatched_custom_member_mapping : NonValidatingSpecBase

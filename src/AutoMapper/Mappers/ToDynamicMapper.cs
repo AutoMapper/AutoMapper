@@ -3,21 +3,20 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Execution;
-using AutoMapper.Internal;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
-
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
     using static Expression;
-    using static ExpressionFactory;
-
+    using static ExpressionBuilder;
     public class ToDynamicMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
+        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetStaticMethod(nameof(Map));
+        private static object Map(object source, object destination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
-            var sourceTypeDetails = profileMap.CreateTypeDetails(typeof(TSource));
-            foreach (var member in sourceTypeDetails.PublicReadAccessors)
+            destination ??= ObjectFactory.CreateInstance(destinationType);
+            var sourceTypeDetails = profileMap.CreateTypeDetails(source.GetType());
+            foreach (var member in sourceTypeDetails.ReadAccessors)
             {
                 object sourceMemberValue;
                 try
@@ -33,7 +32,6 @@ namespace AutoMapper.Mappers
             }
             return destination;
         }
-
         private static void SetDynamically(string memberName, object target, object value)
         {
             var binder = Binder.SetMember(CSharpBinderFlags.None, memberName, null,
@@ -44,21 +42,9 @@ namespace AutoMapper.Mappers
             var callsite = CallSite<Func<CallSite, object, object, object>>.Create(binder);
             callsite.Target(callsite, target, value);
         }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetDeclaredMethod(nameof(Map));
-
-        public bool IsMatch(TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
-
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
-                sourceExpression,
-                ToType(
-                    Coalesce(destExpression.ToObject(),
-                        DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
-                contextExpression,
-                Constant(profileMap));
+        public bool IsMatch(in TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+            Call(MapMethodInfo, sourceExpression.ToObject(), destExpression, Constant(destExpression.Type), ContextParameter, Constant(profileMap));
     }
 }

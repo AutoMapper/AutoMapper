@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Features;
+using AutoMapper.Internal;
 using Shouldly;
 using System.Collections.Generic;
 using Xunit;
@@ -58,7 +59,7 @@ namespace AutoMapper.UnitTests
         {
             feature.ConfigurationProviders.ShouldBeOfLength(1);
 
-            var configurationFeature = config.Features.Get<TFeature>();
+            var configurationFeature = config.Internal().Features.Get<TFeature>();
             configurationFeature.ShouldNotBeNull();
             configurationFeature.Value.ShouldBe(feature.Value);
             configurationFeature.SealedCount.ShouldBe(1);
@@ -89,7 +90,7 @@ namespace AutoMapper.UnitTests
                 _feature = feature;
             }
 
-            public override void Configure(IConfigurationProvider configurationProvider)
+            public override void Configure(IGlobalConfiguration configurationProvider)
             {
                 ConfigurationProviders.Add(configurationProvider);
                 configurationProvider.Features.Set(_feature);
@@ -106,7 +107,7 @@ namespace AutoMapper.UnitTests
                 Value = value;
             }
 
-            public abstract void Configure(IConfigurationProvider configurationProvider);
+            public abstract void Configure(IGlobalConfiguration configurationProvider);
         }
 
         public class ConfigurationFeatureA : ConfigurationFeatureBase
@@ -133,7 +134,7 @@ namespace AutoMapper.UnitTests
                 Value = value;
             }
 
-            void IRuntimeFeature.Seal(IConfigurationProvider configurationProvider)
+            void IRuntimeFeature.Seal(IGlobalConfiguration configurationProvider)
             {
                 SealedCount++;
             }

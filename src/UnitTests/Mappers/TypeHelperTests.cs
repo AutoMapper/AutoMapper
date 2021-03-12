@@ -14,7 +14,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             Type myType = typeof(ChargeCollection);
 
-            Type elementType = ElementTypeHelper.GetElementType(myType);
+            Type elementType = ReflectionHelper.GetElementType(myType);
 
             elementType.ShouldNotBeNull();
         }

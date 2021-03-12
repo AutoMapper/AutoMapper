@@ -37,7 +37,7 @@ namespace AutoMapper.IntegrationTests
             public DbSet<SourceType> SourceTypes { get; set; }
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
-            cfg.CreateMap<SourceType, DestinationType>().ForMember(d => d.Index, o => o.MapFrom(source => source.Parameters.FirstOrDefault(p => p.Name == "Index").Value)));
+            cfg.CreateProjection<SourceType, DestinationType>().ForMember(d => d.Index, o => o.MapFrom(source => source.Parameters.FirstOrDefault(p => p.Name == "Index").Value)));
         [Fact]
         public void Should_project_ok()
         {
@@ -49,7 +49,7 @@ namespace AutoMapper.IntegrationTests
     }
     public class NullChildItemTest : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Parent, ParentDto>());
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<Parent, ParentDto>());
         public class TestContext : DbContext
         {
             public TestContext() : base() => Database.SetInitializer(new DatabaseInitializer());
@@ -150,8 +150,8 @@ namespace AutoMapper.IntegrationTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Student, StudentViewModel>().ForMember(d => d.Score, opts => opts.MapFrom(m => m.ScoreRecords));
-            cfg.CreateMap<ICollection<ScoreRecord>, ScoreModel>()
+            cfg.CreateProjection<Student, StudentViewModel>().ForMember(d => d.Score, opts => opts.MapFrom(m => m.ScoreRecords));
+            cfg.CreateProjection<ICollection<ScoreRecord>, ScoreModel>()
                 .ForMember(d => d.MinScore, opts => opts.MapFrom(m => m.Min(s => s.Score)))
                 .ForMember(d => d.MaxScore, opts => opts.MapFrom(m => m.Max(s => s.Score)));
         });

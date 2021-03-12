@@ -125,12 +125,12 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             c.AllowNullCollections = true;
 
-            c.CreateMap<Foo, FooDto>()
+            c.CreateProjection<Foo, FooDto>()
                 .ForMember(d => d.Bars, o => o.ExplicitExpansion())
                 .ForMember(d => d.Bazs, o => o.ExplicitExpansion());
 
-            c.CreateMap<Bar, BarDto>();
-            c.CreateMap<Baz, BazDto>();
+            c.CreateProjection<Bar, BarDto>();
+            c.CreateProjection<Baz, BazDto>();
         });
 
         [Fact]

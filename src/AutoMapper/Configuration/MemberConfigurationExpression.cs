@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
 namespace AutoMapper.Configuration
 {
-    using static AutoMapper.Internal.ExpressionFactory;
-
+    using static AutoMapper.Execution.ExpressionBuilder;
+    public interface IPropertyMapConfiguration
+    {
+        void Configure(TypeMap typeMap);
+        MemberInfo DestinationMember { get; }
+        LambdaExpression SourceExpression { get; }
+        LambdaExpression GetDestinationExpression();
+        IPropertyMapConfiguration Reverse();
+    }
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private MemberInfo[] _sourceMembers;
@@ -240,7 +246,7 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm =>
             {
                 pm.Ignored = true;
-                if(ignorePaths)
+                if(ignorePaths && pm.TypeMap.PathMaps.Count > 0)
                 {
                     pm.TypeMap.IgnorePaths(DestinationMember);
                 }
@@ -286,7 +292,7 @@ namespace AutoMapper.Configuration
             Expression<Func<TSource, TSourceMember>> sourceMember = null,
             string sourceMemberName = null)
         {
-            var config = new ValueConverterConfiguration(typeof(TValueConverter),
+            var config = new ValueResolverConfiguration(typeof(TValueConverter),
                 typeof(IValueConverter<TSourceMember, TMember>))
             {
                 SourceMember = sourceMember,
@@ -299,7 +305,7 @@ namespace AutoMapper.Configuration
         private static void ConvertUsing<TSourceMember>(PropertyMap propertyMap, IValueConverter<TSourceMember, TMember> valueConverter,
             Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null)
         {
-            var config = new ValueConverterConfiguration(valueConverter,
+            var config = new ValueResolverConfiguration(valueConverter,
                 typeof(IValueConverter<TSourceMember, TMember>))
             {
                 SourceMember = sourceMember,
@@ -313,12 +319,12 @@ namespace AutoMapper.Configuration
         {
             var destMember = DestinationMember;
 
-            if(destMember.DeclaringType.IsGenericTypeDefinition)
+            if(destMember.DeclaringType.ContainsGenericParameters)
             {
-                destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
+                destMember = typeMap.DestinationSetters.Single(m => m.Name == destMember.Name);
             }
 
-            var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
+            var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember, typeof(TMember) == typeof(object) ? destMember.GetMemberType() : typeof(TMember));
 
             Apply(propertyMap);
         }

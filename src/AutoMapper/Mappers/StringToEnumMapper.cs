@@ -1,50 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
-using AutoMapper.Internal;
-
-namespace AutoMapper.Mappers
+namespace AutoMapper.Internal.Mappers
 {
-    using static ExpressionFactory;
-
+    using static Execution.ExpressionBuilder;
+    using static Expression;
     public class StringToEnumMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
-
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
-            IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression)
+        private static readonly MethodInfo EqualsMethod = typeof(StringToEnumMapper).GetMethod("StringCompareOrdinalIgnoreCase");
+        private static readonly MethodInfo ParseMethod = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string), typeof(bool) });
+        private static readonly MethodInfo IsNullOrEmptyMethod = typeof(string).GetMethod("IsNullOrEmpty");
+        public bool IsMatch(in TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+            MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
-            var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),
-                sourceExpression, Expression.Constant(true));
-            var switchCases = new List<SwitchCase>();
-            var enumNames = destinationType.GetDeclaredMembers();
-            foreach (var memberInfo in enumNames.Where(x => x.IsStatic()))
+            List<SwitchCase> switchCases = null;
+            foreach (var memberInfo in destinationType.GetFields(TypeExtensions.StaticFlags))
             {
-                var attribute = memberInfo.GetCustomAttribute(typeof(EnumMemberAttribute)) as EnumMemberAttribute;
-                if (attribute?.Value != null)
+                var attributeValue = memberInfo.GetCustomAttribute<EnumMemberAttribute>()?.Value;
+                if (attributeValue != null)
                 {
-                    var switchCase = Expression.SwitchCase(
-                        ToType(Expression.Constant(Enum.ToObject(destinationType, memberInfo.GetMemberValue(null))),
-                            destinationType), Expression.Constant(attribute.Value));
+                    var switchCase = SwitchCase(
+                        ToType(Constant(Enum.ToObject(destinationType, memberInfo.GetValue(null))), destinationType), Constant(attributeValue));
+                    switchCases ??= new();
                     switchCases.Add(switchCase);
                 }
             }
-            var equalsMethodInfo = Method(() => StringCompareOrdinalIgnoreCase(null, null));
-            var switchTable = switchCases.Count > 0
-                ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), equalsMethodInfo, switchCases)
-                : ToType(enumParse, destinationType);
-            var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
-            return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
+            var enumParse = ToType(Call(ParseMethod, Constant(destinationType), sourceExpression, True), destinationType);
+            var parse = switchCases != null ? Switch(sourceExpression, enumParse, EqualsMethod, switchCases) : enumParse;
+            return Condition(Call(IsNullOrEmptyMethod, sourceExpression), Default(destinationType), parse);
         }
-
-        private static bool StringCompareOrdinalIgnoreCase(string x, string y)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(x, y);
-        }
+        public static bool StringCompareOrdinalIgnoreCase(string x, string y) => StringComparer.OrdinalIgnoreCase.Equals(x, y);
     }
 }

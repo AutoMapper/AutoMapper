@@ -127,8 +127,7 @@ namespace AutoMapper.UnitTests.Bug
             cfg.CreateMap(typeof (Source<>), typeof (int)).ConvertUsing(typeof (Converter<>));
             cfg.CreateMap(typeof (int), typeof (Destination<>)).ConvertUsing(typeof (Converter<>));
             cfg.CreateMap(typeof (OtherSource<>), typeof (Destination<object>)).ConvertUsing(typeof (Converter<>));
-            cfg.CreateMap(typeof (Source<int>), typeof (OtherDestination<>)).ConvertUsing(typeof (Converter<>));
-
+            cfg.CreateMap(typeof(Source<object>), typeof(OtherDestination<>)).ConvertUsing(typeof(Converter<>));
             cfg.CreateMap(typeof (Hashtable), typeof (IReadOnlyDictionary<,>)).ConvertUsing(typeof (Converter<,>));
         });
 

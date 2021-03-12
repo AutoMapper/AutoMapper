@@ -24,9 +24,9 @@ namespace AutoMapper.UnitTests.Projection
             }
         }
         protected override MapperConfiguration Configuration => new MapperConfiguration(x => {
-            x.CreateMap<string, string>().ConvertUsing(s => _niceGreeting);
-            x.CreateMap<Source, Target>();
-            x.CreateMap<SourceChild, TargetChild>();
+            x.CreateProjection<string, string>().ConvertUsing(s => _niceGreeting);
+            x.CreateProjection<Source, Target>();
+            x.CreateProjection<SourceChild, TargetChild>();
         });
         const string _niceGreeting = "Hello";
         [Fact]
@@ -78,8 +78,8 @@ namespace AutoMapper.UnitTests.Projection
         const string _niceGreeting = "Hello";
         protected override MapperConfiguration Configuration => new MapperConfiguration(x =>
         {
-            x.CreateMap<Source, Target>().ConvertUsing(s => new Target { Greeting = _niceGreeting });
-            x.CreateMap<SourceChild, TargetChild>();
+            x.CreateProjection<Source, Target>().ConvertUsing(s => new Target { Greeting = _niceGreeting });
+            x.CreateProjection<SourceChild, TargetChild>();
         });
         [Fact]
         public void Should_work()
@@ -130,8 +130,8 @@ namespace AutoMapper.UnitTests.Projection
         const string _niceGreeting = "Hello";
         protected override MapperConfiguration Configuration => new MapperConfiguration(x =>
         {
-            x.CreateMap<Source, Target>();
-            x.CreateMap<SourceChild, TargetChild>().ConvertUsing(s => new TargetChild { Greeting = _niceGreeting });
+            x.CreateProjection<Source, Target>();
+            x.CreateProjection<SourceChild, TargetChild>().ConvertUsing(s => new TargetChild { Greeting = _niceGreeting });
         });
         [Fact]
         public void Should_work()
