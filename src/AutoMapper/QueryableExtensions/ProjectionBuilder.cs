@@ -352,8 +352,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Projection = projection;
         }
         public bool Empty => Projection == null;
-        internal T Chain<T>(T source, Func<T, LambdaExpression, T> select) => 
-            LetClause == null ? select(source, Projection) : select(select(source, LetClause), Projection);
+        public T Chain<T>(T source, Func<T, LambdaExpression, T> select) => LetClause == null ? select(source, Projection) : select(select(source, LetClause), Projection);
         internal QueryExpressions Prepare(bool enableNullPropagationForQueryMapping, object parameters)
         {
             return new QueryExpressions(Prepare(Projection), Prepare(LetClause));
