@@ -387,8 +387,8 @@ namespace AutoMapper.Execution
             var destinationPropertyType = memberMap.DestinationType;
             var valueResolverFunc = memberMap switch
             {
-                { ValueConverterConfig: { } } => ToType(BuildConvertCall(customSource, memberMap, destValueExpr), destinationPropertyType),
-                { ValueResolverConfig: { } } => BuildResolveCall(customSource, destValueExpr, memberMap),
+                { ValueConverterConfig: { } } => ToType(BuildConvertCall(memberMap, customSource, destValueExpr), destinationPropertyType),
+                { ValueResolverConfig: { } } => BuildResolveCall(memberMap, customSource, destValueExpr),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
                 { SourceMembers: { Length: > 0 } } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
@@ -420,7 +420,7 @@ namespace AutoMapper.Execution
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
         private static Expression ServiceLocator(Type type) => Call(ContextParameter, ContextCreate, Constant(type));
-        private Expression BuildResolveCall(Expression source, Expression destValueExpr, MemberMap memberMap)
+        private Expression BuildResolveCall(MemberMap memberMap, Expression source, Expression destValueExpr)
         {
             var typeMap = memberMap.TypeMap;
             var valueResolverConfig = memberMap.ValueResolverConfig;
@@ -441,7 +441,7 @@ namespace AutoMapper.Execution
                 .ToArray();
             return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
         }
-        private Expression BuildConvertCall(Expression source, MemberMap memberMap, Expression destValueExpr)
+        private Expression BuildConvertCall(MemberMap memberMap, Expression source, Expression destValueExpr)
         {
             var valueConverterConfig = memberMap.ValueConverterConfig;
             var iResolverType = valueConverterConfig.InterfaceType;
