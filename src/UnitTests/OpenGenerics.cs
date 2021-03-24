@@ -114,6 +114,17 @@ namespace AutoMapper.UnitTests
             public TKey MyKey;
             public TValue MyValue;
         }
+
+        class Source<T>
+        {
+            public IEnumerable<T> MyValues;
+        }
+
+        class Destination<T>
+        {
+            public IEnumerable<T> MyValues;
+        }
+
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Destination))
@@ -122,6 +133,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Destination<,>))
                 .ForMember("MyKey", o => o.MapFrom(typeof(KeyResolver<,,>)))
                 .ForMember("MyValue", o => o.MapFrom(typeof(ValueResolver<,,,>)));
+            cfg.CreateMap(typeof(Source<>), typeof(Destination<>))
+                .ForMember("MyValues", o => o.MapFrom(typeof(ValuesResolver<,>)));				
         });
         private class KeyResolver<TKey> : IValueResolver<KeyValuePair<TKey, int>, Destination, string>
         {
@@ -143,6 +156,17 @@ namespace AutoMapper.UnitTests
             public string Resolve(KeyValuePair<TKeySource, TValueSource> source, Destination<TKeyDestination, TValueDestination> destination, string destMember, ResolutionContext context)
                 => source.Value.ToString();
         }
+        private class ValuesResolver<TSource, TDestination>
+            : IValueResolver<Source<TSource>, Destination<TDestination>, IEnumerable<TDestination>>
+        {
+            public IEnumerable<TDestination> Resolve(Source<TSource> source, Destination<TDestination> destination, IEnumerable<TDestination> destMember, ResolutionContext context)
+            {
+                foreach (var item in source.MyValues)
+                {
+                    yield return (TDestination)((object)item);
+                }
+            }
+        }
         [Fact]
         public void Should_map_non_generic_destination()
         {
@@ -156,6 +180,19 @@ namespace AutoMapper.UnitTests
             var destination = Map<Destination<string, string>>(new KeyValuePair<int, int>(1, 2));
             destination.MyKey.ShouldBe("1");
             destination.MyValue.ShouldBe("2");
+        }
+        [Fact]
+        public void Should_map_ienumerable_generic_destination()
+        {
+            var source = new Source<int> { MyValues = new int[] { 1, 2 } };
+            
+            var destination = Map<Destination<string>>(source);
+
+            for (int i = 0; i < destination.MyValues.Count(); i++)
+            {
+                destination.MyValues.Skip(i).First()
+                    .ShouldBe(source.MyValues.Skip(i).First().ToString());
+            }
         }
     }
 
