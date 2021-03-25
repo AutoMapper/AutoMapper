@@ -200,16 +200,16 @@ namespace AutoMapper.UnitTests
             destination.MyValue.ShouldBe("2");
         }
         [Fact]
-        public void Should_map_ienumerable_generic_destination()
+        public void Should_map_closed_to_ienumerable_generic_destination()
         {
-            var source = new Source<int> { MyValues = new int[] { 1, 2 } };
+            var source = new Source { MyValues = new int[] { 1, 2 } };
             var destination = Map<Destination<int>>(source);
             destination.MyValues.ShouldBe(source.MyValues);
         }
         [Fact]
-        public void Should_map_closed_to_ienumerable_generic_destination()
+        public void Should_map_ienumerable_generic_destination()
         {
-            var source = new Source { MyValues = new int[] { 1, 2 } };
+            var source = new Source<int> { MyValues = new int[] { 1, 2 } };
             var destination = Map<Destination<int>>(source);
             destination.MyValues.ShouldBe(source.MyValues);
         }
