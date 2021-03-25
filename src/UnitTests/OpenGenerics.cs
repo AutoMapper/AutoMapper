@@ -185,14 +185,8 @@ namespace AutoMapper.UnitTests
         public void Should_map_ienumerable_generic_destination()
         {
             var source = new Source<int> { MyValues = new int[] { 1, 2 } };
-            
-            var destination = Map<Destination<string>>(source);
-
-            for (int i = 0; i < destination.MyValues.Count(); i++)
-            {
-                destination.MyValues.Skip(i).First()
-                    .ShouldBe(source.MyValues.Skip(i).First().ToString());
-            }
+            var destination = Map<Destination<int>>(source);
+            destination.MyValues.ShouldBe(source.MyValues);
         }
     }
 
