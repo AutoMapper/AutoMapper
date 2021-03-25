@@ -115,6 +115,11 @@ namespace AutoMapper.UnitTests
             public TValue MyValue;
         }
 
+        class Source
+        {
+            public IEnumerable<int> MyValues;
+        }
+
         class Source<T>
         {
             public IEnumerable<T> MyValues;
@@ -133,6 +138,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Destination<,>))
                 .ForMember("MyKey", o => o.MapFrom(typeof(KeyResolver<,,>)))
                 .ForMember("MyValue", o => o.MapFrom(typeof(ValueResolver<,,,>)));
+            cfg.CreateMap(typeof(Source), typeof(Destination<>))
+                .ForMember("MyValues", o => o.MapFrom(typeof(ValuesResolver<>)));
             cfg.CreateMap(typeof(Source<>), typeof(Destination<>))
                 .ForMember("MyValues", o => o.MapFrom(typeof(ValuesResolver<,>)));				
         });
@@ -155,6 +162,17 @@ namespace AutoMapper.UnitTests
         {
             public string Resolve(KeyValuePair<TKeySource, TValueSource> source, Destination<TKeyDestination, TValueDestination> destination, string destMember, ResolutionContext context)
                 => source.Value.ToString();
+        }
+        private class ValuesResolver<TDestination>
+            : IValueResolver<Source, Destination<TDestination>, IEnumerable<TDestination>>
+        {
+            public IEnumerable<TDestination> Resolve(Source source, Destination<TDestination> destination, IEnumerable<TDestination> destMember, ResolutionContext context)
+            {
+                foreach (var item in source.MyValues)
+                {
+                    yield return (TDestination)((object)item);
+                }
+            }
         }
         private class ValuesResolver<TSource, TDestination>
             : IValueResolver<Source<TSource>, Destination<TDestination>, IEnumerable<TDestination>>
@@ -185,6 +203,13 @@ namespace AutoMapper.UnitTests
         public void Should_map_ienumerable_generic_destination()
         {
             var source = new Source<int> { MyValues = new int[] { 1, 2 } };
+            var destination = Map<Destination<int>>(source);
+            destination.MyValues.ShouldBe(source.MyValues);
+        }
+        [Fact]
+        public void Should_map_closed_to_ienumerable_generic_destination()
+        {
+            var source = new Source { MyValues = new int[] { 1, 2 } };
             var destination = Map<Destination<int>>(source);
             destination.MyValues.ShouldBe(source.MyValues);
         }
