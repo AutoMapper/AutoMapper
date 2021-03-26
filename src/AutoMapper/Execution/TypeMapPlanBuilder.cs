@@ -432,15 +432,9 @@ namespace AutoMapper.Execution
             var iResolverType = valueResolverConfig.InterfaceType;
             if (iResolverType.ContainsGenericParameters)
             {
-                var sourceMemberType = iResolverType.GenericTypeArguments.Skip(2).Take(iResolverType.GenericTypeArguments.Count() - 3);
-
-                var destMemberType = iResolverType.GenericTypeArguments.Reverse().First();
-
-                var typeArgs = new[] { typeMap.SourceType, typeMap.DestinationType }
-                    .Concat(sourceMemberType)
-                    .Concat(new[] { destMemberType.ContainsGenericParameters ? destValueExpr.Type : destMemberType })
-                    .ToArray();
-
+                var typeArgs =
+                    iResolverType.GenericTypeArguments.Zip(new[] { typeMap.SourceType, typeMap.DestinationType, sourceMember?.Type, destValueExpr.Type }.Where(t => t != null),
+                        (declaredType, runtimeType) => declaredType.ContainsGenericParameters ? runtimeType : declaredType).ToArray();
                 iResolverType = iResolverType.GetGenericTypeDefinition().MakeGenericType(typeArgs);
             }
             var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
