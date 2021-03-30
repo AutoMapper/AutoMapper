@@ -41,11 +41,11 @@ namespace AutoMapper
             {
                 var message = _message;
                 var newLine = Environment.NewLine;
-                if (Types?.SourceType != null && Types?.DestinationType != null)
+                if (Types.HasValue && Types.Value.SourceType != null && Types.Value.DestinationType != null)
                 {
                     message = message + newLine + newLine + "Mapping types:";
-                    message += newLine + $"{Types?.SourceType.Name} -> {Types?.DestinationType.Name}";
-                    message += newLine + $"{Types?.SourceType.FullName} -> {Types?.DestinationType.FullName}";
+                    message += newLine + $"{Types.Value.SourceType.Name} -> {Types.Value.DestinationType.Name}";
+                    message += newLine + $"{Types.Value.SourceType.FullName} -> {Types.Value.DestinationType.FullName}";
                 }
                 if (TypeMap != null)
                 {
@@ -148,12 +148,12 @@ namespace AutoMapper
         {
             get
             {
-                if (Types != null)
+                if (Types.HasValue)
                 {
                     var message =
                         string.Format(
                             "The following member on {0} cannot be mapped: \n\t{2} \nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
-                            Types?.DestinationType.FullName, Types?.DestinationType.FullName,
+                            Types.Value.DestinationType.FullName, Types.Value.DestinationType.FullName,
                             MemberMap?.DestinationName);
 
                     message += "\nContext:";
@@ -164,8 +164,8 @@ namespace AutoMapper
                         if (exToUse is AutoMapperConfigurationException configExc)
                         {
                             message += configExc.MemberMap == null
-                              ? $"\n\tMapping from type {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}"
-                              : $"\n\tMapping to member {configExc.MemberMap.DestinationName} from {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}";
+                              ? $"\n\tMapping from type {configExc.Types.Value.SourceType.FullName} to {configExc.Types.Value.DestinationType.FullName}"
+                              : $"\n\tMapping to member {configExc.MemberMap.DestinationName} from {configExc.Types.Value.SourceType.FullName} to {configExc.Types.Value.DestinationType.FullName}";
                         }
 
                         exToUse = exToUse.InnerException;
