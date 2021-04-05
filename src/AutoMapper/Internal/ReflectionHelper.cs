@@ -27,12 +27,18 @@ namespace AutoMapper.Internal
         {
             if (propertyOrField is PropertyInfo property)
             {
-                property.SetValue(target, value, null);
+                if (property.CanWrite)
+                {
+                    property.SetValue(target, value, null);
+                }
                 return;
             }
             if (propertyOrField is FieldInfo field)
             {
-                field.SetValue(target, value);
+                if (!field.IsInitOnly)
+                {
+                    field.SetValue(target, value);
+                }
                 return;
             }
             throw Expected(propertyOrField);

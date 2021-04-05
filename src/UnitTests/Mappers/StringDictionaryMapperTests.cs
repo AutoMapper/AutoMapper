@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
@@ -231,6 +233,7 @@ namespace AutoMapper.UnitTests.Mappers
             private int _z = 300;
             public int Z { get { return _z + 30; } }
             public int Value { get; set; }
+            public Collection<int> Integers { get; } = new();
         }
 
         public class SomeOne : SomeBase
@@ -247,10 +250,12 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_ok()
         {
-            SomeBase someBase = new SomeBody();
-            var someOne = new StringDictionary();
+            var someBase = new SomeBody();
+            var someOne = new StringDictionary { ["Integers"] = Enumerable.Range(1, 10).ToArray() };
 
             Mapper.Map(someOne, someBase);
+
+            someBase.Integers.ShouldBe(someOne["Integers"]);
         }
 
         public class Destination
