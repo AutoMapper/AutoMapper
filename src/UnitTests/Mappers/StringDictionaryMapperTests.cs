@@ -38,8 +38,9 @@ namespace AutoMapper.UnitTests.Mappers
             _destination["Foo"].ShouldBe("Foo");
             _destination["Bar"].ShouldBe("Bar");
         }
+        [Fact]
+        public void Should_map_struct() => Map<StringDictionary>(new KeyValuePair<int, string>(1, "one")).ShouldBe(new StringDictionary { { "Key", 1 }, {"Value", "one"} });
     }
-
     public class When_mapping_from_StringDictionary : NonValidatingSpecBase
     {
         Destination _destination;
