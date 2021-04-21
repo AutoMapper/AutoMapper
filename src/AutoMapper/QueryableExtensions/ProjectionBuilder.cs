@@ -363,11 +363,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
         }
     }
-    public static class ExpressionBuilderExtensions
-    {
-        public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(this IProjectionBuilder expressionBuilder) => 
-            (Expression<Func<TSource, TDestination>>) expressionBuilder.GetProjection(typeof(TSource), typeof(TDestination), null, Array.Empty<MemberPath>()).Projection;
-    }
     public class MemberProjection
     {
         public MemberProjection(MemberMap memberMap) => MemberMap = memberMap;
