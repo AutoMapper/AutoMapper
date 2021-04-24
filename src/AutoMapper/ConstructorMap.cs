@@ -44,15 +44,13 @@ namespace AutoMapper
     {
         private readonly MemberInfo[] _sourceMembers;
         private Type _sourceType;
-        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolveValue)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolveValue) : base(typeMap)
         {
-            TypeMap = typeMap;
             Parameter = parameter;
             _sourceMembers = sourceMembers.ToArray();
             CanResolveValue = canResolveValue;
         }
         public ParameterInfo Parameter { get; }
-        public override TypeMap TypeMap { get; }
         public override Type SourceType
         {
             get => _sourceType ??=
@@ -64,8 +62,6 @@ namespace AutoMapper
         public override Type DestinationType => Parameter.ParameterType;
         public override MemberInfo[] SourceMembers => _sourceMembers;
         public override string DestinationName => Parameter.Name;
-        public bool HasDefaultValue => Parameter.IsOptional;
-        public override LambdaExpression CustomMapExpression { get; set; }
         public override LambdaExpression CustomMapFunction { get; set; }
         public override bool CanResolveValue { get; set; }
         public override bool Inline { get; set; }

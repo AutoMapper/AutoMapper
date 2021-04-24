@@ -15,9 +15,10 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberMap
     {
-        protected MemberMap() { }
-        public static readonly MemberMap Instance = new MemberMap();
-        public virtual TypeMap TypeMap => default;
+        protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
+        public static readonly MemberMap Instance = new();
+        public TypeMap TypeMap { get; protected set; }
+        public LambdaExpression CustomMapExpression { get; set; }
         public virtual Type SourceType { get => default; protected set { } }
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
         public virtual IncludedMember IncludedMember => default;
@@ -34,7 +35,6 @@ namespace AutoMapper
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
-        public virtual LambdaExpression CustomMapExpression { get => default; set { } }
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
