@@ -105,16 +105,12 @@ public class MapperProvider
     public IMapper GetMapper()
     {
         var mce = new MapperConfigurationExpression();
-        mce.ConstructServicesUsing(_container.GetInstance);
-
         mce.AddMaps(typeof(SomeProfile).Assembly);
 
         var mc = new MapperConfiguration(mce);
         mc.AssertConfigurationIsValid();
 
-        IMapper m = new Mapper(mc, t => _container.GetInstance(t));
-
-        return m;
+        return new Mapper(mc, _container.GetInstance);
     }
 }
 
