@@ -81,36 +81,23 @@ public class MyRegistrar
         container.RegisterSingleton<IService, SomeService>();
 
         // Automapper
-        container.RegisterSingleton(() => GetMapper(container));
-    }
-
-    private AutoMapper.IMapper GetMapper(Container container)
-    {
-        var mp = container.GetInstance<MapperProvider>();
-        return mp.GetMapper();
+        container.RegisterSingleton(() => MapperProvider.GetMapper(container));
     }
 }
 
-public class MapperProvider
+public static class MapperProvider
 {
-    private readonly Container _container;
-
-    public MapperProvider(Container container)
-    {
-        _container = container;
-    }
-
-    public IMapper GetMapper()
+    public static IMapper GetMapper(Container container)
     {
         var mce = new MapperConfigurationExpression();
-        mce.ConstructServicesUsing(_container.GetInstance);
+        mce.ConstructServicesUsing(container.GetInstance);
 
         mce.AddMaps(typeof(SomeProfile).Assembly);
 
         var mc = new MapperConfiguration(mce);
         mc.AssertConfigurationIsValid();
 
-        IMapper m = new Mapper(mc, t => _container.GetInstance(t));
+        IMapper m = new Mapper(mc, t => container.GetInstance(t));
 
         return m;
     }
