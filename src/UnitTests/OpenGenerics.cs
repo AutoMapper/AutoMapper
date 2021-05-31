@@ -6,6 +6,15 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class OpenGenerics_With_Struct : AutoMapperSpecBase
+    {
+        public struct Id<T>
+        {
+        }
+        protected override MapperConfiguration Configuration { get; } = new(mapper => mapper.CreateMap(typeof(Id<>), typeof(long)).ConvertUsing((_,__)=>(long)42));
+        [Fact]
+        public void Should_work() => Map<long>(new Id<string>()).ShouldBe(42);
+    }
     public class OpenGenerics_With_Base_Generic : AutoMapperSpecBase
     {
         public class Foo<T>
