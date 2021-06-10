@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
+
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
@@ -24,9 +26,13 @@ namespace AutoMapper
         private LockingConcurrentDictionary<TypePair, TypeMap> _resolvedMaps;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
         private readonly ConfigurationValidator _validator;
+        private readonly Func<MapRequest,MethodBuilder> _methodBuilderFactory;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
+            MustBeGeneratedCompatible = configurationExpression.MustBeGeneratedCompatible;
+            _methodBuilderFactory = configurationExpression.MethodBuilderFactory;
+
             _mappers = configurationExpression.Mappers.ToArray();
             _resolvedMaps = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _executionPlans = new LockingConcurrentDictionary<MapRequest, Delegate>(CompileExecutionPlan);
@@ -61,6 +67,8 @@ namespace AutoMapper
             configure(expr);
             return expr;
         }
+
+        public bool MustBeGeneratedCompatible { get; set; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -97,8 +105,21 @@ namespace AutoMapper
 
         private Delegate CompileExecutionPlan(MapRequest mapRequest)
         {
-            var executionPlan = BuildExecutionPlan(mapRequest);
+            LambdaExpression executionPlan = BuildExecutionPlan(mapRequest);
+#if !NETSTANDARD
+            if (!MustBeGeneratedCompatible || !(_methodBuilderFactory is { } mb))
+            {
+                return executionPlan.Compile();
+            }
+
+            MethodBuilder method = _methodBuilderFactory(mapRequest); 
+            executionPlan.CompileToMethod(method);
+            Action p = () => { };
+            return p;
+
+#else
             return executionPlan.Compile(); // breakpoint here to inspect all execution plans
+#endif
         }
 
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
@@ -165,7 +186,7 @@ namespace AutoMapper
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, context);
             BlockExpression Throw(string message, Expression innerException) =>
-                Block(Expression.Throw(New(ExceptionConstructor, Constant(message), innerException, Constant(mapRequest.RequestedTypes))), Default(destinationType));
+                Block(Expression.Throw(New(ExceptionConstructor, Constant(message), innerException, TypePairToExpression(mapRequest.RequestedTypes))), Default(destinationType));
         }
         public TypeMap[] GetAllTypeMaps() => _configuredMaps.Values.ToArray();
 

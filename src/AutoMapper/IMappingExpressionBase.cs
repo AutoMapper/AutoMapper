@@ -54,7 +54,7 @@ namespace AutoMapper
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="beforeFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
-        TMappingExpression BeforeMap(Action<TSource, TDestination> beforeFunction);
+        TMappingExpression BeforeMap(Expression<Action<TSource, TDestination>> beforeFunction);
 
         /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping
@@ -62,7 +62,7 @@ namespace AutoMapper
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="beforeFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
-        TMappingExpression BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction);
+        TMappingExpression BeforeMap(Expression<Action<TSource, TDestination, ResolutionContext>> beforeFunction);
 
         /// <summary>
         /// Execute a custom mapping action before member mapping
@@ -79,7 +79,7 @@ namespace AutoMapper
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
-        TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction);
+        TMappingExpression AfterMap(Expression<Action<TSource, TDestination>> afterFunction);
 
         /// <summary>
         /// Execute a custom function to the source and/or destination types after member mapping
@@ -87,7 +87,7 @@ namespace AutoMapper
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
-        TMappingExpression AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction);
+        TMappingExpression AfterMap(Expression<Action<TSource, TDestination, ResolutionContext>> afterFunction);
 
         /// <summary>
         /// Execute a custom mapping action after member mapping

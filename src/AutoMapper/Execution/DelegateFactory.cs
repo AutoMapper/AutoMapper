@@ -101,8 +101,8 @@ namespace AutoMapper.Execution
 
         private static Expression InvalidType(Type type, string message)
         {
-            var ex = new ArgumentException(message, "type");
-            return Block(Throw(Constant(ex)), Constant(null, type));
+            var constr = typeof(ArgumentException).GetConstructor(new Type[] { typeof(string), typeof(string) });
+            return Block(Throw(New(constr, Constant(message), Constant("type"))), Constant(null, type));
         }
     }
 }

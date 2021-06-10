@@ -11,8 +11,7 @@ namespace AutoMapper.QueryableExtensions
     {
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
-            var defaultDestination = Activator.CreateInstance(propertyMap.DestinationType);
-            return Bind(propertyMap.DestinationMember, Coalesce(result.ResolutionExpression, Constant(defaultDestination)));
+            return Bind(propertyMap.DestinationMember, Coalesce(result.ResolutionExpression, New(propertyMap.DestinationType)));
         }
 
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>

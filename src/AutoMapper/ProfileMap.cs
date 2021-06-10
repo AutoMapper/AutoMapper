@@ -31,6 +31,7 @@ namespace AutoMapper
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory);
 
             Name = profile.ProfileName;
+            MustBeGeneratedCompatible = configuration?.MustBeGeneratedCompatible ?? false;
             AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
             AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
             EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
@@ -76,7 +77,7 @@ namespace AutoMapper
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
         }
 
-
+        public bool MustBeGeneratedCompatible { get; set; }
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }
@@ -170,7 +171,7 @@ namespace AutoMapper
 
         public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IConfigurationProvider configurationProvider)
         {
-            var closedMap = TypeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this);
+            var closedMap = TypeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, MustBeGeneratedCompatible);
             closedMap.IsClosedGeneric = true;
             openMapConfig.Configure(closedMap);
 

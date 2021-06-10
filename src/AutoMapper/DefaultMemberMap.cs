@@ -16,9 +16,16 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class DefaultMemberMap : IMemberMap
     {
-        protected DefaultMemberMap() { }
+        protected DefaultMemberMap(bool mustBeGeneratedCompatible)
+        {
+            MustBeGeneratedCompatible = mustBeGeneratedCompatible;
+        }
 
-        public static readonly IMemberMap Instance = new DefaultMemberMap();
+        public static readonly IMemberMap CompatibleInstance = new DefaultMemberMap(true);
+
+        public static readonly IMemberMap NonCompatibleInstance = new DefaultMemberMap(false);
+
+        public bool MustBeGeneratedCompatible { get; }
 
         public virtual TypeMap TypeMap => default;
         public virtual Type SourceType => default;

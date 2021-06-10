@@ -11,6 +11,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class QueryMapperVisitor : ExpressionVisitor
     {
         private readonly IQueryable _destQuery;
+        private readonly IConfigurationProvider _config;
         private readonly ParameterExpression _instanceParameter;
         private readonly Type _sourceType;
         private readonly Type _destinationType;
@@ -24,6 +25,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _sourceType = sourceType;
             _destinationType = destinationType;
             _destQuery = destQuery;
+            _config = config;
             _instanceParameter = Expression.Parameter(destinationType, "dto");
             _memberVisitor = new MemberAccessQueryMapperVisitor(this, config);
         }
@@ -69,8 +71,13 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, CultureInfo.CurrentCulture);
+                if (_config.MustBeGeneratedCompatible
+                    && (!left.Type.IsValueType || !right.Type.IsValueType))
+                {
+                    throw new InvalidOperationException($"This operation for node {node} is not supported for downloadable configuration.");
+                }
 
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, CultureInfo.CurrentCulture);
                 right = Expression.Constant(value, left.Type);
             }
 

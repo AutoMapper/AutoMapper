@@ -25,6 +25,6 @@ namespace AutoMapper
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="resolver">Custom func</param>
-        void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
+        void MapFrom<TMember>(Expression<Func<TSource, ResolutionContext, TMember>> resolver);
     }
 }

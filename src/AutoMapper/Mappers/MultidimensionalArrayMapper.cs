@@ -47,13 +47,21 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(null,
+            Expression contextExpression)
+        {
+            if (profileMap.MustBeGeneratedCompatible)
+            {
+                throw new InvalidOperationException($"Can't use {nameof(MultidimensionalArrayMapper)} " +
+                                                    $"with {nameof(ProfileMap.MustBeGeneratedCompatible)} flag.");
+            }
+
+            return Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
                     ElementTypeHelper.GetElementType(sourceExpression.Type)),
                 sourceExpression,
                 contextExpression,
                 Constant(configurationProvider));
+        }
 
         public class MultidimensionalArrayFiller
         {

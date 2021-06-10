@@ -80,33 +80,43 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction)
+        public void MapFrom<TResult>(Expression<Func<TSource, TDestination, TResult>> mappingFunction)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest);
+                ParameterExpression p1 = Expression.Parameter(typeof(TSource));
+                ParameterExpression p2 = Expression.Parameter(typeof(TDestination));
+                ParameterExpression p3 = Expression.Parameter(typeof(TMember));
+                ParameterExpression p4 = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.CustomMapFunction = expr;
+                InvocationExpression inv = Expression.Invoke(mappingFunction, p1, p2);
+                LambdaExpression exp = Expression.Lambda(inv, p1, p2, p3, p4);
+                
+                pm.CustomMapFunction = exp;
             });
         }
 
-        public void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> mappingFunction)
+        public void MapFrom<TResult>(Expression<Func<TSource, TDestination, TMember, TResult>> mappingFunction)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember);
+                ParameterExpression p1 = Expression.Parameter(typeof(TSource));
+                ParameterExpression p2 = Expression.Parameter(typeof(TDestination));
+                ParameterExpression p3 = Expression.Parameter(typeof(TMember));
+                ParameterExpression p4 = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.CustomMapFunction = expr;
+                InvocationExpression inv = Expression.Invoke(mappingFunction, p1, p2, p3);
+                LambdaExpression exp = Expression.Lambda(inv, p1, p2, p3, p4);
+                
+                pm.CustomMapFunction = exp;
             });
         }
 
-        public void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> mappingFunction)
+        public void MapFrom<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> mappingFunction)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt);
-
-                pm.CustomMapFunction = expr;
+                pm.CustomMapFunction = mappingFunction;
             });
         }
 
@@ -127,102 +137,139 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.MapFrom(sourceMembersPath));
         }
 
-        public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
+        public void Condition(Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember, ctxt);
-
-                pm.Condition = expr;
+                pm.Condition = condition;
             });
         }
 
-        public void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition)
+        public void Condition(Expression<Func<TSource, TDestination, TMember, TMember, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var mSrc = Expression.Parameter(typeof(TMember));
+                var mDst = Expression.Parameter(typeof(TMember));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.Condition = expr;
+                var inv = Expression.Invoke(condition, src, dst, mSrc, mDst);
+                var lmb = Expression.Lambda(inv, src, dst, mSrc, mDst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void Condition(Func<TSource, TDestination, TMember, bool> condition)
+        public void Condition(Expression<Func<TSource, TDestination, TMember, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var mSrc = Expression.Parameter(typeof(TMember));
+                var mDst = Expression.Parameter(typeof(TMember));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.Condition = expr;
+                var inv = Expression.Invoke(condition, src, dst, mSrc);
+                var lmb = Expression.Lambda(inv, src, dst, mSrc, mDst, ctx);
+
+                pm.Condition = lmb;
             });
         }
 
-        public void Condition(Func<TSource, TDestination, bool> condition)
+        public void Condition(Expression<Func<TSource, TDestination, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var mSrc = Expression.Parameter(typeof(TMember));
+                var mDst = Expression.Parameter(typeof(TMember));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.Condition = expr;
+                var inv = Expression.Invoke(condition, src, dst);
+                var lmb = Expression.Lambda(inv, src, dst, mSrc, mDst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void Condition(Func<TSource, bool> condition)
+        public void Condition(Expression<Func<TSource, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, srcMember, destMember, ctxt) => condition(src);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var mSrc = Expression.Parameter(typeof(TMember));
+                var mDst = Expression.Parameter(typeof(TMember));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.Condition = expr;
+                var inv = Expression.Invoke(condition, src);
+                var lmb = Expression.Lambda(inv, src, dst, mSrc, mDst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void PreCondition(Func<TSource, bool> condition)
+        public void PreCondition(Expression<Func<TSource, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, ResolutionContext, bool>> expr =
-                    (src, dest, ctxt) => condition(src);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.PreCondition = expr;
+                var inv = Expression.Invoke(condition, src);
+                var lmb = Expression.Lambda(inv, src, dst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void PreCondition(Func<ResolutionContext, bool> condition)
+        public void PreCondition(Expression<Func<ResolutionContext, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, ResolutionContext, bool>> expr =
-                    (src, dest, ctxt) => condition(ctxt);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.PreCondition = expr;
+                var inv = Expression.Invoke(condition, ctx);
+                var lmb = Expression.Lambda(inv, src, dst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void PreCondition(Func<TSource, ResolutionContext, bool> condition)
+        public void PreCondition(Expression<Func<TSource, ResolutionContext, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, ResolutionContext, bool>> expr =
-                    (src, dest, ctxt) => condition(src, ctxt);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.PreCondition = expr;
+                var inv = Expression.Invoke(condition, src, ctx);
+                var lmb = Expression.Lambda(inv, src, dst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 
-        public void PreCondition(Func<TSource, TDestination, ResolutionContext, bool> condition)
+        public void PreCondition(Expression<Func<TSource, TDestination, ResolutionContext, bool>> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, ResolutionContext, bool>> expr =
-                    (src, dest, ctxt) => condition(src, dest, ctxt);
+                var src = Expression.Parameter(typeof(TSource));
+                var dst = Expression.Parameter(typeof(TDestination));
+                var ctx = Expression.Parameter(typeof(ResolutionContext));
 
-                pm.PreCondition = expr;
+                var inv = Expression.Invoke(condition, src, dst, ctx);
+                var lmb = Expression.Lambda(inv, src, dst, ctx);
+                
+                pm.Condition = lmb;
             });
         }
 

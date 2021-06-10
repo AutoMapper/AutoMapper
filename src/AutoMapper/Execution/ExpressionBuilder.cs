@@ -19,14 +19,21 @@ namespace AutoMapper.Execution
             mapper => new ResolutionContext((IInternalRuntimeMapper)mapper);
 
         private static readonly MethodInfo ContextMapMethod =
-            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();            
+            ExpressionFactory.Method<ResolutionContext, object>(a => a.Map<object, object>(null, null, null)).GetGenericMethodDefinition();
+
+        public static Expression ThisExpression<T>(this IMemberMap memberMap)
+        {
+            return memberMap?.MustBeGeneratedCompatible ?? true
+                ? Constant(null, typeof(T))
+                : Constant(memberMap, typeof(T));
+        }
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap,
             TypePair typePair,
             Expression sourceParameter,
             Expression contextParameter,
-            IMemberMap propertyMap = null, Expression destinationParameter = null)
+            Expression destinationParameter = null, IMemberMap propertyMap = null)
         {
             if (destinationParameter == null)
                 destinationParameter = Default(typePair.DestinationType);
@@ -43,18 +50,23 @@ namespace AutoMapper.Execution
                     mapExpression = typeMap.MapExpression != null
                         ? typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter,
                             contextParameter)
-                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, 
+                            propertyMap.ThisExpression<IMemberMap>());
                 }
                 else
                 {
-                    mapExpression = ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+                    mapExpression = ContextMap(typePair,
+                        sourceParameter,
+                        contextParameter,
+                        destinationParameter,
+                        propertyMap.ThisExpression<IMemberMap>());
                 }
             }
             else
             {
                 hasTypeConverter = false;
                 mapExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair,
-                    sourceParameter, contextParameter, propertyMap, destinationParameter);
+                    sourceParameter, contextParameter, destinationParameter, propertyMap);
             }
             if (!hasTypeConverter)
             {
@@ -107,7 +119,7 @@ namespace AutoMapper.Execution
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider,
             ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            IMemberMap propertyMap, Expression destinationParameter)
+            Expression destinationParameter, IMemberMap propertyMap = null)
         {
             var match = configurationProvider.FindMapper(typePair);
             if (match != null)
@@ -116,14 +128,18 @@ namespace AutoMapper.Execution
                     sourceParameter, destinationParameter, contextParameter);
                 return mapperExpression;
             }
-            return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter, propertyMap);
+            return ContextMap(typePair,
+                sourceParameter,
+                contextParameter,
+                destinationParameter,
+                propertyMap.ThisExpression<IMemberMap>());
         }
 
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter,
-            Expression destinationParameter, IMemberMap memberMap)
+            Expression destinationParameter, Expression memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(IMemberMap)));
+            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter, memberMap);
         }
 
         public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
@@ -136,13 +152,25 @@ namespace AutoMapper.Execution
             return null;
         }
 
-        public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap) =>
-            typeMap?.MaxDepth > 0 ?
+        public static ConstructorInfo TypePairConstructor = typeof(TypePair).GetConstructors().First();
+
+        public static Expression TypePairToExpression(TypePair typePair)
+        {
+            return New(TypePairConstructor,
+                Constant(typePair.SourceType,
+                    typeof(Type)),
+                Constant(typePair.DestinationType,
+                    typeof(Type)));
+        }
+
+        public static BinaryExpression OverMaxDepth(this Expression context, TypeMap typeMap)
+        {
+            return typeMap?.MaxDepth > 0 ?
                 GreaterThan(
-                    Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
+                    Call(context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, TypePairToExpression(typeMap.Types)),
                     Constant(typeMap.MaxDepth)
-                ) :
-                null;
+                ) : null;
+        }
 
         public static bool AllowsNullDestinationValuesFor(this ProfileMap profile, IMemberMap memberMap = null) =>
             memberMap?.AllowNull ?? profile.AllowNullDestinationValues;

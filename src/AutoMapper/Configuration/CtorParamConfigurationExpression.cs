@@ -24,10 +24,17 @@ namespace AutoMapper.Configuration
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
             _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
 
-        public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
+        public void MapFrom<TMember>(Expression<Func<TSource, ResolutionContext, TMember>> resolver)
         {
-            Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
-            _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
+            ParameterExpression p1 = Expression.Parameter(typeof(TSource));
+            ParameterExpression p2 = Expression.Parameter(typeof(TDestination));
+            ParameterExpression p3 = Expression.Parameter(typeof(TMember));
+            ParameterExpression p4 = Expression.Parameter(typeof(ResolutionContext));
+
+            InvocationExpression inv = Expression.Invoke(resolver, p1, p4);
+            LambdaExpression exp = Expression.Lambda(inv, p1, p2, p3, p4);
+
+            _ctorParamActions.Add(cpm => cpm.CustomMapFunction = exp);
         }
 
         public void MapFrom(string sourceMembersPath)

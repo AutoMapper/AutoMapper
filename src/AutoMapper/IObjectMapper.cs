@@ -63,14 +63,22 @@ namespace AutoMapper
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(
+            Expression contextExpression)
+        {
+            if (profileMap.MustBeGeneratedCompatible)
+            {
+                throw new InvalidOperationException($"Can't use {nameof(ObjectMapper<TSource, TDestination>)} " +
+                                                    $"with {nameof(ProfileMap.MustBeGeneratedCompatible)} flag.");
+            }
+
+            return Call(
                 Constant(this),
                 MapMethod,
                 ToType(sourceExpression, typeof(TSource)),
                 ToType(destExpression, typeof(TDestination)),
-                Constant(sourceExpression.Type),
-                Constant(destExpression.Type),
+                Constant(sourceExpression.Type, typeof(Type)),
+                Constant(destExpression.Type, typeof(Type)),
                 contextExpression);
+        }
     }
 }

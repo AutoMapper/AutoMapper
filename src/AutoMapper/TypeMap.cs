@@ -42,6 +42,8 @@ namespace AutoMapper
             Profile = profile;
         }
 
+        public bool MustBeDownloadable => Profile.MustBeGeneratedCompatible;
+
         private IEnumerable<SourceMemberConfig> SourceMemberConfigs => _sourceMemberConfigs.Values;
 
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)

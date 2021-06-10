@@ -12,7 +12,7 @@ namespace AutoMapper
     public class ConstructorParameterMap : DefaultMemberMap
     {
         public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers,
-            bool canResolveValue)
+            bool canResolveValue) : base(typeMap.MustBeDownloadable)
         {
             TypeMap = typeMap;
             Parameter = parameter;

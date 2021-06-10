@@ -71,21 +71,21 @@ namespace AutoMapper
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Function to map to destination member</param>
-        void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction);
+        void MapFrom<TResult>(Expression<Func<TSource, TDestination, TResult>> mappingFunction);
 
         /// <summary>
         /// Map destination member using a custom function. Access the source, destination object, and destination member.
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Function to map to destination member</param>
-        void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> mappingFunction);
+        void MapFrom<TResult>(Expression<Func<TSource, TDestination, TMember, TResult>> mappingFunction);
 
         /// <summary>
         /// Map destination member using a custom function. Access the source, destination object, destination member, and context.
         /// </summary>
         /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
         /// <param name="mappingFunction">Function to map to destination member</param>
-        void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> mappingFunction);
+        void MapFrom<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> mappingFunction);
 
         /// <summary>
         /// Map destination member using a custom expression. Used in LINQ projection (ProjectTo).
@@ -135,55 +135,55 @@ namespace AutoMapper
         /// Conditionally map this member against the source, destination, source and destination members
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition);
+        void Condition(Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> condition);
 
         /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition);
+        void Condition(Expression<Func<TSource, TDestination, TMember, TMember, bool>> condition);
 
         /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, bool> condition);
+        void Condition(Expression<Func<TSource, TDestination, TMember, bool>> condition);
        
         /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, bool> condition);
+        void Condition(Expression<Func<TSource, TDestination, bool>> condition);
        
         /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, bool> condition);
+        void Condition(Expression<Func<TSource, bool>> condition);
        
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void PreCondition(Func<TSource, bool> condition);
+        void PreCondition(Expression<Func<TSource, bool>> condition);
 
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value
         /// </summary>
         /// <param name="condition">Condition to evaluate using the current resolution context</param>
-        void PreCondition(Func<ResolutionContext, bool> condition);
+        void PreCondition(Expression<Func<ResolutionContext, bool>> condition);
 
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object and the current resolution context</param>
-        void PreCondition(Func<TSource, ResolutionContext, bool> condition);
+        void PreCondition(Expression<Func<TSource, ResolutionContext, bool>> condition);
 
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object, the destination object, and the current resolution context</param>
-        void PreCondition(Func<TSource, TDestination, ResolutionContext, bool> condition);
+        void PreCondition(Expression<Func<TSource, TDestination, ResolutionContext, bool>> condition);
 
         /// <summary>
         /// Ignore this member for LINQ projections unless explicitly expanded during projection

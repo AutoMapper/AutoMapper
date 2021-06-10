@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
                 {
                     throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {member}.", null, new TypePair(typeof(StringDictionary), destinationType));
                 }
-                var value = context.MapMember(member, match.Value, boxedDestination);
+                var value = context.MapMember(member, match.Value, profileMap.MustBeGeneratedCompatible, boxedDestination);
                 member.SetMemberValue(boxedDestination, value);
                 matchedCount++;
             }
@@ -70,7 +70,7 @@ namespace AutoMapper.Mappers
                         continue;
                     }
                     var lastMember = innerMembers[innerMembers.Length - 1];
-                    var value = context.MapMember(lastMember, source[memberPath], innerDestination);
+                    var value = context.MapMember(lastMember, source[memberPath], profileMap.MustBeGeneratedCompatible, innerDestination);
                     lastMember.SetMemberValue(innerDestination, value);
                 }
                 return;

@@ -18,8 +18,8 @@ namespace AutoMapper.Mappers
                     new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
                     Property(sourceExpression, sourceExpression.Type.GetProperty("Value")),
                     contextExpression,
-                    memberMap,
-                    destExpression
+                    destExpression,
+                    memberMap
                 );
 
         public TypePair GetAssociatedTypes(TypePair initialTypes)

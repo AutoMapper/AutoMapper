@@ -13,13 +13,13 @@ namespace AutoMapper
         private Dictionary<TypePair, int> _typeDepth;
         private readonly IInternalRuntimeMapper _inner;
 
-        internal ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
+        public ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
         {
             Options = options;
             _inner = mapper;
         }
 
-        internal ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
+        public ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
 
         /// <summary>
         /// Mapping operation options
@@ -70,14 +70,10 @@ namespace AutoMapper
         }
 
         TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));
-        TDestination IMapperBase.Map<TSource, TDestination>(TSource source)
-            => _inner.Map(source, default(TDestination), this);
-        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)
-            => _inner.Map(source, destination, this);
-        object IMapperBase.Map(object source, Type sourceType, Type destinationType)
-            => _inner.Map(source, (object)null, this, sourceType, destinationType);
-        object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
-            => _inner.Map(source, destination, this, sourceType, destinationType);
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source) => _inner.Map(source, default(TDestination), this);
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination) => _inner.Map(source, destination, this);
+        object IMapperBase.Map(object source, Type sourceType, Type destinationType) => _inner.Map(source, (object)null, this, sourceType, destinationType);
+        object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType) => _inner.Map(source, destination, this, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
             Type sourceType, Type destinationType, IMemberMap memberMap)
             => _inner.Map(source, destination, context, sourceType, destinationType, memberMap);

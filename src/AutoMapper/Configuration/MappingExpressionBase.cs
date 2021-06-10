@@ -260,27 +260,28 @@ namespace AutoMapper.Configuration
             return this as TMappingExpression;
         }
 
-        public TMappingExpression BeforeMap(Action<TSource, TDestination> beforeFunction)
+        public TMappingExpression BeforeMap(Expression<Action<TSource, TDestination>> beforeFunction)
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest);
+                var p1 = Parameter(typeof(TSource));
+                var p2 = Parameter(typeof(TDestination));
+                var p3 = Parameter(typeof(ResolutionContext));
 
-                tm.AddBeforeMapAction(expr);
+                var inv = Invoke(beforeFunction, p1, p2);
+                var exp = Lambda(inv, p1, p2, p3);
+
+                tm.AddBeforeMapAction(exp);
             });
 
             return this as TMappingExpression;
         }
 
-        public TMappingExpression BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction)
+        public TMappingExpression BeforeMap(Expression<Action<TSource, TDestination, ResolutionContext>> beforeFunction)
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest, ctxt);
-
-                tm.AddBeforeMapAction(expr);
+                tm.AddBeforeMapAction(beforeFunction);
             });
 
             return this as TMappingExpression;
@@ -288,33 +289,31 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            void BeforeFunction(TSource src, TDestination dest, ResolutionContext ctxt)
-                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest, ctxt);
-
-            return BeforeMap(BeforeFunction);
+            return BeforeMap((src, dst, ctx) => ((TMappingAction)ctx.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dst, ctx));
         }
 
-        public TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction)
+        public TMappingExpression AfterMap(Expression<Action<TSource, TDestination>> afterFunction)
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest);
+                var p1 = Parameter(typeof(TSource));
+                var p2 = Parameter(typeof(TDestination));
+                var p3 = Parameter(typeof(ResolutionContext));
 
-                tm.AddAfterMapAction(expr);
+                var inv = Invoke(afterFunction, p1, p2);
+                var exp = Lambda(inv, p1, p2, p3);
+
+                tm.AddAfterMapAction(exp);
             });
 
             return this as TMappingExpression;
         }
 
-        public TMappingExpression AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction)
+        public TMappingExpression AfterMap(Expression<Action<TSource, TDestination, ResolutionContext>> afterFunction)
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest, ctxt);
-
-                tm.AddAfterMapAction(expr);
+                tm.AddAfterMapAction(afterFunction);
             });
 
             return this as TMappingExpression;
@@ -322,10 +321,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            void AfterFunction(TSource src, TDestination dest, ResolutionContext ctxt)
-                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest, ctxt);
-
-            return AfterMap(AfterFunction);
+            return AfterMap((src, dst, ctx) => ((TMappingAction)ctx.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dst, ctx));
         }
 
         public TMappingExpression PreserveReferences()

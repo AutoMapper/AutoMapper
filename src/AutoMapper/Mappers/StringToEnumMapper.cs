@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression)
         {
             var destinationType = destExpression.Type;
-            var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType),
+            var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationType, typeof(Type)),
                 sourceExpression, Expression.Constant(true));
             var switchCases = new List<SwitchCase>();
             var enumNames = destinationType.GetDeclaredMembers();

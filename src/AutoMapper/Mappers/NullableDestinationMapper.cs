@@ -16,6 +16,7 @@ namespace AutoMapper.Mappers
                 new TypePair(sourceExpression.Type, Nullable.GetUnderlyingType(destExpression.Type)),
                 sourceExpression,
                 contextExpression,
+                null,
                 memberMap
             );
 

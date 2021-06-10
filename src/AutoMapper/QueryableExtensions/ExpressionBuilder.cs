@@ -291,8 +291,10 @@ namespace AutoMapper.QueryableExtensions
 
                 public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;
 
-                protected override Expression GetValue(string name) =>
-                    _paramValues.TryGetValue(name, out object parameterValue) ? Constant(parameterValue) : null;
+                protected override Expression GetValue(string name)
+                {
+                    return _paramValues.TryGetValue(name, out object parameterValue) ? Constant(parameterValue) : null;
+                }
             }
         }
         [EditorBrowsable(EditorBrowsableState.Never)]

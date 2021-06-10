@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
                 ToType(
                     Call(EnumParseMethod,
-                        Constant(destExpression.Type),
+                        Constant(destExpression.Type, typeof(Type)),
                         Call(sourceExpression, sourceExpression.Type.GetRuntimeMethod("ToString", Type.EmptyTypes)),
                         Constant(true)
                     ),

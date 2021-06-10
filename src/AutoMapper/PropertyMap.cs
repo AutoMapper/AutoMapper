@@ -20,6 +20,7 @@ namespace AutoMapper
         private readonly List<ValueTransformerConfiguration> _valueTransformerConfigs = new List<ValueTransformerConfiguration>();
 
         public PropertyMap(MemberInfo destinationMember, TypeMap typeMap)
+            : base(typeMap.MustBeDownloadable)
         {
             TypeMap = typeMap;
             DestinationMember = destinationMember;

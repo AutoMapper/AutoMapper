@@ -13,9 +13,9 @@ namespace AutoMapper.Mappers
         {
             var destinationType = destExpression.Type;
             var sourceToObject = sourceExpression.ToObject();
-            var toObject = Call(typeof(Enum), "ToObject", null, Constant(destinationType), sourceToObject);
+            var toObject = Call(typeof(Enum), "ToObject", Type.EmptyTypes, Constant(destinationType, typeof(Type)), sourceToObject);
             var castToObject = Convert(toObject, destinationType);
-            var isDefined = Call(typeof(Enum), "IsDefined", null, Constant(sourceExpression.Type), sourceToObject);
+            var isDefined = Call(typeof(Enum), "IsDefined", Type.EmptyTypes, Constant(sourceExpression.Type, typeof(Type)), sourceToObject);
             var sourceToString = Call(sourceExpression, "ToString", null);
             var result = Variable(destinationType, "destinationEnumValue");
             var ignoreCase = Constant(true);

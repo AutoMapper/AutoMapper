@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using AutoMapper.Features;
 using AutoMapper.Mappers;
 
@@ -11,12 +12,17 @@ namespace AutoMapper.Configuration
     {
         private readonly IList<Profile> _profiles = new List<Profile>();
 
-        public MapperConfigurationExpression() : base()
+        public MapperConfigurationExpression(bool mustBeGeneratedCompatible = false)
         {
+            MustBeGeneratedCompatible = mustBeGeneratedCompatible;
             IncludeSourceExtensionMethods(typeof(Enumerable));
 
             Mappers = MapperRegistry.Mappers();
         }
+
+        public bool MustBeGeneratedCompatible { get; set; }
+
+        public Func<MapRequest, MethodBuilder> MethodBuilderFactory { get; set; }
 
         public IEnumerable<IProfileConfiguration> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = Activator.CreateInstance;

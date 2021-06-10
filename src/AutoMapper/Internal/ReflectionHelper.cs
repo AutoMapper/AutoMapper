@@ -49,11 +49,14 @@ namespace AutoMapper.Internal
             return parameter.DefaultValue;
         }
 
-        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination = null)
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, bool mustBeGeneratedCompatible, object destination = null)
         {
             var memberType = GetMemberType(member);
             var destValue = destination == null ? null : GetMemberValue(member, destination);
-            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType, DefaultMemberMap.Instance);
+            return context.Map(value, destValue, value?.GetType() ?? typeof(object), memberType,
+                mustBeGeneratedCompatible
+                    ? DefaultMemberMap.CompatibleInstance
+                    : DefaultMemberMap.NonCompatibleInstance);
         }
 
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)

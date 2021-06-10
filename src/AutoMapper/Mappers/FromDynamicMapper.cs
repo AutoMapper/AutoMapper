@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue, boxedDestination);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, profileMap.MustBeGeneratedCompatible, boxedDestination);
                 member.SetMemberValue(boxedDestination, destinationMemberValue);
             }
             return (TDestination) boxedDestination;

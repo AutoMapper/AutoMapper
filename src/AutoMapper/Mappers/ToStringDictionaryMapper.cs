@@ -6,6 +6,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
+    using System;
     using static Expression;
     using static CollectionMapperExpressionFactory;
 
@@ -18,9 +19,18 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-            => MapCollectionExpression(configurationProvider, profileMap, memberMap,
-                Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, typeof(Dictionary<,>),
+        {
+            if (profileMap.MustBeGeneratedCompatible)
+            {
+                throw new InvalidOperationException($"Can't use {nameof(ToStringDictionaryMapper)} " +
+                                                    $"with {nameof(ProfileMap.MustBeGeneratedCompatible)} flag.");
+            }
+
+            return MapCollectionExpression(configurationProvider, profileMap, memberMap,
+                Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression,
+                contextExpression, typeof(Dictionary<,>),
                 MapKeyPairValueExpr);
+        }
 
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)
         {

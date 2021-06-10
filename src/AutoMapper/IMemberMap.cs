@@ -9,6 +9,8 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IMemberMap
     {
+        bool MustBeGeneratedCompatible { get; }
+        
         TypeMap TypeMap { get; }
         Type SourceType { get; }
         IReadOnlyCollection<MemberInfo> SourceMembers { get; }

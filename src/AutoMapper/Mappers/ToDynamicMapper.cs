@@ -28,7 +28,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, profileMap.MustBeGeneratedCompatible);
                 SetDynamically(member.Name, destination, destinationMemberValue);
             }
             return destination;
@@ -51,8 +51,15 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             IMemberMap memberMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression) =>
-            Call(null,
+            Expression contextExpression)
+        {
+            if (profileMap.MustBeGeneratedCompatible)
+            {
+                throw new InvalidOperationException($"Can't use {nameof(ToDynamicMapper)} " +
+                                                    $"with {nameof(ProfileMap.MustBeGeneratedCompatible)} flag.");
+            }
+
+            return Call(null,
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
                 sourceExpression,
                 ToType(
@@ -60,5 +67,6 @@ namespace AutoMapper.Mappers
                         DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
                 contextExpression,
                 Constant(profileMap));
+        }
     }
 }
