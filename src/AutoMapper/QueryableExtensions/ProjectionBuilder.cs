@@ -428,7 +428,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _previousRequests = previousRequests;
         }
         internal bool AlreadyExists => _previousRequests.Contains(this);
-        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(_previousRequests.Concat(new[] { this }));
+        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(_previousRequests){ this };
         public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
                 MembersToExpand.SequenceEqual(other.MembersToExpand);
         public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
