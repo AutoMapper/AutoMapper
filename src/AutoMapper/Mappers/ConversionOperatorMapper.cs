@@ -17,7 +17,7 @@ namespace AutoMapper.Internal.Mappers
                     return sourceMethod;
                 }
             }
-            return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags, null, new[] { sourceType }, null);
+            return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags | BindingFlags.ExactBinding, null, new[] { sourceType }, null);
         }
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Expression.Call(GetConversionOperator(sourceExpression.Type, destExpression.Type), sourceExpression);
