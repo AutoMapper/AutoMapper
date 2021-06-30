@@ -12,18 +12,17 @@ namespace AutoMapper.UnitTests
             public static implicit operator QueryableValue<T>(T obj) => new() { Value = obj };
             public static implicit operator T(QueryableValue<T> obj) => obj.Value;
         }
-        class DestinationClass
+        class Destination
         {
             public QueryableValue<int?> MyProperty { get; set; } = null!;
         }
-        class SourceClass
+        class Source
         {
             public int? MyProperty { get; set; }
         }
-        protected override MapperConfiguration Configuration => new(c => c.CreateMap<SourceClass, DestinationClass>());
+        protected override MapperConfiguration Configuration => new(c => c.CreateMap<Source, Destination>());
         [Fact]
-        public void Should_not_match() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>()
-            .MemberMap.DestinationName.ShouldBe(nameof(DestinationClass.MyProperty));
+        public void Should_work() => Map<Destination>(new Source { MyProperty = 42 }).MyProperty.Value.ShouldBe(42);
     }
     public class When_mapping_to_classes_with_implicit_conversion_operators_on_the_destination
     {

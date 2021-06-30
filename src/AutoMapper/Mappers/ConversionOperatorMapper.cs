@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 namespace AutoMapper.Internal.Mappers
 {
+    using static Execution.ExpressionBuilder;
     public class ConversionOperatorMapper : IObjectMapper
     {
         private readonly string _operatorName;
@@ -17,9 +18,12 @@ namespace AutoMapper.Internal.Mappers
                     return sourceMethod;
                 }
             }
-            return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags | BindingFlags.ExactBinding, null, new[] { sourceType }, null);
+            return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags, null, new[] { sourceType }, null);
         }
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
-            Expression.Call(GetConversionOperator(sourceExpression.Type, destExpression.Type), sourceExpression);
+        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        {
+            var conversionOperator = GetConversionOperator(sourceExpression.Type, destExpression.Type);
+            return Expression.Call(conversionOperator, ToType(sourceExpression, conversionOperator.GetParameters()[0].ParameterType));
+        }
     }
 }
