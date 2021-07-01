@@ -13,7 +13,7 @@ namespace AutoMapper.Internal.Mappers
         {
             foreach (MethodInfo sourceMethod in sourceType.GetMember(_operatorName, MemberTypes.Method, TypeExtensions.StaticFlags))
             {
-                if (sourceMethod.ReturnType == destinationType)
+                if (destinationType.IsAssignableFrom(sourceMethod.ReturnType))
                 {
                     return sourceMethod;
                 }
