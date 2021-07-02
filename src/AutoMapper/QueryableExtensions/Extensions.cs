@@ -109,7 +109,7 @@ namespace AutoMapper.QueryableExtensions
     }
     public class MemberVisitor : ExpressionVisitor
     {
-        private readonly List<MemberInfo> _members = new List<MemberInfo>();
+        private readonly List<MemberInfo> _members = new();
         public static MemberInfo[] GetMemberPath(Expression expression)
         {
             var memberVisitor = new MemberVisitor();
