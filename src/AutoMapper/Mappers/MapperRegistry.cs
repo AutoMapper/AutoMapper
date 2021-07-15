@@ -3,9 +3,9 @@ namespace AutoMapper.Internal.Mappers
 {
     internal static class MapperRegistry
     {
-        public static List<IObjectMapper> Mappers() => new List<IObjectMapper>
+        public static List<IObjectMapper> Mappers() => new()
         {
-            new CollectionMapper(),// matches IEnumerable, requires a setter or ICollection<> or IList
+            new CollectionMapper(),// matches IEnumerable, requires a setter, ICollection<> or IList
             new AssignableMapper(),// except collections, which are copied; most likely match
             new NullableSourceMapper(),// map from the underlying type
             new ToStringMapper(),// object.ToString, no boxing, special case enums

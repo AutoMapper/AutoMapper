@@ -9,6 +9,6 @@ namespace AutoMapper.Internal.Mappers
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             configurationProvider.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type), sourceExpression, memberMap);
         public TypePair GetAssociatedTypes(in TypePair initialTypes) => GetAssociatedTypes(initialTypes.SourceType, initialTypes.DestinationType);
-        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new TypePair(sourceType, Nullable.GetUnderlyingType(destinationType));
+        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new(sourceType, Nullable.GetUnderlyingType(destinationType));
     }
 }

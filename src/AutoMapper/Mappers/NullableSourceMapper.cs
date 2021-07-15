@@ -10,6 +10,6 @@ namespace AutoMapper.Internal.Mappers
             configurationProvider.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type),
                     ExpressionBuilder.Property(sourceExpression, "Value"), memberMap, destExpression);
         public TypePair GetAssociatedTypes(in TypePair initialTypes) => GetAssociatedTypes(initialTypes.SourceType, initialTypes.DestinationType);
-        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new TypePair(Nullable.GetUnderlyingType(sourceType), destinationType);
+        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new(Nullable.GetUnderlyingType(sourceType), destinationType);
     }
 }

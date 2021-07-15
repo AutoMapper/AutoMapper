@@ -215,4 +215,12 @@ var configuration = new MapperConfiguration(cfg => {});
 configuration.CompileMappings();
 ```
 
-For a few hundred mappings, this may take a couple of seconds.
+For a few hundred mappings, this may take a couple of seconds. If it's a lot more than that, you probably have some really big execution plans.
+
+### Long compilation times
+
+Compilation times increase with the size of the execution plan and that depends on the number of properties and their complexity. Ideally, you would fix your model so you have many small DTOs, each for a particular use case. But you can also decrease the size of the execution plan without changing your classes.
+
+You can set `MapAtRuntime` per member or `MaxExecutionPlanDepth` globally (the default is one, set it to zero).
+
+These will reduce the size of the execution plan by replacing the execution plan for a child object with a method call. This will reduce the time spent compiling, but will probably slow the mapping itself. Search the repo for more details and use a profiler to better understand the effect.

@@ -91,7 +91,7 @@ namespace AutoMapper
                 builder.AppendLine(string.Join(Environment.NewLine, error.ProfileNames));
             }
             builder.AppendLine("This can cause configuration collisions and inconsistent mapping.");
-            builder.AppendLine("Consolidate the CreateMap calls into one profile, or set the root Advanced.AllowAdditiveTypeMapCreation configuration value to 'true'.");
+            builder.AppendLine("Consolidate the CreateMap calls into one profile, or set the root Internal().AllowAdditiveTypeMapCreation configuration value to 'true'.");
 
             Message = builder.ToString();
         }
