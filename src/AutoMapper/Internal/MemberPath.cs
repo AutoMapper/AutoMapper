@@ -10,7 +10,7 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct MemberPath : IEquatable<MemberPath>
     {
-        public static readonly MemberPath Empty = new MemberPath(Array.Empty<MemberInfo>());
+        public static readonly MemberPath Empty = new(Array.Empty<MemberInfo>());
         public readonly MemberInfo[] Members;
 
         public MemberPath(Stack<Member> members) : this(members.ToMemberInfos()){}
@@ -39,11 +39,11 @@ namespace AutoMapper.Internal
 
         public override string ToString() => string.Join(".", Members.Select(mi => mi.Name));
 
-        public static bool operator==(in MemberPath left, in MemberPath right) => left.Equals(right);
+        public static bool operator==(MemberPath left, MemberPath right) => left.Equals(right);
 
-        public static bool operator!=(in MemberPath left, in MemberPath right) => !left.Equals(right);
+        public static bool operator!=(MemberPath left, MemberPath right) => !left.Equals(right);
 
-        public bool StartsWith(in MemberPath path)
+        public bool StartsWith(MemberPath path)
         {
             if (path.Length > Length)
             {

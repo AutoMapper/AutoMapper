@@ -445,7 +445,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
         public static bool operator ==(in ProjectionRequest left, in ProjectionRequest right) => Equals(left, right);
         public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);
-        public bool ShouldExpand(in MemberPath currentPath)
+        public bool ShouldExpand(MemberPath currentPath)
         {
             foreach (var memberToExpand in MembersToExpand)
             {
