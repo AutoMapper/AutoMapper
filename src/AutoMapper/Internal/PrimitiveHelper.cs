@@ -23,15 +23,15 @@ namespace AutoMapper.Internal
             dictionary.TryGetValue(key, out TValue value);
             return value;
         }
-        public static void CheckIsDerivedFrom(this in TypePair types, in TypePair baseTypes)
+        public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
         {
             types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
             types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
         }
-        public static bool IsEnumToEnum(this in TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
-        public static bool IsUnderlyingTypeToEnum(this in TypePair context) =>
+        public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
+        public static bool IsUnderlyingTypeToEnum(this TypePair context) =>
             context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));
-        public static bool IsEnumToUnderlyingType(this in TypePair context) =>
+        public static bool IsEnumToUnderlyingType(this TypePair context) =>
             context.SourceType.IsEnum && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(context.SourceType));
     }
 }

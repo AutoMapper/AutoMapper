@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
 
         private class IntToIntMapper : IObjectMapper
         {
-            public bool IsMatch(in TypePair context)
+            public bool IsMatch(TypePair context)
                 => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
 
             public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,

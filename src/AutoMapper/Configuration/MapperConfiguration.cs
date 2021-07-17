@@ -168,7 +168,7 @@ namespace AutoMapper
             return executionPlan.Compile(); // breakpoint here to inspect all execution plans
         }
 
-        TypeMap IGlobalConfiguration.ResolveAssociatedTypeMap(in TypePair types)
+        TypeMap IGlobalConfiguration.ResolveAssociatedTypeMap(TypePair types)
         {
             var typeMap = ResolveTypeMap(types);
             if (typeMap != null)
@@ -236,12 +236,12 @@ namespace AutoMapper
         IReadOnlyCollection<TypeMap> IGlobalConfiguration.GetAllTypeMaps() => _configuredMaps.Values;
         TypeMap IGlobalConfiguration.FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(sourceType, destinationType);
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
-        TypeMap IGlobalConfiguration.FindTypeMapFor(in TypePair typePair) => FindTypeMapFor(typePair);
+        TypeMap IGlobalConfiguration.FindTypeMapFor(TypePair typePair) => FindTypeMapFor(typePair);
         TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new(sourceType, destinationType));
-        TypeMap FindTypeMapFor(in TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
+        TypeMap FindTypeMapFor(TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
         TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new(sourceType, destinationType));
-        TypeMap IGlobalConfiguration.ResolveTypeMap(in TypePair typePair) => ResolveTypeMap(typePair);
-        TypeMap ResolveTypeMap(in TypePair typePair)
+        TypeMap IGlobalConfiguration.ResolveTypeMap(TypePair typePair) => ResolveTypeMap(typePair);
+        TypeMap ResolveTypeMap(TypePair typePair)
         {
             if (_resolvedMaps.TryGetValue(typePair, out TypeMap typeMap))
             {
@@ -390,8 +390,8 @@ namespace AutoMapper
             return typeMaps;
         }
         TypeMap IGlobalConfiguration.GetIncludedTypeMap(Type sourceType, Type destinationType) => GetIncludedTypeMap(new(sourceType, destinationType));
-        TypeMap IGlobalConfiguration.GetIncludedTypeMap(in TypePair pair) => GetIncludedTypeMap(pair);
-        TypeMap GetIncludedTypeMap(in TypePair pair)
+        TypeMap IGlobalConfiguration.GetIncludedTypeMap(TypePair pair) => GetIncludedTypeMap(pair);
+        TypeMap GetIncludedTypeMap(TypePair pair)
         {
             var typeMap = FindTypeMapFor(pair);
             if (typeMap != null)
@@ -409,14 +409,14 @@ namespace AutoMapper
                 return typeMap;
             }
         }
-        private TypeMap FindClosedGenericTypeMapFor(in TypePair typePair)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
             if (!_hasOpenMaps || !typePair.IsConstructedGenericType)
             {
                 return null;
             }
             return FindClosedGenericMap(typePair);
-            TypeMap FindClosedGenericMap(in TypePair typePair)
+            TypeMap FindClosedGenericMap(TypePair typePair)
             {
                 var genericTypePair = typePair.GetTypeDefinitionIfGeneric();
                 var userMap =
@@ -454,8 +454,8 @@ namespace AutoMapper
                 return typeMap;
             }
         }
-        IObjectMapper IGlobalConfiguration.FindMapper(in TypePair types) => FindMapper(types);
-        IObjectMapper FindMapper(in TypePair types)
+        IObjectMapper IGlobalConfiguration.FindMapper(TypePair types) => FindMapper(types);
+        IObjectMapper FindMapper(TypePair types)
         {
             foreach (var mapper in _mappers)
             {

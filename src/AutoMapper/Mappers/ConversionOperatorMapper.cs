@@ -8,7 +8,7 @@ namespace AutoMapper.Internal.Mappers
     {
         private readonly string _operatorName;
         public ConversionOperatorMapper(string operatorName) => _operatorName = operatorName;
-        public bool IsMatch(in TypePair context) => GetConversionOperator(context.SourceType, context.DestinationType) != null;
+        public bool IsMatch(TypePair context) => GetConversionOperator(context.SourceType, context.DestinationType) != null;
         private MethodInfo GetConversionOperator(Type sourceType, Type destinationType)
         {
             foreach (MethodInfo sourceMethod in sourceType.GetMember(_operatorName, MemberTypes.Method, TypeExtensions.StaticFlags))

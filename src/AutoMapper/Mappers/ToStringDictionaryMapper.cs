@@ -9,7 +9,7 @@ namespace AutoMapper.Internal.Mappers
     public class ToStringDictionaryMapper : IObjectMapper
     {
         private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetStaticMethod(nameof(MembersDictionary));
-        public bool IsMatch(in TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
+        public bool IsMatch(TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(MembersDictionaryMethodInfo, sourceExpression.ToObject(), Constant(profileMap));
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap) =>

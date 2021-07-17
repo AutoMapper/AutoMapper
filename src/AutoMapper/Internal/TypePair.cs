@@ -8,7 +8,7 @@ namespace AutoMapper.Internal
         public readonly TypePair RequestedTypes;
         public readonly TypePair RuntimeTypes;
         public readonly MemberMap MemberMap;
-        public MapRequest(in TypePair requestedTypes, in TypePair runtimeTypes, MemberMap memberMap = null) 
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes, MemberMap memberMap = null) 
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;
@@ -37,7 +37,7 @@ namespace AutoMapper.Internal
         public bool IsConstructedGenericType => SourceType.IsConstructedGenericType || DestinationType.IsConstructedGenericType;
         public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
-        public TypePair CloseGenericTypes(in TypePair closedTypes)
+        public TypePair CloseGenericTypes(TypePair closedTypes)
         {
             var sourceArguments = closedTypes.SourceType.GenericTypeArguments;
             var destinationArguments = closedTypes.DestinationType.GenericTypeArguments;
@@ -55,7 +55,7 @@ namespace AutoMapper.Internal
         }
         public TypePair GetTypeDefinitionIfGeneric() => new TypePair(GetTypeDefinitionIfGeneric(SourceType), GetTypeDefinitionIfGeneric(DestinationType));
         private static Type GetTypeDefinitionIfGeneric(Type type) => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
-        public static bool operator ==(in TypePair left, in TypePair right) => left.Equals(right);
-        public static bool operator !=(in TypePair left, in TypePair right) => !left.Equals(right);
+        public static bool operator ==(TypePair left, TypePair right) => left.Equals(right);
+        public static bool operator !=(TypePair left, TypePair right) => !left.Equals(right);
     }
 }

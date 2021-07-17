@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Mappers
         public void Should_convert_to_type_using_the_custom_type_converter() => Mapper.Map<Destination, Source>(new Destination{ OtherValue = 15 }).Value.ShouldBe(5);
         public class TypeConverterMapper : ObjectMapper<object, object>
         {
-            public override bool IsMatch(in TypePair context) =>
+            public override bool IsMatch(TypePair context) =>
                 GetConverter(context.SourceType).CanConvertTo(context.DestinationType) || GetConverter(context.DestinationType).CanConvertFrom(context.SourceType);
             public override object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context)
             {
@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return new DestinationType();
             }
 
-            public bool IsMatch(in TypePair context)
+            public bool IsMatch(TypePair context)
             {
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
@@ -189,7 +189,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         class EnumMapper : ObjectMapper<object, string>
         {
-            public override bool IsMatch(in TypePair types)
+            public override bool IsMatch(TypePair types)
             {
                 var underlyingType = Nullable.GetUnderlyingType(types.SourceType) ?? types.SourceType;
                 return underlyingType.IsEnum && types.DestinationType == typeof(string);

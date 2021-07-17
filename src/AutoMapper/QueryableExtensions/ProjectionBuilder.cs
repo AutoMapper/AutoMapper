@@ -270,7 +270,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 public Expression GetSourceExpression(Expression parameter) => _members.Take(_members.Length - 1).Select(p => p.Expression).Aggregate(parameter,
                     (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().Peek().Target, left));
                 public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", _members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
-                internal bool IsEquivalentTo(in SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
+                internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
                     _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
             }
             class GetMemberAccessesVisitor : ExpressionVisitor
