@@ -135,7 +135,7 @@ namespace AutoMapper
             var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
             if (typeMap != null)
             {
-                return GenerateTypeMapExpression(mapRequest, typeMap);
+                return GenerateTypeMapExpression(mapRequest.RequestedTypes, typeMap);
             }
             var mapperToUse = FindMapper(mapRequest.RuntimeTypes);
             return GenerateObjectMapperExpression(mapRequest, mapperToUse);
@@ -182,16 +182,16 @@ namespace AutoMapper
             return null;
         }
 
-        private static LambdaExpression GenerateTypeMapExpression(in MapRequest mapRequest, TypeMap typeMap)
+        private static LambdaExpression GenerateTypeMapExpression(TypePair requestedTypes, TypeMap typeMap)
         {
             typeMap.CheckProjection();
-            if (mapRequest.RequestedTypes == typeMap.Types)
+            if (requestedTypes == typeMap.Types)
             {
                 return typeMap.MapExpression;
             }
             var mapDestinationType = typeMap.DestinationType;
-            var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
-            var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
+            var requestedDestinationType = requestedTypes.DestinationType;
+            var source = Parameter(requestedTypes.SourceType, "source");
             var destination = Parameter(requestedDestinationType, "typeMapDestination");
             var checkNullValueTypeDest = CheckNullValueType(destination, mapDestinationType);
             return
@@ -227,7 +227,7 @@ namespace AutoMapper
                 var throwExpression = Throw(newException, runtimeDestinationType);
                 fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
             }
-            var profileMap = mapRequest.MemberMap?.TypeMap?.Profile ?? Configuration;
+            var profileMap = mapRequest.MemberMap?.Profile ?? Configuration;
             var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
             return Lambda(nullCheckSource, source, destination, ContextParameter);
         }

@@ -14,10 +14,10 @@ namespace AutoMapper.Internal
             RuntimeTypes = runtimeTypes;
             MemberMap = memberMap;
         }
-        public bool Equals(MapRequest other) => 
-            RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) && Equals(MemberMap, other.MemberMap);
+        public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) &&
+            (MemberMap == other.MemberMap || (MemberMap?.MapperEquals(other.MemberMap)).GetValueOrDefault());
         public override bool Equals(object obj) => obj is MapRequest other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes, MemberMap);
+        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes, MemberMap?.MapperGetHashCode());
         public static bool operator ==(in MapRequest left, in MapRequest right) => left.Equals(right);
         public static bool operator !=(in MapRequest left, in MapRequest right) => !left.Equals(right);
     }

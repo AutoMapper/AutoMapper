@@ -57,8 +57,20 @@ namespace AutoMapper
         public override string ToString() => DestinationName;
         public Expression ChainSourceMembers(Expression source, Type destinationType, Expression defaultValue) =>
             SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
-        public bool AllowsNullDestinationValues() => TypeMap.Profile.AllowsNullDestinationValuesFor(this);
-        public bool AllowsNullCollections() => TypeMap.Profile.AllowsNullCollectionsFor(this);
+        public bool AllowsNullDestinationValues() => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
+        public bool AllowsNullCollections() => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
+        public ProfileMap Profile => TypeMap?.Profile;
+        private int MaxDepth => (TypeMap?.MaxDepth).GetValueOrDefault();
+        public bool MapperEquals(MemberMap other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return other.MustUseDestination == MustUseDestination && other.MaxDepth == MaxDepth && 
+                other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
+        }
+        public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
     }
     public class ValueResolverConfiguration
     {
