@@ -29,7 +29,11 @@ var mapper = new Mapper(config);
 OrderDto dto = mapper.Map<OrderDto>(order);
 ```
 
-Most applications can use dependency injection to inject the created `IMapper` instance.
+Most applications can then use dependency injection to inject the created `IMapper` instance, for example by registering the mapper-configuration with a service lifetime in `ConfigureServices()` in `Startup.cs`:
+
+```c#
+services.AddSingleton(mapper);
+```
 
 AutoMapper also has non-generic versions of these methods, for those cases where you might not know the type at compile time.
 
