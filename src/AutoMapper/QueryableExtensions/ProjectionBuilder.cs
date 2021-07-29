@@ -128,7 +128,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var memberTypeMap = _configurationProvider.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType);
                     var resolvedSource = ResolveSource();
                     memberProjection.Expression ??= resolvedSource;
-                    var memberRequest = new ProjectionRequest(resolvedSource.Type, memberMap.DestinationType, request.MembersToExpand, request.GetPreviousRequestsAndSelf());
+                    var memberRequest = request.InnerRequest(resolvedSource.Type, memberMap.DestinationType);
                     if (memberRequest.AlreadyExists && depth >= _configurationProvider.RecursiveQueriesMaxDepth)
                     {
                         return null;
@@ -418,26 +418,27 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public readonly Type SourceType;
         public readonly Type DestinationType;
-        public readonly MemberPath[] MembersToExpand;
+        private readonly MemberPath[] _membersToExpand;
         private readonly ICollection<ProjectionRequest> _previousRequests;
         public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ICollection<ProjectionRequest> previousRequests)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            MembersToExpand = membersToExpand;
+            _membersToExpand = membersToExpand;
             _previousRequests = previousRequests;
         }
-        internal bool AlreadyExists => _previousRequests.Contains(this);
-        internal ICollection<ProjectionRequest> GetPreviousRequestsAndSelf() => new HashSet<ProjectionRequest>(_previousRequests){ this };
+        public ProjectionRequest InnerRequest(Type sourceType, Type destinationType) => 
+            new(sourceType, destinationType, _membersToExpand, new HashSet<ProjectionRequest>(_previousRequests) { this });
+        public bool AlreadyExists => _previousRequests.Contains(this);
         public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
-                MembersToExpand.SequenceEqual(other.MembersToExpand);
+            _membersToExpand.SequenceEqual(other._membersToExpand);
         public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
             hashCode.Add(SourceType);
             hashCode.Add(DestinationType);
-            foreach (var member in MembersToExpand)
+            foreach (var member in _membersToExpand)
             {
                 hashCode.Add(member);
             }
@@ -447,7 +448,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);
         public bool ShouldExpand(MemberPath currentPath)
         {
-            foreach (var memberToExpand in MembersToExpand)
+            foreach (var memberToExpand in _membersToExpand)
             {
                 if (memberToExpand.StartsWith(currentPath))
                 {
