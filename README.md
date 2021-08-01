@@ -1,4 +1,4 @@
-<img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
+![AutoMapper](https://s3.amazonaws.com/automapper/logo.png)
 
 [![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/AutoMapper/AutoMapper/actions?query=workflow%3ACI)
 [![NuGet](http://img.shields.io/nuget/vpre/AutoMapper.svg?label=NuGet)](https://www.nuget.org/packages/AutoMapper/)
