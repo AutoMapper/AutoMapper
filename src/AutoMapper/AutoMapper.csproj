@@ -12,6 +12,7 @@
     <PackageId>AutoMapper</PackageId>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Features Condition=" '$(TargetFramework)' == 'net461' ">peverify-compat</Features>
 
     <MinVerTagPrefix>v</MinVerTagPrefix>
@@ -33,6 +34,7 @@
 
   <ItemGroup>
     <None Include="..\..\icon.png" Pack="true" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
