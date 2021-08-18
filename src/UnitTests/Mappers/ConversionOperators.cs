@@ -82,6 +82,9 @@ namespace AutoMapper.UnitTests
 
         }
 
+        public class InheritedFoo : Foo
+        { }
+
         public class Bar
         {
             public string OtherValue { get; set; }
@@ -94,6 +97,17 @@ namespace AutoMapper.UnitTests
 
             var config = new MapperConfiguration(cfg => { });
             _bar = config.CreateMapper().Map<Foo, Bar>(source);
+
+            _bar.OtherValue.ShouldBe("Hello");
+        }
+
+        [Fact]
+        public void Should_use_the_inherited_implicit_conversion_operator()
+        {
+            var source = new InheritedFoo { Value = "Hello" };
+
+            var config = new MapperConfiguration(cfg => { });
+            _bar = config.CreateMapper().Map<InheritedFoo, Bar>(source);
 
             _bar.OtherValue.ShouldBe("Hello");
         }
@@ -147,6 +161,9 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class InheritedFoo : Foo
+        { }
+
         public class Bar
         {
             public string OtherValue { get; set; }
@@ -157,6 +174,17 @@ namespace AutoMapper.UnitTests
         {
             var config = new MapperConfiguration(cfg => { });
             _bar = config.CreateMapper().Map<Foo, Bar>(new Foo { Value = "Hello" });
+            _bar.OtherValue.ShouldBe("Hello");
+        }
+
+        [Fact]
+        public void Should_use_the_inherited_explicit_conversion_operator()
+        {
+            var source = new InheritedFoo { Value = "Hello" };
+
+            var config = new MapperConfiguration(cfg => { });
+            _bar = config.CreateMapper().Map<InheritedFoo, Bar>(source);
+
             _bar.OtherValue.ShouldBe("Hello");
         }
     }
