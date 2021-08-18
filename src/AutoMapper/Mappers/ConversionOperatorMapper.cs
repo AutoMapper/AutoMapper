@@ -11,7 +11,7 @@ namespace AutoMapper.Internal.Mappers
         public bool IsMatch(TypePair context) => GetConversionOperator(context.SourceType, context.DestinationType) != null;
         private MethodInfo GetConversionOperator(Type sourceType, Type destinationType)
         {
-            foreach (MethodInfo sourceMethod in sourceType.GetMember(_operatorName, MemberTypes.Method, TypeExtensions.StaticFlags))
+            foreach (MethodInfo sourceMethod in sourceType.GetMember(_operatorName, MemberTypes.Method, (TypeExtensions.StaticFlags & ~BindingFlags.DeclaredOnly) | BindingFlags.FlattenHierarchy))
             {
                 if (destinationType.IsAssignableFrom(sourceMethod.ReturnType))
                 {
