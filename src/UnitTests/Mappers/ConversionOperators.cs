@@ -178,7 +178,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Should_use_the_inherited_implicit_conversion_operator()
+        public void Should_use_the_inherited_explicit_conversion_operator()
         {
             var source = new InheritedFoo { Value = "Hello" };
 
