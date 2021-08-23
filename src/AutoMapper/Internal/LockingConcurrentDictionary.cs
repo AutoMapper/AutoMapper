@@ -17,7 +17,7 @@ namespace AutoMapper.Internal
         public ConcurrentDictionaryWrapper(Func<TKey, TValue> valueFactory, int capacity = 31)
         {
             _dictionary = new(Environment.ProcessorCount, capacity);
-            _valueFactory = key => valueFactory(key);
+            _valueFactory = valueFactory;
         }
         public TValue GetOrAdd(in TKey key) => _dictionary.GetOrAdd(key, _valueFactory);
     }
