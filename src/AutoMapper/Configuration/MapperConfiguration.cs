@@ -47,6 +47,14 @@ namespace AutoMapper
         /// Use if you want AutoMapper to compile all mappings up front instead of deferring expression compilation for each first map.
         /// </summary>
         void CompileMappings();
+
+        /// <summary>
+        /// Gets the projection expression which can then be fed into any expression capable data store regardless of IQueryable compatibility
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <returns>The underlying projection expression</returns>
+        Expression<Func<TSource, TDestination>> GetProjectionExpression<TSource, TDestination>();
     }
     public class MapperConfiguration : IGlobalConfiguration
     {
@@ -125,6 +133,10 @@ namespace AutoMapper
                 GetExecutionPlan(request);
             }
         }
+
+        public Expression<Func<TSource, TDestination>> GetProjectionExpression<TSource, TDestination>() =>
+            this.Internal().ProjectionBuilder.GetMapExpression<TSource, TDestination>();
+
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
