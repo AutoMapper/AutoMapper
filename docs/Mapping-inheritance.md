@@ -65,6 +65,12 @@ Assert.IsType<OnlineOrderDto>(mapped);
 
 You will notice that because the mapped object is a OnlineOrder, AutoMapper has seen you have a more specific mapping for OnlineOrder than OrderDto, and automatically chosen that.
 
+Note that this does not apply to situations where the mapping happens at configuration time, like `IncludeMembers` does. To get the runtime-mapping behavior in that case, a solution is to use `AfterMap`:
+```c#
+CreateMap<Source, Destination>()
+    .AfterMap((source, destination, context) => context.Mapper.Map(source.InnerSource, destination));
+```
+
 ## Specifying inheritance in derived classes
 
 Instead of configuring inheritance from the base class, you can specify inheritance from the derived classes:
