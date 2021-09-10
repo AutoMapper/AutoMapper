@@ -43,7 +43,7 @@ internal class YourProfile : Profile
 
 ### Default Convention
 
-The package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/) will map all values from Source type to Destination type if both enum types have the same value (or by name or by value). All Source enum values which have no Source equivalent, will throw an exception if EnumMappingValidation is enabled.
+The package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/) will map all values from Source type to Destination type if both enum types have the same value (or by name or by value). All Source enum values which have no Target equivalent, will throw an exception if EnumMappingValidation is enabled.
 
 ### ReverseMap Convention
 
