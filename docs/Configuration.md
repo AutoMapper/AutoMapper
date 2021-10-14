@@ -223,4 +223,5 @@ Compilation times increase with the size of the execution plan and that depends 
 
 You can set `MapAtRuntime` per member or `MaxExecutionPlanDepth` globally (the default is one, set it to zero).
 
-These will reduce the size of the execution plan by replacing the execution plan for a child object with a method call. This will reduce the time spent compiling, but will probably slow the mapping itself. Search the repo for more details and use a profiler to better understand the effect.
+These will reduce the size of the execution plan by replacing the execution plan for a child object with a method call. The compilation will be faster, but the mapping itself might be slower. Search the repo for more details and use a profiler to better understand the effect.
+Avoiding `PreserveReferences` and `MaxDepth` also helps.

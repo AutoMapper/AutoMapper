@@ -84,7 +84,7 @@ namespace AutoMapper.Execution
                 {
                     continue;
                 }
-                if (!inlineWasChecked && typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0)
+                if (!inlineWasChecked && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
                 {
                     memberMap.Inline = false;
                     Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {typeMap.SourceType} - {typeMap.DestinationType}");
