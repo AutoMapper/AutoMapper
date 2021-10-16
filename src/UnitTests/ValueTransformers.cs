@@ -364,5 +364,40 @@ namespace AutoMapper.UnitTests
             var dest = Mapper.Map<Dest<string>>(source);
             dest.Value.ShouldBe("value and more");
         }
+
+        public class ConstructorTransforming : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public string Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public string Value { get; }
+                public Dest(string value)
+                {
+                    Value = value;
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Dest>();
+                cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
+            });
+
+            [Fact]
+            public void Should_transform_value()
+            {
+                var source = new Source
+                {
+                    Value = "Jimmy"
+                };
+                var dest = Mapper.Map<Source, Dest>(source);
+
+                dest.Value.ShouldBe("Jimmy is straight up dope");
+            }
+        }
     }
 }

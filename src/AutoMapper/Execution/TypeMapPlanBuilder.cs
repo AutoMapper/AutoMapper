@@ -277,9 +277,9 @@ namespace AutoMapper.Execution
             var defaultValue = ctorParamMap.Parameter.IsOptional ? ctorParamMap.DefaultValue() : Default(ctorParamMap.DestinationType);
             var resolvedExpression = BuildValueResolverFunc(ctorParamMap, defaultValue);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
-            var tryMap = Block(new[] {resolvedValue},
+            var tryMap = Block(new[] { resolvedValue },
                 Assign(resolvedValue, resolvedExpression),
-                _configurationProvider.MapExpression(_typeMap.Profile, new TypePair(resolvedExpression.Type, ctorParamMap.DestinationType), resolvedValue));
+                MapMember(ctorParamMap, defaultValue, resolvedValue));
             return TryMemberMap(ctorParamMap, tryMap);
         }
         private Expression TryPropertyMap(PropertyMap propertyMap)
@@ -352,15 +352,6 @@ namespace AutoMapper.Execution
                 _propertyMapExpressions.Clear();
                 _propertyMapExpressions.Add(ifThen);
             }
-            Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
-            {
-                var typePair = memberMap.Types();
-                var mapMember = memberMap.Inline ?
-                    _configurationProvider.MapExpression(_typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
-                    ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);
-                mapMember = memberMap.ApplyTransformers(mapMember);
-                return mapMember;
-            }
             ParameterExpression SetVariables(Expression valueResolver, ParameterExpression resolvedValueVariable, Expression mappedMember)
             {
                 _propertyMapExpressions.Clear();
@@ -380,6 +371,15 @@ namespace AutoMapper.Execution
                 }
                 return mappedMemberVariable;
             }
+        }
+        Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
+        {
+            var typePair = memberMap.Types();
+            var mapMember = memberMap.Inline ?
+                _configurationProvider.MapExpression(_typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
+                ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);
+            mapMember = memberMap.ApplyTransformers(mapMember);
+            return mapMember;
         }
         private Expression BuildValueResolverFunc(MemberMap memberMap, Expression destValueExpr)
         {

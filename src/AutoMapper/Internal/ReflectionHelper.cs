@@ -5,6 +5,7 @@ using System.Reflection;
 namespace AutoMapper.Internal
 {
     using static Expression;
+    using static Execution.ExpressionBuilder;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ReflectionHelper
     {
@@ -16,7 +17,7 @@ namespace AutoMapper.Internal
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.IsDefined(typeof(TAttribute));
         public static bool CanBeSet(this MemberInfo member) => member is PropertyInfo property ? property.CanWrite : !((FieldInfo)member).IsInitOnly;
         public static Expression GetDefaultValue(this ParameterInfo parameter) =>
-            parameter is { DefaultValue: null, ParameterType: { IsValueType: true } type } ? Default(type) : Constant(parameter.DefaultValue);
+            parameter is { DefaultValue: null, ParameterType: { IsValueType: true } type } ? Default(type) : ToType(Constant(parameter.DefaultValue), parameter.ParameterType);
         public static object MapMember(this ResolutionContext context, MemberInfo member, object source, object destination = null)
         {
             var memberType = GetMemberType(member);
