@@ -74,7 +74,7 @@ namespace AutoMapper.Execution
                 CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.GetAsPair()), typeMapsPath);
                 return;
             }
-            var inlineWasChecked = typeMap.WasInlineChecked;
+            var wasInlineChecked = typeMap.WasInlineChecked;
             typeMap.WasInlineChecked = true;
             typeMapsPath.Add(typeMap);
             foreach (var memberMap in MemberMaps())
@@ -84,10 +84,10 @@ namespace AutoMapper.Execution
                 {
                     continue;
                 }
-                if (!inlineWasChecked && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
+                if (!wasInlineChecked && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
                 {
                     memberMap.Inline = false;
-                    Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {typeMap.SourceType} - {typeMap.DestinationType}");
+                    TraceInline(typeMap, memberMap);
                 }
                 if (memberTypeMap.PreserveReferences || memberTypeMap.MapExpression != null)
                 {
@@ -105,11 +105,16 @@ namespace AutoMapper.Execution
                         return;
                     }
                     memberTypeMap.PreserveReferences = true;
-                    Trace(typeMap, memberTypeMap);
+                    if (!wasInlineChecked)
+                    {
+                        memberMap.Inline = false;
+                        TraceInline(typeMap, memberMap);
+                    }
+                    Trace(typeMap, memberTypeMap, memberMap);
                     foreach (var derivedTypeMap in configurationProvider.GetIncludedTypeMaps(memberTypeMap))
                     {
                         derivedTypeMap.PreserveReferences = true;
-                        Trace(typeMap, derivedTypeMap);
+                        Trace(typeMap, derivedTypeMap, memberMap);
                     }
                 }
                 CheckForCycles(configurationProvider, memberTypeMap, typeMapsPath);
@@ -139,8 +144,11 @@ namespace AutoMapper.Execution
                 return configurationProvider.ResolveAssociatedTypeMap(types);
             }
             [Conditional("DEBUG")]
-            static void Trace(TypeMap typeMap, TypeMap memberTypeMap) =>
-                Debug.WriteLine($"Setting PreserveReferences: {typeMap.SourceType} - {typeMap.DestinationType} => {memberTypeMap.SourceType} - {memberTypeMap.DestinationType}");
+            static void Trace(TypeMap typeMap, TypeMap memberTypeMap, MemberMap memberMap) =>
+                Debug.WriteLine($"Setting PreserveReferences: {memberMap.DestinationName} {typeMap.SourceType} - {typeMap.DestinationType} => {memberTypeMap.SourceType} - {memberTypeMap.DestinationType}");
+            [Conditional("DEBUG")]
+            static void TraceInline(TypeMap typeMap, MemberMap memberMap) =>
+                Debug.WriteLine($"Resetting Inline: {memberMap.DestinationName} in {typeMap.SourceType} - {typeMap.DestinationType}");
         }
         private Expression CreateDestinationFunc()
         {

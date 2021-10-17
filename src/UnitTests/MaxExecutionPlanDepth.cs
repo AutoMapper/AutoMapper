@@ -210,4 +210,18 @@ namespace AutoMapper.UnitTests
             map.PropertyMaps.First().Inline.ShouldBeFalse();
         }
     }
+    public class InlineWithoutPreserveReferences : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public Source Inner { get; set; }
+        }
+        class Destination
+        {
+            public Destination Inner { get; set; }
+        }
+        protected override MapperConfiguration Configuration => new(cfg => cfg.CreateMap<Source, Destination>());
+        [Fact]
+        public void Should_set_inline_accordingly() => FindTypeMapFor<Source, Destination>().PropertyMaps.First().Inline.ShouldBeFalse();
+    }
 }
