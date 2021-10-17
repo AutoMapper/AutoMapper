@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using Shouldly;
+using System.Linq;
 
 namespace AutoMapper.UnitTests.ValueTypes
 {
@@ -39,6 +40,49 @@ namespace AutoMapper.UnitTests.ValueTypes
             var source = new Source { Value = innerSource };
             innerSource.Parent = source;
             Mapper.Map<Destination>(source);
+        }
+    }
+
+    public class When_value_types_are_the_source_of_map_cycles_with_PreserveReferences : AutoMapperSpecBase
+    {
+        public struct Source
+        {
+            public InnerSource Value { get; set; }
+        }
+
+        public class InnerSource
+        {
+            public Source Parent { get; set; }
+            public InnerSource Inner { get; set; }
+        }
+
+        public struct Destination
+        {
+            public InnerDestination Value { get; set; }
+        }
+
+        public class InnerDestination
+        {
+            public Destination Parent { get; set; }
+            public InnerDestination Inner { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().MaxDepth(2);
+            cfg.CreateMap<InnerSource, InnerDestination>();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            var innerSource = new InnerSource();
+            var source = new Source { Value = innerSource };
+            innerSource.Parent = source;
+            innerSource.Inner = innerSource;
+            var destinationValue = Mapper.Map<Destination>(source).Value;
+            destinationValue.Inner.ShouldBe(destinationValue);
+            FindTypeMapFor<InnerSource, InnerDestination>().MemberMaps.Single(m => m.DestinationName == nameof(InnerDestination.Inner)).Inline.ShouldBeFalse();
         }
     }
 

@@ -101,8 +101,7 @@ namespace AutoMapper.Execution
                         {
                             memberTypeMap.MaxDepth = 10;
                         }
-                        typeMapsPath.Remove(typeMap);
-                        return;
+                        continue;
                     }
                     memberTypeMap.PreserveReferences = true;
                     if (!wasInlineChecked)
