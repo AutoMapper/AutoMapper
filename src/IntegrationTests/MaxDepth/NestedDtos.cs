@@ -71,7 +71,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Sem, SemDto>().MaxDepth(1).ConstructUsing(s => new SemDto());
             cfg.CreateProjection<Art, ArtDto>().MaxDepth(1).ConstructUsing(s => new ArtDto());

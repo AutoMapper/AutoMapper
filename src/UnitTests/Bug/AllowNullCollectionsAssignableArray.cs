@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests.Bug
             public string[] ArrayOfItems { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AllowNullCollections = false;
             cfg.CreateMap<Source, Destination>();

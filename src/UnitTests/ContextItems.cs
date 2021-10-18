@@ -56,7 +56,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value, opt => opt.MapFrom((src, d, member, ctxt) => { ctxt.Items["Item"] = 2; return -1; }));
@@ -156,7 +156,7 @@ namespace AutoMapper.UnitTests
                 public Door Door { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<FromGarage, ToGarage>()
                     .ForMember(dest => dest.ToCars, opts => opts.MapFrom((src, dest, destVal, ctx) =>

@@ -23,14 +23,14 @@ namespace AutoMapper.UnitTests.Bug
             {
                 public int InnerSourceValue { get; set; }
             }
-            protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+            protected override MapperConfiguration CreateConfiguration() => new(c =>
             {
                 var mappers = c.Internal().DefaultMemberConfig.MemberMappers;
                 mappers.Remove(mappers.OfType<NameSplitMember>().Single());
                 c.CreateMap<Source, Destination>();
             });
             [Fact]
-            public void Should_not_validate() => Should.Throw<AutoMapperConfigurationException>(() => Configuration.AssertConfigurationIsValid())
+            public void Should_not_validate() => Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid)
                 .Errors.Single().UnmappedPropertyNames.Single().ShouldBe(nameof(Destination.InnerSourceValue));
         }
         public class ExactMatchNamingConvention : NonValidatingSpecBase
@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests.Bug
                 public string Name { get; set; }
                 public string COMPANY_Name { get; set; }
             }
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg=>
             {
                 cfg.DestinationMemberNamingConvention = new AutoMapper.ExactMatchNamingConvention();
                 cfg.CreateMap<Source, Destination>();
@@ -82,7 +82,7 @@ namespace AutoMapper.UnitTests.Bug
             private Dario _dario;
             private Neda _neda;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProfile("MyMapperProfile", prf =>
                 {

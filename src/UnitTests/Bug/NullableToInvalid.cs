@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
         {
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_not_validate()
         {
-            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
+            new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
         }
     }
 }

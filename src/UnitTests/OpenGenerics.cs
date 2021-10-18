@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
         public struct Id<T>
         {
         }
-        protected override MapperConfiguration Configuration { get; } = new(mapper => mapper.CreateMap(typeof(Id<>), typeof(long)).ConvertUsing((_,__)=>(long)42));
+        protected override MapperConfiguration CreateConfiguration() => new(mapper => mapper.CreateMap(typeof(Id<>), typeof(long)).ConvertUsing((_,__)=>(long)42));
         [Fact]
         public void Should_work() => Map<long>(new Id<string>()).ShouldBe(42);
     }
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests
         public class Bar<T> : BarBase<T>
         {
         }
-        protected override MapperConfiguration Configuration { get; } = new(mapper => mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1")));
+        protected override MapperConfiguration CreateConfiguration() => new(mapper => mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1")));
         [Fact]
         public void Can_map_base_members() => Map<Bar<int>>(new Foo<int> { Value1 = 5 }).Value2.ShouldBe(5);
     }
@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
         class NonGenericDestination : Destination<string>
         {
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source), typeof(Destination<>)).As(typeof(NonGenericDestination));
             cfg.CreateMap(typeof(Source), typeof(NonGenericDestination));
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests
         {
             public T Value;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source<>), typeof(Destination<string>));
             cfg.CreateMap(typeof(Source<>), typeof(Destination<>)).ForAllMembers(o=>o.Ignore());
@@ -87,7 +87,7 @@ namespace AutoMapper.UnitTests
         {
             public T Value;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>cfg.CreateMap(typeof(Source<>), typeof(Destination<>)));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>cfg.CreateMap(typeof(Source<>), typeof(Destination<>)));
         [Fact]
         public void Should_work() => new Action(() => Mapper.Map(new Source<int>(), null, typeof(Destination<>)))
             .ShouldThrow<ArgumentException>().Message.ShouldStartWith($"Type {typeof(Destination<>).FullName}[T] is a generic type definition");
@@ -102,7 +102,7 @@ namespace AutoMapper.UnitTests
         {
             public string Value;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
             cfg.CreateMap(typeof(Source<>), typeof(Destination)).ForMember("Value", o => o.MapFrom(typeof(ValueResolver<>))));
         class ValueResolver<T> : IValueResolver<Source<T>, Destination, object>
         {
@@ -139,7 +139,7 @@ namespace AutoMapper.UnitTests
             public IEnumerable<T> MyValues;
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Destination))
                 .ForMember("MyKey", o => o.MapFrom(typeof(KeyResolver<>)))
@@ -236,7 +236,7 @@ namespace AutoMapper.UnitTests
             public TKey MyKey;
             public TValue MyValue;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(KeyValuePair<,>), typeof(Destination))
                 .ForMember("MyKey", o => o.MapFrom(typeof(Resolver<>), "Key"))
@@ -305,7 +305,7 @@ namespace AutoMapper.UnitTests
             public DestinationTree<T>[] Children { get; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap(typeof(SourceTree<>), typeof(DestinationTree<>)));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap(typeof(SourceTree<>), typeof(DestinationTree<>)));
 
         [Fact]
         public void Should_work()
@@ -328,7 +328,7 @@ namespace AutoMapper.UnitTests
             public T Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
 
         [Fact]
         public void Should_report_unmapped_property()
@@ -360,7 +360,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
 
         [Fact]
         public void Should_report_unmapped_property() =>
@@ -389,7 +389,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
     }
 
     public class OpenGenerics
@@ -469,7 +469,7 @@ namespace AutoMapper.UnitTests
             public int D { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapper => {
+        protected override MapperConfiguration CreateConfiguration() => new(mapper => {
             mapper.CreateMap(typeof(Foo<>), typeof(Bar<>))
             .ForMember("C", to => to.MapFrom("A"))
             .ForMember("D", to => to.MapFrom("B"));
@@ -503,7 +503,7 @@ namespace AutoMapper.UnitTests
             public T Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapper => {
+        protected override MapperConfiguration CreateConfiguration() => new(mapper => {
             mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1"));
         });
 
@@ -527,7 +527,7 @@ namespace AutoMapper.UnitTests
             public T Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapper => {
+        protected override MapperConfiguration CreateConfiguration() => new(mapper => {
             mapper.CreateMap(typeof(Foo<>), typeof(Bar<>)).ForMember("Value2", to => to.MapFrom("Value1"));
         });
 

@@ -53,21 +53,15 @@ namespace AutoMapper.UnitTests
                 _destination.Two.ShouldBe("first");
             }
 
-            protected override MapperConfiguration Configuration
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
-                get
-                {
-                    return new MapperConfiguration(cfg =>
-                    {
-                        cfg.CreateMap<Source, Destination>()
-                         .Include<SourceChild, Destination>()
-                         .ForMember(dest => dest.One, opt => opt.SetMappingOrder(600))
-                         .ForMember(dest => dest.Two, opt => opt.SetMappingOrder(-500));
+                cfg.CreateMap<Source, Destination>()
+                    .Include<SourceChild, Destination>()
+                    .ForMember(dest => dest.One, opt => opt.SetMappingOrder(600))
+                    .ForMember(dest => dest.Two, opt => opt.SetMappingOrder(-500));
 
-                        cfg.CreateMap<SourceChild, Destination>();
-                    });
-                }
-            }
+                cfg.CreateMap<SourceChild, Destination>();
+            });
         }
 
         public class When_specifying_a_mapping_order_for_source_members : AutoMapperSpecBase
@@ -102,7 +96,7 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(src => src.Value1, opt => opt.SetMappingOrder(2))

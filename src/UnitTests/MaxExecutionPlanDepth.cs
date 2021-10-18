@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.Internal().MaxExecutionPlanDepth = 2;
             cfg.CreateMap<Source, Destination>();
@@ -180,7 +180,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.Internal().MaxExecutionPlanDepth = 0;
             cfg.CreateMap<Source, Destination>().PreserveReferences();
@@ -220,7 +220,7 @@ namespace AutoMapper.UnitTests
         {
             public Destination Inner { get; set; }
         }
-        protected override MapperConfiguration Configuration => new(cfg => cfg.CreateMap<Source, Destination>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Destination>());
         [Fact]
         public void Should_set_inline_accordingly() => FindTypeMapFor<Source, Destination>().PropertyMaps.First().Inline.ShouldBeFalse();
     }

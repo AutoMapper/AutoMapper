@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -86,7 +86,7 @@ namespace AutoMapper.UnitTests.Mappers
             public string Bar { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -135,7 +135,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -156,7 +156,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -177,7 +177,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _source;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -198,7 +198,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -245,7 +245,7 @@ namespace AutoMapper.UnitTests.Mappers
             public int A { get { return _a - 30; } }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<SomeBase, SomeBase>());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<SomeBase, SomeBase>());
 
         [Fact]
         public void Should_map_ok()
@@ -321,7 +321,7 @@ namespace AutoMapper.UnitTests.Mappers
             public int A { get { return _a - 30; } }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<SomeBase, SomeBase>());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<SomeBase, SomeBase>());
 
         [Fact]
         public void Should_throw()

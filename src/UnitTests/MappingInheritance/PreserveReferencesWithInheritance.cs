@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
     {
         List<Target.Member> _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Source.Instance, Target.Instance>()
               .Include<Source.Class, Target.Class>()

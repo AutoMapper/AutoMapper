@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.ValueTypes
             public Destination Parent { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Source, Destination>().MaxDepth(2);
             cfg.CreateMap<InnerSource, InnerDestination>();
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.ValueTypes
             public InnerDestination Inner { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().MaxDepth(2);
             cfg.CreateMap<InnerSource, InnerDestination>();
@@ -102,7 +102,7 @@ namespace AutoMapper.UnitTests.ValueTypes
             public string Value2;
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
 
@@ -141,7 +141,7 @@ namespace AutoMapper.UnitTests.ValueTypes
             public ushort Reg2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
+        protected override MapperConfiguration CreateConfiguration() => new(
             cfg => cfg.CreateMap<matrixDigiInStruct1, DigiIn1>()
                 .ForMember(d => d.CncInfo, x => x.MapFrom(s => s.CNCinfo)));
 
@@ -179,7 +179,7 @@ namespace AutoMapper.UnitTests.ValueTypes
             public int? Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
             cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) Convert.ToInt32(s));

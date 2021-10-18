@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForMember(d => d.Child, o => o.MapAtRuntime());
         });
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
 
@@ -111,7 +111,7 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>(MemberList.Source)
                 .ForMember(d => d.Child, opt => opt.UseDestinationValue());
@@ -183,7 +183,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<ChildSource, ChildDestination>();
@@ -230,7 +230,7 @@ namespace AutoMapper.UnitTests
             Three
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
 
         protected override void Because_of()

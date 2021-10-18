@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Mappers
                 public IReadOnlyCollection<int> Values { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+            protected override MapperConfiguration CreateConfiguration() => new(config =>
             {
                 config.CreateMap<Source, Destination>();
             });
@@ -59,7 +59,7 @@ namespace AutoMapper.UnitTests.Mappers
                 public ReadOnlyCollection<int> Values { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+            protected override MapperConfiguration CreateConfiguration() => new(config =>
             {
                 config.CreateMap<Source, Destination>();
             });
@@ -96,7 +96,7 @@ namespace AutoMapper.UnitTests.Mappers
                 public IReadOnlyList<int> Values { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+            protected override MapperConfiguration CreateConfiguration() => new(config =>
             {
                 config.CreateMap<Source, Destination>();
             });

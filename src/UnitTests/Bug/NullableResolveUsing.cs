@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Bug
             public decimal? OddNumber { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForMember(d => d.OddNumber, o => o.MapFrom(s => s.Number));
         });

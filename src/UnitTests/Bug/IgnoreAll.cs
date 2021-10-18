@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Unmapped { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcVal, destVal, c) => srcVal != null));

@@ -32,7 +32,7 @@
         {
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())

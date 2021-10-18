@@ -81,7 +81,7 @@ namespace AutoMapper.UnitTests.Bug
             public K? SelectedID { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrganizationDTO, Organization>().ForMember(d=>d.BranchCollection, o=>o.UseDestinationValue());
             cfg.CreateMap<BranchDTO, Branch>();
@@ -174,7 +174,7 @@ namespace AutoMapper.UnitTests.Bug
             public K? SelectedID { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrganizationDTO, Organization>();
             cfg.CreateMap<BranchDTO, Branch>();

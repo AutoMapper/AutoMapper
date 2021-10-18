@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
@@ -147,7 +147,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<int>(dest => dest * 2);
                 cfg.CreateProfile("Other", p =>
@@ -182,7 +182,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
@@ -218,7 +218,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
@@ -263,7 +263,7 @@ namespace AutoMapper.UnitTests
         {
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceBase, DestBase>().Include<Source, Dest>().AddTransform<string>(dest => dest + " was cool");
             cfg.CreateMap<Source, Dest>().AddTransform<string>(dest => dest + " and now is straight up dope");
@@ -302,7 +302,7 @@ namespace AutoMapper.UnitTests
         {
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceBase, DestBase>().Include<Source, Dest>().ForMember(d => d.Value, o => o.AddTransform(dest => dest + " was cool"));
             cfg.CreateMap<Source, Dest>().ForMember(d=>d.Value, o=>o.AddTransform(dest => dest + " and now is straight up dope"));
@@ -334,7 +334,7 @@ namespace AutoMapper.UnitTests
             public int? NotNull { get; set; }
             public int? Null { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => 
             cfg.CreateMap<Source, Dest>().AddTransform<int>(source=>source+1).AddTransform<int?>(source => source == null ? null : source + 2));
         [Fact]
         public void Should_transform_value()
@@ -355,7 +355,7 @@ namespace AutoMapper.UnitTests
         {
             public T Value { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
                 cfg.CreateMap(typeof(Source), typeof(Dest<>)).ForMember("Value", opt => opt.AddTransform(d => d + " and more")));
         [Fact]
         public void ShouldMatchMemberType()
@@ -381,7 +381,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");

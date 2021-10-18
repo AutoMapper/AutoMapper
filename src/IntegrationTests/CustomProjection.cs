@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.Projection
                 base.Seed(testContext);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(x => {
+        protected override MapperConfiguration CreateConfiguration() => new(x => {
             x.CreateProjection<string, string>().ConvertUsing(s => _niceGreeting);
             x.CreateProjection<Source, Target>();
             x.CreateProjection<SourceChild, TargetChild>();
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Projection
             }
         }
         const string _niceGreeting = "Hello";
-        protected override MapperConfiguration Configuration => new MapperConfiguration(x =>
+        protected override MapperConfiguration CreateConfiguration() => new(x =>
         {
             x.CreateProjection<Source, Target>().ConvertUsing(s => new Target { Greeting = _niceGreeting });
             x.CreateProjection<SourceChild, TargetChild>();
@@ -128,7 +128,7 @@ namespace AutoMapper.UnitTests.Projection
             }
         }
         const string _niceGreeting = "Hello";
-        protected override MapperConfiguration Configuration => new MapperConfiguration(x =>
+        protected override MapperConfiguration CreateConfiguration() => new(x =>
         {
             x.CreateProjection<Source, Target>();
             x.CreateProjection<SourceChild, TargetChild>().ConvertUsing(s => new TargetChild { Greeting = _niceGreeting });

@@ -7,7 +7,7 @@ namespace AutoMapper.UnitTests
 {
     public class ReadonlyCollectionPropertiesOverride : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceBase, DestinationBase>()
                 .Include<Source, Destination>()
@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
     }
     public class ReadonlyCollectionProperties : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<DomainModelBase, ModelBase>()
                 .ForMember(d => d.CodeList, o => o.MapFrom(s => s.CodeList))

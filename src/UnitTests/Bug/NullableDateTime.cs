@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.Bug
             public DateTime? Foo { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(m => m.Foo, opt =>
@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Bug
             public DateTime HiredDate { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForMember(d => d.FiredDate, o => o.MapFrom(s => s.HiredDate.Date));
         });
@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests.Bug
             public DateTime Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<DateTime, DateTime?>()

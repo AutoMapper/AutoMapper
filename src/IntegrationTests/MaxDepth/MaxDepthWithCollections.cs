@@ -13,7 +13,7 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         TrainingCourseDto _course;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             //cfg.AllowNullDestinationValues = false;
             cfg.CreateProjection<TrainingCourse, TrainingCourseDto>().MaxDepth(1);

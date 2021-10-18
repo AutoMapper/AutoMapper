@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests.Mappers
     using static TypeDescriptor;
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.Internal().Mappers.Add(new TypeConverterMapper()));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.Internal().Mappers.Add(new TypeConverterMapper()));
 #if NET461
         public When_specifying_mapping_with_the_BCL_type_converter_class()
         {
@@ -55,21 +55,14 @@ namespace AutoMapper.UnitTests.Mappers
             }
         }
     }
-    public class When_adding_a_custom_mapper : NonValidatingSpecBase
+    public class When_adding_a_custom_mapper : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
             cfg.Internal().Mappers.Add(new TestObjectMapper());
         });
-
-        [Fact]
-        public void Should_have_valid_configuration()
-        {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
-        }
-
 
         public class TestObjectMapper : IObjectMapper
         {
@@ -118,7 +111,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         ClassB _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
@@ -203,7 +196,7 @@ namespace AutoMapper.UnitTests.Mappers
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.Internal().Mappers.Insert(0, new EnumMapper());

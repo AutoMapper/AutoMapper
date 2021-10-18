@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Bug
             public decimal? Number { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Bug
             public decimal? Number { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });

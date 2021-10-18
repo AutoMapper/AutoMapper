@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         public class CDto : BDto { }
         public class DDto : ADto { }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<A, ADto>()
                 .ForMember(d => d.Value, opt => opt.MapFrom(src => 5))

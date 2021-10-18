@@ -55,7 +55,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Customer, CustomerViewModel>()
                 .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.LastName != null ? src : null))
@@ -121,7 +121,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Customer, CustomerViewModel>()
                 .ForMember(dst => dst.Name, opt => opt.MapFrom(src => src.LastName != null ? src.LastName : null))
@@ -143,7 +143,7 @@ namespace AutoMapper.IntegrationTests
     }
     public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
@@ -259,7 +259,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o =>
@@ -353,7 +353,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
@@ -447,7 +447,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQueryWithInnerObject : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<ProductArticle, ProductArticleModel>();
             cfg.CreateProjection<Product, ProductModel>()
@@ -547,7 +547,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<ProductArticle, ProductArticleModel>();
             cfg.CreateProjection<Product, ProductModel>()
@@ -652,7 +652,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidatingSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<ProductArticle, ProductArticleModel>();
             cfg.CreateProjection<Product, ProductModel>()
@@ -854,7 +854,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<CableEnd, CableEndModel>().ForMember(dest => dest.DataHallId, opt => opt.MapFrom(src => src.Rack.DataHall.DataCentreId));
             cfg.CreateProjection<Cable, CableListModel>()
@@ -877,7 +877,7 @@ namespace AutoMapper.IntegrationTests
 
     public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Owner, OwnerDto>();
             cfg.CreateProjection<Brand, BrandDto>()

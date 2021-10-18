@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             public string SpecificProperty { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SpecificDomain, Dto>();
             cfg.CreateMap<BaseDomain, Dto>()
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.Bug
             public string SpecificProperty { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<BaseDomain, Dto>()
                 .ForMember(d => d.SpecificProperty, m => m.Ignore())
@@ -90,7 +90,7 @@ namespace AutoMapper.UnitTests.Bug
         {
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(BaseUserDto<>), typeof(BaseUserEntity<>)).ForMember("Id", opt => opt.Ignore());
             cfg.CreateMap(typeof(ConcreteUserDto), typeof(ConcreteUserEntity)).IncludeBase(typeof(BaseUserDto<string>), typeof(BaseUserEntity<string>));

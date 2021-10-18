@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
         }
 
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Address, AddressDTO>();
             cfg.CreateMap<Customer, CustomerDTO>();
@@ -133,7 +133,7 @@ namespace AutoMapper.UnitTests
             public int? ParentDataInteger { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -184,7 +184,7 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderModel, OrderDTO>();
             cfg.CreateMap<CurrencyModel, CurrencyDTO>();
@@ -229,9 +229,9 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
             public string AddressCity { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source).ForMember(d=>d.Id, o=>o.MapFrom(s=>s.AnotherId)));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source).ForMember(d=>d.Id, o=>o.MapFrom(s=>s.AnotherId)));
         [Fact]
         public void Should_validate() =>
-            new Action(() => Configuration.AssertConfigurationIsValid()).ShouldThrowException<AutoMapperConfigurationException>(ex => ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Address.Id)));
+            new Action(AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex => ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Address.Id)));
     }
 }

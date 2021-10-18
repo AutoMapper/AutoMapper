@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Source, Destination>();
             c.CreateMap<DateTimeOffset?, DateTime?>().ConvertUsing<NullableDateTimeOffsetConverter>();
@@ -122,7 +122,7 @@ namespace AutoMapper.UnitTests.Bug
         }
     
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<int, bool>().ConvertUsing<IntToBoolConverter>();
             cfg.CreateMap<bool, int>().ConvertUsing<BoolToIntConverter>();

@@ -21,7 +21,7 @@
             public string NotifyEmail { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Model, Entity>()
                             .ForMember(e => e.ClientIPAddress, opts => opts.NullSubstitute(""))

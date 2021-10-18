@@ -69,7 +69,7 @@ namespace AutoMapper.IntegrationTests
             public IEnumerable<int> ItemCodes { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProjection<Customer, CustomerViewModel>();
                 cfg.CreateProjection<Item, ItemModel>();

@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests
         {
             public int? MyProperty { get; set; }
         }
-        protected override MapperConfiguration Configuration => new(c => c.CreateMap<Source, Destination>());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
         [Fact]
         public void Should_work() => Map<Destination>(new Source { MyProperty = 42 }).MyProperty.Value.ShouldBe(42);
     }

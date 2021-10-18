@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ClearPrefixes();
             cfg.CreateMap<Source, Destination>();
@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_not_map_with_default_postfix()
         {
-            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
+            new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
         }
     }
 }

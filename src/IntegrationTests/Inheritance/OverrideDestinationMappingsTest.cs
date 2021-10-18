@@ -51,7 +51,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Entity, Model>();
 

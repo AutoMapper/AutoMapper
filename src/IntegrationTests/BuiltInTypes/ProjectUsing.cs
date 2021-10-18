@@ -62,7 +62,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
             public DbSet<MyTable> MyTable { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
 
         [Fact]
         public void Should_project_ok()
@@ -122,7 +122,7 @@ namespace AutoMapper.IntegrationTests.Net4
             public DbSet<Children> Children { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Parent, ParentVM>();
             cfg.CreateProjection<Children, int>()

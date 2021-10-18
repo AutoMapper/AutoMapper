@@ -45,7 +45,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -98,7 +98,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -131,7 +131,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProjection<Source, Dest>();
                 cfg.ValueTransformers.Add<string>(dest => dest + " is straight up dope");
@@ -205,7 +205,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     base.Seed(context);
                 }
             }
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
@@ -261,7 +261,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     base.Seed(context);
                 }
             }
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<int>(dest => dest * 2);
                 cfg.CreateProfile("Other", p =>
@@ -318,7 +318,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
@@ -375,7 +375,7 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     base.Seed(context);
                 }
             }
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ValueTransformers.Add<string>(dest => dest + "! No joke!");
                 cfg.CreateProfile("Other", p =>
