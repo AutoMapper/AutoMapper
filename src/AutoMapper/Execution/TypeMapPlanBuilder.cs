@@ -74,8 +74,6 @@ namespace AutoMapper.Execution
                 CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.GetAsPair()), typeMapsPath);
                 return;
             }
-            var wasInlineChecked = typeMap.WasInlineChecked;
-            typeMap.WasInlineChecked = true;
             typeMapsPath.Add(typeMap);
             foreach (var memberMap in MemberMaps())
             {
@@ -84,7 +82,7 @@ namespace AutoMapper.Execution
                 {
                     continue;
                 }
-                if (!wasInlineChecked && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
+                if (memberMap.Inline && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
                 {
                     memberMap.Inline = false;
                     TraceInline(typeMap, memberMap);
@@ -104,7 +102,7 @@ namespace AutoMapper.Execution
                         continue;
                     }
                     memberTypeMap.PreserveReferences = true;
-                    if (!wasInlineChecked)
+                    if (memberMap.Inline)
                     {
                         memberMap.Inline = false;
                         TraceInline(typeMap, memberMap);

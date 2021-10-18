@@ -116,7 +116,6 @@ namespace AutoMapper
             }
         }
         public bool? IsValid { get; set; }
-        internal bool WasInlineChecked { get; set; }
         public bool AsProxy { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation

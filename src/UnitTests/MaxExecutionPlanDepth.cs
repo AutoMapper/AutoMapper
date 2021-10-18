@@ -101,11 +101,13 @@ namespace AutoMapper.UnitTests
             map = FindTypeMapFor<Source2, Destination2>();
             map.PropertyMaps.First().Inline.ShouldBeFalse();
             map = FindTypeMapFor<Source3, Destination3>();
-            map.PropertyMaps.First().Inline.ShouldBeTrue();
+            map.PropertyMaps.First().Inline.ShouldBeFalse();
             map = FindTypeMapFor<Source4, Destination4>();
-            map.PropertyMaps.First().Inline.ShouldBeTrue();
+            map.PropertyMaps.First().Inline.ShouldBeFalse();
             map = FindTypeMapFor<Source5, Destination5>();
             map.PropertyMaps.First().Inline.ShouldBeFalse();
+            map = FindTypeMapFor<Source6, Destination6>();
+            map.PropertyMaps.First().Inline.ShouldBeTrue();
         }
     }
     public class MaxExecutionPlanDepthWithPreserveReferences : AutoMapperSpecBase
