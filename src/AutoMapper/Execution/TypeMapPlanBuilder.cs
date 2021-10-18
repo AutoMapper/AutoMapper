@@ -82,7 +82,7 @@ namespace AutoMapper.Execution
                 {
                     continue;
                 }
-                if (memberMap.Inline && (memberTypeMap.PreserveReferences || typeMapsPath.Count % configurationProvider.MaxExecutionPlanDepth == 0))
+                if (memberMap.Inline && (memberTypeMap.PreserveReferences || typeMapsPath.Count == configurationProvider.MaxExecutionPlanDepth))
                 {
                     memberMap.Inline = false;
                     TraceInline(typeMap, memberMap);
@@ -102,12 +102,12 @@ namespace AutoMapper.Execution
                         continue;
                     }
                     memberTypeMap.PreserveReferences = true;
+                    Trace(typeMap, memberTypeMap, memberMap);
                     if (memberMap.Inline)
                     {
                         memberMap.Inline = false;
                         TraceInline(typeMap, memberMap);
                     }
-                    Trace(typeMap, memberTypeMap, memberMap);
                     foreach (var derivedTypeMap in configurationProvider.GetIncludedTypeMaps(memberTypeMap))
                     {
                         derivedTypeMap.PreserveReferences = true;
