@@ -1,9 +1,10 @@
-﻿using Shouldly;
+﻿using AutoMapper.UnitTests;
+using Shouldly;
 using System.Linq;
 using Xunit;
-namespace AutoMapper.UnitTests.Projection
+namespace AutoMapper.IntegrationTests
 {
-    public class ConversionOperatorTests : AutoMapperSpecBase
+    public class ProjectionConversionTests : AutoMapperSpecBase
     {
         class Source
         {
@@ -46,8 +47,8 @@ namespace AutoMapper.UnitTests.Projection
         {
             config.CreateMap<Source, Destination>();
             config.CreateMap<NullableSource, NullableDestination>();
-            config.CreateMap<SourceValue, DestinationValue>().ConvertUsing(src => src);
-            config.CreateMap<SourceValue?, DestinationValue?>().ConvertUsing(src => src);
+            //config.CreateMap<SourceValue, DestinationValue>().ConvertUsing(src => src);
+            //config.CreateMap<SourceValue?, DestinationValue?>().ConvertUsing(src => src);
         });
         
         [Fact]
