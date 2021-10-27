@@ -21,7 +21,7 @@ namespace AutoMapper.Features
     public class Features<TFeature> : IReadOnlyCollection<TFeature>
     {
         private IDictionary<Type, TFeature> _features;
-        public int Count => _features == null ? 0 : _features.Count;
+        public int Count => _features?.Count ?? 0;
         /// <summary>
         /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
         /// </summary>

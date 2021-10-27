@@ -10,11 +10,11 @@ namespace AutoMapper.Internal.Mappers
     using static ExpressionBuilder;
     public class FromStringDictionaryMapper : IObjectMapper
     {
-        private static readonly MethodInfo MapDynamicMehod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
+        private static readonly MethodInfo MapDynamicMethod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
         public bool IsMatch(in TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap,
             Expression sourceExpression, Expression destExpression) =>
-                Call(MapDynamicMehod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
+                Call(MapDynamicMethod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
         struct Match
         {
             public object Value;
