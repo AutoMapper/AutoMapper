@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests
 {
     public class MapAtRuntime : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Entity1, EntityDTO1>().ReverseMap();
             cfg.CreateMap<Entity2, EntityDTO2>().ReverseMap();

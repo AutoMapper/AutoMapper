@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security;
+﻿using System.Collections.Generic;
 using Benchmark.Flattening;
-
-[assembly: AllowPartiallyTrustedCallers]
-//[assembly: SecurityTransparent]
-//[assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
 
 namespace Benchmark
 {

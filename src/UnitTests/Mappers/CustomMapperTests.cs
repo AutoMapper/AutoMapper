@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests.Mappers
     using static TypeDescriptor;
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.Internal().Mappers.Add(new TypeConverterMapper()));
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.Internal().Mappers.Add(new TypeConverterMapper()));
 #if NET461
         public When_specifying_mapping_with_the_BCL_type_converter_class()
         {
@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Mappers
         public void Should_convert_to_type_using_the_custom_type_converter() => Mapper.Map<Destination, Source>(new Destination{ OtherValue = 15 }).Value.ShouldBe(5);
         public class TypeConverterMapper : ObjectMapper<object, object>
         {
-            public override bool IsMatch(in TypePair context) =>
+            public override bool IsMatch(TypePair context) =>
                 GetConverter(context.SourceType).CanConvertTo(context.DestinationType) || GetConverter(context.DestinationType).CanConvertFrom(context.SourceType);
             public override object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context)
             {
@@ -55,21 +55,14 @@ namespace AutoMapper.UnitTests.Mappers
             }
         }
     }
-    public class When_adding_a_custom_mapper : NonValidatingSpecBase
+    public class When_adding_a_custom_mapper : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
             cfg.Internal().Mappers.Add(new TestObjectMapper());
         });
-
-        [Fact]
-        public void Should_have_valid_configuration()
-        {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
-        }
-
 
         public class TestObjectMapper : IObjectMapper
         {
@@ -78,7 +71,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return new DestinationType();
             }
 
-            public bool IsMatch(in TypePair context)
+            public bool IsMatch(TypePair context)
             {
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
@@ -118,7 +111,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         ClassB _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
@@ -189,7 +182,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         class EnumMapper : ObjectMapper<object, string>
         {
-            public override bool IsMatch(in TypePair types)
+            public override bool IsMatch(TypePair types)
             {
                 var underlyingType = Nullable.GetUnderlyingType(types.SourceType) ?? types.SourceType;
                 return underlyingType.IsEnum && types.DestinationType == typeof(string);
@@ -203,7 +196,7 @@ namespace AutoMapper.UnitTests.Mappers
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.Internal().Mappers.Insert(0, new EnumMapper());

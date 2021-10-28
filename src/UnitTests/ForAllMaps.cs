@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<Source1, Destination1>();
@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests.Bug
             public int First { get; }
             public int Second { get; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.ForAllMaps((_, c) => c.ForCtorParam("second", o => o.MapFrom(s => 2)));
             cfg.CreateMap<Source, Destination>().ForCtorParam("first", o => o.MapFrom(s => 1));

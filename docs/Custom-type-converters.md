@@ -86,7 +86,3 @@ public class TypeTypeConverter : ITypeConverter<string, Type>
 In the first mapping, from string to Int32, we simply use the built-in Convert.ToInt32 function (supplied as a method group).  The next two use custom ITypeConverter implementations.
 
 The real power of custom type converters is that they are used any time AutoMapper finds the source/destination pairs on any mapped types.  We can build a set of custom type converters, on top of which other mapping configurations use, without needing any extra configuration.  In the above example, we never have to specify the string/int conversion again.  Where as [Custom Value Resolvers](Custom-value-resolvers.html) have to be configured at a type member level, custom type converters are global in scope.
-
-## System Type Converters
-
-The .NET Framework also supports the concepts of type converters, through the [TypeConverter](http://msdn.microsoft.com/en-us/library/system.componentmodel.typeconverter.aspx) class.  AutoMapper supports these types of type converters, in configuration checking and mapping, without the need for any manual configuration.  AutoMapper uses the [TypeDescriptor.GetConverter](http://msdn.microsoft.com/en-us/library/system.componentmodel.typedescriptor.getconverter.aspx) method for determining if the source/destination type pair can be mapped.

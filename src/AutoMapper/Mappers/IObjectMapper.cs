@@ -15,7 +15,7 @@ namespace AutoMapper.Internal.Mappers
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
-        bool IsMatch(in TypePair context);
+        bool IsMatch(TypePair context);
 
         /// <summary>
         /// Builds a mapping expression equivalent to the base Map method
@@ -32,7 +32,7 @@ namespace AutoMapper.Internal.Mappers
     }
     public interface IObjectMapperInfo : IObjectMapper
     {
-        TypePair GetAssociatedTypes(in TypePair initialTypes);
+        TypePair GetAssociatedTypes(TypePair initialTypes);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ namespace AutoMapper.Internal.Mappers
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
-        public virtual bool IsMatch(in TypePair context) => 
+        public virtual bool IsMatch(TypePair context) => 
             typeof(TSource).IsAssignableFrom(context.SourceType) && typeof(TDestination).IsAssignableFrom(context.DestinationType);
 
         /// <summary>

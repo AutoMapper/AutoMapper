@@ -41,35 +41,31 @@ namespace AutoMapper.UnitTests
     public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     {
         [Fact]
-        public void Should_have_valid_configuration()
-        {
-            Configuration.AssertConfigurationIsValid();
-        }
-
+        public void Should_have_valid_configuration() => Configuration.AssertConfigurationIsValid();
     }
 
     public abstract class NonValidatingSpecBase : SpecBase
     {
         private IMapper mapper;
 
-        protected abstract MapperConfiguration Configuration { get; }
-        protected IGlobalConfiguration ConfigProvider => Configuration;
+        protected abstract MapperConfiguration CreateConfiguration();
+        protected IGlobalConfiguration Configuration => Mapper.ConfigurationProvider.Internal();
 
-        protected IMapper Mapper => mapper ??= Configuration.CreateMapper();
+        protected IMapper Mapper => mapper ??= CreateConfiguration().CreateMapper();
 
         protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
 
-        protected TypeMap FindTypeMapFor<TSource, TDestination>() => ConfigProvider.FindTypeMapFor<TSource, TDestination>();
-        protected void AssertConfigurationIsValid() => ConfigProvider.AssertConfigurationIsValid();
-        protected void AssertConfigurationIsValid<TSource, TDestination>() => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor<TSource, TDestination>());
-        protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => ConfigProvider.AssertConfigurationIsValid(ConfigProvider.FindTypeMapFor(sourceType, destinationType));
-        public void AssertConfigurationIsValid(string profileName) => Configuration.Internal().AssertConfigurationIsValid(profileName);
-        public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => Configuration.Internal().AssertConfigurationIsValid<TProfile>();
+        protected TypeMap FindTypeMapFor<TSource, TDestination>() => Configuration.FindTypeMapFor<TSource, TDestination>();
+        protected void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
+        protected void AssertConfigurationIsValid<TSource, TDestination>() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<TSource, TDestination>());
+        protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(sourceType, destinationType));
+        public void AssertConfigurationIsValid(string profileName) => Configuration.AssertConfigurationIsValid(profileName);
+        public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => Configuration.AssertConfigurationIsValid<TProfile>();
         protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
             Mapper.ProjectTo(source, parameters, membersToExpand);
         protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
             Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
-        public IEnumerable<ProfileMap> GetProfiles() => Configuration.Internal().Profiles;
+        public IEnumerable<ProfileMap> GetProfiles() => Configuration.Profiles;
     }
 
     public abstract class SpecBaseBase

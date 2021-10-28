@@ -86,7 +86,7 @@ namespace AutoMapper.UnitTests
             // Nullable so can see a false state
             private static bool? _validated;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 Func<Source, Destination, Destination> mappingFunction = (source, destination) => new Destination();
                 cfg.CreateMap<Source, Destination>().ConvertUsing(mappingFunction);
@@ -107,7 +107,7 @@ namespace AutoMapper.UnitTests
             {
                 _validated.ShouldBeNull();
 
-                Configuration.AssertConfigurationIsValid();
+                AssertConfigurationIsValid();
 
                 _validated.ShouldBe(true);
             }
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests
             // Nullable so can see a false state
             private static bool? _validated;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>().ConvertUsing<CustomTypeConverter>();
                 cfg.Internal().Validator(SetValidated);
@@ -138,7 +138,7 @@ namespace AutoMapper.UnitTests
             {
                 _validated.ShouldBeNull();
 
-                Configuration.AssertConfigurationIsValid();
+                AssertConfigurationIsValid();
 
                 _validated.ShouldBe(true);
             }
@@ -157,7 +157,7 @@ namespace AutoMapper.UnitTests
             // Nullable so can see a false state
             private static bool? _validated;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>().ConvertUsing(new CustomTypeConverter());
                 cfg.Internal().Validator(SetValidated);
@@ -177,7 +177,7 @@ namespace AutoMapper.UnitTests
             {
                 _validated.ShouldBeNull();
 
-                Configuration.AssertConfigurationIsValid();
+                AssertConfigurationIsValid();
 
                 _validated.ShouldBe(true);
             }
@@ -196,7 +196,7 @@ namespace AutoMapper.UnitTests
             // Nullable so can see a false state
             private static bool? _validated;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 Expression<Func<Source, Destination>> mappingExpression = source => new Destination();
                 cfg.CreateMap<Source, Destination>().ConvertUsing(mappingExpression);
@@ -216,9 +216,7 @@ namespace AutoMapper.UnitTests
             public void Validator_should_be_called_by_AssertConfigurationIsValid()
             {
                 _validated.ShouldBeNull();
-
-                Configuration.AssertConfigurationIsValid();
-
+                AssertConfigurationIsValid();
                 _validated.ShouldBe(true);
             }
         }

@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests
             public string DescendantField { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<RootModel, DataModel>()
                             .ForMember(dest => dest.OtherID, opt => opt.MapFrom(src => src.Nested.NestedID))
@@ -92,7 +92,7 @@ namespace AutoMapper.UnitTests
             public decimal Total { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName))
@@ -133,7 +133,7 @@ namespace AutoMapper.UnitTests
             public decimal Total { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
@@ -173,7 +173,7 @@ namespace AutoMapper.UnitTests
             public decimal Total { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForMember(o=>o.Value, o=>o.MapFrom(src => 9))
@@ -213,7 +213,7 @@ namespace AutoMapper.UnitTests
             public int Id { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<TimesheetModel, TimesheetViewModel>()
                 .ForMember(d => d.Contact, o => o.MapFrom(s => s.ContactNavigation.Id))
@@ -295,7 +295,7 @@ namespace AutoMapper.UnitTests
             public decimal Total { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
@@ -336,7 +336,7 @@ namespace AutoMapper.UnitTests
             public decimal Total;
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
@@ -379,7 +379,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o => o.CustomerHolder.Customer.Name, o =>

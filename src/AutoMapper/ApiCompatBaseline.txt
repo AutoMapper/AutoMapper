@@ -14,10 +14,6 @@ MembersMustExist : Member 'public System.Nullable<AutoMapper.TypePair> AutoMappe
 MembersMustExist : Member 'public void AutoMapper.AutoMapperMappingException.Types.set(System.Nullable<AutoMapper.TypePair>)' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ConditionParameters<TSource, TDestination, TMember>' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ConfigurationValidator' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.ContextCacheKey.op_Equality(AutoMapper.ContextCacheKey, AutoMapper.ContextCacheKey)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.ContextCacheKey.op_Equality(AutoMapper.ContextCacheKey, AutoMapper.ContextCacheKey)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.ContextCacheKey.op_Inequality(AutoMapper.ContextCacheKey, AutoMapper.ContextCacheKey)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.ContextCacheKey.op_Inequality(AutoMapper.ContextCacheKey, AutoMapper.ContextCacheKey)' are 'in' in the implementation but '<none>' in the contract.
 MembersMustExist : Member 'public System.Object AutoMapper.ContextCacheKey.Source.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.DuplicateTypeMapConfigurationException.TypeMapConfigErrors..ctor(AutoMapper.TypePair, System.String[])' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.TypePair AutoMapper.DuplicateTypeMapConfigurationException.TypeMapConfigErrors.Types.get()' does not exist in the implementation but it does exist in the contract.
@@ -271,17 +267,9 @@ TypesMustExist : Type 'AutoMapper.Configuration.Conventions.SourceToDestinationM
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.SourceToDestinationNameMapperAttributesMember' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Execution.PropertyDescription.CanWrite.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.String AutoMapper.Execution.PropertyDescription.Name.get()' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.Execution.PropertyDescription.op_Equality(AutoMapper.Execution.PropertyDescription, AutoMapper.Execution.PropertyDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.Execution.PropertyDescription.op_Equality(AutoMapper.Execution.PropertyDescription, AutoMapper.Execution.PropertyDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.Execution.PropertyDescription.op_Inequality(AutoMapper.Execution.PropertyDescription, AutoMapper.Execution.PropertyDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.Execution.PropertyDescription.op_Inequality(AutoMapper.Execution.PropertyDescription, AutoMapper.Execution.PropertyDescription)' are 'in' in the implementation but '<none>' in the contract.
 MembersMustExist : Member 'public System.Type AutoMapper.Execution.PropertyDescription.Type.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.Execution.PropertyEmitter' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.Execution.PropertyDescription[] AutoMapper.Execution.TypeDescription.AdditionalProperties.get()' does not exist in the implementation but it does exist in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.Execution.TypeDescription.op_Equality(AutoMapper.Execution.TypeDescription, AutoMapper.Execution.TypeDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.Execution.TypeDescription.op_Equality(AutoMapper.Execution.TypeDescription, AutoMapper.Execution.TypeDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'left' on method 'AutoMapper.Execution.TypeDescription.op_Inequality(AutoMapper.Execution.TypeDescription, AutoMapper.Execution.TypeDescription)' are 'in' in the implementation but '<none>' in the contract.
-ParameterModifiersCannotChange : Modifiers on parameter 'right' on method 'AutoMapper.Execution.TypeDescription.op_Inequality(AutoMapper.Execution.TypeDescription, AutoMapper.Execution.TypeDescription)' are 'in' in the implementation but '<none>' in the contract.
 MembersMustExist : Member 'public System.Type AutoMapper.Execution.TypeDescription.Type.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public void AutoMapper.Execution.TypeMapPlanBuilder..ctor(AutoMapper.IConfigurationProvider, AutoMapper.TypeMap)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Linq.Expressions.ParameterExpression AutoMapper.Execution.TypeMapPlanBuilder.Context.get()' does not exist in the implementation but it does exist in the contract.
@@ -375,4 +363,4 @@ MembersMustExist : Member 'public void AutoMapper.QueryableExtensions.Impl.Membe
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.NullableDestinationExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.StringExpressionBinder' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.UnderlyingTypeToEnumBinder' does not exist in the implementation but it does exist in the contract.
-Total Issues: 376
+Total Issues: 364

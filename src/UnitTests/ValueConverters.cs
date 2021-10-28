@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
                 public string Value4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value1, opt => opt.ConvertUsing<EightDigitIntToStringConverter, int>())
@@ -92,7 +92,7 @@ namespace AutoMapper.UnitTests
                 public string ValueFoo4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.ValueFoo1, opt => opt.ConvertUsing<EightDigitIntToStringConverter, int>(src => src.Value1))
@@ -150,7 +150,7 @@ namespace AutoMapper.UnitTests
                 public string Value4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember("Value1", opt => opt.ConvertUsing<EightDigitIntToStringConverter, int>())
@@ -208,7 +208,7 @@ namespace AutoMapper.UnitTests
                 public string ValueFoo4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember("ValueFoo1", opt => opt.ConvertUsing<EightDigitIntToStringConverter, int>("Value1"))
@@ -266,7 +266,7 @@ namespace AutoMapper.UnitTests
                 public string Value4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof(Source), typeof(Dest))
                     .ForMember("Value1", opt => opt.ConvertUsing(typeof(EightDigitIntToStringConverter)))
@@ -324,7 +324,7 @@ namespace AutoMapper.UnitTests
                 public string ValueFoo4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof(Source), typeof(Dest))
                     .ForMember("ValueFoo1", opt => opt.ConvertUsing(typeof(EightDigitIntToStringConverter), "Value1"))
@@ -382,7 +382,7 @@ namespace AutoMapper.UnitTests
                 public string Value4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value1, opt => opt.ConvertUsing(new EightDigitIntToStringConverter()))
@@ -440,7 +440,7 @@ namespace AutoMapper.UnitTests
                 public string ValueFoo4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.ValueFoo1, opt => opt.ConvertUsing(new EightDigitIntToStringConverter(), src => src.Value1))
@@ -498,7 +498,7 @@ namespace AutoMapper.UnitTests
                 public string Value4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember("Value1", opt => opt.ConvertUsing(new EightDigitIntToStringConverter()))
@@ -556,7 +556,7 @@ namespace AutoMapper.UnitTests
                 public string ValueFoo4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember("ValueFoo1", opt => opt.ConvertUsing(new EightDigitIntToStringConverter(), "Value1"))
@@ -613,7 +613,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.CreateMap<OtherSource, OtherDest>();

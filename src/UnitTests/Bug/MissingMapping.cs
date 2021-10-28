@@ -18,7 +18,7 @@
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => { });
+        protected override MapperConfiguration CreateConfiguration() => new(c => { });
 
         [Fact]
         public void Can_not_map_unmapped_type()

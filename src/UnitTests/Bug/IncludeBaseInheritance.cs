@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
             public string DPropertyLevel2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceLevel0, DestinationLevel0>()
                 .ForMember(dest => dest.DPropertyLevel0, o => o.MapFrom(src => src.SPropertyLevel0));

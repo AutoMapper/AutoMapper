@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Id { get; set; }
             public Destination Parent { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
+        protected override MapperConfiguration CreateConfiguration() => new(c=>
         {
             c.CreateProjection<Source, Destination>();
             c.Internal().RecursiveQueriesMaxDepth = 1;

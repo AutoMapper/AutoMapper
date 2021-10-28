@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
             public string CompanyName { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Model, Dto>().ForMember(d => d.CompanyName, o => o.Ignore());
         });

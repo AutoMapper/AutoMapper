@@ -341,7 +341,7 @@ namespace AutoMapper.UnitTests.Bug
         class DestinationDerived : Destination
         {
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom((s, d) => 1));
             cfg.CreateMap<Source, DestinationDerived>().IncludeBase<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(s => 2));

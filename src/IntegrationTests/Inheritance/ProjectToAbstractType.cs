@@ -55,7 +55,7 @@ namespace AutoMapper.IntegrationTests.Net4
             public DbSet<DbEntityA> EntityA { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
             cfg.CreateProjection<DbEntityA, ConcreteTypeA>();
@@ -316,7 +316,7 @@ namespace AutoMapper.IntegrationTests.Net4
             public DbSet<DataLayer.Calendar> Calendars { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
 
         [Fact]
         public void Should_project_to_abstract_type()

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using AutoMapper.Internal;
 using Shouldly;
 using Xunit;
@@ -25,7 +27,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -38,13 +40,14 @@ namespace AutoMapper.UnitTests.Mappers
             _destination["Foo"].ShouldBe("Foo");
             _destination["Bar"].ShouldBe("Bar");
         }
+        [Fact]
+        public void Should_map_struct() => Map<StringDictionary>(new KeyValuePair<int, string>(1, "one")).ShouldBe(new StringDictionary { { "Key", 1 }, {"Value", "one"} });
     }
-
     public class When_mapping_from_StringDictionary : NonValidatingSpecBase
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -83,7 +86,7 @@ namespace AutoMapper.UnitTests.Mappers
             public string Bar { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -111,7 +114,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -132,7 +135,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -153,7 +156,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -174,7 +177,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _source;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -195,7 +198,7 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -230,6 +233,7 @@ namespace AutoMapper.UnitTests.Mappers
             private int _z = 300;
             public int Z { get { return _z + 30; } }
             public int Value { get; set; }
+            public Collection<int> Integers { get; } = new();
         }
 
         public class SomeOne : SomeBase
@@ -241,15 +245,17 @@ namespace AutoMapper.UnitTests.Mappers
             public int A { get { return _a - 30; } }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<SomeBase, SomeBase>());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<SomeBase, SomeBase>());
 
         [Fact]
         public void Should_map_ok()
         {
-            SomeBase someBase = new SomeBody();
-            var someOne = new StringDictionary();
+            var someBase = new SomeBody();
+            var someOne = new StringDictionary { ["Integers"] = Enumerable.Range(1, 10).ToArray() };
 
             Mapper.Map(someOne, someBase);
+
+            someBase.Integers.ShouldBe(someOne["Integers"]);
         }
 
         public class Destination
@@ -315,7 +321,7 @@ namespace AutoMapper.UnitTests.Mappers
             public int A { get { return _a - 30; } }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<SomeBase, SomeBase>());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<SomeBase, SomeBase>());
 
         [Fact]
         public void Should_throw()

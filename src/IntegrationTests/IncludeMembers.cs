@@ -59,7 +59,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
@@ -127,7 +127,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.ExplicitExpansion());
@@ -203,7 +203,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault());
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
@@ -282,7 +282,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault());
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom(s => s.Description1));
@@ -378,7 +378,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault());
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSourceDetails.FirstOrDefault()));
@@ -487,7 +487,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSourceWrappers.Select(s => s.InnerSource).FirstOrDefault(), s => s.OtherInnerSources.Select(s=>s).FirstOrDefault());
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSourceDetailsWrapper.Select(s => s.InnerSourceDetails).FirstOrDefault()));
@@ -585,7 +585,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>()
                 .ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSources.FirstOrDefault()))
@@ -685,7 +685,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>()
                 .ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSources.Select(s => s).FirstOrDefault()))
@@ -796,7 +796,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>()
                 .ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSourceWrappers.Select(s => s.InnerSource).FirstOrDefault()))
@@ -870,7 +870,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.MapFrom(s=>s.Description1));
@@ -938,7 +938,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Code, o => o.NullSubstitute(5));
@@ -1003,7 +1003,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault());
             cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Code, o => o.NullSubstitute(5));
@@ -1045,7 +1045,7 @@ namespace AutoMapper.IntegrationTests
             public int Id{ get; set; }
             public long TheField{ get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
             cfg.CreateProjection<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);

@@ -17,13 +17,13 @@ namespace AutoMapper.UnitTests.Projection
         {
             public int? Id { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateProjection<Source, Destination>());
+        protected override MapperConfiguration CreateConfiguration() => new(c=>c.CreateProjection<Source, Destination>());
         [Fact]
         public void Should_project() => ProjectTo<Destination>(new[] { new Source() }.AsQueryable()).First().Id.ShouldBe(0);
     }
     public class InMemoryMapObjectPropertyFromSubQuery : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Product, ProductModel>()
                 .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));

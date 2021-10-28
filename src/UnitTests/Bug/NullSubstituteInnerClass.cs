@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Bar, BarDto>();
             cfg.CreateMap<Foo, FooDto>()

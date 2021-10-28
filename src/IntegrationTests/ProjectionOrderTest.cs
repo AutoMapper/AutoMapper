@@ -55,7 +55,7 @@ namespace AutoMapper.IntegrationTests.ProjectionOrder
             public DbSet<Source2> Source2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
                                                                                         {
                                                                                             cfg.CreateProjection<Source1, Destination>()
                                                                                                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Items.Count()))

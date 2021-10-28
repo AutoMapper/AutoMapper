@@ -35,7 +35,7 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetMethod(nameof(ResolutionContext.MapInternal), TypeExtensions.InstanceFlags);
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
 
-        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, in TypePair typePair, Expression sourceParameter,
+        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter,
             MemberMap propertyMap = null, Expression destinationParameter = null)
         {
             destinationParameter ??= Default(typePair.DestinationType);
@@ -128,7 +128,7 @@ namespace AutoMapper.Execution
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
             }
         }
-        public static Expression ContextMap(in TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
+        public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Expression.Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));

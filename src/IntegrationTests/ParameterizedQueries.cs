@@ -49,9 +49,7 @@ namespace AutoMapper.IntegrationTests.Parameterization
             }
         }
 
-
-        protected override MapperConfiguration Configuration { get; } = 
-        new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             string username = null;
             cfg.CreateProjection<Entity, EntityDto>()

@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class SequenceContainsNoElementsTest : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Person, PersonModel>();
         });

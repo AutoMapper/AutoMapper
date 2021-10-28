@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -89,7 +89,7 @@ namespace AutoMapper.UnitTests
             public string Author { get; set; }
             public string Publisher { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault().InnerSource, s => s.OtherInnerSources.FirstOrDefault()).ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -153,7 +153,7 @@ namespace AutoMapper.UnitTests
             public string Author { get; set; }
             public string Publisher { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault()).ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -211,7 +211,7 @@ namespace AutoMapper.UnitTests
             public string Author { get; set; }
             public string Publisher { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault()).ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
@@ -257,7 +257,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource.NestedInnerSource, s => s.OtherInnerSource.NestedOtherInnerSource);
             cfg.CreateMap<NestedInnerSource, Destination>(MemberList.None);
@@ -304,7 +304,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.MapFrom(s=>s.Description1));
@@ -346,7 +346,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.NullSubstitute("description"));
@@ -388,7 +388,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom((s, d) => s.Description1));
@@ -430,7 +430,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom<DescriptionResolver>());
@@ -482,7 +482,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom<DescriptionResolver,string>(s=>s.Description1));
@@ -533,7 +533,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.ConvertUsing<ValueConverter, string>(s => s.Description1));
@@ -580,7 +580,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.Condition((s, d, sm, dm, c) => false));
@@ -621,7 +621,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.PreCondition((s, d, c) => false));
@@ -665,7 +665,7 @@ namespace AutoMapper.UnitTests
             public string Title { get; set; }
             public Destination Parent { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).IncludeMembers(s=>s.Parent);
@@ -709,7 +709,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource).ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
@@ -752,7 +752,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource).ReverseMap()
                 .ForMember(d=>d.InnerSource, o=>o.Ignore())
@@ -795,7 +795,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Destination, Source>()
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
@@ -839,7 +839,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Destination, Source>(MemberList.None)
                 .ForMember(d => d.InnerSource, o => o.MapFrom(s => s))
@@ -885,7 +885,7 @@ namespace AutoMapper.UnitTests
             public string Title { get; set; }
         }
         bool afterMap, beforeMap;
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).AfterMap((s,d)=>afterMap=true);
@@ -933,7 +933,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForPath(d=>d.InnerDestination.Description, o=>
@@ -982,7 +982,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource).AddTransform<string>(s => s + "Main");
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.AddTransform(s=>s+"Extra")).AddTransform<string>(s => s + "Ex");
@@ -1023,7 +1023,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.AddTransform(s=>s+"Ex"));
@@ -1064,7 +1064,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource");
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -1130,7 +1130,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource").ReverseMap();
             cfg.CreateMap<InnerSource, Destination>(MemberList.None).ReverseMap();
@@ -1173,7 +1173,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.None).IncludeMembers("InnerSource", "OtherInnerSource").ReverseMap()
                 .ForMember("InnerSource", o=>o.Ignore())
@@ -1215,7 +1215,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Destination), typeof(Source<,>))
                 .ForMember("InnerSource", o => o.MapFrom(s => s))
@@ -1259,7 +1259,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Destination), typeof(Source<,>))
                 .ForMember("InnerSource", o => o.MapFrom(s => s))
@@ -1304,7 +1304,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>(MemberList.Source).IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -1336,7 +1336,7 @@ namespace AutoMapper.UnitTests
             public string Description { get; set; }
             public string Title { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source<,>), typeof(Destination), MemberList.Source).IncludeMembers("InnerSource", "OtherInnerSource");
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -1361,7 +1361,7 @@ namespace AutoMapper.UnitTests
         {
             public string FullName { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceBase, Destination>().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName)).IncludeAllDerived();
             cfg.CreateMap<ParentOfSource, Destination>().IncludeMembers(src => src.InnerSource);
@@ -1388,7 +1388,7 @@ namespace AutoMapper.UnitTests
         {
             public string FullName { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceBase, Destination>().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName)).IncludeAllDerived();
             cfg.CreateMap<Source, Destination>();
@@ -1421,7 +1421,7 @@ namespace AutoMapper.UnitTests
         {
             public string CreatedBy { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address) .ForMember(m => m.Id, o => o.Ignore());
             cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
@@ -1455,7 +1455,7 @@ namespace AutoMapper.UnitTests
         {
             public string CreatedBy { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
             cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
@@ -1489,7 +1489,7 @@ namespace AutoMapper.UnitTests
         {
             public string CreatedBy { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
             cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
@@ -1529,7 +1529,7 @@ namespace AutoMapper.UnitTests
         {
             public string CreatedBy { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Customer, CustomerDtoBase>().IncludeMembers(x => x.Address).ForMember(m => m.Id, o => o.Ignore());
             cfg.CreateMap<Address, CustomerDtoBase>(MemberList.None).ForMember(m => m.AddressLine1, o => o.MapFrom(x => x.Line1));
@@ -1552,7 +1552,7 @@ namespace AutoMapper.UnitTests
         {
             public string Name { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
@@ -1580,7 +1580,7 @@ namespace AutoMapper.UnitTests
             public long TheField;
             public long Level1Field;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
             cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
@@ -1617,7 +1617,7 @@ namespace AutoMapper.UnitTests
             public long TheField;
             public long Level1Field;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1);
             cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
@@ -1658,7 +1658,7 @@ namespace AutoMapper.UnitTests
             public string Signature { get; set; }
             public DateTime Expired { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<MetaData, Response>(MemberList.None);
             cfg.CreateMap<Item, Response>().IncludeMembers(src => src.MetaData);

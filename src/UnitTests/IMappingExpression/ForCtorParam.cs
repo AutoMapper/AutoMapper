@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests
             public string Key { get; }
             public string Value { get; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
             c.CreateMap(typeof(KeyValuePair<,>), typeof(Destination))
                 .ForCtorParam("value1", o => o.MapFrom("Value"))
                 .ForCtorParam("key1", o => o.MapFrom("Key")));
@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests
             public Destination(string value) => Value = value;
             public string Value { get; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateProjection<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateProjection<Source, Destination>().ForCtorParam("value", o => o.MapFrom(s => s.Value1)));
         [Fact]
         public void Should_map_ok()
         {
@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
             public int Value1 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source), typeof(Dest))
                 .ForCtorParam("thing", opt => opt.MapFrom(src => ((Source)src).Value));

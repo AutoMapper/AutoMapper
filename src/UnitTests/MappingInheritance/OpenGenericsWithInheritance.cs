@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests
             public T Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap(typeof(Source), typeof(Target<>));
             cfg.CreateMap(typeof(Source), typeof(ITarget<>)).As(typeof(Target<>));
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
             public string DerivedMember { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<BarBase, BarModelBase>()
                 .ForMember(d=>d.Ignored, o=>o.Ignore())
@@ -141,7 +141,7 @@ namespace AutoMapper.UnitTests
             public string DerivedMember { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(BarBase), typeof(BarModelBase))
                 .ForMember("Ignored", o => o.Ignore())
@@ -202,7 +202,7 @@ namespace AutoMapper.UnitTests
             public string SubMember { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Entity, Model>();
 

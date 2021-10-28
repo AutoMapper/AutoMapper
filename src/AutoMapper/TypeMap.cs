@@ -116,7 +116,6 @@ namespace AutoMapper
             }
         }
         public bool? IsValid { get; set; }
-        internal bool WasInlineChecked { get; set; }
         public bool AsProxy { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation
@@ -216,20 +215,20 @@ namespace AutoMapper
             return propertyMap;
         }
         public TypePair GetAsPair() => new TypePair(SourceType, DestinationTypeOverride);
-        public void IncludeDerivedTypes(in TypePair derivedTypes)
+        public void IncludeDerivedTypes(TypePair derivedTypes)
         {
             CheckDifferent(derivedTypes);
             _includedDerivedTypes ??= new();
             _includedDerivedTypes.Add(derivedTypes);
         }
-        private void CheckDifferent(in TypePair types)
+        private void CheckDifferent(TypePair types)
         {
             if (types == Types)
             {
                 throw new InvalidOperationException("You cannot include a type map into itself.");
             }
         }
-        public void IncludeBaseTypes(in TypePair baseTypes)
+        public void IncludeBaseTypes(TypePair baseTypes)
         {
             CheckDifferent(baseTypes);
             _includedBaseTypes ??= new();

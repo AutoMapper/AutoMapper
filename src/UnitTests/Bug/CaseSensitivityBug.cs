@@ -2,19 +2,12 @@
 {
     using Xunit;
 
-    public class CaseSensitivityBug : NonValidatingSpecBase
+    public class CaseSensitivityBug : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Foo, Bar>();
         });
-
-        [Fact]
-        public void TestMethod1()
-        {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
-        }
-
         public class Foo
         {
             public int ID { get; set; }

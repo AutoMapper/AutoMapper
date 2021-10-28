@@ -104,7 +104,7 @@ namespace AutoMapper.UnitTests.Projection
         }
     }
 
-    public class NonGenericProjectionOverrides : NonValidatingSpecBase
+    public class NonGenericProjectionOverrides : AutoMapperSpecBase
     {
         public class Source
         {
@@ -116,15 +116,9 @@ namespace AutoMapper.UnitTests.Projection
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof (Source), typeof (Dest)).ConvertUsing(src => new Dest {Value = 10});
         });
-
-        [Fact]
-        public void Should_validate_because_of_overridden_projection()
-        {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
-        }
     }
 }

@@ -37,7 +37,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {
@@ -75,7 +75,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {
@@ -113,7 +113,7 @@ namespace AutoMapper.IntegrationTests
                 base.Seed(context);
             }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Customer, CustomerViewModel>());
         [Fact]
         public void Can_map_with_projection()
         {

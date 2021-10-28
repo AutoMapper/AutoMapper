@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
         {
             public int Value { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
+        protected override MapperConfiguration CreateConfiguration() => new(c=>
         {
             c.IncludeSourceExtensionMethods(typeof(BarExtensions));
             c.CreateMap<Source, Destination>();
@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests
             public Guid Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.IncludeSourceExtensionMethods(typeof(BarExtensions));
             cfg.CreateMap<Foo, FooDto>().ForMember(d=>d.Value, o=>o.MapFrom(s=>Guid.NewGuid()));
@@ -86,7 +86,7 @@ namespace AutoMapper.UnitTests
             public string Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_value_type_SourceExtensions));
             cfg.CreateMap<Source, Destination>();
@@ -138,7 +138,7 @@ namespace AutoMapper.UnitTests
             public int Property { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_object_SourceExtensions));
             cfg.CreateMap<Source, Destination>();
@@ -176,7 +176,7 @@ namespace AutoMapper.UnitTests
             public int ValuesCount { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -208,7 +208,7 @@ namespace AutoMapper.UnitTests
             public string StringValue;
             public string AnotherStringValue;
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.Internal().FieldMappingEnabled = false;
             cfg.Internal().MethodMappingEnabled = false;
@@ -217,7 +217,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_fail_validation()
         {
-            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
+            new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors[0]
                 .UnmappedPropertyNames.ShouldBe(new[] { "ValuesCount", "OtherValue" });
             Mapper.Map<Destination>(new Source { StringValue = "42" }).StringValue.ShouldBeNull();
         }
@@ -247,7 +247,7 @@ namespace AutoMapper.UnitTests
             public LastName Last;
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<CombinedNames, FullName>()
                 .ForMember(dst => dst.Name, o => o.MapFrom(src => string.Concat(src.First.Name, src.Last.Name)));

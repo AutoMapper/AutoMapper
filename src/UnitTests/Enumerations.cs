@@ -20,7 +20,7 @@ namespace AutoMapper.Tests
             public string Color { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -51,7 +51,7 @@ namespace AutoMapper.Tests
             public ConsoleColor? Color { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -82,7 +82,7 @@ namespace AutoMapper.Tests
             public string Color { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<Enum, string>().ConvertUsing((Enum src) => "Test");
@@ -396,7 +396,7 @@ namespace AutoMapper.Tests
     }
     public class When_mapping_from_a_null_object_with_an_enum : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AllowNullDestinationValues = false;
             cfg.CreateMap<SourceClass, DestinationClass>();
@@ -428,7 +428,7 @@ namespace AutoMapper.Tests
 
     public class When_mapping_to_a_nullable_flags_enum : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceClass, DestinationClass>();
         });
@@ -460,7 +460,7 @@ namespace AutoMapper.Tests
 
     public class When_mapping_from_a_null_object_with_a_nullable_enum : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AllowNullDestinationValues = false;
             cfg.CreateMap<SourceClass, DestinationClass>();
@@ -491,7 +491,7 @@ namespace AutoMapper.Tests
     }
     public class When_mapping_from_a_null_object_with_a_nullable_enum_as_string : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<SourceClass, DestinationClass>();
         });
@@ -568,7 +568,7 @@ namespace AutoMapper.Tests
             Eight = 8
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         protected override void Because_of()
         {
@@ -591,7 +591,7 @@ namespace AutoMapper.Tests
             One
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         [Fact]
         public void Should_return_the_enum_from_defined_enummemberattribute_value()
@@ -653,7 +653,7 @@ namespace AutoMapper.Tests
             One
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => { });
 
         [Fact]
         public void Should_return_the_defined_enummemberattribute_value()

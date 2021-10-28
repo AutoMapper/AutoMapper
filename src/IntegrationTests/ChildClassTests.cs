@@ -70,7 +70,7 @@ namespace AutoMapper.IntegrationTests.Net4
 
         public class UnitTest : AutoMapperSpecBase
         {
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateProjection<Base, BaseDTO>();
                 cfg.CreateProjection<Sub, SubDTO>();

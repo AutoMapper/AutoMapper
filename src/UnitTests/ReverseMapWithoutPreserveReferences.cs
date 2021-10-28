@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
             public virtual ICollection<UserDto> Users { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<CategoryModel, CategoryDto>(MemberList.Destination).ReverseMap();
             cfg.CreateMap<UserModel, UserDto>(MemberList.Destination).ReverseMap();

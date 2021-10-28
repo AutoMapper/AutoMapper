@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_map_with_attribute));
             });
@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_map_and_reverse_map_with_attribute));
             });
@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_reverse_map_with_sourcemember_attribute));
             });
@@ -131,7 +131,7 @@ namespace AutoMapper.UnitTests
                 public string StringValue2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_generic_reverse_map_with_sourcemember_attribute));
             });
@@ -166,7 +166,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_map_and_reverse_map_with_attribute));
                 cfg.CreateMap<Source, Dest>();
@@ -175,7 +175,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_not_validate_successfully()
             {
-                typeof(DuplicateTypeMapConfigurationException).ShouldBeThrownBy(() => Configuration.AssertConfigurationIsValid());
+                typeof(DuplicateTypeMapConfigurationException).ShouldBeThrownBy(AssertConfigurationIsValid);
 
             }
         }
@@ -194,7 +194,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
             });
@@ -233,7 +233,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
             });
@@ -273,7 +273,7 @@ namespace AutoMapper.UnitTests
                 public string OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
             });
@@ -320,7 +320,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_source_member_name_via_attributes));
             });
@@ -368,7 +368,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -415,7 +415,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -463,7 +463,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -505,7 +505,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -566,7 +566,7 @@ namespace AutoMapper.UnitTests
                 public string Name { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -649,7 +649,7 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_value_converter_via_attribute));
             });
@@ -702,7 +702,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_to_construct_using_service_locator_via_attribute));
                 cfg.ConstructServicesUsing(t => new Dest(10));
@@ -746,7 +746,7 @@ namespace AutoMapper.UnitTests
                 public Dest Parent { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_max_depth_via_attribute));
             });
@@ -815,11 +815,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; }
-
-            private static Parent _parent;
-
-            public When_specifying_to_preserve_references_via_attribute()
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 _parent = new Parent
                 {
@@ -834,13 +830,11 @@ namespace AutoMapper.UnitTests
                         Parent = _parent
                     }
                 };
+                cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
+                cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+            });
 
-                Configuration = new MapperConfiguration(cfg =>
-                {
-                    cfg.AddMaps(typeof(When_specifying_to_preserve_references_via_attribute));
-                    cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
-                });
-            }
+            private static Parent _parent;
 
             [Fact]
             public void Should_preserve_parent_relationship()
@@ -861,7 +855,7 @@ namespace AutoMapper.UnitTests
             [AutoMap(typeof(FooBar))]
             public class FooBarDto : FooDto { }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_to_include_all_derived_via_attribute));
             });
@@ -888,7 +882,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_type_of_converter_via_attribute));
             });
@@ -932,7 +926,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(typeof(When_specifying_map_with_attribute));
             });

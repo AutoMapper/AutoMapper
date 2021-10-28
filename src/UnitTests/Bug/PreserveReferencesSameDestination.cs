@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.Bug
             public BaseTypeDto SelfReference { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=> cfg.CreateMap<BaseType, BaseTypeDto>().PreserveReferences());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=> cfg.CreateMap<BaseType, BaseTypeDto>().PreserveReferences());
 
         protected override void Because_of()
         {
@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests.Bug
             public virtual ICollection<EntityOne> Ones { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<EntityTwo, DtoTwo>().PreserveReferences();
             cfg.CreateMap<EntityOne, DtoOne>().PreserveReferences();

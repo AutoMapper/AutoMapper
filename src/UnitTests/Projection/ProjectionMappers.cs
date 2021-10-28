@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Color { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.Internal().ProjectionMappers.Add(new EnumToUnderlyingTypeProjectionMapper());
             cfg.CreateProjection<Source, Destination>();

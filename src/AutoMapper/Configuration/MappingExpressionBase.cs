@@ -34,7 +34,7 @@ namespace AutoMapper.Configuration
         protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType) : this(memberList, new TypePair(sourceType, destinationType))
         {
         }
-        protected MappingExpressionBase(MemberList memberList, in TypePair types)
+        protected MappingExpressionBase(MemberList memberList, TypePair types)
         {
             _memberList = memberList;
             _types = types;
@@ -291,7 +291,7 @@ namespace AutoMapper.Configuration
         {
         }
 
-        protected MappingExpressionBase(MemberList memberList, in TypePair types)
+        protected MappingExpressionBase(MemberList memberList, TypePair types)
             : base(memberList, types)
         {
         }

@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests
         {
             public FlowNodeModel Node;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<FlowChart, FlowChartModel>();
             cfg.CreateMap<FlowNode, FlowNodeModel>()
@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
             public List<CFieldDefinitionDTO<T>> FieldDefinitionList { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(CDataTypeModel<>), typeof(CDataTypeDTO<>)).ReverseMap();
             cfg.CreateMap(typeof(CFieldDefinitionModel<>), typeof(CFieldDefinitionDTO<>)).ReverseMap();
@@ -162,7 +162,7 @@ namespace AutoMapper.UnitTests
             public int Value;
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<InnerSource, InnerDestination>();
@@ -222,7 +222,7 @@ namespace AutoMapper.UnitTests
             public List<SupplierViewModel> Suppliers { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Article, ArticleViewModel>();
             cfg.CreateMap<Supplier, SupplierViewModel>();
@@ -284,7 +284,7 @@ namespace AutoMapper.UnitTests
             public List<SupplierViewModel> Suppliers1 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Article, ArticleViewModel>();
             cfg.CreateMap<Supplier, SupplierViewModel>();
@@ -332,7 +332,7 @@ namespace AutoMapper.UnitTests
             public SupplierViewModel Supplier1 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Supplier, SupplierViewModel>().ForPath(d=>d.Contact.Supplier1, o=>
             {
@@ -347,7 +347,7 @@ namespace AutoMapper.UnitTests
             var supplier = new Supplier();
             supplier.Contact = new Contact { Supplier = supplier };
             Mapper.Map<SupplierViewModel>(supplier);
-            ConfigProvider.GetAllTypeMaps().All(tm => tm.PreserveReferences).ShouldBeFalse();
+            Configuration.GetAllTypeMaps().All(tm => tm.PreserveReferences).ShouldBeFalse();
         }
     }
 
@@ -355,7 +355,7 @@ namespace AutoMapper.UnitTests
     {
         private ParentDto _dto;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ParentModel, ParentDto>();
             cfg.CreateMap<ChildModel, ChildDto>();
@@ -523,7 +523,7 @@ namespace AutoMapper.UnitTests
     {
         private FooDto _dto;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Foo, FooDto>();
             cfg.CreateMap<Bar, BarDto>();
@@ -575,7 +575,7 @@ namespace AutoMapper.UnitTests
     {
         private FooContainerModel _dto;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FooModel, FooScreenModel>();
             cfg.CreateMap<FooModel, FooInputModel>();
@@ -627,7 +627,7 @@ namespace AutoMapper.UnitTests
     {
         private ParentDto _dtoParent;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Parent, ParentDto>();
             cfg.CreateMap<Child, ChildDto>();

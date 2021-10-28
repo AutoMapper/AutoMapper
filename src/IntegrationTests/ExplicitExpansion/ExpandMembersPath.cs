@@ -12,7 +12,7 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     public class ExpandMembersPath : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             var mappingClass1 = cfg.CreateProjection<Class1, Class1DTO>();
             mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));

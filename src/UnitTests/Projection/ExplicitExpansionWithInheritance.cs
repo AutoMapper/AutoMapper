@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests.Projection
 
         private Script _source;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<User, UserModel>();
             cfg.CreateProjection<EntityBase, EntityBaseModel>()

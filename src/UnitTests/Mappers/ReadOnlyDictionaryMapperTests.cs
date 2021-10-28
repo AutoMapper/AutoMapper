@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper
             public IReadOnlyDictionary<int, int> Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        protected override MapperConfiguration CreateConfiguration() => new(config =>
         {
             config.CreateMap<Source, Destination>();
         });
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper
             public ReadOnlyDictionary<int, int> Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        protected override MapperConfiguration CreateConfiguration() => new(config =>
         {
             config.CreateMap<Source, Destination>();
         });

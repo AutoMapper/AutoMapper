@@ -11,7 +11,7 @@
         public class Source2 { }
         public class Dest2 { }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>();
             cfg.CreateMap<Source2, Dest2>();
