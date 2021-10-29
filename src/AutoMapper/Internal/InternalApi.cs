@@ -119,7 +119,7 @@ namespace AutoMapper.Internal
         /// <summary>
         /// Gets the features collection.
         /// </summary>
-        /// <value>The feature colection.</value>
+        /// <value>The feature collection.</value>
         Features<IRuntimeFeature> Features { get; }
         /// <summary>
         /// Find a matching object mapper.
