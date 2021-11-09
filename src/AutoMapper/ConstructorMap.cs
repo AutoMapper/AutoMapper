@@ -27,14 +27,7 @@ namespace AutoMapper
         }
         private bool ParametersCanResolve()
         {
-            foreach (var param in _ctorParams)
-            {
-                if (!param.CanResolveValue)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return _ctorParams.All(param => param.CanResolveValue);
         }
         public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve) =>
             _ctorParams.Add(new ConstructorParameterMap(TypeMap, parameter, sourceMembers, canResolve));
