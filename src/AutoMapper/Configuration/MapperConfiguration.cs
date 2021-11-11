@@ -238,7 +238,7 @@ namespace AutoMapper
         TypeMap IGlobalConfiguration.FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(typeof(TSource), typeof(TDestination));
         TypeMap IGlobalConfiguration.FindTypeMapFor(TypePair typePair) => FindTypeMapFor(typePair);
         TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new(sourceType, destinationType));
-        TypeMap FindTypeMapFor(TypePair typePair) => _configuredMaps.GetOrDefault(typePair);
+        TypeMap FindTypeMapFor(TypePair typePair) => _configuredMaps.GetValueOrDefault(typePair);
         TypeMap IGlobalConfiguration.ResolveTypeMap(Type sourceType, Type destinationType) => ResolveTypeMap(new(sourceType, destinationType));
         TypeMap IGlobalConfiguration.ResolveTypeMap(TypePair typePair) => ResolveTypeMap(typePair);
         TypeMap ResolveTypeMap(TypePair typePair)
@@ -351,10 +351,7 @@ namespace AutoMapper
                 foreach (var derivedMap in derivedMaps)
                 {
                     var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
-                    if (!_resolvedMaps.ContainsKey(includedPair))
-                    {
-                        _resolvedMaps[includedPair] = derivedMap;
-                    }
+                    _resolvedMaps.TryAdd(includedPair, derivedMap);
                 }
             }
             var typeMapsPath = new HashSet<TypeMap>();

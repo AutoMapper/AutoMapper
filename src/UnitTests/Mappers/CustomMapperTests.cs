@@ -12,16 +12,6 @@ namespace AutoMapper.UnitTests.Mappers
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.Internal().Mappers.Add(new TypeConverterMapper()));
-#if NET461
-        public When_specifying_mapping_with_the_BCL_type_converter_class()
-        {
-            // only needed for the xUnitRunner without AppDomains
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                return args.Name == typeof(CustomTypeConverter).Assembly.FullName ? typeof(CustomTypeConverter).Assembly : null;
-            };
-        }
-#endif
         [TypeConverter(typeof(CustomTypeConverter))]
         public class Source
         {
