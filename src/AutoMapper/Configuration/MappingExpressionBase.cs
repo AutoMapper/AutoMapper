@@ -424,6 +424,10 @@ namespace AutoMapper.Configuration
 
         public void As(Type typeOverride)
         {
+            if (typeOverride == DestinationType)
+            {
+                throw new InvalidOperationException("As must specify a derived type, not " + DestinationType);
+            }
             typeOverride.CheckIsDerivedFrom(DestinationType);
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
