@@ -90,6 +90,7 @@ var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto
 
 // Perform mapping
 
+var mapper = new Mapper(configuration);
 OrderDto dto = mapper.Map<Order, OrderDto>(order);
 
 dto.CustomerName.ShouldEqual("George Costanza");
