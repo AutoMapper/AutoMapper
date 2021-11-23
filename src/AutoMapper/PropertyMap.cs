@@ -31,7 +31,6 @@ namespace AutoMapper
         public override Type DestinationType { get; protected set; }
         public override MemberInfo[] SourceMembers => _sourceMembers;
         public override IncludedMember IncludedMember { get; }
-        public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
         public override bool? AllowNull { get; set; }

@@ -64,7 +64,6 @@ namespace AutoMapper
         public override string DestinationName => Parameter.Name;
         public override LambdaExpression CustomMapFunction { get; set; }
         public override bool CanResolveValue { get; set; }
-        public override bool Inline { get; set; }
         public Expression DefaultValue() => Parameter.GetDefaultValue();
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }
