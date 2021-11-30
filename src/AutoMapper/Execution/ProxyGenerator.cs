@@ -122,7 +122,7 @@ namespace AutoMapper.Execution
             ProxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
         class PropertyEmitter
         {
-            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetMethod("NotifyPropertyChanged", TypeExtensions.InstanceFlags);
+            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetMethod("NotifyPropertyChanged", AutoMapper.Internal.TypeExtensions.InstanceFlags);
             private readonly FieldBuilder _fieldBuilder;
             private readonly MethodBuilder _getterBuilder;
             private readonly PropertyBuilder _propertyBuilder;
