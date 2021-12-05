@@ -13,7 +13,6 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Features Condition=" '$(TargetFramework)' == 'net461' ">peverify-compat</Features>
 
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -41,7 +40,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="MinVer" Version="2.5.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="7.0.0-beta.21560.5" PrivateAssets="All" />  
+    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="7.0.0-beta.21603.6" PrivateAssets="All" />  
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">
