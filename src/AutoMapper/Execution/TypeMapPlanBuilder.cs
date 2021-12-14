@@ -50,12 +50,25 @@ namespace AutoMapper.Execution
                 typeMapsPath.Clear();
             }
             CheckForCycles(_configurationProvider, _typeMap, typeMapsPath);
+            var variables = new List<ParameterExpression>();
+            var statements = new List<Expression>();
+            if (_typeMap.IncludedMembersTypeMaps.Count > 0)
+            {
+                variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
+                statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
+                    Assign(v, i.MemberExpression.ReplaceParameters(Source).NullCheck())));
+            }
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
             var mapperFunc = CreateMapperFunc(assignmentFunc);
             var checkContext = CheckContext(_typeMap);
-            var lambaBody = checkContext != null ? new[] {checkContext, mapperFunc} : new[] {mapperFunc};
-            return Lambda(Block(new[] {_destination}, lambaBody), parameters);
+            if (checkContext != null)
+            {
+                statements.Add(checkContext);
+            }
+            statements.Add(mapperFunc);
+            variables.Add(_destination);
+            return Lambda(Block(variables, statements), parameters);
             Expression TypeConverter(ParameterExpression[] parameters)
             {
                 if (_typeMap.TypeConverterType == null)
@@ -171,7 +184,6 @@ namespace AutoMapper.Execution
             {
                 actions.Add(beforeMapAction.ReplaceParameters(Source, _destination, ContextParameter));
             }
-            var includedMembersVariables = _typeMap.IncludedMembersTypeMaps.Count == 0 ? Array.Empty<ParameterExpression>() : IncludedMembers(actions);
             var isConstructorMapping = _typeMap.ConstructorMapping;
             foreach (var propertyMap in _typeMap.PropertyMaps)
             {
@@ -201,14 +213,7 @@ namespace AutoMapper.Execution
                 actions.Add(Call(ContextParameter, DecTypeDepthInfo, typeMapExpression));
             }
             actions.Add(_destination);
-            return Block(includedMembersVariables, actions);
-            IEnumerable<ParameterExpression> IncludedMembers(List<Expression> actions)
-            {
-                var includedMembersVariables = _typeMap.IncludedMembersTypeMaps.Select(i => i.Variable);
-                var assignIncludedMembers = includedMembersVariables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) => Assign(v, i.MemberExpression.ReplaceParameters(Source).NullCheck()));
-                actions.AddRange(assignIncludedMembers);
-                return includedMembersVariables;
-            }
+            return Block(actions);
         }
         private Expression TryPathMap(PathMap pathMap)
         {

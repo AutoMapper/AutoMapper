@@ -11,10 +11,10 @@ namespace AutoMapper
     public class ConstructorMap
     {
         private bool? _canResolve;
-        private readonly List<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
+        private readonly Dictionary<ParameterInfo, ConstructorParameterMap> _ctorParams = new();
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
-        public IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+        public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams.Values;
         public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
             Ctor = ctor;
@@ -27,7 +27,7 @@ namespace AutoMapper
         }
         private bool ParametersCanResolve()
         {
-            foreach (var param in _ctorParams)
+            foreach (var param in _ctorParams.Values)
             {
                 if (!param.CanResolveValue)
                 {
@@ -37,19 +37,47 @@ namespace AutoMapper
             return true;
         }
         public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve) =>
-            _ctorParams.Add(new ConstructorParameterMap(TypeMap, parameter, sourceMembers, canResolve));
+            _ctorParams.Add(parameter, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray(), canResolve));
+        public bool ApplyIncludedMember(IncludedMember includedMember)
+        {
+            var typeMap = includedMember.TypeMap;
+            if (CanResolve || typeMap.ConstructorMap == null)
+            {
+                return false;
+            }
+            bool canResolve = false;
+            foreach (var includedParam in typeMap.ConstructorMap._ctorParams.Values)
+            {
+                if (!includedParam.CanResolveValue)
+                {
+                    continue;
+                }
+                var parameter = includedParam.Parameter;
+                if (_ctorParams.TryGetValue(parameter, out var existingParam) && existingParam.CanResolveValue)
+                {
+                    continue;
+                }
+                canResolve = true;
+                _canResolve = null;
+                _ctorParams[parameter] = new ConstructorParameterMap(includedParam, includedMember);
+            }
+            return canResolve;
+        }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConstructorParameterMap : MemberMap
     {
         private readonly MemberInfo[] _sourceMembers;
         private Type _sourceType;
-        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolveValue) : base(typeMap)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolveValue) : base(typeMap)
         {
             Parameter = parameter;
-            _sourceMembers = sourceMembers.ToArray();
+            _sourceMembers = sourceMembers;
             CanResolveValue = canResolveValue;
         }
+        public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : 
+            this(includedMember.TypeMap, parameterMap.Parameter, parameterMap._sourceMembers, parameterMap.CanResolveValue) =>
+            IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
         public ParameterInfo Parameter { get; }
         public override Type SourceType
         {

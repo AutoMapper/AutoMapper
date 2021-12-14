@@ -353,7 +353,8 @@ namespace AutoMapper
                 .Select(p => new PropertyMap(p, this, includedMember))
                 .ToArray();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0)
+            var appliedConstructorMap = ConstructorMap?.ApplyIncludedMember(includedMember);
+            if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0 && appliedConstructorMap is not true)
             {
                 return;
             }

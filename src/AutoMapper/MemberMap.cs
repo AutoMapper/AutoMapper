@@ -21,12 +21,12 @@ namespace AutoMapper
         public LambdaExpression CustomMapExpression { get; set; }
         public virtual Type SourceType { get => default; protected set { } }
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
-        public virtual IncludedMember IncludedMember => default;
+        public IncludedMember IncludedMember { get; protected set; }
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
         public virtual TypePair Types() => new TypePair(SourceType, DestinationType);
         public virtual bool CanResolveValue { get => default; set { } }
-        public virtual bool IsMapped => Ignored || CanResolveValue;
+        public bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
         public virtual bool Inline { get; set; } = true;
         public virtual bool? AllowNull { get => null; set { } }

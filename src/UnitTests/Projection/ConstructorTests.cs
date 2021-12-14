@@ -74,11 +74,34 @@ namespace AutoMapper.UnitTests.Projection
         class Destination
         {
             public Destination(string value) => Value = value;
-            public string Value { get; set; }
+            public string Value { get; }
         }
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Source, Destination>());
         [Fact]
         public void Should_construct_correctly() => new[] { new Source { Value = 5 } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
+    }
+    public class ConstructorIncludeMembers : AutoMapperSpecBase
+    {
+        class SourceWrapper
+        {
+            public Source Source { get; set; }
+        }
+        class Source
+        {
+            public int Value { get; set; }
+        }
+        class Destination
+        {
+            public Destination(string value) => Value = value;
+            public string Value { get; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateProjection<SourceWrapper, Destination>().IncludeMembers(s => s.Source);
+            cfg.CreateProjection<Source, Destination>();
+        });
+        [Fact]
+        public void Should_construct_correctly() => new[] { new SourceWrapper { Source = new Source { Value = 5 } } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
     }
     public class ConstructorsWithCollections : AutoMapperSpecBase
     {
