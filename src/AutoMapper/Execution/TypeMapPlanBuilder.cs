@@ -29,8 +29,7 @@ namespace AutoMapper.Execution
         }
         public Type DestinationType => _destination.Type;
         public ParameterExpression Source { get; }
-        private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => 
-            new AutoMapperMappingException("Error mapping types.", innerException, memberMap);
+        private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => new("Error mapping types.", innerException, memberMap);
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
             var parameters = new[] { Source, _initialDestination, ContextParameter };
@@ -41,14 +40,7 @@ namespace AutoMapper.Execution
             }
             _propertyMapVariables = new(capacity: 2);
             _propertyMapExpressions = new(capacity: 3);
-            if (typeMapsPath == null)
-            {
-                typeMapsPath = new HashSet<TypeMap>();
-            }
-            else
-            {
-                typeMapsPath.Clear();
-            }
+            Clear(ref typeMapsPath);
             CheckForCycles(_configurationProvider, _typeMap, typeMapsPath);
             var variables = new List<ParameterExpression>();
             var statements = new List<Expression>();
@@ -78,6 +70,17 @@ namespace AutoMapper.Execution
                 var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, DestinationType);
                 var converter = ServiceLocator(_typeMap.TypeConverterType);
                 return Call(ToType(converter, converterInterfaceType), "Convert", parameters);
+            }
+            static void Clear(ref HashSet<TypeMap> typeMapsPath)
+            {
+                if (typeMapsPath == null)
+                {
+                    typeMapsPath = new HashSet<TypeMap>();
+                }
+                else
+                {
+                    typeMapsPath.Clear();
+                }
             }
         }
         private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
@@ -134,11 +137,9 @@ namespace AutoMapper.Execution
             IEnumerable<MemberMap> MemberMaps()
             {
                 var memberMaps = typeMap.MemberMaps;
-                if (typeMap.HasDerivedTypesToInclude)
-                {
-                    memberMaps = memberMaps.Concat(configurationProvider.GetIncludedTypeMaps(typeMap).SelectMany(tm => tm.MemberMaps));
-                }
-                return memberMaps;
+                return typeMap.HasDerivedTypesToInclude ?
+                    memberMaps.Concat(configurationProvider.GetIncludedTypeMaps(typeMap).SelectMany(tm => tm.MemberMaps)) :
+                    memberMaps;
             }
             TypeMap ResolveMemberTypeMap(MemberMap memberMap)
             {
@@ -147,11 +148,7 @@ namespace AutoMapper.Execution
                     return null;
                 }
                 var types = memberMap.Types();
-                if (types.ContainsGenericParameters)
-                {
-                    return null;
-                }
-                return configurationProvider.ResolveAssociatedTypeMap(types);
+                return types.ContainsGenericParameters ? null : configurationProvider.ResolveAssociatedTypeMap(types);
             }
             [Conditional("DEBUG")]
             static void Trace(TypeMap typeMap, TypeMap memberTypeMap, MemberMap memberMap) =>
@@ -165,11 +162,9 @@ namespace AutoMapper.Execution
             var newDestFunc = ToType(CreateNewDestinationFunc(), DestinationType);
             var getDest = DestinationType.IsValueType ? newDestFunc : Coalesce(_initialDestination, newDestFunc);
             var destinationFunc = Assign(_destination, getDest);
-            if (!_typeMap.PreserveReferences)
-            {
-                return destinationFunc;
-            }
-            return Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, Source, Constant(DestinationType), _destination), _destination);
+            return _typeMap.PreserveReferences ?
+                Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, Source, Constant(DestinationType), _destination), _destination) :
+                destinationFunc;
         }
         private Expression CreateAssignmentFunc(Expression createDestination)
         {
