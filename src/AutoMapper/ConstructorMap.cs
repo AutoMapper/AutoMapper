@@ -11,7 +11,7 @@ namespace AutoMapper
     public class ConstructorMap
     {
         private bool? _canResolve;
-        private readonly Dictionary<ParameterInfo, ConstructorParameterMap> _ctorParams = new();
+        private readonly Dictionary<string, ConstructorParameterMap> _ctorParams = new(StringComparer.OrdinalIgnoreCase);
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
         public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams.Values;
@@ -36,8 +36,15 @@ namespace AutoMapper
             }
             return true;
         }
-        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve) =>
-            _ctorParams.Add(parameter, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray(), canResolve));
+        public ConstructorParameterMap this[string name] => _ctorParams.GetValueOrDefault(name);
+        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve)
+        {
+            if (parameter.Name == null)
+            {
+                return;
+            }
+            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray(), canResolve));
+        }
         public bool ApplyIncludedMember(IncludedMember includedMember)
         {
             var typeMap = includedMember.TypeMap;
@@ -52,14 +59,14 @@ namespace AutoMapper
                 {
                     continue;
                 }
-                var parameter = includedParam.Parameter;
-                if (_ctorParams.TryGetValue(parameter, out var existingParam) && existingParam.CanResolveValue)
+                var name = includedParam.DestinationName;
+                if (_ctorParams.TryGetValue(name, out var existingParam) && existingParam.CanResolveValue)
                 {
                     continue;
                 }
                 canResolve = true;
                 _canResolve = null;
-                _ctorParams[parameter] = new ConstructorParameterMap(includedParam, includedMember);
+                _ctorParams[name] = new ConstructorParameterMap(includedParam, includedMember);
             }
             return canResolve;
         }

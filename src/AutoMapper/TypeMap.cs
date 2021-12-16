@@ -148,15 +148,11 @@ namespace AutoMapper
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
                 IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
-        public bool ConstructorParameterMatches(string destinationPropertyName) =>
-            ConstructorMap.CtorParams.Any(c => string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase));
-
+        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMap[destinationPropertyName] != null;
         public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
-
             propertyMap.MapByConvention(sourceMembers);
-
             AddPropertyMap(propertyMap);
         }
         private void AddPropertyMap(PropertyMap propertyMap)
