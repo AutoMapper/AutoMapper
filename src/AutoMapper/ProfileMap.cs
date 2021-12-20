@@ -221,7 +221,7 @@ namespace AutoMapper
             }
             return closedMap;
         }
-        public ITypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetOrDefault(genericPair);
+        public ITypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))

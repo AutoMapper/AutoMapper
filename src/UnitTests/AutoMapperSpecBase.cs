@@ -40,21 +40,23 @@ namespace AutoMapper.UnitTests
 
     public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     {
-        [Fact]
-        public void Should_have_valid_configuration() => Configuration.AssertConfigurationIsValid();
+        protected override void OnConfig(MapperConfiguration mapperConfiguration) => mapperConfiguration.AssertConfigurationIsValid();
     }
 
     public abstract class NonValidatingSpecBase : SpecBase
     {
-        private IMapper mapper;
-
+        private IMapper _mapper;
         protected abstract MapperConfiguration CreateConfiguration();
         protected IGlobalConfiguration Configuration => Mapper.ConfigurationProvider.Internal();
-
-        protected IMapper Mapper => mapper ??= CreateConfiguration().CreateMapper();
-
+        protected IMapper Mapper => _mapper ??= CreateMapper();
+        IMapper CreateMapper()
+        {
+            var config = CreateConfiguration();
+            OnConfig(config);
+            return config.CreateMapper();
+        }
+        protected virtual void OnConfig(MapperConfiguration mapperConfiguration) { }
         protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
-
         protected TypeMap FindTypeMapFor<TSource, TDestination>() => Configuration.FindTypeMapFor<TSource, TDestination>();
         protected void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
         protected void AssertConfigurationIsValid<TSource, TDestination>() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<TSource, TDestination>());

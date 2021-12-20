@@ -30,7 +30,7 @@ namespace AutoMapper.Internal
         public MemberInfo GetMember(string name)
         {
             _nameToMember ??= PossibleNames();
-            return _nameToMember.GetOrDefault(name);
+            return _nameToMember.GetValueOrDefault(name);
         }
         private SourceMembers PossibleNames()
         {
@@ -42,9 +42,9 @@ namespace AutoMapper.Internal
             }
             foreach (var member in accessors)
             {
-                if (!nameToMember.ContainsKey(member.Name))
+                if (!nameToMember.TryAdd(member.Name, member))
                 {
-                    nameToMember.Add(member.Name, member);
+                    continue;
                 }
                 if (Config.Postfixes.Count == 0 && Config.Prefixes.Count == 0)
                 {
@@ -64,10 +64,7 @@ namespace AutoMapper.Internal
         {
             foreach (var memberName in PossibleNames(member.Name, Config.Prefixes, Config.Postfixes))
             {
-                if (!nameToMember.ContainsKey(memberName))
-                {
-                    nameToMember.Add(memberName, member);
-                }
+                nameToMember.TryAdd(memberName, member);
             }
         }
         public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)

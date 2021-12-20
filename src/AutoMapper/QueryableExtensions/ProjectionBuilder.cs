@@ -227,12 +227,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             public override QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, in ProjectionRequest request, ParameterExpression instanceParameter)
             {
                 var letMapInfos = _savedPaths.Select(path =>
-                new {
-                    path.LetExpression,
-                    MapFromSource = path.GetSourceExpression(instanceParameter),
-                    Property = path.GetPropertyDescription(),
-                    path.Marker
-                }).ToArray();
+                    (path.LetExpression,
+                    MapFromSource : path.GetSourceExpression(instanceParameter),
+                    Property : path.GetPropertyDescription(),
+                    path.Marker)).ToArray();
                 var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
                 var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
                 TypeMap letTypeMap;

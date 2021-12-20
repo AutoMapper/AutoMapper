@@ -24,7 +24,6 @@ namespace AutoMapper
             DestinationExpression = destinationExpression;
         }
         public override Type SourceType => CustomMapExpression.ReturnType;
-        public override IncludedMember IncludedMember { get; }
         public LambdaExpression DestinationExpression { get; }
         public MemberPath MemberPath { get; }
         public override Type DestinationType => MemberPath.Last.GetMemberType();

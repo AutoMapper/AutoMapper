@@ -86,7 +86,7 @@ namespace AutoMapper
             {
                 return null;
             }
-            return InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
+            return InstanceCache.GetValueOrDefault(new ContextCacheKey(source, destinationType));
         }
         internal void CacheDestination(object source, Type destinationType, object destination)
         {

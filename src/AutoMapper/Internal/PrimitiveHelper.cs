@@ -18,11 +18,6 @@ namespace AutoMapper.Internal
             }
             return otherCollection.Count == 0 ? collection : Enumerable.Concat(collection, otherCollection);
         }
-        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            dictionary.TryGetValue(key, out TValue value);
-            return value;
-        }
         public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
         {
             types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
