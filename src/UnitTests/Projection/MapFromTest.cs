@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             public string ShortDescription { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateProjection<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateProjection<Model, Dto>().ForMember(d => d.ShortDescription, o => o.MapFrom(s => "mappedFrom")));
 
         protected override void Because_of()
         {
@@ -92,7 +92,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             public string Value { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<Model, Dto>().ForMember(d => d.Value, o => o.MapFrom("Inner.Value")));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Model, Dto>().ForMember(d => d.Value, o => o.MapFrom("Inner.Value")));
         [Fact]
         public void Should_map_ok() => Map<Dto>(new Model { Inner = new InnerModel("mappedFrom") }).Value.ShouldBe("mappedFrom");
     }
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             public string Value { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<Model, Dto>().ForMember(d => d.Value, o => o.MapFrom("Inner.GetSomeValue")));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Model, Dto>().ForMember(d => d.Value, o => o.MapFrom("Inner.GetSomeValue")));
         [Fact]
         public void Should_map_ok() => Map<Dto>(new Model { Inner = new InnerModel("mappedFrom") }).Value.ShouldBe("mappedFrom");
     }

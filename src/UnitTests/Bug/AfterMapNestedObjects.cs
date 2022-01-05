@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Bug
             public InnerDTO Inner { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Inner, InnerDTO>();
             cfg.CreateMap<Outer, OuterDTO>();

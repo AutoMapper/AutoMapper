@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class GenericCreateMapsWithCircularReference : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(User<>), typeof(UserPoco<>));
             cfg.CreateMap(typeof(Role<>), typeof(RolePoco<>));

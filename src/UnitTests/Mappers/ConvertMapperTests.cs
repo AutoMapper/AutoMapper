@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests.Mappers
 {
     public class ConvertMapperTests : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => { });
+        protected override MapperConfiguration CreateConfiguration() => new(c => { });
 
         [Fact]
         public void A_few_cases()
@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests.Mappers
             Mapper.Map<string, decimal?>("12").ShouldBe(12);
             Mapper.Map<string, ushort>("12").ShouldBe((ushort)12);
             Mapper.Map<string, ulong>("12").ShouldBe((ulong)12);
-            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(DateTime))).ShouldBeOfType<ConvertMapper>();
+            Configuration.FindMapper(new TypePair(typeof(string), typeof(DateTime))).ShouldBeOfType<ConvertMapper>();
             var date = DateTime.Now;
             Mapper.Map<DateTime>(date.ToString("O")).ShouldBe(date);
         }
@@ -61,13 +61,13 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void ParseMapper()
         {
-            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(Guid))).ShouldBeOfType<ParseStringMapper>();
+            Configuration.FindMapper(new TypePair(typeof(string), typeof(Guid))).ShouldBeOfType<ParseStringMapper>();
             var guid = Guid.NewGuid();
             Mapper.Map<Guid>(guid.ToString()).ShouldBe(guid);
-            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(TimeSpan))).ShouldBeOfType<ParseStringMapper>();
+            Configuration.FindMapper(new TypePair(typeof(string), typeof(TimeSpan))).ShouldBeOfType<ParseStringMapper>();
             var timeSpan = TimeSpan.FromMinutes(1);
             Mapper.Map<TimeSpan>(timeSpan.ToString()).ShouldBe(timeSpan);
-            ConfigProvider.FindMapper(new TypePair(typeof(string), typeof(DateTimeOffset))).ShouldBeOfType<ParseStringMapper>();
+            Configuration.FindMapper(new TypePair(typeof(string), typeof(DateTimeOffset))).ShouldBeOfType<ParseStringMapper>();
             var dateTimeOffset = DateTimeOffset.Now;
             Mapper.Map<DateTimeOffset>(dateTimeOffset.ToString("O")).ShouldBe(dateTimeOffset);
         }

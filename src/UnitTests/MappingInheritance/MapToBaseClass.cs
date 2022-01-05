@@ -11,7 +11,7 @@
         public class A { }
         public class B : A { }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Input, A>().Include<Input, B>();
             c.CreateMap<Input, B>();
@@ -42,7 +42,7 @@
         class DestinationDerived : Destination
         {
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Source, Destination>().Include<SourceDerived, DestinationDerived>();
             c.CreateMap<SourceDerived, DestinationDerived>();
@@ -66,7 +66,7 @@
         {
         }
         class DestinationConcrete : Destination { }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Source, Destination>().Include<SourceDerived, DestinationDerived>();
             c.CreateMap<SourceDerived, Destination>().As<DestinationConcrete>();

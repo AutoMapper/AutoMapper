@@ -120,17 +120,26 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
 
     public class When_mapping_from_dynamic_with_missing_property
     {
-        Destination _destination;
-
         [Fact]
         public void Should_map_existing_properties()
         {
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<Destination>((object)source);
-            _destination.Foo.ShouldBe("Foo");
-            _destination.Bar.ShouldBeNull();
+            var destination = config.CreateMapper().Map<Destination>((object)source);
+            destination.Foo.ShouldBe("Foo");
+            destination.Bar.ShouldBeNull();
+        }
+        [Fact]
+        public void Should_keep_existing_value()
+        {
+            dynamic source = new DynamicDictionary();
+            source.Foo = "Foo";
+            var config = new MapperConfiguration(cfg => { });
+            var destination = new Destination { Baz = 42 };
+            config.CreateMapper().Map((object)source, destination);
+            destination.Foo.ShouldBe("Foo");
+            destination.Baz.ShouldBe(42);
         }
     }
 

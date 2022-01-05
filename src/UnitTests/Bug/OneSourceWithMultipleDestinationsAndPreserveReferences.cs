@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             public AddressModel Address { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(mapConfig =>
+        protected override MapperConfiguration CreateConfiguration() => new(mapConfig =>
         {
             mapConfig.CreateMap<Client, ClientModel>()
                 .ForMember(m => m.Address, opt => opt.MapFrom(x => x))

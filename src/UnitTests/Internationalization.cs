@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests
                 public string CustomerÆøå { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Order, OrderDto>();
             });

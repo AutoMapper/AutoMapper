@@ -59,7 +59,7 @@ namespace AutoMapper
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
         {
             _pathMaps ??= new();
-            var pathMap = _pathMaps.GetOrDefault(path);
+            var pathMap = _pathMaps.GetValueOrDefault(path);
             if (pathMap == null)
             {
                 pathMap = new(destinationExpression, path, typeMap);
@@ -116,7 +116,6 @@ namespace AutoMapper
             }
         }
         public bool? IsValid { get; set; }
-        internal bool WasInlineChecked { get; set; }
         public bool AsProxy { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation
@@ -149,15 +148,11 @@ namespace AutoMapper
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
                 IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
-        public bool ConstructorParameterMatches(string destinationPropertyName) =>
-            ConstructorMap.CtorParams.Any(c => string.Equals(c.Parameter.Name, destinationPropertyName, StringComparison.OrdinalIgnoreCase));
-
+        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMap[destinationPropertyName] != null;
         public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
-
             propertyMap.MapByConvention(sourceMembers);
-
             AddPropertyMap(propertyMap);
         }
         private void AddPropertyMap(PropertyMap propertyMap)
@@ -216,20 +211,20 @@ namespace AutoMapper
             return propertyMap;
         }
         public TypePair GetAsPair() => new TypePair(SourceType, DestinationTypeOverride);
-        public void IncludeDerivedTypes(in TypePair derivedTypes)
+        public void IncludeDerivedTypes(TypePair derivedTypes)
         {
             CheckDifferent(derivedTypes);
             _includedDerivedTypes ??= new();
             _includedDerivedTypes.Add(derivedTypes);
         }
-        private void CheckDifferent(in TypePair types)
+        private void CheckDifferent(TypePair types)
         {
             if (types == Types)
             {
                 throw new InvalidOperationException("You cannot include a type map into itself.");
             }
         }
-        public void IncludeBaseTypes(in TypePair baseTypes)
+        public void IncludeBaseTypes(TypePair baseTypes)
         {
             CheckDifferent(baseTypes);
             _includedBaseTypes ??= new();
@@ -323,7 +318,7 @@ namespace AutoMapper
         }
         internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath) =>
             Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
-        private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetOrDefault(name);
+        private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
         public bool AddMemberMap(IncludedMember includedMember)
         {
@@ -333,15 +328,14 @@ namespace AutoMapper
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
             _sourceMemberConfigs ??= new();
-            var config = _sourceMemberConfigs.GetOrDefault(sourceMember);
+            var config = _sourceMemberConfigs.GetValueOrDefault(sourceMember);
 
             if (config != null) return config;
 
             config = new(sourceMember);
-            AddSourceMemberConfig(config);
+            _sourceMemberConfigs.Add(config.SourceMember, config);
             return config;
         }
-        private void AddSourceMemberConfig(SourceMemberConfig config) => _sourceMemberConfigs.Add(config.SourceMember, config);
         public bool AddInheritedMap(TypeMap inheritedTypeMap)
         {
             _inheritedTypeMaps ??= new();
@@ -355,7 +349,8 @@ namespace AutoMapper
                 .Select(p => new PropertyMap(p, this, includedMember))
                 .ToArray();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0)
+            var appliedConstructorMap = ConstructorMap?.ApplyIncludedMember(includedMember);
+            if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0 && appliedConstructorMap is not true)
             {
                 return;
             }
@@ -446,10 +441,7 @@ namespace AutoMapper
                 _sourceMemberConfigs ??= new();
                 foreach (var inheritedSourceConfig in inheritedTypeMap._sourceMemberConfigs.Values)
                 {
-                    if (!_sourceMemberConfigs.ContainsKey(inheritedSourceConfig.SourceMember))
-                    {
-                        AddSourceMemberConfig(inheritedSourceConfig);
-                    }
+                    _sourceMemberConfigs.TryAdd(inheritedSourceConfig.SourceMember, inheritedSourceConfig);
                 }
             }
         }

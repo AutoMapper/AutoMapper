@@ -59,7 +59,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Customer, CustomerViewModel>().ForMember(d=>d.ItemsIds, o=>o.MapFrom(s=>s.Items.Select(i=>i.Id)));
         });

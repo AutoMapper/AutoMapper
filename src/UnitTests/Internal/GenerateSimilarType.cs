@@ -63,9 +63,7 @@ namespace AutoMapper.UnitTests
             Assert.Equal(articles[0], instance.Article);
         }
 
-        public IEnumerable<object> GetProperties(Type type)
-        {
-            return type.GetProperties().OrderBy(p => p.Name).Select(p => new { p.Name, p.PropertyType });
-        }
+        public IEnumerable<(string Name, Type PropertyType)> GetProperties(Type type) =>
+            type.GetProperties().OrderBy(p => p.Name).Select(p => (p.Name, p.PropertyType));
     }
 }

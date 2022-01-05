@@ -67,12 +67,12 @@ namespace AutoMapper.Configuration
 
         public void Configure(TypeMap typeMap)
         {
-            var ctorParams = typeMap.ConstructorMap?.CtorParams;
-            if (ctorParams == null)
+            var ctorMap = typeMap.ConstructorMap;
+            if (ctorMap == null)
             {
                 throw new AutoMapperConfigurationException($"The type {typeMap.DestinationType.Name} does not have a constructor.\n{typeMap.DestinationType.FullName}");
             }
-            var parameter = ctorParams.SingleOrDefault(p => p.Parameter.Name == CtorParamName);
+            var parameter = ctorMap[CtorParamName];
             if (parameter == null)
             {
                 throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");

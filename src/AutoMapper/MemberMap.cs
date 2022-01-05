@@ -15,26 +15,26 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberMap
     {
-        protected MemberMap() { }
-        public static readonly MemberMap Instance = new MemberMap();
-        public virtual TypeMap TypeMap => default;
+        protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
+        public static readonly MemberMap Instance = new();
+        public TypeMap TypeMap { get; protected set; }
+        public LambdaExpression CustomMapExpression { get; set; }
         public virtual Type SourceType { get => default; protected set { } }
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
-        public virtual IncludedMember IncludedMember => default;
+        public IncludedMember IncludedMember { get; protected set; }
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
         public virtual TypePair Types() => new TypePair(SourceType, DestinationType);
         public virtual bool CanResolveValue { get => default; set { } }
-        public virtual bool IsMapped => Ignored || CanResolveValue;
+        public bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
-        public virtual bool Inline { get => true; set { } }
+        public virtual bool Inline { get; set; } = true;
         public virtual bool? AllowNull { get => null; set { } }
         public virtual bool CanBeSet => true;
         public virtual bool? UseDestinationValue { get => default; set { } }
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
-        public virtual LambdaExpression CustomMapExpression { get => default; set { } }
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
@@ -57,8 +57,20 @@ namespace AutoMapper
         public override string ToString() => DestinationName;
         public Expression ChainSourceMembers(Expression source, Type destinationType, Expression defaultValue) =>
             SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
-        public bool AllowsNullDestinationValues() => TypeMap.Profile.AllowsNullDestinationValuesFor(this);
-        public bool AllowsNullCollections() => TypeMap.Profile.AllowsNullCollectionsFor(this);
+        public bool AllowsNullDestinationValues() => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
+        public bool AllowsNullCollections() => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
+        public ProfileMap Profile => TypeMap?.Profile;
+        private int MaxDepth => (TypeMap?.MaxDepth).GetValueOrDefault();
+        public bool MapperEquals(MemberMap other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return other.MustUseDestination == MustUseDestination && other.MaxDepth == MaxDepth && 
+                other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
+        }
+        public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
     }
     public class ValueResolverConfiguration
     {

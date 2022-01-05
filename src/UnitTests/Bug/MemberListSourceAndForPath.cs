@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Source { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Input, TargetOuter>(MemberList.Source)
                 .ForPath(x => x.Inner.MyProp, opt => opt.MapFrom(x => x.Source));

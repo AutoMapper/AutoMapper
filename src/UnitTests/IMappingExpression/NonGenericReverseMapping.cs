@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof (Source), typeof (Destination)).ReverseMap();
             });
@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_reverse_mapping_and_ignoring_via_method : NonValidatingSpecBase
+        public class When_reverse_mapping_and_ignoring_via_method : AutoMapperSpecBase
         {
             public class Source
             {
@@ -56,18 +56,12 @@ namespace AutoMapper.UnitTests
                 public int Ignored { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof (Source), typeof (Dest))
                     .ForMember("Ignored", opt => opt.Ignore())
                     .ReverseMap();
             });
-
-            [Fact]
-            public void Should_show_valid()
-            {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid());
-            }
         }
 
         public class When_reverse_mapping_and_ignoring : SpecBase

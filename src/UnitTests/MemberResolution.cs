@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
                 public int OtherValue { get; set; }
             }
-            protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+            protected override MapperConfiguration CreateConfiguration() => new(c=>c.CreateMap<Source, Destination>());
             [Fact]
             public void Should_prefer_the_property()
             {
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests
                 public string SubString { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
 
                 cfg.CreateMap<ModelObject, DtoObject>()
@@ -116,7 +116,7 @@ namespace AutoMapper.UnitTests
                 public string SubString { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .Include<ModelSubObject, DtoSubObject>();
@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests
                 public string SubString { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<IModelObject, DtoObject>()
                     .Include<ModelSubObject, DtoSubObject>();
@@ -231,7 +231,7 @@ namespace AutoMapper.UnitTests
                 public string SubString { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Model, DtoModel>();
 
@@ -292,7 +292,7 @@ namespace AutoMapper.UnitTests
                 public string SubMissingSubSubIAmACoolProperty { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
 
                 cfg.CreateMap<ModelObject, ModelDto>();
@@ -392,7 +392,7 @@ namespace AutoMapper.UnitTests
                 public string SubMissingSubSubIAmACoolProperty;            
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
@@ -491,7 +491,7 @@ namespace AutoMapper.UnitTests
                 public string SubMissingSubSubIAmACoolProperty { get; set;}
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
@@ -577,7 +577,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(x => x.Ignored, opt => opt.Ignore());
@@ -636,7 +636,7 @@ namespace AutoMapper.UnitTests
                 public string SubSomeOtherCoolValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
@@ -693,7 +693,7 @@ namespace AutoMapper.UnitTests
                 public string SubSomeOtherCoolValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
@@ -746,7 +746,7 @@ namespace AutoMapper.UnitTests
                 public string SomeValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
                 cfg.CreateMap<ModelSubObject, ModelSubDto>();
@@ -798,7 +798,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>();
 
@@ -877,7 +877,7 @@ namespace AutoMapper.UnitTests
                 public int MoreBlarg { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg
                     .CreateMap<ModelObject, ModelDto>()
@@ -1027,7 +1027,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof (Order), typeof (OrderDTO))
                     .ForMember("CurrentState", map => map.MapFrom("Status"))
@@ -1096,7 +1096,7 @@ namespace AutoMapper.UnitTests
                 public int someValueWithPascalName { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
             });
@@ -1111,12 +1111,6 @@ namespace AutoMapper.UnitTests
             public void Should_match_to_PascalCased_source_member()
             {
                 _result.someValueWithPascalName.ShouldBe(5);
-            }
-
-            [Fact]
-            public void Should_pass_configuration_check()
-            {
-                Configuration.AssertConfigurationIsValid();
             }
         }
 
@@ -1136,7 +1130,7 @@ namespace AutoMapper.UnitTests
                 public CategoryDto[] Children { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Category, CategoryDto>();
             });
@@ -1167,12 +1161,6 @@ namespace AutoMapper.UnitTests
             }
 
             [Fact]
-            public void Should_pass_configuration_check()
-            {
-                Configuration.AssertConfigurationIsValid();
-            }
-
-            [Fact]
             public void Should_resolve_any_level_of_hierarchies()
             {
                 _result.Name.ShouldBe("Grandparent");
@@ -1196,7 +1184,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof (Source), typeof (Destination));
             });
@@ -1232,7 +1220,7 @@ namespace AutoMapper.UnitTests
                 public int some_source_value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
                 cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
@@ -1278,7 +1266,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePrefixes("Foo");
                 cfg.AddProfile<ChildProfile>();                
@@ -1321,7 +1309,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePrefixes("Foo");
                 cfg.CreateMap<Source, Destination>();
@@ -1365,7 +1353,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePrefixes("Foo");
                 cfg.CreateMap<Source, Destination>();
@@ -1408,7 +1396,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePostfixes("Foo");
                 cfg.CreateMap<Source, Destination>();
@@ -1459,7 +1447,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePrefixes("Foo");
                 cfg.RecognizePostfixes("Bar");
@@ -1504,7 +1492,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizePrefixes("Foo");
                 cfg.RecognizePostfixes("Bar");
@@ -1543,7 +1531,7 @@ namespace AutoMapper.UnitTests
                 public int I_amaCraAZZEE____Name { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
             });
@@ -1574,7 +1562,7 @@ namespace AutoMapper.UnitTests
                 public int Bar { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.ReplaceMemberName("Foo", "Bar");
                 cfg.CreateMap<Source, Destination>();
@@ -1608,7 +1596,7 @@ namespace AutoMapper.UnitTests
                 public int BarValue2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.RecognizeDestinationPrefixes("Foo", "Bar");
                 cfg.CreateMap<Source, Destination>();
@@ -1657,7 +1645,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; private set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });

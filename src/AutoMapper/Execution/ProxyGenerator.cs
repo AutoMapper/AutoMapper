@@ -122,7 +122,7 @@ namespace AutoMapper.Execution
             ProxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
         class PropertyEmitter
         {
-            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetMethod("NotifyPropertyChanged", TypeExtensions.InstanceFlags);
+            private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetInstanceMethod("NotifyPropertyChanged");
             private readonly FieldBuilder _fieldBuilder;
             private readonly MethodBuilder _getterBuilder;
             private readonly PropertyBuilder _propertyBuilder;
@@ -198,8 +198,8 @@ namespace AutoMapper.Execution
         }
         public override bool Equals(object other) => other is TypeDescription description && Equals(description);
         public bool Equals(TypeDescription other) => Type == other.Type && AdditionalProperties.SequenceEqual(other.AdditionalProperties);
-        public static bool operator ==(in TypeDescription left, in TypeDescription right) => left.Equals(right);
-        public static bool operator !=(in TypeDescription left, in TypeDescription right) => !left.Equals(right);
+        public static bool operator ==(TypeDescription left, TypeDescription right) => left.Equals(right);
+        public static bool operator !=(TypeDescription left, TypeDescription right) => !left.Equals(right);
     }
     [DebuggerDisplay("{Name}-{Type.Name}")]
     public readonly struct PropertyDescription : IEquatable<PropertyDescription>
@@ -222,7 +222,7 @@ namespace AutoMapper.Execution
         public override int GetHashCode() => HashCode.Combine(Name, Type, CanWrite);
         public override bool Equals(object other) => other is PropertyDescription description && Equals(description);
         public bool Equals(PropertyDescription other) => Name == other.Name && Type == other.Type && CanWrite == other.CanWrite;
-        public static bool operator ==(in PropertyDescription left, in PropertyDescription right) => left.Equals(right);
-        public static bool operator !=(in PropertyDescription left, in PropertyDescription right) => !left.Equals(right);
+        public static bool operator ==(PropertyDescription left, PropertyDescription right) => left.Equals(right);
+        public static bool operator !=(PropertyDescription left, PropertyDescription right) => !left.Equals(right);
     }
 }

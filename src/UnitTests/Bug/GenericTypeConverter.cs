@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests.Bug
     {
         List<object> _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap(typeof(List<>), typeof(List<>)).ConvertUsing(typeof(Converter<,>)));
+        protected override MapperConfiguration CreateConfiguration() => new(c=>c.CreateMap(typeof(List<>), typeof(List<>)).ConvertUsing(typeof(Converter<,>)));
 
         protected override void Because_of()
         {
@@ -120,7 +120,7 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof (Source<>), typeof (Destination<>)).ConvertUsing(typeof (Converter<>));
             cfg.CreateMap(typeof (OtherSource<>), typeof (OtherDestination<>)).ConvertUsing(typeof (Converter<>));

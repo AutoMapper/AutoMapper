@@ -32,7 +32,7 @@
             public int Other { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AddIgnoreMapAttribute();
             cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructUsing(src => new Dest(((Source)src).Value + 10));

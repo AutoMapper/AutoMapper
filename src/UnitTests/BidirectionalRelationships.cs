@@ -12,7 +12,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private ParentDto _dto;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => 
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => 
         {
             cfg.CreateMap<ParentModel, ParentDto>();
             cfg.CreateMap<ChildModel, ChildDto>();
@@ -82,7 +82,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private ParentDto _dto;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ParentModel, ParentDto>().PreserveReferences();
             cfg.CreateMap<ChildModel, ChildDto>();
@@ -147,7 +147,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private ParentDto<int> _dto;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(ParentModel<>), typeof(ParentDto<>));
             cfg.CreateMap(typeof(ChildModel<>), typeof(ChildDto<>));
@@ -213,7 +213,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
         private ParentDto _dto;
         private static ParentModel _parent;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             _parent = new ParentModel
             {
@@ -311,7 +311,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private FooDto _dto;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Foo, FooDto>().PreserveReferences();
             cfg.CreateMap<Bar, BarDto>();
@@ -363,7 +363,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private FooContainerModel _dto;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FooModel, FooScreenModel>();
             cfg.CreateMap<FooModel, FooInputModel>();
@@ -416,7 +416,7 @@ namespace AutoMapper.UnitTests. BidirectionalRelationships
     {
         private ParentDto _dtoParent;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Parent, ParentDto>().PreserveReferences();
             cfg.CreateMap<Child, ChildDto>();

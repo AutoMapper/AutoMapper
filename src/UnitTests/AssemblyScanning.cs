@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests
     {
         public class When_scanning_by_assembly : NonValidatingSpecBase
         {
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(new[] { typeof(When_scanning_by_assembly).Assembly, typeof(Mapper).Assembly });
             });
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
 
         public class When_scanning_by_type : NonValidatingSpecBase
         {
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AddMaps(new[] { typeof(When_scanning_by_assembly) });
             });
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests
         {
             private static readonly Assembly AutoMapperAssembly = typeof(When_scanning_by_name).Assembly;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
                 cfg.AddMaps(new[] { AutoMapperAssembly.FullName });

@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
             public int A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
+        protected override MapperConfiguration CreateConfiguration() => new(
             cfg =>
             {
                 cfg.ShouldUseConstructor = c => c.IsAssembly;
@@ -39,11 +39,7 @@ namespace AutoMapper.UnitTests
             });
 
         [Fact]
-        public void Should_only_map_internal_ctor()
-        {
-            Should.Throw<AutoMapperConfigurationException>(() =>
-                Configuration.AssertConfigurationIsValid());
-        }
+        public void Should_only_map_internal_ctor() => Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid);
     }
 
     public class ShouldUseConstructorPrivate : NonValidatingSpecBase
@@ -74,7 +70,7 @@ namespace AutoMapper.UnitTests
             public int A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
+        protected override MapperConfiguration CreateConfiguration() => new(
             cfg =>
             {
                 cfg.ShouldUseConstructor = c => c.IsPrivate;
@@ -82,11 +78,7 @@ namespace AutoMapper.UnitTests
             });
 
         [Fact]
-        public void Should_only_map_private_ctor()
-        {
-            Should.Throw<AutoMapperConfigurationException>(() =>
-                Configuration.AssertConfigurationIsValid());
-        }
+        public void Should_only_map_private_ctor() => Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid);
     }
 
     public class ShouldUseConstructorPublic : NonValidatingSpecBase
@@ -116,7 +108,7 @@ namespace AutoMapper.UnitTests
             public int A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(
+        protected override MapperConfiguration CreateConfiguration() => new(
             cfg =>
             {
                 cfg.ShouldUseConstructor = c => c.IsPublic;
@@ -126,8 +118,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_only_map_public_ctor()
         {
-            Should.Throw<AutoMapperConfigurationException>(() =>
-                Configuration.AssertConfigurationIsValid());
+            Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid);
         }
     }
 
@@ -153,7 +144,7 @@ namespace AutoMapper.UnitTests
             public int A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } =
+        protected override MapperConfiguration CreateConfiguration() => 
             new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
     }
 
@@ -178,14 +169,13 @@ namespace AutoMapper.UnitTests
             public string A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = 
+        protected override MapperConfiguration CreateConfiguration() => 
             new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
 
         [Fact]
         public void Should_ignore_static_constructor()
         {
-            Should.Throw<AutoMapperConfigurationException>(() =>
-                Configuration.AssertConfigurationIsValid());
+            Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid);
         }
     }
 
@@ -207,14 +197,11 @@ namespace AutoMapper.UnitTests
             public string A { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } =
+        protected override MapperConfiguration CreateConfiguration() => 
             new MapperConfiguration(cfg => { cfg.CreateMap<Source, Destination>(); });
 
         [Fact]
-        public void Should_ignore_implicit_static_constructor()
-        {
-            Should.Throw<AutoMapperConfigurationException>(() =>
-                Configuration.AssertConfigurationIsValid());
-        }
+        public void Should_ignore_implicit_static_constructor() =>
+            Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid);
     }
 }

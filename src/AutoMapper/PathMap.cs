@@ -18,24 +18,16 @@ namespace AutoMapper
             Condition = pathMap.Condition;
             Ignored = pathMap.Ignored;
         }
-
-        public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
+        public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap) : base(typeMap)
         {
             MemberPath = memberPath;
-            TypeMap = typeMap;
             DestinationExpression = destinationExpression;
         }
-
-        public override TypeMap TypeMap { get; }
-
         public override Type SourceType => CustomMapExpression.ReturnType;
-        public override IncludedMember IncludedMember { get; }
         public LambdaExpression DestinationExpression { get; }
-        public override LambdaExpression CustomMapExpression { get; set; }
         public MemberPath MemberPath { get; }
         public override Type DestinationType => MemberPath.Last.GetMemberType();
         public override string DestinationName => MemberPath.ToString();
-
         public override bool CanResolveValue => !Ignored;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(MemberPath.Last);
         public override bool Ignored { get; set; }

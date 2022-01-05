@@ -5,7 +5,6 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-#if NET461
     public class NullConstructorParameterName
     {
         [Fact]
@@ -20,7 +19,7 @@ namespace AutoMapper.UnitTests.Bug
         object CreateDynamicObject()
         {
             var assemblyName = new AssemblyName("TestClass");
-            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
             TypeBuilder typeBuilder = moduleBuilder.DefineType(assemblyName.FullName
                 , TypeAttributes.Public |
@@ -38,5 +37,4 @@ namespace AutoMapper.UnitTests.Bug
             return Activator.CreateInstance(type);
         }
     }
-#endif
 }

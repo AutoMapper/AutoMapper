@@ -36,7 +36,7 @@ namespace AutoMapper.IntegrationTests
             protected override void OnModelCreating(DbModelBuilder modelBuilder) => Database.SetInitializer(new Initializer());
             public DbSet<SourceType> SourceTypes { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             cfg.CreateProjection<SourceType, DestinationType>().ForMember(d => d.Index, o => o.MapFrom(source => source.Parameters.FirstOrDefault(p => p.Name == "Index").Value)));
         [Fact]
         public void Should_project_ok()
@@ -49,7 +49,7 @@ namespace AutoMapper.IntegrationTests
     }
     public class NullChildItemTest : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateProjection<Parent, ParentDto>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Parent, ParentDto>());
         public class TestContext : DbContext
         {
             public TestContext() : base() => Database.SetInitializer(new DatabaseInitializer());
@@ -148,7 +148,7 @@ namespace AutoMapper.IntegrationTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Student, StudentViewModel>().ForMember(d => d.Score, opts => opts.MapFrom(m => m.ScoreRecords));
             cfg.CreateProjection<ICollection<ScoreRecord>, ScoreModel>()

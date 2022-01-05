@@ -9,7 +9,7 @@ namespace AutoMapper.Internal.Mappers
     using static Expression;
     public class ToStringMapper : IObjectMapper
     {
-        public bool IsMatch(in TypePair context) => context.DestinationType == typeof(string);
+        public bool IsMatch(TypePair context) => context.DestinationType == typeof(string);
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var sourceType = sourceExpression.Type;

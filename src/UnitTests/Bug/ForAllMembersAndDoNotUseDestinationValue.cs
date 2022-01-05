@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForAllMembers(opt => opt.MapFrom(s=>12));
         });

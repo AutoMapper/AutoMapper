@@ -23,8 +23,7 @@ namespace AutoMapper.UnitTests.Bug
             public Int32 Type { get; private set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } 
-            = new MapperConfiguration(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
 
         [Fact]
         public void Should_pick_a_ctor_which_best_matches()
@@ -58,6 +57,6 @@ namespace AutoMapper.UnitTests.Bug
             result.Type.ShouldBe(source.Type);
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
     }
 }

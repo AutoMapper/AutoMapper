@@ -39,7 +39,7 @@ namespace AutoMapper.Internal.Mappers
             var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
             return callsite.Target(callsite, target);
         }
-        public bool IsMatch(in TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
+        public bool IsMatch(TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(MapMethodInfo, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));

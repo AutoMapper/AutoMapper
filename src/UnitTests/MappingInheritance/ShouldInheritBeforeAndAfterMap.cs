@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         public class BaseDest : BaseBaseDest { }
         public class Dest : BaseDest { }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d)=>beforeMapCount++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
             cfg.CreateMap<BaseSource, BaseDest>().Include<Source, Dest>();
@@ -61,7 +61,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         public class BaseDest : BaseBaseDest { }
         public class Dest : BaseDest { }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d) => beforeMapCount++);
             cfg.CreateMap<BaseSource, BaseDest>().IncludeBase<BaseBaseSource, BaseBaseDest>();

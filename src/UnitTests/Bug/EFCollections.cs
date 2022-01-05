@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class DestChild {}
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>();
             cfg.CreateMap<Child, DestChild>();

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
-    public class IncludeBaseWithNonGenericUsage : NonValidatingSpecBase
+    public class IncludeBaseWithNonGenericUsage : AutoMapperSpecBase
     {
         class Source : SourceBase<string>
         { }
@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             public string Time;
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             // It does not matter if generic type is <String> or <>, result is the same.
             cfg.CreateMap(typeof(SourceBase<string>), typeof(DestinationBase<string>))
@@ -32,15 +32,9 @@ namespace AutoMapper.UnitTests.MappingInheritance
             cfg.CreateMap(typeof(Source), typeof(Destination))
                 .IncludeBase(typeof(SourceBase<string>), typeof(DestinationBase<string>));
         });
-
-        [Fact]
-        public void Should_pass_validation()
-        {
-            Should.NotThrow(() => Configuration.AssertConfigurationIsValid());
-        }
     }
 
-    public class IncludeBaseWithGenericUsage : NonValidatingSpecBase
+    public class IncludeBaseWithGenericUsage : AutoMapperSpecBase
     {
         class Source : SourceBase<string>
         { }
@@ -60,7 +54,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             public string Time;
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             // It does not matter if generic type is <String> or <>, result is the same.
             cfg.CreateMap<SourceBase<string>, DestinationBase<string>>()
@@ -68,11 +62,5 @@ namespace AutoMapper.UnitTests.MappingInheritance
             cfg.CreateMap<Source, Destination>()
                 .IncludeBase<SourceBase<string>, DestinationBase<string>>();
         });
-
-        [Fact]
-        public void Should_pass_validation()
-        {
-            Should.NotThrow(() => Configuration.AssertConfigurationIsValid());
-        }
     }
 }

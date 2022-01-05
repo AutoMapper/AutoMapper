@@ -36,7 +36,7 @@ namespace AutoMapper.Execution
             var ctorWithOptionalArgs = type.GetDeclaredConstructors().FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
             if (ctorWithOptionalArgs == null)
             {
-                return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args.");
+                return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args. Validate your configuration for details.");
             }
             //get all optional default values
             var args = ctorWithOptionalArgs.GetParameters().Select(p=>ToType(p.GetDefaultValue(), p.ParameterType));

@@ -13,7 +13,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             Gamma = 13
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<int?, GreekLetters>().ConvertUsing(n => n == null ? GreekLetters.Beta : GreekLetters.Gamma);
         });
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
     public class MissingConverter : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.ConstructServicesUsing(t => null);
             c.CreateMap<int, int>().ConvertUsing<ITypeConverter<int, int>>();
@@ -60,7 +60,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             public decimal? Value3 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<decimal?, decimal>().ConvertUsing(source => source ?? decimal.MaxValue);
@@ -113,7 +113,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<IId, string>().ConvertUsing(id => id.Serialize());
@@ -145,7 +145,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             public IDictionary<int, int> Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(IDictionary<,>), typeof(IDictionary<,>)).ConvertUsing(typeof(DictionaryConverter<,>));
             cfg.CreateMap<Source, Destination>();
@@ -208,7 +208,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<string, int>().ConvertUsing((string arg) => Convert.ToInt32(arg));
             cfg.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
@@ -272,7 +272,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             public Destination Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ConvertUsing(arg => new Destination {Type = Convert.ToInt32(arg.Foo)});
             cfg.CreateMap<ParentSource, ParentDestination>();
@@ -320,7 +320,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ConvertUsing<CustomConverter>();
         });
@@ -362,7 +362,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof (Source), typeof (Destination)).ConvertUsing(typeof (CustomConverter));
         });

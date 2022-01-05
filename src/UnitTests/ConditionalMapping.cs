@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForAllMembers(o => o.Condition((source, destination, sourceProperty, destinationProperty) =>
             {
@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
 
     public class When_ignoring_all_properties_with_an_inaccessible_setter_and_explicitly_implemented_member : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<SourceClass, DestinationClass>().IgnoreAllPropertiesWithAnInaccessibleSetter());
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<SourceClass, DestinationClass>().IgnoreAllPropertiesWithAnInaccessibleSetter());
 
         interface Interface
         {
@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Value, opt => opt.Condition(src => src.Value > 0));
@@ -110,7 +110,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Value, opt =>
@@ -171,7 +171,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.ScreenName, opt => opt.MapFrom(src => src.ScreenName))
@@ -187,7 +187,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         [Fact]
         public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(AssertConfigurationIsValid);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             public int Baz { get; protected set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .IgnoreAllPropertiesWithAnInaccessibleSetter()
@@ -267,7 +267,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         [Fact]
         public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(AssertConfigurationIsValid);
         }
 
         [Fact]

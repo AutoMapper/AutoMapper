@@ -28,6 +28,6 @@ namespace AutoMapper.UnitTests.MappingInheritance
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.AddProfile<TestProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<TestProfile>());
     }
 }

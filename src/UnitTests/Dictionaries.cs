@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+            protected override MapperConfiguration CreateConfiguration() => new(cfg => 
             {
                 cfg.CreateMap<Source, Destination>();
                 cfg.CreateMap<SourceValue, DestinationValue>();
@@ -132,7 +132,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
                 cfg.CreateMap<SourceValue, DestinationValue>();
@@ -176,7 +176,7 @@ namespace AutoMapper.UnitTests
                 public System.Collections.Generic.IDictionary<string, FooDto> Bar { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.AllowNullDestinationValues = false;
                 cfg.CreateMap<Foo, FooDto>();
@@ -219,7 +219,7 @@ namespace AutoMapper.UnitTests
                 public System.Collections.Generic.IDictionary<string, string> Items { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<SourceDto, DestDto>()
                     .ForMember(d => d.Items, opt => opt.MapFrom(s => s.Items));
@@ -433,7 +433,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<FooDto, FooObject>();
                 cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
@@ -481,7 +481,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<BaseClassWithDictionary, DerivedClassWithDictionary>());
+            protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<BaseClassWithDictionary, DerivedClassWithDictionary>());
         }
     }
 
@@ -505,7 +505,7 @@ namespace AutoMapper.UnitTests
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FooDto, FooObject>();
             cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
@@ -556,7 +556,7 @@ namespace AutoMapper.UnitTests
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FooDto, FooObject>();
             cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()

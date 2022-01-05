@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        protected override MapperConfiguration CreateConfiguration() => new(config =>
         {
             config.AllowNullDestinationValues = false;
             config.CreateMap<Inner, Inner>();
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.Bug
         public class Destination
         {
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        protected override MapperConfiguration CreateConfiguration() => new(config =>
         {
             config.AllowNullDestinationValues = false;
             config.CreateMap<Source, Destination>();

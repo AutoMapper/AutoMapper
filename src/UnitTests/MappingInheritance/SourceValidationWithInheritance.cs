@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests
             public bool Prepopulate { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FormElement2, FormElementDTO2>(MemberList.Source)
                 .Include<FieldControl2, FormElementDTO2>();
@@ -106,7 +106,7 @@ namespace AutoMapper.UnitTests
             public bool Prepopulate { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<FormElement2, FormElementDTO2>(MemberList.Source)
                 .Include<FieldControl2, FormElementDTO2>();

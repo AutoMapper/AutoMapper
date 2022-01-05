@@ -8,13 +8,12 @@ namespace AutoMapper.Internal
 {
     using Execution;
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct MemberPath : IEquatable<MemberPath>
+    public readonly struct MemberPath : IEquatable<MemberPath>
     {
-        public static readonly MemberPath Empty = new MemberPath(Array.Empty<MemberInfo>());
+        public static readonly MemberPath Empty = new(Array.Empty<MemberInfo>());
         public readonly MemberInfo[] Members;
-        public MemberPath(Stack<Member> members) : this(members.ToMemberInfos())
-        {
-        }
+
+        public MemberPath(Stack<Member> members) : this(members.ToMemberInfos()){}
 
         public MemberPath(MemberInfo[] members) => Members = members;
 
@@ -26,11 +25,7 @@ namespace AutoMapper.Internal
 
         public bool Equals(MemberPath other) => Members.SequenceEqual(other.Members);
 
-        public override bool Equals(object obj)
-        {
-            if(obj is null) return false;
-            return obj is MemberPath path && Equals(path);
-        }
+        public override bool Equals(object obj) => obj is MemberPath path && Equals(path);
 
         public override int GetHashCode()
         {
@@ -42,14 +37,13 @@ namespace AutoMapper.Internal
             return hashCode.ToHashCode();
         }
 
-        public override string ToString()
-            => string.Join(".", Members.Select(mi => mi.Name));
+        public override string ToString() => string.Join(".", Members.Select(mi => mi.Name));
 
-        public static bool operator==(in MemberPath left, in MemberPath right) => left.Equals(right);
+        public static bool operator==(MemberPath left, MemberPath right) => left.Equals(right);
 
-        public static bool operator!=(in MemberPath left, in MemberPath right) => !left.Equals(right);
+        public static bool operator!=(MemberPath left, MemberPath right) => !left.Equals(right);
 
-        public bool StartsWith(in MemberPath path)
+        public bool StartsWith(MemberPath path)
         {
             if (path.Length > Length)
             {
@@ -65,6 +59,6 @@ namespace AutoMapper.Internal
             return true;
         }
 
-        public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new MemberPath(Members.Concat(memberInfos).ToArray());
+        public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new(Members.Concat(memberInfos).ToArray());
     }
 }

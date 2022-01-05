@@ -18,9 +18,9 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             public string Value { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<TModel, TInterface>().As<TConcrete>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<TModel, TInterface>().As<TConcrete>());
         [Fact]
-        public void Should_report_missing_map() => new Action(() => Configuration.CompileMappings()).ShouldThrow<InvalidOperationException>().Message.ShouldBe(
+        public void Should_report_missing_map() => new Action(AssertConfigurationIsValid).ShouldThrow<InvalidOperationException>().Message.ShouldBe(
             "Missing map from AutoMapper.UnitTests.MappingInheritance.AsWithMissingMap+TModel to AutoMapper.UnitTests.MappingInheritance.AsWithMissingMap+TConcrete. Create using CreateMap<TModel, TConcrete>.");
     }
     public class AsShouldWorkOnlyWithDerivedTypesWithGenerics : AutoMapperSpecBase
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap(typeof(Source<>), typeof(Override<>));
             c.CreateMap(typeof(Source<>), typeof(Destination<>)).As(typeof(Override<>));
@@ -202,17 +202,12 @@ namespace AutoMapper.UnitTests.MappingInheritance
             public string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
-        {
-            get
-            {
-                return new MapperConfiguration(cfg => {
-                    cfg.CreateMap(typeof(NodeDto<>), typeof(NodeModel<>));
-                    cfg.CreateMap(typeof(NodeDto<>), typeof(INodeModel<>)).As(typeof(NodeModel<>));
-                    cfg.CreateMap(typeof(INodeModel<>), typeof(NodeModel<>));
-                });
-            }
-        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+         {
+             cfg.CreateMap(typeof(NodeDto<>), typeof(NodeModel<>));
+             cfg.CreateMap(typeof(NodeDto<>), typeof(INodeModel<>)).As(typeof(NodeModel<>));
+             cfg.CreateMap(typeof(INodeModel<>), typeof(NodeModel<>));
+         });
 
         protected override void Because_of()
         {

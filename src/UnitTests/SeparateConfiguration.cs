@@ -14,18 +14,14 @@
         {
             public int Value { get; set; }
         }
-        public SeparateConfiguration()
+        protected override MapperConfiguration CreateConfiguration()
         {
             var expr = new MapperConfigurationExpression();
 
             expr.CreateMap<Source, Dest>();
 
-            var configuration = new MapperConfiguration(expr);
-
-            Configuration = configuration;
+            return new MapperConfiguration(expr);
         }
-
-        protected override MapperConfiguration Configuration { get; }
 
         [Fact]
         public void Should_use_passed_in_configuration()

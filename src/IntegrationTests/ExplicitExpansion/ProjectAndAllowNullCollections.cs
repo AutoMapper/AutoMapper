@@ -121,7 +121,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.AllowNullCollections = true;
 

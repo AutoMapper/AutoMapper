@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap(typeof (SourceFoo), typeof (DestinationFoo)).ConvertUsing(typeof (DualConverter));
                 cfg.CreateMap(typeof (SourceBar), typeof (DestinationBar)).ConvertUsing(typeof (DualConverter));
@@ -63,12 +63,6 @@ namespace AutoMapper.UnitTests.Bug
             public void Should_use_explicit_converter()
             {
                 _resultBar.DestinationBarValue.ShouldBe(1006);
-            }
-
-            [Fact]
-            public void Should_pass_configuration_validation()
-            {
-                Configuration.AssertConfigurationIsValid();
             }
         }
 }
