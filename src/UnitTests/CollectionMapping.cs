@@ -11,6 +11,20 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    public class AmbigousMethod : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Value { get; set; }
+        }
+        public class Destination
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
+        [Fact]
+        public void Should_work() => Map<Destination[]>(new[] { new Source() }.OrderBy(s => s.Value));
+    }
     public class Enumerator_disposable_at_runtime_class : AutoMapperSpecBase
     {
         class CustomList<T> : List<T>

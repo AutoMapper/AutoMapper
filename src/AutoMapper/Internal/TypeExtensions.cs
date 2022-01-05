@@ -101,6 +101,7 @@ namespace AutoMapper.Internal
         }
 
         public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
-        public static MethodInfo GetInstanceMethod(this Type type, string name) => type.GetMethod(name, InstanceFlags);
+        public static MethodInfo GetInstanceMethod(this Type type, string name) => 
+            (MethodInfo)type.GetMember(name, MemberTypes.Method, InstanceFlags).FirstOrDefault();
     }
 }
