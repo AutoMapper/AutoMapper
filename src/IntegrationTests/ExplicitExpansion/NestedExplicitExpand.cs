@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -78,7 +78,7 @@ namespace AutoMapper.IntegrationTests.Net4
             dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ShouldBe(new Class2DTO[] { null, null, null });
         }
 
-        public class TestContext : System.Data.Entity.DbContext
+        public class TestContext : Microsoft.EntityFrameworkCore.DbContext
         {
             public TestContext()
             {

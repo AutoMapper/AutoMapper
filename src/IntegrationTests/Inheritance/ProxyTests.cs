@@ -3,7 +3,7 @@
     using AutoMapper.UnitTests;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Data.Entity;
+    using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using Xunit;
 

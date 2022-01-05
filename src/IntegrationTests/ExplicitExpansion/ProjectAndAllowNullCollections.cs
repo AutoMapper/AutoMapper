@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Xunit;
 using Shouldly;
@@ -10,7 +10,7 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     using UnitTests;
     using QueryableExtensions;
-    using System.Data.Entity.ModelConfiguration;
+    using Microsoft.EntityFrameworkCore.ModelConfiguration;
 
     public class ProjectAndAllowNullCollections : AutoMapperSpecBase
     {

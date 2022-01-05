@@ -2,7 +2,7 @@
 using Xunit;
 using System.Linq;
 using Shouldly;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper.UnitTests;
 
 namespace AutoMapper.IntegrationTests.Net4

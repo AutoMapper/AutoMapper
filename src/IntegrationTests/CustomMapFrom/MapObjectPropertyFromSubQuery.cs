@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.UnitTests;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

@@ -1,6 +1,6 @@
 ﻿using Shouldly;
 using System;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Xunit;
 

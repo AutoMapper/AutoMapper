@@ -3,7 +3,7 @@ using Xunit;
 using Shouldly;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoMapper.UnitTests.Projection
 {

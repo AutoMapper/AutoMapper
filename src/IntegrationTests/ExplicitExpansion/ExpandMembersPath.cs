@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
@@ -77,7 +77,7 @@ namespace AutoMapper.IntegrationTests.Net4
             dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ToArray().ShouldBe(new Class2DTO[] { null, null, null });
         }
 
-        public class TestContext : System.Data.Entity.DbContext
+        public class TestContext : Microsoft.EntityFrameworkCore.DbContext
         {
             public TestContext()
             {
