@@ -47,13 +47,18 @@ namespace AutoMapper.Internal.Mappers
             Expression MapCollectionCore(Expression destExpression)
             {
                 var destinationType = destExpression.Type;
+                var sourceType = sourceExpression.Type;
                 MethodInfo addMethod;
                 bool isIList, mustUseDestination = memberMap is { MustUseDestination: true };
                 Type destinationCollectionType, destinationElementType;
                 GetDestinationType();
                 var passedDestination = Variable(destExpression.Type, "passedDestination");
                 var newExpression = Variable(passedDestination.Type, "collectionDestination");
-                var sourceElementType = sourceExpression.Type.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceExpression.Type);
+                var sourceElementType = sourceType.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceType);
+                if (sourceType == sourceElementType && destinationType == destinationElementType)
+                {
+                    throw new NotSupportedException($"Recursive collection. Create a custom type converter from {sourceType} to {destinationType}.");
+                }
                 var itemParam = Parameter(sourceElementType, "item");
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 Expression destination, assignNewExpression;

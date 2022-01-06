@@ -11,6 +11,23 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    public class RecursiveCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : List<MyJObject>{}
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
+        [Fact]
+        public void Should_work() => new Action(AssertConfigurationIsValid).ShouldThrow<NotSupportedException>().Message.ShouldBe(
+            "Recursive collection. Create a custom type converter from AutoMapper.UnitTests.RecursiveCollection+MyJObject to AutoMapper.UnitTests.RecursiveCollection+MyJObject.");
+    }
     public class AmbigousMethod : AutoMapperSpecBase
     {
         public class Source
