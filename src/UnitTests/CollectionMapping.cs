@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests
             c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
         [Fact]
         public void Should_work() => new Action(AssertConfigurationIsValid).ShouldThrow<NotSupportedException>().Message.ShouldBe(
-            "Recursive collection. Create a custom type converter from AutoMapper.UnitTests.RecursiveCollection+MyJObject to AutoMapper.UnitTests.RecursiveCollection+MyJObject.");
+            "Recursive collection. Consider a custom type converter from AutoMapper.UnitTests.RecursiveCollection+MyJObject to AutoMapper.UnitTests.RecursiveCollection+MyJObject.");
     }
     public class AmbigousMethod : AutoMapperSpecBase
     {

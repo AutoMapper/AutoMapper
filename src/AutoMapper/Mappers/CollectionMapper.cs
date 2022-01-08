@@ -57,7 +57,7 @@ namespace AutoMapper.Internal.Mappers
                 var sourceElementType = sourceType.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceType);
                 if (sourceType == sourceElementType && destinationType == destinationElementType)
                 {
-                    throw new NotSupportedException($"Recursive collection. Create a custom type converter from {sourceType} to {destinationType}.");
+                    throw new NotSupportedException($"Recursive collection. Consider a custom type converter from {sourceType} to {destinationType}.");
                 }
                 var itemParam = Parameter(sourceElementType, "item");
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
