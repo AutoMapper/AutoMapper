@@ -221,7 +221,7 @@ namespace AutoMapper
         {
             if (types == Types)
             {
-                throw new InvalidOperationException("You cannot include a type map into itself.");
+                throw new InvalidOperationException($"You cannot include a type map into itself.{Environment.NewLine}Source type: {types.SourceType.FullName}{Environment.NewLine}Destination type: {types.DestinationType.FullName}");
             }
         }
         public void IncludeBaseTypes(TypePair baseTypes)
