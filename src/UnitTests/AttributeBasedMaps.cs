@@ -1003,7 +1003,8 @@ namespace AutoMapper.UnitTests
             public void Should_not_convert_to_interface()
             {
                 var source = new Source { Value = 15 };
-                typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<IDest>(source));
+                Should.Throw<AutoMapperMappingException>(() => Mapper.Map<IDest>(source))
+                    .Message.ShouldStartWith("Cannot create interface " + typeof(IDest).FullName);
             }
         }
     }
