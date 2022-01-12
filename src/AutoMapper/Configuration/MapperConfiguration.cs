@@ -300,25 +300,15 @@ namespace AutoMapper
         static List<Type> GetTypeInheritance(Type type)
         {
             var interfaces = type.GetInterfaces();
-            var lastIndex = interfaces.Length - 1;
             var types = new List<Type>(interfaces.Length + 2) { type };
             Type baseType = type;
             while ((baseType = baseType.BaseType) != null)
             {
                 types.Add(baseType);
-                foreach (var interfaceType in baseType.GetInterfaces())
-                {
-                    var interfaceIndex = Array.LastIndexOf(interfaces, interfaceType);
-                    if (interfaceIndex != lastIndex)
-                    {
-                        interfaces[interfaceIndex] = interfaces[lastIndex];
-                        interfaces[lastIndex] = interfaceType;
-                    }
-                }
             }
-            foreach (var interfaceType in interfaces)
+            for(int index = interfaces.Length - 1; index >= 0; index--)
             {
-                types.Add(interfaceType);
+                types.Add(interfaces[index]);
             }
             return types;
         }
