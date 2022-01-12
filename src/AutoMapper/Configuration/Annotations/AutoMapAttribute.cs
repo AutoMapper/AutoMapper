@@ -45,6 +45,11 @@ namespace AutoMapper
         /// </summary>
         public Type TypeConverter { get; set; }
 
+        /// <summary>
+        /// If set to true, proxy will be created.
+        /// </summary>
+        public bool AsProxy { get; set; }
+
         public void ApplyConfiguration(IMappingExpression mappingExpression)
         {
             if (ReverseMap)
@@ -80,6 +85,11 @@ namespace AutoMapper
             if (TypeConverter != null)
             {
                 mappingExpression.ConvertUsing(TypeConverter);
+            }
+
+            if (AsProxy)
+            {
+                mappingExpression.AsProxy();
             }
         }
     }

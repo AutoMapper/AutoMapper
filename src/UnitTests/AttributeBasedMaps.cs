@@ -953,5 +953,58 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => AssertConfigurationIsValid<SecondSource, Dest>());
             }
         }
+
+        public class When_specifying_as_proxy_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), AsProxy = true)]
+            public interface IDest
+            {
+                int Value { get; set; }
+            }
+
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+            {
+                cfg.AddMaps(typeof(When_specifying_as_proxy_via_attribute));
+            });
+
+            [Fact]
+            public void Should_convert_to_interface()
+            {
+                var source = new Source { Value = 15 };
+                IDest dest = Mapper.Map<IDest>(source);
+                dest.Value.ShouldBe(15);
+            }
+        }
+
+        public class When_not_specifying_as_proxy_via_attribute : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            [AutoMap(typeof(Source), AsProxy = false)]
+            public interface IDest
+            {
+                int Value { get; set; }
+            }
+
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+            {
+                cfg.AddMaps(typeof(When_not_specifying_as_proxy_via_attribute));
+            });
+
+            [Fact]
+            public void Should_not_convert_to_interface()
+            {
+                var source = new Source { Value = 15 };
+                typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<IDest>(source));
+            }
+        }
     }
 }
