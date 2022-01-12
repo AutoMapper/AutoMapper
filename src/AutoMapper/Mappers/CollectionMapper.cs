@@ -48,7 +48,7 @@ namespace AutoMapper.Internal.Mappers
             {
                 var destinationType = destExpression.Type;
                 var sourceType = sourceExpression.Type;
-                MethodInfo addMethod;
+                MethodInfo addMethod = null;
                 bool isIList, mustUseDestination = memberMap is { MustUseDestination: true };
                 Type destinationCollectionType, destinationElementType;
                 GetDestinationType();
@@ -58,6 +58,14 @@ namespace AutoMapper.Internal.Mappers
                 if (sourceType == sourceElementType && destinationType == destinationElementType)
                 {
                     throw new NotSupportedException($"Recursive collection. Consider a custom type converter from {sourceType} to {destinationType}.");
+                }
+                if (destinationCollectionType == null)
+                {
+                    if (destinationType.IsAssignableFrom(sourceType))
+                    {
+                        return sourceExpression;
+                    }
+                    throw new NotSupportedException($"Unknown collection. Consider a custom type converter from {sourceType} to {destinationType}.");
                 }
                 var itemParam = Parameter(sourceElementType, "item");
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
@@ -95,6 +103,11 @@ namespace AutoMapper.Internal.Mappers
                         }
                         else
                         {
+                            if (!destinationType.IsInterface)
+                            {
+                                destinationCollectionType = null;
+                                return;
+                            }
                             destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
                             destExpression = Convert(mustUseDestination ? destExpression : Null, destinationCollectionType);
                             addMethod = destinationCollectionType.GetMethod("Add");

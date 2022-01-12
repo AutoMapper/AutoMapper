@@ -11,6 +11,25 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    public class AssignableCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : IEnumerable
+        {
+            public IEnumerator GetEnumerator() => throw new NotImplementedException();
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<MyJObject>();
+    }
     public class RecursiveCollection : AutoMapperSpecBase
     {
         class Source
