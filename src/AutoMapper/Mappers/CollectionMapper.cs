@@ -88,10 +88,10 @@ namespace AutoMapper.Internal.Mappers
                 void GetDestinationType()
                 {
                     destinationCollectionType = destinationType.GetICollectionType();
-                    destinationElementType = destinationCollectionType?.GenericTypeArguments[0] ?? GetEnumerableElementType(destinationType);
                     isIList = destExpression.Type.IsListType();
                     if (destinationCollectionType == null)
                     {
+                        destinationElementType = GetEnumerableElementType(destinationType);
                         if (isIList)
                         {
                             destinationCollectionType = typeof(IList);
@@ -111,6 +111,7 @@ namespace AutoMapper.Internal.Mappers
                     }
                     else
                     {
+                        destinationElementType = destinationCollectionType.GenericTypeArguments[0];
                         addMethod = destinationCollectionType.GetMethod("Add");
                     }
                 }
