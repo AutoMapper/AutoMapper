@@ -54,12 +54,8 @@ namespace AutoMapper.Internal.Mappers
                 GetDestinationType();
                 var passedDestination = Variable(destExpression.Type, "passedDestination");
                 var newExpression = Variable(passedDestination.Type, "collectionDestination");
-                var sourceElementType = sourceType.GetICollectionType()?.GenericTypeArguments[0] ?? GetEnumerableElementType(sourceType);
-                if (sourceType == sourceElementType && destinationType == destinationElementType)
-                {
-                    throw new NotSupportedException($"Recursive collection. Consider a custom type converter from {sourceType} to {destinationType}.");
-                }
-                if (destinationCollectionType == null)
+                var sourceElementType = GetEnumerableElementType(sourceType);
+                if (destinationCollectionType == null || (sourceType == sourceElementType && destinationType == destinationElementType))
                 {
                     if (destinationType.IsAssignableFrom(sourceType))
                     {

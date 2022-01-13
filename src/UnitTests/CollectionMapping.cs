@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using Xunit;
 using Shouldly;
 using System.Collections;
-using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
@@ -44,8 +43,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration CreateConfiguration() => new(c => 
             c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
         [Fact]
-        public void Should_work() => new Action(AssertConfigurationIsValid).ShouldThrow<NotSupportedException>().Message.ShouldBe(
-            "Recursive collection. Consider a custom type converter from AutoMapper.UnitTests.RecursiveCollection+MyJObject to AutoMapper.UnitTests.RecursiveCollection+MyJObject.");
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<MyJObject>();
     }
     public class AmbigousMethod : AutoMapperSpecBase
     {

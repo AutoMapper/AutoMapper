@@ -77,8 +77,10 @@ namespace AutoMapper.Internal
             {
                 return type;
             }
-            foreach (var interfaceType in type.GetInterfaces())
+            var interfaces = type.GetInterfaces();
+            for(int index = interfaces.Length - 1; index >= 0; index--)
             {
+                var interfaceType = interfaces[index];
                 if (interfaceType.IsGenericType(genericInterface))
                 {
                     return interfaceType;
