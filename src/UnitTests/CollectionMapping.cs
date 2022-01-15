@@ -7,9 +7,25 @@ using Xunit;
 using Shouldly;
 using System.Collections;
 using AutoMapper.Internal;
+using System.Collections.Immutable;
 
 namespace AutoMapper.UnitTests
 {
+    public class ImmutableCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public ImmutableArray<int> Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>ImmutableArray.Create<int>())));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<ImmutableArray<int>>();
+    }
     public class AssignableCollection : AutoMapperSpecBase
     {
         class Source

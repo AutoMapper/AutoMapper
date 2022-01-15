@@ -49,8 +49,8 @@ namespace AutoMapper.Internal.Mappers
                 var destinationType = destExpression.Type;
                 var sourceType = sourceExpression.Type;
                 MethodInfo addMethod = null;
-                bool isIList, mustUseDestination = memberMap is { MustUseDestination: true };
-                Type destinationCollectionType, destinationElementType;
+                bool isIList = false, mustUseDestination = memberMap is { MustUseDestination: true };
+                Type destinationCollectionType = null, destinationElementType = null;
                 GetDestinationType();
                 var passedDestination = Variable(destExpression.Type, "passedDestination");
                 var newExpression = Variable(passedDestination.Type, "collectionDestination");
@@ -87,6 +87,11 @@ namespace AutoMapper.Internal.Mappers
                 return CheckContext();
                 void GetDestinationType()
                 {
+                    var immutableCollection = !mustUseDestination && destinationType.IsValueType;
+                    if (immutableCollection)
+                    {
+                        return;
+                    }
                     destinationCollectionType = destinationType.GetICollectionType();
                     isIList = destExpression.Type.IsListType();
                     if (destinationCollectionType == null)
@@ -101,7 +106,6 @@ namespace AutoMapper.Internal.Mappers
                         {
                             if (!destinationType.IsInterface)
                             {
-                                destinationCollectionType = null;
                                 return;
                             }
                             destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
