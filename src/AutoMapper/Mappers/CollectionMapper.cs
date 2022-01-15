@@ -96,11 +96,11 @@ namespace AutoMapper.Internal.Mappers
                     isIList = destExpression.Type.IsListType();
                     if (destinationCollectionType == null)
                     {
-                        destinationElementType = GetEnumerableElementType(destinationType);
                         if (isIList)
                         {
                             destinationCollectionType = typeof(IList);
                             addMethod = IListAdd;
+                            destinationElementType = GetEnumerableElementType(destinationType);
                         }
                         else
                         {
@@ -108,6 +108,7 @@ namespace AutoMapper.Internal.Mappers
                             {
                                 return;
                             }
+                            destinationElementType = GetEnumerableElementType(destinationType);
                             destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
                             destExpression = Convert(mustUseDestination ? destExpression : Null, destinationCollectionType);
                             addMethod = destinationCollectionType.GetMethod("Add");
