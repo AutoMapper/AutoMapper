@@ -11,6 +11,36 @@ using System.Collections.Immutable;
 
 namespace AutoMapper.UnitTests
 {
+    public class NonPublicEnumeratorCurrent : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : List<int>
+        {
+	        public new MyEnumerator GetEnumerator() => new(base.GetEnumerator());
+        }
+        class MyEnumerator : IEnumerator
+        {
+            IEnumerator _enumerator;
+            public MyEnumerator(IEnumerator enumerator)
+            {
+                _enumerator = enumerator;
+            }
+            object IEnumerator.Current => _enumerator.Current;
+            public bool MoveNext() => _enumerator.MoveNext();
+            public void Reset() => _enumerator.Reset();
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject { 1, 2, 3 })));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBe(new[] { 1, 2, 3 });
+    }
     public class ImmutableCollection : AutoMapperSpecBase
     {
         class Source
