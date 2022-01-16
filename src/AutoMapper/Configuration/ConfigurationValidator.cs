@@ -131,7 +131,10 @@ namespace AutoMapper.Configuration
                 if(mapperToUse is IObjectMapperInfo mapperInfo)
                 {
                     var newTypePair = mapperInfo.GetAssociatedTypes(types);
-                    DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    if (newTypePair != types)
+                    {
+                        DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    }
                 }
             }
         }

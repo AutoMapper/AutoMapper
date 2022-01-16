@@ -106,7 +106,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             void ProjectProperties()
             {
-                foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => pm.CanResolveValue && pm.DestinationMember.CanBeSet()).OrderBy(pm => pm.DestinationName))
+                foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => pm.CanResolveValue && pm.DestinationMember.CanBeSet()).OrderBy(pm => pm.DestinationMember.MetadataToken))
                 {
                     var propertyProjection = TryProjectMember(propertyMap, propertyMap.ExplicitExpansion);
                     if (propertyProjection != null)
