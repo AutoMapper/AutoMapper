@@ -246,20 +246,15 @@ namespace AutoMapper.Execution
             {
                 return ForEachArrayItem(loopVar, collection, loopContent);
             }
-            var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
-            var getEnumeratorCall = Expression.Call(collection, getEnumerator);
-            var enumeratorType = getEnumeratorCall.Type;
-            var enumeratorVar = Variable(enumeratorType, "enumerator");
-            var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
-            var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
-            var moveNextCall = Expression.Call(enumeratorVar, moveNext);
+            var getEnumeratorCall = Call(collection, "GetEnumerator");
+            var enumeratorVar = Variable(getEnumeratorCall.Type, "enumerator");
             var breakLabel = Label("LoopBreak");
             var loop = Block(new[] { enumeratorVar, loopVar },
-                enumeratorAssign,
+                Assign(enumeratorVar, getEnumeratorCall),
                 Using(enumeratorVar,
                     Loop(
                         IfThenElse(
-                            moveNextCall,
+                            Call(enumeratorVar, "MoveNext"),
                             Block(Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)), loopContent),
                             Break(breakLabel)
                         ),
@@ -269,9 +264,8 @@ namespace AutoMapper.Execution
             {
                 var breakLabel = Label("LoopBreak");
                 var index = Variable(typeof(int), "sourceArrayIndex");
-                var initialize = Assign(index, Constant(0, typeof(int)));
                 var loop = Block(new[] { index, loopVar },
-                    initialize,
+                    Assign(index, Zero),
                     Loop(
                         IfThenElse(
                             LessThan(index, ArrayLength(array)),
@@ -302,10 +296,11 @@ namespace AutoMapper.Execution
             }
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match
-        public static MemberExpression Property(Expression target, string name) => Expression.Property(target, target.Type.GetProperty(name));
+        public static MemberExpression Property(Expression target, string name) =>
+            Expression.Property(target, target.Type.GetInheritedProperty(name));
         // Expression.Call(string) is inefficient because it does a case insensitive match
         public static MethodCallExpression Call(Expression target, string name, params Expression[] arguments) =>
-            Expression.Call(target, target.Type.GetMethod(name), arguments);
+            Expression.Call(target, target.Type.GetInheritedMethod(name), arguments);
         public static Expression ToObject(this Expression expression) => expression.Type.IsValueType ? Convert(expression, typeof(object)) : expression;
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
