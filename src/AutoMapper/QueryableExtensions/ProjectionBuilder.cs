@@ -265,8 +265,27 @@ namespace AutoMapper.QueryableExtensions.Impl
                     Marker = Default(letExpression.Body.Type);
                     LetExpression = letExpression;
                 }
-                public Expression GetSourceExpression(Expression parameter) => _members.Take(_members.Length - 1).Select(p => p.Expression).Aggregate(parameter,
-                    (left, right) => right is LambdaExpression lambda ? lambda.ReplaceParameters(left) : right.Replace(right.GetChain().Peek().Target, left));
+                public Expression GetSourceExpression(Expression parameter)
+                {
+                    Expression sourceExpression = parameter;
+                    for (int index = 0; index < _members.Length - 1; index++)
+                    {
+                        var sourceMember = _members[index].Expression;
+                        if (sourceMember is LambdaExpression lambda)
+                        {
+                            sourceExpression = lambda.ReplaceParameters(sourceExpression);
+                        }
+                        else
+                        {
+                            var chain = sourceMember.GetChain();
+                            if (chain.TryPeek(out var first))
+                            {
+                                sourceExpression = sourceMember.Replace(first.Target, sourceExpression);
+                            }
+                        }
+                    }
+                    return sourceExpression;
+                }
                 public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", _members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
                 internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
                     _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
