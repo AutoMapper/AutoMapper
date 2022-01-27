@@ -973,7 +973,9 @@ namespace AutoMapper.IntegrationTests
         public void Should_work()
         {
             var query = ProjectTo<Dto>(new ClientContext().AEntities);
-            query.Single().DtoSubWrapper.DtoSub.ShouldBeNull();
+            var result = query.Single();
+            result.DtoSubWrapper.DtoSub.ShouldNotBeNull();
+            result.DtoSubWrapper.DtoSub.SubString.ShouldBe("Test");
         }
         public class Dto
         {
@@ -1004,6 +1006,7 @@ namespace AutoMapper.IntegrationTests
         public class CEntity
         {
             public int Id { get; set; }
+            public int BEntityId { get; set; }
             public string SubString { get; set; }
             public BEntity BEntity { get; set; }
         }
@@ -1024,6 +1027,7 @@ namespace AutoMapper.IntegrationTests
                             new CEntity
                             {
                                 Id = 6,
+                                BEntityId = 1,
                                 SubString = "Test"
                             }
                         }
@@ -1037,8 +1041,22 @@ namespace AutoMapper.IntegrationTests
             {
                 Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
                 Database.SetInitializer(new Initializer());
+
+                modelBuilder.Entity<AEntity>()
+                    .HasRequired(x => x.BEntity)
+                    .WithMany()
+                    .HasForeignKey(x => x.BEntityId);
+
+                modelBuilder.Entity<BEntity>()
+                    .HasMany(x => x.CEntities)
+                    .WithRequired(x => x.BEntity)
+                    .HasForeignKey(x => x.BEntityId);
+
+                modelBuilder.Entity<CEntity>()
+                    .Property(x => x.Id)
+                    .HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
             }
             public DbSet<AEntity> AEntities { get; set; }
-        }    
+        }
     }
 }
