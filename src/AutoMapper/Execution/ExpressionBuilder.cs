@@ -232,7 +232,7 @@ namespace AutoMapper.Execution
             foreach (var member in members)
             {
                 currentExpression = member.Expression;
-                if (!(currentExpression is MemberExpression))
+                if (currentExpression is not MemberExpression)
                 {
                     return false;
                 }
