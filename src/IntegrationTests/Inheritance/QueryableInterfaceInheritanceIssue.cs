@@ -1,68 +1,68 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using AutoMapper.QueryableExtensions;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper.UnitTests;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.IntegrationTests
+namespace AutoMapper.IntegrationTests.Inheritance;
+
+public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase, IAsyncLifetime
 {
-    public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase
+    QueryableDto[] _result;
+
+    public interface IBaseQueryableInterface
     {
-        QueryableDto[] _result;
-
-        public interface IBaseQueryableInterface
-        {
-            string Id { get; set; }
-        }
-
-        public interface IQueryableInterface : IBaseQueryableInterface
-        {
-        }
-
-        public class QueryableInterfaceImpl : IQueryableInterface
-        {
-            public string Id { get; set; }
-        }
-
-        public class QueryableDto
-        {
-            public string Id { get; set; }
-        }
-
-        class Initializer : DropCreateDatabaseAlways<ClientContext>
-        {
-            protected override void Seed(ClientContext context)
-            {
-                context.Entities.AddRange(new[] { new QueryableInterfaceImpl { Id = "One" }, new QueryableInterfaceImpl { Id = "Two" }});
-            }
-        }
-
-        class ClientContext : DbContext
-        {
-            public ClientContext()
-            {
-                Database.SetInitializer(new Initializer());
-            }
-            public DbSet<QueryableInterfaceImpl> Entities { get; set; }
-        }
-
-        protected override void Because_of()
-        {
-            using(var context = new ClientContext())
-            {
-                _result = ProjectTo<QueryableDto>(context.Entities).ToArray();
-            }
-        }
-
-        [Fact]
-        public void QueryableShouldMapSpecifiedBaseInterfaceMember()
-        {
-            _result.FirstOrDefault(dto => dto.Id == "One").ShouldNotBeNull();
-            _result.FirstOrDefault(dto => dto.Id == "Two").ShouldNotBeNull();
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<IQueryableInterface, QueryableDto>());
+        string Id { get; set; }
     }
+
+    public interface IQueryableInterface : IBaseQueryableInterface
+    {
+    }
+
+    public class QueryableInterfaceImpl : IQueryableInterface
+    {
+        public string Id { get; set; }
+    }
+
+    public class QueryableDto
+    {
+        public string Id { get; set; }
+    }
+
+    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    {
+        protected override void Seed(ClientContext context)
+        {
+            context.Entities.AddRange(new[] { new QueryableInterfaceImpl { Id = "One" }, new QueryableInterfaceImpl { Id = "Two" }});
+        }
+    }
+
+    class ClientContext : LocalDbContext
+    {
+        public DbSet<QueryableInterfaceImpl> Entities { get; set; }
+    }
+
+    [Fact]
+    public void QueryableShouldMapSpecifiedBaseInterfaceMember()
+    {
+        _result.FirstOrDefault(dto => dto.Id == "One").ShouldNotBeNull();
+        _result.FirstOrDefault(dto => dto.Id == "Two").ShouldNotBeNull();
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<IQueryableInterface, QueryableDto>());
+
+    public async Task InitializeAsync()
+    {
+        var initializer = new DatabaseInitializer();
+
+        await initializer.Migrate();
+
+        using (var context = new ClientContext())
+        {
+            _result = ProjectTo<QueryableDto>(context.Entities).ToArray();
+        }
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }

@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.IntegrationTests.ValueTransformers
+namespace AutoMapper.IntegrationTests
 {
     namespace ValueTransformerTests
     {
-        public class BasicTransforming : AutoMapperSpecBase
+        public class BasicTransforming : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -24,14 +23,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -61,9 +54,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy is straight up dope");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class StackingTransformers : AutoMapperSpecBase
+        public class StackingTransformers : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -77,14 +79,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -115,9 +111,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy is straight up dope! No joke!");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class DifferentProfiles : AutoMapperSpecBase
+        public class DifferentProfiles : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -138,14 +143,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 cfg.CreateProfile("Other", p => p.ValueTransformers.Add<string>(dest => dest + "! No joke!"));
             });
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -169,9 +168,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy is straight up dope");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class StackingRootConfigAndProfileTransform : AutoMapperSpecBase
+        public class StackingRootConfigAndProfileTransform : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -185,14 +193,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -225,9 +227,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy is straight up dope! No joke!");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class TransformingValueTypes : AutoMapperSpecBase
+        public class TransformingValueTypes : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -241,14 +252,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public int Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -281,9 +286,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe((5 + 3) * 2);
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class StackingRootAndProfileAndMemberConfig : AutoMapperSpecBase
+        public class StackingRootAndProfileAndMemberConfig : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -297,14 +311,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -339,9 +347,18 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy, for real, is straight up dope! No joke!");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
-        public class StackingTypeMapAndRootAndProfileAndMemberConfig : AutoMapperSpecBase
+        public class StackingTypeMapAndRootAndProfileAndMemberConfig : AutoMapperSpecBase, IAsyncLifetime
         {
             public class Source
             {
@@ -355,14 +372,8 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                 public string Value { get; set; }
             }
 
-            public class Context : DbContext
+            public class Context : LocalDbContext
             {
-                public Context()
-                    : base()
-                {
-                    Database.SetInitializer<Context>(new DatabaseInitializer());
-                }
-
                 public DbSet<Source> Sources { get; set; }
             }
 
@@ -397,6 +408,15 @@ namespace AutoMapper.IntegrationTests.ValueTransformers
                     dest.Value.ShouldBe("Jimmy, seriously, for real, is straight up dope! No joke!");
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
 
 
