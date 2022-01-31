@@ -51,7 +51,9 @@ public class MemberWithSubQueryProjections : AutoMapperSpecBase, IAsyncLifetime
         {
             context.Customers.Add(new Customer
             {
-                FirstName = "Bob", LastName = "Smith", Items = new[] { new Item { Code = 1 }, new Item { Code = 3 }, new Item { Code = 5 } }
+                FirstName = "Bob",
+                LastName = "Smith",
+                Items = new[] { new Item { Code = 1 }, new Item { Code = 3 }, new Item { Code = 5 } }
             });
             base.Seed(context);
         }
@@ -171,7 +173,7 @@ public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase, IAsy
     [Fact]
     public void Should_cache_the_subquery()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductModel>(context.Products);
             var counter = new FirstOrDefaultCounter();
@@ -191,7 +193,7 @@ public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase, IAsy
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if(node.Method.Name == "FirstOrDefault")
+            if (node.Method.Name == "FirstOrDefault")
             {
                 Count++;
             }
@@ -294,7 +296,7 @@ public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
     [Fact]
     public void Should_map_ok()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductModel>(context.Products);
             var counter = new FirstOrDefaultCounter();
@@ -312,7 +314,7 @@ public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if(node.Method.Name == "FirstOrDefault")
+            if (node.Method.Name == "FirstOrDefault")
             {
                 Count++;
             }
@@ -377,7 +379,7 @@ public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
 
 public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
 {
-    protected override MapperConfiguration CreateConfiguration() => new(cfg=>
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
         cfg.CreateProjection<Product, ProductModel>()
             .ForMember(d => d.Price, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
@@ -388,7 +390,7 @@ public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
     [Fact]
     public void Should_cache_the_subquery()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductModel>(context.Products);
             var counter = new FirstOrDefaultCounter();
@@ -408,7 +410,7 @@ public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if(node.Method.Name == "FirstOrDefault")
+            if (node.Method.Name == "FirstOrDefault")
             {
                 Count++;
             }
@@ -486,7 +488,7 @@ public class MapObjectPropertyFromSubQueryWithInnerObject : AutoMapperSpecBase, 
     [Fact]
     public void Should_cache_the_subquery()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
             var counter = new FirstOrDefaultCounter();
@@ -590,7 +592,7 @@ public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase, I
     [Fact]
     public void Should_cache_the_subquery()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
             var counter = new FirstOrDefaultCounter();
@@ -610,7 +612,7 @@ public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase, I
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if(node.Method.Name == "FirstOrDefault")
+            if (node.Method.Name == "FirstOrDefault")
             {
                 Count++;
             }
@@ -691,7 +693,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
     {
         cfg.CreateProjection<ProductArticle, ProductArticleModel>();
         cfg.CreateProjection<Product, ProductModel>()
-            .ForMember(d=>d.ArticlesModel, o=>o.MapFrom(s=>s))
+            .ForMember(d => d.ArticlesModel, o => o.MapFrom(s => s))
             .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
         cfg.CreateProjection<Product, ArticlesModel>();
         cfg.CreateProjection<Article, PriceModel>()
@@ -701,7 +703,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
     [Fact]
     public void Should_cache_the_subquery()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles);
             var counter = new FirstOrDefaultCounter();
@@ -729,7 +731,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if(node.Method.Name == "FirstOrDefault")
+            if (node.Method.Name == "FirstOrDefault")
             {
                 Count++;
             }
@@ -869,7 +871,7 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CableEnd>().HasKey(c => new {c.CrossConnectId, c.Name});
+            modelBuilder.Entity<CableEnd>().HasKey(c => new { c.CrossConnectId, c.Name });
         }
     }
 
@@ -883,10 +885,10 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
             var cable = new Cable
             {
                 Ends = new List<CableEnd>()
-                {
-                    new CableEnd { Name = "A", Rack = rack},
-                    new CableEnd { Name = "B" },
-                }
+                    {
+                        new CableEnd { Name = "A", Rack = rack},
+                        new CableEnd { Name = "B" },
+                    }
             };
             context.Cables.Add(cable);
         }
@@ -903,7 +905,7 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
     [Fact]
     public void Should_project_ok()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<CableListModel>(context.Cables);
             var result = projection.Single();
@@ -982,17 +984,17 @@ public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAs
         protected override void Seed(ClientContext context)
         {
             context.ProductReviews.Add(new ProductReview
-                {Product = new Product {Brand = new Brand {Owners = {new Owner {Name = "Owner"}}}}});
+            { Product = new Product { Brand = new Brand { Owners = { new Owner { Name = "Owner" } } } } });
             context.ProductReviews.Add(new ProductReview
-                {Product = new Product {Brand = new Brand {Owners = {new Owner()}}}});
-            context.ProductReviews.Add(new ProductReview {Product = new Product()});
+            { Product = new Product { Brand = new Brand { Owners = { new Owner() } } } });
+            context.ProductReviews.Add(new ProductReview { Product = new Product() });
         }
     }
 
     [Fact]
     public void Should_project_ok()
     {
-        using(var context = new ClientContext())
+        using (var context = new ClientContext())
         {
             var projection = ProjectTo<ProductReviewDto>(context.ProductReviews);
             var results = projection.ToArray();
@@ -1001,6 +1003,110 @@ public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAs
             results.Any(result => result?.Brand == null).ShouldBeTrue();
         }
     }
+    public async Task InitializeAsync()
+    {
+        var initializer = new DatabaseInitializer();
+
+        await initializer.Migrate();
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
+}
+
+public class MemberWithSubQueryIdentity : AutoMapperSpecBase, IAsyncLifetime
+{
+    protected override MapperConfiguration CreateConfiguration() => new MapperConfiguration(cfg =>
+    {
+        cfg.CreateProjection<AEntity, Dto>()
+            .ForMember(dst => dst.DtoSubWrapper, opt => opt.MapFrom(src => src));
+        cfg.CreateProjection<AEntity, DtoSubWrapper>()
+            .ForMember(dst => dst.DtoSub, opt => opt.MapFrom(src => src.BEntity.CEntities.FirstOrDefault(x => x.Id == src.CEntityId)));
+        cfg.CreateProjection<CEntity, DtoSub>();
+    });
+    [Fact]
+    public void Should_work()
+    {
+        var query = ProjectTo<Dto>(new ClientContext().AEntities);
+        var result = query.Single();
+        result.DtoSubWrapper.DtoSub.ShouldNotBeNull();
+        result.DtoSubWrapper.DtoSub.SubString.ShouldBe("Test");
+    }
+    public class Dto
+    {
+        public int Id { get; set; }
+        public DtoSubWrapper DtoSubWrapper { get; set; }
+    }
+    public class DtoSubWrapper
+    {
+        public DtoSub DtoSub { get; set; }
+    }
+    public class DtoSub
+    {
+        public int Id { get; set; }
+        public string SubString { get; set; }
+    }
+    public class AEntity
+    {
+        public int Id { get; set; }
+        public int BEntityId { get; set; }
+        public int CEntityId { get; set; }
+        public BEntity BEntity { get; set; }
+    }
+    public class BEntity
+    {
+        public int Id { get; set; }
+        public ICollection<CEntity> CEntities { get; set; }
+    }
+    public class CEntity
+    {
+        public int Id { get; set; }
+        public int BEntityId { get; set; }
+        public string SubString { get; set; }
+        public BEntity BEntity { get; set; }
+    }
+    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    {
+        protected override void Seed(ClientContext context)
+        {
+            context.AEntities.Add(new AEntity
+            {
+                CEntityId = 6,
+                BEntity = new BEntity
+                {
+                    CEntities = new List<CEntity>
+                        {
+                            new CEntity
+                            {
+                                Id = 6,
+                                BEntityId = 1,
+                                SubString = "Test"
+                            }
+                        }
+                },
+            });
+        }
+    }
+    class ClientContext : LocalDbContext
+    {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AEntity>()
+                .HasOne(x => x.BEntity)
+                .WithMany()
+                .HasForeignKey(x => x.BEntityId);
+
+            modelBuilder.Entity<BEntity>()
+                .HasMany(x => x.CEntities)
+                .WithOne(x => x.BEntity)
+                .HasForeignKey(x => x.BEntityId);
+
+            modelBuilder.Entity<CEntity>()
+                .Property(x => x.Id)
+                .ValueGeneratedNever();
+        }
+        public DbSet<AEntity> AEntities { get; set; }
+    }
+
     public async Task InitializeAsync()
     {
         var initializer = new DatabaseInitializer();
