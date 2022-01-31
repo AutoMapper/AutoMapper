@@ -959,4 +959,104 @@ namespace AutoMapper.IntegrationTests
             }
         }
     }
+    public class MemberWithSubQueryIdentity : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration CreateConfiguration() => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateProjection<AEntity, Dto>()
+                .ForMember(dst => dst.DtoSubWrapper, opt => opt.MapFrom(src => src));
+            cfg.CreateProjection<AEntity, DtoSubWrapper>()
+                .ForMember(dst => dst.DtoSub, opt => opt.MapFrom(src => src.BEntity.CEntities.FirstOrDefault(x => x.Id == src.CEntityId)));
+            cfg.CreateProjection<CEntity, DtoSub>();
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var query = ProjectTo<Dto>(new ClientContext().AEntities);
+            var result = query.Single();
+            result.DtoSubWrapper.DtoSub.ShouldNotBeNull();
+            result.DtoSubWrapper.DtoSub.SubString.ShouldBe("Test");
+        }
+        public class Dto
+        {
+            public int Id { get; set; }
+            public DtoSubWrapper DtoSubWrapper { get; set; }
+        }
+        public class DtoSubWrapper
+        {
+            public DtoSub DtoSub { get; set; }
+        }
+        public class DtoSub
+        {
+            public int Id { get; set; }
+            public string SubString { get; set; }
+        }
+        public class AEntity
+        {
+            public int Id { get; set; }
+            public int BEntityId { get; set; }
+            public int CEntityId { get; set; }
+            public BEntity BEntity { get; set; }
+        }
+        public class BEntity
+        {
+            public int Id { get; set; }
+            public ICollection<CEntity> CEntities { get; set; }
+        }
+        public class CEntity
+        {
+            public int Id { get; set; }
+            public int BEntityId { get; set; }
+            public string SubString { get; set; }
+            public BEntity BEntity { get; set; }
+        }
+        class Initializer : DropCreateDatabaseAlways<ClientContext>
+        {
+            protected override void Seed(ClientContext context)
+            {
+                context.AEntities.Add(new AEntity
+                {
+                    Id = 1,
+                    BEntityId = 1,
+                    CEntityId = 6,
+                    BEntity = new BEntity
+                    {
+                        Id = 1,
+                        CEntities = new List<CEntity>
+                        {
+                            new CEntity
+                            {
+                                Id = 6,
+                                BEntityId = 1,
+                                SubString = "Test"
+                            }
+                        }
+                    },
+                });
+            }
+        }
+        class ClientContext : DbContext
+        {
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+                Database.SetInitializer(new Initializer());
+
+                modelBuilder.Entity<AEntity>()
+                    .HasRequired(x => x.BEntity)
+                    .WithMany()
+                    .HasForeignKey(x => x.BEntityId);
+
+                modelBuilder.Entity<BEntity>()
+                    .HasMany(x => x.CEntities)
+                    .WithRequired(x => x.BEntity)
+                    .HasForeignKey(x => x.BEntityId);
+
+                modelBuilder.Entity<CEntity>()
+                    .Property(x => x.Id)
+                    .HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+            }
+            public DbSet<AEntity> AEntities { get; set; }
+        }
+    }
 }
