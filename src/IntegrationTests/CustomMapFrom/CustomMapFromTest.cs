@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Xunit;
+using System.Threading.Tasks;
+using AutoMapper.UnitTests;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using Xunit;
 
-namespace AutoMapper.IntegrationTests.Net4
+namespace AutoMapper.IntegrationTests.CustomMapFrom
 {
     namespace CustomMapFromTest
     {
-        using AutoMapper.UnitTests;
-        using QueryableExtensions;
-
         public class Customer
         {
             [Key]
@@ -40,14 +37,8 @@ namespace AutoMapper.IntegrationTests.Net4
             public string FullAddress { get; set; }
         }
 
-        public class Context : DbContext
+        public class Context : LocalDbContext
         {
-            public Context()
-                : base()
-            {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
-            }
-
             public DbSet<Customer> Customers { get; set; }
             public DbSet<Address> Addresses { get; set; }
 
@@ -59,12 +50,10 @@ namespace AutoMapper.IntegrationTests.Net4
             {
                 context.Customers.Add(new Customer
                 {
-                    Id = 1,
                     FirstName = "Bob",
                     LastName = "Smith",
                     Address = new Address
                     {
-                        Id = 1,
                         Street = "123 Anywhere",
                         City = "Austin",
                         State = "TX"
@@ -75,7 +64,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
         
-        public class AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec : AutoMapperSpecBase
+        public class AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec : AutoMapperSpecBase, IAsyncLifetime
         {
             protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
@@ -110,6 +99,15 @@ namespace AutoMapper.IntegrationTests.Net4
                     });
                 }
             }
+
+            public async Task InitializeAsync()
+            {
+                var initializer = new DatabaseInitializer();
+
+                await initializer.Migrate();
+            }
+
+            public Task DisposeAsync() => Task.CompletedTask;
         }
     }
 }

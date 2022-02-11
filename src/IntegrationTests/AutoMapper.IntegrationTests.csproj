@@ -11,7 +11,7 @@
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="Shouldly" Version="4.0.3" />
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
   </ItemGroup>

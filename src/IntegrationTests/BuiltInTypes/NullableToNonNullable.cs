@@ -1,131 +1,135 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper.UnitTests;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.IntegrationTests
+namespace AutoMapper.IntegrationTests.BuiltInTypes;
+
+public class NullableLongToLong : AutoMapperSpecBase, IAsyncLifetime
 {
-    using UnitTests;
-    using QueryableExtensions;
-        
-    public class NullableLongToLong : AutoMapperSpecBase
+    public class Customer
     {
-        public class Customer
-        {
-            [Key]
-            public long? Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-        }
+        [Key]
+        public long? Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
 
-        public class CustomerViewModel
-        {
-            public long Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-        }
+    public class CustomerViewModel
+    {
+        public long Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
 
-        public class Context : DbContext
+    public class Context : LocalDbContext
+    {
+        public DbSet<Customer> Customers { get; set; }
+    }
+
+    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    {
+        protected override void Seed(Context context)
         {
-            public Context()
+            context.Customers.Add(new Customer
             {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
-            }
+                FirstName = "Bob",
+                LastName = "Smith",
+            });
 
-            public DbSet<Customer> Customers { get; set; }
-        }
-
-        public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
-        {
-            protected override void Seed(Context context)
-            {
-                context.Customers.Add(new Customer
-                {
-                    Id = 1,
-                    FirstName = "Bob",
-                    LastName = "Smith",
-                });
-
-                base.Seed(context);
-            }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateProjection<Customer, CustomerViewModel>();
-        });
-
-        [Fact]
-        public void Can_map_with_projection()
-        {
-            using (var context = new Context())
-            {
-                var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
-                model.Id.ShouldBe(1);
-                model.FirstName.ShouldBe("Bob");
-                model.LastName.ShouldBe("Smith");
-            }
+            base.Seed(context);
         }
     }
 
-    public class NullableIntToLong : AutoMapperSpecBase
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        public class Customer
+        cfg.CreateProjection<Customer, CustomerViewModel>();
+    });
+
+    [Fact]
+    public void Can_map_with_projection()
+    {
+        using (var context = new Context())
         {
-            [Key]
-            public int? Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-        }
-
-        public class CustomerViewModel
-        {
-            public long Id { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-        }
-
-        public class Context : DbContext
-        {
-            public Context()
-            {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
-            }
-
-            public DbSet<Customer> Customers { get; set; }
-        }
-
-        public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
-        {
-            protected override void Seed(Context context)
-            {
-                context.Customers.Add(new Customer
-                {
-                    Id = 1,
-                    FirstName = "Bob",
-                    LastName = "Smith",
-                });
-
-                base.Seed(context);
-            }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateProjection<Customer, CustomerViewModel>();
-        });
-
-        [Fact]
-        public void Can_map_with_projection()
-        {
-            using(var context = new Context())
-            {
-                var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
-                model.Id.ShouldBe(1);
-                model.FirstName.ShouldBe("Bob");
-                model.LastName.ShouldBe("Smith");
-            }
+            var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
+            model.Id.ShouldBe(1);
+            model.FirstName.ShouldBe("Bob");
+            model.LastName.ShouldBe("Smith");
         }
     }
+
+    public async Task InitializeAsync()
+    {
+        var initializer = new DatabaseInitializer();
+
+        await initializer.Migrate();
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
+}
+
+public class NullableIntToLong : AutoMapperSpecBase, IAsyncLifetime
+{
+    public class Customer
+    {
+        [Key]
+        public int? Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class CustomerViewModel
+    {
+        public long Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class Context : LocalDbContext
+    {
+        public DbSet<Customer> Customers { get; set; }
+    }
+
+    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    {
+        protected override void Seed(Context context)
+        {
+            context.Customers.Add(new Customer
+            {
+                FirstName = "Bob",
+                LastName = "Smith",
+            });
+
+            base.Seed(context);
+        }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateProjection<Customer, CustomerViewModel>();
+    });
+
+    [Fact]
+    public void Can_map_with_projection()
+    {
+        using(var context = new Context())
+        {
+            var model = ProjectTo<CustomerViewModel>(context.Customers).Single();
+            model.Id.ShouldBe(1);
+            model.FirstName.ShouldBe("Bob");
+            model.LastName.ShouldBe("Smith");
+        }
+    }
+
+    public async Task InitializeAsync()
+    {
+        var initializer = new DatabaseInitializer();
+
+        await initializer.Migrate();
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
