@@ -13,6 +13,7 @@ foo.Bar = 5;
 foo.Baz = 6;
 
 var configuration = new MapperConfiguration(cfg => {});
+var mapper = config.CreateMapper();
 
 var result = mapper.Map<Foo>(foo);
 result.Bar.ShouldEqual(5);
@@ -25,6 +26,7 @@ foo2.Baz.ShouldEqual(6);
 
 Similarly you can map straight from `Dictionary<string, object>` to objects, AutoMapper will line up the keys with property names.
 For mapping to destination child objects, you can use the dot notation.
+
 ```c#
 var result = mapper.Map<Foo>(new Dictionary<string, object> { ["InnerFoo.Bar"] = 42 });
 result.InnerFoo.Bar.ShouldEqual(42);
