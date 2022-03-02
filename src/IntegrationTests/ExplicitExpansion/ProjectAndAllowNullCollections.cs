@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 
-public class ProjectAndAllowNullCollections : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectAndAllowNullCollections : IntegrationTest<ProjectAndAllowNullCollections.DatabaseInitializer>
 {
     public class Foo
     {
@@ -137,13 +137,4 @@ public class ProjectAndAllowNullCollections : AutoMapperSpecBase, IAsyncLifetime
             foos[0].Bazs.ShouldBeNull();
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

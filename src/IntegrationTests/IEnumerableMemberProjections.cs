@@ -11,7 +11,7 @@ using UnitTests;
 using QueryableExtensions;
 using System.Collections.Generic;
 
-public class IEnumerableMemberProjections : AutoMapperSpecBase, IAsyncLifetime
+public class IEnumerableMemberProjections : IntegrationTest<IEnumerableMemberProjections.DatabaseInitializer>
 {
     public class Customer
     {
@@ -80,14 +80,4 @@ public class IEnumerableMemberProjections : AutoMapperSpecBase, IAsyncLifetime
             result.Items.Count().ShouldBe(3);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }

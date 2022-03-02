@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class ProjectEnumerableOfIntToList : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectEnumerableOfIntToList : IntegrationTest<ProjectEnumerableOfIntToList.DatabaseInitializer>
 {
     public class Customer
     {
@@ -67,13 +67,4 @@ public class ProjectEnumerableOfIntToList : AutoMapperSpecBase, IAsyncLifetime
             customer.ItemsIds.SequenceEqual(new int[] { 1, 2, 3 }).ShouldBeTrue();
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

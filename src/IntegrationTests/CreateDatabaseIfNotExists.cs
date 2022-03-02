@@ -1,21 +1,22 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper.UnitTests;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace AutoMapper.IntegrationTests;
 
-public class CreateDatabaseIfNotExists<TContext> : DropCreateDatabaseAlways<TContext>
-    where TContext : DbContext, new()
+public abstract class IntegrationTest<TInitializer> : AutoMapperSpecBase, IAsyncLifetime where TInitializer : IInitializer, new()
 {
-
+    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    Task IAsyncLifetime.InitializeAsync() => new TInitializer().Migrate();
 }
-
-public class DropCreateDatabaseAlways<TContext> where TContext : DbContext, new()
+public interface IInitializer
 {
-    protected virtual void Seed(TContext context)
-    {
-
-    }
-
+    Task Migrate();
+}
+public class DropCreateDatabaseAlways<TContext> : IInitializer where TContext : DbContext, new()
+{
+    protected virtual void Seed(TContext context){}
     public async Task Migrate()
     {
         await using var context = new TContext();
