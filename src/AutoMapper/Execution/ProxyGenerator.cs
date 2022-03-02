@@ -19,8 +19,10 @@ namespace AutoMapper.Execution
         private static readonly LockingConcurrentDictionary<TypeDescription, Type> ProxyTypes = new LockingConcurrentDictionary<TypeDescription, Type>(EmitProxy);
         private static ModuleBuilder CreateProxyModule()
         {
-            var builder = AssemblyBuilder.DefineDynamicAssembly(typeof(Mapper).Assembly.GetName(), AssemblyBuilderAccess.Run);
-            return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
+            var assemblyName = typeof(Mapper).Assembly.GetName();
+            assemblyName.Name = "AutoMapper.Proxies.emit";
+            var builder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            return builder.DefineDynamicModule(assemblyName.Name);
         }
         private static Type EmitProxy(TypeDescription typeDescription)
         {
