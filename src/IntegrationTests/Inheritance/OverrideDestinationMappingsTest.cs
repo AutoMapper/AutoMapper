@@ -7,14 +7,14 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.Inheritance;
 
-public class OverrideDestinationMappingsTest : AutoMapperSpecBase, IAsyncLifetime
+public class OverrideDestinationMappingsTest : IntegrationTest<OverrideDestinationMappingsTest.DatabaseInitializer>
 {
     public class Context : LocalDbContext
     {
         public DbSet<Entity> Entity { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -83,13 +83,4 @@ public class OverrideDestinationMappingsTest : AutoMapperSpecBase, IAsyncLifetim
     public class ChildModel : ChildModelBase
     {
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

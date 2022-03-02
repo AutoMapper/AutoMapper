@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests;
 
-public class CustomProjectionStringToString : AutoMapperSpecBase, IAsyncLifetime
+public class CustomProjectionStringToString : IntegrationTest<CustomProjectionStringToString.DatabaseInitializer>
 {
     public class TestContext : LocalDbContext
     {
@@ -58,19 +58,8 @@ public class CustomProjectionStringToString : AutoMapperSpecBase, IAsyncLifetime
     {
         public string Greeting { get; set; }
     }
-
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
-public class CustomProjectionCustomClasses : AutoMapperSpecBase, IAsyncLifetime
+public class CustomProjectionCustomClasses : IntegrationTest<CustomProjectionCustomClasses.DatabaseInitializer>
 {
     public class TestContext : LocalDbContext
     {
@@ -120,19 +109,8 @@ public class CustomProjectionCustomClasses : AutoMapperSpecBase, IAsyncLifetime
     {
         public string Greeting { get; set; }
     }
-
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
-public class CustomProjectionChildClasses : AutoMapperSpecBase, IAsyncLifetime
+public class CustomProjectionChildClasses : IntegrationTest<CustomProjectionChildClasses.DatabaseInitializer>
 {
     public class TestContext : LocalDbContext
     {
@@ -182,15 +160,4 @@ public class CustomProjectionChildClasses : AutoMapperSpecBase, IAsyncLifetime
     {
         public string Greeting { get; set; }
     }
-
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class NullableLongToLong : AutoMapperSpecBase, IAsyncLifetime
+public class NullableLongToLong : IntegrationTest<NullableLongToLong.DatabaseInitializer>
 {
     public class Customer
     {
@@ -30,7 +30,7 @@ public class NullableLongToLong : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Customer> Customers { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -60,18 +60,9 @@ public class NullableLongToLong : AutoMapperSpecBase, IAsyncLifetime
             model.LastName.ShouldBe("Smith");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class NullableIntToLong : AutoMapperSpecBase, IAsyncLifetime
+public class NullableIntToLong : IntegrationTest<NullableIntToLong.DatabaseInitializer>
 {
     public class Customer
     {
@@ -93,7 +84,7 @@ public class NullableIntToLong : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Customer> Customers { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -123,13 +114,4 @@ public class NullableIntToLong : AutoMapperSpecBase, IAsyncLifetime
             model.LastName.ShouldBe("Smith");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

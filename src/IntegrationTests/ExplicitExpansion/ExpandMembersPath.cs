@@ -10,7 +10,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 
-public class ExpandMembersPath : AutoMapperSpecBase, IAsyncLifetime
+public class ExpandMembersPath : IntegrationTest<ExpandMembersPath.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -82,7 +82,7 @@ public class ExpandMembersPath : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Class3> Class3Set { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<TestContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
     {
         protected override void Seed(TestContext context)
         {
@@ -146,12 +146,4 @@ public class ExpandMembersPath : AutoMapperSpecBase, IAsyncLifetime
 
         public Class2 Class2 { get; set; }
     }
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

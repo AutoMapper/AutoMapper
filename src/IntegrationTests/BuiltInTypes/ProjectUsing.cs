@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class ProjectUsingWithNullables : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectUsingWithNullables : IntegrationTest<ProjectUsingWithNullables.DatabaseInitializer>
 {
     public class MyProfile : Profile
     {
@@ -41,7 +41,7 @@ public class ProjectUsingWithNullables : AutoMapperSpecBase, IAsyncLifetime
         public MyEnum EnumValueNullable { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<TestContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
     {
         protected override void Seed(TestContext context)
         {
@@ -73,18 +73,9 @@ public class ProjectUsingWithNullables : AutoMapperSpecBase, IAsyncLifetime
             results[1].EnumValueNullable.ShouldBe(MyEnum.Value1);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ProjectUsingBug : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectUsingBug : IntegrationTest<ProjectUsingBug.DatabaseInitializer>
 {
     public class Parent
     {
@@ -136,13 +127,5 @@ public class ProjectUsingBug : AutoMapperSpecBase, IAsyncLifetime
             var result = ProjectTo<ParentVM>(db.Parents);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new CreateDatabaseIfNotExists<ApplicationDBContext>();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ApplicationDBContext> { }
 }

@@ -10,41 +10,41 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests;
 
-public class IncludeMembers : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public InnerSource InnerSource { get; set; }
         public OtherInnerSource OtherInnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }
-    class OtherInnerSource
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Title { get; set; }
-    }
-    class Destination
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }
     }
-    class Context : LocalDbContext
+    public class Destination
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+    }
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -72,52 +72,42 @@ public class IncludeMembers : AutoMapperSpecBase, IAsyncLifetime
             result.Title.ShouldBe("title");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
-public class IncludeMembersExplicitExpansion : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersExplicitExpansion : IntegrationTest<IncludeMembersExplicitExpansion.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public InnerSource InnerSource { get; set; }
         public OtherInnerSource OtherInnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }
-    class OtherInnerSource
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Title { get; set; }
-    }
-    class Destination
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }
     }
-    class Context : LocalDbContext
+    public class Destination
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+    }
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -145,35 +135,25 @@ public class IncludeMembersExplicitExpansion : AutoMapperSpecBase, IAsyncLifetim
             result.Title.ShouldBe("title");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
 
-public class IncludeMembersFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstOrDefault.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -181,7 +161,7 @@ public class IncludeMembersFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -190,11 +170,11 @@ public class IncludeMembersFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
         public string Author { get; set; }
         public string Publisher { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -229,35 +209,25 @@ public class IncludeMembersFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
             result.Publisher.ShouldBe("publisher");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
 
-public class IncludeMembersFirstOrDefaultWithMapFromExpression : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest<IncludeMembersFirstOrDefaultWithMapFromExpression.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description1 { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -265,7 +235,7 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : AutoMapperSpecB
         public string Title1 { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -274,11 +244,11 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : AutoMapperSpecB
         public string Author { get; set; }
         public string Publisher { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -313,72 +283,63 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : AutoMapperSpecB
             result.Publisher.ShouldBe("publisher");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<IncludeMembersFirstOrDefaultWithSubqueryMapFrom.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
-    class InnerSourceDetails
+    public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OtherInnerSourceDetails> OtherInnerSourceDetails { get; } = new List<OtherInnerSourceDetails>();
     }
-    class OtherInnerSourceDetails
+    public class OtherInnerSourceDetails
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DestinationDetails Details { get; set; }
         public OtherDestinationDetails OtherDetails { get; set; }
     }
-    class DestinationDetails
+    public class DestinationDetails
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherDestinationDetails
+    public class OtherDestinationDetails
     {
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -415,82 +376,73 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : AutoMapperSpecBas
             result.OtherDetails.Author.ShouldBe("author");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceWrapper> InnerSourceWrappers { get; set; } = new List<InnerSourceWrapper>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSourceWrapper
+    public class InnerSourceWrapper
     {
         public int Id { get; set; }
         public InnerSource InnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetailsWrapper> InnerSourceDetailsWrapper { get; } = new List<InnerSourceDetailsWrapper>();
     }
-    class InnerSourceDetailsWrapper
+    public class InnerSourceDetailsWrapper
     {
         public int Id { get; set; }
         public InnerSourceDetails InnerSourceDetails { get; set; }
     }
-    class InnerSourceDetails
+    public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OtherInnerSourceDetails> OtherInnerSourceDetails { get; } = new List<OtherInnerSourceDetails>();
     }
-    class OtherInnerSourceDetails
+    public class OtherInnerSourceDetails
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DestinationDetails Details { get; set; }
         public OtherDestinationDetails OtherDetails { get; set; }
     }
-    class DestinationDetails
+    public class DestinationDetails
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherDestinationDetails
+    public class OtherDestinationDetails
     {
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -528,72 +480,63 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : AutoMapperS
             result.OtherDetails.Author.ShouldBe("author");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class SubqueryMapFromWithIncludeMembersFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
+public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<SubqueryMapFromWithIncludeMembersFirstOrDefault.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
-    class InnerSourceDetails
+    public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OtherInnerSourceDetails> OtherInnerSourceDetails { get; } = new List<OtherInnerSourceDetails>();
     }
-    class OtherInnerSourceDetails
+    public class OtherInnerSourceDetails
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DestinationDetails Details { get; set; }
         public OtherDestinationDetails OtherDetails { get; set; }
     }
-    class DestinationDetails
+    public class DestinationDetails
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherDestinationDetails
+    public class OtherDestinationDetails
     {
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -632,72 +575,63 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : AutoMapperSpecBas
             result.OtherDetails.Author.ShouldBe("author");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
+public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : IntegrationTest<SubqueryMapFromWithIncludeMembersSelectFirstOrDefault.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
-    class InnerSourceDetails
+    public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OtherInnerSourceDetails> OtherInnerSourceDetails { get; } = new List<OtherInnerSourceDetails>();
     }
-    class OtherInnerSourceDetails
+    public class OtherInnerSourceDetails
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DestinationDetails Details { get; set; }
         public OtherDestinationDetails OtherDetails { get; set; }
     }
-    class DestinationDetails
+    public class DestinationDetails
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherDestinationDetails
+    public class OtherDestinationDetails
     {
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -736,82 +670,73 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : AutoMapperS
             result.OtherDetails.Author.ShouldBe("author");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
+public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : IntegrationTest<SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceWrapper> InnerSourceWrappers { get; set; } = new List<InnerSourceWrapper>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSourceWrapper
+    public class InnerSourceWrapper
     {
         public int Id { get; set; }
         public InnerSource InnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetailsWrapper> InnerSourceDetailsWrapper { get; } = new List<InnerSourceDetailsWrapper>();
     }
-    class InnerSourceDetailsWrapper
+    public class InnerSourceDetailsWrapper
     {
         public int Id { get; set; }
         public InnerSourceDetails InnerSourceDetails { get; set; }
     }
-    class InnerSourceDetails
+    public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OtherInnerSourceDetails> OtherInnerSourceDetails { get; } = new List<OtherInnerSourceDetails>();
     }
-    class OtherInnerSourceDetails
+    public class OtherInnerSourceDetails
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DestinationDetails Details { get; set; }
         public OtherDestinationDetails OtherDetails { get; set; }
     }
-    class DestinationDetails
+    public class DestinationDetails
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
     }
-    class OtherDestinationDetails
+    public class OtherDestinationDetails
     {
         public string Title { get; set; }
         public string Author { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -851,51 +776,42 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : AutoM
             result.OtherDetails.Author.ShouldBe("author");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class IncludeMembersWithMapFromExpression : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersWithMapFromExpression : IntegrationTest<IncludeMembersWithMapFromExpression.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public InnerSource InnerSource { get; set; }
         public OtherInnerSource OtherInnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description1 { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Title1 { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Title { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -921,52 +837,43 @@ public class IncludeMembersWithMapFromExpression : AutoMapperSpecBase, IAsyncLif
             result.Title.ShouldBe("title");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class IncludeMembersWithNullSubstitute : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersWithNullSubstitute : IntegrationTest<IncludeMembersWithNullSubstitute.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public InnerSource InnerSource { get; set; }
         public OtherInnerSource OtherInnerSource { get; set; }
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
         public int? OtherCode { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int Code { get; set; }
         public int OtherCode { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -993,50 +900,41 @@ public class IncludeMembersWithNullSubstitute : AutoMapperSpecBase, IAsyncLifeti
             result.OtherCode.ShouldBe(7);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : AutoMapperSpecBase, IAsyncLifetime
+public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : IntegrationTest<IncludeMembersMembersFirstOrDefaultWithNullSubstitute.DatabaseInitializer>
 {
-    class Source
+    public class Source
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
         public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
     }
-    class InnerSource
+    public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
     }
-    class OtherInnerSource
+    public class OtherInnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
         public int? OtherCode { get; set; }
     }
-    class Destination
+    public class Destination
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int Code { get; set; }
         public int OtherCode { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -1064,17 +962,8 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : AutoMapperS
             result.OtherCode.ShouldBe(7);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class CascadedIncludeMembers : AutoMapperSpecBase, IAsyncLifetime
+public class CascadedIncludeMembers : IntegrationTest<CascadedIncludeMembers.DatabaseInitializer>
 {
     public class Source
     {
@@ -1102,11 +991,11 @@ public class CascadedIncludeMembers : AutoMapperSpecBase, IAsyncLifetime
         cfg.CreateProjection<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
         cfg.CreateProjection<Level2, Destination>(MemberList.None);
     });
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Source> Sources { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -1126,13 +1015,4 @@ public class CascadedIncludeMembers : AutoMapperSpecBase, IAsyncLifetime
             result.TheField.ShouldBe(2);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
