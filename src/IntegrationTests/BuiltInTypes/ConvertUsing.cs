@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class ProjectUsingWithNullables : IntegrationTest<ProjectUsingWithNullables.DatabaseInitializer>
+public class ConvertUsingWithNullables : IntegrationTest<ConvertUsingWithNullables.DatabaseInitializer>
 {
     public class MyProfile : Profile
     {
@@ -75,7 +73,7 @@ public class ProjectUsingWithNullables : IntegrationTest<ProjectUsingWithNullabl
     }
 }
 
-public class ProjectUsingBug : IntegrationTest<ProjectUsingBug.DatabaseInitializer>
+public class ConvertUsingBug : IntegrationTest<ConvertUsingBug.DatabaseInitializer>
 {
     public class Parent
     {
@@ -128,4 +126,44 @@ public class ProjectUsingBug : IntegrationTest<ProjectUsingBug.DatabaseInitializ
         }
     }
     public class DatabaseInitializer : DropCreateDatabaseAlways<ApplicationDBContext> { }
+}
+public class StringTypeConverter : IntegrationTest<StringTypeConverter.DatabaseInitializer>
+{
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<string, string>().ConvertUsing(s => s ?? string.Empty);
+        cfg.CreateMap<Planning, Appointment>().ForMember(a => a.Subject, o => o.MapFrom(p => p.Libelle ?? p.Service.Libelle));
+    });
+    [Fact]
+    public void Should_work()
+    {
+        using var context = new ApplicationDBContext();
+        var query = ProjectTo<Appointment>(context.Planning);
+        query.Single().Subject.ShouldBe("Test");
+    }
+    public class Appointment
+    {
+        public int Id { get; set; }
+        public string Subject { get; set; }
+    }
+    public class Planning
+    {
+        public int Id { get; set; }
+        public string Libelle { get; set; }
+        public Service Service { get; set; }
+    }
+    public partial class Service
+    {
+        public int Id { get; set; }
+        public string Libelle { get; set; }
+    }
+    public partial class ApplicationDBContext : LocalDbContext
+    {
+        public DbSet<Planning> Planning { get; set; }
+        public DbSet<Service> Service { get; set; }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ApplicationDBContext>
+    {
+        protected override void Seed(ApplicationDBContext context) => context.Planning.Add(new() { Libelle = "Test" });
+    }
 }

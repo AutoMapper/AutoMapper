@@ -347,7 +347,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             BuiltProjections[request] = depth;
             return depth;
         }
-        public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
+        public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => letExpression.Body;
         public virtual void Push(MemberProjection memberProjection) { }
         public virtual MemberPath GetCurrentPath() => MemberPath.Empty;
         public virtual void Pop() {}
