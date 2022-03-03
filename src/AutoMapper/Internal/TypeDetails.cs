@@ -181,8 +181,8 @@ namespace AutoMapper.Internal
         private IEnumerable<MemberInfo> GetFields(Func<FieldInfo, bool> fieldAvailableFor) =>
             GetTypeInheritance().SelectMany(type => type.GetFields(TypeExtensions.InstanceFlags).Where(field => fieldAvailableFor(field) && Config.ShouldMapField(field)));
         private IEnumerable<MethodInfo> GetPublicNoArgMethods() =>
-            Type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-            .Where(m => m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && Config.ShouldMapMethod(m) && m.GetParameters().Length == 0);
+            Type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m => 
+                m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && !m.IsGenericMethodDefinition && Config.ShouldMapMethod(m) && m.GetParameters().Length == 0);
     }
     public readonly struct ConstructorParameters
     {
