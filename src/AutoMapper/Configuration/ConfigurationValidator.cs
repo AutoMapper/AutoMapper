@@ -94,7 +94,7 @@ namespace AutoMapper.Configuration
         {
             if(typeMap == null)
             {
-                if (types.SourceType.ContainsGenericParameters || types.DestinationType.ContainsGenericParameters)
+                if (types.ContainsGenericParameters)
                 {
                     return;
                 }
