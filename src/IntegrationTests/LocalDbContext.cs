@@ -1,23 +1,9 @@
-﻿using System.Globalization;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace AutoMapper.IntegrationTests;
 
 public abstract class LocalDbContext : DbContext
 {
-    private readonly string _localDbVersion = "mssqllocaldb";
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var baseConnectionString = @"Integrated Security=True; MultipleActiveResultSets=True;";
-
-        var connectionString = string.Format(
-            CultureInfo.InvariantCulture,
-            @"Data Source=(localdb)\{1};{0};Database={2}",
-            baseConnectionString,
-            _localDbVersion,
-            GetType().FullName);
-
-        optionsBuilder.UseSqlServer(connectionString);
-    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(
+        @$"Data Source=(localdb)\mssqllocaldb;Integrated Security=True;MultipleActiveResultSets=True;Database={GetType()};Connection Timeout=160");
 }
