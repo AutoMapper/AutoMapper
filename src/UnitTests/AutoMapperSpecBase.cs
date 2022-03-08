@@ -18,6 +18,8 @@ public class IgnoreMapAttribute : Attribute
 }
 static class Utils
 {
+    public static IMappingExpression<TSource, TDestination> Advanced<TSource, TDestination>(this IProjectionExpression<TSource, TDestination> projection) =>
+        (IMappingExpression<TSource, TDestination>)projection;
     public static TypeMap FindTypeMapFor<TSource, TDestination>(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().FindTypeMapFor<TSource, TDestination>();
     public static IReadOnlyCollection<TypeMap> GetAllTypeMaps(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetAllTypeMaps();
     public static TypeMap ResolveTypeMap(this IConfigurationProvider configurationProvider, Type sourceType, Type destinationType) => configurationProvider.Internal().ResolveTypeMap(sourceType, destinationType);
