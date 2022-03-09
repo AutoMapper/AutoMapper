@@ -87,7 +87,7 @@ namespace AutoMapper.Execution
         {
             if (typeMap.DestinationTypeOverride != null)
             {
-                CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.GetAsPair()), typeMapsPath);
+                CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.AsPair()), typeMapsPath);
                 return;
             }
             typeMapsPath.Add(typeMap);
