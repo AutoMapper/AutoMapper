@@ -32,6 +32,7 @@ namespace AutoMapper
         private HashSet<TypeMap> _inheritedTypeMaps;
         private HashSet<IncludedMember> _includedMembersTypeMaps;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
+        private Type _destinationTypeOverride;
         public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, bool isReverseMap = false)
         {
             Types = new(sourceType, destinationType);
@@ -70,7 +71,7 @@ namespace AutoMapper
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
         public Features<IRuntimeFeature> Features => _features ??= new();
         public LambdaExpression MapExpression { get; private set; }
-        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator && 
+        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator &&
             !CustomConstruction && !HasTypeConverter && DestinationConstructors.Length > 0;
         public TypePair Types;
         public ConstructorMap ConstructorMap { get; set; }
@@ -83,7 +84,15 @@ namespace AutoMapper
         public LambdaExpression CustomMapExpression { get; set; }
         public LambdaExpression CustomCtorFunction { get; set; }
         public LambdaExpression CustomCtorExpression { get; set; }
-        public Type DestinationTypeOverride { get; set; }
+        public Type DestinationTypeOverride
+        { 
+            get => _destinationTypeOverride;
+            set
+            {
+                _destinationTypeOverride = value;
+                _sealed = true;
+            }
+        }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
         public bool ConstructDestinationUsingServiceLocator { get; set; }
         public bool IncludeAllDerivedTypes { get; set; }
