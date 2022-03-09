@@ -219,7 +219,7 @@ namespace AutoMapper
             AddPropertyMap(propertyMap);
             return propertyMap;
         }
-        public TypePair GetAsPair() => new TypePair(SourceType, DestinationTypeOverride);
+        public TypePair AsPair() => new(SourceType, DestinationTypeOverride);
         public void IncludeDerivedTypes(TypePair derivedTypes)
         {
             CheckDifferent(derivedTypes);

@@ -339,7 +339,7 @@ namespace AutoMapper
             {
                 if (typeMap.DestinationTypeOverride != null)
                 {
-                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.GetAsPair());
+                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.AsPair());
                     _resolvedMaps[typeMap.Types] = derivedMap;
                 }
                 else
