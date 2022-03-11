@@ -44,7 +44,8 @@
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(Version)" />
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(Version)" />
+    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="&quot;$(ProjectDir)PreBuild.sh&quot; $(Version)" />
   </Target>
 
 </Project>
