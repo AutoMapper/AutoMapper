@@ -1,95 +1,96 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
-using System.Linq;
-using Xunit;
-using Shouldly;
-using AutoMapper.QueryableExtensions;
-using AutoMapper.UnitTests;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper.UnitTests;
+using Microsoft.EntityFrameworkCore;
+using Shouldly;
+using Xunit;
 
-namespace AutoMapper.IntegrationTests.Net4
+namespace AutoMapper.IntegrationTests.MaxDepth;
+
+public class NestedDtos : AutoMapperSpecBase, IAsyncLifetime
 {
-    public class NestedDtos : AutoMapperSpecBase
+    ArtDto _destination;
+
+    public class Sem
     {
-        ArtDto _destination;
+        [Key]
+        public int Key { get; set; }
+        public string Name { get; set; }
 
-        public class Sem
+        public virtual ICollection<Art> Arts { get; set; }
+    }
+
+    public class Art
+    {
+        [Key]
+        public int Key { get; set; }
+        public string AName { get; set; }
+
+        [ForeignKey("Sem")]
+        public int? SemKey { get; set; }
+        public virtual Sem Sem { get; set; }
+    }
+
+    public class SemDto
+    {
+        public int Key { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ArtDto
+    {
+        public int Key { get; set; }
+        public string AName { get; set; }
+
+        public SemDto Sem { get; set; }
+    }
+
+    public class TestContext : LocalDbContext
+    {
+        public DbSet<Art> Arts { get; set; }
+    }
+
+    public class DatabaseInitializer : CreateDatabaseIfNotExists<TestContext>
+    {
+        protected override void Seed(TestContext context)
         {
-            [Key]
-            public int Key { get; set; }
-            public string Name { get; set; }
+            context.Arts.AddRange(new[] {
+                new Art { AName = "art1", Sem = new Sem { Name = "sem1" } },
+                new Art { AName = "art2", Sem = new Sem { Name = "sem2" } },
+                new Art { AName = "art3", Sem = new Sem { Name = "sem3" } },
+            });
 
-            public virtual ICollection<Art> Arts { get; set; }
-        }
-
-        public class Art
-        {
-            [Key]
-            public int Key { get; set; }
-            public string AName { get; set; }
-
-            [ForeignKey("Sem")]
-            public int? SemKey { get; set; }
-            public virtual Sem Sem { get; set; }
-        }
-
-        public class SemDto
-        {
-            public int Key { get; set; }
-            public string Name { get; set; }
-        }
-
-        public class ArtDto
-        {
-            public int Key { get; set; }
-            public string AName { get; set; }
-
-            public SemDto Sem { get; set; }
-        }
-
-        public class TestContext : DbContext
-        {
-            public TestContext()
-            {
-                Database.SetInitializer<TestContext>(new DatabaseInitializer());
-            }
-            public DbSet<Art> Arts { get; set; }
-        }
-
-        public class DatabaseInitializer : CreateDatabaseIfNotExists<TestContext>
-        {
-            protected override void Seed(TestContext context)
-            {
-                context.Arts.AddRange(new[] {
-                    new Art { AName = "art1", Sem = new Sem { Name = "sem1" } },
-                    new Art { AName = "art2", Sem = new Sem { Name = "sem2" } },
-                    new Art { AName = "art3", Sem = new Sem { Name = "sem3" } },
-                });
-
-                base.Seed(context);
-            }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateProjection<Sem, SemDto>().MaxDepth(1).ConstructUsing(s => new SemDto());
-            cfg.CreateProjection<Art, ArtDto>().MaxDepth(1).ConstructUsing(s => new ArtDto());
-        });
-
-        protected override void Because_of()
-        {
-            using(var context = new TestContext())
-            {
-                _destination = ProjectTo<ArtDto>(context.Arts).FirstOrDefault();
-            }
-        }
-
-        [Fact]
-        public void Should_project_nested_dto()
-        {
-            _destination.AName.ShouldBe("art1");
-            _destination.Sem.Name.ShouldBe("sem1");
+            base.Seed(context);
         }
     }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateProjection<Sem, SemDto>().MaxDepth(1).ConstructUsing(s => new SemDto());
+        cfg.CreateProjection<Art, ArtDto>().MaxDepth(1).ConstructUsing(s => new ArtDto());
+    });
+
+    [Fact]
+    public void Should_project_nested_dto()
+    {
+        _destination.AName.ShouldBe("art1");
+        _destination.Sem.Name.ShouldBe("sem1");
+    }
+
+    public async Task InitializeAsync()
+    {
+        var initializer = new DatabaseInitializer();
+
+        await initializer.Migrate();
+
+        using (var context = new TestContext())
+        {
+            _destination = ProjectTo<ArtDto>(context.Arts).FirstOrDefault();
+        }
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }

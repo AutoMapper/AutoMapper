@@ -6,6 +6,56 @@ using Shouldly;
 using Xunit;
 namespace AutoMapper.UnitTests.InterfaceMapping
 {
+    public class InterfaceInheritance : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateMap<Source, IProperties>()
+                .IncludeBase<Source, IPropertyA>()
+                .IncludeBase<Source, IPropertyB>();
+            cfg.CreateMap<Source, IPropertyA>();
+            cfg.CreateMap<Source, IPropertyB>();
+        });
+        [Fact]
+        public void Should_choose_the_derived_interface()
+        {
+            var source = new Source
+            {
+                Name = "Name",
+                PropertyA = "PropertyA",
+                PropertyB = "PropertyB"
+            };
+            var destination = new Target();
+            Mapper.Map(source, destination);
+            destination.Name.ShouldBe(source.Name);
+            destination.PropertyA.ShouldBe(source.PropertyA);
+            destination.PropertyB.ShouldBe(source.PropertyB);
+        }
+        public class Source
+        {
+            public string PropertyA { get; set; }
+            public string PropertyB { get; set; }
+            public string Name { get; set; }
+        }
+        public class Target : IProperties
+        {
+            public string PropertyA { get; set; }
+            public string PropertyB { get; set; }
+            public string Name { get; set; }
+        }
+        public interface IProperties : IPropertyA, IPropertyB
+        {
+            string Name { get; set; }
+        }
+        public interface IPropertyA
+        {
+            string PropertyA { get; set; }
+        }
+        public interface IPropertyB
+        {
+            string PropertyB { get; set; }
+        }
+    }
     public class MapToInterface : NonValidatingSpecBase
     {
         protected override MapperConfiguration CreateConfiguration() => new(c=>c.CreateMap<object, IEnumerable<object>>());

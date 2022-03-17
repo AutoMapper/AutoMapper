@@ -10,4 +10,4 @@ if($versionNumbers[1] -eq "0" -AND $versionNumbers[2] -eq "0")
 $oldVersion = $oldVersion.ToString() +".0.0"
 echo $oldVersion
 & ..\..\nuget install AutoMapper -Version $oldVersion -OutputDirectory ..\LastMajorVersionBinary
-& copy ..\LastMajorVersionBinary\AutoMapper.$oldVersion\lib\netstandard2.0\AutoMapper.dll ..\LastMajorVersionBinary
+& copy ..\LastMajorVersionBinary\AutoMapper.$oldVersion\lib\netstandard2.1\AutoMapper.dll ..\LastMajorVersionBinary

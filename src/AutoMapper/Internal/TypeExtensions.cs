@@ -77,8 +77,10 @@ namespace AutoMapper.Internal
             {
                 return type;
             }
-            foreach (var interfaceType in type.GetInterfaces())
+            var interfaces = type.GetInterfaces();
+            for(int index = interfaces.Length - 1; index >= 0; index--)
             {
+                var interfaceType = interfaces[index];
                 if (interfaceType.IsGenericType(genericInterface))
                 {
                     return interfaceType;
@@ -101,6 +103,7 @@ namespace AutoMapper.Internal
         }
 
         public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
-        public static MethodInfo GetInstanceMethod(this Type type, string name) => type.GetMethod(name, InstanceFlags);
+        public static MethodInfo GetInstanceMethod(this Type type, string name) => 
+            (MethodInfo)type.GetMember(name, MemberTypes.Method, InstanceFlags).FirstOrDefault();
     }
 }

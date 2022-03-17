@@ -94,7 +94,7 @@ namespace AutoMapper.Configuration
         {
             if(typeMap == null)
             {
-                if (types.SourceType.ContainsGenericParameters || types.DestinationType.ContainsGenericParameters)
+                if (types.ContainsGenericParameters)
                 {
                     return;
                 }
@@ -131,7 +131,10 @@ namespace AutoMapper.Configuration
                 if(mapperToUse is IObjectMapperInfo mapperInfo)
                 {
                     var newTypePair = mapperInfo.GetAssociatedTypes(types);
-                    DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    if (newTypePair != types)
+                    {
+                        DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    }
                 }
             }
         }

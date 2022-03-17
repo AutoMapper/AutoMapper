@@ -1,4 +1,4 @@
-![AutoMapper](https://s3.amazonaws.com/automapper/logo.png)
+![AutoMapper](https://camo.githubusercontent.com/603a9fdf1c6578e4df423ecdb784cb5d634e016850c10ba0798970fd48c55d41/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6175746f6d61707065722f6c6f676f2e706e67)
 
 [![CI](https://github.com/automapper/automapper/workflows/CI/badge.svg)](https://github.com/AutoMapper/AutoMapper/actions?query=workflow%3ACI)
 [![NuGet](http://img.shields.io/nuget/vpre/AutoMapper.svg?label=NuGet)](https://www.nuget.org/packages/AutoMapper/)

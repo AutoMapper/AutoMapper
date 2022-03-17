@@ -6,11 +6,105 @@ using System.Collections.Specialized;
 using Xunit;
 using Shouldly;
 using System.Collections;
-using System.Reflection;
 using AutoMapper.Internal;
+using System.Collections.Immutable;
 
 namespace AutoMapper.UnitTests
 {
+    public class NonPublicEnumeratorCurrent : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : List<int>
+        {
+	        public new MyEnumerator GetEnumerator() => new(base.GetEnumerator());
+        }
+        class MyEnumerator : IEnumerator
+        {
+            IEnumerator _enumerator;
+            public MyEnumerator(IEnumerator enumerator)
+            {
+                _enumerator = enumerator;
+            }
+            object IEnumerator.Current => _enumerator.Current;
+            public bool MoveNext() => _enumerator.MoveNext();
+            public void Reset() => _enumerator.Reset();
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject { 1, 2, 3 })));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBe(new[] { 1, 2, 3 });
+    }
+    public class ImmutableCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public ImmutableArray<int> Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>ImmutableArray.Create<int>())));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<ImmutableArray<int>>();
+    }
+    public class AssignableCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : IEnumerable
+        {
+            public IEnumerator GetEnumerator() => throw new NotImplementedException();
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<MyJObject>();
+    }
+    public class RecursiveCollection : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public MyJObject Value { get; set; }
+        }
+        class MyJObject : List<MyJObject>{}
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(_=>new MyJObject())));
+        [Fact]
+        public void Should_work() => Map<Destination>(new Source()).Value.ShouldBeOfType<MyJObject>();
+    }
+    public class AmbigousMethod : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public string Value { get; set; }
+        }
+        public class Destination
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
+        [Fact]
+        public void Should_work() => Map<Destination[]>(new[] { new Source() }.OrderBy(s => s.Value));
+    }
     public class Enumerator_disposable_at_runtime_class : AutoMapperSpecBase
     {
         class CustomList<T> : List<T>
