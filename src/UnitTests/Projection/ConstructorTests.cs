@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Value2 { get; }
             public IList<DestinationValue> Values { get; set; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Source, Destination>().ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault()));
             cfg.CreateProjection<SourceItem, DestinationItem>().ForCtorParam("destinationValue", o=>o.MapFrom(s=>s.Values.FirstOrDefault()));
@@ -74,11 +74,34 @@ namespace AutoMapper.UnitTests.Projection
         class Destination
         {
             public Destination(string value) => Value = value;
-            public string Value { get; set; }
+            public string Value { get; }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateProjection<Source, Destination>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Source, Destination>());
         [Fact]
         public void Should_construct_correctly() => new[] { new Source { Value = 5 } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
+    }
+    public class ConstructorIncludeMembers : AutoMapperSpecBase
+    {
+        class SourceWrapper
+        {
+            public Source Source { get; set; }
+        }
+        class Source
+        {
+            public int Value { get; set; }
+        }
+        class Destination
+        {
+            public Destination(string value) => Value = value;
+            public string Value { get; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateProjection<SourceWrapper, Destination>().IncludeMembers(s => s.Source);
+            cfg.CreateProjection<Source, Destination>();
+        });
+        [Fact]
+        public void Should_construct_correctly() => new[] { new SourceWrapper { Source = new Source { Value = 5 } } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
     }
     public class ConstructorsWithCollections : AutoMapperSpecBase
     {
@@ -108,7 +131,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Id { get; set; }
             public AddressDto AddressDto { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateProjection<Users, UserDto>().ForMember(d => d.AddressDto, e => e.MapFrom(s => s.FkAddress));
             cfg.CreateProjection<Addresses, AddressDto>().ConstructUsing(a => new AddressDto(a.Id, a.Address));
@@ -141,7 +164,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Other { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AddIgnoreMapAttribute();
             cfg.CreateProjection<Source, Dest>()
@@ -188,7 +211,7 @@ namespace AutoMapper.UnitTests.Projection
             public int Id { get; }
             public DtoB(int id) => Id = id;
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<A, DtoA>();
             cfg.CreateProjection<B, DtoB>();

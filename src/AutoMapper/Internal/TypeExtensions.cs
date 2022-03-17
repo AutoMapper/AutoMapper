@@ -52,8 +52,8 @@ namespace AutoMapper.Internal
         public static FieldInfo GetInheritedField(this Type type, string name) => type.GetField(name, InstanceFlags) ??
             type.BaseClassesAndInterfaces().Select(t => t.GetField(name, InstanceFlags)).FirstOrDefault(f => f != null);
 
-        public static MethodInfo GetInheritedMethod(this Type type, string name) => type.GetMethod(name, InstanceFlags) ??
-            type.BaseClassesAndInterfaces().Select(t => t.GetMethod(name, InstanceFlags)).FirstOrDefault(m => m != null)
+        public static MethodInfo GetInheritedMethod(this Type type, string name) => type.GetInstanceMethod(name) ??
+            type.BaseClassesAndInterfaces().Select(t => t.GetInstanceMethod(name)).FirstOrDefault(m => m != null)
             ?? throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
 
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
@@ -77,8 +77,10 @@ namespace AutoMapper.Internal
             {
                 return type;
             }
-            foreach (var interfaceType in type.GetInterfaces())
+            var interfaces = type.GetInterfaces();
+            for(int index = interfaces.Length - 1; index >= 0; index--)
             {
+                var interfaceType = interfaces[index];
                 if (interfaceType.IsGenericType(genericInterface))
                 {
                     return interfaceType;
@@ -101,5 +103,7 @@ namespace AutoMapper.Internal
         }
 
         public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
+        public static MethodInfo GetInstanceMethod(this Type type, string name) => 
+            (MethodInfo)type.GetMember(name, MemberTypes.Method, InstanceFlags).FirstOrDefault();
     }
 }

@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests.Bug
             public ExpandoObject ExpandoObject { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<From, To>();
         });

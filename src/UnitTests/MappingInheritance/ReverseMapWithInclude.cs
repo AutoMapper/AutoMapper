@@ -50,7 +50,7 @@
 
         public class ConcreteSource : Source { }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Name, conf => conf.MapFrom(source => source.Title))

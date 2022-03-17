@@ -35,6 +35,7 @@ To customize the overall type map configuration, you can set the following prope
  - DisableCtorValidation (bool)
  - IncludeAllDerived (bool)
  - TypeConverter (Type)
+ - AsProxy (bool)
  
 These all correspond to the similar fluent mapping configuration options. Only the `sourceType` value is required to map.
 

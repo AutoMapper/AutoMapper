@@ -42,7 +42,7 @@ You can use the Queryable Extensions like so:
 
 ```c#
 var configuration = new MapperConfiguration(cfg =>
-    cfg.CreateMap<OrderLine, OrderLineDTO>()
+    cfg.CreateProjection<OrderLine, OrderLineDTO>()
     .ForMember(dto => dto.Item, conf => conf.MapFrom(ol => ol.Item.Name)));
 
 public List<OrderLineDTO> GetLinesForOrder(int orderId)
@@ -96,7 +96,7 @@ This map through AutoMapper will result in a SELECT N+1 problem, as each child `
 In the case where members names don't line up, or you want to create calculated property, you can use MapFrom (the expression-based overload) to supply a custom expression for a destination member:
 
 ```c#
-var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Customer, CustomerDto>()
+var configuration = new MapperConfiguration(cfg => cfg.CreateProjection<Customer, CustomerDto>()
     .ForMember(d => d.FullName, opt => opt.MapFrom(c => c.FirstName + " " + c.LastName))
     .ForMember(d => d.TotalContacts, opt => opt.MapFrom(c => c.Contacts.Count()));
 ```
@@ -110,7 +110,7 @@ If the expression is rejected from your query provider (Entity Framework, NHiber
 Occasionally, you need to completely replace a type conversion from a source to a destination type. In normal runtime mapping, this is accomplished via the ConvertUsing method. To perform the analog in LINQ projection, use the ConvertUsing method:
 
 ```c#
-cfg.CreateMap<Source, Dest>().ConvertUsing(src => new Dest { Value = 10 });
+cfg.CreateProjection<Source, Dest>().ConvertUsing(src => new Dest { Value = 10 });
 ```
 
 The expression-based `ConvertUsing` is slightly more limited than Func-based `ConvertUsing` overloads as only what is allowed in an Expression and the underlying LINQ provider will work.
@@ -120,7 +120,7 @@ The expression-based `ConvertUsing` is slightly more limited than Func-based `Co
 If your destination type has a custom constructor but you don't want to override the entire mapping, use the ConstructUsing expression-based method overload:
 
 ```c#
-cfg.CreateMap<Source, Dest>()
+cfg.CreateProjection<Source, Dest>()
     .ConstructUsing(src => new Dest(src.Value + 10));
 ```
 
@@ -168,7 +168,7 @@ LINQ can support aggregate queries, and AutoMapper supports LINQ extension metho
 AutoMapper can also support complex aggregations and nested restrictions, if the LINQ provider supports it:
 
 ```c#
-cfg.CreateMap<Course, CourseModel>()
+cfg.CreateProjection<Course, CourseModel>()
     .ForMember(m => m.EnrollmentsStartingWithA,
           opt => opt.MapFrom(c => c.Enrollments.Where(e => e.Student.LastName.StartsWith("A")).Count()));
 ```
@@ -181,7 +181,7 @@ Occasionally, projections need runtime parameters for their values. Consider a p
 
 ```c#
 string currentUserName = null;
-cfg.CreateMap<Course, CourseModel>()
+cfg.CreateProjection<Course, CourseModel>()
     .ForMember(m => m.CurrentUserName, opt => opt.MapFrom(src => currentUserName));
 ```
 

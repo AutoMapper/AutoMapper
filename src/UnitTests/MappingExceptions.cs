@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.MappingExceptions
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>();
         });
@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests.MappingExceptions
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForPath(d => d.SubValue.Value, opt => opt.MapFrom(src => src.Value));

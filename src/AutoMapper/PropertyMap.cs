@@ -17,9 +17,8 @@ namespace AutoMapper
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _canResolveValue;
         private Type _sourceType;
-        public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap)
+        public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap) : base(typeMap)
         {
-            TypeMap = typeMap;
             DestinationMember = destinationMember;
             DestinationType = destinationMemberType;
         }
@@ -27,13 +26,10 @@ namespace AutoMapper
             : this(inheritedMappedProperty.DestinationMember, inheritedMappedProperty.DestinationType, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
         public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
             : this(includedMemberMap, typeMap) => IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
-        public override TypeMap TypeMap { get; }
         public MemberInfo DestinationMember { get; }
         public override string DestinationName => DestinationMember.Name;
         public override Type DestinationType { get; protected set; }
         public override MemberInfo[] SourceMembers => _sourceMembers;
-        public override IncludedMember IncludedMember { get; }
-        public override bool Inline { get; set; } = true;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
         public override bool? AllowNull { get; set; }
@@ -41,7 +37,6 @@ namespace AutoMapper
         public override LambdaExpression CustomMapFunction { get; set; }
         public override LambdaExpression Condition { get; set; }
         public override LambdaExpression PreCondition { get; set; }
-        public override LambdaExpression CustomMapExpression { get; set; }
         public override bool? UseDestinationValue { get; set; }
         public bool? ExplicitExpansion { get; set; }
         public override object NullSubstitute { get; set; }

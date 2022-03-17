@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests
             public int ShouldBeMapped { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AddGlobalIgnore("ShouldBeMapped");
             cfg.CreateMap<Source, Destination>().ForMember(d => d.ShouldBeMapped, o => o.MapFrom(src => 12));

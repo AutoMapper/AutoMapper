@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Bug
             }
 
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<IMapFrom, MapTo>();
                 cfg.CreateMap<IMapFromElement, IMapToElementWritable>()
@@ -188,7 +188,7 @@ namespace AutoMapper.UnitTests.Bug
                 string prop4 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<iclass1, iclass1DTO>()
                     .Include<iclass2, iclass2DTO>()

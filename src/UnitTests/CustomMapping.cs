@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source1, Destination>().ForMember(dest => dest.Value, opt => opt.MapFrom<MyTestResolver>());
             cfg.CreateMap<Source2, Destination>().ForMember(dest => dest.Value, opt => opt.MapFrom<MyTestResolver>());
@@ -71,7 +71,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(new Resolver(), s=>s.SValue));
         });
@@ -146,7 +146,7 @@ namespace AutoMapper.UnitTests
             public IEnumerator<TItem> GetEnumerator() { return _items.GetEnumerator(); }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(IPager<>), typeof(ModelPager<>)).ForMember("Items", e => e.MapFrom(o => (IEnumerable)o));
         });
@@ -189,7 +189,7 @@ namespace AutoMapper.UnitTests
             public int? Id { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<int, int?>().ConvertUsing<IntToNullableConverter>();
             cfg.CreateMap<Source, Destination>();
@@ -231,7 +231,7 @@ namespace AutoMapper.UnitTests
             public int SubModelId { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Model, ViewModel>()
                 .ForMember(x => x.SubModelId,
@@ -265,7 +265,7 @@ namespace AutoMapper.UnitTests
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             string x = null;
             cfg.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(s=>x.ToString()));
@@ -293,16 +293,7 @@ namespace AutoMapper.UnitTests
             public Guid Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
-        {
-            get
-            {
-                return new MapperConfiguration(c =>
-                {
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => _guid));
-                });
-            }
-        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => _guid)));
 
         protected override void Because_of()
         {
@@ -331,16 +322,7 @@ namespace AutoMapper.UnitTests
             public Guid Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
-        {
-            get
-            {
-                return new MapperConfiguration(c =>
-                {
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom<Resolver>());
-                });
-            }
-        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom<Resolver>()));
 
         class Resolver : IValueResolver<Source, Destination, Guid>
         {
@@ -375,17 +357,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
-        {
-            get
-            {
-                return new MapperConfiguration(c =>
-                {
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom((s, d) => { Throw(); return 0; }));
-                });
-            }
-        }
-
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom((s, d) => { Throw(); return 0; })));
         private void Throw()
         {
             throw _ex;
@@ -421,17 +393,11 @@ namespace AutoMapper.UnitTests
             public InnerDestination Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
-            get
-            {
-                return new MapperConfiguration(c =>
-                {
-                    c.CreateMap<InnerSource, InnerDestination>();
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new InnerSource { IntValue = 15 }));
-                });
-            }
-        }
+            c.CreateMap<InnerSource, InnerDestination>();
+            c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new InnerSource { IntValue = 15 }));
+        });
 
         protected override void Because_of()
         {
@@ -469,17 +435,11 @@ namespace AutoMapper.UnitTests
             public InnerDestination Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
-            get
-            {
-                return new MapperConfiguration(c =>
-                {
-                    c.CreateMap<InnerSource, InnerDestination>();
-                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(s => s.ObjectValue));
-                });
-            }
-        }
+            c.CreateMap<InnerSource, InnerDestination>();
+            c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(s => s.ObjectValue));
+        });
 
         protected override void Because_of()
         {
@@ -506,13 +466,8 @@ namespace AutoMapper.UnitTests
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration
-        {
-            get
-            {
-                return new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new object())));
-            }
-        }
+        protected override MapperConfiguration CreateConfiguration() => 
+            new(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom(src => new object())));
 
         protected override void Because_of()
         {
@@ -540,8 +495,8 @@ namespace AutoMapper.UnitTests
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; }
-            = new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(s=>s.ObjectValue)));
+        protected override MapperConfiguration CreateConfiguration() =>
+            new(c => c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(s=>s.ObjectValue)));
 
         protected override void Because_of()
         {
@@ -593,7 +548,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dto => dto.Value, opt => opt.MapFrom<CustomResolver>())
@@ -660,7 +615,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dto => dto.SomeValue, opt => opt.MapFrom<CustomResolver, ModelSubObject>(m => m.Sub));
@@ -705,7 +660,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForMember(dto => dto.SomeValue,
@@ -745,7 +700,7 @@ namespace AutoMapper.UnitTests
             public int Type { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForMember(dto => dto.Type, opt => opt.MapFrom(m => m.Type));
@@ -804,7 +759,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(s => s.Value,
@@ -864,7 +819,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(s => s.Value,
@@ -1124,7 +1079,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ConstructServicesUsing(t => new CustomConverter(10));
             cfg.CreateMap<Source, Destination>()
@@ -1157,7 +1112,7 @@ namespace AutoMapper.UnitTests
             public int Value2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ConvertUsing(s => new Destination {Value2 = s.Value1 + 10});
@@ -1169,7 +1124,7 @@ namespace AutoMapper.UnitTests
             Exception thrown = null;
             try
             {
-                Configuration.AssertConfigurationIsValid();
+                AssertConfigurationIsValid();
 
             }
             catch (Exception ex)
@@ -1211,7 +1166,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ConstructServicesUsing(type => new CustomValueResolver(5));
 
@@ -1254,7 +1209,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(d => d.Value, opt => opt.MapFrom<CustomValueResolver, int>(src => src.Value));
@@ -1304,7 +1259,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => {
             cfg.CreateMap<SourceDto, DestinationDto>()
                 .ForMember(dest => dest.Ident, opt => opt.MapFrom(x => x.Id))
                 .ForMember(dest => dest.Number, opt => opt.MapFrom<CustomResolver, string>(src => src.NumberValue))
@@ -1357,7 +1312,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ConstructServicesUsing(type => new CustomValueResolver());
 
@@ -1426,7 +1381,7 @@ namespace AutoMapper.UnitTests
             string Name { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => ((ISomeInterface) dest).Name, opt => opt.MapFrom(src => src.MyName));
@@ -1474,7 +1429,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
 
@@ -1560,7 +1515,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<SourceWithList, DestinationWithList>();
@@ -1613,7 +1568,7 @@ namespace AutoMapper.UnitTests
             public int OtherValue { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ConstructUsing(src => new Destination(src.Value + 4))
@@ -1652,7 +1607,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 5));
@@ -1724,7 +1679,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.DisableConstructorMapping();
             cfg.CreateMap<Source, Dest>()

@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.Bug
                 public int? Dummy { get; set; }
             }
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
             {
                 cfg.CreateMap<DummySource, DummyDestination>();
             });

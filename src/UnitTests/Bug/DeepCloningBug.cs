@@ -19,7 +19,7 @@
 
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Outer, Outer>();
             cfg.CreateMap<Inner, Inner>();

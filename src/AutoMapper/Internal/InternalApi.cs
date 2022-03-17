@@ -57,7 +57,7 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IGlobalConfiguration : IConfigurationProvider
     {
-        TypeMap ResolveAssociatedTypeMap(in TypePair types);
+        TypeMap ResolveAssociatedTypeMap(TypePair types);
         /// <summary>
         /// Get all configured type maps created
         /// </summary>
@@ -75,7 +75,7 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap FindTypeMapFor(in TypePair typePair);
+        TypeMap FindTypeMapFor(TypePair typePair);
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type
         /// </summary>
@@ -95,7 +95,7 @@ namespace AutoMapper.Internal
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(in TypePair typePair);
+        TypeMap ResolveTypeMap(TypePair typePair);
         /// <summary>
         /// Dry run single type map
         /// </summary>
@@ -119,14 +119,14 @@ namespace AutoMapper.Internal
         /// <summary>
         /// Gets the features collection.
         /// </summary>
-        /// <value>The feature colection.</value>
+        /// <value>The feature collection.</value>
         Features<IRuntimeFeature> Features { get; }
         /// <summary>
         /// Find a matching object mapper.
         /// </summary>
         /// <param name="types">the types to match</param>
         /// <returns>the matching mapper or null</returns>
-        IObjectMapper FindMapper(in TypePair types);
+        IObjectMapper FindMapper(TypePair types);
         IProjectionBuilder ProjectionBuilder { get; }
         Func<TSource, TDestination, ResolutionContext, TDestination> GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest);
         void RegisterTypeMap(TypeMap typeMap);
@@ -150,7 +150,7 @@ namespace AutoMapper.Internal
         int MaxExecutionPlanDepth { get; }
         int RecursiveQueriesMaxDepth { get; }
         ProfileMap[] Profiles { get; }
-        TypeMap GetIncludedTypeMap(in TypePair typePair);
+        TypeMap GetIncludedTypeMap(TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
     }

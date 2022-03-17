@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         {
             public string Value { get; set; }
         }
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
             c.CreateMap<Source, Destination>();
             c.CreateMap<SourceItem, DestinationItem>();
@@ -71,7 +71,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
         {
             c.CreateMap<Source, Destination>().ForMember(d=>d.Items, o=>o.MapAtRuntime());
             c.CreateMap<SourceItem, DestinationItem>();
@@ -95,7 +95,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         decimal[] _source = Enumerable.Range(1, 10).Select(i=>(decimal)i).ToArray();
         decimal[] _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>{});
+        protected override MapperConfiguration CreateConfiguration() => new(c =>{});
 
         protected override void Because_of()
         {
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         int[] _source = Enumerable.Range(1, 10).ToArray();
         long[] _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>{});
+        protected override MapperConfiguration CreateConfiguration() => new(c =>{});
 
         protected override void Because_of()
         {
@@ -139,7 +139,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         int[] _source = Enumerable.Range(1, 10).ToArray();
         int[] _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<int, int>().ConstructUsing(i => i * 1000));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<int, int>().ConstructUsing(i => i * 1000));
 
         protected override void Because_of()
         {
@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
 
         private class IntToIntMapper : IObjectMapper
         {
-            public bool IsMatch(in TypePair context)
+            public bool IsMatch(TypePair context)
                 => context.SourceType == typeof(int) && context.DestinationType == typeof(int);
 
             public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
@@ -172,7 +172,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
                 => Expression.Multiply(Expression.Convert(sourceExpression, typeof(int)), Expression.Constant(1000));
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.Internal().Mappers.Insert(0, new IntToIntMapper()));
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.Internal().Mappers.Insert(0, new IntToIntMapper()));
 
         protected override void Because_of()
         {
@@ -213,7 +213,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<SourceItem, DestinationItem>();
@@ -255,7 +255,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<SourceItem, DestinationItem>();
@@ -277,7 +277,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
     {
         Author mappedAuthor;
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(delegate{});
+        protected override MapperConfiguration CreateConfiguration() => new(delegate{});
 
         protected override void Because_of()
         {
@@ -326,7 +326,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public string Unmapped { get; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -357,7 +357,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IEnumerable<int> IntCollection { get; set; } = new[] { 1, 2, 3, 4, 5 };
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -390,7 +390,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IEnumerable Values2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -437,7 +437,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IEnumerable<string> Values2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -481,7 +481,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IEnumerable<int> Values { get; } = new List<int>();
             public IEnumerable<string> Values2 { get; } = new List<string>();
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -507,7 +507,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IEnumerable<int> Values { get; } = new List<int>();
             public IEnumerable<string> Values2 { get; } = new List<string>();
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -536,7 +536,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public ICollection Values2 { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -581,7 +581,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public ICollection<string> Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -616,7 +616,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IList Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -651,7 +651,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public IList<string> Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -691,7 +691,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public ValueCollection Values { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });
@@ -738,7 +738,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
@@ -790,7 +790,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
@@ -832,7 +832,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
             public List<DestItem> Values { get; } = new();
             public IEnumerable<DestItem> IValues { get; } = new List<DestItem>();
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<SourceItem, DestItem>();
@@ -865,7 +865,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         {
             public List<DestItem> Values { get; set; } = new();
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<SourceItem, DestItem>();
@@ -893,7 +893,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         private IEnumerable<string> _strings = new List<string> { FirstString };
         private List<string> _mappedStrings = new List<string>();
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.AllowNullDestinationValues = true;
         });

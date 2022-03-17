@@ -34,10 +34,10 @@ namespace AutoMapper.Configuration
             if (!_expression.AllowAdditiveTypeMapCreation)
             {
                 var duplicateTypeMapConfigs = _expression.Profiles.Concat(new[] { (Profile)_expression })
-                    .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => new { profile, typeMap })
+                    .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
                     .GroupBy(x => x.typeMap.Types)
                     .Where(g => g.Count() > 1)
-                    .Select(g => new { TypePair = g.Key, ProfileNames = g.Select(tmc => tmc.profile.ProfileName).ToArray() })
+                    .Select(g => (TypePair : g.Key, ProfileNames : g.Select(tmc => tmc.profile.ProfileName).ToArray()))
                     .Select(g => new DuplicateTypeMapConfigurationException.TypeMapConfigErrors(g.TypePair, g.ProfileNames))
                     .ToArray();
                 if (duplicateTypeMapConfigs.Any())
@@ -94,7 +94,7 @@ namespace AutoMapper.Configuration
         {
             if(typeMap == null)
             {
-                if (types.SourceType.ContainsGenericParameters || types.DestinationType.ContainsGenericParameters)
+                if (types.ContainsGenericParameters)
                 {
                     return;
                 }
@@ -131,7 +131,10 @@ namespace AutoMapper.Configuration
                 if(mapperToUse is IObjectMapperInfo mapperInfo)
                 {
                     var newTypePair = mapperInfo.GetAssociatedTypes(types);
-                    DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    if (newTypePair != types)
+                    {
+                        DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
+                    }
                 }
             }
         }

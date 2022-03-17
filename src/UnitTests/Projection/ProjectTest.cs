@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Projection
             public int A;
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateProjection<Foo, FooDto>();
         });

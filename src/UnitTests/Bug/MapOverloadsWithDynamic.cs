@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Bug
             public SubSetting SubSettings { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {});
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => {});
 
         protected override void Because_of()
         {

@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class SettersInBaseClasses : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, GrandGrandChild>();
             cfg.CreateMap<Source, GrandChild>();

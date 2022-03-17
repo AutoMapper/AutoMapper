@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(Source), typeof(Destination)).ForMember("Value", o => o.MapFrom((src, dest, member, ctx) => 10));
         });

@@ -23,7 +23,7 @@
             public int Foo { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Child,
@@ -58,7 +58,7 @@
             public string Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
             cfg.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom((s,d,dm, context)=>context.Mapper.Map<string>(null))));
 
         [Fact]

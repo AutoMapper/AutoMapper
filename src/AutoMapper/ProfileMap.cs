@@ -198,7 +198,7 @@ namespace AutoMapper
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
             ApplyMemberMaps(typeMap, configurationProvider);
         }
-        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, in TypePair closedTypes, IGlobalConfiguration configurationProvider)
+        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IGlobalConfiguration configurationProvider)
         {
             TypeMap closedMap;
             lock (configurationProvider)
@@ -221,7 +221,7 @@ namespace AutoMapper
             }
             return closedMap;
         }
-        public ITypeMapConfiguration GetGenericMap(in TypePair genericPair) => _openTypeMapConfigs.GetOrDefault(genericPair);
+        public ITypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))

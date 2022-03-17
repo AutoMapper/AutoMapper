@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
             public dynamic Json { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(d => d.Json, o => o.MapFrom(s => new JObject(s.JsonString)));
@@ -186,7 +186,7 @@ namespace AutoMapper.UnitTests.Bug
             public JObject Json { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });

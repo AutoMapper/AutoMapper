@@ -8,7 +8,7 @@ namespace AutoMapper.Internal.Mappers
     public class EnumToEnumMapper : IObjectMapper
     {
         private static readonly MethodInfo TryParseMethod = typeof(Enum).StaticGenericMethod("TryParse", parametersCount: 3);
-        public bool IsMatch(in TypePair context) => context.IsEnumToEnum();
+        public bool IsMatch(TypePair context) => context.IsEnumToEnum();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {

@@ -86,7 +86,7 @@ namespace AutoMapper
             {
                 return null;
             }
-            return InstanceCache.GetOrDefault(new ContextCacheKey(source, destinationType));
+            return InstanceCache.GetValueOrDefault(new ContextCacheKey(source, destinationType));
         }
         internal void CacheDestination(object source, Type destinationType, object destination)
         {
@@ -136,8 +136,8 @@ namespace AutoMapper
             Source = source;
             _destinationType = destinationType;
         }
-        public static bool operator ==(in ContextCacheKey left, in ContextCacheKey right) => left.Equals(right);
-        public static bool operator !=(in ContextCacheKey left, in ContextCacheKey right) => !left.Equals(right);
+        public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
+        public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
         public override int GetHashCode() => HashCode.Combine(Source, _destinationType);
         public bool Equals(ContextCacheKey other) => Source == other.Source && _destinationType == other._destinationType;
         public override bool Equals(object other) => other is ContextCacheKey otherKey && Equals(otherKey);

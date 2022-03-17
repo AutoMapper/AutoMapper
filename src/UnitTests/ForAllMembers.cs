@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests.ForAllMembers
             public DateTime OtherDate { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"),
                 (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests.ForAllMembers
                 this.Internal().ForAllPropertyMaps(pm => pm.DestinationName.StartsWith("Other"), (pm, opt) => opt.MapFrom(typeof(ConditionalValueResolver), pm.SourceMember.Name));
             }
         }
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.AddProfile<MyProfile>());
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
         public class ConditionalValueResolver : IMemberValueResolver<object, object, DateTime, DateTime>
         {
             public DateTime Resolve(object s, object d, DateTime source, DateTime destination, ResolutionContext context) => source.AddDays(1);

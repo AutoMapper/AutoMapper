@@ -8,12 +8,15 @@ jobs:
   build:
     strategy:
       fail-fast: false
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Install SQL Local DB
+      run: ./Setup.ps1
+      shell: pwsh
     - name: Build and Test
       run: ./Build.ps1
       shell: pwsh

@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests
             public int AnotherNumber { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.ShouldMapMethod = (m => m.Name != nameof(Source.AnotherNumber));
             cfg.CreateMap<Source, Destination>();
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_report_unmapped_property()
         {
-            new Action(() => Configuration.AssertConfigurationIsValid())
+            new Action(AssertConfigurationIsValid)
                 .ShouldThrowException<AutoMapperConfigurationException>(ex => 
                 {
                     ex.Errors.ShouldNotBeNull();
@@ -104,7 +104,7 @@ namespace AutoMapper.UnitTests
             public int AnotherNumber { get; set; }
         }
 
-        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => 
         {
             cfg.IncludeSourceExtensionMethods(typeof(SourceExtensions));
             cfg.ShouldMapMethod = (m => m.Name != nameof(SourceExtensions.AnotherNumber));
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_report_unmapped_property() 
         {
-            new Action(() => Configuration.AssertConfigurationIsValid())
+            new Action(AssertConfigurationIsValid)
                 .ShouldThrowException<AutoMapperConfigurationException>(ex => 
                 {
                     ex.Errors.ShouldNotBeNull();
