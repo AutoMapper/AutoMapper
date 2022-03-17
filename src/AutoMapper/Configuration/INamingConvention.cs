@@ -22,7 +22,7 @@ namespace AutoMapper
     }
     public class PascalCaseNamingConvention : INamingConvention
     {
-        private static readonly Regex PascalCase = new Regex(@"(\p{Lu}+(?=$|\p{Lu}[\p{Ll}0-9])|\p{Lu}?[\p{Ll}0-9]+)");
+        private static readonly Regex PascalCase = new Regex(@"(\p{Lu}+(?=$|\p{Lu}[\p{Ll}0-9])|\p{Lu}?[\p{Ll}0-9]+)", RegexOptions.Compiled);
         public static readonly PascalCaseNamingConvention Instance = new PascalCaseNamingConvention();
         public Regex SplittingExpression { get; } = PascalCase;
         public string SeparatorCharacter => string.Empty;
@@ -30,7 +30,7 @@ namespace AutoMapper
     }
     public class LowerUnderscoreNamingConvention : INamingConvention
     {
-        private static readonly Regex LowerUnderscore = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=_?)");
+        private static readonly Regex LowerUnderscore = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=_?)", RegexOptions.Compiled);
         public static readonly LowerUnderscoreNamingConvention Instance = new LowerUnderscoreNamingConvention();
         public Regex SplittingExpression { get; } = LowerUnderscore;
         public string SeparatorCharacter => "_";

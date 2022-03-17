@@ -93,7 +93,7 @@ namespace AutoMapper.UnitTests.Tests
         }
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)", RegexOptions.Compiled) };
 
             var profile = new TestProfile();
             profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
@@ -143,7 +143,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)", RegexOptions.Compiled) };
 
             var profile = new TestProfile();
             profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>

@@ -379,7 +379,7 @@ namespace AutoMapper.UnitTests
 
         public class UnderscoreNamingConvention : INamingConvention
         {
-            public Regex SplittingExpression { get; } = new Regex(@"\p{Lu}[a-z0-9]*(?=_?)");
+            public Regex SplittingExpression { get; } = new Regex(@"\p{Lu}[a-z0-9]*(?=_?)", RegexOptions.Compiled);
 
             public string SeparatorCharacter => "_";
             public string ReplaceValue(Match match)

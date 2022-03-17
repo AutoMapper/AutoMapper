@@ -16,7 +16,7 @@ namespace AutoMapper.IntegrationTests.ProjectionWithExplicitExpansionExtension
         public static void SqlShouldNotSelectColumn(this string sqlSelect, string columnName)=> sqlSelect.ShouldNotContain(columnName);
         public static void SqlFromShouldStartWith  (this string sqlSelect, string tableName)
         {
-            Regex regex = new Regex($@"FROM(\s+)\[dbo\]\.\[{tableName}\](\s+)AS");
+            Regex regex = new Regex($@"FROM(\s+)\[dbo\]\.\[{tableName}\](\s+)AS", RegexOptions.Compiled);
             regex.Match(sqlSelect).Success.ShouldBeTrue();
             // sqlSelect.ShouldContain($"FROM [dbo].[{tableName}] AS");
         }
