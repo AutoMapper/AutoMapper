@@ -8,6 +8,21 @@ using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class NullCheckDefault : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public string Value { get; }
+        }
+        class Destination
+        {
+            public int Length { get; set; } = 42;
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => 
+            c.CreateMap<Source, Destination>().ForMember(d => d.Length, o => o.MapFrom(s => s.Value.Length)));
+        [Fact]
+        public void Should_be_default() => Map<Destination>(new Source()).Length.ShouldBe(0);
+    }
     public class When_mappping_null_with_DoNotAllowNull : AutoMapperSpecBase
     {
         class Source
