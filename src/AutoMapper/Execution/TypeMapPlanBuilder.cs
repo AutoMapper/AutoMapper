@@ -396,7 +396,7 @@ namespace AutoMapper.Execution
                 { ValueResolverConfig: { } } => BuildResolveCall(memberMap, customSource, destValueExpr),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
-                { SourceMembers: { Length: > 0 } } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
+                { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
                 _ => destValueExpr
             };
             if (memberMap.NullSubstitute != null)

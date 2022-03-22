@@ -325,9 +325,9 @@ namespace AutoMapper.Execution
             {
                 return expression;
             }
-            var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ? 
+            var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ?
                 destinationType : expression.Type;
-            var defaultReturn = defaultValue?.Type == returnType ? defaultValue : Default(returnType);
+            var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : Default(returnType);
             ParameterExpression[] variables = null;
             var name = parameter.Name;
             int index = 0;
