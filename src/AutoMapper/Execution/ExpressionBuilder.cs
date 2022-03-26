@@ -16,7 +16,6 @@ namespace AutoMapper.Execution
     {
         public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
         private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
-        public static readonly Expression False = Constant(false, typeof(bool));
         public static readonly Expression True = Constant(true, typeof(bool));
         public static readonly Expression Null = Constant(null, typeof(object));
         public static readonly Expression Empty = Empty();
@@ -351,9 +350,9 @@ namespace AutoMapper.Execution
                 sourceExpression switch
                 {
                     MemberExpression memberExpression => memberExpression.Update(newTarget),
-                    MethodCallExpression { Method: { IsStatic: true }, Arguments: var args } methodCall when args[0] != newTarget =>
+                    MethodCallExpression { Method.IsStatic: true, Arguments: var args } methodCall when args[0] != newTarget =>
                         methodCall.Update(null, new[] { newTarget }.Concat(args.Skip(1))),
-                    MethodCallExpression { Method: { IsStatic: false } } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
+                    MethodCallExpression { Method.IsStatic: false } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
                     _ => sourceExpression,
                 };
         }
