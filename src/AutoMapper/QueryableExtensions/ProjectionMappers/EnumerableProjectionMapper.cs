@@ -43,7 +43,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 else
                 {
-                    var ctorInfo = memberMap.DestinationType.GetConstructor(new[] { typeof(IEnumerable<>)?.MakeGenericType(destinationListType) });
+                    var ctorInfo = memberMap.DestinationType.GetConstructor(new[] { sourceExpression.Type });
                     if (ctorInfo is not null)
                     {
                         sourceExpression = New(ctorInfo, sourceExpression);
