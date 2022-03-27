@@ -20,7 +20,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             memberMap.DestinationType.IsCollection() && memberMap.SourceType.IsCollection();
         public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
         {
-            var destinationListType = GetElementType(memberMap.DestinationType);
+            var destinationType = memberMap.DestinationType;
+            var destinationListType = GetElementType(destinationType);
             var sourceListType = GetElementType(memberMap.SourceType);
             var sourceExpression = resolvedSource;
             if (sourceListType != destinationListType)
@@ -33,17 +34,17 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 sourceExpression = transformedExpressions.Chain(sourceExpression, Select);
             }
-            if (!memberMap.DestinationType.IsAssignableFrom(sourceExpression.Type))
+            if (!destinationType.IsAssignableFrom(sourceExpression.Type))
             {
-                var convertFunction = memberMap.DestinationType.IsArray ? ToArrayMethod : ToListMethod;
+                var convertFunction = destinationType.IsArray ? ToArrayMethod : ToListMethod;
                 convertFunction = convertFunction.MakeGenericMethod(destinationListType);
-                if (memberMap.DestinationType.IsAssignableFrom(convertFunction.ReturnType))
+                if (destinationType.IsAssignableFrom(convertFunction.ReturnType))
                 {
                     sourceExpression = Call(convertFunction, sourceExpression);
                 }
                 else
                 {
-                    var ctorInfo = memberMap.DestinationType.GetConstructor(new[] { sourceExpression.Type });
+                    var ctorInfo = destinationType.GetConstructor(new[] { sourceExpression.Type });
                     if (ctorInfo is not null)
                     {
                         sourceExpression = New(ctorInfo, sourceExpression);
