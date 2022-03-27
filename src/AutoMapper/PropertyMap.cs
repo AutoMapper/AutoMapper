@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using AutoMapper.Internal;
 
 namespace AutoMapper
@@ -14,7 +13,6 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class PropertyMap : MemberMap
     {
-        private readonly Lazy<ConstructorInfo> _destinationTypeIEnumerableCtor;
         private MemberInfo[] _sourceMembers = Array.Empty<MemberInfo>();
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _canResolveValue;
@@ -23,8 +21,6 @@ namespace AutoMapper
         {
             DestinationMember = destinationMember;
             DestinationType = destinationMemberType;
-            IsDestinationTypeAssignableFromList = CheckIfDestionaTypeIsAssignableFromList();
-            _destinationTypeIEnumerableCtor = new(GetDestinationTypeIEnumerableCtor, LazyThreadSafetyMode.ExecutionAndPublication);
         }
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
             : this(inheritedMappedProperty.DestinationMember, inheritedMappedProperty.DestinationType, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
@@ -33,8 +29,6 @@ namespace AutoMapper
         public MemberInfo DestinationMember { get; }
         public override string DestinationName => DestinationMember.Name;
         public override Type DestinationType { get; protected set; }
-        public override bool IsDestinationTypeAssignableFromList { get; }
-        public override ConstructorInfo DestinationTypeIEnumerableCtor => _destinationTypeIEnumerableCtor.Value;
         public override MemberInfo[] SourceMembers => _sourceMembers;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
@@ -108,22 +102,6 @@ namespace AutoMapper
         {
             _valueTransformerConfigs ??= new();
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
-        }
-        private bool CheckIfDestionaTypeIsAssignableFromList()
-        {
-            if (DestinationType is null || !DestinationType.IsGenericType) return false;
-
-            var destinationListType = ReflectionHelper.GetElementType(DestinationType);
-
-            return DestinationType.IsAssignableFrom(typeof(List<>).MakeGenericType(destinationListType));
-        }
-        private ConstructorInfo GetDestinationTypeIEnumerableCtor()
-        {
-            if (DestinationType is null || !DestinationType.IsGenericType) return null;
-
-            var destinationListType = ReflectionHelper.GetElementType(DestinationType);
-
-            return DestinationType?.GetConstructor(new[] { typeof(IEnumerable<>).MakeGenericType(destinationListType) });
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -34,17 +35,19 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             if (!memberMap.DestinationType.IsAssignableFrom(sourceExpression.Type))
             {
-                if (memberMap.DestinationType.IsArray)
+                var convertFunction = memberMap.DestinationType.IsArray ? ToArrayMethod : ToListMethod;
+                convertFunction = convertFunction.MakeGenericMethod(destinationListType);
+                if (memberMap.DestinationType.IsAssignableFrom(convertFunction.ReturnType))
                 {
-                    sourceExpression = Call(ToArrayMethod.MakeGenericMethod(destinationListType), sourceExpression);
+                    sourceExpression = Call(convertFunction, sourceExpression);
                 }
-                else if (memberMap.IsDestinationTypeAssignableFromList)
+                else
                 {
-                    sourceExpression = Call(ToListMethod.MakeGenericMethod(destinationListType), sourceExpression);
-                }
-                else if (memberMap.DestinationTypeIEnumerableCtor is not null)
-                {
-                    sourceExpression = New(memberMap.DestinationTypeIEnumerableCtor, sourceExpression);
+                    var ctorInfo = memberMap.DestinationType.GetConstructor(new[] { typeof(IEnumerable<>)?.MakeGenericType(destinationListType) });
+                    if (ctorInfo is not null)
+                    {
+                        sourceExpression = New(ctorInfo, sourceExpression);
+                    }
                 }
             }
             return sourceExpression;
