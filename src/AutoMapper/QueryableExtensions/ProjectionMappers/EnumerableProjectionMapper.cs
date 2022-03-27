@@ -34,8 +34,18 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             if (!memberMap.DestinationType.IsAssignableFrom(sourceExpression.Type))
             {
-                var convertFunction = memberMap.DestinationType.IsArray ? ToArrayMethod : ToListMethod;
-                sourceExpression = Call(convertFunction.MakeGenericMethod(destinationListType), sourceExpression);
+                if (memberMap.DestinationType.IsArray)
+                {
+                    sourceExpression = Call(ToArrayMethod.MakeGenericMethod(destinationListType), sourceExpression);
+                }
+                else if (memberMap.IsDestinationTypeAssignableFromList)
+                {
+                    sourceExpression = Call(ToListMethod.MakeGenericMethod(destinationListType), sourceExpression);
+                }
+                else if (memberMap.DestinationTypeIEnumerableCtor is not null)
+                {
+                    sourceExpression = New(memberMap.DestinationTypeIEnumerableCtor, sourceExpression);
+                }
             }
             return sourceExpression;
         }

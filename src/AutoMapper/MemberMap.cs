@@ -24,6 +24,8 @@ namespace AutoMapper
         public IncludedMember IncludedMember { get; protected set; }
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
+        public virtual bool IsDestinationTypeAssignableFromList => default;
+        public virtual ConstructorInfo DestinationTypeIEnumerableCtor => default;
         public virtual TypePair Types() => new TypePair(SourceType, DestinationType);
         public virtual bool CanResolveValue { get => default; set { } }
         public bool IsMapped => Ignored || CanResolveValue;
