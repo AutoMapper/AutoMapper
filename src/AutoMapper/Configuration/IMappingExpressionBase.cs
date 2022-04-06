@@ -168,7 +168,8 @@ namespace AutoMapper
         /// <summary>
         /// Create at runtime a proxy type implementing the destination interface.
         /// </summary>
-        void AsProxy();
+        /// <returns>Itself</returns>
+        TMappingExpression AsProxy();
         /// <summary>
         /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
         /// Use this method if you need to specify the converter type at runtime
