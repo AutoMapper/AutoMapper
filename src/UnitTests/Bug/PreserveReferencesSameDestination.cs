@@ -27,8 +27,8 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg=> cfg.CreateMap<BaseType, BaseTypeDto>().PreserveReferences());
-
-        protected override void Because_of()
+        [Fact]
+        public void Should_work()
         {
             var baseType = new BaseType();
             var baseTypeDto = new BaseTypeDto();

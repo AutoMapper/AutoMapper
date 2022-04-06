@@ -1,4 +1,5 @@
 using System.Dynamic;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -19,11 +20,10 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<From, To>();
         });
-
-        protected override void Because_of()
+        [Fact]
+        public void Should_work()
         {
             dynamic baseSettings = new ExpandoObject();
-
             var settings = Mapper.Map<To>(new From { ExpandoObject = baseSettings});
         }
     }
