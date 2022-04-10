@@ -179,13 +179,12 @@ namespace AutoMapper.Execution
             {
                 actions.Add(beforeMapAction.ReplaceParameters(Source, _destination, ContextParameter));
             }
-            var isConstructorMapping = _typeMap.ConstructorMapping;
             foreach (var propertyMap in _typeMap.PropertyMaps)
             {
                 if (propertyMap.CanResolveValue)
                 {
                     var property = TryPropertyMap(propertyMap);
-                    if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                    if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
                     {
                         property = _initialDestination.IfNullElse(Default(property.Type), property);
                     }

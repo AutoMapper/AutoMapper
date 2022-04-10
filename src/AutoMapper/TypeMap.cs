@@ -157,7 +157,7 @@ namespace AutoMapper
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
                 IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
-        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMap[destinationPropertyName] != null;
+        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMapping && ConstructorMap[destinationPropertyName] != null;
         public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
@@ -177,12 +177,9 @@ namespace AutoMapper
             {
                 properties = Profile.CreateTypeDetails(DestinationType).WriteAccessors
                     .Select(p => p.Name)
+                    .Where(p => !ConstructorParameterMatches(p))
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
-                if (ConstructorMapping)
-                {
-                    properties = properties.Where(p => !ConstructorParameterMatches(p));
-                }
             }
             else
             {
