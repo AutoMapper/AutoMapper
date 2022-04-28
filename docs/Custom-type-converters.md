@@ -61,6 +61,8 @@ public void Example()
         Value2 = "01/01/2000",
         Value3 = "AutoMapperSamples.GlobalTypeConverters.GlobalTypeConverters+Destination"
     };
+    
+    var mapper = configuration.CreateMapper();
 
     Destination result = mapper.Map<Source, Destination>(source);
     result.Value3.ShouldEqual(typeof(Destination));
