@@ -55,6 +55,7 @@ namespace AutoMapper
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
         private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
+        private HashSet<TypeMap> _typeMapsPath = new();
         private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
         private readonly ProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
@@ -109,7 +110,46 @@ namespace AutoMapper
             {
                 profile.Clear();
             }
+            _typeMapsPath = null;
             _sealed = true;
+            return;
+            void Seal()
+            {
+                foreach (var profile in Profiles)
+                {
+                    profile.Register(this);
+                }
+                foreach (var profile in Profiles)
+                {
+                    profile.Configure(this);
+                }
+                IGlobalConfiguration globalConfiguration = this;
+                var derivedMaps = new List<TypeMap>();
+                foreach (var typeMap in _configuredMaps.Values)
+                {
+                    if (typeMap.DestinationTypeOverride != null)
+                    {
+                        var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.AsPair());
+                        _resolvedMaps[typeMap.Types] = derivedMap;
+                    }
+                    else
+                    {
+                        _resolvedMaps[typeMap.Types] = typeMap;
+                    }
+                    derivedMaps.Clear();
+                    GetDerivedTypeMaps(typeMap, derivedMaps);
+                    foreach (var derivedMap in derivedMaps)
+                    {
+                        var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
+                        _resolvedMaps.TryAdd(includedPair, derivedMap);
+                    }
+                }
+                foreach (var typeMap in _configuredMaps.Values)
+                {
+                    typeMap.Seal(this, _typeMapsPath);
+                }
+                _features.Seal(this);
+            }
         }
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
             : this(Build(configure))
@@ -255,7 +295,7 @@ namespace AutoMapper
                 {
                     lock (typeMap)
                     {
-                        typeMap.Seal(this, null);
+                        typeMap.Seal(this);
                     }
                 }
             }
@@ -263,6 +303,10 @@ namespace AutoMapper
             {
                 typeMap = GetTypeMap(typePair);
                 _resolvedMaps.Add(typePair, typeMap);
+                if (typeMap != null && typeMap.MapExpression == null)
+                {
+                    typeMap.Seal(this, _typeMapsPath);
+                }
             }
             return typeMap;
         }
@@ -323,45 +367,6 @@ namespace AutoMapper
             return types;
         }
         IEnumerable<IObjectMapper> IGlobalConfiguration.GetMappers() => _mappers;
-        private void Seal()
-        {
-            foreach (var profile in Profiles)
-            {
-                profile.Register(this);
-            }
-            foreach (var profile in Profiles)
-            {
-                profile.Configure(this);
-            }
-            IGlobalConfiguration globalConfiguration = this;
-            var derivedMaps = new List<TypeMap>();
-            foreach (var typeMap in _configuredMaps.Values)
-            {
-                if (typeMap.DestinationTypeOverride != null)
-                {
-                    var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.AsPair());
-                    _resolvedMaps[typeMap.Types] = derivedMap;
-                }
-                else
-                {
-                    _resolvedMaps[typeMap.Types] = typeMap;
-                }
-                derivedMaps.Clear();
-                GetDerivedTypeMaps(typeMap,derivedMaps);
-                foreach (var derivedMap in derivedMaps)
-                {
-                    var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
-                    _resolvedMaps.TryAdd(includedPair, derivedMap);
-                }
-            }
-            var typeMapsPath = new HashSet<TypeMap>();
-            foreach (var typeMap in _configuredMaps.Values)
-            {
-                typeMap.Seal(this, typeMapsPath);
-            }
-            _features.Seal(this);
-        }
-
         private void GetDerivedTypeMaps(TypeMap typeMap, List<TypeMap> typeMaps)
         {
             foreach (var derivedMap in this.Internal().GetIncludedTypeMaps(typeMap))
