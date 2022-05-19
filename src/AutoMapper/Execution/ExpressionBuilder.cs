@@ -33,6 +33,12 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
+        private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
+        private static readonly ParameterExpression[] DisposableArray = new[] { Disposable };
+        private static readonly Expression DisposeCall = IfNullElse(Disposable, Empty, Expression.Call(Disposable, DisposeMethod));
+        private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
+        private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
+        private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
 
         public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter,
             MemberMap propertyMap = null, Expression destinationParameter = null)
@@ -262,36 +268,34 @@ namespace AutoMapper.Execution
             static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
             {
                 var breakLabel = Label("LoopBreak");
-                var index = Variable(typeof(int), "sourceArrayIndex");
-                var loop = Block(new[] { index, loopVar },
-                    Assign(index, Zero),
+                var loop = Block(new[] { Index, loopVar },
+                    ResetIndex,
                     Loop(
                         IfThenElse(
-                            LessThan(index, ArrayLength(array)),
-                            Block(Assign(loopVar, ArrayAccess(array, index)), loopContent, PostIncrementAssign(index)),
+                            LessThan(Index, ArrayLength(array)),
+                            Block(Assign(loopVar, ArrayAccess(array, Index)), loopContent, IncrementIndex),
                             Break(breakLabel)
                         ),
                     breakLabel));
                 return loop;
             }
-            static Expression Using(Expression disposable, Expression body)
+            static Expression Using(Expression target, Expression body)
             {
-                Expression disposeCall;
-                if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
+                Expression finallyDispose;
+                if (typeof(IDisposable).IsAssignableFrom(target.Type))
                 {
-                    disposeCall = Expression.Call(disposable, DisposeMethod);
+                    finallyDispose = Expression.Call(target, DisposeMethod);
                 }
                 else
                 {
-                    if (disposable.Type.IsValueType)
+                    if (target.Type.IsValueType)
                     {
                         return body;
                     }
-                    var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
-                    var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
-                    disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Expression.Call(disposableVariable, DisposeMethod)));
+                    var assignDisposable = Assign(Disposable, TypeAs(target, typeof(IDisposable)));
+                    finallyDispose = Block(DisposableArray, assignDisposable, DisposeCall);
                 }
-                return TryFinally(body, disposeCall);
+                return TryFinally(body, finallyDispose);
             }
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match

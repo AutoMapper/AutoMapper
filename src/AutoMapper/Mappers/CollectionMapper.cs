@@ -157,6 +157,9 @@ namespace AutoMapper.Internal.Mappers
             private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", new[] { typeof(Array), typeof(int) });
             private static readonly MethodInfo CountMethod = typeof(Enumerable).StaticGenericMethod("Count", parametersCount: 1);
             private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
+            private static readonly ParameterExpression Index = Variable(typeof(int), "destinationArrayIndex");
+            private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
+            private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
             private static Array MapMultidimensional(Array source, Type destinationElementType, ResolutionContext context)
             {
                 var sourceElementType = source.GetType().GetElementType();
@@ -199,11 +202,10 @@ namespace AutoMapper.Internal.Mappers
                 }
                 var itemParam = Parameter(sourceElementType, "sourceItem");
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
-                var indexParam = Parameter(typeof(int), "destinationArrayIndex");
-                var setItem = Assign(ArrayAccess(destination, PostIncrementAssign(indexParam)), itemExpr);
-                return Block(new[] { destination, indexParam },
+                var setItem = Assign(ArrayAccess(destination, IncrementIndex), itemExpr);
+                return Block(new[] { destination, Index },
                     createDestination,
-                    Assign(indexParam, Zero),
+                    ResetIndex,
                     ForEach(itemParam, sourceExpression, setItem),
                     destination);
                 Expression MapFromArray()
