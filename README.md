@@ -48,6 +48,10 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 ```
 PM> Install-Package AutoMapper
 ```
+Or, install [AutoMapper](https://www.nuget.org/packages/AutoMapper/) from the .NET Cli as:
+```
+dotnet add package AutoMapper
+```
 
 ### Do you have an issue?
 
