@@ -297,7 +297,7 @@ namespace AutoMapper
                 {
                     lock (typeMap)
                     {
-                        typeMap.Seal(this);
+                        typeMap.Seal(this, null);
                     }
                 }
             }
@@ -472,5 +472,6 @@ namespace AutoMapper
             _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
+        void IGlobalConfiguration.Seal(TypeMap typeMap) => typeMap.Seal(this, _typeMapsPath);
     }
 }

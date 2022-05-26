@@ -260,7 +260,7 @@ namespace AutoMapper
             _valueTransformerConfigs ??= new();
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
-        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath = null)
+        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath)
         {
             if (_sealed)
             {

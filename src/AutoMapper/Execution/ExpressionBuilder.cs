@@ -52,7 +52,7 @@ namespace AutoMapper.Execution
                 hasTypeConverter = typeMap.HasTypeConverter;
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
-                    typeMap.Seal(configurationProvider);
+                    configurationProvider.Seal(typeMap);
                     mapExpression = typeMap.MapExpression?.ConvertReplaceParameters(sourceParameter, destinationParameter);
                 }
             }
