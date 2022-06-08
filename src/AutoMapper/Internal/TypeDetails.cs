@@ -123,12 +123,29 @@ namespace AutoMapper.Internal
                     from extensionMethod in sourceExtensionMethodSearch
                     where extensionMethod.IsGenericMethodDefinition
                         && extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
-                    select extensionMethod.MakeGenericMethod(genericInterfaceArguments)
+                    let constructedGeneric = MakeGenericMethod(extensionMethod, genericInterfaceArguments)
+                    where constructedGeneric != null
+                    select constructedGeneric
                 )
                 from methodMatch in matchedMethods
                 where methodMatch.GetParameters()[0].ParameterType.IsAssignableFrom(genericInterface)
                 select methodMatch
             );
+
+            // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
+            // in order to catch exceptions resulting from the generic arguments not being compatible
+            // with any constraints that may be on the generic method's generic parameters.
+            static MethodInfo MakeGenericMethod(MethodInfo genericMethod, Type[] genericArguments)
+            {
+                try
+                {
+                    return genericMethod.MakeGenericMethod(genericArguments);
+                }
+                catch (ArgumentException)
+                {
+                    return null;
+                }
+            }
         }
         private MemberInfo[] BuildReadAccessors()
         {
