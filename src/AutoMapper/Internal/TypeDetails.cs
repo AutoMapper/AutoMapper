@@ -29,12 +29,16 @@ namespace AutoMapper.Internal
             type.GetDeclaredConstructors().Where(profileMap.ShouldUseConstructor).Select(c => new ConstructorParameters(c));
         public MemberInfo GetMember(string name)
         {
-            _nameToMember ??= PossibleNames();
+            EnsureNameToMember();
             return _nameToMember.GetValueOrDefault(name);
         }
-        private SourceMembers PossibleNames()
+        private void EnsureNameToMember()
         {
-            var nameToMember = new SourceMembers(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
+            if (_nameToMember != null)
+            {
+                return;
+            }
+            _nameToMember = new SourceMembers(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
             IEnumerable<MemberInfo> accessors = ReadAccessors;
             if (Config.MethodMappingEnabled)
             {
@@ -42,29 +46,25 @@ namespace AutoMapper.Internal
             }
             foreach (var member in accessors)
             {
-                if (!nameToMember.TryAdd(member.Name, member))
-                {
-                    continue;
-                }
+                _nameToMember.Add(member.Name, member);
                 if (Config.Postfixes.Count == 0 && Config.Prefixes.Count == 0)
                 {
                     continue;
                 }
-                CheckPrePostfixes(nameToMember, member);
+                CheckPrePostfixes(member);
             }
-            return nameToMember;
         }
         private IEnumerable<MemberInfo> AddMethods(IEnumerable<MemberInfo> accessors)
         {
             var publicNoArgMethods = GetPublicNoArgMethods();
-            var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(Config.ShouldMapMethod));
+            var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(m=>!_nameToMember.ContainsKey(m.Name) &&  Config.ShouldMapMethod(m)));
             return accessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods);
         }
-        private void CheckPrePostfixes(SourceMembers nameToMember, MemberInfo member)
+        private void CheckPrePostfixes(MemberInfo member)
         {
             foreach (var memberName in PossibleNames(member.Name, Config.Prefixes, Config.Postfixes))
             {
-                nameToMember.TryAdd(memberName, member);
+                _nameToMember.TryAdd(memberName, member);
             }
         }
         public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
@@ -105,7 +105,7 @@ namespace AutoMapper.Internal
         public ConstructorParameters[] Constructors => _constructors ??= GetConstructors();
         private IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
-            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType.IsAssignableFrom(Type));
+            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.FirstParameterType().IsAssignableFrom(Type));
             var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
             if (Type.IsInterface && Type.IsGenericType)
             {
@@ -128,7 +128,7 @@ namespace AutoMapper.Internal
                     select constructedGeneric
                 )
                 from methodMatch in matchedMethods
-                where methodMatch.GetParameters()[0].ParameterType.IsAssignableFrom(genericInterface)
+                where methodMatch.FirstParameterType().IsAssignableFrom(genericInterface)
                 select methodMatch
             );
 
@@ -182,7 +182,8 @@ namespace AutoMapper.Internal
             GetTypeInheritance().SelectMany(type => type.GetFields(TypeExtensions.InstanceFlags).Where(field => fieldAvailableFor(field) && Config.ShouldMapField(field)));
         private IEnumerable<MethodInfo> GetPublicNoArgMethods() =>
             Type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m => 
-                m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && !m.IsGenericMethodDefinition && Config.ShouldMapMethod(m) && m.GetParameters().Length == 0);
+                m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && !m.IsGenericMethodDefinition && !_nameToMember.ContainsKey(m.Name) &&
+                Config.ShouldMapMethod(m) && m.GetParameters().Length == 0);
     }
     public readonly struct ConstructorParameters
     {
