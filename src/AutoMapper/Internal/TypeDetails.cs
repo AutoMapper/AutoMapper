@@ -141,7 +141,7 @@ namespace AutoMapper.Internal
                 {
                     continue;
                 }
-                yield return name.Remove(name.Length - postfix.Length);
+                yield return name[..^postfix.Length];
             }
         }
         public Type Type { get; }
