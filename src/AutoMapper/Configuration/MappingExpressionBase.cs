@@ -20,6 +20,7 @@ namespace AutoMapper.Configuration
         TypePair Types { get; }
         ITypeMapConfiguration ReverseTypeMap { get; }
         TypeMap TypeMap { get; }
+        bool HasTypeConverter { get; }
     }
     public abstract class MappingExpressionBase : ITypeMapConfiguration
     {
@@ -42,6 +43,7 @@ namespace AutoMapper.Configuration
         protected bool Projection { get; set; }
         public TypePair Types => _types;
         public bool IsReverseMap { get; set; }
+        public bool HasTypeConverter { get; protected set; }
         public TypeMap TypeMap { get; private set; }
         public Type SourceType => _types.SourceType;
         public Type DestinationType => _types.DestinationType;
@@ -451,11 +453,15 @@ namespace AutoMapper.Configuration
             return this as TMappingExpression;
         }
 
-        public void ConvertUsing(Type typeConverterType) 
-            => TypeMapActions.Add(tm => tm.TypeConverterType = typeConverterType);
+        public void ConvertUsing(Type typeConverterType)
+        {
+            HasTypeConverter = true;
+            TypeMapActions.Add(tm => tm.TypeConverterType = typeConverterType);
+        }
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
         {
+            HasTypeConverter = true;
             TypeMapActions.Add(tm =>
             {
                 Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
@@ -467,6 +473,7 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction)
         {
+            HasTypeConverter = true;
             TypeMapActions.Add(tm =>
             {
                 Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
@@ -476,13 +483,11 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
-        {
-            ConvertUsing(converter.Convert);
-        }
+        public void ConvertUsing(ITypeConverter<TSource, TDestination> converter) => ConvertUsing(converter.Convert);
 
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
+            HasTypeConverter = true;
             TypeMapActions.Add(tm => tm.TypeConverterType = typeof(TTypeConverter));
         }
 
@@ -517,8 +522,11 @@ namespace AutoMapper.Configuration
 
         private static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(Type type) => type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
 
-        public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>
+        public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction)
+        {
+            HasTypeConverter = true;
             TypeMapActions.Add(tm => tm.CustomMapExpression = mappingFunction);
+        }
 
         public TMappingExpression AsProxy()
         {

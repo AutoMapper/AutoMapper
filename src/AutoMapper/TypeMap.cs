@@ -33,10 +33,14 @@ namespace AutoMapper
         private HashSet<IncludedMember> _includedMembersTypeMaps;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private Type _destinationTypeOverride;
-        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, bool isReverseMap = false)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null)
         {
             Types = new(sourceType, destinationType);
             Profile = profile;
+            if (typeMapConfiguration?.HasTypeConverter is true)
+            {
+                return;
+            }
             SourceTypeDetails = profile.CreateTypeDetails(sourceType);
             DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
             var sourceMembers = new List<MemberInfo>();
@@ -44,7 +48,8 @@ namespace AutoMapper
             {
                 sourceMembers.Clear();
                 var propertyType = destinationProperty.GetMemberType();
-                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, isReverseMap))
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, 
+                        typeMapConfiguration?.IsReverseMap is true))
                 {
                     AddPropertyMap(destinationProperty, propertyType, sourceMembers);
                 }
