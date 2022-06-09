@@ -55,9 +55,9 @@ namespace AutoMapper.Internal
             IEnumerable<MemberInfo> AddMethods(IEnumerable<MemberInfo> accessors)
             {
                 var publicNoArgMethods = GetPublicNoArgMethods();
-                var publicNoArgExtensionMethods = GetPublicNoArgExtensionMethods(Config.SourceExtensionMethods.Where(m => 
+                var noArgExtensionMethods = GetNoArgExtensionMethods(Config.SourceExtensionMethods.Where(m => 
                     !_nameToMember.ContainsKey(m.Name) && Config.ShouldMapMethod(m)));
-                return accessors.Concat(publicNoArgMethods).Concat(publicNoArgExtensionMethods);
+                return accessors.Concat(publicNoArgMethods).Concat(noArgExtensionMethods);
             }
             IEnumerable<MethodInfo> GetPublicNoArgMethods() => Type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(m =>
                 m.DeclaringType != typeof(object) && m.ReturnType != typeof(void) && !m.IsGenericMethodDefinition && !_nameToMember.ContainsKey(m.Name) &&
@@ -69,7 +69,7 @@ namespace AutoMapper.Internal
                     _nameToMember.TryAdd(memberName, member);
                 }
             }
-            IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+            IEnumerable<MethodInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
             {
                 var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.FirstParameterType().IsAssignableFrom(Type));
                 var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
