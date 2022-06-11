@@ -355,7 +355,7 @@ namespace AutoMapper.Execution
                 {
                     MemberExpression memberExpression => memberExpression.Update(newTarget),
                     MethodCallExpression { Method.IsStatic: true, Arguments: var args } methodCall when args[0] != newTarget =>
-                        methodCall.Update(null, new[] { newTarget }.Concat(args.Skip(1))),
+                        methodCall.Update(null, args.Skip(1).Prepend(newTarget)),
                     MethodCallExpression { Method.IsStatic: false } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
                     _ => sourceExpression,
                 };

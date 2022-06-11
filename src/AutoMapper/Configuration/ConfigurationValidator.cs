@@ -33,7 +33,7 @@ namespace AutoMapper.Configuration
         {
             if (!_expression.AllowAdditiveTypeMapCreation)
             {
-                var duplicateTypeMapConfigs = _expression.Profiles.Concat(new[] { (Profile)_expression })
+                var duplicateTypeMapConfigs = _expression.Profiles.Append((Profile)_expression)
                     .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
                     .GroupBy(x => x.typeMap.Types)
                     .Where(g => g.Count() > 1)

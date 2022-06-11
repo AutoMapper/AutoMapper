@@ -218,7 +218,7 @@ namespace AutoMapper.Execution
             return TryMemberMap(pathMap, pathMapExpression);
             static Expression CreateInnerObjects(Expression destination)
             {
-                return Block(destination.GetMemberExpressions().Select(NullCheck).Concat(new[] { ExpressionBuilder.Empty }));
+                return Block(destination.GetMemberExpressions().Select(NullCheck).Append(ExpressionBuilder.Empty));
                 static Expression NullCheck(MemberExpression memberExpression)
                 {
                     var setter = GetSetter(memberExpression);
@@ -273,7 +273,7 @@ namespace AutoMapper.Execution
             var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
             var variables = constructorMap.Ctor.GetParameters().Select(parameter => Variable(parameter.ParameterType, parameter.Name)).ToArray();
             var body = variables.Zip(ctorArgs, (variable, expression) => (Expression)Assign(variable, ToType(expression, variable.Type)))
-                .Concat(new[] { CheckReferencesCache(New(constructorMap.Ctor, variables)) });
+                .Append(CheckReferencesCache(New(constructorMap.Ctor, variables)));
             return Block(variables, body);
         }
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -443,7 +443,7 @@ namespace AutoMapper.Execution
             }
             var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
                 .Zip(iResolverType.GenericTypeArguments, ToType)
-                .Concat(new[] { ContextParameter })
+                .Append(ContextParameter)
                 .ToArray();
             return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
         }
