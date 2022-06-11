@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 namespace AutoMapper.Internal
 {
-    using SourceMembers = Dictionary<string, MemberInfo>;
     /// <summary>
     /// Contains cached reflection information for easy retrieval
     /// </summary>
@@ -14,7 +14,7 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeDetails
     {
-        private SourceMembers _nameToMember;
+        private Dictionary<string, MemberInfo> _nameToMember;
         private ConstructorParameters[] _constructors;
         private MemberInfo[] _readAccessors;
         private MemberInfo[] _writeAccessors;
@@ -33,10 +33,18 @@ namespace AutoMapper.Internal
             {
                 SetNameToMember();
             }
-            return _nameToMember.GetValueOrDefault(name);
+            if (_nameToMember.TryGetValue(name, out var member))
+            {
+                if (member is GenericMethodDefinition genericMethod)
+                {
+                    return genericMethod.Close();
+                }
+                return member;
+            }
+            return null;
             void SetNameToMember()
             {
-                _nameToMember = new SourceMembers(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
+                _nameToMember = new(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
                 IEnumerable<MemberInfo> accessors = ReadAccessors;
                 if (Config.MethodMappingEnabled)
                 {
@@ -69,49 +77,64 @@ namespace AutoMapper.Internal
                     _nameToMember.TryAdd(memberName, member);
                 }
             }
-            IEnumerable<MethodInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+            IEnumerable<MemberInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
             {
                 var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.FirstParameterType().IsAssignableFrom(Type));
                 var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
                 if (Type.IsInterface && Type.IsGenericType)
                 {
-                    genericInterfaces = genericInterfaces.Union(new[] { Type });
+                    genericInterfaces = genericInterfaces.Append(Type);
                 }
                 return explicitExtensionMethods.Union
                 (
                     from genericInterface in genericInterfaces
-                    let genericInterfaceArguments = genericInterface.GenericTypeArguments
-                    let matchedMethods = (
-                        from extensionMethod in sourceExtensionMethodSearch
-                        where !extensionMethod.IsGenericMethodDefinition
-                        select extensionMethod
-                    ).Concat(
-                        from extensionMethod in sourceExtensionMethodSearch
-                        where extensionMethod.IsGenericMethodDefinition
-                            && extensionMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
-                        let constructedGeneric = MakeGenericMethod(extensionMethod, genericInterfaceArguments)
-                        where constructedGeneric != null
-                        select constructedGeneric
-                    )
-                    from methodMatch in matchedMethods
-                    where methodMatch.FirstParameterType().IsAssignableFrom(genericInterface)
-                    select methodMatch
+                    from extensionMethod in sourceExtensionMethodSearch
+                    let firstArgumentType = extensionMethod.GetParameters()[0].ParameterType
+                    where extensionMethod.IsGenericMethodDefinition && extensionMethod.GetGenericArguments().Length == genericInterface.GenericTypeArguments.Length
+                            && (firstArgumentType.ContainsGenericParameters || firstArgumentType.IsAssignableFrom(genericInterface))
+                    select extensionMethod.IsGenericMethodDefinition ? new GenericMethodDefinition(extensionMethod, genericInterface) : (MemberInfo)extensionMethod
                 );
+            }
+        }
+        class GenericMethodDefinition : MemberInfo
+        {
+            readonly MethodInfo _genericMethod;
+            readonly Type _genericInterface;
+            MethodInfo _closedMethod = ExpressionBuilder.DecTypeDepthInfo;
+            public GenericMethodDefinition(MethodInfo genericMethod, Type genericInterface)
+            {
+                _genericMethod = genericMethod;
+                _genericInterface = genericInterface;
+            }
+            public MethodInfo Close()
+            {
+                if (_closedMethod != ExpressionBuilder.DecTypeDepthInfo)
+                {
+                    return _closedMethod;
+                }
                 // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
                 // in order to catch exceptions resulting from the generic arguments not being compatible
                 // with any constraints that may be on the generic method's generic parameters.
-                static MethodInfo MakeGenericMethod(MethodInfo genericMethod, Type[] genericArguments)
+                try
                 {
-                    try
-                    {
-                        return genericMethod.MakeGenericMethod(genericArguments);
-                    }
-                    catch (ArgumentException)
-                    {
-                        return null;
-                    }
+                    _closedMethod = _genericMethod.MakeGenericMethod(_genericInterface.GenericTypeArguments);
                 }
+                catch (ArgumentException)
+                {
+                    _closedMethod = null;
+                    return null;
+                }
+                _closedMethod =  _closedMethod.FirstParameterType().IsAssignableFrom(_genericInterface) ? _closedMethod : null;
+                return _closedMethod;
             }
+            public override Type DeclaringType => throw new NotImplementedException();
+            public override MemberTypes MemberType => throw new NotImplementedException();
+            public override string Name => _genericMethod.Name;
+            public override string ToString() => Name;
+            public override Type ReflectedType => throw new NotImplementedException();
+            public override object[] GetCustomAttributes(bool inherit) => throw new NotImplementedException();
+            public override object[] GetCustomAttributes(Type attributeType, bool inherit) => throw new NotImplementedException();
+            public override bool IsDefined(Type attributeType, bool inherit) => throw new NotImplementedException();
         }
         public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
@@ -177,7 +200,7 @@ namespace AutoMapper.Internal
         private static bool FieldReadable(FieldInfo fieldInfo) => true;
         private static bool PropertyWritable(PropertyInfo propertyInfo) => propertyInfo.CanWrite || propertyInfo.PropertyType.IsCollection();
         private static bool FieldWritable(FieldInfo fieldInfo) => !fieldInfo.IsInitOnly;
-        private IEnumerable<Type> GetTypeInheritance() => Type.IsInterface ? new[] { Type }.Concat(Type.GetInterfaces()) : Type.GetTypeInheritance();
+        private IEnumerable<Type> GetTypeInheritance() => Type.IsInterface ? Type.GetInterfaces().Prepend(Type) : Type.GetTypeInheritance();
         private IEnumerable<PropertyInfo> GetProperties(Func<PropertyInfo, bool> propertyAvailableFor) =>
             GetTypeInheritance().SelectMany(type => type.GetProperties(TypeExtensions.InstanceFlags).Where(property => propertyAvailableFor(property) && Config.ShouldMapProperty(property)));
         private IEnumerable<MemberInfo> GetFields(Func<FieldInfo, bool> fieldAvailableFor) =>
