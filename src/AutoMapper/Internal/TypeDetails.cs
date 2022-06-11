@@ -85,7 +85,7 @@ namespace AutoMapper.Internal
             ).Concat(
                 from method in sourceExtensionMethodSearch
                 let firstParameterType = method.FirstParameterType()
-                where firstParameterType.ContainsGenericParameters
+                where firstParameterType.IsInterface && firstParameterType.ContainsGenericParameters
                 let genericInterface = Type.GetGenericInterface(firstParameterType.GetGenericTypeDefinition())
                 where genericInterface != null
                 select new GenericMethod(method, genericInterface)
