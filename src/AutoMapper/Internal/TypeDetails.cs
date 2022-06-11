@@ -77,26 +77,19 @@ namespace AutoMapper.Internal
                     _nameToMember.TryAdd(memberName, member);
                 }
             }
-            IEnumerable<MemberInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
-            {
-                var explicitExtensionMethods = (IEnumerable<MemberInfo>)sourceExtensionMethodSearch.
-                    Where(method => !method.IsGenericMethodDefinition && method.FirstParameterType().IsAssignableFrom(Type));
-                var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
-                if (Type.IsInterface && Type.IsGenericType)
-                {
-                    genericInterfaces = genericInterfaces.Append(Type);
-                }
-                return explicitExtensionMethods.Concat
-                (
-                    from genericInterface in genericInterfaces
-                    from extensionMethod in sourceExtensionMethodSearch
-                    let firstArgumentType = extensionMethod.GetParameters()[0].ParameterType
-                    where extensionMethod.IsGenericMethodDefinition && 
-                             extensionMethod.GetGenericArguments().Length == genericInterface.GenericTypeArguments.Length && 
-                             (firstArgumentType.ContainsGenericParameters || firstArgumentType.IsAssignableFrom(genericInterface))
-                    select new GenericMethod(extensionMethod, genericInterface)
-                );
-            }
+            IEnumerable<MemberInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch) =>
+            (
+                from method in sourceExtensionMethodSearch
+                where !method.ContainsGenericParameters && method.FirstParameterType().IsAssignableFrom(Type)
+                select (MemberInfo) method
+            ).Concat(
+                from method in sourceExtensionMethodSearch
+                let firstParameterType = method.FirstParameterType()
+                where firstParameterType.ContainsGenericParameters
+                let genericInterface = Type.GetGenericInterface(firstParameterType.GetGenericTypeDefinition())
+                where genericInterface != null
+                select new GenericMethod(method, genericInterface)
+            );
         }
         class GenericMethod : MemberInfo
         {
