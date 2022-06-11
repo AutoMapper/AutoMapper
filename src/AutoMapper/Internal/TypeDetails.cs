@@ -35,7 +35,7 @@ namespace AutoMapper.Internal
             }
             if (_nameToMember.TryGetValue(name, out var member))
             {
-                if (member is GenericMethodDefinition genericMethod)
+                if (member is GenericMethod genericMethod)
                 {
                     return genericMethod.Close();
                 }
@@ -92,16 +92,16 @@ namespace AutoMapper.Internal
                     let firstArgumentType = extensionMethod.GetParameters()[0].ParameterType
                     where extensionMethod.IsGenericMethodDefinition && extensionMethod.GetGenericArguments().Length == genericInterface.GenericTypeArguments.Length
                             && (firstArgumentType.ContainsGenericParameters || firstArgumentType.IsAssignableFrom(genericInterface))
-                    select extensionMethod.IsGenericMethodDefinition ? new GenericMethodDefinition(extensionMethod, genericInterface) : (MemberInfo)extensionMethod
+                    select extensionMethod.IsGenericMethodDefinition ? new GenericMethod(extensionMethod, genericInterface) : (MemberInfo)extensionMethod
                 );
             }
         }
-        class GenericMethodDefinition : MemberInfo
+        class GenericMethod : MemberInfo
         {
             readonly MethodInfo _genericMethod;
             readonly Type _genericInterface;
             MethodInfo _closedMethod = ExpressionBuilder.DecTypeDepthInfo;
-            public GenericMethodDefinition(MethodInfo genericMethod, Type genericInterface)
+            public GenericMethod(MethodInfo genericMethod, Type genericInterface)
             {
                 _genericMethod = genericMethod;
                 _genericInterface = genericInterface;
