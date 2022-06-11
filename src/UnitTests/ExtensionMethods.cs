@@ -7,6 +7,28 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    interface IGeneric<T> { }
+    public class When_an_extension_method_is_for_a_base_interface : AutoMapperSpecBase
+    {
+        class Source : IGeneric<int>
+        {
+        }
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
+        {
+            c.IncludeSourceExtensionMethods(typeof(GenericExtensions));
+            c.CreateMap<Source, Destination>();
+        });
+        [Fact]
+        public void It_should_be_used() => Map<Destination>(new Source()).Value.ShouldBe(12);
+    }
+    public static class GenericExtensions
+    {
+        private static int GetValue(this IGeneric<int> obj) => 12;
+    }
     public class When_an_extension_method_is_for_a_base_class : AutoMapperSpecBase
     {
         class Source

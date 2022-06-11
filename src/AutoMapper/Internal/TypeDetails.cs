@@ -79,20 +79,22 @@ namespace AutoMapper.Internal
             }
             IEnumerable<MemberInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
             {
-                var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.FirstParameterType().IsAssignableFrom(Type));
+                var explicitExtensionMethods = (IEnumerable<MemberInfo>)sourceExtensionMethodSearch.
+                    Where(method => !method.IsGenericMethodDefinition && method.FirstParameterType().IsAssignableFrom(Type));
                 var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
                 if (Type.IsInterface && Type.IsGenericType)
                 {
                     genericInterfaces = genericInterfaces.Append(Type);
                 }
-                return explicitExtensionMethods.Union
+                return explicitExtensionMethods.Concat
                 (
                     from genericInterface in genericInterfaces
                     from extensionMethod in sourceExtensionMethodSearch
                     let firstArgumentType = extensionMethod.GetParameters()[0].ParameterType
-                    where extensionMethod.IsGenericMethodDefinition && extensionMethod.GetGenericArguments().Length == genericInterface.GenericTypeArguments.Length
-                            && (firstArgumentType.ContainsGenericParameters || firstArgumentType.IsAssignableFrom(genericInterface))
-                    select extensionMethod.IsGenericMethodDefinition ? new GenericMethod(extensionMethod, genericInterface) : (MemberInfo)extensionMethod
+                    where extensionMethod.IsGenericMethodDefinition && 
+                             extensionMethod.GetGenericArguments().Length == genericInterface.GenericTypeArguments.Length && 
+                             (firstArgumentType.ContainsGenericParameters || firstArgumentType.IsAssignableFrom(genericInterface))
+                    select new GenericMethod(extensionMethod, genericInterface)
                 );
             }
         }
