@@ -35,7 +35,7 @@ namespace AutoMapper.Internal
             }
             if (_nameToMember.TryGetValue(name, out var member))
             {
-                if (member is GenericMethod genericMethod)
+                if (Config.MethodMappingEnabled && member is GenericMethod genericMethod)
                 {
                     return genericMethod.Close();
                 }
@@ -79,21 +79,23 @@ namespace AutoMapper.Internal
             }
             IEnumerable<MemberInfo> GetNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
             {
-                var extensionMethods =
-                    from method in sourceExtensionMethodSearch
-                    where !method.ContainsGenericParameters && method.FirstParameterType().IsAssignableFrom(Type)
-                    select (MemberInfo)method;
+                var extensionMethods = (IEnumerable<MemberInfo>)
+                    sourceExtensionMethodSearch.Where(method => !method.ContainsGenericParameters && method.FirstParameterType().IsAssignableFrom(Type));
                 var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType);
                 if (Type.IsInterface && Type.IsGenericType)
                 {
                     genericInterfaces = genericInterfaces.Prepend(Type);
                 }
+                if (!genericInterfaces.Any())
+                {
+                    return extensionMethods;
+                }
                 var definitions = genericInterfaces.GroupBy(t => t.GetGenericTypeDefinition()).ToDictionary(g => g.Key, g => g.First());
                 return extensionMethods.Concat(
                     from method in sourceExtensionMethodSearch
-                    let firstParameterType = method.FirstParameterType()
-                    where firstParameterType.IsInterface && firstParameterType.ContainsGenericParameters
-                    let genericInterface = definitions.GetValueOrDefault(firstParameterType.GetGenericTypeDefinition())
+                    let targetType = method.FirstParameterType()
+                    where targetType.IsInterface && targetType.ContainsGenericParameters
+                    let genericInterface = definitions.GetValueOrDefault(targetType.GetGenericTypeDefinition())
                     where genericInterface != null
                     select new GenericMethod(method, genericInterface));
             }
@@ -110,23 +112,20 @@ namespace AutoMapper.Internal
             }
             public MethodInfo Close()
             {
-                if (_closedMethod != ExpressionBuilder.DecTypeDepthInfo)
+                if (_closedMethod == ExpressionBuilder.DecTypeDepthInfo)
                 {
-                    return _closedMethod;
+                    // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
+                    // in order to catch exceptions resulting from the generic arguments not being compatible
+                    // with any constraints that may be on the generic method's generic parameters.
+                    try
+                    {
+                        _closedMethod = _genericMethod.MakeGenericMethod(_genericInterface.GenericTypeArguments);
+                    }
+                    catch (ArgumentException)
+                    {
+                        _closedMethod = null;
+                    }
                 }
-                // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
-                // in order to catch exceptions resulting from the generic arguments not being compatible
-                // with any constraints that may be on the generic method's generic parameters.
-                try
-                {
-                    _closedMethod = _genericMethod.MakeGenericMethod(_genericInterface.GenericTypeArguments);
-                }
-                catch (ArgumentException)
-                {
-                    _closedMethod = null;
-                    return null;
-                }
-                _closedMethod =  _closedMethod.FirstParameterType().IsAssignableFrom(_genericInterface) ? _closedMethod : null;
                 return _closedMethod;
             }
             public override Type DeclaringType => throw new NotImplementedException();
