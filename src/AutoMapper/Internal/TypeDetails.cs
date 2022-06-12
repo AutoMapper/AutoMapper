@@ -33,15 +33,11 @@ namespace AutoMapper.Internal
             {
                 SetNameToMember();
             }
-            if (_nameToMember.TryGetValue(name, out var member))
+            if (_nameToMember.TryGetValue(name, out var member) && Config.MethodMappingEnabled && member is GenericMethod genericMethod)
             {
-                if (Config.MethodMappingEnabled && member is GenericMethod genericMethod)
-                {
-                    return genericMethod.Close();
-                }
-                return member;
+                return genericMethod.Close();
             }
-            return null;
+            return member;
             void SetNameToMember()
             {
                 _nameToMember = new(ReadAccessors.Length, StringComparer.OrdinalIgnoreCase);
