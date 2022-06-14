@@ -48,7 +48,7 @@ namespace AutoMapper.Internal
                 }
                 foreach (var member in accessors)
                 {
-                    _nameToMember.Add(member.Name, member);
+                    _nameToMember.TryAdd(member.Name, member);
                     if (Config.Postfixes.Count == 0 && Config.Prefixes.Count == 0)
                     {
                         continue;

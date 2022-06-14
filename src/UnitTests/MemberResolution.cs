@@ -4,6 +4,34 @@ using Shouldly;
 using Xunit;
 namespace AutoMapper.UnitTests.MemberResolution;
 
+public class When_multiple_source_members_match_postfix : AutoMapperSpecBase
+{
+    class Order
+    {
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
+    }
+
+    class OrderDto
+    {
+        public int ProductId { get; set; }
+    }
+    class Product
+    {
+        public int Id { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.RecognizePostfixes("Id");
+        c.CreateMap<Order, OrderDto>();
+    });
+    [Fact]
+    public void Should_prefer_the_property()
+    {
+        var destination = Map<OrderDto>(new Order { ProductId = 12, Product = new() { Id = 42 } });
+        destination.ProductId.ShouldBe(12);
+    }
+}
 public class When_multiple_source_members_match : AutoMapperSpecBase
 {
     class Source
