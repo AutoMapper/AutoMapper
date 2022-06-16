@@ -16,7 +16,6 @@ namespace AutoMapper.Execution
     {
         public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
         private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
-        public static readonly Expression False = Constant(false, typeof(bool));
         public static readonly Expression True = Constant(true, typeof(bool));
         public static readonly Expression Null = Constant(null, typeof(object));
         public static readonly Expression Empty = Empty();
@@ -34,6 +33,12 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
+        private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
+        private static readonly ParameterExpression[] DisposableArray = new[] { Disposable };
+        private static readonly Expression DisposeCall = IfNullElse(Disposable, Empty, Expression.Call(Disposable, DisposeMethod));
+        private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
+        private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
+        private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
 
         public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter,
             MemberMap propertyMap = null, Expression destinationParameter = null)
@@ -47,7 +52,7 @@ namespace AutoMapper.Execution
                 hasTypeConverter = typeMap.HasTypeConverter;
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
-                    typeMap.Seal(configurationProvider);
+                    configurationProvider.Seal(typeMap);
                     mapExpression = typeMap.MapExpression?.ConvertReplaceParameters(sourceParameter, destinationParameter);
                 }
             }
@@ -263,36 +268,34 @@ namespace AutoMapper.Execution
             static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
             {
                 var breakLabel = Label("LoopBreak");
-                var index = Variable(typeof(int), "sourceArrayIndex");
-                var loop = Block(new[] { index, loopVar },
-                    Assign(index, Zero),
+                var loop = Block(new[] { Index, loopVar },
+                    ResetIndex,
                     Loop(
                         IfThenElse(
-                            LessThan(index, ArrayLength(array)),
-                            Block(Assign(loopVar, ArrayAccess(array, index)), loopContent, PostIncrementAssign(index)),
+                            LessThan(Index, ArrayLength(array)),
+                            Block(Assign(loopVar, ArrayAccess(array, Index)), loopContent, IncrementIndex),
                             Break(breakLabel)
                         ),
                     breakLabel));
                 return loop;
             }
-            static Expression Using(Expression disposable, Expression body)
+            static Expression Using(Expression target, Expression body)
             {
-                Expression disposeCall;
-                if (typeof(IDisposable).IsAssignableFrom(disposable.Type))
+                Expression finallyDispose;
+                if (typeof(IDisposable).IsAssignableFrom(target.Type))
                 {
-                    disposeCall = Expression.Call(disposable, DisposeMethod);
+                    finallyDispose = Expression.Call(target, DisposeMethod);
                 }
                 else
                 {
-                    if (disposable.Type.IsValueType)
+                    if (target.Type.IsValueType)
                     {
                         return body;
                     }
-                    var disposableVariable = Variable(typeof(IDisposable), "disposableVariable");
-                    var assignDisposable = Assign(disposableVariable, TypeAs(disposable, typeof(IDisposable)));
-                    disposeCall = Block(new[] { disposableVariable }, assignDisposable, IfNullElse(disposableVariable, Empty, Expression.Call(disposableVariable, DisposeMethod)));
+                    var assignDisposable = Assign(Disposable, TypeAs(target, typeof(IDisposable)));
+                    finallyDispose = Block(DisposableArray, assignDisposable, DisposeCall);
                 }
-                return TryFinally(body, disposeCall);
+                return TryFinally(body, finallyDispose);
             }
         }
         // Expression.Property(string) is inefficient because it does a case insensitive match
@@ -325,9 +328,9 @@ namespace AutoMapper.Execution
             {
                 return expression;
             }
-            var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ? 
+            var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ?
                 destinationType : expression.Type;
-            var defaultReturn = defaultValue?.Type == returnType ? defaultValue : Default(returnType);
+            var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : Default(returnType);
             ParameterExpression[] variables = null;
             var name = parameter.Name;
             int index = 0;
@@ -351,9 +354,9 @@ namespace AutoMapper.Execution
                 sourceExpression switch
                 {
                     MemberExpression memberExpression => memberExpression.Update(newTarget),
-                    MethodCallExpression { Method: { IsStatic: true }, Arguments: var args } methodCall when args[0] != newTarget =>
-                        methodCall.Update(null, new[] { newTarget }.Concat(args.Skip(1))),
-                    MethodCallExpression { Method: { IsStatic: false } } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
+                    MethodCallExpression { Method.IsStatic: true, Arguments: var args } methodCall when args[0] != newTarget =>
+                        methodCall.Update(null, args.Skip(1).Prepend(newTarget)),
+                    MethodCallExpression { Method.IsStatic: false } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
                     _ => sourceExpression,
                 };
         }

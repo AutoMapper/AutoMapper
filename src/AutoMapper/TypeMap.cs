@@ -32,10 +32,15 @@ namespace AutoMapper
         private HashSet<TypeMap> _inheritedTypeMaps;
         private HashSet<IncludedMember> _includedMembersTypeMaps;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
-        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, bool isReverseMap = false)
+        private Type _destinationTypeOverride;
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null)
         {
             Types = new(sourceType, destinationType);
             Profile = profile;
+            if (typeMapConfiguration?.HasTypeConverter is true)
+            {
+                return;
+            }
             SourceTypeDetails = profile.CreateTypeDetails(sourceType);
             DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
             var sourceMembers = new List<MemberInfo>();
@@ -43,7 +48,8 @@ namespace AutoMapper
             {
                 sourceMembers.Clear();
                 var propertyType = destinationProperty.GetMemberType();
-                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, isReverseMap))
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, 
+                        typeMapConfiguration?.IsReverseMap is true))
                 {
                     AddPropertyMap(destinationProperty, propertyType, sourceMembers);
                 }
@@ -70,7 +76,7 @@ namespace AutoMapper
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
         public Features<IRuntimeFeature> Features => _features ??= new();
         public LambdaExpression MapExpression { get; private set; }
-        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator && 
+        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator &&
             !CustomConstruction && !HasTypeConverter && DestinationConstructors.Length > 0;
         public TypePair Types;
         public ConstructorMap ConstructorMap { get; set; }
@@ -83,7 +89,15 @@ namespace AutoMapper
         public LambdaExpression CustomMapExpression { get; set; }
         public LambdaExpression CustomCtorFunction { get; set; }
         public LambdaExpression CustomCtorExpression { get; set; }
-        public Type DestinationTypeOverride { get; set; }
+        public Type DestinationTypeOverride
+        { 
+            get => _destinationTypeOverride;
+            set
+            {
+                _destinationTypeOverride = value;
+                _sealed = true;
+            }
+        }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
         public bool ConstructDestinationUsingServiceLocator { get; set; }
         public bool IncludeAllDerivedTypes { get; set; }
@@ -148,7 +162,7 @@ namespace AutoMapper
             SourceType.IsGenericTypeDefinition ?
                 Array.Empty<LambdaExpression>() :
                 IncludedMembersNames.Select(name => ExpressionBuilder.MemberAccessLambda(SourceType, name));
-        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMap[destinationPropertyName] != null;
+        public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMapping && ConstructorMap[destinationPropertyName] != null;
         public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
@@ -168,12 +182,9 @@ namespace AutoMapper
             {
                 properties = Profile.CreateTypeDetails(DestinationType).WriteAccessors
                     .Select(p => p.Name)
+                    .Where(p => !ConstructorParameterMatches(p))
                     .Except(autoMappedProperties)
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
-                if (ConstructorMapping)
-                {
-                    properties = properties.Where(p => !ConstructorParameterMatches(p));
-                }
             }
             else
             {
@@ -210,7 +221,7 @@ namespace AutoMapper
             AddPropertyMap(propertyMap);
             return propertyMap;
         }
-        public TypePair GetAsPair() => new TypePair(SourceType, DestinationTypeOverride);
+        public TypePair AsPair() => new(SourceType, DestinationTypeOverride);
         public void IncludeDerivedTypes(TypePair derivedTypes)
         {
             CheckDifferent(derivedTypes);
@@ -254,7 +265,7 @@ namespace AutoMapper
             _valueTransformerConfigs ??= new();
             _valueTransformerConfigs.Add(valueTransformerConfiguration);
         }
-        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath = null)
+        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath)
         {
             if (_sealed)
             {

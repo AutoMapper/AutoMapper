@@ -11,7 +11,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.CustomMapFrom;
 
-public class MemberWithSubQueryProjections : AutoMapperSpecBase, IAsyncLifetime
+public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryProjections.DatabaseInitializer>
 {
     public class Customer
     {
@@ -79,17 +79,8 @@ public class MemberWithSubQueryProjections : AutoMapperSpecBase, IAsyncLifetime
             result.FirstItem.Code.ShouldBe(1);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class MemberWithSubQueryProjectionsNoMap : AutoMapperSpecBase, IAsyncLifetime
+public class MemberWithSubQueryProjectionsNoMap : IntegrationTest<MemberWithSubQueryProjectionsNoMap.DatabaseInitializer>
 {
     public class Customer
     {
@@ -150,17 +141,8 @@ public class MemberWithSubQueryProjectionsNoMap : AutoMapperSpecBase, IAsyncLife
             result.FirstItem.Code.ShouldBe(1);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQueryTypeNameMax : IntegrationTest<MapObjectPropertyFromSubQueryTypeNameMax.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -256,7 +238,7 @@ public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase, IAsy
         public int VeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnNameVeryLongColumnName11 { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -264,22 +246,13 @@ public class MapObjectPropertyFromSubQueryTypeNameMax : AutoMapperSpecBase, IAsy
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQueryExplicitExpansion : IntegrationTest<MapObjectPropertyFromSubQueryExplicitExpansion.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -353,7 +326,7 @@ public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
         public PriceModel Price { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -361,23 +334,14 @@ public class MapObjectPropertyFromSubQueryExplicitExpansion : AutoMapperSpecBase
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Article> Articles { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQuery : IntegrationTest<MapObjectPropertyFromSubQuery.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -451,7 +415,7 @@ public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
         public PriceModel Price { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -459,22 +423,13 @@ public class MapObjectPropertyFromSubQuery : AutoMapperSpecBase, IAsyncLifetime
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MapObjectPropertyFromSubQueryWithInnerObject : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQueryWithInnerObject : IntegrationTest<MapObjectPropertyFromSubQueryWithInnerObject.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -552,7 +507,7 @@ public class MapObjectPropertyFromSubQueryWithInnerObject : AutoMapperSpecBase, 
         public PriceModel Price { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -562,23 +517,14 @@ public class MapObjectPropertyFromSubQueryWithInnerObject : AutoMapperSpecBase, 
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductArticle> ProductArticles { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQueryWithCollection : IntegrationTest<MapObjectPropertyFromSubQueryWithCollection.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -662,7 +608,7 @@ public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase, I
         public PriceModel Price { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -671,20 +617,11 @@ public class MapObjectPropertyFromSubQueryWithCollection : AutoMapperSpecBase, I
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductArticle> ProductArticles { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
 public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidatingSpecBase, IAsyncLifetime
@@ -788,7 +725,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
         public ICollection<PriceModel> Articles { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -797,7 +734,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductArticle> ProductArticles { get; set; }
@@ -812,7 +749,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
+public class SubQueryWithMapFromNullable : IntegrationTest<SubQueryWithMapFromNullable.DatabaseInitializer>
 {
     // Source Types
     public class Cable
@@ -863,7 +800,7 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
         public int? DataHallId { get; set; }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Cable> Cables { get; set; }
         public DbSet<CableEnd> CableEnds { get; set; }
@@ -875,7 +812,7 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
         }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -913,17 +850,9 @@ public class SubQueryWithMapFromNullable : AutoMapperSpecBase, IAsyncLifetime
             result.AnotherEnd.DataHallId.ShouldBeNull();
         }
     }
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAsyncLifetime
+public class MapObjectPropertyFromSubQueryCustomSource : IntegrationTest<MapObjectPropertyFromSubQueryCustomSource.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
@@ -971,7 +900,7 @@ public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAs
         public string Name { get; set; }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -979,7 +908,7 @@ public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAs
         public DbSet<ProductReview> ProductReviews { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -1003,17 +932,9 @@ public class MapObjectPropertyFromSubQueryCustomSource : AutoMapperSpecBase, IAs
             results.Any(result => result?.Brand == null).ShouldBeTrue();
         }
     }
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class MemberWithSubQueryIdentity : AutoMapperSpecBase, IAsyncLifetime
+public class MemberWithSubQueryIdentity : IntegrationTest<MemberWithSubQueryIdentity.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new MapperConfiguration(cfg =>
     {
@@ -1064,7 +985,7 @@ public class MemberWithSubQueryIdentity : AutoMapperSpecBase, IAsyncLifetime
         public string SubString { get; set; }
         public BEntity BEntity { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -1086,7 +1007,7 @@ public class MemberWithSubQueryIdentity : AutoMapperSpecBase, IAsyncLifetime
             });
         }
     }
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1106,13 +1027,4 @@ public class MemberWithSubQueryIdentity : AutoMapperSpecBase, IAsyncLifetime
         }
         public DbSet<AEntity> AEntities { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

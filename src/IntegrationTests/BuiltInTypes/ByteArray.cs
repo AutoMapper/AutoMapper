@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class ByteArrayColumns : AutoMapperSpecBase, IAsyncLifetime
+public class ByteArrayColumns : IntegrationTest<ByteArrayColumns.DatabaseInitializer>
 {
     public class Customer
     {
@@ -32,7 +32,7 @@ public class ByteArrayColumns : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Customer> Customers { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -64,13 +64,4 @@ public class ByteArrayColumns : AutoMapperSpecBase, IAsyncLifetime
             });
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

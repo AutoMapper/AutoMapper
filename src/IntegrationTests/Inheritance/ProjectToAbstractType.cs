@@ -10,7 +10,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.Inheritance;
 
-public class ProjectToAbstractType : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectToAbstractType : IntegrationTest<ProjectToAbstractType.DatabaseInitializer>
 {
     ITypeA[] _destinations;
 
@@ -32,7 +32,7 @@ public class ProjectToAbstractType : AutoMapperSpecBase, IAsyncLifetime
         public string Name { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -66,18 +66,9 @@ public class ProjectToAbstractType : AutoMapperSpecBase, IAsyncLifetime
         _destinations.Length.ShouldBe(3);
         _destinations[2].Name.ShouldBe("Bill Gates");
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class ProjectToInterface : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectToInterface : IntegrationTest<ProjectToInterface.DatabaseInitializer>
 {
     //Data Objects
     public class DataLayer
@@ -253,7 +244,7 @@ public class ProjectToInterface : AutoMapperSpecBase, IAsyncLifetime
         }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -351,13 +342,4 @@ public class ProjectToInterface : AutoMapperSpecBase, IAsyncLifetime
             CreateProjection<IValidityDayType, DataLayer.ValidityDayType>();
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

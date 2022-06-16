@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.MaxDepth;
 
-public class MaxDepthWithCollections : AutoMapperSpecBase, IAsyncLifetime
+public class MaxDepthWithCollections : IntegrationTest<MaxDepthWithCollections.DatabaseInitializer>
 {
     TrainingCourseDto _course;
 
@@ -23,13 +23,17 @@ public class MaxDepthWithCollections : AutoMapperSpecBase, IAsyncLifetime
     [Fact]
     public void Should_project_with_MaxDepth()
     {
+        using (var context = new ClientContext())
+        {
+            _course = ProjectTo<TrainingCourseDto>(context.TrainingCourses).FirstOrDefault(n => n.CourseName == "Course 1");
+        }
         _course.CourseName.ShouldBe("Course 1");
         var content = _course.Content[0];
         content.ContentName.ShouldBe("Content 1");
         content.Course.ShouldBeNull();
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -41,7 +45,7 @@ public class MaxDepthWithCollections : AutoMapperSpecBase, IAsyncLifetime
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<TrainingCourse> TrainingCourses { get; set; }
         public DbSet<TrainingContent> TrainingContents { get; set; }
@@ -84,18 +88,4 @@ public class MaxDepthWithCollections : AutoMapperSpecBase, IAsyncLifetime
 
         public TrainingCourseDto Course { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-
-        using (var context = new ClientContext())
-        {
-            _course = ProjectTo<TrainingCourseDto>(context.TrainingCourses).FirstOrDefault(n => n.CourseName == "Course 1");
-        }
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

@@ -12,7 +12,7 @@ namespace AutoMapper.Internal.Mappers
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var constructor = GetConstructor(sourceExpression.Type, destExpression.Type);
-            return Expression.New(constructor, ToType(sourceExpression, constructor.GetParameters()[0].ParameterType));
+            return Expression.New(constructor, ToType(sourceExpression, constructor.FirstParameterType()));
         }
     }
 }

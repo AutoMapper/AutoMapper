@@ -87,8 +87,8 @@ namespace AutoMapper.UnitTests.Bug
             cfg.CreateMap<BranchDTO, Branch>();
             cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
         });
-
-        protected override void Because_of()
+        [Fact]
+        public void Should_work()
         {
             var branchDto = new BranchDTO { ID = 51, Name = "B1" };
             var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };

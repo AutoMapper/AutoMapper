@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.Inheritance;
 
-public class DerivedComplexTypes : AutoMapperSpecBase, IAsyncLifetime
+public class DerivedComplexTypes : IntegrationTest<DerivedComplexTypes.DatabaseInitializer>
 {
     [ComplexType]
     public class LocalizedString
@@ -82,13 +82,4 @@ public class DerivedComplexTypes : AutoMapperSpecBase, IAsyncLifetime
             customerVm.Address.ShouldBe("home");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

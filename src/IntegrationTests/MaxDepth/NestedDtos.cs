@@ -10,7 +10,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.MaxDepth;
 
-public class NestedDtos : AutoMapperSpecBase, IAsyncLifetime
+public class NestedDtos : IntegrationTest<NestedDtos.DatabaseInitializer>
 {
     ArtDto _destination;
 
@@ -53,7 +53,7 @@ public class NestedDtos : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Art> Arts { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<TestContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
     {
         protected override void Seed(TestContext context)
         {
@@ -76,21 +76,11 @@ public class NestedDtos : AutoMapperSpecBase, IAsyncLifetime
     [Fact]
     public void Should_project_nested_dto()
     {
-        _destination.AName.ShouldBe("art1");
-        _destination.Sem.Name.ShouldBe("sem1");
-    }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-
         using (var context = new TestContext())
         {
             _destination = ProjectTo<ArtDto>(context.Arts).FirstOrDefault();
         }
+        _destination.AName.ShouldBe("art1");
+        _destination.Sem.Name.ShouldBe("sem1");
     }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

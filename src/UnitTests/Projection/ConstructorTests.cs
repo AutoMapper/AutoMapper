@@ -80,6 +80,20 @@ namespace AutoMapper.UnitTests.Projection
         [Fact]
         public void Should_construct_correctly() => new[] { new Source { Value = 5 } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBe("5");
     }
+    public class ConstructorMapFrom : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Value { get; set; }
+        }
+        record Destination(bool Value)
+        {
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg => 
+            cfg.CreateProjection<Source, Destination>().ForCtorParam(nameof(Destination.Value), o=>o.MapFrom(s=>s.Value==5)));
+        [Fact]
+        public void Should_construct_correctly() => new[] { new Source { Value = 5 } }.AsQueryable().ProjectTo<Destination>(Configuration).First().Value.ShouldBeTrue();
+    }
     public class ConstructorIncludeMembers : AutoMapperSpecBase
     {
         class SourceWrapper

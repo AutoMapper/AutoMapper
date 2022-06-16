@@ -6,6 +6,32 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class SealGenerics : AutoMapperSpecBase
+    {
+        public record SourceProperty<T>(T Value, SourceProperty<T> Recursive = null);
+        public record DestProperty<T>(T Value, DestProperty<T> Recursive = null);
+        public record User(SourceProperty<Guid> UserStoreId);
+        public class UserPropertiesContainer
+        {
+            public UserProperties User { get; set; }
+        }
+        public class UserProperties
+        {
+            public DestProperty<Guid> UserStoreId { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateMap(typeof(SourceProperty<>), typeof(DestProperty<>));
+            cfg.CreateMap<User, UserPropertiesContainer>().ForMember(dest => dest.User, opt => opt.MapFrom(src => src));
+            cfg.CreateMap<User, UserProperties>();
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var guid = Guid.NewGuid();
+            Map<UserProperties>(new User(new(guid))).UserStoreId.Value.ShouldBe(guid);
+        }
+    }
     public class OpenGenerics_With_Struct : AutoMapperSpecBase
     {
         public struct Id<T>

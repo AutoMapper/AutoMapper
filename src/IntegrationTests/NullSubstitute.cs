@@ -9,7 +9,7 @@ namespace AutoMapper.IntegrationTests;
 
 using UnitTests;
         
-public class NullSubstitute : AutoMapperSpecBase, IAsyncLifetime
+public class NullSubstitute : IntegrationTest<NullSubstitute.DatabaseInitializer>
 {
     public class Customer
     {
@@ -33,7 +33,7 @@ public class NullSubstitute : AutoMapperSpecBase, IAsyncLifetime
         public DbSet<Customer> Customers { get; set; }
     }
 
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -60,17 +60,8 @@ public class NullSubstitute : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBe(5);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class NullSubstituteWithStrings : AutoMapperSpecBase, IAsyncLifetime
+public class NullSubstituteWithStrings : IntegrationTest<NullSubstituteWithStrings.DatabaseInitializer>
 {
     public class Customer
     {
@@ -89,7 +80,7 @@ public class NullSubstituteWithStrings : AutoMapperSpecBase, IAsyncLifetime
     {
         public DbSet<Customer> Customers { get; set; }
     }
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -107,44 +98,35 @@ public class NullSubstituteWithStrings : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBe("5");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class NullSubstituteWithEntity : AutoMapperSpecBase, IAsyncLifetime
+public class NullSubstituteWithEntity : IntegrationTest<NullSubstituteWithEntity.DatabaseInitializer>
 {
-    class Customer
+    public class Customer
     {
         public int Id { get; set; }
         public Value Value { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
-    class Value
+    public class Value
     {
         public int Id { get; set; }
     }
-    class CustomerViewModel
+    public class CustomerViewModel
     {
         public ValueViewModel Value { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
-    class ValueViewModel
+    public class ValueViewModel
     {
         public int Id { get; set; }
     }
-    class Context : LocalDbContext
+    public class Context : LocalDbContext
     {
         public DbSet<Customer> Customers { get; set; }
     }
-    class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -165,13 +147,4 @@ public class NullSubstituteWithEntity : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().Value.ShouldBeNull();
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

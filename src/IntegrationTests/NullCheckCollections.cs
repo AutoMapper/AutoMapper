@@ -11,7 +11,7 @@ namespace AutoMapper.IntegrationTests;
 
 using System;
 using UnitTests;
-public class NullCheckCollectionsFirstOrDefault : AutoMapperSpecBase, IAsyncLifetime
+public class NullCheckCollectionsFirstOrDefault : IntegrationTest<NullCheckCollectionsFirstOrDefault.DatabaseInitializer>
 {
     public class SourceType
     {
@@ -28,11 +28,11 @@ public class NullCheckCollectionsFirstOrDefault : AutoMapperSpecBase, IAsyncLife
     {
         public int? Index { get; set; }
     }
-    class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
     {
         protected override void Seed(TestContext context) => context.SourceTypes.Add(new SourceType { Parameters = { new Parameter { Name = "Index", Value = 101 } } });
     }
-    class TestContext : LocalDbContext
+    public class TestContext : LocalDbContext
     {
         public DbSet<SourceType> SourceTypes { get; set; }
     }
@@ -46,17 +46,8 @@ public class NullCheckCollectionsFirstOrDefault : AutoMapperSpecBase, IAsyncLife
             ProjectTo<DestinationType>(context.SourceTypes).Single().Index.ShouldBe(101);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class NullChildItemTest : AutoMapperSpecBase, IAsyncLifetime
+public class NullChildItemTest : IntegrationTest<NullChildItemTest.DatabaseInitializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<Parent, ParentDto>());
     public class TestContext : LocalDbContext
@@ -109,17 +100,8 @@ public class NullChildItemTest : AutoMapperSpecBase, IAsyncLifetime
         public int Id { get; set; }
         public int Value { get; set; }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class NullCheckCollections : AutoMapperSpecBase, IAsyncLifetime
+public class NullCheckCollections : IntegrationTest<NullCheckCollections.DatabaseInitializer>
 {
     public class Student
     {
@@ -178,13 +160,4 @@ public class NullCheckCollections : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<StudentViewModel>(context.Students).Single().Name.ShouldBe("Bob");
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

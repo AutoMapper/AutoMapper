@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.Inheritance;
 
-public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase, IAsyncLifetime
+public class QueryableInterfaceInheritanceIssue : IntegrationTest<QueryableInterfaceInheritanceIssue.DatabaseInitializer>
 {
     QueryableDto[] _result;
 
@@ -30,7 +30,7 @@ public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase, IAsyncLife
         public string Id { get; set; }
     }
 
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
         protected override void Seed(ClientContext context)
         {
@@ -38,7 +38,7 @@ public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase, IAsyncLife
         }
     }
 
-    class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<QueryableInterfaceImpl> Entities { get; set; }
     }
@@ -46,23 +46,13 @@ public class QueryableInterfaceInheritanceIssue : AutoMapperSpecBase, IAsyncLife
     [Fact]
     public void QueryableShouldMapSpecifiedBaseInterfaceMember()
     {
+        using (var context = new ClientContext())
+        {
+            _result = ProjectTo<QueryableDto>(context.Entities).ToArray();
+        }
         _result.FirstOrDefault(dto => dto.Id == "One").ShouldNotBeNull();
         _result.FirstOrDefault(dto => dto.Id == "Two").ShouldNotBeNull();
     }
 
     protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateProjection<IQueryableInterface, QueryableDto>());
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-
-        using (var context = new ClientContext())
-        {
-            _result = ProjectTo<QueryableDto>(context.Entities).ToArray();
-        }
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

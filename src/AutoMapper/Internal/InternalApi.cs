@@ -153,6 +153,7 @@ namespace AutoMapper.Internal
         TypeMap GetIncludedTypeMap(TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
+        void Seal(TypeMap typeMap);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression

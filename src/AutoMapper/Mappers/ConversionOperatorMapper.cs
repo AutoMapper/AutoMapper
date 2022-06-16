@@ -23,7 +23,7 @@ namespace AutoMapper.Internal.Mappers
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var conversionOperator = GetConversionOperator(sourceExpression.Type, destExpression.Type);
-            return Expression.Call(conversionOperator, ToType(sourceExpression, conversionOperator.GetParameters()[0].ParameterType));
+            return Expression.Call(conversionOperator, ToType(sourceExpression, conversionOperator.FirstParameterType()));
         }
     }
 }

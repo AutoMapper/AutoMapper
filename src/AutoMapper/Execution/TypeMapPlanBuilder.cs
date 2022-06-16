@@ -87,7 +87,7 @@ namespace AutoMapper.Execution
         {
             if (typeMap.DestinationTypeOverride != null)
             {
-                CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.GetAsPair()), typeMapsPath);
+                CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.AsPair()), typeMapsPath);
                 return;
             }
             typeMapsPath.Add(typeMap);
@@ -179,13 +179,12 @@ namespace AutoMapper.Execution
             {
                 actions.Add(beforeMapAction.ReplaceParameters(Source, _destination, ContextParameter));
             }
-            var isConstructorMapping = _typeMap.ConstructorMapping;
             foreach (var propertyMap in _typeMap.PropertyMaps)
             {
                 if (propertyMap.CanResolveValue)
                 {
                     var property = TryPropertyMap(propertyMap);
-                    if (isConstructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                    if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
                     {
                         property = _initialDestination.IfNullElse(Default(property.Type), property);
                     }
@@ -219,7 +218,7 @@ namespace AutoMapper.Execution
             return TryMemberMap(pathMap, pathMapExpression);
             static Expression CreateInnerObjects(Expression destination)
             {
-                return Block(destination.GetMemberExpressions().Select(NullCheck).Concat(new[] { ExpressionBuilder.Empty }));
+                return Block(destination.GetMemberExpressions().Select(NullCheck).Append(ExpressionBuilder.Empty));
                 static Expression NullCheck(MemberExpression memberExpression)
                 {
                     var setter = GetSetter(memberExpression);
@@ -274,7 +273,7 @@ namespace AutoMapper.Execution
             var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
             var variables = constructorMap.Ctor.GetParameters().Select(parameter => Variable(parameter.ParameterType, parameter.Name)).ToArray();
             var body = variables.Zip(ctorArgs, (variable, expression) => (Expression)Assign(variable, ToType(expression, variable.Type)))
-                .Concat(new[] { CheckReferencesCache(New(constructorMap.Ctor, variables)) });
+                .Append(CheckReferencesCache(New(constructorMap.Ctor, variables)));
             return Block(variables, body);
         }
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -396,7 +395,7 @@ namespace AutoMapper.Execution
                 { ValueResolverConfig: { } } => BuildResolveCall(memberMap, customSource, destValueExpr),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
-                { SourceMembers: { Length: > 0 } } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
+                { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
                 _ => destValueExpr
             };
             if (memberMap.NullSubstitute != null)
@@ -444,7 +443,7 @@ namespace AutoMapper.Execution
             }
             var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
                 .Zip(iResolverType.GenericTypeArguments, ToType)
-                .Concat(new[] { ContextParameter })
+                .Append(ContextParameter)
                 .ToArray();
             return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
         }

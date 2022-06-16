@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
-public class EnumToUnderlyingType : AutoMapperSpecBase, IAsyncLifetime
+public class EnumToUnderlyingType : IntegrationTest<EnumToUnderlyingType.DatabaseInitializer>
 {
     public class Customer
     {
@@ -27,7 +27,7 @@ public class EnumToUnderlyingType : AutoMapperSpecBase, IAsyncLifetime
     {
         public DbSet<Customer> Customers { get; set; }
     }
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -44,17 +44,8 @@ public class EnumToUnderlyingType : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe((int)ConsoleColor.Yellow);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class UnderlyingTypeToEnum : AutoMapperSpecBase, IAsyncLifetime
+public class UnderlyingTypeToEnum : IntegrationTest<UnderlyingTypeToEnum.DatabaseInitializer>
 {
     public class Customer
     {
@@ -73,7 +64,7 @@ public class UnderlyingTypeToEnum : AutoMapperSpecBase, IAsyncLifetime
     {
         public DbSet<Customer> Customers { get; set; }
     }
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -90,17 +81,8 @@ public class UnderlyingTypeToEnum : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe(ConsoleColor.Yellow);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
-public class EnumToEnum : AutoMapperSpecBase, IAsyncLifetime
+public class EnumToEnum : IntegrationTest<EnumToEnum.DatabaseInitializer>
 {
     public class Customer
     {
@@ -119,7 +101,7 @@ public class EnumToEnum : AutoMapperSpecBase, IAsyncLifetime
     {
         public DbSet<Customer> Customers { get; set; }
     }
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
     {
         protected override void Seed(Context context)
         {
@@ -136,13 +118,4 @@ public class EnumToEnum : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<CustomerViewModel>(context.Customers).First().ConsoleColor.ShouldBe(ConsoleColor.DarkYellow);
         }
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

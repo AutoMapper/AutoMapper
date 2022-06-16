@@ -106,7 +106,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             void ProjectProperties()
             {
-                foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => pm.CanResolveValue && pm.DestinationMember.CanBeSet()).OrderBy(pm => pm.DestinationMember.MetadataToken))
+                foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => 
+                    pm.CanResolveValue && pm.DestinationMember.CanBeSet() && !typeMap.ConstructorParameterMatches(pm.DestinationName))
+                    .OrderBy(pm => pm.DestinationMember.MetadataToken))
                 {
                     var propertyProjection = TryProjectMember(propertyMap, propertyMap.ExplicitExpansion);
                     if (propertyProjection != null)
@@ -231,7 +233,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     MapFromSource : path.GetSourceExpression(instanceParameter),
                     Property : path.GetPropertyDescription(),
                     path.Marker)).ToArray();
-                var properties = letMapInfos.Select(m => m.Property).Concat(GetMemberAccessesVisitor.Retrieve(projection, instanceParameter));
+                var properties = letMapInfos.Select(m => m.Property).Concat(GePropertiesVisitor.Retrieve(projection, instanceParameter));
                 var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
                 TypeMap letTypeMap;
                 lock(ConfigurationProvider)
@@ -290,11 +292,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                 internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
                     _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
             }
-            class GetMemberAccessesVisitor : ExpressionVisitor
+            class GePropertiesVisitor : ExpressionVisitor
             {
                 private readonly Expression _target;
-                public List<MemberInfo> Members { get; } = new();
-                public GetMemberAccessesVisitor(Expression target) => _target = target;
+                public HashSet<MemberInfo> Members { get; } = new();
+                public GePropertiesVisitor(Expression target) => _target = target;
                 protected override Expression VisitMember(MemberExpression node)
                 {
                     if(node.Expression == _target)
@@ -305,7 +307,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 public static IEnumerable<PropertyDescription> Retrieve(Expression expression, Expression target)
                 {
-                    var visitor = new GetMemberAccessesVisitor(target);
+                    var visitor = new GePropertiesVisitor(target);
                     visitor.Visit(expression);
                     return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
                 }
@@ -347,7 +349,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             BuiltProjections[request] = depth;
             return depth;
         }
-        public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => null;
+        public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => letExpression.Body;
         public virtual void Push(MemberProjection memberProjection) { }
         public virtual MemberPath GetCurrentPath() => MemberPath.Empty;
         public virtual void Pop() {}

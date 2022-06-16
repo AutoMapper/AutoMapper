@@ -32,11 +32,8 @@ namespace AutoMapper.UnitTests.ConditionalMapping
                 return true;
             }));
         });
-
-        protected override void Because_of()
-        {
-            Mapper.Map(_source, _destination);
-        }
+        [Fact]
+        public void Should_work() => Mapper.Map(_source, _destination);
     }
 
     public class When_ignoring_all_properties_with_an_inaccessible_setter_and_explicitly_implemented_member : AutoMapperSpecBase

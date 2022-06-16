@@ -7,6 +7,47 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.UnitTests
 {
+    interface IGeneric<T> { }
+    public class When_an_extension_methods_contraints_fail : NonValidatingSpecBase
+    {
+        class Source : IGeneric<int>
+        {
+        }
+        class Destination
+        {
+            public int Count { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
+        {
+            c.IncludeSourceExtensionMethods(typeof(GenericExtensions));
+            c.CreateMap<Source, Destination>();
+        });
+        [Fact]
+        public void It_should_fail_validation() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>()
+            .Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Destination.Count));
+    }
+    public class When_an_extension_method_is_for_a_base_interface : AutoMapperSpecBase
+    {
+        class Source : IGeneric<int>
+        {
+        }
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
+        {
+            c.IncludeSourceExtensionMethods(typeof(GenericExtensions));
+            c.CreateMap<Source, Destination>();
+        });
+        [Fact]
+        public void It_should_be_used() => Map<Destination>(new Source()).Value.ShouldBe(12);
+    }
+    public static class GenericExtensions
+    {
+        private static int GetValue(this IGeneric<int> _) => 12;
+        private static int Count<T>(this IGeneric<T> _) where T : IDisposable => 12;
+    }
     public class When_an_extension_method_is_for_a_base_class : AutoMapperSpecBase
     {
         class Source

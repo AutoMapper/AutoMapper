@@ -11,7 +11,7 @@ using UnitTests;
 using QueryableExtensions;
 using System.Collections.Generic;
 
-public class ICollectionAggregateProjections : AutoMapperSpecBase, IAsyncLifetime
+public class ICollectionAggregateProjections : IntegrationTest<ICollectionAggregateProjections.DatabaseInitializer>
 {
     public class Customer
     {
@@ -79,15 +79,4 @@ public class ICollectionAggregateProjections : AutoMapperSpecBase, IAsyncLifetim
             result.ItemCodesSum.ShouldBe(9);
         }
     }
-
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }

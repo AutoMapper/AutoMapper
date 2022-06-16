@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.IntegrationTests;
 
-public class ProjectionOrderTest : AutoMapperSpecBase, IAsyncLifetime
+public class ProjectionOrderTest : IntegrationTest<ProjectionOrderTest.DatabaseInitializer>
 {
     public class Destination
     {
@@ -43,7 +43,7 @@ public class ProjectionOrderTest : AutoMapperSpecBase, IAsyncLifetime
         public string String { get; set; }
     }
 
-    private class ClientContext : LocalDbContext
+    public class ClientContext : LocalDbContext
     {
         public DbSet<Source1> Source1 { get; set; }
 
@@ -69,19 +69,7 @@ public class ProjectionOrderTest : AutoMapperSpecBase, IAsyncLifetime
             ProjectTo<Destination>(context.Source1).Union(ProjectTo<Destination>(context.Source2)).ToString();
         }
     }
-
-    class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
+    public class DatabaseInitializer : DropCreateDatabaseAlways<ClientContext>
     {
-
     }
-
-    public async Task InitializeAsync()
-    {
-        var initializer = new DatabaseInitializer();
-
-        await initializer.Migrate();
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
 }
