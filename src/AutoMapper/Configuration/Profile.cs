@@ -186,7 +186,7 @@ namespace AutoMapper
         {
             _sourceExtensionMethods ??= new();
             _sourceExtensionMethods.AddRange(
-                type.GetMethods(TypeExtensions.StaticFlags).Where(m => m.GetParameters().Length == 1 && m.Has<ExtensionAttribute>()));
+                type.GetMethods(Internal.TypeExtensions.StaticFlags).Where(m => m.GetParameters().Length == 1 && m.Has<ExtensionAttribute>()));
         }
     }
 }
