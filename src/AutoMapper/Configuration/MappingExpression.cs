@@ -37,7 +37,6 @@ namespace AutoMapper.Configuration
             foreach(var memberName in memberNames)
             {
                 SourceType.GetFieldOrProperty(memberName);
-                ForSourceMemberCore(memberName, o => o.DoNotValidate());
             }
             TypeMapActions.Add(tm => tm.IncludedMembersNames = memberNames);
             return this;
@@ -176,14 +175,7 @@ namespace AutoMapper.Configuration
             return ForDestinationMember(memberInfo, memberOptions);
         }
 
-        private void IncludeMembersCore(LambdaExpression[] memberExpressions)
-        {
-            foreach(var member in memberExpressions.Select(memberExpression => memberExpression.GetMember()).Where(member => member != null))
-            {
-                ForSourceMemberCore(member, o => o.DoNotValidate());
-            }
-            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
-        }
+        private void IncludeMembersCore(LambdaExpression[] memberExpressions) => TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
 
         public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {

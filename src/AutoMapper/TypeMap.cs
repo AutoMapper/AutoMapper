@@ -193,6 +193,8 @@ namespace AutoMapper
                 properties = Profile.CreateTypeDetails(SourceType).ReadAccessors
                     .Select(p => p.Name)
                     .Except(MappedMembers().Select(m => m.GetSourceMemberName()))
+                    .Except(IncludedMembersNames)
+                    .Except(IncludedMembers.Select(m=>m.GetMember()?.Name))
                     .Except(ignoredSourceMembers ?? Array.Empty<string>());
             }
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
