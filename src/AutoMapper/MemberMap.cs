@@ -39,7 +39,9 @@ namespace AutoMapper
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
-        public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.LastOrDefault();
+        public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.FirstOrDefault();
+        public string GetSourceMemberName() =>
+            ValueConverterConfig?.GetSourceMemberName() ?? ValueResolverConfig?.GetSourceMemberName() ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {
@@ -92,6 +94,7 @@ namespace AutoMapper
             InterfaceType = interfaceType;
         }
         public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+        public string GetSourceMemberName() => SourceMember == null ? SourceMemberName : SourceMember.GetMember()?.Name;
     }
     public readonly struct ValueTransformerConfiguration
     {

@@ -176,41 +176,28 @@ namespace AutoMapper
         }
         public string[] GetUnmappedPropertyNames()
         {
-            var autoMappedProperties = GetPropertyNames(PropertyMaps);
             IEnumerable<string> properties;
             if (ConfiguredMemberList == MemberList.Destination)
             {
                 properties = Profile.CreateTypeDetails(DestinationType).WriteAccessors
                     .Select(p => p.Name)
                     .Where(p => !ConstructorParameterMatches(p))
-                    .Except(autoMappedProperties)
+                    .Except(MappedMembers().Select(m => m.DestinationName))
                     .Except(PathMaps.Select(p => p.MemberPath.First.Name));
             }
             else
             {
-                var redirectedSourceMembers = MemberMaps
-                     .Where(pm => pm.IsMapped && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationName)
-                     .Select(pm => pm.SourceMember.Name);
-
                 var ignoredSourceMembers = _sourceMemberConfigs?.Values
                     .Where(smc => smc.IsIgnored())
                     .Select(pm => pm.SourceMember.Name);
-
                 properties = Profile.CreateTypeDetails(SourceType).ReadAccessors
                     .Select(p => p.Name)
-                    .Except(autoMappedProperties)
-                    .Except(redirectedSourceMembers)
+                    .Except(MappedMembers().Select(m => m.GetSourceMemberName()))
                     .Except(ignoredSourceMembers ?? Array.Empty<string>());
             }
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
-            string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
-                ? pm.DestinationName
-                : pm.SourceMembers.Length > 1
-                    ? pm.SourceMembers[0].Name
-                    : pm.SourceMember?.Name ?? pm.DestinationName;
-            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped).Select(GetPropertyName).ToArray();
+            IEnumerable<MemberMap> MappedMembers() => MemberMaps.Where(pm => pm.IsMapped);
         }
-
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty, Type destinationPropertyType)
         {
             var propertyMap = GetPropertyMap(destinationProperty.Name);

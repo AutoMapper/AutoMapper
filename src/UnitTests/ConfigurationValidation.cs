@@ -285,6 +285,49 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class ResolversWithSourceValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Resolved { get; set; }
+            public int TypedResolved { get; set; }
+            public int Converted { get; set; }
+            public int TypedConverted { get; set; }
+        }
+        class Destination
+        {
+            public int ResolvedDest { get; set; }
+            public int TypedResolvedDest { get; set; }
+            public int ConvertedDest { get; set; }
+            public int TypedConvertedDest { get; set; }
+        }
+        class MemberResolver : IMemberValueResolver<Source, Destination, int, int>
+        {
+            public int Resolve(Source source, Destination destination, int sourceMember, int destinationMember, ResolutionContext context) => 5;
+        }
+        class ValueConverter : IValueConverter<int, int>
+        {
+            public int Convert(int sourceMember, ResolutionContext context) => 5;
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>(MemberList.Source)
+                .ForMember(d => d.ResolvedDest, o => o.MapFrom<MemberResolver, int>("Resolved"))
+                .ForMember(d=>d.TypedResolvedDest, o => o.MapFrom<MemberResolver, int>(s => s.TypedResolved))
+                .ForMember(d => d.ConvertedDest, o => o.ConvertUsing<ValueConverter, int>("Converted"))
+                .ForMember(d => d.TypedConvertedDest, o => o.ConvertUsing<ValueConverter, int>(s => s.TypedConverted));
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var result = Mapper.Map<Source, Destination>(new Source());
+            result.ResolvedDest.ShouldBe(5);
+            result.TypedResolvedDest.ShouldBe(5);
+            result.ConvertedDest.ShouldBe(5);
+            result.TypedConvertedDest.ShouldBe(5);
+        }
+    }
+
     public class NonMemberExpressionWithSourceValidation : NonValidatingSpecBase
     {
         class Source
