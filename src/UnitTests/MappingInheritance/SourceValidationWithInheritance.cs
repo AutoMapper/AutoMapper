@@ -1,4 +1,5 @@
 ﻿using System;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -59,6 +60,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
                 .ForMember(dto => dto.ElementType, opt => opt.MapFrom(src => 0));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class SourceValidationWithIgnore: AutoMapperSpecBase
@@ -118,6 +121,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
                 .ForMember(dto => dto.ElementType, opt => opt.MapFrom(src => 0));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
-
 }

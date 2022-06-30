@@ -43,6 +43,7 @@ static class Utils
 public abstract class AutoMapperSpecBase : NonValidatingSpecBase
 {
     protected override void OnConfig(MapperConfiguration mapperConfiguration) => mapperConfiguration.AssertConfigurationIsValid();
+    protected override void AssertConfigurationIsValid() => Configuration.Internal();
 }
 
 public abstract class NonValidatingSpecBase : SpecBase
@@ -60,7 +61,7 @@ public abstract class NonValidatingSpecBase : SpecBase
     protected virtual void OnConfig(MapperConfiguration mapperConfiguration) { }
     protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
     protected TypeMap FindTypeMapFor<TSource, TDestination>() => Configuration.FindTypeMapFor<TSource, TDestination>();
-    protected void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
+    protected virtual void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
     protected void AssertConfigurationIsValid<TSource, TDestination>() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<TSource, TDestination>());
     protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(sourceType, destinationType));
     public void AssertConfigurationIsValid(string profileName) => Configuration.AssertConfigurationIsValid(profileName);

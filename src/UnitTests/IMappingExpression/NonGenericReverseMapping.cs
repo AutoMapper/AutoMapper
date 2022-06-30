@@ -62,6 +62,8 @@ namespace AutoMapper.UnitTests
                     .ForMember("Ignored", opt => opt.Ignore())
                     .ReverseMap();
             });
+            [Fact]
+            public void Validate() => AssertConfigurationIsValid();
         }
 
         public class When_reverse_mapping_and_ignoring : SpecBase

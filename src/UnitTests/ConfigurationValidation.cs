@@ -51,6 +51,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         public class C { }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<A, B>().ConvertUsing(x => new B { Foo = new C() }));
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_using_a_type_converter_class : AutoMapperSpecBase
@@ -71,6 +73,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             public B Convert(A source, B dest, ResolutionContext context) => new B { Foo = new C() };
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_skipping_validation : NonValidatingSpecBase
@@ -364,6 +368,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : NonValidatingSpecBase
@@ -776,5 +782,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             public List<KeyValuePair<string, string>> Details { get; private set; }
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

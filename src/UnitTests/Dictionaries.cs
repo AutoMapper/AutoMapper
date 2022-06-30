@@ -482,6 +482,8 @@ namespace AutoMapper.UnitTests
             }
 
             protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<BaseClassWithDictionary, DerivedClassWithDictionary>());
+            [Fact]
+            public void Validate() => AssertConfigurationIsValid();
         }
     }
 

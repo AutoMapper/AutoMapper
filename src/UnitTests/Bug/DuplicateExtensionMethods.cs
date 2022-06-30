@@ -38,5 +38,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<Source, Destination>();
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

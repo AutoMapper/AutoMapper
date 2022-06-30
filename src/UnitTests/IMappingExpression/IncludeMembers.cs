@@ -1576,6 +1576,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource);
             cfg.CreateMap<InnerSource, Destination>(MemberList.None);
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
     public class CascadedIncludeMembers : AutoMapperSpecBase
     {

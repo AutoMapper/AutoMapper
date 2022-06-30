@@ -2,6 +2,7 @@
 {
     using System;
     using Shouldly;
+    using Xunit;
 
     public class MapFromClosureBug : SpecBaseBase
     {
@@ -45,7 +46,7 @@
         {
             public int? Total { get; set; }
         }
-
+        [Fact]
         public void Should_map_successfully()
         {
             var mapperConfiguration = new MapperConfiguration(cfg =>
@@ -66,6 +67,5 @@
             // Assert
             dto.ShouldNotBeNull();
         }
-
     }
 }
