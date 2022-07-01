@@ -349,6 +349,23 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
             .ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Source.Value));
     }
 
+    public class MatchingNonMemberExpressionWithSourceValidation : NonValidatingSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>(MemberList.Source)
+            .ForMember(d => d.Value, o => o.MapFrom(s => s.Value ?? "")));
+        [Fact]
+        public void Should_be_ignored() => new Action(AssertConfigurationIsValid)
+            .ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Source.Value));
+    }
+
     public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : AutoMapperSpecBase
     {
         public class ModelObject

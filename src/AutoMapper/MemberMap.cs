@@ -39,9 +39,20 @@ namespace AutoMapper
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
-        public MemberInfo SourceMember => CustomMapExpression.GetMember() ?? SourceMembers.FirstOrDefault();
-        public string GetSourceMemberName() =>
-            ValueConverterConfig?.GetSourceMemberName() ?? ValueResolverConfig?.GetSourceMemberName() ?? SourceMember?.Name;
+        public MemberInfo SourceMember => this switch
+        {
+            { ValueConverterConfig: ValueResolverConfiguration converter } => converter switch
+                {
+                    { SourceMember: LambdaExpression sourceExpression } => sourceExpression.GetMember(),
+                    { SourceMemberName: { } } => null,
+                    _ => SourceMembers.Length == 1 ? SourceMembers[0] : null
+                },
+            { ValueResolverConfig.SourceMember: var sourceExpression } => sourceExpression?.GetMember(),
+            { CustomMapFunction: { } } => null,
+            { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),
+            _ => SourceMembers.FirstOrDefault(),
+        };
+        public string GetSourceMemberName() => (ValueConverterConfig ?? ValueResolverConfig)?.SourceMemberName ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {
@@ -94,7 +105,6 @@ namespace AutoMapper
             InterfaceType = interfaceType;
         }
         public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
-        public string GetSourceMemberName() => SourceMember == null ? SourceMemberName : SourceMember.GetMember()?.Name;
     }
     public readonly struct ValueTransformerConfiguration
     {
