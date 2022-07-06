@@ -75,7 +75,7 @@ namespace AutoMapper.Configuration
             var parameter = ctorMap[CtorParamName];
             if (parameter == null)
             {
-                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
+                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
             }
             foreach (var action in _ctorParamActions)
             {
