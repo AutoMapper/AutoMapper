@@ -9,6 +9,8 @@ namespace AutoMapper.Execution
     using static Expression;
     using static ExpressionBuilder;
     using Internal;
+    using AutoMapper.Configuration;
+
     public class TypeMapPlanBuilder
     {
         private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
@@ -33,7 +35,7 @@ namespace AutoMapper.Execution
         public LambdaExpression CreateMapperLambda(HashSet<TypeMap> typeMapsPath)
         {
             var parameters = new[] { Source, _initialDestination, ContextParameter };
-            var customExpression = TypeConverter(parameters) ?? (_typeMap.CustomMapFunction ?? _typeMap.CustomMapExpression)?.ConvertReplaceParameters(parameters);
+            var customExpression = _typeMap.TypeConverter?.GetExpression(parameters);
             if (customExpression != null)
             {
                 return Lambda(customExpression, parameters);
@@ -61,16 +63,6 @@ namespace AutoMapper.Execution
             statements.Add(mapperFunc);
             variables.Add(_destination);
             return Lambda(Block(variables, statements), parameters);
-            Expression TypeConverter(ParameterExpression[] parameters)
-            {
-                if (_typeMap.TypeConverterType == null)
-                {
-                    return null;
-                }
-                var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, DestinationType);
-                var converter = ServiceLocator(_typeMap.TypeConverterType);
-                return Call(ToType(converter, converterInterfaceType), "Convert", parameters);
-            }
             static void Clear(ref HashSet<TypeMap> typeMapsPath)
             {
                 if (typeMapsPath == null)
@@ -423,7 +415,6 @@ namespace AutoMapper.Execution
             }
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
-        private static Expression ServiceLocator(Type type) => Call(ContextParameter, ContextCreate, Constant(type));
         private Expression BuildResolveCall(MemberMap memberMap, Expression source, Expression destValueExpr)
         {
             var typeMap = memberMap.TypeMap;
@@ -464,6 +455,42 @@ namespace AutoMapper.Execution
             return Call(ToType(resolverInstance, iResolverType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage() 
                 => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
+        }
+    }
+    public abstract class TypeConverter
+    {
+        public abstract Expression GetExpression(ParameterExpression[] parameters);
+        public virtual void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes) { }
+    }
+    public class LambdaTypeConverter : TypeConverter
+    {
+        public LambdaTypeConverter(LambdaExpression lambda) => Lambda = lambda;
+        public LambdaExpression Lambda { get; }
+        public override Expression GetExpression(ParameterExpression[] parameters) => Lambda.ConvertReplaceParameters(parameters);
+    }
+    public class ClassTypeConverter : TypeConverter
+    {
+        public ClassTypeConverter(TypePair types, Type converterType, Type converterInterface)
+        {
+            Types = types;
+            ConverterType = converterType;
+            ConverterInterface = converterInterface;
+        }
+        public ClassTypeConverter(TypePair types, Type converterType) : this(types, converterType, types.ContainsGenericParameters ? null : types.ITypeConverter())
+        {
+        }
+        public TypePair Types { get; }
+        public Type ConverterType { get; private set; }
+        public Type ConverterInterface { get; private set; }
+        public override Expression GetExpression(ParameterExpression[] parameters) =>
+            Call(ToType(ServiceLocator(ConverterType), ConverterInterface), "Convert", parameters);
+        public override void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
+        {
+            var typeParams = (openMapConfig.SourceType.IsGenericTypeDefinition ? closedTypes.SourceType.GenericTypeArguments : Type.EmptyTypes)
+                .Concat(openMapConfig.DestinationType.IsGenericTypeDefinition ? closedTypes.DestinationType.GenericTypeArguments : Type.EmptyTypes);
+            var neededParameters = ConverterType.GenericParametersCount();
+            ConverterType = ConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
+            ConverterInterface = closedTypes.ITypeConverter();
         }
     }
 }

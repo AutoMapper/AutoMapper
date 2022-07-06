@@ -48,7 +48,7 @@ namespace AutoMapper
             {
                 sourceMembers.Clear();
                 var propertyType = destinationProperty.GetMemberType();
-                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers, 
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers,
                         typeMapConfiguration?.IsReverseMap is true))
                 {
                     AddPropertyMap(destinationProperty, propertyType, sourceMembers);
@@ -85,12 +85,11 @@ namespace AutoMapper
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
         public ProfileMap Profile { get; }
-        public LambdaExpression CustomMapFunction { get; set; }
         public LambdaExpression CustomMapExpression { get; set; }
         public LambdaExpression CustomCtorFunction { get; set; }
         public LambdaExpression CustomCtorExpression { get; set; }
         public Type DestinationTypeOverride
-        { 
+        {
             get => _destinationTypeOverride;
             set
             {
@@ -109,7 +108,6 @@ namespace AutoMapper
         public IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs.NullCheck();
         public bool PreserveReferences { get; set; }
         public int MaxDepth { get; set; }
-        public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
         public IReadOnlyCollection<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (_propertyMaps?.Values).NullCheck();
         public IReadOnlyCollection<PathMap> PathMaps => (_pathMaps?.Values).NullCheck();
@@ -144,7 +142,8 @@ namespace AutoMapper
         public ConstructorParameters[] DestinationConstructors => DestinationTypeDetails.Constructors;
         public bool ConstructorMapping => ConstructorMap is { CanResolve: true };
         public bool CustomConstruction => (CustomCtorExpression ?? CustomCtorFunction) != null;
-        public bool HasTypeConverter => (CustomMapFunction ?? CustomMapExpression ?? (object)TypeConverterType) != null;
+        public bool HasTypeConverter => TypeConverter != null;
+        public TypeConverter TypeConverter { get; set; }
         public bool ShouldCheckForValid =>
             !HasTypeConverter
             && DestinationTypeOverride == null
@@ -194,7 +193,7 @@ namespace AutoMapper
                     .Select(p => p.Name)
                     .Except(MappedMembers().Select(m => m.GetSourceMemberName()))
                     .Except(IncludedMembersNames)
-                    .Except(IncludedMembers.Select(m=>m.GetMember()?.Name))
+                    .Except(IncludedMembers.Select(m => m.GetMember()?.Name))
                     .Except(ignoredSourceMembers ?? Array.Empty<string>());
             }
             return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
@@ -462,6 +461,15 @@ namespace AutoMapper
             }
             typeMap._inheritedTypeMaps ??= new();
             typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
+        }
+        public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
+        {
+            TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
+            if (DestinationTypeOverride is { IsGenericTypeDefinition: true })
+            {
+                var neededParameters = DestinationTypeOverride.GenericParametersCount();
+                DestinationTypeOverride = DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GenericTypeArguments.Take(neededParameters).ToArray());
+            }
         }
     }
 }

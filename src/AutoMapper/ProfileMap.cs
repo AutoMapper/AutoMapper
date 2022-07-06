@@ -207,18 +207,7 @@ namespace AutoMapper
             }
             openMapConfig.Configure(closedMap);
             Configure(closedMap, configurationProvider);
-            if (closedMap.TypeConverterType != null)
-            {
-                var typeParams = (openMapConfig.SourceType.IsGenericTypeDefinition ? closedTypes.SourceType.GenericTypeArguments : Type.EmptyTypes)
-                    .Concat(openMapConfig.DestinationType.IsGenericTypeDefinition ? closedTypes.DestinationType.GenericTypeArguments : Type.EmptyTypes);
-                var neededParameters = closedMap.TypeConverterType.GenericParametersCount();
-                closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
-            }
-            if (closedMap.DestinationTypeOverride is { IsGenericTypeDefinition: true })
-            {
-                var neededParameters = closedMap.DestinationTypeOverride.GenericParametersCount();
-                closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GenericTypeArguments.Take(neededParameters).ToArray());
-            }
+            closedMap.CloseGenerics(openMapConfig, closedTypes);
             return closedMap;
         }
         public ITypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
