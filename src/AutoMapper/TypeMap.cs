@@ -8,6 +8,7 @@ using System.ComponentModel;
 namespace AutoMapper
 {
     using Execution;
+    using static Expression;
     using Configuration;
     using Features;
     using QueryableExtensions.Impl;
@@ -19,6 +20,7 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class TypeMap
     {
+        private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
         private Dictionary<string, PropertyMap> _propertyMaps;
         private Features<IRuntimeFeature> _features;
         private HashSet<LambdaExpression> _afterMapActions;
@@ -127,7 +129,6 @@ namespace AutoMapper
             }
         }
         public bool? IsValid { get; set; }
-        public bool AsProxy { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation
             || CustomConstruction
@@ -460,6 +461,7 @@ namespace AutoMapper
             typeMap._inheritedTypeMaps ??= new();
             typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
         }
+        public void AsProxy() => CustomCtorExpression = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
         public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
         {
             TypeConverter?.CloseGenerics(openMapConfig, closedTypes);

@@ -535,7 +535,7 @@ namespace AutoMapper.Configuration
             {
                 throw new InvalidOperationException("Only interfaces can be proxied. " + DestinationType);
             }
-            TypeMapActions.Add(tm => tm.AsProxy = true);
+            TypeMapActions.Add(tm => tm.AsProxy());
             return this as TMappingExpression;
         }
     }

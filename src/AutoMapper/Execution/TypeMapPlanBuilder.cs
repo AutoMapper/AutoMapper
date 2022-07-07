@@ -13,7 +13,6 @@ namespace AutoMapper.Execution
 
     public class TypeMapPlanBuilder
     {
-        private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
         private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
         private readonly IGlobalConfiguration _configurationProvider;
         private readonly ParameterExpression _destination;
@@ -255,8 +254,7 @@ namespace AutoMapper.Execution
             { CustomCtorExpression: LambdaExpression constructUsing } => constructUsing.ReplaceParameters(Source),
             { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(Source, ContextParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
-            { DestinationTypeToUse: { IsInterface: true } interfaceType } => _typeMap.AsProxy ? 
-                Call(CreateProxyMethod, Constant(interfaceType)) : Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
+            { DestinationTypeToUse: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType)
         };
         private Expression ConstructorMapping(ConstructorMap constructorMap)
