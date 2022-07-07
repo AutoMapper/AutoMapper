@@ -308,7 +308,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression ConstructUsingServiceLocator()
         {
-            TypeMapActions.Add(tm => tm.ConstructDestinationUsingServiceLocator = true);
+            TypeMapActions.Add(tm => tm.CustomCtorFunction = Lambda(ServiceLocator(tm.DestinationType)));
 
             return this as TMappingExpression;
         }
@@ -457,7 +457,7 @@ namespace AutoMapper.Configuration
         public void ConvertUsing(Type typeConverterType)
         {
             HasTypeConverter = true;
-            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(Types, typeConverterType));
+            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(tm.Types, typeConverterType));
         }
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)

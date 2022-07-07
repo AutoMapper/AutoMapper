@@ -76,7 +76,7 @@ namespace AutoMapper
         private void AddPathMap(PathMap pathMap) => _pathMaps.Add(pathMap.MemberPath, pathMap);
         public Features<IRuntimeFeature> Features => _features ??= new();
         public LambdaExpression MapExpression { get; private set; }
-        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract && !ConstructDestinationUsingServiceLocator &&
+        internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract &&
             !CustomConstruction && !HasTypeConverter && DestinationConstructors.Length > 0;
         public TypePair Types;
         public ConstructorMap ConstructorMap { get; set; }
@@ -98,7 +98,6 @@ namespace AutoMapper
             }
         }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
-        public bool ConstructDestinationUsingServiceLocator { get; set; }
         public bool IncludeAllDerivedTypes { get; set; }
         public MemberList ConfiguredMemberList { get; set; }
         public IReadOnlyCollection<TypePair> IncludedDerivedTypes => _includedDerivedTypes.NullCheck();
@@ -132,7 +131,6 @@ namespace AutoMapper
         public bool PassesCtorValidation =>
             DisableConstructorValidation
             || CustomConstruction
-            || ConstructDestinationUsingServiceLocator
             || ConstructorMapping
             || DestinationTypeToUse.IsAbstract
             || DestinationTypeToUse.IsGenericTypeDefinition

@@ -257,7 +257,6 @@ namespace AutoMapper.Execution
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
             { DestinationTypeToUse: { IsInterface: true } interfaceType } => _typeMap.AsProxy ? 
                 Call(CreateProxyMethod, Constant(interfaceType)) : Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
-            { ConstructDestinationUsingServiceLocator: true } => ServiceLocator(DestinationType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType)
         };
         private Expression ConstructorMapping(ConstructorMap constructorMap)
@@ -490,7 +489,6 @@ namespace AutoMapper.Execution
                 .Concat(openMapConfig.DestinationType.IsGenericTypeDefinition ? closedTypes.DestinationType.GenericTypeArguments : Type.EmptyTypes);
             var neededParameters = ConverterType.GenericParametersCount();
             ConverterType = ConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
-            ConverterInterface = closedTypes.ITypeConverter();
         }
     }
 }
