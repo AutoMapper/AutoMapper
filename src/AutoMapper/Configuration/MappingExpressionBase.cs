@@ -9,7 +9,6 @@ using AutoMapper.Internal;
 namespace AutoMapper.Configuration
 {
     using static Expression;
-    using static Execution.ExpressionBuilder;
     using Execution;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface ITypeMapConfiguration
@@ -308,36 +307,21 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression ConstructUsingServiceLocator()
         {
-            TypeMapActions.Add(tm => tm.CustomCtorFunction = Lambda(ServiceLocator(tm.DestinationType)));
+            TypeMapActions.Add(tm => tm.ConstructUsingServiceLocator());
 
             return this as TMappingExpression;
         }
 
-        public TMappingExpression BeforeMap(Action<TSource, TDestination> beforeFunction)
+        public TMappingExpression BeforeMap(Action<TSource, TDestination> beforeFunction) => BeforeMapCore((src, dest, ctxt) => beforeFunction(src, dest));
+
+        private TMappingExpression BeforeMapCore(Expression<Action<TSource, TDestination, ResolutionContext>> expr)
         {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest);
-
-                tm.AddBeforeMapAction(expr);
-            });
-
+            TypeMapActions.Add(tm => tm.AddBeforeMapAction(expr));
             return this as TMappingExpression;
         }
 
-        public TMappingExpression BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => beforeFunction(src, dest, ctxt);
-
-                tm.AddBeforeMapAction(expr);
-            });
-
-            return this as TMappingExpression;
-        }
+        public TMappingExpression BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction) => 
+            BeforeMapCore((src, dest, ctxt) => beforeFunction(src, dest, ctxt));
 
         public TMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination> =>
             BeforeMap(CallMapAction<TMappingAction>);
@@ -346,31 +330,16 @@ namespace AutoMapper.Configuration
         private static void CallMapAction<TMappingAction>(TSource source, TDestination destination, ResolutionContext context) =>
             ((IMappingAction<TSource, TDestination>)context.CreateInstance(typeof(TMappingAction))).Process(source, destination, context);
 
-        public TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction)
+        public TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction) => AfterMapCore((src, dest, ctxt) => afterFunction(src, dest));
+
+        private TMappingExpression AfterMapCore(Expression<Action<TSource, TDestination, ResolutionContext>> expr)
         {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest);
-
-                tm.AddAfterMapAction(expr);
-            });
-
+            TypeMapActions.Add(tm => tm.AddAfterMapAction(expr));
             return this as TMappingExpression;
         }
 
-        public TMappingExpression AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction)
-        {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Action<TSource, TDestination, ResolutionContext>> expr =
-                    (src, dest, ctxt) => afterFunction(src, dest, ctxt);
-
-                tm.AddAfterMapAction(expr);
-            });
-
-            return this as TMappingExpression;
-        }
+        public TMappingExpression AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction) => 
+            AfterMapCore((src, dest, ctxt) => afterFunction(src, dest, ctxt));
 
         public TMappingExpression PreserveReferences()
         {
@@ -460,25 +429,16 @@ namespace AutoMapper.Configuration
             TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(typeConverterType, tm.Types.ITypeConverter()));
         }
 
-        public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
+        public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction) => ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest));
+
+        private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr)
         {
             HasTypeConverter = true;
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr = (src, dest, ctxt) => mappingFunction(src, dest);
-                tm.TypeConverter = new LambdaTypeConverter(expr);
-            });
+            TypeMapActions.Add(tm => tm.TypeConverter = new LambdaTypeConverter(expr));
         }
 
-        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction)
-        {
-            HasTypeConverter = true;
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr = (src, dest, ctxt) => mappingFunction(src, dest, ctxt);
-                tm.TypeConverter = new LambdaTypeConverter(expr);
-            });
-        }
+        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction) =>
+            ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest, ctxt));
 
         public void ConvertUsing(ITypeConverter<TSource, TDestination> converter) => ConvertUsing(converter.Convert);
 

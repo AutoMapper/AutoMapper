@@ -451,7 +451,7 @@ namespace AutoMapper.Execution
                         Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
             return Call(ToType(resolverInstance, iResolverType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage() 
-                => new AutoMapperConfigurationException($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
+                => new($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
         }
     }
     public abstract class TypeConverter
@@ -473,7 +473,7 @@ namespace AutoMapper.Execution
             ConverterInterface = converterInterface;
         }
         public Type ConverterType { get; private set; }
-        public Type ConverterInterface { get; private set; }
+        public Type ConverterInterface { get; }
         public override Expression GetExpression(ParameterExpression[] parameters) =>
             Call(ToType(ServiceLocator(ConverterType), ConverterInterface), "Convert", parameters);
         public override void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)

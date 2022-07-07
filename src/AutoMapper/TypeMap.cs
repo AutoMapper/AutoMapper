@@ -9,6 +9,7 @@ namespace AutoMapper
 {
     using Execution;
     using static Expression;
+    using static Execution.ExpressionBuilder;
     using Configuration;
     using Features;
     using QueryableExtensions.Impl;
@@ -313,6 +314,7 @@ namespace AutoMapper
                 return false;
             }
         }
+        public void ConstructUsingServiceLocator() => CustomCtorFunction = Lambda(ServiceLocator(DestinationType));
         internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath) =>
             Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
         private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
@@ -460,7 +462,7 @@ namespace AutoMapper
             typeMap._inheritedTypeMaps ??= new();
             typeMap._inheritedTypeMaps.UnionWith(_inheritedTypeMaps);
         }
-        public void AsProxy() => CustomCtorExpression = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
+        public void AsProxy() => CustomCtorFunction = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
         public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
         {
             TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
