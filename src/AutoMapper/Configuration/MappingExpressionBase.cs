@@ -457,7 +457,7 @@ namespace AutoMapper.Configuration
         public void ConvertUsing(Type typeConverterType)
         {
             HasTypeConverter = true;
-            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(tm.Types, typeConverterType));
+            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(typeConverterType, tm.Types.ITypeConverter()));
         }
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
@@ -485,7 +485,7 @@ namespace AutoMapper.Configuration
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
             HasTypeConverter = true;
-            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(Types, typeof(TTypeConverter), typeof(ITypeConverter<TSource, TDestination>)));
+            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(typeof(TTypeConverter), typeof(ITypeConverter<TSource, TDestination>)));
         }
 
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)

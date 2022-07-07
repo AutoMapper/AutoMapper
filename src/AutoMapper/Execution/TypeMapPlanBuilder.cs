@@ -469,16 +469,11 @@ namespace AutoMapper.Execution
     }
     public class ClassTypeConverter : TypeConverter
     {
-        public ClassTypeConverter(TypePair types, Type converterType, Type converterInterface)
+        public ClassTypeConverter(Type converterType, Type converterInterface)
         {
-            Types = types;
             ConverterType = converterType;
             ConverterInterface = converterInterface;
         }
-        public ClassTypeConverter(TypePair types, Type converterType) : this(types, converterType, types.ContainsGenericParameters ? null : types.ITypeConverter())
-        {
-        }
-        public TypePair Types { get; }
         public Type ConverterType { get; private set; }
         public Type ConverterInterface { get; private set; }
         public override Expression GetExpression(ParameterExpression[] parameters) =>
