@@ -99,7 +99,6 @@ namespace AutoMapper
                 _sealed = true;
             }
         }
-        public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
         public bool IncludeAllDerivedTypes { get; set; }
         public MemberList ConfiguredMemberList { get; set; }
         public IReadOnlyCollection<TypePair> IncludedDerivedTypes => _includedDerivedTypes.NullCheck();
@@ -133,9 +132,9 @@ namespace AutoMapper
             DisableConstructorValidation
             || CustomConstruction
             || ConstructorMapping
-            || DestinationTypeToUse.IsAbstract
-            || DestinationTypeToUse.IsGenericTypeDefinition
-            || DestinationTypeToUse.IsValueType
+            || DestinationType.IsAbstract
+            || DestinationType.IsGenericTypeDefinition
+            || DestinationType.IsValueType
             || TypeDetails.GetConstructors(DestinationType, Profile).Any(c => c.AllParametersOptional());
         public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;
         public ConstructorParameters[] DestinationConstructors => DestinationTypeDetails.Constructors;

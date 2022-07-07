@@ -25,7 +25,7 @@ namespace AutoMapper.Execution
             _configurationProvider = configurationProvider;
             _typeMap = typeMap;
             Source = Parameter(typeMap.SourceType, "source");
-            _initialDestination = Parameter(typeMap.DestinationTypeToUse, "destination");
+            _initialDestination = Parameter(typeMap.DestinationType, "destination");
             _destination = Variable(_initialDestination.Type, "typeMapDestination");
         }
         public Type DestinationType => _destination.Type;
@@ -254,7 +254,7 @@ namespace AutoMapper.Execution
             { CustomCtorExpression: LambdaExpression constructUsing } => constructUsing.ReplaceParameters(Source),
             { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(Source, ContextParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
-            { DestinationTypeToUse: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
+            { DestinationType: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType)
         };
         private Expression ConstructorMapping(ConstructorMap constructorMap)

@@ -195,7 +195,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
                 { ConstructorMap: { CanResolve: true } constructorMap } => 
                     New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map) ?? Default(map.DestinationType))),
-                _ => New(typeMap.DestinationTypeToUse)
+                _ => New(typeMap.DestinationType)
             };
         }
         private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new(
