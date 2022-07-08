@@ -41,12 +41,7 @@ namespace AutoMapper
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
         public MemberInfo SourceMember => this switch
         {
-            { Resolver: ValueResolver resolver } => resolver switch
-                {
-                    { SourceMember: MemberInfo member } => member,
-                    { SourceMemberName: { } } => null,
-                    _ => SourceMembers.Length == 1 ? SourceMembers[0] : null
-                },
+            { Resolver: ValueResolver resolver } => resolver.GetSourceMember(this),
             { ValueResolverConfig.SourceMember: var sourceExpression } => sourceExpression?.GetMember(),
             { CustomMapFunction: { } } => null,
             { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),

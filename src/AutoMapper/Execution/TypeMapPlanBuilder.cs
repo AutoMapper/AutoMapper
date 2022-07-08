@@ -439,8 +439,8 @@ namespace AutoMapper.Execution
     public abstract class ValueResolver
     {
         public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destinationMember);
+        public abstract MemberInfo GetSourceMember(MemberMap memberMap);
         public abstract Type ResolvedType { get; }
-        public abstract MemberInfo SourceMember { get; }
         public abstract string SourceMemberName { get; set; }
     }
     public class ValueConverter : ValueResolver
@@ -474,8 +474,13 @@ namespace AutoMapper.Execution
             AutoMapperConfigurationException BuildExceptionMessage()
                 => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");
         }
+        public override MemberInfo GetSourceMember(MemberMap memberMap) => this switch
+        {
+            { SourceMemberLambda: { } lambda } => lambda.GetMember(),
+            { SourceMemberName: { } } => null,
+            _ => memberMap.SourceMembers.Length == 1 ? memberMap.SourceMembers[0] : null
+        };
         public override Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
-        public override MemberInfo SourceMember => SourceMemberLambda?.GetMember();
     }
     public abstract class TypeConverter
     {
