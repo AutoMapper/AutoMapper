@@ -90,14 +90,13 @@ namespace AutoMapper
         {
             get => _sourceType ??=
                 CustomMapExpression?.ReturnType ??
-                CustomMapFunction?.ReturnType ??
+                Resolver?.ResolvedType ??
                 (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : Parameter.ParameterType);
             protected set => _sourceType = value;
         }
         public override Type DestinationType => Parameter.ParameterType;
         public override MemberInfo[] SourceMembers => _sourceMembers;
         public override string DestinationName => Parameter.Name;
-        public override LambdaExpression CustomMapFunction { get; set; }
         public override bool CanResolveValue { get; set; }
         public Expression DefaultValue() => Parameter.GetDefaultValue();
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;

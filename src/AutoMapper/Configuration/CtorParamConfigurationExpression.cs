@@ -1,4 +1,5 @@
-﻿using AutoMapper.Internal;
+﻿using AutoMapper.Execution;
+using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -56,7 +57,7 @@ namespace AutoMapper.Configuration
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
             Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
-            _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
+            _ctorParamActions.Add(cpm => cpm.Resolver = new FuncResolver(resolverExpression));
         }
 
         public void MapFrom(string sourceMembersPath)

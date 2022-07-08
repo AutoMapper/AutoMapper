@@ -34,7 +34,6 @@ namespace AutoMapper
         public override bool Ignored { get; set; }
         public override bool? AllowNull { get; set; }
         public int? MappingOrder { get; set; }
-        public override LambdaExpression CustomMapFunction { get; set; }
         public override LambdaExpression Condition { get; set; }
         public override LambdaExpression PreCondition { get; set; }
         public override bool? UseDestinationValue { get; set; }
@@ -45,7 +44,6 @@ namespace AutoMapper
         {
             get => _sourceType ??=
                 Resolver?.ResolvedType ??
-                CustomMapFunction?.ReturnType ??
                 CustomMapExpression?.ReturnType ??
                 (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : typeof(object));
             protected set => _sourceType = value;
@@ -70,7 +68,6 @@ namespace AutoMapper
                 {
                     _sourceType = inheritedMappedProperty._sourceType;
                     CustomMapExpression = inheritedMappedProperty.CustomMapExpression;
-                    CustomMapFunction = inheritedMappedProperty.CustomMapFunction;
                     Resolver = inheritedMappedProperty.Resolver;
                 }
                 else if (_sourceMembers.Length == 0)
@@ -93,7 +90,7 @@ namespace AutoMapper
             }
         }
         public override bool CanResolveValue => _canResolveValue ??= !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
-        public bool IsResolveConfigured => (CustomMapFunction ?? CustomMapExpression ?? (object)Resolver) != null;
+        public bool IsResolveConfigured => (CustomMapExpression ?? (object)Resolver) != null;
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();

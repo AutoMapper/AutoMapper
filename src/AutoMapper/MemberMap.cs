@@ -35,13 +35,11 @@ namespace AutoMapper
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
-        public virtual LambdaExpression CustomMapFunction { get => default; set { } }
         public ValueResolver Resolver { get; set; }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
         public MemberInfo SourceMember => this switch
         {
             { Resolver: ValueResolver resolver } => resolver.GetSourceMember(this),
-            { CustomMapFunction: { } } => null,
             { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),
             _ => SourceMembers.FirstOrDefault(),
         };

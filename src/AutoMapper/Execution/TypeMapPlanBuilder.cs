@@ -381,7 +381,6 @@ namespace AutoMapper.Execution
             var valueResolverFunc = memberMap switch
             {
                 { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, _destination, destValueExpr),
-                { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
                 { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
                 _ => destValueExpr
@@ -418,6 +417,16 @@ namespace AutoMapper.Execution
         public abstract MemberInfo GetSourceMember(MemberMap memberMap);
         public abstract Type ResolvedType { get; }
         public abstract string SourceMemberName { get; set; }
+    }
+    public class FuncResolver : ValueResolver
+    {
+        public override Type ResolvedType => Lambda.ReturnType;
+        public override string SourceMemberName { get => null; set { } }
+        public LambdaExpression Lambda { get; }
+        public FuncResolver(LambdaExpression lambda) => Lambda = lambda;
+        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
+            Lambda.ConvertReplaceParameters(source, destination, destinationMember, ContextParameter);
+        public override MemberInfo GetSourceMember(MemberMap memberMap) => null;
     }
     public abstract class ValueResolverConfig : ValueResolver
     {

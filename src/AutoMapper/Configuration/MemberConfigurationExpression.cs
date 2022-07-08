@@ -57,8 +57,8 @@ namespace AutoMapper.Configuration
             MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember));
         public void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> mappingFunction) =>
             MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt));
-        private void MapFromResult<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) =>
-            PropertyMapActions.Add(pm => pm.CustomMapFunction = expr);
+        private void MapFromResult<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) => 
+            SetResolver(new FuncResolver(expr));
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression) => MapFromUntyped(mapExpression);
         internal void MapFromUntyped(LambdaExpression sourceExpression)
         {
