@@ -36,14 +36,14 @@ namespace AutoMapper
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
+        public ValueResolver Resolver { get; set; }
         public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
-        public virtual ValueResolverConfiguration ValueConverterConfig { get => default; set { } }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
         public MemberInfo SourceMember => this switch
         {
-            { ValueConverterConfig: ValueResolverConfiguration converter } => converter switch
+            { Resolver: ValueResolver resolver } => resolver switch
                 {
-                    { SourceMember: LambdaExpression sourceExpression } => sourceExpression.GetMember(),
+                    { SourceMember: MemberInfo member } => member,
                     { SourceMemberName: { } } => null,
                     _ => SourceMembers.Length == 1 ? SourceMembers[0] : null
                 },
@@ -52,7 +52,7 @@ namespace AutoMapper
             { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),
             _ => SourceMembers.FirstOrDefault(),
         };
-        public string GetSourceMemberName() => (ValueConverterConfig ?? ValueResolverConfig)?.SourceMemberName ?? SourceMember?.Name;
+        public string GetSourceMemberName() => Resolver?.SourceMemberName ?? ValueResolverConfig?.SourceMemberName ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {

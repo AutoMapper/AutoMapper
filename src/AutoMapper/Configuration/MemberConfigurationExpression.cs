@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 namespace AutoMapper.Configuration
 {
+    using Execution;
     using static AutoMapper.Execution.ExpressionBuilder;
     public interface IPropertyMapConfiguration
     {
@@ -117,15 +118,15 @@ namespace AutoMapper.Configuration
         private void ConvertUsingCore<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
             ConvertUsingCore(new(typeof(TValueConverter), typeof(IValueConverter<TSourceMember, TMember>))
             {
-                SourceMember = sourceMember,
+                SourceMemberLambda = sourceMember,
                 SourceMemberName = sourceMemberName
             });
-        private void ConvertUsingCore(ValueResolverConfiguration config) => PropertyMapActions.Add(pm => pm.ValueConverterConfig = config);
+        private void ConvertUsingCore(ValueConverter converter) => PropertyMapActions.Add(pm => pm.Resolver = converter);
         private void ConvertUsingCore<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter,
             Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
             ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
             {
-                SourceMember = sourceMember,
+                SourceMemberLambda = sourceMember,
                 SourceMemberName = sourceMemberName
             });
         public void Configure(TypeMap typeMap)

@@ -380,7 +380,7 @@ namespace AutoMapper.Execution
             var destinationPropertyType = memberMap.DestinationType;
             var valueResolverFunc = memberMap switch
             {
-                { ValueConverterConfig: { } } => ToType(BuildConvertCall(memberMap, customSource, destValueExpr), destinationPropertyType),
+                { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, destValueExpr),
                 { ValueResolverConfig: { } } => BuildResolveCall(memberMap, customSource, destValueExpr),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
@@ -435,24 +435,47 @@ namespace AutoMapper.Execution
                 .ToArray();
             return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
         }
-        private Expression BuildConvertCall(MemberMap memberMap, Expression source, Expression destValueExpr)
+    }
+    public abstract class ValueResolver
+    {
+        public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destinationMember);
+        public abstract Type ResolvedType { get; }
+        public abstract MemberInfo SourceMember { get; }
+        public abstract string SourceMemberName { get; set; }
+    }
+    public class ValueConverter : ValueResolver
+    {
+        readonly Expression _instance;
+        public Type ConcreteType { get; }
+        public Type InterfaceType { get; }
+        public LambdaExpression SourceMemberLambda { get; set; }
+        public override string SourceMemberName { get; set; }
+        public ValueConverter(Type concreteType, Type interfaceType)
         {
-            var valueConverterConfig = memberMap.ValueConverterConfig;
-            var iResolverType = valueConverterConfig.InterfaceType;
-            var iResolverTypeArgs = iResolverType.GenericTypeArguments;
-            var resolverInstance = valueConverterConfig.Instance != null ? 
-                Constant(valueConverterConfig.Instance) : 
-                ServiceLocator(valueConverterConfig.ConcreteType);
-            var sourceMember = valueConverterConfig.SourceMember?.ReplaceParameters(source) ??
-                (valueConverterConfig.SourceMemberName != null ?
-                    PropertyOrField(source, valueConverterConfig.SourceMemberName) : 
-                    memberMap.SourceMembers.Length > 0 ?
-                        memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destValueExpr) : 
-                        Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
-            return Call(ToType(resolverInstance, iResolverType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
-            AutoMapperConfigurationException BuildExceptionMessage() 
-                => new($"Cannot find a source member to pass to the value converter of type {valueConverterConfig.ConcreteType.FullName}. Configure a source member to map from.");
+            _instance = ServiceLocator(concreteType);
+            ConcreteType = concreteType;
+            InterfaceType = interfaceType;
         }
+        public ValueConverter(object instance, Type interfaceType)
+        {
+            _instance = Constant(instance);
+            InterfaceType = interfaceType;
+        }
+        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destinationMember)
+        {
+            var iResolverTypeArgs = InterfaceType.GenericTypeArguments;
+            var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
+                (SourceMemberName != null ?
+                    PropertyOrField(source, SourceMemberName) :
+                    memberMap.SourceMembers.Length > 0 ?
+                        memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destinationMember) :
+                        Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
+            return Call(ToType(_instance, InterfaceType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
+            AutoMapperConfigurationException BuildExceptionMessage()
+                => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");
+        }
+        public override Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+        public override MemberInfo SourceMember => SourceMemberLambda?.GetMember();
     }
     public abstract class TypeConverter
     {

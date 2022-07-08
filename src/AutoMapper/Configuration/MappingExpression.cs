@@ -120,23 +120,23 @@ namespace AutoMapper.Configuration
             {
                 PropertyMapActions.Add(pm =>
                 {
-                    var config = new ValueResolverConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
+                    var config = new ValueConverter(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
                     {
                         SourceMemberName = sourceMemberName
                     };
 
-                    pm.ValueConverterConfig = config;
+                    pm.Resolver = config;
                 });
             }
 
             private static void ConvertUsing(PropertyMap propertyMap, Type valueConverterType, string sourceMemberName = null)
             {
-                var config = new ValueResolverConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                var config = new ValueConverter(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
                 {
                     SourceMemberName = sourceMemberName
                 };
 
-                propertyMap.ValueConverterConfig = config;
+                propertyMap.Resolver = config;
             }
         }
     }
