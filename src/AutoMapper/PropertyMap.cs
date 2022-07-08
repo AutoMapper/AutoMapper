@@ -44,7 +44,6 @@ namespace AutoMapper
         {
             get => _sourceType ??=
                 Resolver?.ResolvedType ??
-                CustomMapExpression?.ReturnType ??
                 (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : typeof(object));
             protected set => _sourceType = value;
         }
@@ -67,7 +66,6 @@ namespace AutoMapper
                 if (inheritedMappedProperty.IsResolveConfigured)
                 {
                     _sourceType = inheritedMappedProperty._sourceType;
-                    CustomMapExpression = inheritedMappedProperty.CustomMapExpression;
                     Resolver = inheritedMappedProperty.Resolver;
                 }
                 else if (_sourceMembers.Length == 0)
@@ -90,7 +88,7 @@ namespace AutoMapper
             }
         }
         public override bool CanResolveValue => _canResolveValue ??= !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
-        public bool IsResolveConfigured => (CustomMapExpression ?? (object)Resolver) != null;
+        public bool IsResolveConfigured => Resolver != null;
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();

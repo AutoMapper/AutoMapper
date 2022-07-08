@@ -250,7 +250,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                         var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
-                        letPropertyMap.CustomMapExpression = Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter);
+                        letPropertyMap.SetResolver(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                         projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                     }
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);

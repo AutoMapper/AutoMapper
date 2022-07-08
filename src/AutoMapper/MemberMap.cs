@@ -18,7 +18,8 @@ namespace AutoMapper
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
         public static readonly MemberMap Instance = new();
         public TypeMap TypeMap { get; protected set; }
-        public LambdaExpression CustomMapExpression { get; set; }
+        public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
+        public void SetResolver(LambdaExpression lambda) => Resolver = new ExpressionResolver(lambda);
         public virtual Type SourceType { get => default; protected set { } }
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
         public IncludedMember IncludedMember { get; protected set; }
@@ -37,17 +38,12 @@ namespace AutoMapper
         public virtual LambdaExpression Condition { get => default; set { } }
         public ValueResolver Resolver { get; set; }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
-        public MemberInfo SourceMember => this switch
-        {
-            { Resolver: ValueResolver resolver } => resolver.GetSourceMember(this),
-            { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),
-            _ => SourceMembers.FirstOrDefault(),
-        };
+        public MemberInfo SourceMember => Resolver == null ? SourceMembers.FirstOrDefault() : Resolver.GetSourceMember(this);
         public string GetSourceMemberName() => Resolver?.SourceMemberName ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {
-            CustomMapExpression = sourceMember;
+            SetResolver(sourceMember);
             Ignored = false;
         }
         public void MapFrom(string sourceMembersPath)

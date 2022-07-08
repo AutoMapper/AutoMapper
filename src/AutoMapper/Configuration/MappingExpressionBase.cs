@@ -234,7 +234,7 @@ namespace AutoMapper.Configuration
 
                 var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
 
-                pathMap.CustomMapExpression = customExpression;
+                pathMap.SetResolver(customExpression);
             });
         }
 

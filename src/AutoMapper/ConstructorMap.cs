@@ -89,7 +89,6 @@ namespace AutoMapper
         public override Type SourceType
         {
             get => _sourceType ??=
-                CustomMapExpression?.ReturnType ??
                 Resolver?.ResolvedType ??
                 (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : Parameter.ParameterType);
             protected set => _sourceType = value;

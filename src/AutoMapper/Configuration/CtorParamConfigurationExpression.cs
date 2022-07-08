@@ -52,7 +52,7 @@ namespace AutoMapper.Configuration
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
-            _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
+            _ctorParamActions.Add(cpm => cpm.SetResolver(sourceMember));
 
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {

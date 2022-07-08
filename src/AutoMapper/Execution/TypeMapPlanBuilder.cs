@@ -381,7 +381,6 @@ namespace AutoMapper.Execution
             var valueResolverFunc = memberMap switch
             {
                 { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, _destination, destValueExpr),
-                { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
                 { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
                 _ => destValueExpr
             };
@@ -398,16 +397,6 @@ namespace AutoMapper.Execution
                 }
             }
             return valueResolverFunc;
-            static Expression CustomMapExpression(Expression mapFrom, Type destinationPropertyType, Expression destValueExpr)
-            {
-                var nullCheckedExpression = mapFrom.NullCheck(destinationPropertyType, destValueExpr);
-                if (nullCheckedExpression != mapFrom)
-                {
-                    return nullCheckedExpression;
-                }
-                var defaultExpression = Default(mapFrom.Type);
-                return TryCatch(mapFrom, Catch(typeof(NullReferenceException), defaultExpression), Catch(typeof(ArgumentNullException), defaultExpression));
-            }
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
     }
@@ -416,17 +405,38 @@ namespace AutoMapper.Execution
         public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember);
         public abstract MemberInfo GetSourceMember(MemberMap memberMap);
         public abstract Type ResolvedType { get; }
-        public abstract string SourceMemberName { get; set; }
+        public virtual string SourceMemberName { get => null; set { } }
+        public virtual LambdaExpression ProjectToExpression => null;
     }
-    public class FuncResolver : ValueResolver
+    public abstract class LambdaValueResolver : ValueResolver
     {
-        public override Type ResolvedType => Lambda.ReturnType;
-        public override string SourceMemberName { get => null; set { } }
         public LambdaExpression Lambda { get; }
-        public FuncResolver(LambdaExpression lambda) => Lambda = lambda;
+        public override Type ResolvedType => Lambda.ReturnType;
+        protected LambdaValueResolver(LambdaExpression lambda) => Lambda = lambda;
+    }
+    public class FuncResolver : LambdaValueResolver
+    {
+        public FuncResolver(LambdaExpression lambda) : base(lambda) { }
         public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
             Lambda.ConvertReplaceParameters(source, destination, destinationMember, ContextParameter);
         public override MemberInfo GetSourceMember(MemberMap memberMap) => null;
+    }
+    public class ExpressionResolver : LambdaValueResolver
+    {
+        public ExpressionResolver(LambdaExpression lambda) : base(lambda) { }
+        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        {
+            var mapFrom = Lambda.ReplaceParameters(source);
+            var nullCheckedExpression = mapFrom.NullCheck(memberMap.DestinationType, destinationMember);
+            if (nullCheckedExpression != mapFrom)
+            {
+                return nullCheckedExpression;
+            }
+            var defaultExpression = Default(mapFrom.Type);
+            return TryCatch(mapFrom, Catch(typeof(NullReferenceException), defaultExpression), Catch(typeof(ArgumentNullException), defaultExpression));
+        }
+        public override MemberInfo GetSourceMember(MemberMap memberMap) => Lambda.GetMember();
+        public override LambdaExpression ProjectToExpression => Lambda;
     }
     public abstract class ValueResolverConfig : ValueResolver
     {
