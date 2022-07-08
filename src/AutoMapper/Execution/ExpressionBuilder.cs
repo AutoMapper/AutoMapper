@@ -173,6 +173,10 @@ namespace AutoMapper.Execution
         }
         public static Expression Chain(this MemberInfo[] members, Expression target)
         {
+            if (members.Length == 0)
+            {
+                return null;
+            }
             foreach (var member in members)
             {
                 target = member switch

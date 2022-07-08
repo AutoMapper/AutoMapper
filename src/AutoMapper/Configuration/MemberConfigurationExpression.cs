@@ -30,24 +30,24 @@ namespace AutoMapper.Configuration
         public void MapAtRuntime() => PropertyMapActions.Add(pm => pm.Inline = false);
         public void NullSubstitute(object nullSubstitute) => PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
         public void MapFrom<TValueResolver>() where TValueResolver : IValueResolver<TSource, TDestination, TMember> =>
-            AddValueResolver(new(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>)));
-        private void AddValueResolver(ClassValueResolver config) => SetResolver(config);
-        private void SetResolver(ValueResolver config) => PropertyMapActions.Add(pm => pm.Resolver = config);
+            MapFromCore(new(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>)));
+        protected void MapFromCore(ClassValueResolver config) => SetResolver(config);
+        protected void SetResolver(ValueResolver config) => PropertyMapActions.Add(pm => pm.Resolver = config);
         public void MapFrom<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
                 MapFromCore<TValueResolver, TSourceMember>(sourceMember);
         public void MapFrom<TValueResolver, TSourceMember>(string sourceMemberName) where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
                 MapFromCore<TValueResolver, TSourceMember>(null, sourceMemberName);
         private void MapFromCore<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember, string sourceMemberName = null) where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
-            AddValueResolver(new(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
+            MapFromCore(new(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMemberName = sourceMemberName,
                 SourceMemberLambda = sourceMember
             });
         public void MapFrom(IValueResolver<TSource, TDestination, TMember> valueResolver) =>
-            AddValueResolver(new(valueResolver, typeof(IValueResolver<TSource, TDestination, TMember>)));
+            MapFromCore(new(valueResolver, typeof(IValueResolver<TSource, TDestination, TMember>)));
         public void MapFrom<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember) =>
-            AddValueResolver(new(valueResolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
+            MapFromCore(new(valueResolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMemberLambda = sourceMember
             });
@@ -122,7 +122,7 @@ namespace AutoMapper.Configuration
                 SourceMemberLambda = sourceMember,
                 SourceMemberName = sourceMemberName
             });
-        private void ConvertUsingCore(ValueConverter converter) => SetResolver(converter);
+        protected void ConvertUsingCore(ValueConverter converter) => SetResolver(converter);
         private void ConvertUsingCore<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter,
             Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
             ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))

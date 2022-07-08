@@ -377,12 +377,10 @@ namespace AutoMapper.Execution
         {
             var customSource = GetCustomSource(memberMap);
             var destinationPropertyType = memberMap.DestinationType;
-            var valueResolverFunc = memberMap switch
-            {
-                { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, _destination, destValueExpr),
-                { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
-                _ => destValueExpr
-            };
+            var valueResolverFunc =
+                memberMap.Resolver?.GetExpression(memberMap, customSource, _destination, destValueExpr) ??
+                memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr) ??
+                destValueExpr;
             if (memberMap.NullSubstitute != null)
             {
                 valueResolverFunc = memberMap.NullSubstitute(valueResolverFunc);
@@ -466,9 +464,7 @@ namespace AutoMapper.Execution
             var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
                 (SourceMemberName != null ?
                     PropertyOrField(source, SourceMemberName) :
-                    memberMap.SourceMembers.Length > 0 ?
-                        memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destinationMember) :
-                        Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
+                    memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destinationMember) ?? Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
             return Call(ToType(_instance, InterfaceType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage()
                 => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");

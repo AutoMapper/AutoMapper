@@ -86,13 +86,7 @@ namespace AutoMapper
             this(includedMember.TypeMap, parameterMap.Parameter, parameterMap._sourceMembers, parameterMap.CanResolveValue) =>
             IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
         public ParameterInfo Parameter { get; }
-        public override Type SourceType
-        {
-            get => _sourceType ??=
-                Resolver?.ResolvedType ??
-                (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : Parameter.ParameterType);
-            protected set => _sourceType = value;
-        }
+        public override Type SourceType => _sourceType ??= GetSourceType();
         public override Type DestinationType => Parameter.ParameterType;
         public override MemberInfo[] SourceMembers => _sourceMembers;
         public override string DestinationName => Parameter.Name;

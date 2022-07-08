@@ -15,7 +15,6 @@ namespace AutoMapper
     {
         private MemberInfo[] _sourceMembers = Array.Empty<MemberInfo>();
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
-        private bool? _canResolveValue;
         private Type _sourceType;
         public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap) : base(typeMap)
         {
@@ -40,13 +39,7 @@ namespace AutoMapper
         public bool? ExplicitExpansion { get; set; }
         public override object NullSubstitute { get; set; }
         public override IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs.NullCheck();
-        public override Type SourceType
-        {
-            get => _sourceType ??=
-                Resolver?.ResolvedType ??
-                (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : typeof(object));
-            protected set => _sourceType = value;
-        }
+        public override Type SourceType => _sourceType ??= GetSourceType();
         public void MapByConvention(IEnumerable<MemberInfo> sourceMembers) => _sourceMembers = sourceMembers.ToArray();
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
@@ -58,11 +51,9 @@ namespace AutoMapper
             {
                 if (inheritedMappedProperty.Ignored)
                 {
-                    _canResolveValue = false;
                     Ignored = true;
                     return;
                 }
-                _canResolveValue = true;
                 if (inheritedMappedProperty.IsResolveConfigured)
                 {
                     _sourceType = inheritedMappedProperty._sourceType;
@@ -87,8 +78,7 @@ namespace AutoMapper
                 _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             }
         }
-        public override bool CanResolveValue => _canResolveValue ??= !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
-        public bool IsResolveConfigured => Resolver != null;
+        public override bool CanResolveValue => !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();

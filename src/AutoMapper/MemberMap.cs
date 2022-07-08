@@ -15,17 +15,19 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberMap
     {
+        private static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Null);
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
         public static readonly MemberMap Instance = new();
         public TypeMap TypeMap { get; protected set; }
         public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
+        public bool IsResolveConfigured => Resolver != null;
         public void SetResolver(LambdaExpression lambda) => Resolver = new ExpressionResolver(lambda);
-        public virtual Type SourceType { get => default; protected set { } }
+        public virtual Type SourceType => default;
         public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
         public IncludedMember IncludedMember { get; protected set; }
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
-        public virtual TypePair Types() => new TypePair(SourceType, DestinationType);
+        public virtual TypePair Types() => new(SourceType, DestinationType);
         public virtual bool CanResolveValue { get => default; set { } }
         public bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
@@ -49,14 +51,14 @@ namespace AutoMapper
         public void MapFrom(string sourceMembersPath)
         {
             var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
-                                                // just a placeholder so the member is mapped
-                                                Lambda(ExpressionBuilder.Null) :
+                                                EmptyLambda :// just a placeholder so the member is mapped
                                                 ExpressionBuilder.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
             MapFrom(mapExpression);
         }
         public override string ToString() => DestinationName;
+        public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);
         public Expression ChainSourceMembers(Expression source, Type destinationType, Expression defaultValue) =>
-            SourceMembers.Chain(source).NullCheck(destinationType, defaultValue);
+            ChainSourceMembers(source)?.NullCheck(destinationType, defaultValue);
         public bool AllowsNullDestinationValues() => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
         public bool AllowsNullCollections() => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
         public ProfileMap Profile => TypeMap?.Profile;
@@ -71,6 +73,7 @@ namespace AutoMapper
                 other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
         }
         public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
+        protected Type GetSourceType() => Resolver?.ResolvedType ?? SourceMembers.LastOrDefault()?.GetMemberType() ?? DestinationType;
     }
     public readonly struct ValueTransformerConfiguration
     {

@@ -404,9 +404,9 @@ namespace AutoMapper.Configuration
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 
-        public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor) => ConstructUsingCode(ctor);
+        public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor) => ConstructUsingCore(ctor);
 
-        private TMappingExpression ConstructUsingCode(LambdaExpression ctor)
+        private TMappingExpression ConstructUsingCore(LambdaExpression ctor)
         {
             TypeMapActions.Add(tm => tm.CustomCtorFunction = ctor);
             return this as TMappingExpression;
@@ -415,7 +415,7 @@ namespace AutoMapper.Configuration
         public TMappingExpression ConstructUsing(Func<TSource, ResolutionContext, TDestination> ctor)
         {
             Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
-            return ConstructUsingCode(expr);
+            return ConstructUsingCore(expr);
         }
 
         public void ConvertUsing(Type typeConverterType)
