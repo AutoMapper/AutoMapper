@@ -406,7 +406,7 @@ namespace AutoMapper.Configuration
 
         public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
         {
-            TypeMapActions.Add(tm => tm.CustomCtorExpression = ctor);
+            TypeMapActions.Add(tm => tm.CustomCtorFunction = ctor);
 
             return this as TMappingExpression;
         }

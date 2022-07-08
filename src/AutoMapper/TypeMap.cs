@@ -90,7 +90,7 @@ namespace AutoMapper
         public ProfileMap Profile { get; }
         public LambdaExpression CustomMapExpression { get; set; }
         public LambdaExpression CustomCtorFunction { get; set; }
-        public LambdaExpression CustomCtorExpression { get; set; }
+        public LambdaExpression CustomCtorExpression => CustomCtorFunction?.Parameters.Count == 1 ? CustomCtorFunction : null;
         public Type DestinationTypeOverride
         {
             get => _destinationTypeOverride;
@@ -140,7 +140,7 @@ namespace AutoMapper
         public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;
         public ConstructorParameters[] DestinationConstructors => DestinationTypeDetails.Constructors;
         public bool ConstructorMapping => ConstructorMap is { CanResolve: true };
-        public bool CustomConstruction => (CustomCtorExpression ?? CustomCtorFunction) != null;
+        public bool CustomConstruction => CustomCtorFunction != null;
         public bool HasTypeConverter => TypeConverter != null;
         public TypeConverter TypeConverter { get; set; }
         public bool ShouldCheckForValid =>

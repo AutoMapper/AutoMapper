@@ -251,7 +251,6 @@ namespace AutoMapper.Execution
         }
         private Expression CreateNewDestinationFunc() => _typeMap switch
         {
-            { CustomCtorExpression: LambdaExpression constructUsing } => constructUsing.ReplaceParameters(Source),
             { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(Source, ContextParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
             { DestinationType: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
