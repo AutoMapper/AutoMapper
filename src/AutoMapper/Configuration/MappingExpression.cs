@@ -78,66 +78,34 @@ namespace AutoMapper.Configuration
 
         public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
-            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
-                : base(destinationMember, sourceType)
+            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType)
             {
             }
-
-            public void MapFrom(Type valueResolverType)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void MapFrom(Type valueResolverType, string sourceMemberName)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
+            public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));
+            public void MapFrom(Type valueResolverType, string sourceMemberName) =>
+                 MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
                 {
                     SourceMemberName = sourceMemberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName)
-            {
-                var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
-                {
-                    SourceMemberName = sourceMemberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void ConvertUsing(Type valueConverterType) 
-                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType));
-
-            public void ConvertUsing(Type valueConverterType, string sourceMemberName) 
-                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType, sourceMemberName));
-
-            public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName)
-            {
-                PropertyMapActions.Add(pm =>
-                {
-                    var config = new ValueConverter(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
-                    {
-                        SourceMemberName = sourceMemberName
-                    };
-
-                    pm.Resolver = config;
                 });
-            }
-
-            private static void ConvertUsing(PropertyMap propertyMap, Type valueConverterType, string sourceMemberName = null)
-            {
-                var config = new ValueConverter(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName) =>
+                MapFromCore(new(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
                 {
                     SourceMemberName = sourceMemberName
-                };
-
-                propertyMap.Resolver = config;
-            }
+                });
+            private void MapFromCore(ValueResolverConfiguration valueResolver) => PropertyMapActions.Add(pm => pm.ValueResolverConfig = valueResolver);
+            public void ConvertUsing(Type valueConverterType) => ConvertUsingCore(valueConverterType);
+            public void ConvertUsing(Type valueConverterType, string sourceMemberName) => ConvertUsingCore(valueConverterType, sourceMemberName);
+            public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName) =>
+                ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
+                {
+                    SourceMemberName = sourceMemberName
+                });
+            private void ConvertUsingCore(ValueConverter converter) => PropertyMapActions.Add(pm => pm.Resolver = converter);
+            private void ConvertUsingCore(Type valueConverterType, string sourceMemberName = null) =>
+                ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                {
+                    SourceMemberName = sourceMemberName
+                });
         }
     }
 
