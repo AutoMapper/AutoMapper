@@ -508,12 +508,18 @@ namespace AutoMapper.Execution
     {
         public abstract Expression GetExpression(ParameterExpression[] parameters);
         public virtual void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes) { }
+        public virtual LambdaExpression ProjectToExpression => null;
     }
     public class LambdaTypeConverter : TypeConverter
     {
         public LambdaTypeConverter(LambdaExpression lambda) => Lambda = lambda;
         public LambdaExpression Lambda { get; }
         public override Expression GetExpression(ParameterExpression[] parameters) => Lambda.ConvertReplaceParameters(parameters);
+    }
+    public class ExpressionTypeConverter : LambdaTypeConverter
+    {
+        public ExpressionTypeConverter(LambdaExpression lambda) : base(lambda){}
+        public override LambdaExpression ProjectToExpression => Lambda;
     }
     public class ClassTypeConverter : TypeConverter
     {

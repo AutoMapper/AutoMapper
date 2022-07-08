@@ -88,7 +88,7 @@ namespace AutoMapper
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
         public ProfileMap Profile { get; }
-        public LambdaExpression CustomMapExpression { get; set; }
+        public LambdaExpression CustomMapExpression => TypeConverter?.ProjectToExpression;
         public LambdaExpression CustomCtorFunction { get; set; }
         public LambdaExpression CustomCtorExpression => CustomCtorFunction?.Parameters.Count == 1 ? CustomCtorFunction : null;
         public Type DestinationTypeOverride

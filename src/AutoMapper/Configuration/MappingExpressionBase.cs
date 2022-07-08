@@ -404,23 +404,18 @@ namespace AutoMapper.Configuration
             TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 
-        public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
+        public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor) => ConstructUsingCode(ctor);
+
+        private TMappingExpression ConstructUsingCode(LambdaExpression ctor)
         {
             TypeMapActions.Add(tm => tm.CustomCtorFunction = ctor);
-
             return this as TMappingExpression;
         }
 
         public TMappingExpression ConstructUsing(Func<TSource, ResolutionContext, TDestination> ctor)
         {
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
-
-                tm.CustomCtorFunction = expr;
-            });
-
-            return this as TMappingExpression;
+            Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
+            return ConstructUsingCode(expr);
         }
 
         public void ConvertUsing(Type typeConverterType)
@@ -431,10 +426,13 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction) => ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest));
 
-        private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr)
+        private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr) =>
+            SetTypeConverter(new LambdaTypeConverter(expr));
+
+        private void SetTypeConverter(TypeConverter typeConverter)
         {
             HasTypeConverter = true;
-            TypeMapActions.Add(tm => tm.TypeConverter = new LambdaTypeConverter(expr));
+            TypeMapActions.Add(tm => tm.TypeConverter = typeConverter);
         }
 
         public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction) =>
@@ -442,11 +440,8 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(ITypeConverter<TSource, TDestination> converter) => ConvertUsing(converter.Convert);
 
-        public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
-        {
-            HasTypeConverter = true;
-            TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(typeof(TTypeConverter), typeof(ITypeConverter<TSource, TDestination>)));
-        }
+        public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination> => 
+            SetTypeConverter(new ClassTypeConverter(typeof(TTypeConverter), typeof(ITypeConverter<TSource, TDestination>)));
 
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
@@ -479,16 +474,8 @@ namespace AutoMapper.Configuration
 
         private static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(Type type) => type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
 
-        public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction)
-        {
-            HasTypeConverter = true;
-            TypeMapActions.Add(tm =>
-            {
-                tm.CustomMapExpression = mappingFunction;
-                tm.TypeConverter = new LambdaTypeConverter(mappingFunction);
-            });
-        }
-
+        public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>  SetTypeConverter(new ExpressionTypeConverter(mappingFunction));
+        
         public TMappingExpression AsProxy()
         {
             if (!DestinationType.IsInterface)

@@ -79,9 +79,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
         private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
-            if (typeMap.CustomMapExpression != null)
+            var customProjection = typeMap.CustomMapExpression?.ReplaceParameters(instanceParameter);
+            if (customProjection != null)
             {
-                return typeMap.CustomMapExpression.ReplaceParameters(instanceParameter);
+                return customProjection;
             }
             var propertiesProjections = new List<MemberBinding>();
             int depth;
