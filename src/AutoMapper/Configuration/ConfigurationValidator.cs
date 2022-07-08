@@ -143,7 +143,7 @@ namespace AutoMapper.Configuration
         {
             foreach (var memberMap in typeMap.MemberMaps)
             {
-                if(memberMap.Ignored || memberMap.Resolver != null || memberMap.ValueResolverConfig != null)
+                if(memberMap.Ignored || memberMap.Resolver != null)
                 {
                     continue;
                 }

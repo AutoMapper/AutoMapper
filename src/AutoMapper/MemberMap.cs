@@ -37,17 +37,15 @@ namespace AutoMapper
         public virtual LambdaExpression Condition { get => default; set { } }
         public virtual LambdaExpression CustomMapFunction { get => default; set { } }
         public ValueResolver Resolver { get; set; }
-        public virtual ValueResolverConfiguration ValueResolverConfig { get => default; set { } }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
         public MemberInfo SourceMember => this switch
         {
             { Resolver: ValueResolver resolver } => resolver.GetSourceMember(this),
-            { ValueResolverConfig.SourceMember: var sourceExpression } => sourceExpression?.GetMember(),
             { CustomMapFunction: { } } => null,
             { CustomMapExpression: LambdaExpression mapFrom } => mapFrom.GetMember(),
             _ => SourceMembers.FirstOrDefault(),
         };
-        public string GetSourceMemberName() => Resolver?.SourceMemberName ?? ValueResolverConfig?.SourceMemberName ?? SourceMember?.Name;
+        public string GetSourceMemberName() => Resolver?.SourceMemberName ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
         {
@@ -79,27 +77,6 @@ namespace AutoMapper
                 other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
         }
         public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
-    }
-    public class ValueResolverConfiguration
-    {
-        public object Instance { get; }
-        public Type ConcreteType { get; }
-        public Type InterfaceType { get; }
-        public LambdaExpression SourceMember { get; set; }
-        public string SourceMemberName { get; set; }
-
-        public ValueResolverConfiguration(Type concreteType, Type interfaceType)
-        {
-            ConcreteType = concreteType;
-            InterfaceType = interfaceType;
-        }
-
-        public ValueResolverConfiguration(object instance, Type interfaceType)
-        {
-            Instance = instance;
-            InterfaceType = interfaceType;
-        }
-        public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
     }
     public readonly struct ValueTransformerConfiguration
     {

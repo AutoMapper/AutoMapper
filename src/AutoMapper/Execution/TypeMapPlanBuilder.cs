@@ -380,8 +380,7 @@ namespace AutoMapper.Execution
             var destinationPropertyType = memberMap.DestinationType;
             var valueResolverFunc = memberMap switch
             {
-                { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, destValueExpr),
-                { ValueResolverConfig: { } } => BuildResolveCall(memberMap, customSource, destValueExpr),
+                { Resolver: { } resolver } => resolver.GetExpression(memberMap, customSource, _destination, destValueExpr),
                 { CustomMapFunction: LambdaExpression function } => function.ConvertReplaceParameters(customSource, _destination, destValueExpr, ContextParameter),
                 { CustomMapExpression: LambdaExpression mapFrom } => CustomMapExpression(mapFrom.ReplaceParameters(customSource), destinationPropertyType, destValueExpr),
                 { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr),
@@ -412,56 +411,38 @@ namespace AutoMapper.Execution
             }
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
-        private Expression BuildResolveCall(MemberMap memberMap, Expression source, Expression destValueExpr)
-        {
-            var typeMap = memberMap.TypeMap;
-            var valueResolverConfig = memberMap.ValueResolverConfig;
-            var resolverInstance = valueResolverConfig.Instance != null ? 
-                Constant(valueResolverConfig.Instance) : 
-                ServiceLocator(typeMap.MakeGenericType(valueResolverConfig.ConcreteType));
-            var sourceMember = valueResolverConfig.SourceMember?.ReplaceParameters(source) ??
-                (valueResolverConfig.SourceMemberName != null ? PropertyOrField(source, valueResolverConfig.SourceMemberName) : null);
-            var iResolverType = valueResolverConfig.InterfaceType;
-            if (iResolverType.ContainsGenericParameters)
-            {
-                var typeArgs =
-                    iResolverType.GenericTypeArguments.Zip(new[] { typeMap.SourceType, typeMap.DestinationType, sourceMember?.Type, destValueExpr.Type }.Where(t => t != null),
-                        (declaredType, runtimeType) => declaredType.ContainsGenericParameters ? runtimeType : declaredType).ToArray();
-                iResolverType = iResolverType.GetGenericTypeDefinition().MakeGenericType(typeArgs);
-            }
-            var parameters = new[] { source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
-                .Zip(iResolverType.GenericTypeArguments, ToType)
-                .Append(ContextParameter)
-                .ToArray();
-            return Call(ToType(resolverInstance, iResolverType), "Resolve", parameters);
-        }
     }
     public abstract class ValueResolver
     {
-        public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destinationMember);
+        public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember);
         public abstract MemberInfo GetSourceMember(MemberMap memberMap);
         public abstract Type ResolvedType { get; }
         public abstract string SourceMemberName { get; set; }
     }
-    public class ValueConverter : ValueResolver
+    public abstract class ValueResolverConfig : ValueResolver
     {
-        readonly Expression _instance;
+        private protected Expression _instance;
         public Type ConcreteType { get; }
-        public Type InterfaceType { get; }
+        public Type InterfaceType { get; protected set; }
         public LambdaExpression SourceMemberLambda { get; set; }
-        public override string SourceMemberName { get; set; }
-        public ValueConverter(Type concreteType, Type interfaceType)
+        protected ValueResolverConfig(Type concreteType, Type interfaceType)
         {
-            _instance = ServiceLocator(concreteType);
             ConcreteType = concreteType;
             InterfaceType = interfaceType;
         }
-        public ValueConverter(object instance, Type interfaceType)
+        protected ValueResolverConfig(object instance, Type interfaceType)
         {
             _instance = Constant(instance);
             InterfaceType = interfaceType;
         }
-        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destinationMember)
+        public override string SourceMemberName { get; set; }
+        public override Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+    }
+    public class ValueConverter : ValueResolverConfig
+    {
+        public ValueConverter(Type concreteType, Type interfaceType) : base(concreteType, interfaceType) => _instance = ServiceLocator(concreteType);
+        public ValueConverter(object instance, Type interfaceType) : base(instance, interfaceType) { }
+        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
         {
             var iResolverTypeArgs = InterfaceType.GenericTypeArguments;
             var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
@@ -480,7 +461,30 @@ namespace AutoMapper.Execution
             { SourceMemberName: { } } => null,
             _ => memberMap.SourceMembers.Length == 1 ? memberMap.SourceMembers[0] : null
         };
-        public override Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+    }
+    public class ClassValueResolver : ValueResolverConfig
+    {
+        public ClassValueResolver(Type concreteType, Type interfaceType) : base(concreteType, interfaceType) { }
+        public ClassValueResolver(object instance, Type interfaceType) : base(instance, interfaceType) { }
+        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        {
+            var typeMap = memberMap.TypeMap;
+            var resolverInstance = _instance ?? ServiceLocator(typeMap.MakeGenericType(ConcreteType));
+            var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ?? (SourceMemberName != null ? PropertyOrField(source, SourceMemberName) : null);
+            if (InterfaceType.ContainsGenericParameters)
+            {
+                var typeArgs =
+                    InterfaceType.GenericTypeArguments.Zip(new[] { typeMap.SourceType, typeMap.DestinationType, sourceMember?.Type, destinationMember.Type }.Where(t => t != null),
+                        (declaredType, runtimeType) => declaredType.ContainsGenericParameters ? runtimeType : declaredType).ToArray();
+                InterfaceType = InterfaceType.GetGenericTypeDefinition().MakeGenericType(typeArgs);
+            }
+            var parameters = new[] { source, destination, sourceMember, destinationMember }.Where(p => p != null)
+                .Zip(InterfaceType.GenericTypeArguments, ToType)
+                .Append(ContextParameter)
+                .ToArray();
+            return Call(ToType(resolverInstance, InterfaceType), "Resolve", parameters);
+        }
+        public override MemberInfo GetSourceMember(MemberMap memberMap) => SourceMemberLambda?.GetMember();
     }
     public abstract class TypeConverter
     {

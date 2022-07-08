@@ -92,7 +92,8 @@ namespace AutoMapper.Configuration
                 {
                     SourceMemberName = sourceMemberName
                 });
-            private void MapFromCore(ValueResolverConfiguration valueResolver) => PropertyMapActions.Add(pm => pm.ValueResolverConfig = valueResolver);
+            private void MapFromCore(ClassValueResolver valueResolver) => SetResolver(valueResolver);
+            private void SetResolver(ValueResolver valueResolver) => PropertyMapActions.Add(pm => pm.Resolver = valueResolver);
             public void ConvertUsing(Type valueConverterType) => ConvertUsingCore(valueConverterType);
             public void ConvertUsing(Type valueConverterType, string sourceMemberName) => ConvertUsingCore(valueConverterType, sourceMemberName);
             public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName) =>
@@ -100,7 +101,7 @@ namespace AutoMapper.Configuration
                 {
                     SourceMemberName = sourceMemberName
                 });
-            private void ConvertUsingCore(ValueConverter converter) => PropertyMapActions.Add(pm => pm.Resolver = converter);
+            private void ConvertUsingCore(ValueConverter converter) => SetResolver(converter);
             private void ConvertUsingCore(Type valueConverterType, string sourceMemberName = null) =>
                 ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
                 {

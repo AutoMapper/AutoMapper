@@ -31,7 +31,8 @@ namespace AutoMapper.Configuration
         public void NullSubstitute(object nullSubstitute) => PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
         public void MapFrom<TValueResolver>() where TValueResolver : IValueResolver<TSource, TDestination, TMember> =>
             AddValueResolver(new(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>)));
-        private void AddValueResolver(ValueResolverConfiguration config) => PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+        private void AddValueResolver(ClassValueResolver config) => SetResolver(config);
+        private void SetResolver(ValueResolver config) => PropertyMapActions.Add(pm => pm.Resolver = config);
         public void MapFrom<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
                 MapFromCore<TValueResolver, TSourceMember>(sourceMember);
@@ -41,14 +42,14 @@ namespace AutoMapper.Configuration
             AddValueResolver(new(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMemberName = sourceMemberName,
-                SourceMember = sourceMember
+                SourceMemberLambda = sourceMember
             });
         public void MapFrom(IValueResolver<TSource, TDestination, TMember> valueResolver) =>
             AddValueResolver(new(valueResolver, typeof(IValueResolver<TSource, TDestination, TMember>)));
         public void MapFrom<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember) =>
             AddValueResolver(new(valueResolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
-                SourceMember = sourceMember
+                SourceMemberLambda = sourceMember
             });
         public void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction) =>
             MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest));
@@ -121,7 +122,7 @@ namespace AutoMapper.Configuration
                 SourceMemberLambda = sourceMember,
                 SourceMemberName = sourceMemberName
             });
-        private void ConvertUsingCore(ValueConverter converter) => PropertyMapActions.Add(pm => pm.Resolver = converter);
+        private void ConvertUsingCore(ValueConverter converter) => SetResolver(converter);
         private void ConvertUsingCore<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter,
             Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
             ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
