@@ -30,7 +30,7 @@ namespace AutoMapper
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
         public virtual TypePair Types() => new(SourceType, DestinationType);
-        public virtual bool CanResolveValue { get => default; set { } }
+        public bool CanResolveValue => !Ignored && Resolver != null;
         public bool IsMapped => Ignored || CanResolveValue;
         public virtual bool Ignored { get => default; set { } }
         public virtual bool Inline { get; set; } = true;
@@ -78,8 +78,8 @@ namespace AutoMapper
         protected Type GetSourceType() => Resolver?.ResolvedType ?? DestinationType;
         public void MapByConvention(MemberInfo[] sourceMembers)
         {
-            SourceMembers = sourceMembers;
             Debug.Assert(sourceMembers.Length > 0);
+            SourceMembers = sourceMembers;
             Resolver = this;
         }
         Expression IValueResolver.GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>

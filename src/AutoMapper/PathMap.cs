@@ -28,7 +28,6 @@ namespace AutoMapper
         public MemberPath MemberPath { get; }
         public override Type DestinationType => MemberPath.Last.GetMemberType();
         public override string DestinationName => MemberPath.ToString();
-        public override bool CanResolveValue => !Ignored;
         public override bool CanBeSet => ReflectionHelper.CanBeSet(MemberPath.Last);
         public override bool Ignored { get; set; }
         public override LambdaExpression Condition { get; set; }

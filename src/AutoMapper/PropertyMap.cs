@@ -76,7 +76,6 @@ namespace AutoMapper
                 _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             }
         }
-        public override bool CanResolveValue => !Ignored && Resolver != null;
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();

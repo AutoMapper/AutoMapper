@@ -37,13 +37,13 @@ namespace AutoMapper
             return true;
         }
         public ConstructorParameterMap this[string name] => _ctorParams.GetValueOrDefault(name);
-        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve)
+        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers)
         {
             if (parameter.Name == null)
             {
                 return;
             }
-            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray(), canResolve));
+            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray()));
         }
         public bool ApplyIncludedMember(IncludedMember includedMember)
         {
@@ -75,10 +75,9 @@ namespace AutoMapper
     public class ConstructorParameterMap : MemberMap
     {
         private Type _sourceType;
-        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolveValue) : base(typeMap)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap)
         {
             Parameter = parameter;
-            CanResolveValue = canResolveValue;
             if (sourceMembers.Length > 0)
             {
                 MapByConvention(sourceMembers);
@@ -89,14 +88,13 @@ namespace AutoMapper
             }
         }
         public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : 
-            this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers, parameterMap.CanResolveValue) =>
+            this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers) =>
             IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
         public ParameterInfo Parameter { get; }
         public override Type SourceType => _sourceType ??= GetSourceType();
         public override Type DestinationType => Parameter.ParameterType;
         public override MemberInfo[] SourceMembers { get; set; }
         public override string DestinationName => Parameter.Name;
-        public override bool CanResolveValue { get; set; }
         public Expression DefaultValue() => Parameter.GetDefaultValue();
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }

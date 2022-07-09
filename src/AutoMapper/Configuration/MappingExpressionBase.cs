@@ -175,18 +175,11 @@ namespace AutoMapper.Configuration
                 {
                     sourceMembers.Clear();
                     var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, constructor.DeclaringType, parameter.ParameterType, parameter.Name, sourceMembers, IsReverseMap);
-                    if (!canResolve)
+                    if (!canResolve && !parameter.IsOptional && !IsConfigured(parameter))
                     {
-                        if (parameter.IsOptional || IsConfigured(parameter))
-                        {
-                            canResolve = true;
-                        }
-                        else
-                        {
-                            canMapResolve = false;
-                        }
+                        canMapResolve = false;
                     }
-                    ctorMap.AddParameter(parameter, sourceMembers, canResolve);
+                    ctorMap.AddParameter(parameter, sourceMembers);
                 }
                 typeMap.ConstructorMap = ctorMap;
                 if (canMapResolve)

@@ -82,7 +82,6 @@ namespace AutoMapper.Configuration
             {
                 action(parameter);
             }
-            parameter.CanResolveValue = true;
         }
     }
 }
