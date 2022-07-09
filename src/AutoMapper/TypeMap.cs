@@ -164,7 +164,7 @@ namespace AutoMapper
         public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
-            propertyMap.MapByConvention(sourceMembers);
+            propertyMap.MapByConvention(sourceMembers.ToArray());
             AddPropertyMap(propertyMap);
         }
         private void AddPropertyMap(PropertyMap propertyMap)

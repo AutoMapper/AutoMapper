@@ -376,11 +376,7 @@ namespace AutoMapper.Execution
         private Expression BuildValueResolverFunc(MemberMap memberMap, Expression destValueExpr)
         {
             var customSource = GetCustomSource(memberMap);
-            var destinationPropertyType = memberMap.DestinationType;
-            var valueResolverFunc =
-                memberMap.Resolver?.GetExpression(memberMap, customSource, _destination, destValueExpr) ??
-                memberMap.ChainSourceMembers(customSource, destinationPropertyType, destValueExpr) ??
-                destValueExpr;
+            var valueResolverFunc = memberMap.Resolver?.GetExpression(memberMap, customSource, _destination, destValueExpr) ?? destValueExpr;
             if (memberMap.NullSubstitute != null)
             {
                 valueResolverFunc = memberMap.NullSubstitute(valueResolverFunc);
@@ -397,31 +393,31 @@ namespace AutoMapper.Execution
         }
         private Expression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
     }
-    public abstract class ValueResolver
+    public interface IValueResolver
     {
-        public abstract Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember);
-        public abstract MemberInfo GetSourceMember(MemberMap memberMap);
-        public abstract Type ResolvedType { get; }
-        public virtual string SourceMemberName { get => null; set { } }
-        public virtual LambdaExpression ProjectToExpression => null;
+        Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember);
+        MemberInfo GetSourceMember(MemberMap memberMap);
+        Type ResolvedType { get; }
+        string SourceMemberName => null;
+        LambdaExpression ProjectToExpression => null;
     }
-    public abstract class LambdaValueResolver : ValueResolver
+    public abstract class LambdaValueResolver
     {
         public LambdaExpression Lambda { get; }
-        public override Type ResolvedType => Lambda.ReturnType;
+        public Type ResolvedType => Lambda.ReturnType;
         protected LambdaValueResolver(LambdaExpression lambda) => Lambda = lambda;
     }
-    public class FuncResolver : LambdaValueResolver
+    public class FuncResolver : LambdaValueResolver, IValueResolver
     {
         public FuncResolver(LambdaExpression lambda) : base(lambda) { }
-        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
+        public Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
             Lambda.ConvertReplaceParameters(source, destination, destinationMember, ContextParameter);
-        public override MemberInfo GetSourceMember(MemberMap memberMap) => null;
+        public MemberInfo GetSourceMember(MemberMap _) => null;
     }
-    public class ExpressionResolver : LambdaValueResolver
+    public class ExpressionResolver : LambdaValueResolver, IValueResolver
     {
         public ExpressionResolver(LambdaExpression lambda) : base(lambda) { }
-        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        public Expression GetExpression(MemberMap memberMap, Expression source, Expression _, Expression destinationMember)
         {
             var mapFrom = Lambda.ReplaceParameters(source);
             var nullCheckedExpression = mapFrom.NullCheck(memberMap.DestinationType, destinationMember);
@@ -432,10 +428,10 @@ namespace AutoMapper.Execution
             var defaultExpression = Default(mapFrom.Type);
             return TryCatch(mapFrom, Catch(typeof(NullReferenceException), defaultExpression), Catch(typeof(ArgumentNullException), defaultExpression));
         }
-        public override MemberInfo GetSourceMember(MemberMap memberMap) => Lambda.GetMember();
-        public override LambdaExpression ProjectToExpression => Lambda;
+        public MemberInfo GetSourceMember(MemberMap _) => Lambda.GetMember();
+        public LambdaExpression ProjectToExpression => Lambda;
     }
-    public abstract class ValueResolverConfig : ValueResolver
+    public abstract class ValueResolverConfig
     {
         private protected Expression _instance;
         public Type ConcreteType { get; }
@@ -451,14 +447,14 @@ namespace AutoMapper.Execution
             _instance = Constant(instance);
             InterfaceType = interfaceType;
         }
-        public override string SourceMemberName { get; set; }
-        public override Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+        public string SourceMemberName { get; set; }
+        public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
     }
-    public class ValueConverter : ValueResolverConfig
+    public class ValueConverter : ValueResolverConfig, IValueResolver
     {
         public ValueConverter(Type concreteType, Type interfaceType) : base(concreteType, interfaceType) => _instance = ServiceLocator(concreteType);
         public ValueConverter(object instance, Type interfaceType) : base(instance, interfaceType) { }
-        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        public Expression GetExpression(MemberMap memberMap, Expression source, Expression _, Expression destinationMember)
         {
             var iResolverTypeArgs = InterfaceType.GenericTypeArguments;
             var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
@@ -469,18 +465,18 @@ namespace AutoMapper.Execution
             AutoMapperConfigurationException BuildExceptionMessage()
                 => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");
         }
-        public override MemberInfo GetSourceMember(MemberMap memberMap) => this switch
+        public MemberInfo GetSourceMember(MemberMap memberMap) => this switch
         {
             { SourceMemberLambda: { } lambda } => lambda.GetMember(),
             { SourceMemberName: { } } => null,
             _ => memberMap.SourceMembers.Length == 1 ? memberMap.SourceMembers[0] : null
         };
     }
-    public class ClassValueResolver : ValueResolverConfig
+    public class ClassValueResolver : ValueResolverConfig, IValueResolver
     {
         public ClassValueResolver(Type concreteType, Type interfaceType) : base(concreteType, interfaceType) { }
         public ClassValueResolver(object instance, Type interfaceType) : base(instance, interfaceType) { }
-        public override Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        public Expression GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
         {
             var typeMap = memberMap.TypeMap;
             var resolverInstance = _instance ?? ServiceLocator(typeMap.MakeGenericType(ConcreteType));
@@ -498,7 +494,7 @@ namespace AutoMapper.Execution
                 .ToArray();
             return Call(ToType(resolverInstance, InterfaceType), "Resolve", parameters);
         }
-        public override MemberInfo GetSourceMember(MemberMap memberMap) => SourceMemberLambda?.GetMember();
+        public MemberInfo GetSourceMember(MemberMap _) => SourceMemberLambda?.GetMember();
     }
     public abstract class TypeConverter
     {

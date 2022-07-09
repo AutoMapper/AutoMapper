@@ -9,21 +9,23 @@ namespace AutoMapper
     using static Expression;
     using Execution;
     using Internal;
+    using System.Diagnostics;
+
     /// <summary>
     /// The base class for member maps (property, constructor and path maps).
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class MemberMap
+    public class MemberMap : IValueResolver
     {
         private static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Null);
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
         public static readonly MemberMap Instance = new();
         public TypeMap TypeMap { get; protected set; }
         public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
-        public bool IsResolveConfigured => Resolver != null;
+        public bool IsResolveConfigured => Resolver != null && Resolver != this;
         public void SetResolver(LambdaExpression lambda) => Resolver = new ExpressionResolver(lambda);
         public virtual Type SourceType => default;
-        public virtual MemberInfo[] SourceMembers => Array.Empty<MemberInfo>();
+        public virtual MemberInfo[] SourceMembers { get => Array.Empty<MemberInfo>(); set { } }
         public IncludedMember IncludedMember { get; protected set; }
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
@@ -38,9 +40,9 @@ namespace AutoMapper
         public virtual object NullSubstitute { get => default; set { } }
         public virtual LambdaExpression PreCondition { get => default; set { } }
         public virtual LambdaExpression Condition { get => default; set { } }
-        public ValueResolver Resolver { get; set; }
+        public IValueResolver Resolver { get; set; }
         public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
-        public MemberInfo SourceMember => Resolver == null ? SourceMembers.FirstOrDefault() : Resolver.GetSourceMember(this);
+        public MemberInfo SourceMember => Resolver?.GetSourceMember(this);
         public string GetSourceMemberName() => Resolver?.SourceMemberName ?? SourceMember?.Name;
         public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
         public void MapFrom(LambdaExpression sourceMember)
@@ -73,7 +75,17 @@ namespace AutoMapper
                 other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
         }
         public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
-        protected Type GetSourceType() => Resolver?.ResolvedType ?? SourceMembers.LastOrDefault()?.GetMemberType() ?? DestinationType;
+        protected Type GetSourceType() => Resolver?.ResolvedType ?? DestinationType;
+        public void MapByConvention(MemberInfo[] sourceMembers)
+        {
+            SourceMembers = sourceMembers;
+            Debug.Assert(sourceMembers.Length > 0);
+            Resolver = this;
+        }
+        Expression IValueResolver.GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
+            ChainSourceMembers(source, memberMap.DestinationType, destinationMember);
+        MemberInfo IValueResolver.GetSourceMember(MemberMap memberMap) => SourceMembers.FirstOrDefault();
+        Type IValueResolver.ResolvedType => SourceMembers.LastOrDefault()?.GetMemberType();
     }
     public readonly struct ValueTransformerConfiguration
     {

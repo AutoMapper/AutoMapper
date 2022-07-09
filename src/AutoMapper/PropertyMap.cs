@@ -13,7 +13,6 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class PropertyMap : MemberMap
     {
-        private MemberInfo[] _sourceMembers = Array.Empty<MemberInfo>();
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private Type _sourceType;
         public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap) : base(typeMap)
@@ -28,7 +27,7 @@ namespace AutoMapper
         public MemberInfo DestinationMember { get; }
         public override string DestinationName => DestinationMember.Name;
         public override Type DestinationType { get; protected set; }
-        public override MemberInfo[] SourceMembers => _sourceMembers;
+        public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
         public override bool Ignored { get; set; }
         public override bool? AllowNull { get; set; }
@@ -40,7 +39,6 @@ namespace AutoMapper
         public override object NullSubstitute { get; set; }
         public override IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs.NullCheck();
         public override Type SourceType => _sourceType ??= GetSourceType();
-        public void MapByConvention(IEnumerable<MemberInfo> sourceMembers) => _sourceMembers = sourceMembers.ToArray();
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
             if (Ignored)
@@ -59,10 +57,10 @@ namespace AutoMapper
                     _sourceType = inheritedMappedProperty._sourceType;
                     Resolver = inheritedMappedProperty.Resolver;
                 }
-                else if (_sourceMembers.Length == 0)
+                else if (SourceMembers.Length == 0)
                 {
                     _sourceType = inheritedMappedProperty._sourceType;
-                    _sourceMembers = inheritedMappedProperty._sourceMembers;
+                    MapByConvention(inheritedMappedProperty.SourceMembers);
                 }
             }
             AllowNull ??= inheritedMappedProperty.AllowNull;
@@ -78,7 +76,7 @@ namespace AutoMapper
                 _valueTransformerConfigs.InsertRange(0, inheritedMappedProperty._valueTransformerConfigs);
             }
         }
-        public override bool CanResolveValue => !Ignored && (_sourceMembers.Length > 0 || IsResolveConfigured);
+        public override bool CanResolveValue => !Ignored && Resolver != null;
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
             _valueTransformerConfigs ??= new();
