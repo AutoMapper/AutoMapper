@@ -57,7 +57,7 @@ namespace AutoMapper
                     _sourceType = inheritedMappedProperty._sourceType;
                     Resolver = inheritedMappedProperty.Resolver;
                 }
-                else if (SourceMembers.Length == 0)
+                else if (Resolver == null)
                 {
                     _sourceType = inheritedMappedProperty._sourceType;
                     MapByConvention(inheritedMappedProperty.SourceMembers);

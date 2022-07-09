@@ -267,7 +267,8 @@ namespace AutoMapper.Execution
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
         {
             var defaultValue = ctorParamMap.Parameter.IsOptional ? ctorParamMap.DefaultValue() : Default(ctorParamMap.DestinationType);
-            var resolvedExpression = BuildValueResolverFunc(ctorParamMap, defaultValue);
+            var customSource = GetCustomSource(ctorParamMap);
+            var resolvedExpression = BuildValueResolverFunc(ctorParamMap, customSource, defaultValue);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
             var tryMap = Block(new[] { resolvedValue },
                 Assign(resolvedValue, resolvedExpression),
@@ -301,7 +302,8 @@ namespace AutoMapper.Execution
                 destinationMemberReadOnly = destinationField.IsInitOnly;
                 destinationMemberGetter = destinationMemberAccess;
             }
-            var valueResolver = BuildValueResolverFunc(memberMap, destinationMemberGetter);
+            var customSource = GetCustomSource(memberMap);
+            var valueResolver = BuildValueResolverFunc(memberMap, customSource, destinationMemberGetter);
             var resolvedValueVariable = Variable(valueResolver.Type, "resolvedValue");
             var destinationMemberValue = DestinationMemberValue(memberMap, destinationMemberGetter, destinationMemberReadOnly);
             var mappedMember = MapMember(memberMap, destinationMemberValue, resolvedValueVariable);
@@ -310,7 +312,7 @@ namespace AutoMapper.Execution
             if (memberMap.Condition != null)
             {
                 _propertyMapExpressions.Add(IfThen(
-                    memberMap.Condition.ConvertReplaceParameters(GetCustomSource(memberMap), _destination, mappedMemberVariable, destinationMemberGetter, ContextParameter),
+                    memberMap.Condition.ConvertReplaceParameters(customSource, _destination, mappedMemberVariable, destinationMemberGetter, ContextParameter),
                     mapperExpr));
             }
             else if (!destinationMemberReadOnly)
@@ -319,7 +321,7 @@ namespace AutoMapper.Execution
             }
             if (memberMap.PreCondition != null)
             {
-                Precondition(memberMap);
+                Precondition(memberMap, customSource);
             }
             return Block(_propertyMapVariables, _propertyMapExpressions);
             Expression DestinationMemberValue(MemberMap memberMap, Expression destinationMemberGetter, bool destinationMemberReadOnly)
@@ -337,9 +339,9 @@ namespace AutoMapper.Execution
                     return Condition(ReferenceEqual(_initialDestination, Null), Default(memberMap.DestinationType), destinationMemberGetter);
                 }
             }
-            void Precondition(MemberMap memberMap)
+            void Precondition(MemberMap memberMap, Expression customSource)
             {
-                var preCondition = memberMap.PreCondition.ConvertReplaceParameters(GetCustomSource(memberMap), _destination, ContextParameter);
+                var preCondition = memberMap.PreCondition.ConvertReplaceParameters(customSource, _destination, ContextParameter);
                 var ifThen = IfThen(preCondition, Block(_propertyMapExpressions));
                 _propertyMapExpressions.Clear();
                 _propertyMapExpressions.Add(ifThen);
@@ -373,9 +375,8 @@ namespace AutoMapper.Execution
             mapMember = memberMap.ApplyTransformers(mapMember);
             return mapMember;
         }
-        private Expression BuildValueResolverFunc(MemberMap memberMap, Expression destValueExpr)
+        private Expression BuildValueResolverFunc(MemberMap memberMap, Expression customSource, Expression destValueExpr)
         {
-            var customSource = GetCustomSource(memberMap);
             var valueResolverFunc = memberMap.Resolver?.GetExpression(memberMap, customSource, _destination, destValueExpr) ?? destValueExpr;
             if (memberMap.NullSubstitute != null)
             {
@@ -448,7 +449,7 @@ namespace AutoMapper.Execution
             InterfaceType = interfaceType;
         }
         public string SourceMemberName { get; set; }
-        public Type ResolvedType => InterfaceType.GenericTypeArguments.Last();
+        public Type ResolvedType => InterfaceType.GenericTypeArguments[^1];
     }
     public class ValueConverter : ValueResolverConfig, IValueResolver
     {

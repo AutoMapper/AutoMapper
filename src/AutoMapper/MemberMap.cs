@@ -84,8 +84,8 @@ namespace AutoMapper
         }
         Expression IValueResolver.GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
             ChainSourceMembers(source, memberMap.DestinationType, destinationMember);
-        MemberInfo IValueResolver.GetSourceMember(MemberMap memberMap) => SourceMembers.FirstOrDefault();
-        Type IValueResolver.ResolvedType => SourceMembers.LastOrDefault()?.GetMemberType();
+        MemberInfo IValueResolver.GetSourceMember(MemberMap memberMap) => SourceMembers[0];
+        Type IValueResolver.ResolvedType => SourceMembers[^1].GetMemberType();
     }
     public readonly struct ValueTransformerConfiguration
     {

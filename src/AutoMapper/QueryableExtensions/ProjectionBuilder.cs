@@ -145,7 +145,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                         var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                            _ => memberMap.ChainSourceMembers(CheckCustomSource()) ?? throw CannotMap(memberMap, request.SourceType)
+                            { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource()),
+                            _ => throw CannotMap(memberMap, request.SourceType)
                         };
                         if (NullSubstitute())
                         {
