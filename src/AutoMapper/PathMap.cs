@@ -30,6 +30,7 @@ namespace AutoMapper
         public override string DestinationName => MemberPath.ToString();
         public override bool CanBeSet => ReflectionHelper.CanBeSet(MemberPath.Last);
         public override bool Ignored { get; set; }
+        public override IncludedMember IncludedMember { get; }
         public override LambdaExpression Condition { get; set; }
     }
 }

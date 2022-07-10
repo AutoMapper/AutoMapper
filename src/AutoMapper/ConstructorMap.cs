@@ -93,6 +93,7 @@ namespace AutoMapper
         public ParameterInfo Parameter { get; }
         public override Type SourceType => _sourceType ??= GetSourceType();
         public override Type DestinationType => Parameter.ParameterType;
+        public override IncludedMember IncludedMember { get; }
         public override MemberInfo[] SourceMembers { get; set; }
         public override string DestinationName => Parameter.Name;
         public Expression DefaultValue() => Parameter.IsOptional ? Parameter.GetDefaultValue() : Expression.Default(DestinationType);

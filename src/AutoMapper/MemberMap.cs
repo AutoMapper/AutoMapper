@@ -25,7 +25,7 @@ namespace AutoMapper
         public void SetResolver(LambdaExpression lambda) => Resolver = new ExpressionResolver(lambda);
         public virtual Type SourceType => default;
         public virtual MemberInfo[] SourceMembers { get => Array.Empty<MemberInfo>(); set { } }
-        public IncludedMember IncludedMember { get; protected set; }
+        public virtual IncludedMember IncludedMember => null;
         public virtual string DestinationName => default;
         public virtual Type DestinationType { get => default; protected set { } }
         public virtual TypePair Types() => new(SourceType, DestinationType);
