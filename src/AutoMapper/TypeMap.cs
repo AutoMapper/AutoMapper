@@ -365,7 +365,7 @@ namespace AutoMapper
                 }
                 return pathMap;
             }
-            public void AddPathMap(PathMap pathMap) => PathMaps.Add(pathMap.MemberPath, pathMap);
+            private void AddPathMap(PathMap pathMap) => PathMaps.Add(pathMap.MemberPath, pathMap);
             public Features<IRuntimeFeature> Features => _features ??= new();
             public Type DestinationTypeOverride { get; set; }
             public void IncludeBaseTypes(TypePair baseTypes)
