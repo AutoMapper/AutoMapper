@@ -266,7 +266,7 @@ namespace AutoMapper.Execution
         }
         private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
         {
-            var defaultValue = ctorParamMap.Parameter.IsOptional ? ctorParamMap.DefaultValue() : Default(ctorParamMap.DestinationType);
+            var defaultValue = ctorParamMap.DefaultValue();
             var customSource = GetCustomSource(ctorParamMap);
             var resolvedExpression = BuildValueResolverFunc(ctorParamMap, customSource, defaultValue);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");

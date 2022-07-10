@@ -359,7 +359,7 @@ namespace AutoMapper
             ApplyIncludedMemberActions(includedMember, typeMap);
             foreach (var notOverridenPathMap in notOverridenPathMaps)
             {
-                AddPathMap(new(notOverridenPathMap, this, includedMember) { Resolver = notOverridenPathMap.Resolver });
+                AddPathMap(new(notOverridenPathMap, this, includedMember));
             }
             return;
             void ApplyIncludedMemberActions(IncludedMember includedMember, TypeMap typeMap)

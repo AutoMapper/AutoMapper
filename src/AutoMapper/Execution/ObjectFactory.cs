@@ -32,16 +32,14 @@ namespace AutoMapper.Execution
             {
                 return New(defaultCtor);
             }
-            //find a ctor with only optional args
-            var ctorWithOptionalArgs = type.GetDeclaredConstructors().FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
-            if (ctorWithOptionalArgs == null)
+            var ctorWithOptionalArgs =
+                (from ctor in type.GetDeclaredConstructors() let args = ctor.GetParameters() where args.All(p => p.IsOptional) select (ctor, args)).FirstOrDefault();
+            if (ctorWithOptionalArgs.args == null)
             {
                 return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args. Validate your configuration for details.");
             }
-            //get all optional default values
-            var args = ctorWithOptionalArgs.GetParameters().Select(p=>ToType(p.GetDefaultValue(), p.ParameterType));
-            //create the ctor expression
-            return New(ctorWithOptionalArgs, args);
+            var arguments = ctorWithOptionalArgs.args.Select(p => p.GetDefaultValue());
+            return New(ctorWithOptionalArgs.ctor, arguments);
         }
         private static Expression CreateInterfaceExpression(Type type) =>
             type.IsGenericType(typeof(IDictionary<,>)) ? CreateCollection(type, typeof(Dictionary<,>)) : 

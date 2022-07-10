@@ -95,7 +95,7 @@ namespace AutoMapper
         public override Type DestinationType => Parameter.ParameterType;
         public override MemberInfo[] SourceMembers { get; set; }
         public override string DestinationName => Parameter.Name;
-        public Expression DefaultValue() => Parameter.GetDefaultValue();
+        public Expression DefaultValue() => Parameter.IsOptional ? Parameter.GetDefaultValue() : Expression.Default(DestinationType);
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }
 }
