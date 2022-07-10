@@ -230,7 +230,7 @@ namespace AutoMapper
                 pathMap.Ignored = true;
             }
         }
-        public bool HasDerivedTypesToInclude => _includedDerivedTypes?.Count > 0 || DestinationTypeOverride != null;
+        public bool HasDerivedTypesToInclude => _includedDerivedTypes?.Count > 0;
         public bool Projection { get; set; }
         public void AddBeforeMapAction(LambdaExpression beforeMap)
         {
