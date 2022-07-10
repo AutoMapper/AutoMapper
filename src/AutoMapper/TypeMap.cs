@@ -128,7 +128,6 @@ namespace AutoMapper
                 return maps;
             }
         }
-        public bool? IsValid { get; set; }
         public bool PassesCtorValidation =>
             DisableConstructorValidation
             || CustomConstruction
@@ -143,11 +142,7 @@ namespace AutoMapper
         public bool CustomConstruction => CustomCtorFunction != null;
         public bool HasTypeConverter => TypeConverter != null;
         public TypeConverter TypeConverter { get; set; }
-        public bool ShouldCheckForValid =>
-            !HasTypeConverter
-            && DestinationTypeOverride == null
-            && ConfiguredMemberList != MemberList.None
-            && !(IsValid ?? false);
+        public bool ShouldCheckForValid => !HasTypeConverter && DestinationTypeOverride == null && ConfiguredMemberList != MemberList.None;
         public LambdaExpression[] IncludedMembers { get; internal set; } = Array.Empty<LambdaExpression>();
         public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
         public IReadOnlyCollection<IncludedMember> IncludedMembersTypeMaps => _includedMembersTypeMaps.NullCheck();

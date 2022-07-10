@@ -117,7 +117,6 @@ namespace AutoMapper.Configuration
                 }
 
                 CheckPropertyMaps(typeMapsChecked, typeMap);
-                typeMap.IsValid = true;
             }
             else
             {
