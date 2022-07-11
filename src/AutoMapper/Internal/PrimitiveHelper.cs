@@ -11,12 +11,15 @@ namespace AutoMapper.Internal
         public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
         public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
         {
-            otherCollection ??= Array.Empty<T>();
+            if (otherCollection == null || otherCollection.Count == 0)
+            {
+                return collection;
+            }
             if (collection.Count == 0)
             {
                 return otherCollection;
             }
-            return otherCollection.Count == 0 ? collection : Enumerable.Concat(collection, otherCollection);
+            return Enumerable.Concat(collection, otherCollection);
         }
         public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
         {

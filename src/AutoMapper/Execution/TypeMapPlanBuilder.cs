@@ -170,7 +170,7 @@ namespace AutoMapper.Execution
             {
                 actions.Add(beforeMapAction.ReplaceParameters(Source, _destination, ContextParameter));
             }
-            foreach (var propertyMap in _typeMap.PropertyMaps)
+            foreach (var propertyMap in _typeMap.OrderedPropertyMaps())
             {
                 if (propertyMap.CanResolveValue)
                 {

@@ -24,7 +24,6 @@ namespace AutoMapper
         private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
         private TypeMapDetails _details;
         private Dictionary<string, PropertyMap> _propertyMaps;
-        private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
         public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null)
         {
@@ -101,13 +100,13 @@ namespace AutoMapper
         public bool PreserveReferences { get => (_details?.PreserveReferences).GetValueOrDefault(); set => Details.PreserveReferences = value; }
         public int MaxDepth { get => (_details?.MaxDepth).GetValueOrDefault(); set => Details.MaxDepth = value; }
         public bool DisableConstructorValidation { get => (_details?.DisableConstructorValidation).GetValueOrDefault(); set => Details.DisableConstructorValidation = value; }
-        public IReadOnlyCollection<PropertyMap> PropertyMaps => _orderedPropertyMaps ?? (_propertyMaps?.Values).NullCheck();
+        public IReadOnlyCollection<PropertyMap> PropertyMaps => (_propertyMaps?.Values).NullCheck();
         public IReadOnlyCollection<PathMap> PathMaps => (_details?.PathMaps?.Values).NullCheck();
         public IEnumerable<MemberMap> MemberMaps
         {
             get
             {
-                var maps = ((IReadOnlyCollection<MemberMap>)PropertyMaps).Concat(PathMaps);
+                var maps = PropertyMaps.Concat((IReadOnlyCollection<MemberMap>)PathMaps);
                 if (ConstructorMapping)
                 {
                     maps = maps.Concat(ConstructorMap.CtorParams);
@@ -216,16 +215,21 @@ namespace AutoMapper
             _details?.Seal(configurationProvider, this, typeMapsPath);
             if (!Projection)
             {
-                if (HasMappingOrder())
-                {
-                    _orderedPropertyMaps = PropertyMaps.OrderBy(map => map.MappingOrder).ToArray();
-                    _propertyMaps.Clear();
-                }
                 MapExpression = CreateMapperLambda(configurationProvider, typeMapsPath);
             }
             SourceTypeDetails = null;
             DestinationTypeDetails = null;
-            return;
+        }
+        public IEnumerable<PropertyMap> OrderedPropertyMaps()
+        {
+            if (HasMappingOrder())
+            {
+                return PropertyMaps.OrderBy(map => map.MappingOrder);
+            }
+            else
+            {
+                return PropertyMaps;
+            }
             bool HasMappingOrder()
             {
                 if (_propertyMaps == null)
