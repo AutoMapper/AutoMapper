@@ -13,13 +13,8 @@ namespace AutoMapper
         private bool? _canResolve;
         private readonly Dictionary<string, ConstructorParameterMap> _ctorParams = new(StringComparer.OrdinalIgnoreCase);
         public ConstructorInfo Ctor { get; }
-        public TypeMap TypeMap { get; }
         public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams.Values;
-        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
-        {
-            Ctor = ctor;
-            TypeMap = typeMap;
-        }
+        public ConstructorMap(ConstructorInfo ctor) => Ctor = ctor;
         public bool CanResolve
         {
             get => _canResolve ??= ParametersCanResolve();
@@ -37,13 +32,13 @@ namespace AutoMapper
             return true;
         }
         public ConstructorParameterMap this[string name] => _ctorParams.GetValueOrDefault(name);
-        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers)
+        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap)
         {
             if (parameter.Name == null)
             {
                 return;
             }
-            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray()));
+            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(typeMap, parameter, sourceMembers.ToArray()));
         }
         public bool ApplyIncludedMember(IncludedMember includedMember)
         {

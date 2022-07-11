@@ -169,7 +169,7 @@ namespace AutoMapper.Configuration
             foreach (var destCtor in typeMap.DestinationConstructors)
             {
                 var constructor = destCtor.Constructor;
-                var ctorMap = new ConstructorMap(constructor, typeMap);
+                var ctorMap = new ConstructorMap(constructor);
                 bool canMapResolve = true;
                 foreach (var parameter in destCtor.Parameters)
                 {
@@ -179,7 +179,7 @@ namespace AutoMapper.Configuration
                     {
                         canMapResolve = false;
                     }
-                    ctorMap.AddParameter(parameter, sourceMembers);
+                    ctorMap.AddParameter(parameter, sourceMembers, typeMap);
                 }
                 typeMap.ConstructorMap = ctorMap;
                 if (canMapResolve)

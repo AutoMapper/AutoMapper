@@ -12,7 +12,7 @@ namespace AutoMapper.Execution
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ObjectFactory
     {
-        private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
+        private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new(GenerateConstructor);
         public static object CreateInstance(Type type) => CtorCache.GetOrAdd(type)();
         private static Func<object> GenerateConstructor(Type type) =>
             Lambda<Func<object>>(GenerateConstructorExpression(type).ToObject()).Compile();

@@ -72,14 +72,14 @@ namespace AutoMapper
         class MemberMapDetails
         {
             public List<ValueTransformerConfiguration> ValueTransformers { get; private set; }
-            public bool? AllowNull { get; set; }
-            public int? MappingOrder { get; set; }
-            public bool? ExplicitExpansion { get; set; }
-            public bool? UseDestinationValue { get; set; }
-            public object NullSubstitute { get; set; }
-            public LambdaExpression PreCondition { get; set; }
-            public LambdaExpression Condition { get; set; }
-            public IncludedMember IncludedMember { get; set; }
+            public bool? AllowNull;
+            public int? MappingOrder;
+            public bool? ExplicitExpansion;
+            public bool? UseDestinationValue;
+            public object NullSubstitute;
+            public LambdaExpression PreCondition;
+            public LambdaExpression Condition;
+            public IncludedMember IncludedMember;
             public void ApplyInheritedPropertyMap(MemberMapDetails inheritedMappedProperty)
             {
                 AllowNull ??= inheritedMappedProperty.AllowNull;

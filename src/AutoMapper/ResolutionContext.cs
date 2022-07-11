@@ -10,11 +10,11 @@ namespace AutoMapper
     {
         private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
-        private readonly IInternalRuntimeMapper _inner;
+        private readonly IInternalRuntimeMapper _mapper;
         internal ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
         {
             Options = options;
-            _inner = mapper;
+            _mapper = mapper;
         }
         internal ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
         /// <summary>
@@ -36,7 +36,7 @@ namespace AutoMapper
         /// Current mapper
         /// </summary>
         public IRuntimeMapper Mapper => this;
-        ResolutionContext IInternalRuntimeMapper.DefaultContext => _inner.DefaultContext;
+        ResolutionContext IInternalRuntimeMapper.DefaultContext => _mapper.DefaultContext;
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
@@ -60,34 +60,15 @@ namespace AutoMapper
             }
         }
         TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));
-        TDestination IMapperBase.Map<TSource, TDestination>(TSource source)
-            => _inner.Map(source, default(TDestination), this);
-        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)
-            => _inner.Map(source, destination, this);
-        object IMapperBase.Map(object source, Type sourceType, Type destinationType)
-            => _inner.Map(source, (object)null, this, sourceType, destinationType);
-        object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType)
-            => _inner.Map(source, destination, this, sourceType, destinationType);
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source) => _mapper.Map(source, default(TDestination), this);
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)  => _mapper.Map(source, destination, this);
+        object IMapperBase.Map(object source, Type sourceType, Type destinationType)  => _mapper.Map(source, (object)null, this, sourceType, destinationType);
+        object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType) => _mapper.Map(source, destination, this, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
-            Type sourceType, Type destinationType, MemberMap memberMap)
-            => _inner.Map(source, destination, context, sourceType, destinationType, memberMap);
-        internal object CreateInstance(Type type)
-        {
-            var service = Options.ServiceCtor(type);
-            if (service == null)
-            {
-                throw new AutoMapperMappingException("Cannot create an instance of type " + type);
-            }
-            return service;
-        }
-        internal object GetDestination(object source, Type destinationType)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-            return InstanceCache.GetValueOrDefault(new ContextCacheKey(source, destinationType));
-        }
+            Type sourceType, Type destinationType, MemberMap memberMap) => _mapper.Map(source, destination, context, sourceType, destinationType, memberMap);
+        internal object CreateInstance(Type type) => Options.ServiceCtor(type) ?? throw new AutoMapperMappingException("Cannot create an instance of type " + type);
+        internal object GetDestination(object source, Type destinationType) => 
+            source == null ? null :  InstanceCache.GetValueOrDefault(new ContextCacheKey(source, destinationType));
         internal void CacheDestination(object source, Type destinationType, object destination)
         {
             if (source == null)
@@ -107,18 +88,18 @@ namespace AutoMapper
             }
             return depth > typeMap.MaxDepth;
         }
-        internal bool IsDefault => this == _inner.DefaultContext;
+        internal bool IsDefault => this == _mapper.DefaultContext;
         internal static void CheckContext(ref ResolutionContext resolutionContext)
         {
             if (resolutionContext.IsDefault)
             {
-                resolutionContext = new ResolutionContext(resolutionContext._inner);
+                resolutionContext = new ResolutionContext(resolutionContext._mapper);
             }
         }
-        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, MemberMap memberMap)
-            => _inner.Map(source, destination, this, memberMap: memberMap);
-        internal object Map(object source, object destination, Type sourceType, Type destinationType, MemberMap memberMap)
-            => _inner.Map(source, destination, this, sourceType, destinationType, memberMap);
+        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, MemberMap memberMap) => 
+            _mapper.Map(source, destination, this, memberMap: memberMap);
+        internal object Map(object source, object destination, Type sourceType, Type destinationType, MemberMap memberMap) => 
+            _mapper.Map(source, destination, this, sourceType, destinationType, memberMap);
         private void CheckDefault()
         {
             if (IsDefault)
