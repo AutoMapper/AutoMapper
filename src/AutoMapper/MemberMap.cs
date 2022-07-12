@@ -60,8 +60,8 @@ namespace AutoMapper
         public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);
         public Expression ChainSourceMembers(Expression source, Type destinationType, Expression defaultValue) =>
             ChainSourceMembers(source)?.NullCheck(destinationType, defaultValue);
-        public bool AllowsNullDestinationValues() => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
-        public bool AllowsNullCollections() => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
+        public bool AllowsNullDestinationValues => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
+        public bool AllowsNullCollections => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
         public ProfileMap Profile => TypeMap?.Profile;
         private int MaxDepth => (TypeMap?.MaxDepth).GetValueOrDefault();
         public bool MapperEquals(MemberMap other)
@@ -71,9 +71,9 @@ namespace AutoMapper
                 return false;
             }
             return other.MustUseDestination == MustUseDestination && other.MaxDepth == MaxDepth && 
-                other.AllowsNullDestinationValues() == AllowsNullDestinationValues() && other.AllowsNullCollections() == AllowsNullCollections();
+                other.AllowsNullDestinationValues == AllowsNullDestinationValues && other.AllowsNullCollections == AllowsNullCollections;
         }
-        public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues(), AllowsNullCollections());
+        public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues, AllowsNullCollections);
         protected Type GetSourceType() => Resolver?.ResolvedType ?? DestinationType;
         public void MapByConvention(MemberInfo[] sourceMembers)
         {

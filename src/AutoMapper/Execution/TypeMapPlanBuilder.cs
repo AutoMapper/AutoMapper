@@ -49,7 +49,7 @@ namespace AutoMapper.Execution
             {
                 variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
                 statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
-                    Assign(v, i.MemberExpression.ReplaceParameters(Source).NullCheck())));
+                    Assign(v, i.MemberExpression.ReplaceParameters(parameters).NullCheck())));
             }
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
@@ -161,7 +161,8 @@ namespace AutoMapper.Execution
         {
             var actions = new List<Expression> { createDestination };
             Expression typeMapExpression = null;
-            if (_typeMap.MaxDepth > 0)
+            var hasMaxDepth = _typeMap.MaxDepth > 0;
+            if (hasMaxDepth)
             {
                 typeMapExpression = Constant(_typeMap);
                 actions.Add(Call(ContextParameter, IncTypeDepthInfo, typeMapExpression));
@@ -193,7 +194,7 @@ namespace AutoMapper.Execution
             {
                 actions.Add(afterMapAction.ReplaceParameters(Source, _destination, ContextParameter));
             }
-            if (_typeMap.MaxDepth > 0)
+            if (hasMaxDepth)
             {
                 actions.Add(Call(ContextParameter, DecTypeDepthInfo, typeMapExpression));
             }
@@ -382,7 +383,7 @@ namespace AutoMapper.Execution
             {
                 valueResolverFunc = memberMap.NullSubstitute(valueResolverFunc);
             }
-            else if (!memberMap.AllowsNullDestinationValues())
+            else if (!memberMap.AllowsNullDestinationValues)
             {
                 var toCreate = memberMap.SourceType;
                 if (!toCreate.IsAbstract && toCreate.IsClass && !toCreate.IsArray)

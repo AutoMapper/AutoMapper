@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\ci.yml = .github\workflows\ci.yml
 		CONTRIBUTING.md = CONTRIBUTING.md
 		Directory.Build.props = Directory.Build.props
+		icon.png = icon.png
 		ISSUE_TEMPLATE.md = ISSUE_TEMPLATE.md
 		nuget.config = nuget.config
 		Push.ps1 = Push.ps1
