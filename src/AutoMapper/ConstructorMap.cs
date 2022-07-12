@@ -12,9 +12,14 @@ namespace AutoMapper
     {
         private bool? _canResolve;
         private readonly Dictionary<string, ConstructorParameterMap> _ctorParams = new(StringComparer.OrdinalIgnoreCase);
-        public ConstructorInfo Ctor { get; }
+        public ConstructorInfo Ctor { get; private set; }
         public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams.Values;
-        public ConstructorMap(ConstructorInfo ctor) => Ctor = ctor;
+        public void Reset(ConstructorInfo ctor)
+        {
+            Ctor = ctor;
+            _ctorParams.Clear();
+            _canResolve = null;
+        }
         public bool CanResolve
         {
             get => _canResolve ??= ParametersCanResolve();

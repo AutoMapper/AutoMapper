@@ -166,10 +166,12 @@ namespace AutoMapper.Configuration
         private void MapDestinationCtorToSource(TypeMap typeMap)
         {
             var sourceMembers = new List<MemberInfo>();
+            ConstructorMap ctorMap = new();
+            typeMap.ConstructorMap = ctorMap;
             foreach (var destCtor in typeMap.DestinationConstructors)
             {
                 var constructor = destCtor.Constructor;
-                var ctorMap = new ConstructorMap(constructor);
+                ctorMap.Reset(constructor);
                 bool canMapResolve = true;
                 foreach (var parameter in destCtor.Parameters)
                 {
@@ -181,7 +183,6 @@ namespace AutoMapper.Configuration
                     }
                     ctorMap.AddParameter(parameter, sourceMembers, typeMap);
                 }
-                typeMap.ConstructorMap = ctorMap;
                 if (canMapResolve)
                 {
                     ctorMap.CanResolve = true;
