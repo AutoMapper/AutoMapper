@@ -53,9 +53,12 @@ namespace AutoMapper
         {
             if (Projection)
             {
-                throw new AutoMapperConfigurationException("CreateProjection works with ProjectTo, not with Map.", QueryMapperHelper.MissingMapException(Types));
+                throw new AutoMapperConfigurationException("CreateProjection works with ProjectTo, not with Map.", MissingMapException(Types));
             }
         }
+        public static Exception MissingMapException(TypePair types) => MissingMapException(types.SourceType, types.DestinationType);
+        public static Exception MissingMapException(Type sourceType, Type destinationType)
+            => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using CreateMap<{sourceType.Name}, {destinationType.Name}>.");
         public bool Projection { get; set; }
         public LambdaExpression MapExpression { get; private set; }
         internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract &&

@@ -16,17 +16,6 @@ namespace AutoMapper.QueryableExtensions
     public static class Extensions
     {
         /// <summary>
-        /// Maps a queryable expression of a source type to a queryable expression of a destination type
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TDestination">Destination type</typeparam>
-        /// <param name="sourceQuery">Source queryable</param>
-        /// <param name="destQuery">Destination queryable</param>
-        /// <param name="config"></param>
-        /// <returns>Mapped destination queryable</returns>
-        public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config) => 
-            QueryMapperVisitor.Map(sourceQuery, destQuery, config.Internal());
-        /// <summary>
         /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>

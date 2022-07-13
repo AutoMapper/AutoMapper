@@ -74,7 +74,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var _);
         private Expression CreateProjectionCore(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
         {
-            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
+            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
             return CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
         }
         private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)

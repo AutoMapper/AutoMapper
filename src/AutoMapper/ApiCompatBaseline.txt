@@ -13,4 +13,6 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.UseExistingValueAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-Total Issues: 14
+MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
+TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
+Total Issues: 16
