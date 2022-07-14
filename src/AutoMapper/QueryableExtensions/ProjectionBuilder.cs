@@ -19,7 +19,6 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
         QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps);
-        Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProjectionMapper
@@ -33,8 +32,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         internal static List<IProjectionMapper> DefaultProjectionMappers() =>
             new()
             {
-                new CustomProjectionMapper(),
-                new MappedTypeProjectionMapper(),
                 new AssignableProjectionMapper(),
                 new EnumerableProjectionMapper(),
                 new NullableSourceProjectionMapper(),
@@ -70,8 +67,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
                 new(projection, instanceParameter);
         }
-        public Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps) =>
-            CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var _);
         private Expression CreateProjectionCore(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
         {
             typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
@@ -136,8 +131,22 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         return null;
                     }
-                    var projectionMapper = GetProjectionMapper();
-                    var mappedExpression = projectionMapper.Project(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, letPropertyMaps);
+                    Expression mappedExpression;
+                    if (memberTypeMap != null)
+                    {
+                        mappedExpression = CreateProjectionCore(memberRequest, resolvedSource, memberTypeMap, letPropertyMaps);
+                        if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues && 
+                            resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
+                        {
+                            // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
+                            mappedExpression = resolvedSource.IfNullElse(Constant(null, mappedExpression.Type), mappedExpression);
+                        }
+                    }
+                    else
+                    {
+                        var projectionMapper = GetProjectionMapper();
+                        mappedExpression = projectionMapper.Project(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, letPropertyMaps);
+                    }
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     Expression ResolveSource()
                     {
