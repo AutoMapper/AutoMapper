@@ -9,7 +9,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class AssignableProjectionMapper : IProjectionMapper
     {
         public bool IsMatch(TypePair context) => context.DestinationType.IsAssignableFrom(context.SourceType);
-        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
-            => ExpressionBuilder.ToType(resolvedSource, memberMap.DestinationType);
+        public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+            => ExpressionBuilder.ToType(resolvedSource, request.DestinationType);
     }
 }

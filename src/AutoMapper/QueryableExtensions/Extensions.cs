@@ -48,7 +48,7 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, IDictionary<string, object> parameters, params string[] membersToExpand) => 
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, ParameterBag parameters, params string[] membersToExpand) => 
             new ProjectionExpression(source, configuration).To<TDestination>(parameters, membersToExpand);
         /// <summary>
         /// Extension method to project from a queryable using the provided mapping engine
@@ -69,7 +69,7 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        public static IQueryable ProjectTo(this IQueryable source, Type destinationType, IConfigurationProvider configuration, IDictionary<string, object> parameters, params string[] membersToExpand) => 
+        public static IQueryable ProjectTo(this IQueryable source, Type destinationType, IConfigurationProvider configuration, ParameterBag parameters, params string[] membersToExpand) => 
             new ProjectionExpression(source, configuration).To(destinationType, parameters, membersToExpand);
         readonly struct ProjectionExpression
         {
@@ -103,13 +103,12 @@ namespace AutoMapper.QueryableExtensions
         {
             var memberVisitor = new MemberVisitor();
             memberVisitor.Visit(expression);
-            return memberVisitor.MemberPath.ToArray();
+            return memberVisitor._members.ToArray();
         }
         protected override Expression VisitMember(MemberExpression node)
         {
             _members.AddRange(node.GetMemberExpressions().Select(e => e.Member));
             return node;
         }
-        public IReadOnlyCollection<MemberInfo> MemberPath => _members;
     }
 }

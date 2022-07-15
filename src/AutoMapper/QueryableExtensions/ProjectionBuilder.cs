@@ -24,7 +24,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public interface IProjectionMapper
     {
         bool IsMatch(TypePair context);
-        Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
+        Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProjectionBuilder : IProjectionBuilder
@@ -62,15 +62,11 @@ namespace AutoMapper.QueryableExtensions.Impl
         public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
         {
             var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
-            var projection = CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var typeMap);
+            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
+            var projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
             return letPropertyMaps.Count > 0 ?
                 letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
                 new(projection, instanceParameter);
-        }
-        private Expression CreateProjectionCore(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
-        {
-            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
-            return CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
         }
         private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
@@ -145,7 +141,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     else
                     {
                         var projectionMapper = GetProjectionMapper();
-                        mappedExpression = projectionMapper.Project(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, letPropertyMaps);
+                        mappedExpression = projectionMapper.Project(_configurationProvider, memberRequest, resolvedSource, letPropertyMaps);
                     }
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     Expression ResolveSource()
