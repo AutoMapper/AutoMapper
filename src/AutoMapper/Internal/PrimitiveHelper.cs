@@ -26,6 +26,7 @@ namespace AutoMapper.Internal
             types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
             types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
         }
+        public static bool IsCollection(this TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
         public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
         public static bool IsUnderlyingTypeToEnum(this TypePair context) =>
             context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));

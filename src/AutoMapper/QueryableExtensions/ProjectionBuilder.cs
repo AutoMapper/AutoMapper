@@ -23,7 +23,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProjectionMapper
     {
-        bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource);
+        bool IsMatch(TypePair context);
         Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -189,9 +189,10 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                     IProjectionMapper GetProjectionMapper()
                     {
+                        var context = memberMap.Types();
                         foreach (var mapper in _projectionMappers)
                         {
-                            if (mapper.IsMatch(memberMap, memberTypeMap, resolvedSource))
+                            if (mapper.IsMatch(context))
                             {
                                 return mapper;
                             }
