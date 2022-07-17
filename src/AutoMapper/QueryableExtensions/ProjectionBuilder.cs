@@ -109,7 +109,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                 }
             }
-            Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null)
+            Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null, Expression defaultSource = null)
             {
                 var memberProjection = new MemberProjection(memberMap);
                 letPropertyMaps.Push(memberProjection);
@@ -151,7 +151,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
                             { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource()),
-                            _ => throw CannotMap(memberMap, request.SourceType)
+                            _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                         };
                         if (NullSubstitute())
                         {
@@ -201,7 +201,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
                 { ConstructorMap: { CanResolve: true } constructorMap } => 
-                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map) ?? Default(map.DestinationType))),
+                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, null, map.DefaultValue()) ?? Default(map.DestinationType))),
                 _ => New(typeMap.DestinationType)
             };
         }

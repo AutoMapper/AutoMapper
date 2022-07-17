@@ -27,10 +27,11 @@ namespace AutoMapper.UnitTests.Projection
 
         class EntitySource
         {
+            public DateTime NotSupported;
         }
         class EntityDestination
         {
-            public EntityDestination(object notSupported = null) { }
+            public EntityDestination(int notSupported = 0) { }
         }
     }
 }
