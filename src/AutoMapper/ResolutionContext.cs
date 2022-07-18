@@ -11,25 +11,24 @@ namespace AutoMapper
         private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
         private readonly IInternalRuntimeMapper _mapper;
-        internal ResolutionContext(IMappingOperationOptions options, IInternalRuntimeMapper mapper)
+        private readonly IMappingOperationOptions _options;
+        internal ResolutionContext(IInternalRuntimeMapper mapper, IMappingOperationOptions options = null)
         {
-            Options = options;
             _mapper = mapper;
+            _options = options;
         }
-        internal ResolutionContext(IInternalRuntimeMapper mapper) : this(mapper.DefaultContext.Options, mapper) { }
         /// <summary>
-        /// Mapping operation options
-        /// </summary>
-        public IMappingOperationOptions Options { get; }
-        /// <summary>
-        /// Context items from <see cref="Options"/>
+        /// The items passed in the options of the Map call.
         /// </summary>
         public IDictionary<string, object> Items
         {
             get
             {
-                CheckDefault();
-                return Options.Items;
+                if (_options == null)
+                {
+                    ThrowInvalidMap();
+                }
+                return _options.Items;
             }
         }
         /// <summary>
@@ -45,7 +44,7 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                return _instanceCache ??= new Dictionary<ContextCacheKey, object>();
+                return _instanceCache ??= new();
             }
         }
         /// <summary>
@@ -56,26 +55,26 @@ namespace AutoMapper
             get
             {
                 CheckDefault();
-                return _typeDepth ??= new Dictionary<TypePair, int>();
+                return _typeDepth ??= new();
             }
         }
         TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));
         TDestination IMapperBase.Map<TSource, TDestination>(TSource source) => _mapper.Map(source, default(TDestination), this);
-        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination)  => _mapper.Map(source, destination, this);
-        object IMapperBase.Map(object source, Type sourceType, Type destinationType)  => _mapper.Map(source, (object)null, this, sourceType, destinationType);
+        TDestination IMapperBase.Map<TSource, TDestination>(TSource source, TDestination destination) => _mapper.Map(source, destination, this);
+        object IMapperBase.Map(object source, Type sourceType, Type destinationType) => _mapper.Map(source, (object)null, this, sourceType, destinationType);
         object IMapperBase.Map(object source, object destination, Type sourceType, Type destinationType) => _mapper.Map(source, destination, this, sourceType, destinationType);
         TDestination IInternalRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context,
             Type sourceType, Type destinationType, MemberMap memberMap) => _mapper.Map(source, destination, context, sourceType, destinationType, memberMap);
-        internal object CreateInstance(Type type) => Options.ServiceCtor(type) ?? throw new AutoMapperMappingException("Cannot create an instance of type " + type);
-        internal object GetDestination(object source, Type destinationType) => 
-            source == null ? null :  InstanceCache.GetValueOrDefault(new ContextCacheKey(source, destinationType));
+        internal object CreateInstance(Type type) => ServiceCtor()(type) ?? throw new AutoMapperMappingException("Cannot create an instance of type " + type);
+        private Func<Type, object> ServiceCtor() => _options?.ServiceCtor ?? _mapper.ServiceCtor;
+        internal object GetDestination(object source, Type destinationType) => source == null ? null : InstanceCache.GetValueOrDefault(new(source, destinationType));
         internal void CacheDestination(object source, Type destinationType, object destination)
         {
             if (source == null)
             {
                 return;
             }
-            InstanceCache[new ContextCacheKey(source, destinationType)] = destination;
+            InstanceCache[new(source, destinationType)] = destination;
         }
         internal void IncrementTypeDepth(TypeMap typeMap) => TypeDepth[typeMap.Types]++;
         internal void DecrementTypeDepth(TypeMap typeMap) => TypeDepth[typeMap.Types]--;
@@ -89,24 +88,26 @@ namespace AutoMapper
             return depth > typeMap.MaxDepth;
         }
         internal bool IsDefault => this == _mapper.DefaultContext;
+        Func<Type, object> IInternalRuntimeMapper.ServiceCtor => ServiceCtor();
         internal static void CheckContext(ref ResolutionContext resolutionContext)
         {
             if (resolutionContext.IsDefault)
             {
-                resolutionContext = new ResolutionContext(resolutionContext._mapper);
+                resolutionContext = new(resolutionContext._mapper);
             }
         }
-        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, MemberMap memberMap) => 
+        internal TDestination MapInternal<TSource, TDestination>(TSource source, TDestination destination, MemberMap memberMap) =>
             _mapper.Map(source, destination, this, memberMap: memberMap);
-        internal object Map(object source, object destination, Type sourceType, Type destinationType, MemberMap memberMap) => 
+        internal object Map(object source, object destination, Type sourceType, Type destinationType, MemberMap memberMap) =>
             _mapper.Map(source, destination, this, sourceType, destinationType, memberMap);
         private void CheckDefault()
         {
             if (IsDefault)
             {
-                throw new InvalidOperationException("You must use a Map overload that takes Action<IMappingOperationOptions>!");
+                ThrowInvalidMap();
             }
         }
+        private static void ThrowInvalidMap() => throw new InvalidOperationException("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>!");
     }
     public readonly struct ContextCacheKey : IEquatable<ContextCacheKey>
     {
