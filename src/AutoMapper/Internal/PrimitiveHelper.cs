@@ -11,18 +11,22 @@ namespace AutoMapper.Internal
         public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
         public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
         {
-            otherCollection ??= Array.Empty<T>();
+            if (otherCollection == null || otherCollection.Count == 0)
+            {
+                return collection;
+            }
             if (collection.Count == 0)
             {
                 return otherCollection;
             }
-            return otherCollection.Count == 0 ? collection : Enumerable.Concat(collection, otherCollection);
+            return Enumerable.Concat(collection, otherCollection);
         }
         public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
         {
             types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
             types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
         }
+        public static bool IsCollection(this TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
         public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
         public static bool IsUnderlyingTypeToEnum(this TypePair context) =>
             context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));

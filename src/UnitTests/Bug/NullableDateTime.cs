@@ -32,6 +32,8 @@ namespace AutoMapper.UnitTests.Bug
                     opt.MapFrom(src => src.Bars.Min(b => b.Bar));
                 });
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class FromDateToNullableDateTime : AutoMapperSpecBase

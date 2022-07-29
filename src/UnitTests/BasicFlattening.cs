@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 using Shouldly;
+using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
@@ -232,6 +233,6 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Customer, CustomerDTO>(MemberList.Source).ForMember(d=>d.Id, o=>o.MapFrom(s=>s.AnotherId)));
         [Fact]
         public void Should_validate() =>
-            new Action(AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex => ex.Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Address.Id)));
+            new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors.Single().UnmappedPropertyNames.Single().ShouldBe(nameof(Address.Id));
     }
 }

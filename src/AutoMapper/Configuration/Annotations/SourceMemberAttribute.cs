@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper.Internal;
+using System;
+using System.Reflection;
 
 namespace AutoMapper.Configuration.Annotations
 {
@@ -17,6 +19,11 @@ namespace AutoMapper.Configuration.Annotations
 
         public void ApplyConfiguration(IMemberConfigurationExpression memberConfigurationExpression)
         {
+            var destinationMember = memberConfigurationExpression.DestinationMember;
+            if (destinationMember.Has<ValueConverterAttribute>() || destinationMember.Has<ValueResolverAttribute>())
+            {
+                return;
+            }
             memberConfigurationExpression.MapFrom(Name);
         }
     }

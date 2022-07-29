@@ -16,13 +16,12 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static readonly MethodInfo SelectMethod = typeof(Enumerable).StaticGenericMethod("Select", parametersCount: 2);
         private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetStaticMethod("ToArray");
         private static readonly MethodInfo ToListMethod = typeof(Enumerable).GetStaticMethod("ToList");
-        public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
-            memberMap.DestinationType.IsCollection() && memberMap.SourceType.IsCollection();
-        public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) 
+        public bool IsMatch(TypePair context) => context.IsCollection();
+        public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
         {
-            var destinationType = memberMap.DestinationType;
+            var destinationType = request.DestinationType;
             var destinationListType = GetElementType(destinationType);
-            var sourceListType = GetElementType(memberMap.SourceType);
+            var sourceListType = GetElementType(request.SourceType);
             var sourceExpression = resolvedSource;
             if (sourceListType != destinationListType)
             {

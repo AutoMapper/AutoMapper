@@ -32,8 +32,9 @@ namespace AutoMapper.UnitTests.MappingInheritance
             cfg.CreateMap(typeof(Source), typeof(Destination))
                 .IncludeBase(typeof(SourceBase<string>), typeof(DestinationBase<string>));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
-
     public class IncludeBaseWithGenericUsage : AutoMapperSpecBase
     {
         class Source : SourceBase<string>
@@ -62,5 +63,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             cfg.CreateMap<Source, Destination>()
                 .IncludeBase<SourceBase<string>, DestinationBase<string>>();
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

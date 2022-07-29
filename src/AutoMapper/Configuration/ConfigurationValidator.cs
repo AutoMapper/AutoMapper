@@ -117,7 +117,6 @@ namespace AutoMapper.Configuration
                 }
 
                 CheckPropertyMaps(typeMapsChecked, typeMap);
-                typeMap.IsValid = true;
             }
             else
             {
@@ -143,7 +142,7 @@ namespace AutoMapper.Configuration
         {
             foreach (var memberMap in typeMap.MemberMaps)
             {
-                if(memberMap.Ignored || memberMap.ValueConverterConfig != null || memberMap.ValueResolverConfig != null)
+                if(memberMap.Ignored)
                 {
                     continue;
                 }

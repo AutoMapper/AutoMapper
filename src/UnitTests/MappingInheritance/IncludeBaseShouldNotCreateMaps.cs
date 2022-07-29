@@ -1,4 +1,5 @@
 ﻿using System;
+using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
@@ -29,5 +30,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<TestProfile>());
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

@@ -16,7 +16,7 @@ namespace AutoMapper.Execution
         private static readonly EventInfo PropertyChanged = typeof(INotifyPropertyChanged).GetEvent(nameof(INotifyPropertyChanged.PropertyChanged));
         private static readonly ConstructorInfo ProxyBaseCtor = typeof(ProxyBase).GetConstructor(Type.EmptyTypes);
         private static readonly ModuleBuilder ProxyModule = CreateProxyModule();
-        private static readonly LockingConcurrentDictionary<TypeDescription, Type> ProxyTypes = new LockingConcurrentDictionary<TypeDescription, Type>(EmitProxy);
+        private static readonly LockingConcurrentDictionary<TypeDescription, Type> ProxyTypes = new(EmitProxy);
         private static ModuleBuilder CreateProxyModule()
         {
             var assemblyName = typeof(Mapper).Assembly.GetName();

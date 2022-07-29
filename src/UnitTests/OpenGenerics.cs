@@ -416,6 +416,8 @@ namespace AutoMapper.UnitTests
         }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.AddProfile<MyProfile>());
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class OpenGenerics

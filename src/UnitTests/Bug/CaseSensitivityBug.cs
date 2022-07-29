@@ -17,5 +17,7 @@
         {
             public int id { get; set; }
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

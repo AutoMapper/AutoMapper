@@ -22,6 +22,8 @@ namespace AutoMapper.UnitTests.Constructors
         }
         protected override MapperConfiguration CreateConfiguration() => new(c => 
             c.CreateMap<Source, Destination>().ForCtorParam("otherValue", o=>o.MapFrom(s=>0)));
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
     public class Nullable_enum_default_value : AutoMapperSpecBase
     {

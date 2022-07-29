@@ -19,13 +19,12 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand);
         QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps);
-        Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProjectionMapper
     {
-        bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource);
-        Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
+        bool IsMatch(TypePair context);
+        Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProjectionBuilder : IProjectionBuilder
@@ -33,8 +32,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         internal static List<IProjectionMapper> DefaultProjectionMappers() =>
             new()
             {
-                new CustomProjectionMapper(),
-                new MappedTypeProjectionMapper(),
                 new AssignableProjectionMapper(),
                 new EnumerableProjectionMapper(),
                 new NullableSourceProjectionMapper(),
@@ -65,23 +62,18 @@ namespace AutoMapper.QueryableExtensions.Impl
         public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
         {
             var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
-            var projection = CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var typeMap);
+            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
+            var projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
             return letPropertyMaps.Count > 0 ?
                 letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
                 new(projection, instanceParameter);
         }
-        public Expression CreateInnerProjection(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps) =>
-            CreateProjectionCore(request, instanceParameter, letPropertyMaps, out var _);
-        private Expression CreateProjectionCore(in ProjectionRequest request, Expression instanceParameter, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
-        {
-            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
-            return CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
-        }
         private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
-            if (typeMap.CustomMapExpression != null)
+            var customProjection = typeMap.CustomMapExpression?.ReplaceParameters(instanceParameter);
+            if (customProjection != null)
             {
-                return typeMap.CustomMapExpression.ReplaceParameters(instanceParameter);
+                return customProjection;
             }
             var propertiesProjections = new List<MemberBinding>();
             int depth;
@@ -117,7 +109,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                 }
             }
-            Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null)
+            Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null, Expression defaultSource = null)
             {
                 var memberProjection = new MemberProjection(memberMap);
                 letPropertyMaps.Push(memberProjection);
@@ -135,8 +127,22 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         return null;
                     }
-                    var projectionMapper = GetProjectionMapper();
-                    var mappedExpression = projectionMapper.Project(_configurationProvider, memberMap, memberTypeMap, memberRequest, resolvedSource, letPropertyMaps);
+                    Expression mappedExpression;
+                    if (memberTypeMap != null)
+                    {
+                        mappedExpression = CreateProjectionCore(memberRequest, resolvedSource, memberTypeMap, letPropertyMaps);
+                        if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues && 
+                            resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
+                        {
+                            // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
+                            mappedExpression = resolvedSource.IfNullElse(Constant(null, mappedExpression.Type), mappedExpression);
+                        }
+                    }
+                    else
+                    {
+                        var projectionMapper = GetProjectionMapper();
+                        mappedExpression = projectionMapper.Project(_configurationProvider, memberRequest, resolvedSource, letPropertyMaps);
+                    }
                     return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
                     Expression ResolveSource()
                     {
@@ -144,8 +150,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                         var resolvedSource = memberMap switch
                         {
                             { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                            { SourceMembers: { Length: >0 } sourceMembers } => sourceMembers.Chain(CheckCustomSource()),
-                            _ => throw CannotMap(memberMap, request.SourceType)
+                            { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource()),
+                            _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                         };
                         if (NullSubstitute())
                         {
@@ -179,9 +185,10 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                     IProjectionMapper GetProjectionMapper()
                     {
+                        var context = memberMap.Types();
                         foreach (var mapper in _projectionMappers)
                         {
-                            if (mapper.IsMatch(memberMap, memberTypeMap, resolvedSource))
+                            if (mapper.IsMatch(context))
                             {
                                 return mapper;
                             }
@@ -194,8 +201,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
                 { ConstructorMap: { CanResolve: true } constructorMap } => 
-                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map) ?? Default(map.DestinationType))),
-                _ => New(typeMap.DestinationTypeToUse)
+                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, null, map.DefaultValue()) ?? Default(map.DestinationType))),
+                _ => New(typeMap.DestinationType)
             };
         }
         private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new(
@@ -250,7 +257,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                         var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
-                        letPropertyMap.CustomMapExpression = Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter);
+                        letPropertyMap.SetResolver(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                         projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                     }
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);

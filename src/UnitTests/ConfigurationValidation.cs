@@ -51,6 +51,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         public class C { }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<A, B>().ConvertUsing(x => new B { Foo = new C() }));
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_using_a_type_converter_class : AutoMapperSpecBase
@@ -71,6 +73,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             public B Convert(A source, B dest, ResolutionContext context) => new B { Foo = new C() };
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_skipping_validation : NonValidatingSpecBase
@@ -285,6 +289,49 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class ResolversWithSourceValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int Resolved { get; set; }
+            public int TypedResolved { get; set; }
+            public int Converted { get; set; }
+            public int TypedConverted { get; set; }
+        }
+        class Destination
+        {
+            public int ResolvedDest { get; set; }
+            public int TypedResolvedDest { get; set; }
+            public int ConvertedDest { get; set; }
+            public int TypedConvertedDest { get; set; }
+        }
+        class MemberResolver : IMemberValueResolver<Source, Destination, int, int>
+        {
+            public int Resolve(Source source, Destination destination, int sourceMember, int destinationMember, ResolutionContext context) => 5;
+        }
+        class ValueConverter : IValueConverter<int, int>
+        {
+            public int Convert(int sourceMember, ResolutionContext context) => 5;
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>(MemberList.Source)
+                .ForMember(d => d.ResolvedDest, o => o.MapFrom<MemberResolver, int>("Resolved"))
+                .ForMember(d=>d.TypedResolvedDest, o => o.MapFrom<MemberResolver, int>(s => s.TypedResolved))
+                .ForMember(d => d.ConvertedDest, o => o.ConvertUsing<ValueConverter, int>("Converted"))
+                .ForMember(d => d.TypedConvertedDest, o => o.ConvertUsing<ValueConverter, int>(s => s.TypedConverted));
+        });
+        [Fact]
+        public void Should_work()
+        {
+            var result = Mapper.Map<Source, Destination>(new Source());
+            result.ResolvedDest.ShouldBe(5);
+            result.TypedResolvedDest.ShouldBe(5);
+            result.ConvertedDest.ShouldBe(5);
+            result.TypedConvertedDest.ShouldBe(5);
+        }
+    }
+
     public class NonMemberExpressionWithSourceValidation : NonValidatingSpecBase
     {
         class Source
@@ -297,6 +344,23 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
         protected override MapperConfiguration CreateConfiguration() => new(c=>c.CreateMap<Source, Destination>(MemberList.Source)
             .ForMember(d=>d.OtherValue, o=>o.MapFrom(s=>s.Value ?? "")));
+        [Fact]
+        public void Should_be_ignored() => new Action(AssertConfigurationIsValid)
+            .ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Source.Value));
+    }
+
+    public class MatchingNonMemberExpressionWithSourceValidation : NonValidatingSpecBase
+    {
+        class Source
+        {
+            public string Value { get; set; }
+        }
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>(MemberList.Source)
+            .ForMember(d => d.Value, o => o.MapFrom(s => s.Value ?? "")));
         [Fact]
         public void Should_be_ignored() => new Action(AssertConfigurationIsValid)
             .ShouldThrow<AutoMapperConfigurationException>().Errors[0].UnmappedPropertyNames[0].ShouldBe(nameof(Source.Value));
@@ -321,6 +385,8 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : NonValidatingSpecBase
@@ -733,5 +799,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         {
             public List<KeyValuePair<string, string>> Details { get; private set; }
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

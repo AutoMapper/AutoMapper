@@ -6,6 +6,7 @@ namespace AutoMapper
 {
     using QueryableExtensions;
     using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
+    using Factory = Func<Type, object>;
     using Internal;
     public interface IMapperBase
     {
@@ -140,18 +141,22 @@ namespace AutoMapper
     {
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, MemberMap memberMap = null);
         ResolutionContext DefaultContext { get; }
+        Factory ServiceCtor { get; }
     }
     public class Mapper : IMapper, IInternalRuntimeMapper
     {
         private readonly IGlobalConfiguration _configurationProvider;
+        private readonly Factory _serviceCtor;
         public Mapper(IConfigurationProvider configurationProvider) : this(configurationProvider, configurationProvider.Internal().ServiceCtor) { }
-        public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
+        public Mapper(IConfigurationProvider configurationProvider, Factory serviceCtor)
         {
             _configurationProvider = (IGlobalConfiguration)configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
-            DefaultContext = new ResolutionContext(new MappingOperationOptions<object, object>(serviceCtor ?? throw new NullReferenceException(nameof(serviceCtor))), this);
+            _serviceCtor = serviceCtor ?? throw new NullReferenceException(nameof(serviceCtor));
+            DefaultContext = new(this);
         }
         internal ResolutionContext DefaultContext { get; }
         ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
+        Factory IInternalRuntimeMapper.ServiceCtor => _serviceCtor;
         public IConfigurationProvider ConfigurationProvider => _configurationProvider;
         public TDestination Map<TDestination>(object source) => Map(source, default(TDestination));
         public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts) => Map(source, default, opts);
@@ -181,19 +186,19 @@ namespace AutoMapper
         private TDestination MapWithOptions<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts,
             Type sourceType = null, Type destinationType = null)
         {
-            var typedOptions = new MappingOperationOptions<TSource, TDestination>(DefaultContext.Options.ServiceCtor);
+            MappingOperationOptions<TSource, TDestination> typedOptions = new(_serviceCtor);
             opts(typedOptions);
             typedOptions.BeforeMapAction?.Invoke(source, destination);
-            destination = MapCore(source, destination, new ResolutionContext(typedOptions, this), sourceType, destinationType);
+            destination = MapCore(source, destination, new(this, typedOptions), sourceType, destinationType);
             typedOptions.AfterMapAction?.Invoke(source, destination);
             return destination;
         }
         private TDestination MapCore<TSource, TDestination>(
             TSource source, TDestination destination, ResolutionContext context, Type sourceType = null, Type destinationType = null, MemberMap memberMap = null)
         {
-            var runtimeTypes = new TypePair(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
-            var requestedTypes = new TypePair(typeof(TSource), typeof(TDestination));
-            var mapRequest = new MapRequest(requestedTypes, runtimeTypes, memberMap);
+            TypePair requestedTypes = new(typeof(TSource), typeof(TDestination));
+            TypePair runtimeTypes = new(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
+            MapRequest mapRequest = new(requestedTypes, runtimeTypes, memberMap);
             return _configurationProvider.GetExecutionPlan<TSource, TDestination>(mapRequest)(source, destination, context);
         }
     }

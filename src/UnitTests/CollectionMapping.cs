@@ -702,6 +702,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<SourceItem, SpecificDestinationItem>();
             cfg.CreateMap<Source, Destination>();
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_passing_a_not_empty_collection : AutoMapperSpecBase

@@ -20,6 +20,8 @@ namespace AutoMapper.UnitTests
         }
         protected override MapperConfiguration CreateConfiguration() => new(c=>
             c.CreateMap<Destination, Source>().ForMember(src => src.Id, opt => opt.MapFrom(_ => Guid.Empty)).ReverseMap());
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
     public class InvalidReverseMap : NonValidatingSpecBase
     {
@@ -519,6 +521,8 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Source, Destination>(MemberList.Source)
                 .ForMember(dest => dest.Value3, opt => opt.MapFrom(src => src.Value2));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_validating_only_against_source_members_and_unmatching_source_members_are_manually_mapped_with_resolvers : AutoMapperSpecBase
@@ -540,6 +544,8 @@ namespace AutoMapper.UnitTests
                 .ForMember(dest => dest.Value3, opt => opt.MapFrom(src => src.Value2))
                 .ForSourceMember(src => src.Value2, opt => opt.DoNotValidate());
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_reverse_mapping_and_ignoring_via_method : AutoMapperSpecBase
@@ -561,6 +567,8 @@ namespace AutoMapper.UnitTests
                 .ForMember(d => d.Ignored, opt => opt.Ignore())
                 .ReverseMap();
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_reverse_mapping_and_ignoring : SpecBase

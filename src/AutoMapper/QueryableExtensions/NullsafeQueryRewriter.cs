@@ -40,7 +40,7 @@ namespace AutoMapper.QueryableExtensions
     /// </remarks>
     internal class NullsafeQueryRewriter : ExpressionVisitor
     {
-        static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(Fallback);
+        static readonly LockingConcurrentDictionary<Type, Expression> Cache = new(Fallback);
 
         public static Expression NullCheck(Expression expression) => new NullsafeQueryRewriter().Visit(expression);
 

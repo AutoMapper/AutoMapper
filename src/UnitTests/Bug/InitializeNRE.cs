@@ -33,6 +33,8 @@ namespace AutoMapper.UnitTests.Bug
             cfg.ConstructServicesUsing(t => new Res());
             cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.MapFrom<IRes>());
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
 
@@ -60,5 +62,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             cfg.CreateMap<TestEntity, TestViewModel>();
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

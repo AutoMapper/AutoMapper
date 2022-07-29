@@ -444,7 +444,7 @@ namespace AutoMapper
                 // we want the exact map the user included, but we could instantiate an open generic
                 if (typeMap?.Types != pair)
                 {
-                    throw QueryMapperHelper.MissingMapException(pair);
+                    throw TypeMap.MissingMapException(pair);
                 }
                 return typeMap;
             }

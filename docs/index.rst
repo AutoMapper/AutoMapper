@@ -72,6 +72,7 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    :caption: Upgrading
    
    API-Changes
+   12.0-Upgrade-Guide
    11.0-Upgrade-Guide
    10.0-Upgrade-Guide
    9.0-Upgrade-Guide

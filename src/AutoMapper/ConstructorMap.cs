@@ -12,13 +12,13 @@ namespace AutoMapper
     {
         private bool? _canResolve;
         private readonly Dictionary<string, ConstructorParameterMap> _ctorParams = new(StringComparer.OrdinalIgnoreCase);
-        public ConstructorInfo Ctor { get; }
-        public TypeMap TypeMap { get; }
+        public ConstructorInfo Ctor { get; private set; }
         public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams.Values;
-        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
+        public void Reset(ConstructorInfo ctor)
         {
             Ctor = ctor;
-            TypeMap = typeMap;
+            _ctorParams.Clear();
+            _canResolve = null;
         }
         public bool CanResolve
         {
@@ -37,13 +37,13 @@ namespace AutoMapper
             return true;
         }
         public ConstructorParameterMap this[string name] => _ctorParams.GetValueOrDefault(name);
-        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, bool canResolve)
+        public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap)
         {
             if (parameter.Name == null)
             {
                 return;
             }
-            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(TypeMap, parameter, sourceMembers.ToArray(), canResolve));
+            _ctorParams.Add(parameter.Name, new ConstructorParameterMap(typeMap, parameter, sourceMembers.ToArray()));
         }
         public bool ApplyIncludedMember(IncludedMember includedMember)
         {
@@ -74,32 +74,29 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConstructorParameterMap : MemberMap
     {
-        private readonly MemberInfo[] _sourceMembers;
         private Type _sourceType;
-        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolveValue) : base(typeMap)
+        public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap)
         {
             Parameter = parameter;
-            _sourceMembers = sourceMembers;
-            CanResolveValue = canResolveValue;
+            if (sourceMembers.Length > 0)
+            {
+                MapByConvention(sourceMembers);
+            }
+            else
+            {
+                SourceMembers = Array.Empty<MemberInfo>();
+            }
         }
         public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : 
-            this(includedMember.TypeMap, parameterMap.Parameter, parameterMap._sourceMembers, parameterMap.CanResolveValue) =>
+            this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers) =>
             IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
         public ParameterInfo Parameter { get; }
-        public override Type SourceType
-        {
-            get => _sourceType ??=
-                CustomMapExpression?.ReturnType ??
-                CustomMapFunction?.ReturnType ??
-                (_sourceMembers.Length > 0 ? _sourceMembers[_sourceMembers.Length - 1].GetMemberType() : Parameter.ParameterType);
-            protected set => _sourceType = value;
-        }
+        public override Type SourceType => _sourceType ??= GetSourceType();
         public override Type DestinationType => Parameter.ParameterType;
-        public override MemberInfo[] SourceMembers => _sourceMembers;
+        public override IncludedMember IncludedMember { get; }
+        public override MemberInfo[] SourceMembers { get; set; }
         public override string DestinationName => Parameter.Name;
-        public override LambdaExpression CustomMapFunction { get; set; }
-        public override bool CanResolveValue { get; set; }
-        public Expression DefaultValue() => Parameter.GetDefaultValue();
+        public Expression DefaultValue() => Parameter.IsOptional ? Parameter.GetDefaultValue() : Expression.Default(DestinationType);
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }
 }

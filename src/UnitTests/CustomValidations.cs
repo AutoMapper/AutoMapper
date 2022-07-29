@@ -96,7 +96,7 @@ namespace AutoMapper.UnitTests
             private static void SetValidated(ValidationContext context)
             {
                 if (context.TypeMap.SourceType == typeof(Source) &&
-                    context.TypeMap.DestinationTypeToUse == typeof(Destination))
+                    context.TypeMap.DestinationType == typeof(Destination))
                 {
                     _validated = true;
                 }
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests
             private static void SetValidated(ValidationContext context)
             {
                 if (context.TypeMap.SourceType == typeof(Source) &&
-                    context.TypeMap.DestinationTypeToUse == typeof(Destination))
+                    context.TypeMap.DestinationType == typeof(Destination))
                 {
                     _validated = true;
                 }
@@ -166,7 +166,7 @@ namespace AutoMapper.UnitTests
             private static void SetValidated(ValidationContext context)
             {
                 if (context.TypeMap.SourceType == typeof(Source) &&
-                    context.TypeMap.DestinationTypeToUse == typeof(Destination))
+                    context.TypeMap.DestinationType == typeof(Destination))
                 {
                     _validated = true;
                 }
@@ -206,7 +206,7 @@ namespace AutoMapper.UnitTests
             private static void SetValidated(ValidationContext context)
             {
                 if (context.TypeMap.SourceType == typeof(Source) &&
-                    context.TypeMap.DestinationTypeToUse == typeof(Destination))
+                    context.TypeMap.DestinationType == typeof(Destination))
                 {
                     _validated = true;
                 }

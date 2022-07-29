@@ -38,10 +38,10 @@ namespace AutoMapper.UnitTests.Projection
         }
         private class EnumToUnderlyingTypeProjectionMapper : IProjectionMapper
         {
-            public Expression Project(IGlobalConfiguration configuration, MemberMap memberMap, TypeMap memberTypeMap, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) =>
-                Convert(resolvedSource, memberMap.DestinationType);
-            public bool IsMatch(MemberMap memberMap, TypeMap memberTypeMap, Expression resolvedSource) =>
-                memberMap.SourceType.IsEnum && Enum.GetUnderlyingType(memberMap.SourceType) == memberMap.DestinationType;
+            public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps) =>
+                Convert(resolvedSource, request.DestinationType);
+            public bool IsMatch(TypePair context) =>
+                context.SourceType.IsEnum && Enum.GetUnderlyingType(context.SourceType) == context.DestinationType;
         }
     }
 }

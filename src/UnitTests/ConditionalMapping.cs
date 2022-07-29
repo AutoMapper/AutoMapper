@@ -58,6 +58,8 @@ namespace AutoMapper.UnitTests.ConditionalMapping
 
             public int PublicProperty { get; set; }
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_configuring_a_member_to_skip_based_on_the_property_value : AutoMapperSpecBase

@@ -42,6 +42,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
             c.CreateMap(typeof(Source<>), typeof(Override<>));
             c.CreateMap(typeof(Source<>), typeof(Destination<>)).As(typeof(Override<>));
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class AsShouldWorkOnlyWithDerivedTypes

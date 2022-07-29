@@ -32,8 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\icon.png" Pack="true" PackagePath="" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="" Visible="False" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="" Visible="False" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,8 +44,8 @@
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">
-    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)\PreBuild.ps1&quot; -version $(Version)" />
-    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="&quot;$(ProjectDir)PreBuild.sh&quot; $(Version)" />
+    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)ApiCompat\PreBuild.ps1&quot; -version $(Version)" />
+    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="&quot;$(ProjectDir)ApiCompat/PreBuild.sh&quot; $(Version)" />
   </Target>
 
 </Project>

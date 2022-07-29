@@ -26,11 +26,12 @@ namespace AutoMapper.Execution
         public static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
         public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.IncrementTypeDepth));
         public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.DecrementTypeDepth));
-        public static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
+        private static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
         public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
         public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
         public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
-        private static readonly MethodInfo CheckContextMethod = typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext));
+        private static readonly MethodCallExpression CheckContextCall = Expression.Call(
+            typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext)), ContextParameter);
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
         private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
@@ -133,6 +134,7 @@ namespace AutoMapper.Execution
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
             }
         }
+        public static Expression ServiceLocator(Type type) => Expression.Call(ContextParameter, ContextCreate, Constant(type));
         public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression destinationParameter, MemberMap memberMap)
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
@@ -142,7 +144,7 @@ namespace AutoMapper.Execution
         {
             if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
-                return Expression.Call(CheckContextMethod, ContextParameter);
+                return CheckContextCall;
             }
             return null;
         }

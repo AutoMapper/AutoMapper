@@ -17,7 +17,7 @@ namespace AutoMapper.Internal
 
         public MemberPath(MemberInfo[] members) => Members = members;
 
-        public MemberInfo Last => Members[Members.Length - 1];
+        public MemberInfo Last => Members[^1];
 
         public MemberInfo First => Members[0];
 

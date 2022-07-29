@@ -37,7 +37,6 @@ namespace AutoMapper.Configuration
             foreach(var memberName in memberNames)
             {
                 SourceType.GetFieldOrProperty(memberName);
-                ForSourceMemberCore(memberName, o => o.DoNotValidate());
             }
             TypeMapActions.Add(tm => tm.IncludedMembersNames = memberNames);
             return this;
@@ -79,66 +78,32 @@ namespace AutoMapper.Configuration
 
         public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
-            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
-                : base(destinationMember, sourceType)
+            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType)
             {
             }
-
-            public void MapFrom(Type valueResolverType)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void MapFrom(Type valueResolverType, string sourceMemberName)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
+            public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));
+            public void MapFrom(Type valueResolverType, string sourceMemberName) =>
+                 MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
                 {
                     SourceMemberName = sourceMemberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName)
-            {
-                var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
-                {
-                    SourceMemberName = sourceMemberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void ConvertUsing(Type valueConverterType) 
-                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType));
-
-            public void ConvertUsing(Type valueConverterType, string sourceMemberName) 
-                => PropertyMapActions.Add(pm => ConvertUsing(pm, valueConverterType, sourceMemberName));
-
-            public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName)
-            {
-                PropertyMapActions.Add(pm =>
-                {
-                    var config = new ValueResolverConfiguration(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
-                    {
-                        SourceMemberName = sourceMemberName
-                    };
-
-                    pm.ValueConverterConfig = config;
                 });
-            }
-
-            private static void ConvertUsing(PropertyMap propertyMap, Type valueConverterType, string sourceMemberName = null)
-            {
-                var config = new ValueResolverConfiguration(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+            public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName) =>
+                MapFromCore(new(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
                 {
                     SourceMemberName = sourceMemberName
-                };
-
-                propertyMap.ValueConverterConfig = config;
-            }
+                });
+            public void ConvertUsing(Type valueConverterType) => ConvertUsingCore(valueConverterType);
+            public void ConvertUsing(Type valueConverterType, string sourceMemberName) => ConvertUsingCore(valueConverterType, sourceMemberName);
+            public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName) =>
+                base.ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
+                {
+                    SourceMemberName = sourceMemberName
+                });
+            private void ConvertUsingCore(Type valueConverterType, string sourceMemberName = null) =>
+                base.ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
+                {
+                    SourceMemberName = sourceMemberName
+                });
         }
     }
 
@@ -176,14 +141,7 @@ namespace AutoMapper.Configuration
             return ForDestinationMember(memberInfo, memberOptions);
         }
 
-        private void IncludeMembersCore(LambdaExpression[] memberExpressions)
-        {
-            foreach(var member in memberExpressions.Select(memberExpression => memberExpression.GetMember()).Where(member => member != null))
-            {
-                ForSourceMemberCore(member, o => o.DoNotValidate());
-            }
-            TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
-        }
+        private void IncludeMembersCore(LambdaExpression[] memberExpressions) => TypeMapActions.Add(tm => tm.IncludedMembers = memberExpressions);
 
         public IMappingExpression<TSource, TDestination> IncludeMembers(params Expression<Func<TSource, object>>[] memberExpressions)
         {

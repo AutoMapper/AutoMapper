@@ -72,5 +72,7 @@ namespace AutoMapper.UnitTests.Projection
             cfg.CreateProjection<Source, Dest>()
                 .ConvertUsing(src => new Dest {Value = 10});
         });
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 }

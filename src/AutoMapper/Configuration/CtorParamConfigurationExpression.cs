@@ -1,4 +1,5 @@
-﻿using AutoMapper.Internal;
+﻿using AutoMapper.Execution;
+using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -51,12 +52,12 @@ namespace AutoMapper.Configuration
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
-            _ctorParamActions.Add(cpm => cpm.CustomMapExpression = sourceMember);
+            _ctorParamActions.Add(cpm => cpm.SetResolver(sourceMember));
 
         public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
             Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
-            _ctorParamActions.Add(cpm => cpm.CustomMapFunction = resolverExpression);
+            _ctorParamActions.Add(cpm => cpm.Resolver = new FuncResolver(resolverExpression));
         }
 
         public void MapFrom(string sourceMembersPath)
@@ -75,13 +76,12 @@ namespace AutoMapper.Configuration
             var parameter = ctorMap[CtorParamName];
             if (parameter == null)
             {
-                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
+                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
             }
             foreach (var action in _ctorParamActions)
             {
                 action(parameter);
             }
-            parameter.CanResolveValue = true;
         }
     }
 }

@@ -95,6 +95,8 @@ namespace AutoMapper.UnitTests.Mappers
         {
             public bool Value { get; set; }
         }
+        [Fact]
+        public void Validate() => AssertConfigurationIsValid();
     }
 
     public class When_adding_a_simple_custom_mapper : AutoMapperSpecBase
