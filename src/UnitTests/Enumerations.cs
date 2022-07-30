@@ -6,6 +6,13 @@ using Xunit;
 
 namespace AutoMapper.Tests
 {
+    public class InvalidStringToEnum : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration CreateConfiguration() => new(_=> { });
+        [Fact]
+        public void Should_throw() => new Action(()=>Map<ConsoleColor>("d")).ShouldThrow<AutoMapperMappingException>().InnerException.Message.ShouldBe(
+            "Requested value 'd' was not found.");
+    }
     public class DefaultEnumValueToString : AutoMapperSpecBase
     {
         Destination _destination;
