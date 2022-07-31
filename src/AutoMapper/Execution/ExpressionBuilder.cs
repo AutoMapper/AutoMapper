@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 namespace AutoMapper.Execution
 {
     using Internal;
@@ -352,15 +353,21 @@ namespace AutoMapper.Execution
                 var assignment = Assign(newVariable, UpdateTarget(member.Expression, variable));
                 return variable.IfNullElse(defaultReturn, Block(assignment, NullCheck(newVariable)));
             }
-            static Expression UpdateTarget(Expression sourceExpression, Expression newTarget) =>
-                sourceExpression switch
-                {
-                    MemberExpression memberExpression => memberExpression.Update(newTarget),
-                    MethodCallExpression { Method.IsStatic: true, Arguments: var args } methodCall when args[0] != newTarget =>
-                        methodCall.Update(null, args.Skip(1).Prepend(newTarget)),
-                    MethodCallExpression { Method.IsStatic: false } methodCall => methodCall.Update(newTarget, methodCall.Arguments),
-                    _ => sourceExpression,
-                };
+            static Expression UpdateTarget(Expression sourceExpression, Expression newTarget) => sourceExpression switch
+            {
+                MemberExpression memberExpression => memberExpression.Update(newTarget),
+                MethodCallExpression { Object: null, Arguments: var args } methodCall when args[0] != newTarget =>
+                    ExtensionMethod(methodCall.Method, newTarget, args),
+                MethodCallExpression { Object: Expression target } methodCall when target != newTarget => 
+                    Expression.Call(newTarget, methodCall.Method, methodCall.Arguments),
+                _ => sourceExpression,
+            };
+            static MethodCallExpression ExtensionMethod(MethodInfo method, Expression newTarget, ReadOnlyCollection<Expression> args)
+            {
+                var newArgs = args.ToArray();
+                newArgs[0] = newTarget;
+                return Expression.Call(method, newArgs);
+            }
         }
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else) => expression.Type.IsValueType ?
             (expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else) :
