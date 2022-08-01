@@ -74,17 +74,12 @@ namespace AutoMapper.Internal.Mappers
                     addItems = Condition(overMaxDepth, ExpressionBuilder.Empty, addItems);
                 }
                 var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
-                var checkNull = Block(new[] { newExpression, passedDestination },
+                return Block(new[] { newExpression, passedDestination },
                         Assign(passedDestination, destExpression),
                         assignNewExpression,
                         Call(destination, clearMethod),
                         addItems,
                         destination);
-                if (memberMap != null)
-                {
-                    return checkNull;
-                }
-                return CheckContext();
                 void GetDestinationType()
                 {
                     var immutableCollection = !mustUseDestination && destinationType.IsValueType;
@@ -132,20 +127,6 @@ namespace AutoMapper.Internal.Mappers
                         destination = newExpression;
                         assignNewExpression = Assign(newExpression, Coalesce(passedDestination, ObjectFactory.GenerateConstructorExpression(passedDestination.Type)));
                     }
-                }
-                Expression CheckContext()
-                {
-                    var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
-                    if (elementTypeMap == null)
-                    {
-                        return checkNull;
-                    }
-                    var checkContext = ExpressionBuilder.CheckContext(elementTypeMap);
-                    if (checkContext == null)
-                    {
-                        return checkNull;
-                    }
-                    return Block(checkContext, checkNull);
                 }
             }
         }

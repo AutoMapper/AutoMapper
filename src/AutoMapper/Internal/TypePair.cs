@@ -8,16 +8,16 @@ namespace AutoMapper.Internal
         public readonly TypePair RequestedTypes;
         public readonly TypePair RuntimeTypes;
         public readonly MemberMap MemberMap;
-        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes, MemberMap memberMap = null) 
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes, MemberMap memberMap) 
         {
             RequestedTypes = requestedTypes;
             RuntimeTypes = runtimeTypes;
             MemberMap = memberMap;
         }
         public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) &&
-            (MemberMap == other.MemberMap || (MemberMap?.MapperEquals(other.MemberMap)).GetValueOrDefault());
+            (MemberMap == other.MemberMap || MemberMap.MapperEquals(other.MemberMap));
         public override bool Equals(object obj) => obj is MapRequest other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes, MemberMap?.MapperGetHashCode());
+        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes, MemberMap.MapperGetHashCode());
         public static bool operator ==(in MapRequest left, in MapRequest right) => left.Equals(right);
         public static bool operator !=(in MapRequest left, in MapRequest right) => !left.Equals(right);
     }

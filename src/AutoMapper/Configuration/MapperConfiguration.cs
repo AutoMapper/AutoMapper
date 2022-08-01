@@ -173,7 +173,7 @@ namespace AutoMapper
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
         public void CompileMappings()
         {
-            foreach (var request in _resolvedMaps.Keys.Where(t => !t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types)).ToArray())
+            foreach (var request in _resolvedMaps.Keys.Where(t => !t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types, MemberMap.Instance)).ToArray())
             {
                 GetExecutionPlan(request);
             }
@@ -181,7 +181,7 @@ namespace AutoMapper
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
-            return this.Internal().BuildExecutionPlan(new(typePair, typePair));
+            return this.Internal().BuildExecutionPlan(new(typePair, typePair, MemberMap.Instance));
         }
         LambdaExpression IGlobalConfiguration.BuildExecutionPlan(in MapRequest mapRequest)
         {
@@ -237,7 +237,7 @@ namespace AutoMapper
                     var throwExpression = Throw(newException, runtimeDestinationType);
                     fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
                 }
-                var profileMap = mapRequest.MemberMap?.Profile ?? Configuration;
+                var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
                 var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
                 return Lambda(nullCheckSource, source, destination, ContextParameter);
             }

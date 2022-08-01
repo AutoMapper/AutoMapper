@@ -18,7 +18,8 @@ namespace AutoMapper
     {
         private static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Null);
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
-        public static readonly MemberMap Instance = new();
+        internal static readonly MemberMap Instance = new();
+        internal static readonly MemberMap InstanceUseDestination = new PropertyMap(default(MemberInfo), null, null) { UseDestinationValue = true };
         public TypeMap TypeMap { get; protected set; }
         public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
         public bool IsResolveConfigured => Resolver != null && Resolver != this;
@@ -64,15 +65,8 @@ namespace AutoMapper
         public bool AllowsNullCollections => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
         public ProfileMap Profile => TypeMap?.Profile;
         private int MaxDepth => (TypeMap?.MaxDepth).GetValueOrDefault();
-        public bool MapperEquals(MemberMap other)
-        {
-            if (other == null)
-            {
-                return false;
-            }
-            return other.MustUseDestination == MustUseDestination && other.MaxDepth == MaxDepth && 
+        public bool MapperEquals(MemberMap other) => other.MustUseDestination == MustUseDestination && other.MaxDepth == MaxDepth && 
                 other.AllowsNullDestinationValues == AllowsNullDestinationValues && other.AllowsNullCollections == AllowsNullCollections;
-        }
         public int MapperGetHashCode() => HashCode.Combine(MustUseDestination, MaxDepth, AllowsNullDestinationValues, AllowsNullCollections);
         protected Type GetSourceType() => Resolver?.ResolvedType ?? DestinationType;
         public void MapByConvention(MemberInfo[] sourceMembers)

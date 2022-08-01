@@ -31,7 +31,7 @@ namespace AutoMapper.Execution
         public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
         public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
         public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
-        private static readonly MethodCallExpression CheckContextCall = Expression.Call(
+        public static readonly MethodCallExpression CheckContextCall = Expression.Call(
             typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext)), ContextParameter);
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
@@ -81,9 +81,7 @@ namespace AutoMapper.Execution
             var destinationType = destinationParameter.Type;
             var isCollection = destinationType.IsCollection();
             var mustUseDestination = memberMap is { MustUseDestination: true };
-            var ifSourceNull = memberMap == null ? 
-                destinationParameter.IfNullElse(DefaultDestination(), ClearDestinationCollection()) :
-                mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
+            var ifSourceNull = mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
             return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {
@@ -109,13 +107,13 @@ namespace AutoMapper.Execution
                         }
                         var destinationElementType = GetEnumerableElementType(destinationType);
                         destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
-                        collection = Convert(collection, destinationCollectionType);
+                        collection = TypeAs(collection, destinationCollectionType);
                     }
                     clearMethod = destinationCollectionType.GetMethod("Clear");
                 }
                 return Block(new[] { destinationVariable },
                     Assign(destinationVariable, destinationParameter),
-                    Condition(ReferenceEqual(destinationVariable, Null), Empty, Expression.Call(collection, clearMethod)),
+                    Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)),
                     destinationVariable);
             }
             Expression DefaultDestination()
@@ -140,14 +138,6 @@ namespace AutoMapper.Execution
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Expression.Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
-        }
-        public static Expression CheckContext(TypeMap typeMap)
-        {
-            if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
-            {
-                return CheckContextCall;
-            }
-            return null;
         }
         public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>

@@ -198,6 +198,7 @@ namespace AutoMapper
         {
             TypePair requestedTypes = new(typeof(TSource), typeof(TDestination));
             TypePair runtimeTypes = new(source?.GetType() ?? sourceType ?? typeof(TSource), destination?.GetType() ?? destinationType ?? typeof(TDestination));
+            memberMap ??= destination == null ? MemberMap.Instance : MemberMap.InstanceUseDestination;
             MapRequest mapRequest = new(requestedTypes, runtimeTypes, memberMap);
             return _configurationProvider.GetExecutionPlan<TSource, TDestination>(mapRequest)(source, destination, context);
         }
