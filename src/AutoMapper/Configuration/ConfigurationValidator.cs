@@ -127,13 +127,9 @@ namespace AutoMapper.Configuration
                 }
                 var context = new ValidationContext(types, memberMap, mapperToUse);
                 Validate(context);
-                if(mapperToUse is IObjectMapperInfo mapperInfo)
+                if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
                 {
-                    var newTypePair = mapperInfo.GetAssociatedTypes(types);
-                    if (newTypePair != types)
-                    {
-                        DryRunTypeMap(typeMapsChecked, newTypePair, null, memberMap);
-                    }
+                    DryRunTypeMap(typeMapsChecked, newTypes, null, memberMap);
                 }
             }
         }

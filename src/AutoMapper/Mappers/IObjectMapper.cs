@@ -29,12 +29,8 @@ namespace AutoMapper.Internal.Mappers
         /// <returns>Map expression</returns>
         Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression);
+        TypePair? GetAssociatedTypes(TypePair initialTypes) => null;
     }
-    public interface IObjectMapperInfo : IObjectMapper
-    {
-        TypePair GetAssociatedTypes(TypePair initialTypes);
-    }
-
     /// <summary>
     /// Base class for simple object mappers that don't want to use expressions.
     /// </summary>

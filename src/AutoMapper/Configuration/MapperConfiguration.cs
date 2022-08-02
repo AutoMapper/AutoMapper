@@ -267,9 +267,9 @@ namespace AutoMapper
             {
                 return typeMap;
             }
-            if (FindMapper(types) is IObjectMapperInfo objectMapperInfo)
+            if (FindMapper(types)?.GetAssociatedTypes(types) is TypePair newTypes)
             {
-                return ResolveTypeMap(objectMapperInfo.GetAssociatedTypes(types));
+                return ResolveTypeMap(newTypes);
             }
             return null;
         }

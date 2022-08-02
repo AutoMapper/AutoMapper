@@ -12,9 +12,9 @@ namespace AutoMapper.Internal.Mappers
     using static Execution.ExpressionBuilder;
     using static Expression;
     using static ReflectionHelper;
-    public class CollectionMapper : IObjectMapperInfo
+    public class CollectionMapper : IObjectMapper
     {
-        public TypePair GetAssociatedTypes(TypePair context) => new(GetElementType(context.SourceType), GetElementType(context.DestinationType));
+        public TypePair? GetAssociatedTypes(TypePair context) => new(GetElementType(context.SourceType), GetElementType(context.DestinationType));
         public bool IsMatch(TypePair context) => context.IsCollection();
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
