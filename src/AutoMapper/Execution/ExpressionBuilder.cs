@@ -31,7 +31,7 @@ namespace AutoMapper.Execution
         public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
         public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
         public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
-        public static readonly MethodCallExpression CheckContextCall = Expression.Call(
+        private static readonly MethodCallExpression CheckContextCall = Expression.Call(
             typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext)), ContextParameter);
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
@@ -42,10 +42,10 @@ namespace AutoMapper.Execution
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
 
-        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter,
-            MemberMap propertyMap = null, Expression destinationParameter = null)
+        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression source,
+            MemberMap propertyMap = null, Expression destination = null)
         {
-            destinationParameter ??= Default(typePair.DestinationType);
+            destination ??= Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             Expression mapExpression = null;
             bool hasTypeConverter;
@@ -55,19 +55,22 @@ namespace AutoMapper.Execution
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
                     configurationProvider.Seal(typeMap);
-                    mapExpression = typeMap.MapExpression?.ConvertReplaceParameters(sourceParameter, destinationParameter);
+                    if (typeMap.MapExpression != null)
+                    {
+                        mapExpression = typeMap.Invoke(source, destination);
+                    }
                 }
             }
             else
             {
                 hasTypeConverter = false;
                 var mapper = configurationProvider.FindMapper(typePair);
-                mapExpression = mapper?.MapExpression(configurationProvider, profileMap, propertyMap, sourceParameter, destinationParameter);
+                mapExpression = mapper?.MapExpression(configurationProvider, profileMap, propertyMap, source, destination);
             }
-            mapExpression ??= ContextMap(typePair, sourceParameter, destinationParameter, propertyMap);
+            mapExpression ??= ContextMap(typePair, source, destination, propertyMap);
             if (!hasTypeConverter)
             {
-                mapExpression = NullCheckSource(profileMap, sourceParameter, destinationParameter, mapExpression, propertyMap);
+                mapExpression = NullCheckSource(profileMap, source, destination, mapExpression, propertyMap);
             }
             return ToType(mapExpression, typePair.DestinationType);
         }
@@ -138,6 +141,14 @@ namespace AutoMapper.Execution
         {
             var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Expression.Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
+        }
+        public static Expression CheckContext(TypeMap typeMap)
+        {
+            if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
+            {
+                return CheckContextCall;
+            }
+            return null;
         }
         public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>

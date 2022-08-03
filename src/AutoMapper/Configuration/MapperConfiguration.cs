@@ -199,17 +199,11 @@ namespace AutoMapper
                 {
                     return typeMap.MapExpression;
                 }
-                var mapDestinationType = typeMap.DestinationType;
                 var requestedDestinationType = requestedTypes.DestinationType;
                 var source = Parameter(requestedTypes.SourceType, "source");
                 var destination = Parameter(requestedDestinationType, "typeMapDestination");
-                var checkNullValueTypeDest = CheckNullValueType(destination, mapDestinationType);
-                return
-                    Lambda(
-                        ToType(
-                            Invoke(typeMap.MapExpression, ToType(source, typeMap.SourceType), ToType(checkNullValueTypeDest, mapDestinationType), ContextParameter),
-                            requestedDestinationType),
-                    source, destination, ContextParameter);
+                var checkNullValueTypeDest = CheckNullValueType(destination, typeMap.DestinationType);
+                return Lambda(ToType(typeMap.Invoke(source, checkNullValueTypeDest), requestedDestinationType), source, destination, ContextParameter);
             }
             static Expression CheckNullValueType(Expression expression, Type runtimeType) =>
                 !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, Default(runtimeType)) : expression;

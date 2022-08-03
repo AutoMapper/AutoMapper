@@ -54,9 +54,10 @@ namespace AutoMapper.Execution
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
             var mapperFunc = CreateMapperFunc(assignmentFunc);
-            if (_typeMap.MaxDepth > 0 || _typeMap.PreserveReferences)
+            var checkContext = CheckContext(_typeMap);
+            if (checkContext != null)
             {
-                statements.Add(CheckContextCall);
+                statements.Add(checkContext);
             }
             statements.Add(mapperFunc);
             variables.Add(_destination);

@@ -61,6 +61,8 @@ namespace AutoMapper
             => new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using CreateMap<{sourceType.Name}, {destinationType.Name}>.");
         public bool Projection { get; set; }
         public LambdaExpression MapExpression { get; private set; }
+        public Expression Invoke(Expression source, Expression destination) =>
+            Expression.Invoke(MapExpression, ToType(source, SourceType), ToType(destination, DestinationType), ContextParameter);
         internal bool CanConstructorMap() => Profile.ConstructorMappingEnabled && !DestinationType.IsAbstract &&
             !CustomConstruction && !HasTypeConverter && DestinationConstructors.Length > 0;
         public TypePair Types;
