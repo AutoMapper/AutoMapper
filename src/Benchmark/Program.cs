@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Benchmark.Flattening;
 
 namespace Benchmark
@@ -14,12 +15,16 @@ namespace Benchmark
                     { "Complex", new IObjectToObjectMapper[] { new ComplexTypeMapper(), new ManualComplexTypeMapper() } },
                     { "Deep", new IObjectToObjectMapper[] { new DeepTypeMapper(), new ManualDeepTypeMapper() } }
                 };
-            foreach(var pair in mappers)
+            while (true)
             {
-                foreach(var mapper in pair.Value)
+                foreach (var pair in mappers)
                 {
-                    new BenchEngine(mapper, pair.Key).Start();
+                    foreach (var mapper in pair.Value)
+                    {
+                        new BenchEngine(mapper, pair.Key).Start();
+                    }
                 }
+                Console.ReadLine();
             }
         }
     }

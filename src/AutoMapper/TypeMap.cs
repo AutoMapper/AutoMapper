@@ -12,7 +12,6 @@ namespace AutoMapper
     using static Execution.ExpressionBuilder;
     using Configuration;
     using Features;
-    using QueryableExtensions.Impl;
     using Internal;
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
