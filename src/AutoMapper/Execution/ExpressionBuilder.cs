@@ -43,15 +43,16 @@ namespace AutoMapper.Execution
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
 
         public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression source,
-            MemberMap propertyMap = null, Expression destination = null)
+            MemberMap memberMap = null, Expression destination = null)
         {
             destination ??= Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             Expression mapExpression = null;
-            bool hasTypeConverter;
+            bool nullCheck;
             if (typeMap != null)
             {
-                hasTypeConverter = typeMap.HasTypeConverter;
+                var allowNull = memberMap?.AllowNull;
+                nullCheck = !typeMap.HasTypeConverter && allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues;
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
                     configurationProvider.Seal(typeMap);
@@ -63,37 +64,41 @@ namespace AutoMapper.Execution
             }
             else
             {
-                hasTypeConverter = false;
                 var mapper = configurationProvider.FindMapper(typePair);
-                mapExpression = mapper?.MapExpression(configurationProvider, profileMap, propertyMap, source, destination);
+                if (mapper != null)
+                {
+                    mapExpression = mapper.MapExpression(configurationProvider, profileMap, memberMap, source, destination);
+                    nullCheck = mapExpression != source;
+                    mapExpression = ToType(mapExpression, typePair.DestinationType);
+                }
+                else
+                {
+                    nullCheck = true;
+                }
             }
-            mapExpression ??= ContextMap(typePair, source, destination, propertyMap);
-            if (!hasTypeConverter)
-            {
-                mapExpression = NullCheckSource(profileMap, source, destination, mapExpression, propertyMap);
-            }
-            return ToType(mapExpression, typePair.DestinationType);
+            mapExpression ??= ContextMap(typePair, source, destination, memberMap);
+            return nullCheck ? NullCheckSource(profileMap, source, destination, mapExpression, memberMap) : mapExpression;
         }
-        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression mapExpression, MemberMap memberMap)
+        public static Expression NullCheckSource(ProfileMap profileMap, Expression source, Expression destination, Expression mapExpression, MemberMap memberMap)
         {
-            var sourceType = sourceParameter.Type;
+            var sourceType = source.Type;
             if (sourceType.IsValueType && !sourceType.IsNullableType())
             {
                 return mapExpression;
             }
-            var destinationType = destinationParameter.Type;
+            var destinationType = destination.Type;
             var isCollection = destinationType.IsCollection();
             var mustUseDestination = memberMap is { MustUseDestination: true };
             var ifSourceNull = mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
-            return sourceParameter.IfNullElse(ifSourceNull, mapExpression);
+            return source.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {
                 if (!isCollection)
                 {
-                    return destinationParameter;
+                    return destination;
                 }
                 MethodInfo clearMethod;
-                var destinationVariable = Variable(destinationParameter.Type, "collectionDestination");
+                var destinationVariable = Variable(destination.Type, "collectionDestination");
                 Expression collection = destinationVariable;
                 if (destinationType.IsListType())
                 {
@@ -106,7 +111,7 @@ namespace AutoMapper.Execution
                     {
                         if (!mustUseDestination)
                         {
-                            return destinationParameter;
+                            return destination;
                         }
                         var destinationElementType = GetEnumerableElementType(destinationType);
                         destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
@@ -115,7 +120,7 @@ namespace AutoMapper.Execution
                     clearMethod = destinationCollectionType.GetMethod("Clear");
                 }
                 return Block(new[] { destinationVariable },
-                    Assign(destinationVariable, destinationParameter),
+                    Assign(destinationVariable, destination),
                     Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)),
                     destinationVariable);
             }
@@ -123,14 +128,14 @@ namespace AutoMapper.Execution
             {
                 if ((isCollection && profileMap.AllowsNullCollectionsFor(memberMap)) || (!isCollection && profileMap.AllowsNullDestinationValuesFor(memberMap)))
                 {
-                    return destinationParameter.NodeType == ExpressionType.Default ? destinationParameter : Default(destinationType);
+                    return destination.NodeType == ExpressionType.Default ? destination : Default(destinationType);
                 }
                 if (destinationType.IsArray)
                 {
                     var destinationElementType = destinationType.GetElementType();
                     var rank = destinationType.GetArrayRank();
-                    return rank == 1 ? 
-                        Expression.Call(ArrayEmptyMethod.MakeGenericMethod(destinationElementType)) : 
+                    return rank == 1 ?
+                        Expression.Call(ArrayEmptyMethod.MakeGenericMethod(destinationElementType)) :
                         NewArrayBounds(destinationElementType, Enumerable.Repeat(Zero, rank));
                 }
                 return ObjectFactory.GenerateConstructorExpression(destinationType);
@@ -164,7 +169,7 @@ namespace AutoMapper.Execution
             }
             var transformers = perMember.Concat(perMap).Concat(perProfile);
             return Apply(transformers, memberMap, source);
-            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, MemberMap memberMap, Expression source) => 
+            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, MemberMap memberMap, Expression source) =>
                 transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source,
                     (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
         }
@@ -325,22 +330,36 @@ namespace AutoMapper.Execution
             return newLambda;
         }
         public static Expression Replace(this Expression exp, Expression old, Expression replace) => new ReplaceVisitor(old, replace).Visit(exp);
-        public static Expression NullCheck(this Expression expression, Type destinationType = null, Expression defaultValue = null)
+        public static Expression NullCheck(this Expression expression, MemberMap memberMap = null, Expression defaultValue = null)
         {
             var chain = expression.GetChain();
-            if (chain.Count == 0 || chain.Peek().Target is not ParameterExpression parameter)
+            var min = memberMap?.IncludedMember != null ? 1 : 2;
+            if (chain.Count < min || chain.Peek().Target is not ParameterExpression parameter)
             {
                 return expression;
             }
+            var destinationType = memberMap?.DestinationType;
             var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ?
                 destinationType : expression.Type;
             var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : Default(returnType);
             ParameterExpression[] variables = null;
-            var name = parameter.Name;
+            Expression begin;
+            string name;
+            if (min == 1)
+            {
+                begin = parameter;
+                name = parameter.Name;
+            }
+            else
+            {
+                var second = chain.Pop();
+                begin = second.Expression;
+                name = parameter.Name + second.MemberInfo.Name;
+            }
             int index = 0;
-            var nullCheckedExpression = NullCheck(parameter);
+            var nullCheckedExpression = NullCheck(begin);
             return variables == null ? nullCheckedExpression : Block(variables, nullCheckedExpression);
-            Expression NullCheck(ParameterExpression variable)
+            Expression NullCheck(Expression variable)
             {
                 var member = chain.Pop();
                 if (chain.Count == 0)

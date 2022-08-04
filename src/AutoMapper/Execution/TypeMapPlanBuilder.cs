@@ -235,10 +235,7 @@ namespace AutoMapper.Execution
             {
                 mapperFunc = Condition(overMaxDepth, Default(DestinationType), mapperFunc);
             }
-            if (_typeMap.Profile.AllowNullDestinationValues)
-            {
-                mapperFunc = Source.IfNullElse(Default(DestinationType), mapperFunc);
-            }
+            mapperFunc = NullCheckSource(_typeMap.Profile, Source, _initialDestination, mapperFunc, null);
             return CheckReferencesCache(mapperFunc);
         }
         private Expression CheckReferencesCache(Expression valueBuilder)
@@ -421,7 +418,7 @@ namespace AutoMapper.Execution
         public Expression GetExpression(MemberMap memberMap, Expression source, Expression _, Expression destinationMember)
         {
             var mapFrom = Lambda.ReplaceParameters(source);
-            var nullCheckedExpression = mapFrom.NullCheck(memberMap.DestinationType, destinationMember);
+            var nullCheckedExpression = mapFrom.NullCheck(memberMap, destinationMember);
             if (nullCheckedExpression != mapFrom)
             {
                 return nullCheckedExpression;
@@ -461,7 +458,7 @@ namespace AutoMapper.Execution
             var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
                 (SourceMemberName != null ?
                     PropertyOrField(source, SourceMemberName) :
-                    memberMap.ChainSourceMembers(source, iResolverTypeArgs[1], destinationMember) ?? Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
+                    memberMap.ChainSourceMembers(source, destinationMember) ?? Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
             return Call(ToType(_instance, InterfaceType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage()
                 => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");

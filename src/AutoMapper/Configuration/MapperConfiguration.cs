@@ -207,33 +207,38 @@ namespace AutoMapper
             }
             static Expression CheckNullValueType(Expression expression, Type runtimeType) =>
                 !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, Default(runtimeType)) : expression;
-            LambdaExpression GenerateObjectMapperExpression(in MapRequest mapRequest, IObjectMapper mapperToUse)
+            LambdaExpression GenerateObjectMapperExpression(in MapRequest mapRequest, IObjectMapper mapper)
             {
                 var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
-                var destination = Parameter(mapRequest.RequestedTypes.DestinationType, "mapperDestination");
+                var destinationType = mapRequest.RequestedTypes.DestinationType;
+                var destination = Parameter(destinationType, "mapperDestination");
                 var runtimeDestinationType = mapRequest.RuntimeTypes.DestinationType;
                 Expression fullExpression;
-                if (mapperToUse == null)
+                bool nullCheck;
+                if (mapper == null)
                 {
                     var exception = new AutoMapperMappingException("Missing type map configuration or unsupported mapping.", null, mapRequest.RuntimeTypes)
                     {
                         MemberMap = mapRequest.MemberMap
                     };
+                    nullCheck = true;
                     fullExpression = Throw(Constant(exception), runtimeDestinationType);
                 }
                 else
                 {
                     var checkNullValueTypeDest = CheckNullValueType(destination, runtimeDestinationType);
-                    var map = mapperToUse.MapExpression(this, Configuration, mapRequest.MemberMap,
-                                                                            ToType(source, mapRequest.RuntimeTypes.SourceType),
-                                                                            ToType(checkNullValueTypeDest, runtimeDestinationType));
+                    var mapperSource = ToType(source, mapRequest.RuntimeTypes.SourceType);
+                    var map = mapper.MapExpression(this, Configuration, mapRequest.MemberMap, mapperSource, ToType(checkNullValueTypeDest, runtimeDestinationType));
+                    nullCheck = map != mapperSource;
                     var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest));
-                    var throwExpression = Throw(newException, runtimeDestinationType);
-                    fullExpression = TryCatch(ToType(map, runtimeDestinationType), Catch(ExceptionParameter, throwExpression));
+                    fullExpression = TryCatch(ToType(map, destinationType), Catch(ExceptionParameter, Throw(newException, destinationType)));
                 }
-                var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
-                var nullCheckSource = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
-                return Lambda(nullCheckSource, source, destination, ContextParameter);
+                if (nullCheck)
+                {
+                    var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
+                    fullExpression = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
+                }
+                return Lambda(fullExpression, source, destination, ContextParameter);
             }
         }
         static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)

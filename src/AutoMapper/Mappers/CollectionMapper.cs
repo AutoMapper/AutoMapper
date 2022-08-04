@@ -74,13 +74,13 @@ namespace AutoMapper.Internal.Mappers
                     addItems = Condition(overMaxDepth, ExpressionBuilder.Empty, addItems);
                 }
                 var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
-                var checkNull = Block(new[] { newExpression, passedDestination },
-                        Assign(passedDestination, destExpression),
-                        assignNewExpression,
-                        Call(destination, clearMethod),
-                        addItems,
-                        destination);
-                return CheckContext();
+                return Block(new[] { newExpression, passedDestination },
+                                    CheckContext() ?? ExpressionBuilder.Empty,
+                                    Assign(passedDestination, destExpression),
+                                    assignNewExpression,
+                                    Call(destination, clearMethod),
+                                    addItems,
+                                    destination);
                 void GetDestinationType()
                 {
                     var immutableCollection = !mustUseDestination && destinationType.IsValueType;
@@ -132,16 +132,7 @@ namespace AutoMapper.Internal.Mappers
                 Expression CheckContext()
                 {
                     var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
-                    if (elementTypeMap == null)
-                    {
-                        return checkNull;
-                    }
-                    var checkContext = ExpressionBuilder.CheckContext(elementTypeMap);
-                    if (checkContext == null)
-                    {
-                        return checkNull;
-                    }
-                    return Block(checkContext, checkNull);
+                    return elementTypeMap == null ? null : ExpressionBuilder.CheckContext(elementTypeMap);
                 }
             }
         }
