@@ -47,9 +47,7 @@ namespace AutoMapper.Execution
             var statements = new List<Expression>();
             if (_typeMap.IncludedMembersTypeMaps.Count > 0)
             {
-                variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
-                statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
-                    Assign(v, i.MemberExpression.ReplaceParameters(parameters).NullCheck())));
+                IncludeMembers(parameters, variables, statements);
             }
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
@@ -72,6 +70,12 @@ namespace AutoMapper.Execution
                 {
                     typeMapsPath.Clear();
                 }
+            }
+            void IncludeMembers(ParameterExpression[] parameters, List<ParameterExpression> variables, List<Expression> statements)
+            {
+                variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
+                statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
+                    Assign(v, i.MemberExpression.ReplaceParameters(parameters).NullCheck())));
             }
         }
         private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
