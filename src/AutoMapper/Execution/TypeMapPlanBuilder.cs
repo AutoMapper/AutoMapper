@@ -76,11 +76,6 @@ namespace AutoMapper.Execution
         }
         private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
         {
-            if (typeMap.DestinationTypeOverride != null)
-            {
-                CheckForCycles(configurationProvider, configurationProvider.GetIncludedTypeMap(typeMap.AsPair()), typeMapsPath);
-                return;
-            }
             typeMapsPath.Add(typeMap);
             foreach (var memberMap in MemberMaps())
             {
