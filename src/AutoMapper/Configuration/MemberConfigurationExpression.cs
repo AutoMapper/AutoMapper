@@ -15,6 +15,7 @@ namespace AutoMapper.Configuration
         LambdaExpression SourceExpression { get; }
         LambdaExpression GetDestinationExpression();
         IPropertyMapConfiguration Reverse();
+        bool Ignored => false;
     }
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
@@ -90,15 +91,18 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.AddValueTransformation(new ValueTransformerConfiguration(pm.DestinationType, transformer)));
         public void ExplicitExpansion() => PropertyMapActions.Add(pm => pm.ExplicitExpansion = true);
         public void Ignore() => Ignore(ignorePaths: true);
-        public void Ignore(bool ignorePaths) =>
+        public void Ignore(bool ignorePaths)
+        {
+            Ignored = true;
             PropertyMapActions.Add(pm =>
             {
                 pm.Ignored = true;
-                if(ignorePaths && pm.TypeMap.PathMaps.Count > 0)
+                if (ignorePaths && pm.TypeMap.PathMaps.Count > 0)
                 {
                     pm.TypeMap.IgnorePaths(DestinationMember);
                 }
             });
+        }
         public void AllowNull() => SetAllowNull(true);
         public void DoNotAllowNull() => SetAllowNull(false);
         private void SetAllowNull(bool value) => PropertyMapActions.Add(pm => pm.AllowNull = value);
@@ -148,6 +152,7 @@ namespace AutoMapper.Configuration
             }
         }
         public LambdaExpression SourceExpression { get; private set; }
+        public bool Ignored { get; private set; }
         public LambdaExpression GetDestinationExpression() => DestinationMember.Lambda();
         public IPropertyMapConfiguration Reverse()
         {

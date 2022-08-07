@@ -5,6 +5,8 @@ InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMapp
 MembersMustExist : Member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.IMappingOperationOptions AutoMapper.ResolutionContext.Options.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ValueResolverConfiguration' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Default interface member 'public System.Boolean AutoMapper.Configuration.IPropertyMapConfiguration.Ignored' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Default interface member 'public System.Boolean AutoMapper.Configuration.IPropertyMapConfiguration.Ignored.get()' is present in the implementation but not in the contract.
 MembersMustExist : Member 'public void AutoMapper.Configuration.MappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' does not exist in the implementation but it does exist in the contract.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.IgnoreAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.MapAtRuntimeAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
@@ -25,4 +27,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 26
+Total Issues: 28

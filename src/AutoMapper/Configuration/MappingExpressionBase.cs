@@ -21,6 +21,7 @@ namespace AutoMapper.Configuration
         ITypeMapConfiguration ReverseTypeMap { get; }
         TypeMap TypeMap { get; }
         bool HasTypeConverter { get; }
+        IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember);
     }
     public abstract class MappingExpressionBase : ITypeMapConfiguration
     {
@@ -60,11 +61,6 @@ namespace AutoMapper.Configuration
             TypeMap = typeMap;
             typeMap.Projection = Projection;
             typeMap.ConfiguredMemberList = _memberList;
-            var globalIgnores = typeMap.Profile.GlobalIgnores;
-            if (globalIgnores.Count > 0)
-            {
-                GlobalIgnores(typeMap, globalIgnores);
-            }
             foreach (var action in TypeMapActions)
             {
                 action(typeMap);
@@ -149,18 +145,6 @@ namespace AutoMapper.Configuration
                 ReverseMapExpression.IncludeBaseCore(includedBaseType.DestinationType, includedBaseType.SourceType);
             }
             ReverseIncludedMembers(typeMap);
-        }
-
-        private void GlobalIgnores(TypeMap typeMap, IReadOnlyCollection<string> globalIgnores)
-        {
-            foreach (var ignoredPropertyName in globalIgnores.Where(p => GetDestinationMemberConfiguration(p) == null))
-            {
-                var ignoredProperty = typeMap.DestinationSetters.SingleOrDefault(p => p.Name == ignoredPropertyName);
-                if (ignoredProperty != null)
-                {
-                    IgnoreDestinationMember(ignoredProperty);
-                }
-            }
         }
 
         private void MapDestinationCtorToSource(TypeMap typeMap)
@@ -263,11 +247,8 @@ namespace AutoMapper.Configuration
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
         }
 
-        protected IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
-            GetDestinationMemberConfiguration(destinationMember.Name);
-
-        private IPropertyMapConfiguration GetDestinationMemberConfiguration(string name) =>
-            _memberConfigurations?.FirstOrDefault(m => m.DestinationMember.Name == name);
+        public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
+            _memberConfigurations?.FirstOrDefault(m => m.DestinationMember == destinationMember);
 
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
     }

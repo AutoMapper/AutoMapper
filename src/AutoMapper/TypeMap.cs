@@ -37,9 +37,15 @@ namespace AutoMapper
             var sourceMembers = new List<MemberInfo>();
             foreach (var destinationProperty in DestinationTypeDetails.WriteAccessors)
             {
+                var destinationName = destinationProperty.Name;
+                var memberConfig = typeMapConfiguration?.GetDestinationMemberConfiguration(destinationProperty);
+                if (memberConfig?.Ignored is true || profile.GlobalIgnores.Contains(destinationName))
+                {
+                    continue;
+                }
                 sourceMembers.Clear();
                 var propertyType = destinationProperty.GetMemberType();
-                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationProperty.Name, sourceMembers,
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationName, sourceMembers,
                         typeMapConfiguration?.IsReverseMap is true))
                 {
                     AddPropertyMap(destinationProperty, propertyType, sourceMembers);
@@ -143,7 +149,7 @@ namespace AutoMapper
         public IEnumerable<LambdaExpression> GetAllIncludedMembers() => IncludedMembersNames.Length == 0 ||  SourceType.ContainsGenericParameters ?
             IncludedMembers : IncludedMembers.Concat(IncludedMembersNames.Select(name => MemberAccessLambda(SourceType, name)));
         public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMapping && ConstructorMap[destinationPropertyName] != null;
-        public void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
+        private void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
             propertyMap.MapByConvention(sourceMembers.ToArray());
