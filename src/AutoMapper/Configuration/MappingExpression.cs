@@ -60,10 +60,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        protected override void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true)
-        {
-            ForMember(property, _ => {}).Ignore(ignorePaths);
-        }
+        protected override void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true) => ForMember(property, o=>o.Ignore());
 
         internal MemberConfigurationExpression ForMember(MemberInfo destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
         {

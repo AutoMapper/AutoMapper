@@ -248,7 +248,7 @@ namespace AutoMapper.Configuration
         }
 
         public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
-            _memberConfigurations?.FirstOrDefault(m => m.DestinationMember == destinationMember);
+            _memberConfigurations?.Find(m => m.DestinationMember == destinationMember);
 
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
     }
@@ -442,7 +442,7 @@ namespace AutoMapper.Configuration
         {
             foreach (var property in PropertiesWithAnInaccessibleSetter(SourceType))
             {
-                ForSourceMember(property.Name, options => options.DoNotValidate());
+                ForSourceMemberCore(property, options => options.DoNotValidate());
             }
             return this as TMappingExpression;
         }

@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration.Conventions
     }
     public class ParentSourceToDestinationNameMapper : IParentSourceToDestinationNameMapper
     {
-        public List<ISourceToDestinationNameMapper> NamedMappers { get; } = new List<ISourceToDestinationNameMapper> { new DefaultName() };
+        public List<ISourceToDestinationNameMapper> NamedMappers { get; } = new(){ new DefaultName() };
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             MemberInfo memberInfo = null;
@@ -35,10 +35,10 @@ namespace AutoMapper.Configuration.Conventions
     }
     public class PrePostfixName : ISourceToDestinationNameMapper
     {
-        public List<string> Prefixes { get; } = new List<string>();
-        public List<string> Postfixes { get; } = new List<string>();
-        public List<string> DestinationPrefixes { get; } = new List<string>();
-        public List<string> DestinationPostfixes { get; } = new List<string>();
+        public List<string> Prefixes { get; } = new();
+        public List<string> Postfixes { get; } = new();
+        public List<string> DestinationPrefixes { get; } = new();
+        public List<string> DestinationPostfixes { get; } = new();
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             MemberInfo member;
@@ -54,24 +54,28 @@ namespace AutoMapper.Configuration.Conventions
     }
     public class ReplaceName : ISourceToDestinationNameMapper
     {
-        private readonly List<MemberNameReplacer> _memberNameReplacers = new List<MemberNameReplacer>();
+        private readonly List<MemberNameReplacer> _memberNameReplacers = new();
 
         public ReplaceName AddReplace(string original, string newValue)
         {
-            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
+            _memberNameReplacers.Add(new(original, newValue));
             return this;
         }
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
+            if (possibleSourceNames.Length == 0)
+            {
+                return null;
+            }
             var possibleDestNames = sourceTypeDetails.ReadAccessors.Select(mi => (mi, possibles : PossibleNames(mi.Name))).ToArray();
             foreach (var sourceName in possibleSourceNames)
             {
-                foreach (var destName in possibleDestNames)
+                foreach (var (mi, possibles) in possibleDestNames)
                 {
-                    if (Array.Exists(destName.possibles, name => string.Compare(name, sourceName, StringComparison.OrdinalIgnoreCase) == 0))
+                    if (possibles.Contains(sourceName, StringComparer.OrdinalIgnoreCase))
                     {
-                        return destName.mi;
+                        return mi;
                     }
                 }
             }

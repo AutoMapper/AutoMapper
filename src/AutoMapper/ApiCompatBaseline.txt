@@ -1,8 +1,13 @@
 Compat issues with assembly AutoMapper:
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.AutoMapAttribute' changed from '[AttributeUsageAttribute(1036, AllowMultiple=true)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple=true)]' in the implementation.
+MembersMustExist : Member 'public System.String AutoMapper.ExactMatchNamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public TMappingExpression AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.String AutoMapper.INamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public System.String AutoMapper.INamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.String AutoMapper.LowerUnderscoreNamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.String AutoMapper.PascalCaseNamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.IMappingOperationOptions AutoMapper.ResolutionContext.Options.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ValueResolverConfiguration' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Default interface member 'public System.Boolean AutoMapper.Configuration.IPropertyMapConfiguration.Ignored' is present in the implementation but not in the contract.
@@ -27,4 +32,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 28
+Total Issues: 33

@@ -17,6 +17,7 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ProfileMap
     {
+        private static readonly HashSet<string> EmptyHashSet = new();
         private ITypeMapConfiguration[] _typeMapConfigs;
         private Dictionary<TypePair, ITypeMapConfiguration> _openTypeMapConfigs;
         private Dictionary<Type, TypeDetails> _typeDetails;
@@ -38,13 +39,14 @@ namespace AutoMapper
             ShouldUseConstructor = profile.ShouldUseConstructor ?? configuration?.ShouldUseConstructor ?? (c => true);
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
             _memberConfigurations = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations).ToArray();
-            var nameSplitMember = _memberConfigurations[0].MemberMappers.OfType<NameSplitMember>().FirstOrDefault();
+            var nameSplitMember = (NameSplitMember)_memberConfigurations[0].MemberMappers.Find(m => m is NameSplitMember);
             if (nameSplitMember != null)
             {
                 nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
                 nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
             }
-            GlobalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores).ToArray();
+            var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
+            GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions).ToArray();
@@ -109,7 +111,7 @@ namespace AutoMapper
         public Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
-        public IReadOnlyCollection<string> GlobalIgnores { get; }
+        public HashSet<string> GlobalIgnores { get; }
         public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
         public List<string> Prefixes { get; }
