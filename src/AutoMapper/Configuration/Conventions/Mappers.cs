@@ -23,14 +23,15 @@ namespace AutoMapper.Configuration.Conventions
         public List<ISourceToDestinationNameMapper> NamedMappers { get; } = new(){ new DefaultName() };
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
-            MemberInfo memberInfo = null;
             foreach (var namedMapper in NamedMappers)
             {
-                memberInfo = namedMapper.GetMatchingMemberInfo(sourceTypeDetails, destType, destMemberType, nameToSearch);
+                var memberInfo = namedMapper.GetMatchingMemberInfo(sourceTypeDetails, destType, destMemberType, nameToSearch);
                 if (memberInfo != null)
-                    break;
+                {
+                    return memberInfo;
+                }
             }
-            return memberInfo;
+            return null;
         }
     }
     public class PrePostfixName : ISourceToDestinationNameMapper

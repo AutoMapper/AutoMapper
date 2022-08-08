@@ -41,18 +41,11 @@ namespace AutoMapper.Configuration.Conventions
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
         public List<IChildMemberConfiguration> MemberMappers { get; } = new();
-        public IMemberConfiguration AddMember<TMemberMapper>(Action<TMemberMapper> setupAction = null) where TMemberMapper : IChildMemberConfiguration, new()
-        {
+        public IMemberConfiguration AddMember<TMemberMapper>(Action<TMemberMapper> setupAction = null) where TMemberMapper : IChildMemberConfiguration, new() =>
             GetOrAdd(MemberMappers, setupAction);
-            return this;
-        }
-        public IMemberConfiguration AddName<TNameMapper>(Action<TNameMapper> setupAction = null)
-            where TNameMapper : ISourceToDestinationNameMapper, new()
-        {
+        public IMemberConfiguration AddName<TNameMapper>(Action<TNameMapper> setupAction = null) where TNameMapper : ISourceToDestinationNameMapper, new() =>
             GetOrAdd(NameMapper.NamedMappers, setupAction);
-            return this;
-        }
-        private void GetOrAdd<TMemberMapper>(IList list, Action<TMemberMapper> setupAction = null) where TMemberMapper : new()
+        private IMemberConfiguration GetOrAdd<TMemberMapper>(IList list, Action<TMemberMapper> setupAction = null) where TMemberMapper : new()
         {
             var child = list.OfType<TMemberMapper>().FirstOrDefault();
             if (child == null)
@@ -61,6 +54,7 @@ namespace AutoMapper.Configuration.Conventions
                 list.Add(child);
             }
             setupAction?.Invoke(child);
+            return this;
         }
         public MemberConfiguration()
         {
@@ -87,9 +81,13 @@ namespace AutoMapper.Configuration.Conventions
         public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
         {
             var destinationMemberNamingConvention = isReverseMap ? SourceMemberNamingConvention : DestinationMemberNamingConvention;
-            var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
             var matches = destinationMemberNamingConvention.Split(nameToSearch);
             var length = matches.Length;
+            if (length < 2)
+            {
+                return false;
+            }
+            var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
             var separator = sourceMemberNamingConvention.SeparatorCharacter;
             for (var index = 1; index <= length; index++)
             {
