@@ -88,29 +88,26 @@ namespace AutoMapper.Configuration.Conventions
         {
             var destinationMemberNamingConvention = isReverseMap ? SourceMemberNamingConvention : DestinationMemberNamingConvention;
             var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
-            var matches = destinationMemberNamingConvention.SplittingExpression?.Matches(nameToSearch);
-            if (matches == null || matches.Count < 2)
+            var matches = destinationMemberNamingConvention.Split(nameToSearch);
+            var length = matches.Length;
+            var separator = sourceMemberNamingConvention.SeparatorCharacter;
+            for (var index = 1; index <= length; index++)
             {
-                return false;
-            }
-            MemberInfo matchingMemberInfo = null;
-            for (var index = 1; index <= matches.Count; index++)
-            {
-                var first = string.Join(sourceMemberNamingConvention.SeparatorCharacter, matches.Take(index).Select(m=>m.Value));
-                matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
+                var first = string.Join(separator, matches, 0, index);
+                var matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
                 if (matchingMemberInfo != null)
                 {
                     resolvers.Add(matchingMemberInfo);
                     var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
-                    var second = string.Join(sourceMemberNamingConvention.SeparatorCharacter, matches.Skip(index).Select(m=>m.Value));
-                    var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap);
-                    if (!foundMatch)
-                        resolvers.RemoveAt(resolvers.Count - 1);
-                    else
-                        break;
+                    var second = string.Join(separator, matches, index, length - index);
+                    if (parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap))
+                    {
+                        return true;
+                    }
+                    resolvers.RemoveAt(resolvers.Count - 1);
                 }
             }
-            return matchingMemberInfo != null;
+            return false;
         }
     }
 }

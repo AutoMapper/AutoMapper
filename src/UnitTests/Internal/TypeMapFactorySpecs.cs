@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Xunit;
 using Shouldly;
@@ -11,7 +8,6 @@ namespace AutoMapper.UnitTests.Tests
 {
     using AutoMapper.Internal;
     using System;
-    using Assembly = System.Reflection.Assembly;
 
     public class StubNamingConvention : INamingConvention
     {
@@ -25,6 +21,8 @@ namespace AutoMapper.UnitTests.Tests
 
         public Regex SplittingExpression { get; set; }
         public string SeparatorCharacter { get; set; }
+
+        public string[] Split(string input) => SplittingExpression.Matches(input).Select(m=>m.Value).ToArray();
 
         public string ReplaceValue(Match match)
         {

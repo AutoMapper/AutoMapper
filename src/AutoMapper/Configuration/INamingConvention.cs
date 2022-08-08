@@ -1,4 +1,5 @@
-using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
 namespace AutoMapper
 {
     /// <summary>
@@ -6,30 +7,46 @@ namespace AutoMapper
     /// </summary>
     public interface INamingConvention
     {
-        /// <summary>
-        /// Regular expression on how to tokenize a member
-        /// </summary>
-        Regex SplittingExpression { get; }
+        string[] Split(string input);
         string SeparatorCharacter { get; }
     }
     public class ExactMatchNamingConvention : INamingConvention
     {
         public static readonly ExactMatchNamingConvention Instance = new();
-        public Regex SplittingExpression { get; }
-        public string SeparatorCharacter => "";
+        public string[] Split(string _) => Array.Empty<string>();
+        public string SeparatorCharacter => null;
     }
     public class PascalCaseNamingConvention : INamingConvention
     {
-        private static readonly Regex PascalCase = new(@"(\p{Lu}+(?=$|\p{Lu}[\p{Ll}0-9])|\p{Lu}?[\p{Ll}0-9]+)");
         public static readonly PascalCaseNamingConvention Instance = new();
-        public Regex SplittingExpression { get; } = PascalCase;
         public string SeparatorCharacter => "";
+        public string[] Split(string input)
+        {
+            List<string> result = null;
+            int lower = 0;
+            int index = 1;
+            while (index < input.Length)
+            {
+                if (char.IsUpper(input[index]))
+                {
+                    result ??= new();
+                    result.Add(input[lower..index]);
+                    lower = index;
+                }
+                index++;
+            }
+            if (result == null)
+            {
+                return Array.Empty<string>();
+            }
+            result.Add(input[lower..index]);
+            return result.ToArray();
+        }
     }
     public class LowerUnderscoreNamingConvention : INamingConvention
     {
-        private static readonly Regex LowerUnderscore = new(@"[\p{Ll}\p{Lu}0-9]+(?=_?)");
         public static readonly LowerUnderscoreNamingConvention Instance = new();
-        public Regex SplittingExpression { get; } = LowerUnderscore;
         public string SeparatorCharacter => "_";
+        public string[] Split(string input) => input.Split('_', StringSplitOptions.RemoveEmptyEntries);
     }
 }
