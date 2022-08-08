@@ -132,14 +132,14 @@ namespace AutoMapper
             return typeDetails;
         }
         private TypeDetails TypeDetailsFactory(Type type) => new(type, this);
-        public void Register(IGlobalConfiguration configurationProvider)
+        public void Register(IGlobalConfiguration configurationProvider, List<MemberInfo> sourceMembers)
         {
             foreach (var config in _typeMapConfigs)
             {
-                BuildTypeMap(configurationProvider, config);
+                BuildTypeMap(configurationProvider, config, sourceMembers);
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, sourceMembers);
                 }
             }
         }
@@ -154,9 +154,9 @@ namespace AutoMapper
                 }
             }
         }
-        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config)
+        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config, List<MemberInfo> sourceMembers)
         {
-            var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config);
+            var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config, sourceMembers);
             config.Configure(typeMap);
             configurationProvider.RegisterTypeMap(typeMap);
         }

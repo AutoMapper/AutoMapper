@@ -24,7 +24,7 @@ namespace AutoMapper
         private TypeMapDetails _details;
         private Dictionary<string, PropertyMap> _propertyMaps;
         private bool _sealed;
-        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null, List<MemberInfo> sourceMembers = null)
         {
             Types = new(sourceType, destinationType);
             Profile = profile;
@@ -34,7 +34,7 @@ namespace AutoMapper
             }
             SourceTypeDetails = profile.CreateTypeDetails(sourceType);
             DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
-            var sourceMembers = new List<MemberInfo>();
+            sourceMembers ??= new List<MemberInfo>();
             foreach (var destinationProperty in DestinationTypeDetails.WriteAccessors)
             {
                 var destinationName = destinationProperty.Name;
@@ -149,7 +149,7 @@ namespace AutoMapper
         public IEnumerable<LambdaExpression> GetAllIncludedMembers() => IncludedMembersNames.Length == 0 ||  SourceType.ContainsGenericParameters ?
             IncludedMembers : IncludedMembers.Concat(IncludedMembersNames.Select(name => MemberAccessLambda(SourceType, name)));
         public bool ConstructorParameterMatches(string destinationPropertyName) => ConstructorMapping && ConstructorMap[destinationPropertyName] != null;
-        private void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, IEnumerable<MemberInfo> sourceMembers)
+        private void AddPropertyMap(MemberInfo destProperty, Type destinationPropertyType, List<MemberInfo> sourceMembers)
         {
             var propertyMap = new PropertyMap(destProperty, destinationPropertyType, this);
             propertyMap.MapByConvention(sourceMembers.ToArray());

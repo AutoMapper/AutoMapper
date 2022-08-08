@@ -115,9 +115,10 @@ namespace AutoMapper
             return;
             void Seal()
             {
+                var sourceMembers = new List<MemberInfo>();
                 foreach (var profile in Profiles)
                 {
-                    profile.Register(this);
+                    profile.Register(this, sourceMembers);
                 }
                 foreach (var profile in Profiles)
                 {
