@@ -93,23 +93,23 @@ You can set the source and destination naming conventions
 
 ```c#
 var configuration = new MapperConfiguration(cfg => {
-  cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-  cfg.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+  cfg.SourceMemberNamingConvention = LowerUnderscoreNamingConvention.Instance;
+  cfg.DestinationMemberNamingConvention = PascalCaseNamingConvention.Instance;
 });
 ```
 
 This will map the following properties to each other:
 `  property_name -> PropertyName `
 
-You can also set this at a per profile level
+You can also set this per profile
 
 ```c#
 public class OrganizationProfile : Profile
 {
   public OrganizationProfile()
   {
-    SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-    DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+    SourceMemberNamingConvention = LowerUnderscoreNamingConvention.Instance;
+    DestinationMemberNamingConvention = PascalCaseNamingConvention.Instance;
     //Put your CreateMap... Etc.. here
   }
 }
