@@ -24,8 +24,7 @@ namespace AutoMapper
         {
             List<string> result = null;
             int lower = 0;
-            int index = 1;
-            while (index < input.Length)
+            for(int index = 1; index < input.Length; index++)
             {
                 if (char.IsUpper(input[index]))
                 {
@@ -33,13 +32,12 @@ namespace AutoMapper
                     result.Add(input[lower..index]);
                     lower = index;
                 }
-                index++;
             }
             if (result == null)
             {
                 return Array.Empty<string>();
             }
-            result.Add(input[lower..index]);
+            result.Add(input[lower..]);
             return result.ToArray();
         }
     }

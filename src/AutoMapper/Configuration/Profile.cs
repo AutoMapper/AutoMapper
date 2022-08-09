@@ -63,9 +63,9 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
-        private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
-        private readonly PrePostfixName _prePostfixName = new PrePostfixName();
-        private readonly List<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        private readonly List<ITypeMapConfiguration> _typeMapConfigs = new();
+        private readonly PrePostfixName _prePostfixName = new();
+        private readonly List<IMemberConfiguration> _memberConfigurations = new();
         private List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions;
         private List<Action<TypeMap, IMappingExpression>> _allTypeMapActions;
         private List<string> _globalIgnores;
@@ -186,7 +186,7 @@ namespace AutoMapper
         {
             _sourceExtensionMethods ??= new();
             _sourceExtensionMethods.AddRange(
-                type.GetMethods(TypeExtensions.StaticFlags).Where(m => m.GetParameters().Length == 1 && m.Has<ExtensionAttribute>()));
+                type.GetMethods(TypeExtensions.StaticFlags).Where(m => m.Has<ExtensionAttribute>() && m.GetParameters().Length == 1));
         }
     }
 }
