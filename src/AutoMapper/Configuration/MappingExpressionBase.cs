@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface ITypeMapConfiguration
     {
-        void Configure(TypeMap typeMap);
+        void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers);
         Type SourceType { get; }
         Type DestinationType { get; }
         bool IsReverseMap { get; }
@@ -56,7 +56,7 @@ namespace AutoMapper.Configuration
         protected List<IPropertyMapConfiguration> MemberConfigurations => _memberConfigurations ??= new();
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations => _sourceMemberConfigurations ??= new();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations => _ctorParamConfigurations ??= new();
-        public void Configure(TypeMap typeMap)
+        public void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers)
         {
             TypeMap = typeMap;
             typeMap.Projection = Projection;
@@ -67,7 +67,7 @@ namespace AutoMapper.Configuration
             }
             if (typeMap.ConstructorMap == null && typeMap.CanConstructorMap())
             {
-                MapDestinationCtorToSource(typeMap);
+                MapDestinationCtorToSource(typeMap, sourceMembers);
             }
             if (_memberConfigurations != null)
             {
@@ -147,9 +147,9 @@ namespace AutoMapper.Configuration
             ReverseIncludedMembers(typeMap);
         }
 
-        private void MapDestinationCtorToSource(TypeMap typeMap)
+        private void MapDestinationCtorToSource(TypeMap typeMap, List<MemberInfo> sourceMembers)
         {
-            var sourceMembers = new List<MemberInfo>();
+            sourceMembers ??= new();
             ConstructorMap ctorMap = new();
             typeMap.ConstructorMap = ctorMap;
             foreach (var destCtor in typeMap.DestinationConstructors)

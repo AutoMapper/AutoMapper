@@ -56,6 +56,7 @@ namespace AutoMapper
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
         private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
         private HashSet<TypeMap> _typeMapsPath = new();
+        private List<MemberInfo> _sourceMembers = new();
         private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
         private readonly ProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
@@ -111,14 +112,14 @@ namespace AutoMapper
                 profile.Clear();
             }
             _typeMapsPath = null;
+            _sourceMembers = null;
             _sealed = true;
             return;
             void Seal()
             {
-                var sourceMembers = new List<MemberInfo>();
                 foreach (var profile in Profiles)
                 {
-                    profile.Register(this, sourceMembers);
+                    profile.Register(this);
                 }
                 foreach (var profile in Profiles)
                 {
@@ -257,6 +258,7 @@ namespace AutoMapper
         internal ProfileMap[] Profiles { get; }
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
+        List<MemberInfo> IGlobalConfiguration.SourceMembers => _sourceMembers;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetExecutionPlan(mapRequest);
         private Delegate GetExecutionPlan(in MapRequest mapRequest) => _executionPlans.GetOrAdd(mapRequest);

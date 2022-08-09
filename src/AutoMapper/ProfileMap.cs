@@ -132,14 +132,14 @@ namespace AutoMapper
             return typeDetails;
         }
         private TypeDetails TypeDetailsFactory(Type type) => new(type, this);
-        public void Register(IGlobalConfiguration configurationProvider, List<MemberInfo> sourceMembers)
+        public void Register(IGlobalConfiguration configurationProvider)
         {
             foreach (var config in _typeMapConfigs)
             {
-                BuildTypeMap(configurationProvider, config, sourceMembers);
+                BuildTypeMap(configurationProvider, config);
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap, sourceMembers);
+                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
                 }
             }
         }
@@ -154,10 +154,11 @@ namespace AutoMapper
                 }
             }
         }
-        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config, List<MemberInfo> sourceMembers)
+        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config)
         {
+            var sourceMembers = configurationProvider.SourceMembers;
             var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config, sourceMembers);
-            config.Configure(typeMap);
+            config.Configure(typeMap, sourceMembers);
             configurationProvider.RegisterTypeMap(typeMap);
         }
         private void Configure(ITypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
@@ -185,7 +186,7 @@ namespace AutoMapper
             {
                 var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
                 action(typeMap, expression);
-                expression.Configure(typeMap);
+                expression.Configure(typeMap, configurationProvider.SourceMembers);
             }
             foreach (var action in AllPropertyMapActions)
             {
@@ -207,7 +208,7 @@ namespace AutoMapper
             {
                 closedMap = new TypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig);
             }
-            openMapConfig.Configure(closedMap);
+            openMapConfig.Configure(closedMap, configurationProvider.SourceMembers);
             Configure(closedMap, configurationProvider);
             closedMap.CloseGenerics(openMapConfig, closedTypes);
             return closedMap;

@@ -34,7 +34,7 @@ namespace AutoMapper
             }
             SourceTypeDetails = profile.CreateTypeDetails(sourceType);
             DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
-            sourceMembers ??= new List<MemberInfo>();
+            sourceMembers ??= new();
             foreach (var destinationProperty in DestinationTypeDetails.WriteAccessors)
             {
                 var destinationName = destinationProperty.Name;
