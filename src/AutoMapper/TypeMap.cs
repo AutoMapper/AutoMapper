@@ -24,7 +24,7 @@ namespace AutoMapper
         private TypeMapDetails _details;
         private Dictionary<string, PropertyMap> _propertyMaps;
         private bool _sealed;
-        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, ITypeMapConfiguration typeMapConfiguration = null, List<MemberInfo> sourceMembers = null)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration = null, List<MemberInfo> sourceMembers = null)
         {
             Types = new(sourceType, destinationType);
             Profile = profile;
@@ -270,7 +270,7 @@ namespace AutoMapper
             }
             _details.CopyInheritedMapsTo(typeMap);
         }
-        public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes) => TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
+        public void CloseGenerics(TypeMapConfiguration openMapConfig, TypePair closedTypes) => TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
         public bool AddMemberMap(IncludedMember includedMember) => Details.AddMemberMap(includedMember);
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap) =>
             Details.FindOrCreatePathMapFor(destinationExpression, path, typeMap);

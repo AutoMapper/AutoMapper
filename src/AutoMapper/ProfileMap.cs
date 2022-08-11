@@ -18,8 +18,8 @@ namespace AutoMapper
     public class ProfileMap
     {
         private static readonly HashSet<string> EmptyHashSet = new();
-        private ITypeMapConfiguration[] _typeMapConfigs;
-        private Dictionary<TypePair, ITypeMapConfiguration> _openTypeMapConfigs;
+        private TypeMapConfiguration[] _typeMapConfigs;
+        private Dictionary<TypePair, TypeMapConfiguration> _openTypeMapConfigs;
         private Dictionary<Type, TypeDetails> _typeDetails;
         private ConcurrentDictionaryWrapper<Type, TypeDetails> _runtimeTypeDetails;
         private readonly IMemberConfiguration[] _memberConfigurations;
@@ -63,7 +63,7 @@ namespace AutoMapper
             return;
             void SetTypeMapConfigs()
             {
-                _typeMapConfigs = new ITypeMapConfiguration[profile.TypeMapConfigs.Count];
+                _typeMapConfigs = new TypeMapConfiguration[profile.TypeMapConfigs.Count];
                 var index = 0;
                 var reverseMapsCount = 0;
                 foreach (var typeMapConfig in profile.TypeMapConfigs)
@@ -146,7 +146,7 @@ namespace AutoMapper
                 }
             }
         }
-        private void BuildTypeMap(IGlobalConfiguration configurationProvider, ITypeMapConfiguration config)
+        private void BuildTypeMap(IGlobalConfiguration configurationProvider, TypeMapConfiguration config)
         {
             var sourceMembers = configurationProvider.SourceMembers;
             var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config, sourceMembers);
@@ -171,7 +171,7 @@ namespace AutoMapper
                 }
             }
         }
-        private void Configure(ITypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
+        private void Configure(TypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
         {
             var typeMap = typeMapConfiguration.TypeMap;
             if (typeMap.IncludeAllDerivedTypes)
@@ -211,7 +211,7 @@ namespace AutoMapper
             ApplyDerivedMaps(typeMap, typeMap, configurationProvider);
             ApplyMemberMaps(typeMap, configurationProvider);
         }
-        public TypeMap CreateClosedGenericTypeMap(ITypeMapConfiguration openMapConfig, TypePair closedTypes, IGlobalConfiguration configurationProvider)
+        public TypeMap CreateClosedGenericTypeMap(TypeMapConfiguration openMapConfig, TypePair closedTypes, IGlobalConfiguration configurationProvider)
         {
             TypeMap closedMap;
             lock (configurationProvider)
@@ -223,7 +223,7 @@ namespace AutoMapper
             closedMap.CloseGenerics(openMapConfig, closedTypes);
             return closedMap;
         }
-        public ITypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
+        public TypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
         private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configurationProvider)
         {
             foreach (var baseMap in configurationProvider.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))

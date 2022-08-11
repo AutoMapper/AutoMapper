@@ -369,7 +369,7 @@ namespace AutoMapper
                         FindTypeMapFor(genericTypePair.SourceType, typePair.DestinationType) ??
                         FindTypeMapFor(typePair.SourceType, genericTypePair.DestinationType) ??
                         FindTypeMapFor(genericTypePair);
-                    ITypeMapConfiguration genericMapConfig;
+                    TypeMapConfiguration genericMapConfig;
                     ProfileMap profile;
                     TypeMap cachedMap;
                     TypePair closedTypes;
@@ -461,7 +461,7 @@ namespace AutoMapper
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
         void IGlobalConfiguration.Seal(TypeMap typeMap) => typeMap.Seal(this, _typeMapsPath);
-        void IGlobalConfiguration.RegisterAsMap(ITypeMapConfiguration typeMapConfiguration) =>
+        void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>
             _resolvedMaps[typeMapConfiguration.Types] = GetIncludedTypeMap(new(typeMapConfiguration.SourceType, typeMapConfiguration.DestinationTypeOverride));
     }
 }

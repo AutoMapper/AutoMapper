@@ -54,8 +54,8 @@ namespace AutoMapper
         IReadOnlyCollection<string> GlobalIgnores { get; }
         INamingConvention SourceMemberNamingConvention { get; }
         INamingConvention DestinationMemberNamingConvention { get; }
-        IReadOnlyCollection<ITypeMapConfiguration> TypeMapConfigs { get; }
-        IReadOnlyCollection<ITypeMapConfiguration> OpenTypeMapConfigs { get; }
+        IReadOnlyCollection<TypeMapConfiguration> TypeMapConfigs { get; }
+        IReadOnlyCollection<TypeMapConfiguration> OpenTypeMapConfigs { get; }
         IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
     }
     /// <summary>
@@ -63,13 +63,13 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
-        private readonly List<ITypeMapConfiguration> _typeMapConfigs = new();
+        private readonly List<TypeMapConfiguration> _typeMapConfigs = new();
         private readonly PrePostfixName _prePostfixName = new();
         private readonly List<IMemberConfiguration> _memberConfigurations = new();
         private List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions;
         private List<Action<TypeMap, IMappingExpression>> _allTypeMapActions;
         private List<string> _globalIgnores;
-        private List<ITypeMapConfiguration> _openTypeMapConfigs;
+        private List<TypeMapConfiguration> _openTypeMapConfigs;
         private List<MethodInfo> _sourceExtensionMethods;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _constructorMappingEnabled;
@@ -102,8 +102,8 @@ namespace AutoMapper
         IReadOnlyCollection<string> IProfileConfiguration.GlobalIgnores => _globalIgnores.NullCheck();
         IReadOnlyCollection<IMemberConfiguration> IProfileConfiguration.MemberConfigurations => _memberConfigurations;
         IReadOnlyCollection<MethodInfo> IProfileConfiguration.SourceExtensionMethods => _sourceExtensionMethods.NullCheck();
-        IReadOnlyCollection<ITypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
-        IReadOnlyCollection<ITypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs.NullCheck();
+        IReadOnlyCollection<TypeMapConfiguration> IProfileConfiguration.TypeMapConfigs => _typeMapConfigs;
+        IReadOnlyCollection<TypeMapConfiguration> IProfileConfiguration.OpenTypeMapConfigs => _openTypeMapConfigs.NullCheck();
         IReadOnlyCollection<ValueTransformerConfiguration> IProfileConfiguration.ValueTransformers => _valueTransformerConfigs.NullCheck();
 
         public virtual string ProfileName { get; }

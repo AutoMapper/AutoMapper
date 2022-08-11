@@ -11,20 +11,7 @@ namespace AutoMapper.Configuration
     using static Expression;
     using Execution;
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface ITypeMapConfiguration
-    {
-        void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers);
-        Type SourceType { get; }
-        Type DestinationType { get; }
-        Type DestinationTypeOverride { get; }
-        bool IsReverseMap { get; }
-        TypePair Types { get; }
-        ITypeMapConfiguration ReverseTypeMap { get; }
-        TypeMap TypeMap { get; }
-        bool HasTypeConverter { get; }
-        IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember);
-    }
-    public abstract class MappingExpressionBase : ITypeMapConfiguration
+    public abstract class TypeMapConfiguration
     {
         private List<ValueTransformerConfiguration> _valueTransformers;
         private Features<IMappingFeature> _features;
@@ -33,16 +20,15 @@ namespace AutoMapper.Configuration
         private List<IPropertyMapConfiguration> _memberConfigurations;
         private readonly MemberList _memberList;
         private readonly TypePair _types;
-
-        protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType) : this(memberList, new TypePair(sourceType, destinationType))
+        protected TypeMapConfiguration(MemberList memberList, Type sourceType, Type destinationType) : this(memberList, new TypePair(sourceType, destinationType))
         {
         }
-        protected MappingExpressionBase(MemberList memberList, TypePair types)
+        protected TypeMapConfiguration(MemberList memberList, TypePair types)
         {
             _memberList = memberList;
             _types = types;
         }
-        public Type DestinationTypeOverride { get; private set; }
+        public Type DestinationTypeOverride { get; protected set; }
         protected bool Projection { get; set; }
         public TypePair Types => _types;
         public bool IsReverseMap { get; set; }
@@ -51,22 +37,13 @@ namespace AutoMapper.Configuration
         public Type SourceType => _types.SourceType;
         public Type DestinationType => _types.DestinationType;
         public Features<IMappingFeature> Features => _features ??= new();
-        public ITypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
+        public TypeMapConfiguration ReverseTypeMap => ReverseMapExpression;
         public List<ValueTransformerConfiguration> ValueTransformers => _valueTransformers ??= new();
-        protected MappingExpressionBase ReverseMapExpression { get; set; }
+        protected TypeMapConfiguration ReverseMapExpression { get; set; }
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
         protected List<IPropertyMapConfiguration> MemberConfigurations => _memberConfigurations ??= new();
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations => _sourceMemberConfigurations ??= new();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations => _ctorParamConfigurations ??= new();
-        public void As(Type typeOverride)
-        {
-            if (typeOverride == DestinationType)
-            {
-                throw new InvalidOperationException("As must specify a derived type, not " + DestinationType);
-            }
-            typeOverride.CheckIsDerivedFrom(DestinationType);
-            DestinationTypeOverride = typeOverride;
-        }
         public void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers)
         {
             TypeMap = typeMap;
@@ -105,8 +82,7 @@ namespace AutoMapper.Configuration
                 ConfigureReverseMap(typeMap);
             }
         }
-
-        protected void ReverseMapCore(MappingExpressionBase reverseMap)
+        protected void ReverseMapCore(TypeMapConfiguration reverseMap)
         {
             ReverseMapExpression = reverseMap;
             if (_memberConfigurations != null)
@@ -115,7 +91,6 @@ namespace AutoMapper.Configuration
             }
             _features?.ReverseTo(reverseMap.Features);
         }
-
         private void AddCtorParamConfigurations(TypeMap typeMap)
         {
             foreach (var paramConfig in _ctorParamConfigurations)
@@ -123,7 +98,6 @@ namespace AutoMapper.Configuration
                 paramConfig.Configure(typeMap);
             }
         }
-
         private void AddSourceMembersConfigurations(TypeMap typeMap)
         {
             foreach (var memberConfig in _sourceMemberConfigurations)
@@ -131,7 +105,6 @@ namespace AutoMapper.Configuration
                 memberConfig.Configure(typeMap);
             }
         }
-
         private void AddValueTransformers(TypeMap typeMap)
         {
             foreach (var valueTransformer in _valueTransformers)
@@ -139,7 +112,6 @@ namespace AutoMapper.Configuration
                 typeMap.AddValueTransformation(valueTransformer);
             }
         }
-
         private void ConfigureReverseMap(TypeMap typeMap)
         {
             ReverseSourceMembers(typeMap);
@@ -157,7 +129,6 @@ namespace AutoMapper.Configuration
             }
             ReverseIncludedMembers(typeMap);
         }
-
         private void MapDestinationCtorToSource(TypeMap typeMap, List<MemberInfo> sourceMembers)
         {
             sourceMembers ??= new();
@@ -187,10 +158,8 @@ namespace AutoMapper.Configuration
             return;
             bool IsConfigured(ParameterInfo parameter) => _ctorParamConfigurations?.Any(c => c.CtorParamName == parameter.Name) is true;
         }
-
         protected IEnumerable<IPropertyMapConfiguration> MapToSourceMembers() =>
             _memberConfigurations?.Where(m => m.SourceExpression != null && m.SourceExpression.Body == m.SourceExpression.Parameters[0]) ?? Array.Empty<IPropertyMapConfiguration>();
-
         private void ReverseIncludedMembers(TypeMap typeMap)
         {
             Stack<Member> chain = null;
@@ -202,7 +171,6 @@ namespace AutoMapper.Configuration
                 ReverseSourceMembers(memberPath, customExpression);
             }
         }
-
         private void ReverseSourceMembers(TypeMap typeMap)
         {
             foreach (var propertyMap in typeMap.PropertyMaps.Where(p => p.SourceMembers.Length > 1 && !p.SourceMembers.Any(s => s is MethodInfo)))
@@ -212,7 +180,6 @@ namespace AutoMapper.Configuration
                 ReverseSourceMembers(memberPath, customExpression);
             }
         }
-
         private void ReverseSourceMembers(MemberPath memberPath, LambdaExpression customExpression)
         {
             ReverseMapExpression.TypeMapActions.Add(reverseTypeMap =>
@@ -226,124 +193,95 @@ namespace AutoMapper.Configuration
                 pathMap.SetResolver(customExpression);
             });
         }
-
         protected void ForSourceMemberCore(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
             var memberInfo = SourceType.GetFieldOrProperty(sourceMemberName);
-
             ForSourceMemberCore(memberInfo, memberOptions);
         }
-
         protected void ForSourceMemberCore(MemberInfo memberInfo, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
             var srcConfig = new SourceMappingExpression(memberInfo);
-
             memberOptions(srcConfig);
-
             SourceMemberConfigurations.Add(srcConfig);
         }
-
         protected void IncludeCore(Type derivedSourceType, Type derivedDestinationType)
         {
             var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
             derivedTypes.CheckIsDerivedFrom(_types);
             TypeMapActions.Add(tm => tm.IncludeDerivedTypes(derivedTypes));
         }
-
-
         protected void IncludeBaseCore(Type sourceBase, Type destinationBase)
         {
             var baseTypes = new TypePair(sourceBase, destinationBase);
             _types.CheckIsDerivedFrom(baseTypes);
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
         }
-
         public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
             _memberConfigurations?.Find(m => m.DestinationMember == destinationMember);
-
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
     }
-
-    public abstract class MappingExpressionBase<TSource, TDestination, TMappingExpression>
-        : MappingExpressionBase, IMappingExpressionBase<TSource, TDestination, TMappingExpression> 
+    public abstract class MappingExpressionBase<TSource, TDestination, TMappingExpression> : TypeMapConfiguration, IMappingExpressionBase<TSource, TDestination, TMappingExpression>
         where TMappingExpression : class, IMappingExpressionBase<TSource, TDestination, TMappingExpression>
     {
-
-        protected MappingExpressionBase(MemberList memberList)
-            : base(memberList, typeof(TSource), typeof(TDestination))
+        protected MappingExpressionBase(MemberList memberList) : base(memberList, typeof(TSource), typeof(TDestination)){ }
+        protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType) : base(memberList, sourceType, destinationType){}
+        protected MappingExpressionBase(MemberList memberList, TypePair types) : base(memberList, types){}
+        public void As(Type typeOverride)
         {
+            if (typeOverride == DestinationType)
+            {
+                throw new InvalidOperationException("As must specify a derived type, not " + DestinationType);
+            }
+            typeOverride.CheckIsDerivedFrom(DestinationType);
+            DestinationTypeOverride = typeOverride;
         }
-
-        protected MappingExpressionBase(MemberList memberList, Type sourceType, Type destinationType)
-            : base(memberList, sourceType, destinationType)
-        {
-        }
-
-        protected MappingExpressionBase(MemberList memberList, TypePair types)
-            : base(memberList, types)
-        {
-        }
-
         public TMappingExpression MaxDepth(int depth)
         {
             TypeMapActions.Add(tm => tm.MaxDepth = depth);
 
             return this as TMappingExpression;
         }
-
         public TMappingExpression ConstructUsingServiceLocator()
         {
             TypeMapActions.Add(tm => tm.ConstructUsingServiceLocator());
 
             return this as TMappingExpression;
         }
-
         public TMappingExpression BeforeMap(Action<TSource, TDestination> beforeFunction) => BeforeMapCore((src, dest, ctxt) => beforeFunction(src, dest));
-
         private TMappingExpression BeforeMapCore(Expression<Action<TSource, TDestination, ResolutionContext>> expr)
         {
             TypeMapActions.Add(tm => tm.AddBeforeMapAction(expr));
             return this as TMappingExpression;
         }
-
         public TMappingExpression BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction) => 
             BeforeMapCore((src, dest, ctxt) => beforeFunction(src, dest, ctxt));
-
         public TMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination> =>
             BeforeMap(CallMapAction<TMappingAction>);
         public TMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination> =>
             AfterMap(CallMapAction<TMappingAction>);
         private static void CallMapAction<TMappingAction>(TSource source, TDestination destination, ResolutionContext context) =>
             ((IMappingAction<TSource, TDestination>)context.CreateInstance(typeof(TMappingAction))).Process(source, destination, context);
-
         public TMappingExpression AfterMap(Action<TSource, TDestination> afterFunction) => AfterMapCore((src, dest, ctxt) => afterFunction(src, dest));
-
         private TMappingExpression AfterMapCore(Expression<Action<TSource, TDestination, ResolutionContext>> expr)
         {
             TypeMapActions.Add(tm => tm.AddAfterMapAction(expr));
             return this as TMappingExpression;
         }
-
         public TMappingExpression AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction) => 
             AfterMapCore((src, dest, ctxt) => afterFunction(src, dest, ctxt));
-
         public TMappingExpression PreserveReferences()
         {
             TypeMapActions.Add(tm => tm.PreserveReferences = true);
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression DisableCtorValidation()
         {
             TypeMapActions.Add(tm =>
             {
                 tm.DisableConstructorValidation = true;
             });
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression ValidateMemberList(MemberList memberList)
         {
             TypeMapActions.Add(tm =>
@@ -352,84 +290,60 @@ namespace AutoMapper.Configuration
             });
             return this as TMappingExpression;
         }
-
         public TMappingExpression IncludeAllDerived()
         {
             TypeMapActions.Add(tm => tm.IncludeAllDerivedTypes = true);
             return this as TMappingExpression;
         }
-
         public TMappingExpression Include(Type otherSourceType, Type otherDestinationType)
         {
             IncludeCore(otherSourceType, otherDestinationType);
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression IncludeBase(Type sourceBase, Type destinationBase)
         {
             IncludeBaseCore(sourceBase, destinationBase);
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
             ForSourceMemberCore(sourceMemberName, memberOptions);
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor) => ConstructUsingCore(ctor);
-
         private TMappingExpression ConstructUsingCore(LambdaExpression ctor)
         {
             TypeMapActions.Add(tm => tm.CustomCtorFunction = ctor);
             return this as TMappingExpression;
         }
-
         public TMappingExpression ConstructUsing(Func<TSource, ResolutionContext, TDestination> ctor)
         {
             Expression<Func<TSource, ResolutionContext, TDestination>> expr = (src, ctxt) => ctor(src, ctxt);
             return ConstructUsingCore(expr);
         }
-
         public void ConvertUsing(Type typeConverterType)
         {
             HasTypeConverter = true;
             TypeMapActions.Add(tm => tm.TypeConverter = new ClassTypeConverter(typeConverterType, tm.Types.ITypeConverter()));
         }
-
         public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction) => ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest));
-
-        private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr) =>
-            SetTypeConverter(new LambdaTypeConverter(expr));
-
+        private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr) => SetTypeConverter(new LambdaTypeConverter(expr));
         private void SetTypeConverter(TypeConverter typeConverter)
         {
             HasTypeConverter = true;
             TypeMapActions.Add(tm => tm.TypeConverter = typeConverter);
         }
-
-        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction) =>
-            ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest, ctxt));
-
+        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction) => ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest, ctxt));
         public void ConvertUsing(ITypeConverter<TSource, TDestination> converter) => ConvertUsing(converter.Convert);
-
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination> => 
             SetTypeConverter(new ClassTypeConverter(typeof(TTypeConverter), typeof(ITypeConverter<TSource, TDestination>)));
-
         public TMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
             var ctorParamExpression = new CtorParamConfigurationExpression<TSource, TDestination>(ctorParamName, SourceType);
-
             paramOptions(ctorParamExpression);
-
             CtorParamConfigurations.Add(ctorParamExpression);
-
             return this as TMappingExpression;
         }
-
         public TMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
             foreach(var property in PropertiesWithAnInaccessibleSetter(DestinationType))
@@ -438,7 +352,6 @@ namespace AutoMapper.Configuration
             }
             return this as TMappingExpression;
         }
-
         public TMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
             foreach (var property in PropertiesWithAnInaccessibleSetter(SourceType))
@@ -447,11 +360,8 @@ namespace AutoMapper.Configuration
             }
             return this as TMappingExpression;
         }
-
         private static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(Type type) => type.GetRuntimeProperties().Where(p => p.GetSetMethod() == null);
-
         public void ConvertUsing(Expression<Func<TSource, TDestination>> mappingFunction) =>  SetTypeConverter(new ExpressionTypeConverter(mappingFunction));
-        
         public TMappingExpression AsProxy()
         {
             if (!DestinationType.IsInterface)

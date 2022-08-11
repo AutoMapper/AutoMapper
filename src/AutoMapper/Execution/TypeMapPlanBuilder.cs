@@ -496,7 +496,7 @@ namespace AutoMapper.Execution
     public abstract class TypeConverter
     {
         public abstract Expression GetExpression(ParameterExpression[] parameters);
-        public virtual void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes) { }
+        public virtual void CloseGenerics(TypeMapConfiguration openMapConfig, TypePair closedTypes) { }
         public virtual LambdaExpression ProjectToExpression => null;
     }
     public class LambdaTypeConverter : TypeConverter
@@ -521,7 +521,7 @@ namespace AutoMapper.Execution
         public Type ConverterInterface { get; }
         public override Expression GetExpression(ParameterExpression[] parameters) =>
             Call(ToType(ServiceLocator(ConverterType), ConverterInterface), "Convert", parameters);
-        public override void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
+        public override void CloseGenerics(TypeMapConfiguration openMapConfig, TypePair closedTypes)
         {
             var typeParams = (openMapConfig.SourceType.IsGenericTypeDefinition ? closedTypes.SourceType.GenericTypeArguments : Type.EmptyTypes)
                 .Concat(openMapConfig.DestinationType.IsGenericTypeDefinition ? closedTypes.DestinationType.GenericTypeArguments : Type.EmptyTypes);
