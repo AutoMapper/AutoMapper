@@ -199,8 +199,7 @@ namespace AutoMapper.Internal.Mappers
                 {
                     sourceElementType = sourceType.GetElementType();
                     createDestination = Assign(destination, NewArrayBounds(destinationElementType, ArrayLength(sourceExpression)));
-                    if (!destinationElementType.IsAssignableFrom(sourceElementType) || 
-                        configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null)
+                    if (MustMap(sourceElementType, destinationElementType))
                     {
                         return null;
                     }
@@ -212,13 +211,14 @@ namespace AutoMapper.Internal.Mappers
                 Expression MapFromIEnumerable()
                 {
                     var iEnumerableType = sourceType.GetIEnumerableType();
-                    if (iEnumerableType == null || (sourceElementType = iEnumerableType.GenericTypeArguments[0]) != destinationElementType ||
-                        configurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null)
+                    if (iEnumerableType == null || MustMap(sourceElementType = iEnumerableType.GenericTypeArguments[0], destinationElementType))
                     {
                         return null;
                     }
                     return Call(ToArrayMethod.MakeGenericMethod(sourceElementType), sourceExpression);
                 }
+                bool MustMap(Type sourceType, Type destinationType) => !destinationType.IsAssignableFrom(sourceType) || 
+                    configurationProvider.FindTypeMapFor(sourceType, destinationType) != null;
             }
         }
     }
