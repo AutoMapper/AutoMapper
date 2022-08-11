@@ -155,6 +155,7 @@ namespace AutoMapper.Internal
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
         void Seal(TypeMap typeMap);
+        void RegisterAsMap(ITypeMapConfiguration typeMapConfiguration);
         List<MemberInfo> SourceMembers { get; }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]

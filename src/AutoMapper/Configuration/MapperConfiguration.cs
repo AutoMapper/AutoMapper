@@ -18,20 +18,17 @@ namespace AutoMapper
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
         /// </summary>
         void AssertConfigurationIsValid();
-
         /// <summary>
         /// Create a mapper instance based on this configuration. Mapper instances are lightweight and can be created as needed.
         /// </summary>
         /// <returns>The mapper instance</returns>
         IMapper CreateMapper();
-
         /// <summary>
         /// Create a mapper instance with the specified service constructor to be used for resolvers and type converters.
         /// </summary>
         /// <param name="serviceCtor">Service factory to create services</param>
         /// <returns>The mapper instance</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
-
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
@@ -41,7 +38,6 @@ namespace AutoMapper
         /// <param name="destinationType">the runtime type of the destination object</param>
         /// <returns>the execution plan</returns>
         LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType);
-
         /// <summary>
         /// Compile all underlying mapping expressions to cached delegates.
         /// Use if you want AutoMapper to compile all mappings up front instead of deferring expression compilation for each first map.
@@ -51,7 +47,6 @@ namespace AutoMapper
     public class MapperConfiguration : IGlobalConfiguration
     {
         private static readonly MethodInfo MappingError = typeof(MapperConfiguration).GetMethod(nameof(GetMappingError));
-
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
         private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
@@ -68,7 +63,6 @@ namespace AutoMapper
         private readonly Func<Type, object> _serviceCtor;
         private readonly bool _sealed;
         private readonly bool _hasOpenMaps;
-
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -129,15 +123,7 @@ namespace AutoMapper
                 var derivedMaps = new List<TypeMap>();
                 foreach (var typeMap in _configuredMaps.Values)
                 {
-                    if (typeMap.DestinationTypeOverride != null)
-                    {
-                        var derivedMap = globalConfiguration.GetIncludedTypeMap(typeMap.AsPair());
-                        _resolvedMaps[typeMap.Types] = derivedMap;
-                    }
-                    else
-                    {
-                        _resolvedMaps[typeMap.Types] = typeMap;
-                    }
+                    _resolvedMaps[typeMap.Types] = typeMap;
                     derivedMaps.Clear();
                     GetDerivedTypeMaps(typeMap, derivedMaps);
                     foreach (var derivedMap in derivedMaps)
@@ -387,7 +373,7 @@ namespace AutoMapper
                     ProfileMap profile;
                     TypeMap cachedMap;
                     TypePair closedTypes;
-                    if (userMap != null && userMap.DestinationTypeOverride == null)
+                    if (userMap != null)
                     {
                         genericMapConfig = userMap.Profile.GetGenericMap(userMap.Types);
                         profile = userMap.Profile;
@@ -475,5 +461,7 @@ namespace AutoMapper
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
         void IGlobalConfiguration.Seal(TypeMap typeMap) => typeMap.Seal(this, _typeMapsPath);
+        void IGlobalConfiguration.RegisterAsMap(ITypeMapConfiguration typeMapConfiguration) =>
+            _resolvedMaps[typeMapConfiguration.Types] = GetIncludedTypeMap(new(typeMapConfiguration.SourceType, typeMapConfiguration.DestinationTypeOverride));
     }
 }

@@ -136,21 +136,13 @@ namespace AutoMapper
         {
             foreach (var config in _typeMapConfigs)
             {
-                BuildTypeMap(configurationProvider, config);
-                if (config.ReverseTypeMap != null)
+                if (config.DestinationTypeOverride == null)
                 {
-                    BuildTypeMap(configurationProvider, config.ReverseTypeMap);
-                }
-            }
-        }
-        public void Configure(IGlobalConfiguration configurationProvider)
-        {
-            foreach (var typeMapConfiguration in _typeMapConfigs)
-            {
-                Configure(typeMapConfiguration, configurationProvider);
-                if (typeMapConfiguration.ReverseTypeMap != null)
-                {
-                    Configure(typeMapConfiguration.ReverseTypeMap, configurationProvider);
+                    BuildTypeMap(configurationProvider, config);
+                    if (config.ReverseTypeMap != null)
+                    {
+                        BuildTypeMap(configurationProvider, config.ReverseTypeMap);
+                    }
                 }
             }
         }
@@ -160,6 +152,24 @@ namespace AutoMapper
             var typeMap = new TypeMap(config.SourceType, config.DestinationType, this, config, sourceMembers);
             config.Configure(typeMap, sourceMembers);
             configurationProvider.RegisterTypeMap(typeMap);
+        }
+        public void Configure(IGlobalConfiguration configurationProvider)
+        {
+            foreach (var typeMapConfiguration in _typeMapConfigs)
+            {
+                if (typeMapConfiguration.DestinationTypeOverride == null)
+                {
+                    Configure(typeMapConfiguration, configurationProvider);
+                    if (typeMapConfiguration.ReverseTypeMap != null)
+                    {
+                        Configure(typeMapConfiguration.ReverseTypeMap, configurationProvider);
+                    }
+                }
+                else
+                {
+                    configurationProvider.RegisterAsMap(typeMapConfiguration);
+                }
+            }
         }
         private void Configure(ITypeMapConfiguration typeMapConfiguration, IGlobalConfiguration configurationProvider)
         {

@@ -16,6 +16,7 @@ namespace AutoMapper.Configuration
         void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers);
         Type SourceType { get; }
         Type DestinationType { get; }
+        Type DestinationTypeOverride { get; }
         bool IsReverseMap { get; }
         TypePair Types { get; }
         ITypeMapConfiguration ReverseTypeMap { get; }
@@ -41,6 +42,7 @@ namespace AutoMapper.Configuration
             _memberList = memberList;
             _types = types;
         }
+        public Type DestinationTypeOverride { get; private set; }
         protected bool Projection { get; set; }
         public TypePair Types => _types;
         public bool IsReverseMap { get; set; }
@@ -56,6 +58,15 @@ namespace AutoMapper.Configuration
         protected List<IPropertyMapConfiguration> MemberConfigurations => _memberConfigurations ??= new();
         protected List<ISourceMemberConfiguration> SourceMemberConfigurations => _sourceMemberConfigurations ??= new();
         protected List<ICtorParameterConfiguration> CtorParamConfigurations => _ctorParamConfigurations ??= new();
+        public void As(Type typeOverride)
+        {
+            if (typeOverride == DestinationType)
+            {
+                throw new InvalidOperationException("As must specify a derived type, not " + DestinationType);
+            }
+            typeOverride.CheckIsDerivedFrom(DestinationType);
+            DestinationTypeOverride = typeOverride;
+        }
         public void Configure(TypeMap typeMap, List<MemberInfo> sourceMembers)
         {
             TypeMap = typeMap;
@@ -367,16 +378,6 @@ namespace AutoMapper.Configuration
             ForSourceMemberCore(sourceMemberName, memberOptions);
 
             return this as TMappingExpression;
-        }
-
-        public void As(Type typeOverride)
-        {
-            if (typeOverride == DestinationType)
-            {
-                throw new InvalidOperationException("As must specify a derived type, not " + DestinationType);
-            }
-            typeOverride.CheckIsDerivedFrom(DestinationType);
-            TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 
         public TMappingExpression ConstructUsing(Expression<Func<TSource, TDestination>> ctor) => ConstructUsingCore(ctor);

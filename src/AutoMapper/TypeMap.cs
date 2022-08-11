@@ -80,15 +80,6 @@ namespace AutoMapper
         public LambdaExpression CustomMapExpression => TypeConverter?.ProjectToExpression;
         public LambdaExpression CustomCtorFunction { get => _details?.CustomCtorFunction; set => Details.CustomCtorFunction = value; }
         public LambdaExpression CustomCtorExpression => CustomCtorFunction?.Parameters.Count == 1 ? CustomCtorFunction : null;
-        public Type DestinationTypeOverride
-        {
-            get => _details?.DestinationTypeOverride;
-            set
-            {
-                Details.DestinationTypeOverride = value;
-                _sealed = true;
-            }
-        }
         public bool IncludeAllDerivedTypes { get => (_details?.IncludeAllDerivedTypes).GetValueOrDefault(); set => Details.IncludeAllDerivedTypes = value; }
         public MemberList ConfiguredMemberList
         {
@@ -138,7 +129,7 @@ namespace AutoMapper
         public bool CustomConstruction => CustomCtorFunction != null;
         public bool HasTypeConverter => TypeConverter != null;
         public TypeConverter TypeConverter { get; set; }
-        public bool ShouldCheckForValid => !HasTypeConverter && DestinationTypeOverride == null && ConfiguredMemberList != MemberList.None;
+        public bool ShouldCheckForValid => ConfiguredMemberList != MemberList.None && !HasTypeConverter;
         public LambdaExpression[] IncludedMembers { get => _details?.IncludedMembers ?? Array.Empty<LambdaExpression>(); set => Details.IncludedMembers = value; }
         public string[] IncludedMembersNames { get => _details?.IncludedMembersNames ?? Array.Empty<string>(); set => Details.IncludedMembersNames = value; }
         public IReadOnlyCollection<IncludedMember> IncludedMembersTypeMaps => (_details?.IncludedMembersTypeMaps).NullCheck();
@@ -196,7 +187,6 @@ namespace AutoMapper
             AddPropertyMap(propertyMap);
             return propertyMap;
         }
-        public TypePair AsPair() => new(SourceType, DestinationTypeOverride);
         private void CheckDifferent(TypePair types)
         {
             if (types == Types)
@@ -280,15 +270,7 @@ namespace AutoMapper
             }
             _details.CopyInheritedMapsTo(typeMap);
         }
-        public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes)
-        {
-            TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
-            if (DestinationTypeOverride is { IsGenericTypeDefinition: true })
-            {
-                var neededParameters = DestinationTypeOverride.GenericParametersCount();
-                DestinationTypeOverride = DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GenericTypeArguments.Take(neededParameters).ToArray());
-            }
-        }
+        public void CloseGenerics(ITypeMapConfiguration openMapConfig, TypePair closedTypes) => TypeConverter?.CloseGenerics(openMapConfig, closedTypes);
         public bool AddMemberMap(IncludedMember includedMember) => Details.AddMemberMap(includedMember);
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap) =>
             Details.FindOrCreatePathMapFor(destinationExpression, path, typeMap);
@@ -305,7 +287,6 @@ namespace AutoMapper
             public bool IncludeAllDerivedTypes;
             public LambdaExpression CustomCtorFunction;
             public MemberList ConfiguredMemberList;
-            public Type DestinationTypeOverride;
             public HashSet<LambdaExpression> AfterMapActions { get; private set; }
             public HashSet<LambdaExpression> BeforeMapActions { get; private set; }
             public HashSet<TypePair> IncludedDerivedTypes { get; private set; }
