@@ -50,6 +50,6 @@ var configuration = new MapperConfiguration(cfg => cfg.DisableConstructorMapping
 You can configure which constructors are considered for the destination object:
 
 ```c#
-// don't map private constructors
-var configuration = new MapperConfiguration(cfg => cfg.ShouldUseConstructor = ci => !ci.IsPrivate);
+// use only public constructors
+var configuration = new MapperConfiguration(cfg => cfg.ShouldUseConstructor = constructor => constructor.IsPublic);
 ```

@@ -4,11 +4,20 @@ using System.Linq.Expressions;
 using Xunit;
 using Shouldly;
 using System.Collections.Generic;
-using System.Diagnostics;
-using AutoMapper;
-
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class RecordConstructorValidation : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+        record Destination(int Value, int Other){}
+        protected override MapperConfiguration CreateConfiguration() => new(c =>
+            c.CreateMap<Source, Destination>().ForCtorParam(nameof(Destination.Value), o => o.MapFrom(s => 0)));
+        [Fact]
+        public void Validate() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Message.
+            ShouldContainWithoutWhitespace("When mapping to records, consider excluding non-public constructors.");
+    }
     public class ConstructorValidation : AutoMapperSpecBase
     {
         class Source

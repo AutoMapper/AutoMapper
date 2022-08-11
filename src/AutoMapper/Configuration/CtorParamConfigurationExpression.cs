@@ -76,12 +76,15 @@ namespace AutoMapper.Configuration
             var parameter = ctorMap[CtorParamName];
             if (parameter == null)
             {
-                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
+                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord()}");
             }
             foreach (var action in _ctorParamActions)
             {
                 action(parameter);
             }
+            return;
+            string CheckRecord() => ctorMap.Ctor.IsFamily && ctorMap.Ctor.DeclaringType.GetMethod("<Clone>$") != null ?
+                " When mapping to records, consider excluding non-public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
         }
     }
 }
