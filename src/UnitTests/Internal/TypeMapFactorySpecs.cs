@@ -8,13 +8,12 @@ namespace AutoMapper.UnitTests.Tests
 {
     using AutoMapper.Internal;
     using System;
-    using System.Collections.Generic;
 
     public class StubNamingConvention : INamingConvention
     {
         public Regex SplittingExpression { get; set; }
         public string SeparatorCharacter { get; set; }
-        public List<ReadOnlyMemory<char>> Split(string input) => SplittingExpression.Matches(input).Select(m => m.Value.AsMemory()).ToList();
+        public string[] Split(string input) => SplittingExpression.Matches(input).Select(m=>m.Value).ToArray();
     }
 
     public class When_constructing_type_maps_with_matching_property_names : SpecBase
@@ -51,104 +50,65 @@ namespace AutoMapper.UnitTests.Tests
             propertyMaps.Count().ShouldBe(2);
         }
     }
-
-    public class When_using_a_custom_source_naming_convention : SpecBase
+    public class When_using_a_custom_source_naming_convention : AutoMapperSpecBase
     {
-        private TypeMap _map;
-        private ProfileMap _mappingOptions;
-
         private class Source
         {
             public SubSource some__source { get; set; }
         }
-
         private class SubSource
         {
             public int value { get; set; }
         }
-
         private class Destination
         {
             public int SomeSourceValue { get; set; }
         }
-
         private class TestProfile : Profile
         {
-            public override string ProfileName => "Test";
-        }
-        protected override void Establish_context()
-        {
-            var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
-
-            var profile = new TestProfile();
-            profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            public TestProfile()
             {
-                _.SourceMemberNamingConvention = namingConvention;
-                _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-            });
-            _mappingOptions = new ProfileMap(profile);
+                var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
+                this.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+                {
+                    _.SourceMemberNamingConvention = namingConvention;
+                    _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+                });
+            }
         }
-
-        protected override void Because_of()
-        {
-            _map = new TypeMap(typeof(Source), typeof(Destination), _mappingOptions);
-        }
-
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.AddProfile<TestProfile>());
         [Fact]
-        public void Should_split_using_naming_convention_rules()
-        {
-            _map.PropertyMaps.Count().ShouldBe(1);
-        }
+        public void Should_split_using_naming_convention_rules() => AssertConfigurationIsValid();
     }
-
-    public class When_using_a_custom_destination_naming_convention : SpecBase
+    public class When_using_a_custom_destination_naming_convention : AutoMapperSpecBase
     {
-        private TypeMap _map;
-        private ProfileMap _mappingOptions;
-
         private class Source
         {
             public SubSource SomeSource { get; set; }
         }
-
         private class SubSource
         {
             public int Value { get; set; }
         }
-
         private class Destination
         {
             public int some__source__value { get; set; }
         }
-
         private class TestProfile : Profile
         {
-            public override string ProfileName => "Test";
-        }
-
-        protected override void Establish_context()
-        {
-            var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
-
-            var profile = new TestProfile();
-            profile.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            public TestProfile()
             {
-                _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-                _.DestinationMemberNamingConvention = namingConvention;
-            });
-            _mappingOptions = new ProfileMap(profile);
+                var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
+                this.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+                {
+                    _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+                    _.DestinationMemberNamingConvention = namingConvention;
+                });
+            }
         }
-
-        protected override void Because_of()
-        {
-            _map = new TypeMap(typeof(Source), typeof(Destination), _mappingOptions);
-        }
-
+        protected override MapperConfiguration CreateConfiguration() => new(c => c.AddProfile<TestProfile>());
         [Fact]
-        public void Should_split_using_naming_convention_rules()
-        {
-            _map.PropertyMaps.Count().ShouldBe(1);
-        }
+        public void Should_split_using_naming_convention_rules() => AssertConfigurationIsValid();
     }
 
     public class When_using_a_source_member_name_replacer : SpecBase
@@ -179,7 +139,7 @@ namespace AutoMapper.UnitTests.Tests
             });
 
             var mapper = config.CreateMapper();
-            var dest = mapper.Map<Destination>(new Source { Ävíator = 3, SubAirlinaFlight = 4, Value = 5 });
+            var dest = mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
             dest.Aviator.ShouldBe(3);
             dest.SubAirlineFlight.ShouldBe(4);
             dest.Value.ShouldBe(5);

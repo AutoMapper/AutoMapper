@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 namespace AutoMapper.Configuration.Conventions
@@ -77,66 +76,92 @@ namespace AutoMapper.Configuration.Conventions
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class NameSplitMember : IChildMemberConfiguration
     {
+        bool _default = true;
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
-        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
+        public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap) =>
+            _default ?
+                Default(options, sourceType, destType, destMemberType, nameToSearch, resolvers, parent, isReverseMap) :
+                Conventions(options, sourceType, destType, destMemberType, nameToSearch, resolvers, parent, isReverseMap);
+        bool Default(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
         {
-            var destinationMemberNamingConvention = isReverseMap ? SourceMemberNamingConvention : DestinationMemberNamingConvention;
-            var matches = destinationMemberNamingConvention.Split(nameToSearch);
-            if (matches == null)
+            MemberInfo matchingMemberInfo = null;
+            int index = 1;
+            for (; index < nameToSearch.Length; index++)
             {
-                return false;
-            }
-            var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
-            var separator = sourceMemberNamingConvention.SeparatorCharacter;
-            var length = matches.Count - 1;
-            for (var index = 0; index <= length; index++)
-            {
-                var first = Join(separator, matches, 0, index);
-                var matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
-                if (matchingMemberInfo == null)
-                {
-                    continue;
-                }
-                resolvers.Add(matchingMemberInfo);
-                if (index == length)
+                if (char.IsUpper(nameToSearch[index]) && Found())
                 {
                     return true;
                 }
+            }
+            return matchingMemberInfo != null && Found();
+            bool Found()
+            {
+                var first = nameToSearch[..index];
+                matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
+                if (matchingMemberInfo == null)
+                {
+                    return false;
+                }
+                resolvers.Add(matchingMemberInfo);
+                var second = nameToSearch[index..];
                 var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
-                var second = Join(separator, matches, index + 1, length);
                 if (parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap))
                 {
                     return true;
                 }
                 resolvers.RemoveAt(resolvers.Count - 1);
+                return false;
+            }
+        }
+        bool Conventions(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap)
+        {
+            var destinationMemberNamingConvention = isReverseMap ? SourceMemberNamingConvention : DestinationMemberNamingConvention;
+            var matches = destinationMemberNamingConvention.Split(nameToSearch);
+            var length = matches.Length;
+            if (length < 2)
+            {
+                return false;
+            }
+            var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
+            var separator = sourceMemberNamingConvention.SeparatorCharacter;
+            for (var index = 1; index <= length; index++)
+            {
+                var first = string.Join(separator, matches, 0, index);
+                var matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
+                if (matchingMemberInfo != null)
+                {
+                    resolvers.Add(matchingMemberInfo);
+                    var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
+                    var second = string.Join(separator, matches, index, length - index);
+                    if (parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap))
+                    {
+                        return true;
+                    }
+                    resolvers.RemoveAt(resolvers.Count - 1);
+                }
             }
             return false;
-            static string Join(string separator, List<ReadOnlyMemory<char>> matches, int startIndex, int endIndex)
+        }
+        internal void Set(INamingConvention source, INamingConvention destination)
+        {
+            if (source == null)
             {
-                Debug.Assert(startIndex <= endIndex);
-                int resultLength = 0;
-                var separatorLength = separator.Length;
-                for (int index = startIndex; index <= endIndex; index++)
-                {
-                    resultLength += matches[index].Length + separatorLength;
-                }
-                resultLength -= separatorLength;
-                return string.Create(resultLength, (matches, startIndex, endIndex, separator), static (span, state) =>
-                {
-                    var separatorSpan = state.separator.AsSpan();
-                    for (int index = state.startIndex, destinationIndex = 0; index <= state.endIndex; index++)
-                    {
-                        var match = state.matches[index].Span;
-                        match.CopyTo(span[destinationIndex..]);
-                        destinationIndex += match.Length;
-                        if (index != state.endIndex)
-                        {
-                            separatorSpan.CopyTo(span[destinationIndex..]);
-                            destinationIndex += separatorSpan.Length;
-                        }
-                    }
-                });
+                SourceMemberNamingConvention = PascalCaseNamingConvention.Instance;
+            }
+            else
+            {
+                SourceMemberNamingConvention = source;
+                _default = false;
+            }
+            if (destination == null)
+            {
+                DestinationMemberNamingConvention = PascalCaseNamingConvention.Instance;
+            }
+            else
+            {
+                DestinationMemberNamingConvention = destination;
+                _default = false;
             }
         }
     }

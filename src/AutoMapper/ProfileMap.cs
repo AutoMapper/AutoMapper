@@ -40,11 +40,7 @@ namespace AutoMapper
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
             _memberConfigurations = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations).ToArray();
             var nameSplitMember = (NameSplitMember)_memberConfigurations[0].MemberMappers.Find(m => m is NameSplitMember);
-            if (nameSplitMember != null)
-            {
-                nameSplitMember.SourceMemberNamingConvention = profile.SourceMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
-                nameSplitMember.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention ?? PascalCaseNamingConvention.Instance;
-            }
+            nameSplitMember?.Set(profile.SourceMemberNamingConvention, profile.DestinationMemberNamingConvention);
             var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
             GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();

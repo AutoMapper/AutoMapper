@@ -3,8 +3,8 @@ using Shouldly;
 using System.Linq;
 using System;
 using System.Text.RegularExpressions;
+using System.Reflection;
 using AutoMapper.Internal;
-using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests
 {
@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests
         {
             public Guid Id { get; set; }
         }
-        protected override MapperConfiguration CreateConfiguration() => new(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c=>
             c.CreateMap<Destination, Source>().ForMember(src => src.Id, opt => opt.MapFrom(_ => Guid.Empty)).ReverseMap());
         [Fact]
         public void Validate() => AssertConfigurationIsValid();
@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
         {
         }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+        protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
             cfg.CreateMap<One, Two>()
                 .ForMember(d => d.Name, o => o.MapFrom(s => "name"))
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests
             public int OrderItemsCount { get; set; }
         }
 
-        protected override MapperConfiguration CreateConfiguration() => new(c =>
+        protected override MapperConfiguration CreateConfiguration() => new(c=>
         {
             c.CreateMap<Order, OrderDto>().ReverseMap();
         });
@@ -165,12 +165,10 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_flatten()
         {
-            var model = new Order
-            {
-                CustomerHolder = new CustomerHolder
-                {
-                    Customer = new Customer { Name = "George Costanza", Total = 74.85m }
-                }
+            var model = new Order {
+                CustomerHolder = new CustomerHolder {
+                        Customer = new Customer { Name = "George Costanza", Total = 74.85m }
+                    }
             };
             var dto = Mapper.Map<OrderDto>(model);
             dto.CustomerName.ShouldBe("George Costanza");
@@ -308,8 +306,8 @@ namespace AutoMapper.UnitTests
         {
             cfg.CreateMap<Order, OrderDto>()
                 .ReverseMap()
-                .ForMember(d => d.Customerholder, o => o.Ignore())
-                .ForPath(d => d.Customerholder.Customer.Total, o => o.MapFrom(s => s.CustomerholderCustomerTotal));
+                .ForMember(d=>d.Customerholder, o=>o.Ignore())
+                .ForPath(d=>d.Customerholder.Customer.Total, o=>o.MapFrom(s=>s.CustomerholderCustomerTotal));
         });
 
         [Fact]
@@ -386,7 +384,7 @@ namespace AutoMapper.UnitTests
             public Regex SplittingExpression { get; } = new Regex(@"\p{Lu}[a-z0-9]*(?=_?)");
 
             public string SeparatorCharacter => "_";
-            public List<ReadOnlyMemory<char>> Split(string input) => SplittingExpression.Matches(input).Select(m => m.Value.AsMemory()).ToList();
+            public string[] Split(string input) => SplittingExpression.Matches(input).Select(m => m.Value).ToArray();
         }
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg =>
