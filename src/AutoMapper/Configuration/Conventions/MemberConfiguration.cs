@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 namespace AutoMapper.Configuration.Conventions
@@ -82,30 +83,61 @@ namespace AutoMapper.Configuration.Conventions
         {
             var destinationMemberNamingConvention = isReverseMap ? SourceMemberNamingConvention : DestinationMemberNamingConvention;
             var matches = destinationMemberNamingConvention.Split(nameToSearch);
-            var length = matches.Length;
-            if (length < 2)
+            if (matches == null)
             {
                 return false;
             }
             var sourceMemberNamingConvention = isReverseMap ? DestinationMemberNamingConvention : SourceMemberNamingConvention;
             var separator = sourceMemberNamingConvention.SeparatorCharacter;
-            for (var index = 1; index <= length; index++)
+            var length = matches.Count - 1;
+            for (var index = 0; index <= length; index++)
             {
-                var first = string.Join(separator, matches, 0, index);
+                var first = Join(separator, matches, 0, index);
                 var matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, first);
-                if (matchingMemberInfo != null)
+                if (matchingMemberInfo == null)
                 {
-                    resolvers.Add(matchingMemberInfo);
-                    var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
-                    var second = string.Join(separator, matches, index, length - index);
-                    if (parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap))
-                    {
-                        return true;
-                    }
-                    resolvers.RemoveAt(resolvers.Count - 1);
+                    continue;
                 }
+                resolvers.Add(matchingMemberInfo);
+                if (index == length)
+                {
+                    return true;
+                }
+                var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
+                var second = Join(separator, matches, index + 1, length);
+                if (parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, second, resolvers, isReverseMap))
+                {
+                    return true;
+                }
+                resolvers.RemoveAt(resolvers.Count - 1);
             }
             return false;
+            static string Join(string separator, List<ReadOnlyMemory<char>> matches, int startIndex, int endIndex)
+            {
+                Debug.Assert(startIndex <= endIndex);
+                int resultLength = 0;
+                var separatorLength = separator.Length;
+                for (int index = startIndex; index <= endIndex; index++)
+                {
+                    resultLength += matches[index].Length + separatorLength;
+                }
+                resultLength -= separatorLength;
+                return string.Create(resultLength, (matches, startIndex, endIndex, separator), static (span, state) =>
+                {
+                    var separatorSpan = state.separator.AsSpan();
+                    for (int index = state.startIndex, destinationIndex = 0; index <= state.endIndex; index++)
+                    {
+                        var match = state.matches[index].Span;
+                        match.CopyTo(span[destinationIndex..]);
+                        destinationIndex += match.Length;
+                        if (index != state.endIndex)
+                        {
+                            separatorSpan.CopyTo(span[destinationIndex..]);
+                            destinationIndex += separatorSpan.Length;
+                        }
+                    }
+                });
+            }
         }
     }
 }
