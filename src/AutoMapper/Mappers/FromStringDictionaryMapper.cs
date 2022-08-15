@@ -15,28 +15,23 @@ namespace AutoMapper.Internal.Mappers
         public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap,
             Expression sourceExpression, Expression destExpression) =>
                 Call(MapDynamicMethod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
-        struct Match
-        {
-            public object Value;
-            public int Count;
-        }
         private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)
         {
             boxedDestination ??= ObjectFactory.CreateInstance(destinationType);
             int matchedCount = 0;
             foreach (var member in profileMap.CreateTypeDetails(destinationType).WriteAccessors)
             {
-                var match = MatchSource(member.Name);
-                if (match.Count == 0)
+                var (value, count) = MatchSource(member.Name);
+                if (count == 0)
                 {
                     continue;
                 }
-                if (match.Count > 1)
+                if (count > 1)
                 {
                     throw new AutoMapperMappingException($"Multiple matching keys were found in the source dictionary for destination member {member}.", null, new TypePair(typeof(StringDictionary), destinationType));
                 }
-                var value = context.MapMember(member, match.Value, boxedDestination);
-                member.SetMemberValue(boxedDestination, value);
+                var mappedValue = context.MapMember(member, value, boxedDestination);
+                member.SetMemberValue(boxedDestination, mappedValue);
                 matchedCount++;
             }
             if (matchedCount < source.Count)
@@ -44,18 +39,18 @@ namespace AutoMapper.Internal.Mappers
                 MapInnerProperties();
             }
             return boxedDestination;
-            Match MatchSource(string name)
+            (object Value, int Count) MatchSource(string name)
             {
                 if (source.TryGetValue(name, out var value))
                 {
-                    return new Match { Value = value, Count = 1 };
+                    return (value, 1);
                 }
                 var matches = source.Where(s => s.Key.Trim() == name).Select(s=>s.Value).ToArray();
                 if (matches.Length == 1)
                 {
-                    return new Match { Value = matches[0], Count = 1 };
+                    return (matches[0], 1);
                 }
-                return new Match { Count = matches.Length };
+                return (null, matches.Length);
             }
             void MapInnerProperties()
             {

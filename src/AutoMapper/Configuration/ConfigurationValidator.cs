@@ -125,7 +125,7 @@ namespace AutoMapper.Configuration
                 {
                     throw new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap };
                 }
-                var context = new ValidationContext(types, memberMap, mapperToUse);
+                var context = new ValidationContext(types, memberMap, ObjectMapper: mapperToUse);
                 Validate(context);
                 if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
                 {
@@ -153,27 +153,5 @@ namespace AutoMapper.Configuration
             }
         }
     }
-    public readonly struct ValidationContext
-    {
-        public readonly IObjectMapper ObjectMapper { get; }
-        public readonly MemberMap MemberMap { get; }
-        public readonly TypeMap TypeMap { get; }
-        public readonly TypePair Types { get; }
-
-        public ValidationContext(TypePair types, MemberMap memberMap, IObjectMapper objectMapper) : this(types, memberMap, objectMapper, null)
-        {
-        }
-
-        public ValidationContext(TypePair types, MemberMap memberMap, TypeMap typeMap) : this(types, memberMap, null, typeMap)
-        {
-        }
-
-        private ValidationContext(TypePair types, MemberMap memberMap, IObjectMapper objectMapper, TypeMap typeMap)
-        {
-            ObjectMapper = objectMapper;
-            TypeMap = typeMap;
-            Types = types;
-            MemberMap = memberMap;
-        }
-    }
+    public readonly record struct ValidationContext(TypePair Types, MemberMap MemberMap, TypeMap TypeMap = null, IObjectMapper ObjectMapper = null);
 }

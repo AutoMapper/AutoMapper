@@ -119,9 +119,9 @@ namespace AutoMapper.Execution
                 ctorIl.Emit(OpCodes.Ret);
             }
         }
-        public static Type GetProxyType(Type interfaceType) => ProxyTypes.GetOrAdd(new TypeDescription(interfaceType));
+        public static Type GetProxyType(Type interfaceType) => ProxyTypes.GetOrAdd(new(interfaceType, Array.Empty<PropertyDescription>()));
         public static Type GetSimilarType(Type sourceType, IEnumerable<PropertyDescription> additionalProperties) =>
-            ProxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
+            ProxyTypes.GetOrAdd(new(sourceType, additionalProperties.OrderBy(p=>p.Name).ToArray()));
         class PropertyEmitter
         {
             private static readonly MethodInfo ProxyBaseNotifyPropertyChanged = typeof(ProxyBase).GetInstanceMethod("NotifyPropertyChanged");
@@ -174,20 +174,8 @@ namespace AutoMapper.Execution
         protected void NotifyPropertyChanged(PropertyChangedEventHandler handler, string method) =>
             handler?.Invoke(this, new PropertyChangedEventArgs(method));
     }
-    public readonly struct TypeDescription : IEquatable<TypeDescription>
+    public readonly record struct TypeDescription(Type Type, PropertyDescription[] AdditionalProperties)
     {
-        public readonly Type Type;
-        public readonly PropertyDescription[] AdditionalProperties;
-        public TypeDescription(Type type) : this(type, Array.Empty<PropertyDescription>()) { }
-        public TypeDescription(Type type, IEnumerable<PropertyDescription> additionalProperties)
-        {
-            Type = type ?? throw new ArgumentNullException(nameof(type));
-            if (additionalProperties == null)
-            {
-                throw new ArgumentNullException(nameof(additionalProperties));
-            }
-            AdditionalProperties = additionalProperties.OrderBy(p => p.Name).ToArray();
-        }
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
@@ -198,33 +186,11 @@ namespace AutoMapper.Execution
             }
             return hashCode.ToHashCode();
         }
-        public override bool Equals(object other) => other is TypeDescription description && Equals(description);
         public bool Equals(TypeDescription other) => Type == other.Type && AdditionalProperties.SequenceEqual(other.AdditionalProperties);
-        public static bool operator ==(TypeDescription left, TypeDescription right) => left.Equals(right);
-        public static bool operator !=(TypeDescription left, TypeDescription right) => !left.Equals(right);
     }
     [DebuggerDisplay("{Name}-{Type.Name}")]
-    public readonly struct PropertyDescription : IEquatable<PropertyDescription>
+    public readonly record struct PropertyDescription(string Name, Type Type, bool CanWrite = true)
     {
-        public readonly string Name;
-        public readonly Type Type;
-        public readonly bool CanWrite;
-        public PropertyDescription(string name, Type type, bool canWrite = true)
-        {
-            Name = name;
-            Type = type;
-            CanWrite = canWrite;
-        }
-        public PropertyDescription(PropertyInfo property)
-        {
-            Name = property.Name;
-            Type = property.PropertyType;
-            CanWrite = property.CanWrite;
-        }
-        public override int GetHashCode() => HashCode.Combine(Name, Type, CanWrite);
-        public override bool Equals(object other) => other is PropertyDescription description && Equals(description);
-        public bool Equals(PropertyDescription other) => Name == other.Name && Type == other.Type && CanWrite == other.CanWrite;
-        public static bool operator ==(PropertyDescription left, PropertyDescription right) => left.Equals(right);
-        public static bool operator !=(PropertyDescription left, PropertyDescription right) => !left.Equals(right);
+        public PropertyDescription(PropertyInfo property) : this(property.Name, property.PropertyType, property.CanWrite) { }
     }
 }

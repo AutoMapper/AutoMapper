@@ -17,8 +17,8 @@ namespace AutoMapper.Execution
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
         private readonly TypeMap _typeMap;
-        private List<ParameterExpression> _propertyMapVariables;
-        private List<Expression> _propertyMapExpressions;
+        private List<ParameterExpression> _propertyMapVariables = null;
+        private List<Expression> _propertyMapExpressions = null;
         public TypeMapPlanBuilder(IGlobalConfiguration configurationProvider, TypeMap typeMap)
         {
             _configurationProvider = configurationProvider;

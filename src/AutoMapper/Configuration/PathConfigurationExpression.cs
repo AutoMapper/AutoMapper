@@ -27,22 +27,7 @@ namespace AutoMapper.Configuration
         void Ignore();
         void Condition(Func<ConditionParameters<TSource, TDestination, TMember>, bool> condition);
     }
-    public readonly struct ConditionParameters<TSource, TDestination, TMember>
-    {
-        public readonly TSource Source { get; }
-        public readonly TDestination Destination { get; }
-        public readonly TMember SourceMember { get; }
-        public readonly TMember DestinationMember { get; }
-        public readonly ResolutionContext Context { get; }
-        public ConditionParameters(TSource source, TDestination destination, TMember sourceMember, TMember destinationMember, ResolutionContext context)
-        {
-            Source = source;
-            Destination = destination;
-            SourceMember = sourceMember;
-            DestinationMember = destinationMember;
-            Context = context;
-        }
-    }
+    public readonly record struct ConditionParameters<TSource, TDestination, TMember>(TSource Source, TDestination Destination, TMember SourceMember, TMember DestinationMember, ResolutionContext Context);
     public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;

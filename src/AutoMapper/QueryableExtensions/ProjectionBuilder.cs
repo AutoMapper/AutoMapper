@@ -263,23 +263,15 @@ namespace AutoMapper.QueryableExtensions.Impl
                     projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
                 }
             }
-            readonly struct SubQueryPath
+            readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
             {
-                private readonly MemberProjection[] _members;
-                public readonly Expression Marker;
-                public readonly LambdaExpression LetExpression;
-                public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression)
-                {
-                    _members = members;
-                    Marker = Default(letExpression.Body.Type);
-                    LetExpression = letExpression;
-                }
+                public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression) : this(members, letExpression, Default(letExpression.Body.Type)){ }
                 public Expression GetSourceExpression(Expression parameter)
                 {
                     Expression sourceExpression = parameter;
-                    for (int index = 0; index < _members.Length - 1; index++)
+                    for (int index = 0; index < Members.Length - 1; index++)
                     {
-                        var sourceMember = _members[index].Expression;
+                        var sourceMember = Members[index].Expression;
                         if (sourceMember is LambdaExpression lambda)
                         {
                             sourceExpression = lambda.ReplaceParameters(sourceExpression);
@@ -295,9 +287,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                     }
                     return sourceExpression;
                 }
-                public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", _members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
-                internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && _members.Length == other._members.Length &&
-                    _members.Take(_members.Length - 1).Zip(other._members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
+                public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
+                internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
+                    Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
             }
             class GePropertiesVisitor : ExpressionVisitor
             {
@@ -367,16 +359,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             => default;
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public readonly struct QueryExpressions
+    public readonly record struct QueryExpressions(LambdaExpression Projection, LambdaExpression LetClause = null)
     {
-        public readonly LambdaExpression LetClause;
-        public readonly LambdaExpression Projection;
         public QueryExpressions(Expression projection, ParameterExpression parameter) : this(projection == null ? null : Lambda(projection, parameter)) { }
-        public QueryExpressions(LambdaExpression projection, LambdaExpression letClause  = null)
-        {
-            LetClause = letClause;
-            Projection = projection;
-        }
         public bool Empty => Projection == null;
         public T Chain<T>(T source, Func<T, LambdaExpression, T> select) => LetClause == null ? select(source, Projection) : select(select(source, LetClause), Projection);
         internal QueryExpressions Prepare(bool enableNullPropagationForQueryMapping, object parameters)
@@ -440,41 +425,27 @@ namespace AutoMapper.QueryableExtensions.Impl
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public readonly struct ProjectionRequest : IEquatable<ProjectionRequest>
+    public readonly record struct ProjectionRequest(Type SourceType, Type DestinationType, MemberPath[] MembersToExpand, ICollection<ProjectionRequest> PreviousRequests)
     {
-        public readonly Type SourceType;
-        public readonly Type DestinationType;
-        private readonly MemberPath[] _membersToExpand;
-        private readonly ICollection<ProjectionRequest> _previousRequests;
-        public ProjectionRequest(Type sourceType, Type destinationType, MemberPath[] membersToExpand, ICollection<ProjectionRequest> previousRequests)
-        {
-            SourceType = sourceType;
-            DestinationType = destinationType;
-            _membersToExpand = membersToExpand;
-            _previousRequests = previousRequests;
-        }
         public ProjectionRequest InnerRequest(Type sourceType, Type destinationType) => 
-            new(sourceType, destinationType, _membersToExpand, new HashSet<ProjectionRequest>(_previousRequests) { this });
-        public bool AlreadyExists => _previousRequests.Contains(this);
+            new(sourceType, destinationType, MembersToExpand, new HashSet<ProjectionRequest>(PreviousRequests) { this });
+        public bool AlreadyExists => PreviousRequests.Contains(this);
         public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
-            _membersToExpand.SequenceEqual(other._membersToExpand);
-        public override bool Equals(object obj) => obj is ProjectionRequest request && Equals(request);
+            MembersToExpand.SequenceEqual(other.MembersToExpand);
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
             hashCode.Add(SourceType);
             hashCode.Add(DestinationType);
-            foreach (var member in _membersToExpand)
+            foreach (var member in MembersToExpand)
             {
                 hashCode.Add(member);
             }
             return hashCode.ToHashCode();
         }
-        public static bool operator ==(in ProjectionRequest left, in ProjectionRequest right) => Equals(left, right);
-        public static bool operator !=(in ProjectionRequest left, in ProjectionRequest right) => !Equals(left, right);
         public bool ShouldExpand(MemberPath currentPath)
         {
-            foreach (var memberToExpand in _membersToExpand)
+            foreach (var memberToExpand in MembersToExpand)
             {
                 if (memberToExpand.StartsWith(currentPath))
                 {

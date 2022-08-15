@@ -416,16 +416,5 @@ namespace AutoMapper.Execution
             public override void Replace(Expression oldNode, Expression newNode) => base.Replace(oldNode, ToType(newNode, oldNode.Type));
         }
     }
-    public readonly struct Member
-    {
-        public Member(Expression expression, MemberInfo memberInfo, Expression target)
-        {
-            Expression = expression;
-            MemberInfo = memberInfo;
-            Target = target;
-        }
-        public readonly Expression Expression;
-        public readonly MemberInfo MemberInfo;
-        public readonly Expression Target;
-    }
+    public readonly record struct Member(Expression Expression, MemberInfo MemberInfo, Expression Target);
 }

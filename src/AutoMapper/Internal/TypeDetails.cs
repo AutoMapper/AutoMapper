@@ -203,15 +203,9 @@ namespace AutoMapper.Internal
         private IEnumerable<MemberInfo> GetFields(Func<FieldInfo, bool> fieldAvailableFor) =>
             GetTypeInheritance().SelectMany(type => type.GetFields(TypeExtensions.InstanceFlags).Where(field => fieldAvailableFor(field) && Config.ShouldMapField(field)));
     }
-    public readonly struct ConstructorParameters
+    public readonly record struct ConstructorParameters(ConstructorInfo Constructor, ParameterInfo[] Parameters)
     {
-        public readonly ConstructorInfo Constructor;
-        public readonly ParameterInfo[] Parameters;
-        public ConstructorParameters(ConstructorInfo constructor)
-        {
-            Constructor = constructor;
-            Parameters = constructor.GetParameters();
-        }
+        public ConstructorParameters(ConstructorInfo constructor) : this(constructor, constructor.GetParameters()){}
         public int ParametersCount => Parameters.Length;
         public bool AllParametersOptional() => Parameters.All(p => p.IsOptional);
     }

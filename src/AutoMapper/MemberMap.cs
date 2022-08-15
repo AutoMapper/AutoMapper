@@ -80,17 +80,9 @@ namespace AutoMapper
         MemberInfo IValueResolver.GetSourceMember(MemberMap memberMap) => SourceMembers[0];
         Type IValueResolver.ResolvedType => SourceMembers[^1].GetMemberType();
     }
-    public readonly struct ValueTransformerConfiguration
+    public readonly record struct ValueTransformerConfiguration(Type ValueType, LambdaExpression TransformerExpression)
     {
-        public readonly Type ValueType;
-        public readonly LambdaExpression TransformerExpression;
-        public ValueTransformerConfiguration(Type valueType, LambdaExpression transformerExpression)
-        {
-            ValueType = valueType;
-            TransformerExpression = transformerExpression;
-        }
-        public bool IsMatch(MemberMap memberMap)
-            => ValueType.IsAssignableFrom(memberMap.SourceType) && memberMap.DestinationType.IsAssignableFrom(ValueType);
+        public bool IsMatch(MemberMap memberMap) => ValueType.IsAssignableFrom(memberMap.SourceType) && memberMap.DestinationType.IsAssignableFrom(ValueType);
     }
     public static class ValueTransformerConfigurationExtensions
     {

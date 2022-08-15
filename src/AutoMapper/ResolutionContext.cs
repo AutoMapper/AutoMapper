@@ -109,19 +109,5 @@ namespace AutoMapper
         }
         private static void ThrowInvalidMap() => throw new InvalidOperationException("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>!");
     }
-    public readonly struct ContextCacheKey : IEquatable<ContextCacheKey>
-    {
-        private readonly Type _destinationType;
-        public readonly object Source;
-        public ContextCacheKey(object source, Type destinationType)
-        {
-            Source = source;
-            _destinationType = destinationType;
-        }
-        public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
-        public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
-        public override int GetHashCode() => HashCode.Combine(Source, _destinationType);
-        public bool Equals(ContextCacheKey other) => Source == other.Source && _destinationType == other._destinationType;
-        public override bool Equals(object other) => other is ContextCacheKey otherKey && Equals(otherKey);
-    }
+    public readonly record struct ContextCacheKey(object Source, Type DestinationType);
 }
