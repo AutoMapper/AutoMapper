@@ -3,9 +3,9 @@ using AutoMapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
-
+using System.Reflection;
+using System.Runtime.CompilerServices;
 namespace AutoMapper.Configuration
 {
     public interface ICtorParamConfigurationExpression
@@ -76,14 +76,14 @@ namespace AutoMapper.Configuration
             var parameter = ctorMap[CtorParamName];
             if (parameter == null)
             {
-                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord()}");
+                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord(ctorMap.Ctor)}");
             }
             foreach (var action in _ctorParamActions)
             {
                 action(parameter);
             }
             return;
-            string CheckRecord() => ctorMap.Ctor.IsFamily && ctorMap.Ctor.DeclaringType.GetMethod("<Clone>$") != null ?
+            static string CheckRecord(ConstructorInfo ctor) => ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
                 " When mapping to records, consider excluding non-public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
         }
     }
