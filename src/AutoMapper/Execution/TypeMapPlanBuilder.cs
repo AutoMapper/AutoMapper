@@ -9,9 +9,8 @@ namespace AutoMapper.Execution
     using static Expression;
     using static ExpressionBuilder;
     using Internal;
-    using AutoMapper.Configuration;
-
-    public class TypeMapPlanBuilder
+    using Configuration;
+    public struct TypeMapPlanBuilder
     {
         private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
         private readonly IGlobalConfiguration _configurationProvider;
@@ -71,12 +70,12 @@ namespace AutoMapper.Execution
                     typeMapsPath.Clear();
                 }
             }
-            void IncludeMembers(ParameterExpression[] parameters, List<ParameterExpression> variables, List<Expression> statements)
-            {
-                variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
-                statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
-                    Assign(v, i.MemberExpression.ReplaceParameters(parameters).NullCheck())));
-            }
+        }
+        void IncludeMembers(ParameterExpression[] parameters, List<ParameterExpression> variables, List<Expression> statements)
+        {
+            variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
+            statements.AddRange(variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
+                Assign(v, i.MemberExpression.ReplaceParameters(parameters).NullCheck())));
         }
         private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
         {
@@ -321,47 +320,47 @@ namespace AutoMapper.Execution
                 Precondition(memberMap, customSource);
             }
             return Block(_propertyMapVariables, _propertyMapExpressions);
-            Expression DestinationMemberValue(MemberMap memberMap, Expression destinationMemberGetter, bool destinationMemberReadOnly)
+        }
+        Expression DestinationMemberValue(MemberMap memberMap, Expression destinationMemberGetter, bool destinationMemberReadOnly)
+        {
+            if (memberMap is { UseDestinationValue: true } || (memberMap.UseDestinationValue is null && destinationMemberReadOnly))
             {
-                if (memberMap is { UseDestinationValue: true } || (memberMap.UseDestinationValue is null && destinationMemberReadOnly))
-                {
-                    return destinationMemberGetter;
-                }
-                else if (DestinationType.IsValueType)
-                {
-                    return Default(memberMap.DestinationType);
-                }
-                else
-                {
-                    return Condition(ReferenceEqual(_initialDestination, Null), Default(memberMap.DestinationType), destinationMemberGetter);
-                }
+                return destinationMemberGetter;
             }
-            void Precondition(MemberMap memberMap, Expression customSource)
+            else if (DestinationType.IsValueType)
             {
-                var preCondition = memberMap.PreCondition.ConvertReplaceParameters(customSource, _destination, ContextParameter);
-                var ifThen = IfThen(preCondition, Block(_propertyMapExpressions));
-                _propertyMapExpressions.Clear();
-                _propertyMapExpressions.Add(ifThen);
+                return Default(memberMap.DestinationType);
             }
-            ParameterExpression SetVariables(Expression valueResolver, ParameterExpression resolvedValueVariable, Expression mappedMember)
+            else
             {
-                _propertyMapExpressions.Clear();
-                _propertyMapVariables.Clear();
-                _propertyMapVariables.Add(resolvedValueVariable);
-                _propertyMapExpressions.Add(Assign(resolvedValueVariable, valueResolver));
-                ParameterExpression mappedMemberVariable;
-                if (mappedMember == resolvedValueVariable)
-                {
-                    mappedMemberVariable = resolvedValueVariable;
-                }
-                else
-                {
-                    mappedMemberVariable = Variable(mappedMember.Type, "mappedValue");
-                    _propertyMapVariables.Add(mappedMemberVariable);
-                    _propertyMapExpressions.Add(Assign(mappedMemberVariable, mappedMember));
-                }
-                return mappedMemberVariable;
+                return Condition(ReferenceEqual(_initialDestination, Null), Default(memberMap.DestinationType), destinationMemberGetter);
             }
+        }
+        void Precondition(MemberMap memberMap, Expression customSource)
+        {
+            var preCondition = memberMap.PreCondition.ConvertReplaceParameters(customSource, _destination, ContextParameter);
+            var ifThen = IfThen(preCondition, Block(_propertyMapExpressions));
+            _propertyMapExpressions.Clear();
+            _propertyMapExpressions.Add(ifThen);
+        }
+        ParameterExpression SetVariables(Expression valueResolver, ParameterExpression resolvedValueVariable, Expression mappedMember)
+        {
+            _propertyMapExpressions.Clear();
+            _propertyMapVariables.Clear();
+            _propertyMapVariables.Add(resolvedValueVariable);
+            _propertyMapExpressions.Add(Assign(resolvedValueVariable, valueResolver));
+            ParameterExpression mappedMemberVariable;
+            if (mappedMember == resolvedValueVariable)
+            {
+                mappedMemberVariable = resolvedValueVariable;
+            }
+            else
+            {
+                mappedMemberVariable = Variable(mappedMember.Type, "mappedValue");
+                _propertyMapVariables.Add(mappedMemberVariable);
+                _propertyMapExpressions.Add(Assign(mappedMemberVariable, mappedMember));
+            }
+            return mappedMemberVariable;
         }
         Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
         {
