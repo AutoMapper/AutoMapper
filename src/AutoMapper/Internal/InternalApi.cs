@@ -154,9 +154,13 @@ namespace AutoMapper.Internal
         TypeMap GetIncludedTypeMap(TypePair typePair);
         TypeMap GetIncludedTypeMap(Type sourceType, Type destinationType);
         TypeMap[] GetIncludedTypeMaps(IReadOnlyCollection<TypePair> includedTypes);
-        void Seal(TypeMap typeMap);
         void RegisterAsMap(TypeMapConfiguration typeMapConfiguration);
+        ParameterExpression[] Parameters { get; }
         List<MemberInfo> SourceMembers { get; }
+        List<ParameterExpression> Variables { get; }
+        List<Expression> Expressions { get; }
+        HashSet<TypeMap> TypeMapsPath { get; }
+        CatchBlock[] Catches { get; }
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression

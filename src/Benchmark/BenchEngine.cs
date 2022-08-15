@@ -17,18 +17,18 @@ namespace Benchmark
         public void Start()
         {
             _mapper.Initialize();
-            _mapper.Map();
+            //_mapper.Map();
 
-            var timer = Stopwatch.StartNew();
+            //var timer = Stopwatch.StartNew();
 
-            for(int i = 0; i < 1_000_000; i++)
-            {
-                _mapper.Map();
-            }
+            //for(int i = 0; i < 1_000_000; i++)
+            //{
+            //    _mapper.Map();
+            //}
 
-            timer.Stop();
+            //timer.Stop();
 
-            Console.WriteLine("{2:D3} ms {0}: - {1}", _mapper.Name, _mode, (int)timer.Elapsed.TotalMilliseconds);
+            //Console.WriteLine("{2:D3} ms {0}: - {1}", _mapper.Name, _mode, (int)timer.Elapsed.TotalMilliseconds);
         }
     }
 }

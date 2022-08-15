@@ -63,6 +63,7 @@ MembersMustExist : Member 'public System.Boolean AutoMapper.Execution.TypeDescri
 MembersMustExist : Member 'public System.Boolean AutoMapper.Execution.TypeDescription.op_Inequality(AutoMapper.Execution.TypeDescription, AutoMapper.Execution.TypeDescription)' does not exist in the implementation but it does exist in the contract.
 CannotSealType : Type 'AutoMapper.Execution.TypeMapPlanBuilder' is actually (has the sealed modifier) sealed in the implementation but not sealed in the contract.
 TypeCannotChangeClassification : Type 'AutoMapper.Execution.TypeMapPlanBuilder' is a 'struct' in the implementation but is a 'class' in the contract.
+MembersMustExist : Member 'public System.Linq.Expressions.LambdaExpression AutoMapper.Execution.TypeMapPlanBuilder.CreateMapperLambda(System.Collections.Generic.HashSet<AutoMapper.TypeMap>)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.ConstructorInfo System.Reflection.ConstructorInfo AutoMapper.Internal.ConstructorParameters.Constructor' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.ParameterInfo[] System.Reflection.ParameterInfo[] AutoMapper.Internal.ConstructorParameters.Parameters' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Internal.TypePair AutoMapper.Internal.MapRequest.RequestedTypes' does not exist in the implementation but it does exist in the contract.
@@ -70,6 +71,7 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public AutoMapper.MemberMap AutoMapper.MemberMap AutoMapper.Internal.MapRequest.MemberMap' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.MapRequest.op_Equality(AutoMapper.Internal.MapRequest, AutoMapper.Internal.MapRequest)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.MapRequest.op_Inequality(AutoMapper.Internal.MapRequest, AutoMapper.Internal.MapRequest)' does not exist in the implementation but it does exist in the contract.
+CannotChangeAttribute : Attribute 'System.Runtime.CompilerServices.IteratorStateMachineAttribute' on 'AutoMapper.Internal.TypeExtensions.GetTypeInheritance(System.Type)' changed from '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__19))]' in the contract to '[IteratorStateMachineAttribute(typeof(TypeExtensions.<GetTypeInheritance>d__22))]' in the implementation.
 MembersMustExist : Member 'public System.Type System.Type AutoMapper.Internal.TypePair.DestinationType' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Type System.Type AutoMapper.Internal.TypePair.SourceType' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypePair.Equals(AutoMapper.Internal.TypePair)' does not exist in the implementation but it does exist in the contract.
@@ -86,4 +88,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 87
+Total Issues: 89

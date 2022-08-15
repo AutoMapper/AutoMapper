@@ -39,6 +39,7 @@ namespace AutoMapper.Execution
         private static readonly ParameterExpression[] DisposableArray = new[] { Disposable };
         private static readonly Expression DisposeCall = IfNullElse(Disposable, Empty, Expression.Call(Disposable, DisposeMethod));
         private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
+        private static readonly ParameterExpression[] Indexes = new[] { Index };
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
 
@@ -55,7 +56,7 @@ namespace AutoMapper.Execution
                 nullCheck = !typeMap.HasTypeConverter && allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues;
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
-                    configurationProvider.Seal(typeMap);
+                    typeMap.Seal(configurationProvider);
                     if (typeMap.MapExpression != null)
                     {
                         mapExpression = typeMap.Invoke(source, destination);
@@ -254,18 +255,19 @@ namespace AutoMapper.Execution
             return currentExpression == lambda.Body;
         }
         public static LambdaExpression MemberAccessLambda(Type type, string memberPath) => GetMemberPath(type, memberPath).Lambda();
-        public static Expression ForEach(ParameterExpression loopVar, Expression collection, Expression loopContent)
+        public static Expression ForEach(List<ParameterExpression> variables, List<Expression> statements, ParameterExpression loopVar, Expression collection, Expression loopContent)
         {
             if (collection.Type.IsArray)
             {
-                return ForEachArrayItem(loopVar, collection, loopContent);
+                return ForEachArrayItem(variables, statements, loopVar, collection, loopContent);
             }
             var getEnumeratorCall = Call(collection, "GetEnumerator");
             var enumeratorVar = Variable(getEnumeratorCall.Type, "enumerator");
             var breakLabel = Label("LoopBreak");
-            var loop = Block(new[] { enumeratorVar, loopVar },
-                Assign(enumeratorVar, getEnumeratorCall),
-                Using(enumeratorVar,
+            variables.Add(enumeratorVar);
+            variables.Add(loopVar);
+            statements.Add(Assign(enumeratorVar, getEnumeratorCall));
+            statements.Add(Using(enumeratorVar,
                     Loop(
                         IfThenElse(
                             Call(enumeratorVar, "MoveNext"),
@@ -273,20 +275,21 @@ namespace AutoMapper.Execution
                             Break(breakLabel)
                         ),
                     breakLabel)));
-            return loop;
-            static Expression ForEachArrayItem(ParameterExpression loopVar, Expression array, Expression loopContent)
+            return Block(variables, statements);
+            static Expression ForEachArrayItem(List<ParameterExpression> variables, List<Expression> statements, ParameterExpression loopVar, Expression array, Expression loopContent)
             {
                 var breakLabel = Label("LoopBreak");
-                var loop = Block(new[] { Index, loopVar },
-                    ResetIndex,
-                    Loop(
+                variables.Add(Index);
+                variables.Add(loopVar);
+                statements.Add(ResetIndex);
+                statements.Add(Loop(
                         IfThenElse(
                             LessThan(Index, ArrayLength(array)),
-                            Block(Assign(loopVar, ArrayAccess(array, Index)), loopContent, IncrementIndex),
+                            Block(Assign(loopVar, ArrayAccess(array, Indexes)), loopContent, IncrementIndex),
                             Break(breakLabel)
                         ),
                     breakLabel));
-                return loop;
+                return Block(variables, statements);
             }
             static Expression Using(Expression target, Expression body)
             {
@@ -315,21 +318,26 @@ namespace AutoMapper.Execution
             Expression.Call(target, target.Type.GetInheritedMethod(name), arguments);
         public static Expression ToObject(this Expression expression) => expression.Type.IsValueType ? Convert(expression, typeof(object)) : expression;
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
-        public static Expression ReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
+        public static Expression ReplaceParameters(this LambdaExpression initialLambda, Expression newParameter) =>
+            new ParameterReplaceVisitor().Replace(initialLambda, newParameter);
+        public static Expression ReplaceParameters(this LambdaExpression initialLambda, Expression[] newParameters) =>
             new ParameterReplaceVisitor().Replace(initialLambda, newParameters);
-        public static Expression ConvertReplaceParameters(this LambdaExpression initialLambda, params Expression[] newParameters) =>
+        public static Expression ConvertReplaceParameters(this LambdaExpression initialLambda, Expression newParameter) =>
+            new ConvertParameterReplaceVisitor().Replace(initialLambda, newParameter);
+        public static Expression ConvertReplaceParameters(this LambdaExpression initialLambda, Expression[] newParameters) =>
             new ConvertParameterReplaceVisitor().Replace(initialLambda, newParameters);
-        private static Expression Replace(this ParameterReplaceVisitor visitor, LambdaExpression initialLambda, params Expression[] newParameters)
+        private static Expression Replace(this ParameterReplaceVisitor visitor, LambdaExpression initialLambda, Expression newParameter) =>
+            visitor.Replace(initialLambda.Body, initialLambda.Parameters[0], newParameter);
+        private static Expression Replace(this ParameterReplaceVisitor visitor, LambdaExpression initialLambda, Expression[] newParameters)
         {
             var newLambda = initialLambda.Body;
             for (var i = 0; i < Math.Min(newParameters.Length, initialLambda.Parameters.Count); i++)
             {
-                visitor.Replace(initialLambda.Parameters[i], newParameters[i]);
-                newLambda = visitor.Visit(newLambda);
+                newLambda = visitor.Replace(newLambda, initialLambda.Parameters[i], newParameters[i]);
             }
             return newLambda;
         }
-        public static Expression Replace(this Expression exp, Expression old, Expression replace) => new ReplaceVisitor(old, replace).Visit(exp);
+        public static Expression Replace(this Expression exp, Expression old, Expression replace) => new ReplaceVisitor().Replace(exp, old, replace);
         public static Expression NullCheck(this Expression expression, MemberMap memberMap = null, Expression defaultValue = null)
         {
             var chain = expression.GetChain();
@@ -396,15 +404,15 @@ namespace AutoMapper.Execution
         {
             protected Expression _oldNode;
             protected Expression _newNode;
-            public virtual void Replace(Expression oldNode, Expression newNode)
+            public virtual Expression Replace(Expression target, Expression oldNode, Expression newNode)
             {
                 _oldNode = oldNode;
                 _newNode = newNode;
+                return base.Visit(target);
             }
         }
         class ReplaceVisitor : ReplaceVisitorBase
         {
-            public ReplaceVisitor(Expression oldNode, Expression newNode) => Replace(oldNode, newNode);
             public override Expression Visit(Expression node) => _oldNode == node ? _newNode : base.Visit(node);
         }
         class ParameterReplaceVisitor : ReplaceVisitorBase
@@ -413,7 +421,7 @@ namespace AutoMapper.Execution
         }
         class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
         {
-            public override void Replace(Expression oldNode, Expression newNode) => base.Replace(oldNode, ToType(newNode, oldNode.Type));
+            public override Expression Replace(Expression target, Expression oldNode, Expression newNode) => base.Replace(target, oldNode, ToType(newNode, oldNode.Type));
         }
     }
     public readonly record struct Member(Expression Expression, MemberInfo MemberInfo, Expression Target);

@@ -202,17 +202,17 @@ namespace AutoMapper
             }
         }
         public bool HasDerivedTypesToInclude => IncludedDerivedTypes.Count > 0;
-        public void Seal(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath)
+        public void Seal(IGlobalConfiguration configurationProvider)
         {
             if (_sealed)
             {
                 return;
             }
             _sealed = true;
-            _details?.Seal(configurationProvider, this, typeMapsPath);
+            _details?.Seal(configurationProvider, this);
             if (!Projection)
             {
-                MapExpression = CreateMapperLambda(configurationProvider, typeMapsPath);
+                MapExpression = CreateMapperLambda(configurationProvider);
             }
             SourceTypeDetails = null;
             DestinationTypeDetails = null;
@@ -257,8 +257,8 @@ namespace AutoMapper
         public void AddAfterMapAction(LambdaExpression afterMap) => Details.AddAfterMapAction(afterMap);
         public void AddValueTransformation(ValueTransformerConfiguration config) => Details.AddValueTransformation(config);
         public void ConstructUsingServiceLocator() => CustomCtorFunction = Lambda(ServiceLocator(DestinationType));
-        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider, HashSet<TypeMap> typeMapsPath) =>
-            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(typeMapsPath);
+        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider) =>
+            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda();
         private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
         public void AsProxy() => CustomCtorFunction = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
@@ -297,7 +297,7 @@ namespace AutoMapper
             public HashSet<IncludedMember> IncludedMembersTypeMaps { get; private set; }
             public List<ValueTransformerConfiguration> ValueTransformerConfigs { get; private set; }
             public Features<IRuntimeFeature> Features => _features ??= new();
-            public void Seal(IGlobalConfiguration configurationProvider, TypeMap thisMap, HashSet<TypeMap> typeMapsPath)
+            public void Seal(IGlobalConfiguration configurationProvider, TypeMap thisMap)
             {
                 if (InheritedTypeMaps != null)
                 {
@@ -315,7 +315,7 @@ namespace AutoMapper
                 {
                     foreach (var includedMemberTypeMap in IncludedMembersTypeMaps)
                     {
-                        includedMemberTypeMap.TypeMap.Seal(configurationProvider, typeMapsPath);
+                        includedMemberTypeMap.TypeMap.Seal(configurationProvider);
                         ApplyIncludedMemberTypeMap(includedMemberTypeMap, thisMap);
                     }
                 }

@@ -67,20 +67,35 @@ namespace AutoMapper.Internal.Mappers
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 Expression destination, assignNewExpression;
                 UseDestinationValue();
-                var addItems = ForEach(itemParam, sourceExpression, Call(destination, addMethod, itemExpr));
+                var statements = configurationProvider.Expressions;
+                PrimitiveHelper.Clear(ref statements);
+                statements.Add(itemExpr);
+                var addCall = Call(destination, addMethod, statements);
+                statements.Clear();
+                var variables = configurationProvider.Variables;
+                PrimitiveHelper.Clear(ref variables);
+                var addItems = ForEach(variables, statements, itemParam, sourceExpression, addCall);
                 var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
                 if (overMaxDepth != null)
                 {
                     addItems = Condition(overMaxDepth, ExpressionBuilder.Empty, addItems);
                 }
                 var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
-                return Block(new[] { newExpression, passedDestination },
-                                    CheckContext() ?? ExpressionBuilder.Empty,
-                                    Assign(passedDestination, destExpression),
-                                    assignNewExpression,
-                                    Call(destination, clearMethod),
-                                    addItems,
-                                    destination);
+                statements.Clear();
+                variables.Clear();
+                variables.Add(newExpression);
+                variables.Add(passedDestination);
+                var checkContext = CheckContext();
+                if (checkContext != null)
+                {
+                    statements.Add(checkContext);
+                }
+                statements.Add(Assign(passedDestination, destExpression));
+                statements.Add(assignNewExpression);
+                statements.Add(Call(destination, clearMethod));
+                statements.Add(addItems);
+                statements.Add(destination);
+                return Block(variables, statements);
                 void GetDestinationType()
                 {
                     var immutableCollection = !mustUseDestination && destinationType.IsValueType;
@@ -146,7 +161,7 @@ namespace AutoMapper.Internal.Mappers
             private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
             private static readonly ParameterExpression Index = Variable(typeof(int), "destinationArrayIndex");
             private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
-            private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
+            private static readonly UnaryExpression[] IncrementIndex = new[] { PostIncrementAssign(Index) };
             private static Array MapMultidimensional(Array source, Type destinationElementType, ResolutionContext context)
             {
                 var sourceElementType = source.GetType().GetElementType();
@@ -169,6 +184,10 @@ namespace AutoMapper.Internal.Mappers
                 Type sourceElementType = typeof(object);
                 Expression createDestination;
                 var destination = Parameter(destinationType, "destinationArray");
+                var variables = configurationProvider.Variables;
+                var statements = configurationProvider.Expressions;
+                PrimitiveHelper.Clear(ref variables);
+                PrimitiveHelper.Clear(ref statements);
                 if (sourceType.IsArray)
                 {
                     var mapFromArray = MapFromArray();
@@ -185,28 +204,40 @@ namespace AutoMapper.Internal.Mappers
                         return mapFromIEnumerable;
                     }
                     var count = Call(CountMethod.MakeGenericMethod(sourceElementType), sourceExpression);
-                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, count));
+                    statements.Add(count);
+                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, statements));
                 }
                 var itemParam = Parameter(sourceElementType, "sourceItem");
                 var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 var setItem = Assign(ArrayAccess(destination, IncrementIndex), itemExpr);
-                return Block(new[] { destination, Index },
-                    createDestination,
-                    ResetIndex,
-                    ForEach(itemParam, sourceExpression, setItem),
-                    destination);
+                variables.Clear();
+                statements.Clear();
+                var forEach = ForEach(variables, statements, itemParam, sourceExpression, setItem);
+                variables.Clear();
+                statements.Clear();
+                variables.Add(destination);
+                variables.Add(Index);
+                statements.Add(createDestination);
+                statements.Add(ResetIndex);
+                statements.Add(forEach);
+                statements.Add(destination);
+                return Block(variables, statements);
                 Expression MapFromArray()
                 {
                     sourceElementType = sourceType.GetElementType();
-                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, ArrayLength(sourceExpression)));
+                    statements.Add(ArrayLength(sourceExpression));
+                    createDestination = Assign(destination, NewArrayBounds(destinationElementType, statements));
                     if (MustMap(sourceElementType, destinationElementType))
                     {
                         return null;
                     }
-                    return Block(new[] { destination },
-                        createDestination,
-                        Call(sourceExpression, CopyToMethod, destination, Zero),
-                        destination);
+                    variables.Clear();
+                    statements.Clear();
+                    variables.Add(destination);
+                    statements.Add(createDestination);
+                    statements.Add(Call(sourceExpression, CopyToMethod, destination, Zero));
+                    statements.Add(destination);
+                    return Block(variables, statements);
                 }
                 Expression MapFromIEnumerable()
                 {

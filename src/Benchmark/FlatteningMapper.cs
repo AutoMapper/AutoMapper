@@ -20,7 +20,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
             });
-            config.AssertConfigurationIsValid();
+            //config.AssertConfigurationIsValid();
             _mapper = config.CreateMapper();
             _customer = new Customer()
             {
@@ -192,7 +192,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Foo, FooDest>();
                 cfg.CreateMap<InnerFoo, InnerFooDest>();
             });
-            config.AssertConfigurationIsValid();
+            //config.AssertConfigurationIsValid();
             _mapper = config.CreateMapper();
             _foo = Foo.New();
         }
@@ -352,7 +352,7 @@ namespace Benchmark.Flattening
         public void Initialize()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Model11, Dto11>());
-            config.AssertConfigurationIsValid();
+            //config.AssertConfigurationIsValid();
             _mapper = config.CreateMapper();
             _model = new Model11 { Value = 5 };
         }
@@ -406,7 +406,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
-            config.AssertConfigurationIsValid();
+            //config.AssertConfigurationIsValid();
             _mapper = config.CreateMapper();
             _source = new ModelObject
             {

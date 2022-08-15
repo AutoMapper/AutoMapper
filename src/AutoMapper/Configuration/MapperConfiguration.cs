@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
@@ -50,8 +51,6 @@ namespace AutoMapper
         private readonly IObjectMapper[] _mappers;
         private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
         private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
-        private HashSet<TypeMap> _typeMapsPath = new();
-        private List<MemberInfo> _sourceMembers = new();
         private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
         private readonly ProjectionBuilder _projectionBuilder;
         private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
@@ -63,6 +62,12 @@ namespace AutoMapper
         private readonly Func<Type, object> _serviceCtor;
         private readonly bool _sealed;
         private readonly bool _hasOpenMaps;
+        private readonly HashSet<TypeMap> _typeMapsPath = new();
+        private readonly List<MemberInfo> _sourceMembers = new();
+        private readonly List<ParameterExpression> _variables = new();
+        private readonly ParameterExpression[] _parameters = new ParameterExpression[] { null, null, ContextParameter };
+        private readonly CatchBlock[] _catches = new CatchBlock[1];
+        private readonly List<Expression> _expressions = new();
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -107,6 +112,10 @@ namespace AutoMapper
             }
             _typeMapsPath = null;
             _sourceMembers = null;
+            _expressions = null;
+            _variables = null;
+            _parameters = null;
+            _catches = null;
             _sealed = true;
             return;
             void Seal()
@@ -134,7 +143,7 @@ namespace AutoMapper
                 }
                 foreach (var typeMap in _configuredMaps.Values)
                 {
-                    typeMap.Seal(this, _typeMapsPath);
+                    typeMap.Seal(this);
                 }
                 _features.Seal(this);
             }
@@ -245,6 +254,11 @@ namespace AutoMapper
         int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
         Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
         List<MemberInfo> IGlobalConfiguration.SourceMembers => _sourceMembers;
+        List<ParameterExpression> IGlobalConfiguration.Variables => _variables;
+        List<Expression> IGlobalConfiguration.Expressions => _expressions;
+        HashSet<TypeMap> IGlobalConfiguration.TypeMapsPath => _typeMapsPath;
+        ParameterExpression[] IGlobalConfiguration.Parameters => _parameters;
+        CatchBlock[] IGlobalConfiguration.Catches => _catches;
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetExecutionPlan(mapRequest);
         private Delegate GetExecutionPlan(in MapRequest mapRequest) => _executionPlans.GetOrAdd(mapRequest);
@@ -285,7 +299,7 @@ namespace AutoMapper
                 {
                     lock (typeMap)
                     {
-                        typeMap.Seal(this, null);
+                        typeMap.Seal(this);
                     }
                 }
             }
@@ -295,7 +309,7 @@ namespace AutoMapper
                 _resolvedMaps.Add(typePair, typeMap);
                 if (typeMap != null && typeMap.MapExpression == null)
                 {
-                    typeMap.Seal(this, _typeMapsPath);
+                    typeMap.Seal(this);
                 }
             }
             return typeMap;
@@ -460,7 +474,6 @@ namespace AutoMapper
             _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
-        void IGlobalConfiguration.Seal(TypeMap typeMap) => typeMap.Seal(this, _typeMapsPath);
         void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>
             _resolvedMaps[typeMapConfiguration.Types] = GetIncludedTypeMap(new(typeMapConfiguration.SourceType, typeMapConfiguration.DestinationTypeOverride));
     }
