@@ -96,10 +96,10 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
         });
         [Fact]
-        public static void Should_null_check()
+        public void Should_null_check()
         {
             Expression<Func<Source, InnerSource>> expression = s => s.InnerSources.FirstOrDefault().InnerSource;
-            var result= expression.Body.NullCheck();
+            var result= expression.Body.NullCheck(Configuration);
         }
         [Fact]
         public void Should_flatten()

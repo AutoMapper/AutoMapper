@@ -30,7 +30,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class ProjectionBuilder : IProjectionBuilder
     {
         internal static List<IProjectionMapper> DefaultProjectionMappers() =>
-            new()
+            new(capacity: 5)
             {
                 new AssignableProjectionMapper(),
                 new EnumerableProjectionMapper(),

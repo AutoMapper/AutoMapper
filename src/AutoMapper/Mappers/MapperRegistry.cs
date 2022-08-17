@@ -3,7 +3,7 @@ namespace AutoMapper.Internal.Mappers
 {
     internal static class MapperRegistry
     {
-        public static List<IObjectMapper> Mappers() => new()
+        public static List<IObjectMapper> Mappers() => new(capacity: 18)
         {
             new CollectionMapper(),// matches IEnumerable, requires a setter, ICollection<> or IList
             new AssignableMapper(),// except collections, which are copied; most likely match

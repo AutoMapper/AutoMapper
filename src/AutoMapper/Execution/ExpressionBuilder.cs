@@ -366,10 +366,10 @@ namespace AutoMapper.Execution
             return newLambda;
         }
         public static Expression Replace(this Expression exp, Expression old, Expression replace) => new ReplaceVisitor().Replace(exp, old, replace);
-        public static Expression NullCheck(this Expression expression, MemberMap memberMap = null, Expression defaultValue = null)
+        public static Expression NullCheck(this Expression expression, IGlobalConfiguration configuration, MemberMap memberMap = null, Expression defaultValue = null)
         {
             var chain = expression.GetChain();
-            var min = memberMap?.IncludedMember != null ? 1 : 2;
+            var min = memberMap?.IncludedMember == null ? 2 : 1;
             if (chain.Count < min || chain.Peek().Target is not ParameterExpression parameter)
             {
                 return expression;
@@ -378,36 +378,35 @@ namespace AutoMapper.Execution
             var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ?
                 destinationType : expression.Type;
             var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : Default(returnType);
-            ParameterExpression[] variables = null;
-            Expression begin;
-            string name;
-            if (min == 1)
+            List<ParameterExpression> variables = null;
+            List<Expression> expressions = null;
+            var name = parameter.Name;
+            var nullCheckedExpression = NullCheck(parameter);
+            if (variables == null)
             {
-                begin = parameter;
-                name = parameter.Name;
+                return nullCheckedExpression;
             }
-            else
-            {
-                var second = chain.Pop();
-                begin = second.Expression;
-                name = parameter.Name + second.MemberInfo.Name;
-            }
-            int index = 0;
-            var nullCheckedExpression = NullCheck(begin);
-            return variables == null ? nullCheckedExpression : Block(variables, nullCheckedExpression);
+            expressions.Add(nullCheckedExpression);
+            return  Block(variables, expressions);
             Expression NullCheck(Expression variable)
             {
                 var member = chain.Pop();
+                var skipNullCheck = min == 2 && variable == parameter;
                 if (chain.Count == 0)
                 {
-                    return variable.IfNullElse(defaultReturn, UpdateTarget(expression, variable));
+                    var updated = UpdateTarget(expression, variable);
+                    return  skipNullCheck ? updated : variable.IfNullElse(defaultReturn, updated);
                 }
-                variables ??= new ParameterExpression[chain.Count];
+                if (variables == null)
+                {
+                    (variables, expressions) = configuration.ScratchPad();
+                }
                 name += member.MemberInfo.Name;
                 var newVariable = Variable(member.Expression.Type, name);
-                variables[index++] = newVariable;
+                variables.Add(newVariable);
                 var assignment = Assign(newVariable, UpdateTarget(member.Expression, variable));
-                return variable.IfNullElse(defaultReturn, Block(assignment, NullCheck(newVariable)));
+                var block = Block(assignment, NullCheck(newVariable));
+                return skipNullCheck ? block : variable.IfNullElse(defaultReturn, block);
             }
             static Expression UpdateTarget(Expression sourceExpression, Expression newTarget) => sourceExpression switch
             {

@@ -59,8 +59,8 @@ namespace AutoMapper
         }
         public override string ToString() => DestinationName;
         public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);
-        public Expression ChainSourceMembers(Expression source, Expression defaultValue) =>
-            ChainSourceMembers(source)?.NullCheck(this, defaultValue);
+        public Expression ChainSourceMembers(IGlobalConfiguration configuration, Expression source, Expression defaultValue) =>
+            ChainSourceMembers(source)?.NullCheck(configuration, this, defaultValue);
         public bool AllowsNullDestinationValues => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
         public bool AllowsNullCollections => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
         public ProfileMap Profile => TypeMap?.Profile;
@@ -75,8 +75,8 @@ namespace AutoMapper
             SourceMembers = sourceMembers;
             Resolver = this;
         }
-        Expression IValueResolver.GetExpression(MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
-            ChainSourceMembers(source, destinationMember);
+        Expression IValueResolver.GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
+            ChainSourceMembers(configuration, source, destinationMember);
         MemberInfo IValueResolver.GetSourceMember(MemberMap memberMap) => SourceMembers[0];
         Type IValueResolver.ResolvedType => SourceMembers[^1].GetMemberType();
     }

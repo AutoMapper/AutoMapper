@@ -394,6 +394,7 @@ namespace Benchmark.Flattening
         {
             var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMap<ModelObject, ModelDto>();
                 cfg.CreateMap<Model1, Dto1>();
                 cfg.CreateMap<Model2, Dto2>();
                 cfg.CreateMap<Model3, Dto3>();
@@ -404,7 +405,6 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model8, Dto8>();
                 cfg.CreateMap<Model9, Dto9>();
                 cfg.CreateMap<Model10, Dto10>();
-                cfg.CreateMap<ModelObject, ModelDto>();
             });
             //config.AssertConfigurationIsValid();
             _mapper = config.CreateMapper();
