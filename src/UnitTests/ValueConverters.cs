@@ -1,4 +1,5 @@
 ﻿using Shouldly;
+using System;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -119,6 +120,25 @@ namespace AutoMapper.UnitTests
                 dest.ValueFoo3.ShouldBe("0003");
                 dest.ValueFoo4.ShouldBe("0004");
             }
+        }
+        public class When_specifying_value_converter_with_no_source : AutoMapperSpecBase
+        {
+            public class EightDigitIntToStringConverter : IValueConverter<int, string>
+            {
+                public string Convert(int sourceMember, ResolutionContext context) => sourceMember.ToString("d8");
+            }
+            public class Source
+            {
+            }
+            public class Dest
+            {
+                public string ValueFoo1 { get; set; }
+            }
+            protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.ValueFoo1, opt => opt.ConvertUsing<EightDigitIntToStringConverter, int>()));
+            [Fact]
+            public void Should_report_error() => new Action(()=>Map<Dest>(new Source())).ShouldThrow<AutoMapperMappingException>().InnerException.Message.ShouldBe(
+                "Cannot find a source member to pass to the value converter of type AutoMapper.UnitTests.ValueConverters+When_specifying_value_converter_with_no_source+EightDigitIntToStringConverter. Configure a source member to map from.");
         }
 
         public class When_specifying_value_converter_for_string_based_matching_member : AutoMapperSpecBase

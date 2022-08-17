@@ -342,7 +342,8 @@ namespace AutoMapper.Execution
         public static MemberExpression Property(Expression target, string name) =>
             Expression.Property(target, target.Type.GetInheritedProperty(name));
         // Expression.Call(string) is inefficient because it does a case insensitive match
-        public static MethodCallExpression Call(Expression target, string name, params Expression[] arguments) =>
+        public static MethodCallExpression Call(Expression target, string name) => Expression.Call(target, target.Type.GetInheritedMethod(name));
+        public static MethodCallExpression Call(Expression target, string name, Expression[] arguments) =>
             Expression.Call(target, target.Type.GetInheritedMethod(name), arguments);
         public static Expression ToObject(this Expression expression) => expression.Type.IsValueType ? Convert(expression, typeof(object)) : expression;
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);

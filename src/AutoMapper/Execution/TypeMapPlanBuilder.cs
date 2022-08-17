@@ -468,12 +468,15 @@ namespace AutoMapper.Execution
         public ValueConverter(object instance, Type interfaceType) : base(instance, interfaceType) { }
         public Expression GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression _, Expression destinationMember)
         {
-            var iResolverTypeArgs = InterfaceType.GenericTypeArguments;
-            var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ??
-                (SourceMemberName != null ?
-                    PropertyOrField(source, SourceMemberName) :
-                    memberMap.ChainSourceMembers(configuration, source, destinationMember) ?? Throw(Constant(BuildExceptionMessage()), iResolverTypeArgs[0]));
-            return Call(ToType(_instance, InterfaceType), "Convert", ToType(sourceMember, iResolverTypeArgs[0]), ContextParameter);
+            var sourceMemberType = InterfaceType.GenericTypeArguments[0];
+            var sourceMember = this switch
+            {
+                { SourceMemberLambda: { } } => SourceMemberLambda.ReplaceParameters(source),
+                { SourceMemberName: { } } => PropertyOrField(source, SourceMemberName),
+                _ when memberMap.SourceMembers.Length > 0 => memberMap.ChainSourceMembers(configuration, source, destinationMember),
+                _ => Throw(Constant(BuildExceptionMessage()), sourceMemberType)
+            };
+            return Call(ToType(_instance, InterfaceType), InterfaceType.GetMethod("Convert"), ToType(sourceMember, sourceMemberType), ContextParameter);
             AutoMapperConfigurationException BuildExceptionMessage()
                 => new($"Cannot find a source member to pass to the value converter of type {ConcreteType}. Configure a source member to map from.");
         }
