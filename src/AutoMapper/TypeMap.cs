@@ -202,17 +202,17 @@ namespace AutoMapper
             }
         }
         public bool HasDerivedTypesToInclude => IncludedDerivedTypes.Count > 0;
-        public void Seal(IGlobalConfiguration configurationProvider)
+        public void Seal(IGlobalConfiguration configuration)
         {
             if (_sealed)
             {
                 return;
             }
             _sealed = true;
-            _details?.Seal(configurationProvider, this);
+            _details?.Seal(configuration, this);
             if (!Projection)
             {
-                MapExpression = CreateMapperLambda(configurationProvider);
+                MapExpression = CreateMapperLambda(configuration);
             }
             SourceTypeDetails = null;
             DestinationTypeDetails = null;
@@ -257,8 +257,8 @@ namespace AutoMapper
         public void AddAfterMapAction(LambdaExpression afterMap) => Details.AddAfterMapAction(afterMap);
         public void AddValueTransformation(ValueTransformerConfiguration config) => Details.AddValueTransformation(config);
         public void ConstructUsingServiceLocator() => CustomCtorFunction = Lambda(ServiceLocator(DestinationType));
-        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configurationProvider) =>
-            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda();
+        internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configuration) =>
+            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configuration, this).CreateMapperLambda();
         private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
         public void AsProxy() => CustomCtorFunction = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
@@ -297,7 +297,7 @@ namespace AutoMapper
             public HashSet<IncludedMember> IncludedMembersTypeMaps { get; private set; }
             public List<ValueTransformerConfiguration> ValueTransformerConfigs { get; private set; }
             public Features<IRuntimeFeature> Features => _features ??= new();
-            public void Seal(IGlobalConfiguration configurationProvider, TypeMap thisMap)
+            public void Seal(IGlobalConfiguration configuration, TypeMap thisMap)
             {
                 if (InheritedTypeMaps != null)
                 {
@@ -315,7 +315,7 @@ namespace AutoMapper
                 {
                     foreach (var includedMemberTypeMap in IncludedMembersTypeMaps)
                     {
-                        includedMemberTypeMap.TypeMap.Seal(configurationProvider);
+                        includedMemberTypeMap.TypeMap.Seal(configuration);
                         ApplyIncludedMemberTypeMap(includedMemberTypeMap, thisMap);
                     }
                 }
@@ -326,7 +326,7 @@ namespace AutoMapper
                         ApplyInheritedTypeMap(inheritedTypeMap, thisMap);
                     }
                 }
-                _features?.Seal(configurationProvider);
+                _features?.Seal(configuration);
             }
             public void IncludeDerivedTypes(TypePair derivedTypes)
             {

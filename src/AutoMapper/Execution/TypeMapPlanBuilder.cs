@@ -13,30 +13,30 @@ namespace AutoMapper.Execution
     public struct TypeMapPlanBuilder
     {
         private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
-        private readonly IGlobalConfiguration _configurationProvider;
+        private readonly IGlobalConfiguration _configuration;
         private readonly ParameterExpression _destination;
         private readonly ParameterExpression _initialDestination;
         private readonly TypeMap _typeMap;
         private List<ParameterExpression> _variables;
         private List<Expression> _expressions;
         private CatchBlock[] _catches;
-        public TypeMapPlanBuilder(IGlobalConfiguration configurationProvider, TypeMap typeMap)
+        public TypeMapPlanBuilder(IGlobalConfiguration configuration, TypeMap typeMap)
         {
-            _configurationProvider = configurationProvider;
+            _configuration = configuration;
             _typeMap = typeMap;
             Source = Parameter(typeMap.SourceType, "source");
             _initialDestination = Parameter(typeMap.DestinationType, "destination");
             _destination = Variable(_initialDestination.Type, "typeMapDestination");
-            _variables = configurationProvider.Variables;
-            _expressions = configurationProvider.Expressions;
-            _catches = configurationProvider.Catches;
+            _variables = configuration.Variables;
+            _expressions = configuration.Expressions;
+            _catches = configuration.Catches;
         }
         public Type DestinationType => _destination.Type;
         public ParameterExpression Source { get; }
         private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => new("Error mapping types.", innerException, memberMap);
         ParameterExpression[] GetParameters(ParameterExpression source = null, ParameterExpression destination = null)
         {
-            var parameters = _configurationProvider.Parameters ?? new ParameterExpression[] { null, null, ContextParameter };
+            var parameters = _configuration.Parameters ?? new ParameterExpression[] { null, null, ContextParameter };
             parameters[0] = source ?? Source;
             parameters[1] = destination ?? _destination;
             return parameters;
@@ -52,9 +52,9 @@ namespace AutoMapper.Execution
             _variables ??= new();
             _expressions ??= new();
             _catches ??= new CatchBlock[1];
-            var typeMapsPath = _configurationProvider.TypeMapsPath;
+            var typeMapsPath = _configuration.TypeMapsPath;
             Clear(ref typeMapsPath);
-            CheckForCycles(_configurationProvider, _typeMap, typeMapsPath);
+            CheckForCycles(_configuration, _typeMap, typeMapsPath);
             var createDestinationFunc = CreateDestinationFunc();
             var assignmentFunc = CreateAssignmentFunc(createDestinationFunc);
             var mapperFunc = CreateMapperFunc(assignmentFunc);
@@ -91,7 +91,7 @@ namespace AutoMapper.Execution
             _expressions.AddRange(_variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) =>
                 Assign(v, i.MemberExpression.ReplaceParameters(source).NullCheck())));
         }
-        private static void CheckForCycles(IGlobalConfiguration configurationProvider, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
+        private static void CheckForCycles(IGlobalConfiguration configuration, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
         {
             typeMapsPath.Add(typeMap);
             foreach (var memberMap in MemberMaps())
@@ -101,7 +101,7 @@ namespace AutoMapper.Execution
                 {
                     continue;
                 }
-                if (memberMap.Inline && (memberTypeMap.PreserveReferences || typeMapsPath.Count == configurationProvider.MaxExecutionPlanDepth))
+                if (memberMap.Inline && (memberTypeMap.PreserveReferences || typeMapsPath.Count == configuration.MaxExecutionPlanDepth))
                 {
                     memberMap.Inline = false;
                     TraceInline(typeMap, memberMap);
@@ -127,13 +127,13 @@ namespace AutoMapper.Execution
                         memberMap.Inline = false;
                         TraceInline(typeMap, memberMap);
                     }
-                    foreach (var derivedTypeMap in configurationProvider.GetIncludedTypeMaps(memberTypeMap))
+                    foreach (var derivedTypeMap in configuration.GetIncludedTypeMaps(memberTypeMap))
                     {
                         derivedTypeMap.PreserveReferences = true;
                         Trace(typeMap, derivedTypeMap, memberMap);
                     }
                 }
-                CheckForCycles(configurationProvider, memberTypeMap, typeMapsPath);
+                CheckForCycles(configuration, memberTypeMap, typeMapsPath);
             }
             typeMapsPath.Remove(typeMap);
             return;
@@ -141,7 +141,7 @@ namespace AutoMapper.Execution
             {
                 var memberMaps = typeMap.MemberMaps;
                 return typeMap.HasDerivedTypesToInclude ?
-                    memberMaps.Concat(configurationProvider.GetIncludedTypeMaps(typeMap).SelectMany(tm => tm.MemberMaps)) :
+                    memberMaps.Concat(configuration.GetIncludedTypeMaps(typeMap).SelectMany(tm => tm.MemberMaps)) :
                     memberMaps;
             }
             TypeMap ResolveMemberTypeMap(MemberMap memberMap)
@@ -151,7 +151,7 @@ namespace AutoMapper.Execution
                     return null;
                 }
                 var types = memberMap.Types();
-                return types.ContainsGenericParameters ? null : configurationProvider.ResolveAssociatedTypeMap(types);
+                return types.ContainsGenericParameters ? null : configuration.ResolveAssociatedTypeMap(types);
             }
             [Conditional("DEBUG")]
             static void Trace(TypeMap typeMap, TypeMap memberTypeMap, MemberMap memberMap) =>
@@ -247,7 +247,7 @@ namespace AutoMapper.Execution
             {
                 mapperFunc = Condition(overMaxDepth, Default(DestinationType), mapperFunc);
             }
-            mapperFunc = NullCheckSource(_typeMap.Profile, Source, _initialDestination, mapperFunc, null);
+            mapperFunc = _configuration.NullCheckSource(_typeMap.Profile, Source, _initialDestination, mapperFunc, null);
             return CheckReferencesCache(mapperFunc);
         }
         private Expression CheckReferencesCache(Expression valueBuilder)
@@ -280,10 +280,13 @@ namespace AutoMapper.Execution
             var customSource = GetCustomSource(ctorParamMap);
             var resolvedExpression = BuildValueResolverFunc(ctorParamMap, customSource, defaultValue);
             var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
-            var tryMap = Block(new[] { resolvedValue },
-                Assign(resolvedValue, resolvedExpression),
-                MapMember(ctorParamMap, defaultValue, resolvedValue));
-            return TryMemberMap(ctorParamMap, tryMap);
+            var mapMember = MapMember(ctorParamMap, defaultValue, resolvedValue);
+            _variables.Clear();
+            _variables.Add(resolvedValue);
+            _expressions.Clear();
+            _expressions.Add(Assign(resolvedValue, resolvedExpression));
+            _expressions.Add(mapMember);
+            return TryMemberMap(ctorParamMap, Block(_variables, _expressions));
         }
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
@@ -375,7 +378,7 @@ namespace AutoMapper.Execution
         {
             var typePair = memberMap.Types();
             var mapMember = memberMap.Inline ?
-                _configurationProvider.MapExpression(_typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
+                _configuration.MapExpression(_typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
                 ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);
             return memberMap.ApplyTransformers(mapMember);
         }

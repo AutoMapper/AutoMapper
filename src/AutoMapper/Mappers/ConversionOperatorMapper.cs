@@ -20,7 +20,7 @@ namespace AutoMapper.Internal.Mappers
             }
             return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags, null, new[] { sourceType }, null);
         }
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var conversionOperator = GetConversionOperator(sourceExpression.Type, destExpression.Type);
             return Expression.Call(conversionOperator, ToType(sourceExpression, conversionOperator.FirstParameterType()));

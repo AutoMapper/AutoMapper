@@ -40,7 +40,7 @@ namespace AutoMapper.Internal.Mappers
             return callsite.Target(callsite, target);
         }
         public bool IsMatch(TypePair context) => context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(MapMethodInfo, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
     }

@@ -233,7 +233,7 @@ namespace AutoMapper
                 if (nullCheck)
                 {
                     var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
-                    fullExpression = NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
+                    fullExpression = this.NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
                 }
                 return Lambda(fullExpression, source, destination, ContextParameter);
             }

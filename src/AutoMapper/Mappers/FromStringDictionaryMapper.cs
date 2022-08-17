@@ -12,7 +12,7 @@ namespace AutoMapper.Internal.Mappers
     {
         private static readonly MethodInfo MapDynamicMethod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
         public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap,
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap,
             Expression sourceExpression, Expression destExpression) =>
                 Call(MapDynamicMethod, sourceExpression, destExpression.ToObject(), Constant(destExpression.Type), ContextParameter, Constant(profileMap));
         private static object MapDynamic(StringDictionary source, object boxedDestination, Type destinationType, ResolutionContext context, ProfileMap profileMap)

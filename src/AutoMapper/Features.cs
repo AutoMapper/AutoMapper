@@ -7,7 +7,7 @@ namespace AutoMapper.Features
 {
     public interface IGlobalFeature
     {
-        void Configure(IGlobalConfiguration configurationProvider);
+        void Configure(IGlobalConfiguration configuration);
     }
     public interface IMappingFeature
     {
@@ -16,7 +16,7 @@ namespace AutoMapper.Features
     }
     public interface IRuntimeFeature
     {
-        void Seal(IGlobalConfiguration configurationProvider);
+        void Seal(IGlobalConfiguration configuration);
     }
     public class Features<TFeature> : IReadOnlyCollection<TFeature>
     {
@@ -91,7 +91,7 @@ namespace AutoMapper.Features
                 feature.Configure(typeMap);
             }
         }
-        internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configurationProvider)
+        internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)
         {
             if (features.Count == 0)
             {
@@ -99,7 +99,7 @@ namespace AutoMapper.Features
             }
             foreach (var feature in features)
             {
-                feature.Seal(configurationProvider);
+                feature.Seal(configuration);
             }
         }
     }

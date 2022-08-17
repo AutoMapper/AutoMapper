@@ -13,7 +13,7 @@ namespace AutoMapper.Internal.Mappers
         private static readonly MethodInfo ParseMethod = typeof(Enum).StaticGenericMethod("Parse", parametersCount: 2);
         private static readonly PropertyInfo Length = typeof(string).GetProperty("Length");
         public bool IsMatch(TypePair context) => context.SourceType == typeof(string) && context.DestinationType.IsEnum;
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;

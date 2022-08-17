@@ -42,12 +42,33 @@ namespace AutoMapper.Execution
         private static readonly ParameterExpression[] Indexes = new[] { Index };
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
-
-        public static Expression MapExpression(this IGlobalConfiguration configurationProvider, ProfileMap profileMap, TypePair typePair, Expression source,
+        public static (List<ParameterExpression> Variables, List<Expression> Expressions) ScratchPad(this IGlobalConfiguration configuration)
+        {
+            var variables = configuration.Variables;
+            if (variables == null)
+            {
+                variables = new();
+            }
+            else
+            {
+                variables.Clear();
+            }
+            var expressions = configuration.Expressions;
+            if (expressions == null)
+            {
+                expressions = new();
+            }
+            else
+            {
+                expressions.Clear();
+            }
+            return (variables, expressions);
+        }
+        public static Expression MapExpression(this IGlobalConfiguration configuration, ProfileMap profileMap, TypePair typePair, Expression source,
             MemberMap memberMap = null, Expression destination = null)
         {
             destination ??= Default(typePair.DestinationType);
-            var typeMap = configurationProvider.ResolveTypeMap(typePair);
+            var typeMap = configuration.ResolveTypeMap(typePair);
             Expression mapExpression = null;
             bool nullCheck;
             if (typeMap != null)
@@ -56,7 +77,7 @@ namespace AutoMapper.Execution
                 nullCheck = !typeMap.HasTypeConverter && allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues;
                 if (!typeMap.HasDerivedTypesToInclude)
                 {
-                    typeMap.Seal(configurationProvider);
+                    typeMap.Seal(configuration);
                     if (typeMap.MapExpression != null)
                     {
                         mapExpression = typeMap.Invoke(source, destination);
@@ -65,10 +86,10 @@ namespace AutoMapper.Execution
             }
             else
             {
-                var mapper = configurationProvider.FindMapper(typePair);
+                var mapper = configuration.FindMapper(typePair);
                 if (mapper != null)
                 {
-                    mapExpression = mapper.MapExpression(configurationProvider, profileMap, memberMap, source, destination);
+                    mapExpression = mapper.MapExpression(configuration, profileMap, memberMap, source, destination);
                     nullCheck = mapExpression != source;
                     mapExpression = ToType(mapExpression, typePair.DestinationType);
                 }
@@ -78,9 +99,10 @@ namespace AutoMapper.Execution
                 }
             }
             mapExpression ??= ContextMap(typePair, source, destination, memberMap);
-            return nullCheck ? NullCheckSource(profileMap, source, destination, mapExpression, memberMap) : mapExpression;
+            return nullCheck ? configuration.NullCheckSource(profileMap, source, destination, mapExpression, memberMap) : mapExpression;
         }
-        public static Expression NullCheckSource(ProfileMap profileMap, Expression source, Expression destination, Expression mapExpression, MemberMap memberMap)
+        public static Expression NullCheckSource(this IGlobalConfiguration configuration, ProfileMap profileMap, Expression source, Expression destination, 
+            Expression mapExpression, MemberMap memberMap)
         {
             var sourceType = source.Type;
             if (sourceType.IsValueType && !sourceType.IsNullableType())
@@ -120,10 +142,12 @@ namespace AutoMapper.Execution
                     }
                     clearMethod = destinationCollectionType.GetMethod("Clear");
                 }
-                return Block(new[] { destinationVariable },
-                    Assign(destinationVariable, destination),
-                    Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)),
-                    destinationVariable);
+                var (variables, statements) = configuration.ScratchPad();
+                variables.Add(destinationVariable);
+                statements.Add(Assign(destinationVariable, destination));
+                statements.Add(Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)));
+                statements.Add(destinationVariable);
+                return Block(variables, statements);
             }
             Expression DefaultDestination()
             {
@@ -264,17 +288,19 @@ namespace AutoMapper.Execution
             var getEnumeratorCall = Call(collection, "GetEnumerator");
             var enumeratorVar = Variable(getEnumeratorCall.Type, "enumerator");
             var breakLabel = Label("LoopBreak");
-            variables.Add(enumeratorVar);
-            variables.Add(loopVar);
-            statements.Add(Assign(enumeratorVar, getEnumeratorCall));
-            statements.Add(Using(enumeratorVar,
+            var usingEnumerator = Using(statements, enumeratorVar,
                     Loop(
                         IfThenElse(
                             Call(enumeratorVar, "MoveNext"),
                             Block(Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)), loopContent),
                             Break(breakLabel)
                         ),
-                    breakLabel)));
+                    breakLabel));
+            statements.Clear();
+            variables.Add(enumeratorVar);
+            variables.Add(loopVar);
+            statements.Add(Assign(enumeratorVar, getEnumeratorCall));
+            statements.Add(usingEnumerator);
             return Block(variables, statements);
             static Expression ForEachArrayItem(List<ParameterExpression> variables, List<Expression> statements, ParameterExpression loopVar, Expression array, Expression loopContent)
             {
@@ -291,7 +317,7 @@ namespace AutoMapper.Execution
                     breakLabel));
                 return Block(variables, statements);
             }
-            static Expression Using(Expression target, Expression body)
+            static Expression Using(List<Expression> statements, Expression target, Expression body)
             {
                 Expression finallyDispose;
                 if (typeof(IDisposable).IsAssignableFrom(target.Type))
@@ -305,7 +331,9 @@ namespace AutoMapper.Execution
                         return body;
                     }
                     var assignDisposable = Assign(Disposable, TypeAs(target, typeof(IDisposable)));
-                    finallyDispose = Block(DisposableArray, assignDisposable, DisposeCall);
+                    statements.Add(assignDisposable);
+                    statements.Add(DisposeCall);
+                    finallyDispose = Block(DisposableArray, statements);
                 }
                 return TryFinally(body, finallyDispose);
             }

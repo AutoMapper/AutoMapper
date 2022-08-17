@@ -20,14 +20,14 @@ namespace AutoMapper.Internal.Mappers
         /// <summary>
         /// Builds a mapping expression equivalent to the base Map method
         /// </summary>
-        /// <param name="configurationProvider"></param>
+        /// <param name="configuration"></param>
         /// <param name="profileMap"></param>
         /// <param name="memberMap"></param>
         /// <param name="sourceExpression">Source parameter</param>
         /// <param name="destExpression">Destination parameter</param>
         /// 
         /// <returns>Map expression</returns>
-        Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+        Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression);
         TypePair? GetAssociatedTypes(TypePair initialTypes) => null;
     }
@@ -59,7 +59,7 @@ namespace AutoMapper.Internal.Mappers
         /// <returns>Destination object</returns>
         public abstract TDestination Map(TSource source, TDestination destination, Type sourceType, Type destinationType, ResolutionContext context);
 
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap,
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap,
             MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
             Call(
                 Constant(this),

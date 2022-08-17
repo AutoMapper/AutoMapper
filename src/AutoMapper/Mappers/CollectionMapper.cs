@@ -16,12 +16,12 @@ namespace AutoMapper.Internal.Mappers
     {
         public TypePair? GetAssociatedTypes(TypePair context) => new(GetElementType(context.SourceType), GetElementType(context.DestinationType));
         public bool IsMatch(TypePair context) => context.IsCollection();
-        public Expression MapExpression(IGlobalConfiguration configurationProvider, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
+        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
         {
             var destinationType = destExpression.Type;
             if (destinationType.IsArray)
             {
-                return ArrayMapper.MapToArray(configurationProvider, profileMap, sourceExpression, destinationType);
+                return ArrayMapper.MapToArray(configuration, profileMap, sourceExpression, destinationType);
             }
             if (destinationType.IsGenericType(typeof(ReadOnlyCollection<>)))
             {
@@ -64,16 +64,13 @@ namespace AutoMapper.Internal.Mappers
                     throw new NotSupportedException($"Unknown collection. Consider a custom type converter from {sourceType} to {destinationType}.");
                 }
                 var itemParam = Parameter(sourceElementType, "item");
-                var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+                var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 Expression destination, assignNewExpression;
                 UseDestinationValue();
-                var statements = configurationProvider.Expressions;
-                PrimitiveHelper.Clear(ref statements);
+                var (variables, statements) = configuration.ScratchPad();
                 statements.Add(itemExpr);
                 var addCall = Call(destination, addMethod, statements);
                 statements.Clear();
-                var variables = configurationProvider.Variables;
-                PrimitiveHelper.Clear(ref variables);
                 var addItems = ForEach(variables, statements, itemParam, sourceExpression, addCall);
                 var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
                 if (overMaxDepth != null)
@@ -146,7 +143,7 @@ namespace AutoMapper.Internal.Mappers
                 }
                 Expression CheckContext()
                 {
-                    var elementTypeMap = configurationProvider.ResolveTypeMap(sourceElementType, destinationElementType);
+                    var elementTypeMap = configuration.ResolveTypeMap(sourceElementType, destinationElementType);
                     return elementTypeMap == null ? null : ExpressionBuilder.CheckContext(elementTypeMap);
                 }
             }
@@ -173,7 +170,7 @@ namespace AutoMapper.Internal.Mappers
                 }
                 return destinationArray;
             }
-            public static Expression MapToArray(IGlobalConfiguration configurationProvider, ProfileMap profileMap, Expression sourceExpression, Type destinationType)
+            public static Expression MapToArray(IGlobalConfiguration configuration, ProfileMap profileMap, Expression sourceExpression, Type destinationType)
             {
                 var destinationElementType = destinationType.GetElementType();
                 if (destinationType.GetArrayRank() > 1)
@@ -184,10 +181,7 @@ namespace AutoMapper.Internal.Mappers
                 Type sourceElementType = typeof(object);
                 Expression createDestination;
                 var destination = Parameter(destinationType, "destinationArray");
-                var variables = configurationProvider.Variables;
-                var statements = configurationProvider.Expressions;
-                PrimitiveHelper.Clear(ref variables);
-                PrimitiveHelper.Clear(ref statements);
+                var (variables, statements) = configuration.ScratchPad();
                 if (sourceType.IsArray)
                 {
                     var mapFromArray = MapFromArray();
@@ -208,7 +202,7 @@ namespace AutoMapper.Internal.Mappers
                     createDestination = Assign(destination, NewArrayBounds(destinationElementType, statements));
                 }
                 var itemParam = Parameter(sourceElementType, "sourceItem");
-                var itemExpr = configurationProvider.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+                var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 var setItem = Assign(ArrayAccess(destination, IncrementIndex), itemExpr);
                 variables.Clear();
                 statements.Clear();
@@ -249,7 +243,7 @@ namespace AutoMapper.Internal.Mappers
                     return Call(ToArrayMethod.MakeGenericMethod(sourceElementType), sourceExpression);
                 }
                 bool MustMap(Type sourceType, Type destinationType) => !destinationType.IsAssignableFrom(sourceType) || 
-                    configurationProvider.FindTypeMapFor(sourceType, destinationType) != null;
+                    configuration.FindTypeMapFor(sourceType, destinationType) != null;
             }
         }
     }

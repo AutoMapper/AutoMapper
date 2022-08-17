@@ -8,17 +8,6 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class PrimitiveHelper
     {
-        public static void Clear<T>(ref T collection) where T : IList, new()
-        {
-            if (collection == null)
-            {
-                collection = new();
-            }
-            else
-            {
-                collection.Clear();
-            }
-        }
         public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
         public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
         {
