@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Cryptography;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
@@ -68,6 +67,7 @@ namespace AutoMapper
         private readonly ParameterExpression[] _parameters = new ParameterExpression[] { null, null, ContextParameter };
         private readonly CatchBlock[] _catches = new CatchBlock[1];
         private readonly List<Expression> _expressions = new();
+        private readonly Dictionary<Type, DefaultExpression> _defaults;
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -98,6 +98,7 @@ namespace AutoMapper
                 typeMapsCount += profileMap.TypeMapsCount;
                 openTypeMapsCount += profileMap.OpenTypeMapsCount;
             }
+            _defaults = new(3 * typeMapsCount);
             _configuredMaps = new(typeMapsCount);
             _hasOpenMaps = openTypeMapsCount > 0;
             _runtimeMaps = new(GetTypeMap, openTypeMapsCount);
@@ -110,12 +111,15 @@ namespace AutoMapper
             {
                 profile.Clear();
             }
+            _configuredMaps.TrimExcess();
+            _resolvedMaps.TrimExcess();
             _typeMapsPath = null;
             _sourceMembers = null;
             _expressions = null;
             _variables = null;
             _parameters = null;
             _catches = null;
+            _defaults = null;
             _sealed = true;
             return;
             void Seal()
@@ -259,6 +263,19 @@ namespace AutoMapper
         HashSet<TypeMap> IGlobalConfiguration.TypeMapsPath => _typeMapsPath;
         ParameterExpression[] IGlobalConfiguration.Parameters => _parameters;
         CatchBlock[] IGlobalConfiguration.Catches => _catches;
+        DefaultExpression IGlobalConfiguration.GetDefault(Type type)
+        {
+            if (_defaults == null)
+            {
+                return Default(type);
+            }
+            if (!_defaults.TryGetValue(type, out var defaultExpression))
+            {
+                defaultExpression = Default(type);
+                _defaults.Add(type, defaultExpression);
+            }
+            return defaultExpression;
+        }
         Func<TSource, TDestination, ResolutionContext, TDestination> IGlobalConfiguration.GetExecutionPlan<TSource, TDestination>(in MapRequest mapRequest)
             => (Func<TSource, TDestination, ResolutionContext, TDestination>)GetExecutionPlan(mapRequest);
         private Delegate GetExecutionPlan(in MapRequest mapRequest) => _executionPlans.GetOrAdd(mapRequest);

@@ -17,8 +17,8 @@ namespace AutoMapper.Internal
         public static bool IsPublic(this PropertyInfo propertyInfo) => (propertyInfo.GetGetMethod() ?? propertyInfo.GetSetMethod()) != null;
         public static bool Has<TAttribute>(this MemberInfo member) where TAttribute : Attribute => member.IsDefined(typeof(TAttribute));
         public static bool CanBeSet(this MemberInfo member) => member is PropertyInfo property ? property.CanWrite : !((FieldInfo)member).IsInitOnly;
-        public static Expression GetDefaultValue(this ParameterInfo parameter) =>
-            parameter is { DefaultValue: null, ParameterType: { IsValueType: true } type } ? Default(type) : ToType(Constant(parameter.DefaultValue), parameter.ParameterType);
+        public static Expression GetDefaultValue(this ParameterInfo parameter, IGlobalConfiguration configuration) =>
+            parameter is { DefaultValue: null, ParameterType: { IsValueType: true } type } ? configuration.Default(type) : ToType(Constant(parameter.DefaultValue), parameter.ParameterType);
         public static object MapMember(this ResolutionContext context, MemberInfo member, object source, object destination = null)
         {
             var memberType = GetMemberType(member);

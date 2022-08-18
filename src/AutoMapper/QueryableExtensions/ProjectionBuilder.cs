@@ -201,7 +201,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
                 { ConstructorMap: { CanResolve: true } constructorMap } => 
-                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, null, map.DefaultValue()) ?? Default(map.DestinationType))),
+                    New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, null, map.DefaultValue(null)) ?? Default(map.DestinationType))),
                 _ => New(typeMap.DestinationType)
             };
         }
@@ -245,7 +245,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 TypeMap letTypeMap;
                 lock(Configuration)
                 {
-                    letTypeMap = new(request.SourceType, letType, typeMap.Profile);
+                    letTypeMap = new(request.SourceType, letType, typeMap.Profile, null);
                 }
                 var secondParameter = Parameter(letType, "dtoLet");
                 ReplaceSubQueries();

@@ -216,8 +216,21 @@ namespace AutoMapper.Configuration
             _types.CheckIsDerivedFrom(baseTypes);
             TypeMapActions.Add(tm => tm.IncludeBaseTypes(baseTypes));
         }
-        public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember) =>
-            _memberConfigurations?.Find(m => m.DestinationMember == destinationMember);
+        public IPropertyMapConfiguration GetDestinationMemberConfiguration(MemberInfo destinationMember)
+        {
+            if (_memberConfigurations == null)
+            {
+                return null;
+            }
+            foreach (var config in _memberConfigurations)
+            {
+                if (config.DestinationMember == destinationMember)
+                {
+                    return config;
+                }
+            }
+            return null;
+        }
         protected abstract void IgnoreDestinationMember(MemberInfo property, bool ignorePaths = true);
     }
     public abstract class MappingExpressionBase<TSource, TDestination, TMappingExpression> : TypeMapConfiguration, IMappingExpressionBase<TSource, TDestination, TMappingExpression>

@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
         public void Should_null_check()
         {
             Expression<Func<Source, InnerSource>> expression = s => s.InnerSources.FirstOrDefault().InnerSource;
-            var result= expression.Body.NullCheck(Configuration);
+            var result= expression.Body.NullCheck(null);
         }
         [Fact]
         public void Should_flatten()

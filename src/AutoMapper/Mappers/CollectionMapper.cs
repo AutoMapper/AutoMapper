@@ -40,7 +40,7 @@ namespace AutoMapper.Internal.Mappers
             {
                 var destinationTypeArguments = destinationType.GenericTypeArguments;
                 var closedCollectionType = genericCollectionType.MakeGenericType(destinationTypeArguments);
-                var dict = MapCollectionCore(Default(closedCollectionType));
+                var dict = MapCollectionCore(configuration.Default(closedCollectionType));
                 var readOnlyClosedType = destinationType.IsInterface ? genericReadOnlyCollectionType.MakeGenericType(destinationTypeArguments) : destinationType;
                 return New(readOnlyClosedType.GetConstructors()[0], dict);
             }
@@ -138,7 +138,8 @@ namespace AutoMapper.Internal.Mappers
                     else
                     {
                         destination = newExpression;
-                        assignNewExpression = Assign(newExpression, Coalesce(passedDestination, ObjectFactory.GenerateConstructorExpression(passedDestination.Type)));
+                        var ctor = ObjectFactory.GenerateConstructorExpression(passedDestination.Type, configuration);
+                        assignNewExpression = Assign(newExpression, Coalesce(passedDestination, ctor));
                     }
                 }
                 Expression CheckContext()

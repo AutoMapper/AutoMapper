@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests.Tests
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             var profile = new ProfileMap(mappingOptions);
 
-            var typeMap = new TypeMap(typeof(Source), typeof(Destination), profile);
+            var typeMap = new TypeMap(typeof(Source), typeof(Destination), profile, null);
 
             var propertyMaps = typeMap.PropertyMaps;
 

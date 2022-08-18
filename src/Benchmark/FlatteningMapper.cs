@@ -6,22 +6,45 @@ namespace Benchmark.Flattening
 {
     using System.Collections.Generic;
     using System.Linq;
-
-    public class DeepTypeMapper : IObjectToObjectMapper
+    static class Config
     {
-        private Customer _customer;
-        private IMapper _mapper;
-        public string Name { get; } = "Deep Types";
-        public void Initialize()
+        public static readonly IMapper Mapper = CreateMapper();
+        private static IMapper CreateMapper()
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Address, Address>();
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
+
+                cfg.CreateMap<Foo, FooDest>();
+                cfg.CreateMap<InnerFoo, InnerFooDest>();
+            
+                cfg.CreateMap<Model11, Dto11>();
+
+                cfg.CreateMap<ModelObject, ModelDto>();
+                cfg.CreateMap<Model1, Dto1>();
+                cfg.CreateMap<Model2, Dto2>();
+                cfg.CreateMap<Model3, Dto3>();
+                cfg.CreateMap<Model4, Dto4>();
+                cfg.CreateMap<Model5, Dto5>();
+                cfg.CreateMap<Model6, Dto6>();
+                cfg.CreateMap<Model7, Dto7>();
+                cfg.CreateMap<Model8, Dto8>();
+                cfg.CreateMap<Model9, Dto9>();
+                cfg.CreateMap<Model10, Dto10>();
             });
             //config.AssertConfigurationIsValid();
-            _mapper = config.CreateMapper();
+            return config.CreateMapper();
+        }
+        public static TDestination Map<TSource, TDestination>(TSource source) => Mapper.Map<TDestination>(source);
+    }
+    public class DeepTypeMapper : IObjectToObjectMapper
+    {
+        private Customer _customer;
+        public string Name { get; } = "Deep Types";
+        public void Initialize()
+        {
             _customer = new Customer()
             {
                 Address = new Address() { City = "istanbul", Country = "turkey", Id = 1, Street = "istiklal cad." },
@@ -41,51 +64,44 @@ namespace Benchmark.Flattening
                 }.ToArray()
             };
         }
-
-        public object Map()
-        {
-            return _mapper.Map<Customer, CustomerDTO>(_customer);
-        }
-
-        public class Address
-        {
-            public int Id { get; set; }
-            public string Street { get; set; }
-            public string City { get; set; }
-            public string Country { get; set; }
-        }
-
-        public class AddressDTO
-        {
-            public int Id { get; set; }
-            public string City { get; set; }
-            public string Country { get; set; }
-        }
-
-        public class Customer
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public decimal? Credit { get; set; }
-            public Address Address { get; set; }
-            public Address HomeAddress { get; set; }
-            public Address[] Addresses { get; set; }
-            public List<Address> WorkAddresses { get; set; }
-        }
-
-        public class CustomerDTO
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public Address Address { get; set; }
-            public AddressDTO HomeAddress { get; set; }
-            public AddressDTO[] Addresses { get; set; }
-            public List<AddressDTO> WorkAddresses { get; set; }
-            public string AddressCity { get; set; }
-        }
-
+        public object Map() => Config.Map<Customer, CustomerDTO>(_customer);
+    }
+    public class Address
+    {
+        public int Id { get; set; }
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
     }
 
+    public class AddressDTO
+    {
+        public int Id { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+    }
+
+    public class Customer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal? Credit { get; set; }
+        public Address Address { get; set; }
+        public Address HomeAddress { get; set; }
+        public Address[] Addresses { get; set; }
+        public List<Address> WorkAddresses { get; set; }
+    }
+
+    public class CustomerDTO
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public Address Address { get; set; }
+        public AddressDTO HomeAddress { get; set; }
+        public AddressDTO[] Addresses { get; set; }
+        public List<AddressDTO> WorkAddresses { get; set; }
+        public string AddressCity { get; set; }
+    }
     public class ManualDeepTypeMapper : IObjectToObjectMapper
     {
         private Customer _customer;
@@ -135,71 +151,20 @@ namespace Benchmark.Flattening
             {
                 dto.WorkAddresses.Add(new AddressDTO() { Id = workAddress.Id, Country = workAddress.Country, City = workAddress.City });
             }
-
             return dto;
         }
-
-        public class Address
-        {
-            public int Id { get; set; }
-            public string Street { get; set; }
-            public string City { get; set; }
-            public string Country { get; set; }
-        }
-
-        public class AddressDTO
-        {
-            public int Id { get; set; }
-            public string City { get; set; }
-            public string Country { get; set; }
-        }
-
-        public class Customer
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public decimal? Credit { get; set; }
-            public Address Address { get; set; }
-            public Address HomeAddress { get; set; }
-            public Address[] Addresses { get; set; }
-            public ICollection<Address> WorkAddresses { get; set; }
-        }
-
-        public class CustomerDTO
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public Address Address { get; set; }
-            public AddressDTO HomeAddress { get; set; }
-            public AddressDTO[] Addresses { get; set; }
-            public List<AddressDTO> WorkAddresses { get; set; }
-            public string AddressCity { get; set; }
-        }
-
     }
-
     public class ComplexTypeMapper : IObjectToObjectMapper
     {
         private Foo _foo;
         public string Name { get; } = "Complex Types";
-        private IMapper _mapper;
-
-
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Foo, FooDest>();
-                cfg.CreateMap<InnerFoo, InnerFooDest>();
-            });
-            //config.AssertConfigurationIsValid();
-            _mapper = config.CreateMapper();
             _foo = Foo.New();
         }
-
         public object Map()
         {
-            var dest = _mapper.Map<Foo, FooDest>(_foo);
+            var dest = Config.Map<Foo, FooDest>(_foo);
             return dest;
         }
     }
@@ -339,75 +304,26 @@ namespace Benchmark.Flattening
             return dest;
         }
     }
-
-
     public class CtorMapper : IObjectToObjectMapper
     {
         private Model11 _model;
-
         public string Name => "CtorMapper";
-
-        private IMapper _mapper;
-
-        public void Initialize()
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Model11, Dto11>());
-            //config.AssertConfigurationIsValid();
-            _mapper = config.CreateMapper();
-            _model = new Model11 { Value = 5 };
-        }
-
-        public object Map()
-        {
-            return _mapper.Map<Model11, Dto11>(_model);
-        }
+        public void Initialize() => _model = new Model11 { Value = 5 };
+        public object Map() => Config.Map<Model11, Dto11>(_model);
     }
-
     public class ManualCtorMapper : IObjectToObjectMapper
     {
         private Model11 _model;
-
         public string Name => "ManualCtorMapper";
-
-        public void Initialize()
-        {
-            _model = new Model11 { Value = 5 };
-        }
-
-        public object Map()
-        {
-            return new Dto11(_model.Value);
-        }
+        public void Initialize() => _model = new Model11 { Value = 5 };
+        public object Map() => new Dto11(_model.Value);
     }
-
     public class FlatteningMapper : IObjectToObjectMapper
     {
         private ModelObject _source;
-        private IMapper _mapper;
-
-        public string Name
-        {
-            get { return "AutoMapper"; }
-        }
-
+        public string Name => "AutoMapper";
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<ModelObject, ModelDto>();
-                cfg.CreateMap<Model1, Dto1>();
-                cfg.CreateMap<Model2, Dto2>();
-                cfg.CreateMap<Model3, Dto3>();
-                cfg.CreateMap<Model4, Dto4>();
-                cfg.CreateMap<Model5, Dto5>();
-                cfg.CreateMap<Model6, Dto6>();
-                cfg.CreateMap<Model7, Dto7>();
-                cfg.CreateMap<Model8, Dto8>();
-                cfg.CreateMap<Model9, Dto9>();
-                cfg.CreateMap<Model10, Dto10>();
-            });
-            //config.AssertConfigurationIsValid();
-            _mapper = config.CreateMapper();
             _source = new ModelObject
             {
                 BaseDate = new DateTime(2007, 4, 5),
@@ -428,23 +344,14 @@ namespace Benchmark.Flattening
                     ProperName = "Some other name"
                 },
             };
+            var mapper = Config.Mapper;
         }
-
-        public object Map()
-        {
-            return _mapper.Map<ModelObject, ModelDto>(_source);
-        }
+        public object Map() => Config.Map<ModelObject, ModelDto>(_source);
     }
-
     public class ManualMapper : IObjectToObjectMapper
     {
         private ModelObject _source;
-
-        public string Name
-        {
-            get { return "Manual"; }
-        }
-
+        public string Name => "Manual";
         public void Initialize()
         {
             _source = new ModelObject
@@ -468,7 +375,6 @@ namespace Benchmark.Flattening
                 },
             };
         }
-
         public object Map()
         {
             return new ModelDto
@@ -481,7 +387,6 @@ namespace Benchmark.Flattening
             };
         }
     }
-
     public class Model1
     {
         public int Value { get; set; }

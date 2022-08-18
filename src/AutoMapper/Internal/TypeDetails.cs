@@ -133,8 +133,9 @@ namespace AutoMapper.Internal
             public override object[] GetCustomAttributes(Type attributeType, bool inherit) => throw new NotImplementedException();
             public override bool IsDefined(Type attributeType, bool inherit) => throw new NotImplementedException();
         }
-        public static IEnumerable<string> PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
+        public static string[] PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
         {
+            List<string> result = null;
             foreach (var prefix in prefixes)
             {
                 if (!memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
@@ -142,26 +143,23 @@ namespace AutoMapper.Internal
                     continue;
                 }
                 var withoutPrefix = memberName[prefix.Length..];
-                yield return withoutPrefix;
-                foreach (var s in PostFixes(postfixes, withoutPrefix))
-                {
-                    yield return s;
-                }
+                result ??= new();
+                result.Add(withoutPrefix);
+                PostFixes(ref result, postfixes, withoutPrefix);
             }
-            foreach (var s in PostFixes(postfixes, memberName))
+            PostFixes(ref result, postfixes, memberName);
+            return result == null ? Array.Empty<string>() : result.ToArray();
+            static void PostFixes(ref List<string> result, List< string> postfixes, string name)
             {
-                yield return s;
-            }
-        }
-        private static IEnumerable<string> PostFixes(List<string> postfixes, string name)
-        {
-            foreach (var postfix in postfixes)
-            {
-                if (!name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
+                foreach (var postfix in postfixes)
                 {
-                    continue;
+                    if (!name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                    result ??= new();
+                    result.Add(name[..^postfix.Length]);
                 }
-                yield return name[..^postfix.Length];
             }
         }
         public Type Type { get; }

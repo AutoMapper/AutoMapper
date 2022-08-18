@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 namespace AutoMapper
 {
+    using Execution;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConstructorMap
     {
@@ -96,7 +97,7 @@ namespace AutoMapper
         public override IncludedMember IncludedMember { get; }
         public override MemberInfo[] SourceMembers { get; set; }
         public override string DestinationName => Parameter.Name;
-        public Expression DefaultValue() => Parameter.IsOptional ? Parameter.GetDefaultValue() : Expression.Default(DestinationType);
+        public Expression DefaultValue(IGlobalConfiguration configuration) => Parameter.IsOptional ? Parameter.GetDefaultValue(configuration) : configuration.Default(DestinationType);
         public override string ToString() => Parameter.Member.DeclaringType + "." + Parameter.Member + ".parameter " + Parameter.Name;
     }
 }

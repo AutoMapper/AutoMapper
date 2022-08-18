@@ -161,6 +161,7 @@ namespace AutoMapper.Internal
         List<Expression> Expressions { get; }
         HashSet<TypeMap> TypeMapsPath { get; }
         CatchBlock[] Catches { get; }
+        DefaultExpression GetDefault(Type type);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression

@@ -20,7 +20,7 @@ namespace AutoMapper.Internal.Mappers
             var ignoreCase = True;
             var enumParse = Call(ParseMethod.MakeGenericMethod(destinationType), sourceExpression, ignoreCase);
             var enumMember = CheckEnumMember(sourceExpression, destinationType, enumParse, EqualsMethod);
-            return Condition(Equal(Property(sourceExpression, Length), Zero), Default(destinationType), enumMember);
+            return Condition(Equal(Property(sourceExpression, Length), Zero), configuration.Default(destinationType), enumMember);
         }
         internal static Expression CheckEnumMember(Expression sourceExpression, Type enumType, Expression defaultExpression, MethodInfo comparison = null)
         {

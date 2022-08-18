@@ -24,7 +24,7 @@ namespace AutoMapper
         private TypeMapDetails _details;
         private Dictionary<string, PropertyMap> _propertyMaps;
         private bool _sealed;
-        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration = null, List<MemberInfo> sourceMembers = null)
+        public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration, List<MemberInfo> sourceMembers = null)
         {
             Types = new(sourceType, destinationType);
             Profile = profile;

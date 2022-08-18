@@ -42,9 +42,11 @@ namespace AutoMapper.Execution
         private static readonly ParameterExpression[] Indexes = new[] { Index };
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
+        public static DefaultExpression Default(this IGlobalConfiguration configuration, Type type) =>
+            configuration == null ? Expression.Default(type) : configuration.GetDefault(type);
         public static (List<ParameterExpression> Variables, List<Expression> Expressions) ScratchPad(this IGlobalConfiguration configuration)
         {
-            var variables = configuration.Variables;
+            var variables = configuration?.Variables;
             if (variables == null)
             {
                 variables = new();
@@ -53,7 +55,7 @@ namespace AutoMapper.Execution
             {
                 variables.Clear();
             }
-            var expressions = configuration.Expressions;
+            var expressions = configuration?.Expressions;
             if (expressions == null)
             {
                 expressions = new();
@@ -67,7 +69,7 @@ namespace AutoMapper.Execution
         public static Expression MapExpression(this IGlobalConfiguration configuration, ProfileMap profileMap, TypePair typePair, Expression source,
             MemberMap memberMap = null, Expression destination = null)
         {
-            destination ??= Default(typePair.DestinationType);
+            destination ??= configuration.Default(typePair.DestinationType);
             var typeMap = configuration.ResolveTypeMap(typePair);
             Expression mapExpression = null;
             bool nullCheck;
@@ -153,7 +155,7 @@ namespace AutoMapper.Execution
             {
                 if ((isCollection && profileMap.AllowsNullCollectionsFor(memberMap)) || (!isCollection && profileMap.AllowsNullDestinationValuesFor(memberMap)))
                 {
-                    return destination.NodeType == ExpressionType.Default ? destination : Default(destinationType);
+                    return destination.NodeType == ExpressionType.Default ? destination : configuration.Default(destinationType);
                 }
                 if (destinationType.IsArray)
                 {
@@ -163,7 +165,7 @@ namespace AutoMapper.Execution
                         Expression.Call(ArrayEmptyMethod.MakeGenericMethod(destinationElementType)) :
                         NewArrayBounds(destinationElementType, Enumerable.Repeat(Zero, rank));
                 }
-                return ObjectFactory.GenerateConstructorExpression(destinationType);
+                return ObjectFactory.GenerateConstructorExpression(destinationType, configuration);
             }
         }
         public static Expression ServiceLocator(Type type) => Expression.Call(ContextParameter, ContextCreate, Constant(type));
@@ -378,7 +380,7 @@ namespace AutoMapper.Execution
             var destinationType = memberMap?.DestinationType;
             var returnType = (destinationType != null && destinationType != expression.Type && Nullable.GetUnderlyingType(destinationType) == expression.Type) ?
                 destinationType : expression.Type;
-            var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : Default(returnType);
+            var defaultReturn = (defaultValue is { NodeType: ExpressionType.Default } && defaultValue.Type == returnType) ? defaultValue : configuration.Default(returnType);
             List<ParameterExpression> variables = null;
             List<Expression> expressions = null;
             var name = parameter.Name;

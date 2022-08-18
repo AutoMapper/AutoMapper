@@ -15,17 +15,17 @@ namespace AutoMapper.Execution
         private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new(GenerateConstructor);
         public static object CreateInstance(Type type) => CtorCache.GetOrAdd(type)();
         private static Func<object> GenerateConstructor(Type type) =>
-            Lambda<Func<object>>(GenerateConstructorExpression(type).ToObject()).Compile();
+            Lambda<Func<object>>(GenerateConstructorExpression(type, null).ToObject()).Compile();
         public static object CreateInterfaceProxy(Type interfaceType) => CreateInstance(ProxyGenerator.GetProxyType(interfaceType));
-        public static Expression GenerateConstructorExpression(Type type) => type switch
+        public static Expression GenerateConstructorExpression(Type type, IGlobalConfiguration configuration) => type switch
         {
-            { IsValueType: true } => Default(type),
+            { IsValueType: true } => configuration.Default(type),
             Type stringType when stringType == typeof(string) => Constant(string.Empty),
             { IsInterface: true } => CreateInterfaceExpression(type),
             { IsAbstract: true } => InvalidType(type, $"Cannot create an instance of abstract type {type}."),
-            _ => CallConstructor(type)
+            _ => CallConstructor(type, configuration)
         };
-        private static Expression CallConstructor(Type type)
+        private static Expression CallConstructor(Type type, IGlobalConfiguration configuration)
         {
             var defaultCtor = type.GetConstructor(TypeExtensions.InstanceFlags, null, Type.EmptyTypes, null);
             if (defaultCtor != null)
@@ -38,7 +38,7 @@ namespace AutoMapper.Execution
             {
                 return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args. Validate your configuration for details.");
             }
-            var arguments = ctorWithOptionalArgs.args.Select(p => p.GetDefaultValue());
+            var arguments = ctorWithOptionalArgs.args.Select(p => p.GetDefaultValue(configuration));
             return New(ctorWithOptionalArgs.ctor, arguments);
         }
         private static Expression CreateInterfaceExpression(Type type) =>
