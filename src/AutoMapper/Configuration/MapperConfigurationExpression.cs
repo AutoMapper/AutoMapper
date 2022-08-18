@@ -93,8 +93,8 @@ namespace AutoMapper
     }
     public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
     {
-        private readonly List<Profile> _profiles = new List<Profile>();
-        private readonly List<Validator> _validators = new List<Validator>();
+        private readonly List<Profile> _profiles = new();
+        private readonly List<Validator> _validators = new();
         private readonly List<IObjectMapper> _mappers;
         private Func<Type, object> _serviceCtor = Activator.CreateInstance;
 
@@ -119,7 +119,7 @@ namespace AutoMapper
         /// </summary>
         int IGlobalConfigurationExpression.MaxExecutionPlanDepth { get; set; } = 1;
 
-        Validator[] IGlobalConfigurationExpression.GetValidators() => _validators.ToArray();
+        List<Validator> IGlobalConfigurationExpression.GetValidators() => _validators;
 
         List<IProjectionMapper> IGlobalConfigurationExpression.ProjectionMappers { get; } = ProjectionBuilder.DefaultProjectionMappers();
 

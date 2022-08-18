@@ -63,9 +63,12 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
+        private readonly List<string> _prefixes = new() { "Get" };
+        private readonly List<string> _postfixes = new();
         private readonly List<TypeMapConfiguration> _typeMapConfigs = new();
         private readonly PrePostfixName _prePostfixName = new();
-        private readonly List<IMemberConfiguration> _memberConfigurations = new();
+        private readonly NameSplitMember _nameSplitMember = new();
+        private readonly List<IMemberConfiguration> _memberConfigurations;
         private List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions;
         private List<Action<TypeMap, IMappingExpression>> _allTypeMapActions;
         private List<string> _globalIgnores;
@@ -73,21 +76,15 @@ namespace AutoMapper
         private List<MethodInfo> _sourceExtensionMethods;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _constructorMappingEnabled;
-
         protected Profile(string profileName) : this() => ProfileName = profileName;
-
         protected Profile()
         {
             ProfileName = GetType().FullName;
-            var memberConfiguration = new MemberConfiguration();
-            memberConfiguration.MemberMappers.Add(new NameSplitMember());
-            _prePostfixName.Prefixes.Add("Get");
+            MemberConfiguration memberConfiguration = new() { MemberMappers = { _nameSplitMember } };
             memberConfiguration.NameMapper.NamedMappers.Add(_prePostfixName);
-            _memberConfigurations.Add(memberConfiguration);
+            _memberConfigurations = new() { memberConfiguration };
         }
-        protected Profile(string profileName, Action<IProfileExpression> configurationAction)
-            : this(profileName)  => configurationAction(this);
-
+        protected Profile(string profileName, Action<IProfileExpression> configurationAction) : this(profileName)  => configurationAction(this);
         IMemberConfiguration DefaultMemberConfig => _memberConfigurations[0];
         IMemberConfiguration IProfileExpressionInternal.DefaultMemberConfig => DefaultMemberConfig;
         bool? IProfileConfiguration.ConstructorMappingEnabled => _constructorMappingEnabled;
@@ -114,10 +111,20 @@ namespace AutoMapper
         public Func<FieldInfo, bool> ShouldMapField { get; set; }
         public Func<MethodInfo, bool> ShouldMapMethod { get; set; }
         public Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
-        public INamingConvention SourceMemberNamingConvention { get; set; }
-        public INamingConvention DestinationMemberNamingConvention { get; set; }
+        public INamingConvention SourceMemberNamingConvention
+        {
+            get => _nameSplitMember.SourceMemberNamingConvention;
+            set => _nameSplitMember.SourceMemberNamingConvention = value;
+        }
+        public INamingConvention DestinationMemberNamingConvention
+        {
+            get => _nameSplitMember.DestinationMemberNamingConvention;
+            set => _nameSplitMember.DestinationMemberNamingConvention = value;
+        }
         public List<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs ??= new();
-
+        NameSplitMember IProfileExpressionInternal.NameSplitMember => _nameSplitMember;
+        List<string> IProfileExpressionInternal.Prefixes => _prefixes;
+        List<string> IProfileExpressionInternal.Postfixes => _postfixes;
         public void DisableConstructorMapping() => _constructorMappingEnabled = false;
 
         void IProfileExpressionInternal.ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
@@ -164,11 +171,11 @@ namespace AutoMapper
             }
             return map;
         }
-        public void ClearPrefixes() => _prePostfixName.Prefixes.Clear();
+        public void ClearPrefixes() => _prefixes.Clear();
         public void ReplaceMemberName(string original, string newValue) =>
             DefaultMemberConfig.AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
-        public void RecognizePrefixes(params string[] prefixes) => _prePostfixName.Prefixes.AddRange(prefixes);
-        public void RecognizePostfixes(params string[] postfixes) => _prePostfixName.Postfixes.AddRange(postfixes);
+        public void RecognizePrefixes(params string[] prefixes) => _prefixes.AddRange(prefixes);
+        public void RecognizePostfixes(params string[] postfixes) => _postfixes.AddRange(postfixes);
         public void RecognizeDestinationPrefixes(params string[] prefixes) => _prePostfixName.DestinationPrefixes.AddRange(prefixes);
         public void RecognizeDestinationPostfixes(params string[] postfixes) => _prePostfixName.DestinationPostfixes.AddRange(postfixes);
         public void AddGlobalIgnore(string propertyNameStartingWith)

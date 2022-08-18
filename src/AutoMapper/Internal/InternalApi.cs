@@ -47,7 +47,7 @@ namespace AutoMapper.Internal
         /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the docs</a> for details.
         /// </summary>
         int MaxExecutionPlanDepth { get; set; }
-        Validator[] GetValidators();
+        List<Validator> GetValidators();
         List<IProjectionMapper> ProjectionMappers { get; }
         /// <summary>
         /// How many levels deep should recursive queries be expanded.
@@ -166,6 +166,9 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression
     {
+        NameSplitMember NameSplitMember { get; }
+        List<string> Prefixes { get; }
+        List<string> Postfixes { get; }
         IMemberConfiguration DefaultMemberConfig { get; }
         IMemberConfiguration AddMemberConfiguration();
         /// <summary>

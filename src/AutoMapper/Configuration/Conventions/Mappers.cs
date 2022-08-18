@@ -36,8 +36,6 @@ namespace AutoMapper.Configuration.Conventions
     }
     public class PrePostfixName : ISourceToDestinationNameMapper
     {
-        public List<string> Prefixes { get; } = new();
-        public List<string> Postfixes { get; } = new();
         public List<string> DestinationPrefixes { get; } = new();
         public List<string> DestinationPostfixes { get; } = new();
         public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)

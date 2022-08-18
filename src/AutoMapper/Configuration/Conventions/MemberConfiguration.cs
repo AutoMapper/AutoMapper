@@ -77,8 +77,8 @@ namespace AutoMapper.Configuration.Conventions
     public class NameSplitMember : IChildMemberConfiguration
     {
         bool _default = true;
-        public INamingConvention SourceMemberNamingConvention { get; set; }
-        public INamingConvention DestinationMemberNamingConvention { get; set; }
+        public INamingConvention SourceMemberNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
+        public INamingConvention DestinationMemberNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
         public bool MapDestinationPropertyToSource(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, IMemberConfiguration parent, bool isReverseMap) =>
             _default ?
                 Default(options, sourceType, destType, destMemberType, nameToSearch, resolvers, parent, isReverseMap) :
@@ -143,26 +143,7 @@ namespace AutoMapper.Configuration.Conventions
             }
             return false;
         }
-        internal void Set(INamingConvention source, INamingConvention destination)
-        {
-            if (source == null)
-            {
-                SourceMemberNamingConvention = PascalCaseNamingConvention.Instance;
-            }
-            else
-            {
-                SourceMemberNamingConvention = source;
-                _default = false;
-            }
-            if (destination == null)
-            {
-                DestinationMemberNamingConvention = PascalCaseNamingConvention.Instance;
-            }
-            else
-            {
-                DestinationMemberNamingConvention = destination;
-                _default = false;
-            }
-        }
+        internal void Seal() => _default =  SourceMemberNamingConvention == PascalCaseNamingConvention.Instance && 
+            DestinationMemberNamingConvention == PascalCaseNamingConvention.Instance;
     }
 }

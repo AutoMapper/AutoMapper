@@ -39,25 +39,20 @@ namespace AutoMapper
             ShouldUseConstructor = profile.ShouldUseConstructor ?? configuration?.ShouldUseConstructor ?? (c => true);
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
             _memberConfigurations = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations).ToArray();
-            var nameSplitMember = (NameSplitMember)_memberConfigurations[0].MemberMappers.Find(m => m is NameSplitMember);
-            nameSplitMember?.Set(profile.SourceMemberNamingConvention, profile.DestinationMemberNamingConvention);
             var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
             GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions).ToArray();
-            var prePostFixes = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations)
-                                        .Select(m => m.NameMapper)
-                                        .SelectMany(m => m.NamedMappers)
-                                        .OfType<PrePostfixName>()
-                                        .ToArray();
-            Prefixes = prePostFixes.SelectMany(m => m.Prefixes).Distinct().ToList();
-            Postfixes = prePostFixes.SelectMany(m => m.Postfixes).Distinct().ToList();
-            SetTypeMapConfigs();
-            SetOpenTypeMapConfigs();
-            _typeDetails = new(2*_typeMapConfigs.Length);
+            var profileInternal = (IProfileExpressionInternal)profile;
+            profileInternal.NameSplitMember.Seal();
+            Prefixes = profileInternal.Prefixes.Concat(configuration?.Prefixes).Distinct().ToList();
+            Postfixes = profileInternal.Postfixes.Concat(configuration?.Postfixes).Distinct().ToList();
+            TypeMapConfigs();
+            OpenTypeMapConfigs();
+            _typeDetails = new(2 * _typeMapConfigs.Length);
             return;
-            void SetTypeMapConfigs()
+            void TypeMapConfigs()
             {
                 _typeMapConfigs = new TypeMapConfiguration[profile.TypeMapConfigs.Count];
                 var index = 0;
@@ -72,7 +67,7 @@ namespace AutoMapper
                 }
                 TypeMapsCount = index + reverseMapsCount;
             }
-            void SetOpenTypeMapConfigs()
+            void OpenTypeMapConfigs()
             {
                 _openTypeMapConfigs = new(profile.OpenTypeMapConfigs.Count);
                 foreach (var openTypeMapConfig in profile.OpenTypeMapConfigs)

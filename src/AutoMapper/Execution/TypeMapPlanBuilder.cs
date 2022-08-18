@@ -36,15 +36,15 @@ namespace AutoMapper.Execution
         public Type DestinationType => _destination.Type;
         public ParameterExpression Source { get; }
         private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => new("Error mapping types.", innerException, memberMap);
-        ParameterExpression[] GetParameters(ParameterExpression source = null, ParameterExpression destination = null)
+        ParameterExpression[] GetParameters(ParameterExpression first = null, ParameterExpression second = null)
         {
-            _parameters[0] = source ?? Source;
-            _parameters[1] = destination ?? _destination;
+            _parameters[0] = first ?? Source;
+            _parameters[1] = second ?? _destination;
             return _parameters;
         }
         public LambdaExpression CreateMapperLambda()
         {
-            var parameters = GetParameters(destination: _initialDestination);
+            var parameters = GetParameters(second: _initialDestination);
             var customExpression = _typeMap.TypeConverter?.GetExpression(parameters);
             if (customExpression != null)
             {
@@ -72,7 +72,7 @@ namespace AutoMapper.Execution
             }
             _expressions.Add(mapperFunc);
             _variables.Add(_destination);
-            return Lambda(Block(_variables, _expressions), GetParameters(destination: _initialDestination));
+            return Lambda(Block(_variables, _expressions), GetParameters(second: _initialDestination));
             static void Clear(ref HashSet<TypeMap> typeMapsPath)
             {
                 if (typeMapsPath == null)
@@ -262,7 +262,7 @@ namespace AutoMapper.Execution
         }
         private Expression CreateNewDestinationFunc() => _typeMap switch
         {
-            { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(GetParameters(destination: ContextParameter)),
+            { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(GetParameters(second: ContextParameter)),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
             { DestinationType: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType, _configuration)
@@ -351,7 +351,7 @@ namespace AutoMapper.Execution
         }
         void Precondition(MemberMap memberMap, ParameterExpression customSource)
         {
-            var preCondition = memberMap.PreCondition.ConvertReplaceParameters(GetParameters(source: customSource));
+            var preCondition = memberMap.PreCondition.ConvertReplaceParameters(GetParameters(first: customSource));
             var ifThen = IfThen(preCondition, Block(_expressions));
             _expressions.Clear();
             _expressions.Add(ifThen);

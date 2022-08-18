@@ -6,29 +6,23 @@ using AutoMapper.Internal;
 using AutoMapper.Internal.Mappers;
 namespace AutoMapper.Configuration
 {
-    using Validator = Action<ValidationContext>;
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ConfigurationValidator
     {
         private readonly IGlobalConfiguration _config;
         private readonly IGlobalConfigurationExpression _expression;
-        private readonly Validator[] _validators;
-
         public ConfigurationValidator(IGlobalConfiguration config, IGlobalConfigurationExpression expression)
         {
-            _validators = expression.GetValidators();
             _config = config;
             _expression = expression;
         }
-
         private void Validate(ValidationContext context)
         {
-            foreach (var validator in _validators)
+            foreach (var validator in _expression.GetValidators())
             {
                 validator(context);
             }
         }
-
         public void AssertConfigurationExpressionIsValid(IEnumerable<TypeMap> typeMaps)
         {
             if (!_expression.AllowAdditiveTypeMapCreation)
@@ -47,7 +41,6 @@ namespace AutoMapper.Configuration
             }
             AssertConfigurationIsValid(typeMaps);
         }
-
         public void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
         {
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
@@ -64,10 +57,8 @@ namespace AutoMapper.Configuration
             {
                 throw new AutoMapperConfigurationException(badTypeMaps);
             }
-
             var typeMapsChecked = new List<TypeMap>();
             var configExceptions = new List<Exception>();
-
             foreach (var typeMap in maps)
             {
                 try
@@ -79,7 +70,6 @@ namespace AutoMapper.Configuration
                     configExceptions.Add(e);
                 }
             }
-
             if (configExceptions.Count > 1)
             {
                 throw new AggregateException(configExceptions);
@@ -89,7 +79,6 @@ namespace AutoMapper.Configuration
                 throw configExceptions[0];
             }
         }
-
         private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
         {
             if(typeMap == null)
@@ -107,15 +96,12 @@ namespace AutoMapper.Configuration
                     return;
                 }
                 typeMapsChecked.Add(typeMap);
-
                 var context = new ValidationContext(types, memberMap, typeMap);
                 Validate(context);
-
                 if(!typeMap.ShouldCheckForValid)
                 {
                     return;
                 }
-
                 CheckPropertyMaps(typeMapsChecked, typeMap);
             }
             else
@@ -133,7 +119,6 @@ namespace AutoMapper.Configuration
                 }
             }
         }
-
         private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
         {
             foreach (var memberMap in typeMap.MemberMaps)

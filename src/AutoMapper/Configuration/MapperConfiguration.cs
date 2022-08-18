@@ -64,7 +64,7 @@ namespace AutoMapper
         private readonly HashSet<TypeMap> _typeMapsPath = new();
         private readonly List<MemberInfo> _sourceMembers = new();
         private readonly List<ParameterExpression> _variables = new();
-        private readonly ParameterExpression[] _parameters = new ParameterExpression[] { null, null, ContextParameter };
+        private readonly ParameterExpression[] _parameters = new[] { null, null, ContextParameter };
         private readonly CatchBlock[] _catches = new CatchBlock[1];
         private readonly List<Expression> _expressions = new();
         private readonly Dictionary<Type, DefaultExpression> _defaults;
@@ -165,9 +165,12 @@ namespace AutoMapper
                 return executionPlan.Compile(); // breakpoint here to inspect all execution plans
             }
         }
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
-            : this(Build(configure))
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(Build(configure)){}
+        static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
         {
+            MapperConfigurationExpression expr = new();
+            configure(expr);
+            return expr;
         }
         public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(_configuredMaps.Values);
         public IMapper CreateMapper() => new Mapper(this);
@@ -241,12 +244,6 @@ namespace AutoMapper
                 }
                 return Lambda(fullExpression, source, destination, ContextParameter);
             }
-        }
-        static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
-        {
-            var expr = new MapperConfigurationExpression();
-            configure(expr);
-            return expr;
         }
         IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder;
         Func<Type, object> IGlobalConfiguration.ServiceCtor => _serviceCtor;
