@@ -50,12 +50,12 @@ namespace AutoMapper
             SetResolver(sourceMember);
             Ignored = false;
         }
-        public void MapFrom(string sourceMembersPath)
+        public void MapFrom(string sourceMembersPath, MemberInfo[] members)
         {
-            var mapExpression = TypeMap.SourceType.IsGenericTypeDefinition ?
-                                                EmptyLambda :// just a placeholder so the member is mapped
-                                                ExpressionBuilder.MemberAccessLambda(TypeMap.SourceType, sourceMembersPath);
-            MapFrom(mapExpression);
+            var sourceType = TypeMap.SourceType;
+            var sourceMembers = sourceType.ContainsGenericParameters ? null :// just a placeholder so the member is mapped
+                members[0].DeclaringType.ContainsGenericParameters ? ReflectionHelper.GetMemberPath(sourceType, sourceMembersPath, TypeMap) : members;
+            Resolver = new MemberPathResolver(sourceMembers);
         }
         public override string ToString() => DestinationName;
         public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);

@@ -69,7 +69,7 @@ namespace AutoMapper.Configuration
         public void MapFrom(string sourceMembersPath)
         {
             _sourceMembers = ReflectionHelper.GetMemberPath(_sourceType, sourceMembersPath);
-            PropertyMapActions.Add(pm => pm.MapFrom(sourceMembersPath));
+            PropertyMapActions.Add(pm => pm.MapFrom(sourceMembersPath, _sourceMembers));
         }
         public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition) =>
             ConditionCore((src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember, ctxt));

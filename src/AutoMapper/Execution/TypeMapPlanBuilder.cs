@@ -162,8 +162,8 @@ namespace AutoMapper.Execution
         }
         private Expression CreateDestinationFunc()
         {
-            var newDestFunc = ToType(CreateNewDestinationFunc(), DestinationType);
-            var getDest = DestinationType.IsValueType ? newDestFunc : Coalesce(_initialDestination, newDestFunc);
+            var newDestFunc = CreateNewDestinationFunc();
+            var getDest = DestinationType.IsValueType ? newDestFunc : Coalesce(_initialDestination, ToType(newDestFunc, DestinationType));
             var destinationFunc = Assign(_destination, getDest);
             return _typeMap.PreserveReferences ?
                 Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, Source, Constant(DestinationType), _destination), _destination) :
@@ -410,6 +410,19 @@ namespace AutoMapper.Execution
         Type ResolvedType { get; }
         string SourceMemberName => null;
         LambdaExpression ProjectToExpression => null;
+    }
+    public class MemberPathResolver : IValueResolver
+    {
+        private readonly MemberInfo[] _members;
+        public MemberPathResolver(MemberInfo[] members) => _members = members;
+        public Type ResolvedType => _members?[^1].GetMemberType();
+        public Expression GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression destination, Expression destinationMember)
+        {
+            var expression = _members.Chain(source);
+            return memberMap.IncludedMember == null && _members.Length < 2 ? expression : expression.NullCheck(configuration, memberMap, destinationMember);
+        }
+        public MemberInfo GetSourceMember(MemberMap memberMap) => _members.Length == 1 ? _members[0] : null;
+        public LambdaExpression ProjectToExpression => _members.Lambda();
     }
     public abstract class LambdaValueResolver
     {

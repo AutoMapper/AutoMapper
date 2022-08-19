@@ -48,8 +48,15 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         {
             public string FullName { get; set; }
         }
+        [Fact]
+        public void Should_project_from_String()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<UserModel, UserDto>()
+                            .ForMember(dto => dto.FullName, opt => opt.MapFrom("FirstName")));
+            var result = new[] { new UserModel { FirstName = "Hallo" } }.AsQueryable().ProjectTo<UserDto>(config).Single();
+            result.FullName.ShouldBe("Hallo");
+        }
     }
-
     public class When_mapping_from_and_source_member_both_can_work : AutoMapperSpecBase
     {
         Dto _destination;

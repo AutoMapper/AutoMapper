@@ -62,8 +62,8 @@ namespace AutoMapper.Configuration
 
         public void MapFrom(string sourceMembersPath)
         {
-            ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
-            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath));
+            var sourceMembers = ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
+            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
         }
 
         public void Configure(TypeMap typeMap)

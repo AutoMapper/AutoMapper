@@ -280,7 +280,8 @@ namespace AutoMapper.Execution
             }
             return currentExpression == lambda.Body;
         }
-        public static LambdaExpression MemberAccessLambda(Type type, string memberPath) => GetMemberPath(type, memberPath).Lambda();
+        public static LambdaExpression MemberAccessLambda(Type type, string memberPath, TypeMap typeMap) => 
+            GetMemberPath(type, memberPath, typeMap).Lambda();
         public static Expression ForEach(List<ParameterExpression> variables, List<Expression> statements, ParameterExpression loopVar, Expression collection, Expression loopContent)
         {
             if (collection.Type.IsArray)

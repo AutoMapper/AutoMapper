@@ -45,16 +45,21 @@ namespace AutoMapper.Internal
             }
             throw Expected(propertyOrField);
         }
-        private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField) => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
+        private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField) => new(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
         public static object GetMemberValue(this MemberInfo propertyOrField, object target) => propertyOrField switch
         {
             PropertyInfo property => property.GetValue(target, null),
             FieldInfo field => field.GetValue(target),
             _ => throw Expected(propertyOrField)
         };
-        public static MemberInfo[] GetMemberPath(Type type, string fullMemberName)
+        public static MemberInfo[] GetMemberPath(Type type, string fullMemberName, TypeMap typeMap = null)
         {
             var memberNames = fullMemberName.Split('.');
+            var sourceDetails = typeMap?.SourceTypeDetails;
+            if (sourceDetails != null && memberNames.Length == 1)
+            {
+                return new[] { sourceDetails.GetMember(memberNames[0]) };
+            }
             var members = new MemberInfo[memberNames.Length];
             Type previousType = type;
             for(int index = 0; index < memberNames.Length; index++)
