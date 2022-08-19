@@ -59,8 +59,11 @@ namespace AutoMapper
         }
         public override string ToString() => DestinationName;
         public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);
-        public Expression ChainSourceMembers(IGlobalConfiguration configuration, Expression source, Expression defaultValue) =>
-            ChainSourceMembers(source).NullCheck(configuration, this, defaultValue);
+        public Expression ChainSourceMembers(IGlobalConfiguration configuration, Expression source, Expression defaultValue)
+        {
+            var expression = ChainSourceMembers(source);
+            return IncludedMember == null && SourceMembers.Length < 2 ? expression : expression.NullCheck(configuration, this, defaultValue);
+        }
         public bool AllowsNullDestinationValues => Profile?.AllowsNullDestinationValuesFor(this) ?? true;
         public bool AllowsNullCollections => (Profile?.AllowsNullCollectionsFor(this)).GetValueOrDefault();
         public ProfileMap Profile => TypeMap?.Profile;
