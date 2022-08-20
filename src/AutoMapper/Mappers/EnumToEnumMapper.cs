@@ -17,7 +17,7 @@ namespace AutoMapper.Internal.Mappers
             var result = Variable(destinationType, "destinationEnumValue");
             var ignoreCase = True;
             var tryParse = Call(TryParseMethod.MakeGenericMethod(destinationType), sourceToString, ignoreCase, result);
-            var (variables, statements) = configuration.ScratchPad();
+            var (variables, statements) = configuration.Scratchpad();
             variables.Add(result);
             statements.Add(Condition(tryParse, result, Convert(sourceExpression, destinationType)));
             return Block(variables, statements);

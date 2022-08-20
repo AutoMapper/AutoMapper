@@ -67,7 +67,7 @@ namespace AutoMapper.Internal.Mappers
                 var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
                 Expression destination, assignNewExpression;
                 UseDestinationValue();
-                var (variables, statements) = configuration.ScratchPad();
+                var (variables, statements) = configuration.Scratchpad();
                 statements.Add(itemExpr);
                 var addCall = Call(destination, addMethod, statements);
                 statements.Clear();
@@ -159,7 +159,7 @@ namespace AutoMapper.Internal.Mappers
             private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
             private static readonly ParameterExpression Index = Variable(typeof(int), "destinationArrayIndex");
             private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
-            private static readonly UnaryExpression[] IncrementIndex = new[] { PostIncrementAssign(Index) };
+            private static readonly ReadOnlyCollection<Expression> IncrementIndex = PostIncrementAssign(Index).ToReadOnly<Expression>();
             private static Array MapMultidimensional(Array source, Type destinationElementType, ResolutionContext context)
             {
                 var sourceElementType = source.GetType().GetElementType();
@@ -182,7 +182,7 @@ namespace AutoMapper.Internal.Mappers
                 Type sourceElementType = typeof(object);
                 Expression createDestination;
                 var destination = Parameter(destinationType, "destinationArray");
-                var (variables, statements) = configuration.ScratchPad();
+                var (variables, statements) = configuration.Scratchpad();
                 if (sourceType.IsArray)
                 {
                     var mapFromArray = MapFromArray();

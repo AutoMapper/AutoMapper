@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 namespace AutoMapper.Internal
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class PrimitiveHelper
     {
+        public static ReadOnlyCollection<T> ToReadOnly<T>(this T item) where T : Expression => new ReadOnlyCollectionBuilder<T>{ item }.ToReadOnlyCollection();
         public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
         public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
         {

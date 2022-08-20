@@ -36,15 +36,15 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
         private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
-        private static readonly ParameterExpression[] DisposableArray = new[] { Disposable };
+        private static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
         private static readonly Expression DisposeCall = IfNullElse(Disposable, Empty, Expression.Call(Disposable, DisposeMethod));
         private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
-        private static readonly ParameterExpression[] Indexes = new[] { Index };
+        private static readonly ReadOnlyCollection<Expression> Indexes = Index.ToReadOnly<Expression>();
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
         public static DefaultExpression Default(this IGlobalConfiguration configuration, Type type) =>
             configuration == null ? Expression.Default(type) : configuration.GetDefault(type);
-        public static (List<ParameterExpression> Variables, List<Expression> Expressions) ScratchPad(this IGlobalConfiguration configuration)
+        public static (List<ParameterExpression> Variables, List<Expression> Expressions) Scratchpad(this IGlobalConfiguration configuration)
         {
             var variables = configuration?.Variables;
             if (variables == null)
@@ -144,7 +144,7 @@ namespace AutoMapper.Execution
                     }
                     clearMethod = destinationCollectionType.GetMethod("Clear");
                 }
-                var (variables, statements) = configuration.ScratchPad();
+                var (variables, statements) = configuration.Scratchpad();
                 variables.Add(destinationVariable);
                 statements.Add(Assign(destinationVariable, destination));
                 statements.Add(Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)));
@@ -403,7 +403,7 @@ namespace AutoMapper.Execution
                 }
                 if (variables == null)
                 {
-                    (variables, expressions) = configuration.ScratchPad();
+                    (variables, expressions) = configuration.Scratchpad();
                 }
                 name += member.MemberInfo.Name;
                 var newVariable = Variable(member.Expression.Type, name);
