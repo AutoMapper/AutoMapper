@@ -22,7 +22,6 @@ namespace AutoMapper
         private Dictionary<TypePair, TypeMapConfiguration> _openTypeMapConfigs;
         private Dictionary<Type, TypeDetails> _typeDetails;
         private ConcurrentDictionaryWrapper<Type, TypeDetails> _runtimeTypeDetails;
-        private readonly IMemberConfiguration[] _memberConfigurations;
         public ProfileMap(IProfileConfiguration profile, IGlobalConfigurationExpression configuration = null)
         {
             var globalProfile = (IProfileConfiguration)configuration;
@@ -38,14 +37,15 @@ namespace AutoMapper
             ShouldMapMethod = profile.ShouldMapMethod ?? configuration?.ShouldMapMethod ?? (p => !p.IsSpecialName);
             ShouldUseConstructor = profile.ShouldUseConstructor ?? configuration?.ShouldUseConstructor ?? (c => true);
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
-            _memberConfigurations = profile.MemberConfigurations.Concat(globalProfile?.MemberConfigurations).ToArray();
+            var profileInternal = (IProfileExpressionInternal)profile;
+            MemberConfiguration = profileInternal.MemberConfiguration;
+            GlobalMemberConfiguration = configuration.Internal()?.MemberConfiguration;
             var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
             GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions).ToArray();
-            var profileInternal = (IProfileExpressionInternal)profile;
-            profileInternal.NameSplitMember.Seal();
+            profileInternal.MemberConfiguration.Seal();
             Prefixes = profileInternal.Prefixes.Concat(configuration?.Prefixes).Distinct().ToList();
             Postfixes = profileInternal.Postfixes.Concat(configuration?.Postfixes).Distinct().ToList();
             TypeMapConfigs();
@@ -103,7 +103,8 @@ namespace AutoMapper
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         public HashSet<string> GlobalIgnores { get; }
-        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
+        public MemberConfiguration MemberConfiguration { get; }
+        public MemberConfiguration GlobalMemberConfiguration { get; }
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
         public List<string> Prefixes { get; }
         public List<string> Postfixes { get; }
@@ -253,21 +254,10 @@ namespace AutoMapper
                 ApplyDerivedMaps(baseMap, derivedMap, configuration);
             }
         }
-        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberName, List<MemberInfo> members, bool reverseNamingConventions)
-        {
-            if(destMemberName == null)
-            {
-                return false;
-            }
-            foreach (var memberConfiguration in _memberConfigurations)
-            {
-                if (memberConfiguration.MapDestinationPropertyToSource(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberName, List<MemberInfo> members, bool reverseNamingConventions) =>
+            destMemberName != null && 
+            (MemberConfiguration.IsMatch(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions) ||
+            GlobalMemberConfiguration?.IsMatch(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions) is true);
         public bool AllowsNullDestinationValuesFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullDestinationValues;
         public bool AllowsNullCollectionsFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullCollections;
     }

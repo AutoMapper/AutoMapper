@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
         private static readonly SourceMember[] Empty = new SourceMember[0];
         private readonly Dictionary<TypeDetails, SourceMember[]> _allSourceMembers = new Dictionary<TypeDetails, SourceMember[]>();
 
-        public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
+        public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             if (!_allSourceMembers.TryGetValue(sourceTypeDetails, out SourceMember[] sourceMembers))
             {
@@ -71,7 +71,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
-            cfg.Internal().AddMemberConfiguration().AddName<SourceToDestinationNameMapperAttributesMember>();
+            cfg.Internal().MemberConfiguration.NameToMemberMappers.Add(new SourceToDestinationNameMapperAttributesMember());
             cfg.CreateProfile("New Profile", profile =>
             {
                 profile.CreateMap<Category, CategoryDto>();

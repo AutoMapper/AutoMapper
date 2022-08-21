@@ -166,11 +166,9 @@ namespace AutoMapper.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression
     {
-        NameSplitMember NameSplitMember { get; }
         List<string> Prefixes { get; }
         List<string> Postfixes { get; }
-        IMemberConfiguration DefaultMemberConfig { get; }
-        IMemberConfiguration AddMemberConfiguration();
+        MemberConfiguration MemberConfiguration { get; }
         /// <summary>
         /// Allows to enable null-value propagation for query mapping. 
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>

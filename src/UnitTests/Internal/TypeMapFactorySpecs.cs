@@ -66,15 +66,7 @@ namespace AutoMapper.UnitTests.Tests
         }
         private class TestProfile : Profile
         {
-            public TestProfile()
-            {
-                var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
-                this.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
-                {
-                    _.SourceMemberNamingConvention = namingConvention;
-                    _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-                });
-            }
+            public TestProfile() => SourceMemberNamingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
         }
         protected override MapperConfiguration CreateConfiguration() => new(c => c.AddProfile<TestProfile>());
         [Fact]
@@ -96,15 +88,7 @@ namespace AutoMapper.UnitTests.Tests
         }
         private class TestProfile : Profile
         {
-            public TestProfile()
-            {
-                var namingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
-                this.Internal().AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
-                {
-                    _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-                    _.DestinationMemberNamingConvention = namingConvention;
-                });
-            }
+            public TestProfile() => DestinationMemberNamingConvention = new StubNamingConvention{ SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
         }
         protected override MapperConfiguration CreateConfiguration() => new(c => c.AddProfile<TestProfile>());
         [Fact]

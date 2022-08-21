@@ -8,33 +8,6 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug.NamingConventions
 {
-    public class CaseSensitive : NonValidatingSpecBase
-    {
-        class Source
-        {
-            public int value;
-        }
-        class Destination
-        {
-            public int Value;
-        }
-        protected override MapperConfiguration CreateConfiguration() => new(c =>
-        { 
-            c.CreateMap<Source, Destination>();
-            c.Internal().DefaultMemberConfig.NameMapper.NamedMappers[0] = new CaseSensitiveMapper();
-        });
-        private class CaseSensitiveMapper : ISourceToDestinationNameMapper
-        {
-            public MemberInfo GetMatchingMemberInfo(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
-            {
-                var sourceMember = sourceTypeDetails.GetMember(nameToSearch);
-                return sourceMember?.Name != nameToSearch ? null : sourceMember;
-            }
-        }
-        [Fact]
-        public void Should_consider_case() => 
-            new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors.Single().UnmappedPropertyNames.Single().ShouldBe("Value");
-    }
     public class RemoveNameSplitMapper : NonValidatingSpecBase
     {
         class Source
@@ -51,15 +24,14 @@ namespace AutoMapper.UnitTests.Bug.NamingConventions
         }
         protected override MapperConfiguration CreateConfiguration() => new(c =>
         {
-            var mappers = c.Internal().DefaultMemberConfig.MemberMappers;
-            mappers.Remove(mappers.OfType<NameSplitMember>().Single());
+            c.Internal().DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
             c.CreateMap<Source, Destination>();
         });
         [Fact]
         public void Should_not_validate() => Should.Throw<AutoMapperConfigurationException>(AssertConfigurationIsValid)
             .Errors.Single().UnmappedPropertyNames.Single().ShouldBe(nameof(Destination.InnerSourceValue));
     }
-    public class ExactMatchNamingConvention : NonValidatingSpecBase
+    public class DisableNamingConvention : NonValidatingSpecBase
     {
         class Source
         {
@@ -72,7 +44,7 @@ namespace AutoMapper.UnitTests.Bug.NamingConventions
         }
         protected override MapperConfiguration CreateConfiguration() => new(cfg=>
         {
-            cfg.DestinationMemberNamingConvention = new AutoMapper.ExactMatchNamingConvention();
+            cfg.DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
             cfg.CreateMap<Source, Destination>();
         });
         [Fact]

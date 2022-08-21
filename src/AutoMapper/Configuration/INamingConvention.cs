@@ -10,13 +10,13 @@ namespace AutoMapper
         string[] Split(string input);
         string SeparatorCharacter { get; }
     }
-    public class ExactMatchNamingConvention : INamingConvention
+    public sealed class ExactMatchNamingConvention : INamingConvention
     {
         public static readonly ExactMatchNamingConvention Instance = new();
         public string[] Split(string _) => Array.Empty<string>();
         public string SeparatorCharacter => null;
     }
-    public class PascalCaseNamingConvention : INamingConvention
+    public sealed class PascalCaseNamingConvention : INamingConvention
     {
         public static readonly PascalCaseNamingConvention Instance = new();
         public string SeparatorCharacter => "";
@@ -41,7 +41,7 @@ namespace AutoMapper
             return result.ToArray();
         }
     }
-    public class LowerUnderscoreNamingConvention : INamingConvention
+    public sealed class LowerUnderscoreNamingConvention : INamingConvention
     {
         public static readonly LowerUnderscoreNamingConvention Instance = new();
         public string SeparatorCharacter => "_";

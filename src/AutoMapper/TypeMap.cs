@@ -35,6 +35,7 @@ namespace AutoMapper
             SourceTypeDetails = profile.CreateTypeDetails(sourceType);
             DestinationTypeDetails = profile.CreateTypeDetails(destinationType);
             sourceMembers ??= new();
+            var isReverseMap = typeMapConfiguration?.IsReverseMap is true;
             foreach (var destinationProperty in DestinationTypeDetails.WriteAccessors)
             {
                 var destinationName = destinationProperty.Name;
@@ -45,8 +46,7 @@ namespace AutoMapper
                 }
                 sourceMembers.Clear();
                 var propertyType = destinationProperty.GetMemberType();
-                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationName, sourceMembers,
-                        typeMapConfiguration?.IsReverseMap is true))
+                if (profile.MapDestinationPropertyToSource(SourceTypeDetails, destinationType, propertyType, destinationName, sourceMembers, isReverseMap))
                 {
                     AddPropertyMap(destinationProperty, propertyType, sourceMembers);
                 }
