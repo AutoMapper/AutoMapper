@@ -77,7 +77,7 @@ namespace AutoMapper
             }
             _mappers = configuration.Mappers.ToArray();
             _executionPlans = new(CompileExecutionPlan);
-            _validator = new(this, configuration);
+            _validator = new(configuration);
             _projectionBuilder = new(this, configuration.ProjectionMappers.ToArray());
 
             _serviceCtor = configuration.ServiceCtor;
@@ -172,7 +172,7 @@ namespace AutoMapper
             configure(expr);
             return expr;
         }
-        public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(_configuredMaps.Values);
+        public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(this, _configuredMaps.Values);
         public IMapper CreateMapper() => new Mapper(this);
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
         public void CompileMappings()
@@ -478,14 +478,14 @@ namespace AutoMapper
             return null;
         }
         void IGlobalConfiguration.RegisterTypeMap(TypeMap typeMap) => _configuredMaps[typeMap.Types] = typeMap;
-        void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(new[] { typeMap });
+        void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(this, new[] { typeMap });
         void IGlobalConfiguration.AssertConfigurationIsValid(string profileName)
         {
             if (Profiles.All(x => x.Name != profileName))
             {
                 throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
             }
-            _validator.AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
+            _validator.AssertConfigurationIsValid(this, _configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
         }
         void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
         void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>

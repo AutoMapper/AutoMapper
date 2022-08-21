@@ -119,7 +119,7 @@ namespace AutoMapper
         /// </summary>
         int IGlobalConfigurationExpression.MaxExecutionPlanDepth { get; set; } = 1;
 
-        List<Validator> IGlobalConfigurationExpression.GetValidators() => _validators;
+        List<Validator> IGlobalConfigurationExpression.Validators => _validators;
 
         List<IProjectionMapper> IGlobalConfigurationExpression.ProjectionMappers { get; } = ProjectionBuilder.DefaultProjectionMappers();
 

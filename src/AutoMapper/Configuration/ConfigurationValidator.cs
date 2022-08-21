@@ -7,27 +7,20 @@ using AutoMapper.Internal.Mappers;
 namespace AutoMapper.Configuration
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class ConfigurationValidator
+    public readonly record struct ConfigurationValidator(IGlobalConfigurationExpression Expression)
     {
-        private readonly IGlobalConfiguration _config;
-        private readonly IGlobalConfigurationExpression _expression;
-        public ConfigurationValidator(IGlobalConfiguration config, IGlobalConfigurationExpression expression)
-        {
-            _config = config;
-            _expression = expression;
-        }
         private void Validate(ValidationContext context)
         {
-            foreach (var validator in _expression.GetValidators())
+            foreach (var validator in Expression.Validators)
             {
                 validator(context);
             }
         }
-        public void AssertConfigurationExpressionIsValid(IEnumerable<TypeMap> typeMaps)
+        public void AssertConfigurationExpressionIsValid(IGlobalConfiguration config, IEnumerable<TypeMap> typeMaps)
         {
-            if (!_expression.AllowAdditiveTypeMapCreation)
+            if (!Expression.AllowAdditiveTypeMapCreation)
             {
-                var duplicateTypeMapConfigs = _expression.Profiles.Append((Profile)_expression)
+                var duplicateTypeMapConfigs = Expression.Profiles.Append((Profile)Expression)
                     .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
                     .GroupBy(x => x.typeMap.Types)
                     .Where(g => g.Count() > 1)
@@ -39,9 +32,9 @@ namespace AutoMapper.Configuration
                     throw new DuplicateTypeMapConfigurationException(duplicateTypeMapConfigs);
                 }
             }
-            AssertConfigurationIsValid(typeMaps);
+            AssertConfigurationIsValid(config, typeMaps);
         }
-        public void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
+        public void AssertConfigurationIsValid(IGlobalConfiguration config, IEnumerable<TypeMap> typeMaps)
         {
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
@@ -63,7 +56,7 @@ namespace AutoMapper.Configuration
             {
                 try
                 {
-                    DryRunTypeMap(typeMapsChecked, typeMap.Types, typeMap, null);
+                    DryRunTypeMap(config, typeMapsChecked, typeMap.Types, typeMap, null);
                 }
                 catch (Exception e)
                 {
@@ -79,7 +72,7 @@ namespace AutoMapper.Configuration
                 throw configExceptions[0];
             }
         }
-        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
+        private void DryRunTypeMap(IGlobalConfiguration config, ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
         {
             if(typeMap == null)
             {
@@ -87,7 +80,7 @@ namespace AutoMapper.Configuration
                 {
                     return;
                 }
-                typeMap = _config.ResolveTypeMap(types.SourceType, types.DestinationType);
+                typeMap = config.ResolveTypeMap(types.SourceType, types.DestinationType);
             }
             if (typeMap != null)
             {
@@ -102,11 +95,11 @@ namespace AutoMapper.Configuration
                 {
                     return;
                 }
-                CheckPropertyMaps(typeMapsChecked, typeMap);
+                CheckPropertyMaps(config, typeMapsChecked, typeMap);
             }
             else
             {
-                var mapperToUse = _config.FindMapper(types);
+                var mapperToUse = config.FindMapper(types);
                 if (mapperToUse == null)
                 {
                     throw new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap };
@@ -115,11 +108,11 @@ namespace AutoMapper.Configuration
                 Validate(context);
                 if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
                 {
-                    DryRunTypeMap(typeMapsChecked, newTypes, null, memberMap);
+                    DryRunTypeMap(config, typeMapsChecked, newTypes, null, memberMap);
                 }
             }
         }
-        private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
+        private void CheckPropertyMaps(IGlobalConfiguration config, ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
         {
             foreach (var memberMap in typeMap.MemberMaps)
             {
@@ -133,8 +126,7 @@ namespace AutoMapper.Configuration
                 {
                     return;
                 }
-                var destinationType = memberMap.DestinationType;
-                DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, memberMap);
+                DryRunTypeMap(config, typeMapsChecked, new(sourceType, memberMap.DestinationType), null, memberMap);
             }
         }
     }

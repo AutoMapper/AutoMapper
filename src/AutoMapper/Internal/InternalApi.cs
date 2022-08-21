@@ -47,7 +47,7 @@ namespace AutoMapper.Internal
         /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the docs</a> for details.
         /// </summary>
         int MaxExecutionPlanDepth { get; set; }
-        List<Validator> GetValidators();
+        List<Validator> Validators { get; }
         List<IProjectionMapper> ProjectionMappers { get; }
         /// <summary>
         /// How many levels deep should recursive queries be expanded.
