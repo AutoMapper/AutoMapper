@@ -133,7 +133,7 @@ namespace AutoMapper.Internal
             public override object[] GetCustomAttributes(Type attributeType, bool inherit) => throw new NotImplementedException();
             public override bool IsDefined(Type attributeType, bool inherit) => throw new NotImplementedException();
         }
-        public static string[] PossibleNames(string memberName, List<string> prefixes, List<string> postfixes)
+        public static string[] PossibleNames(string memberName, HashSet<string> prefixes, HashSet<string> postfixes)
         {
             List<string> result = null;
             foreach (var prefix in prefixes)
@@ -149,7 +149,7 @@ namespace AutoMapper.Internal
             }
             PostFixes(ref result, postfixes, memberName);
             return result == null ? Array.Empty<string>() : result.ToArray();
-            static void PostFixes(ref List<string> result, List< string> postfixes, string name)
+            static void PostFixes(ref List<string> result, HashSet<string> postfixes, string name)
             {
                 foreach (var postfix in postfixes)
                 {

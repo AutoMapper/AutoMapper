@@ -177,8 +177,8 @@ namespace AutoMapper
         }
         public void RecognizePrefixes(params string[] prefixes) => _prefixes.AddRange(prefixes);
         public void RecognizePostfixes(params string[] postfixes) => _postfixes.AddRange(postfixes);
-        public void RecognizeDestinationPrefixes(params string[] prefixes) => _prePostfixName.DestinationPrefixes.AddRange(prefixes);
-        public void RecognizeDestinationPostfixes(params string[] postfixes) => _prePostfixName.DestinationPostfixes.AddRange(postfixes);
+        public void RecognizeDestinationPrefixes(params string[] prefixes) => _prePostfixName.DestinationPrefixes.UnionWith(prefixes);
+        public void RecognizeDestinationPostfixes(params string[] postfixes) => _prePostfixName.DestinationPostfixes.UnionWith(postfixes);
         public void AddGlobalIgnore(string propertyNameStartingWith)
         {
             _globalIgnores ??= new();

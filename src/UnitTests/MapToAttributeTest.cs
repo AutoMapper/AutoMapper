@@ -40,6 +40,9 @@ namespace AutoMapper.UnitTests
             }
             return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(sourceTypeDetails, d.Member, destType, destMemberType, nameToSearch)).Member;
         }
+        public void Merge(ISourceToDestinationNameMapper otherNamedMapper)
+        {
+        }
         readonly struct SourceMember
         {
             public SourceMember(MemberInfo sourceMember)

@@ -9,6 +9,7 @@ namespace AutoMapper.Configuration.Conventions
     public interface ISourceToDestinationNameMapper
     {
         MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch);
+        void Merge(ISourceToDestinationNameMapper otherNamedMapper);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberConfiguration
@@ -49,11 +50,33 @@ namespace AutoMapper.Configuration.Conventions
             _nameSplitMember = isDefault ? new DefaultNameSplitMember() : new ConventionsNameSplitMember();
             _nameSplitMember.Parent = this;
         }
+        public void Merge(MemberConfiguration other)
+        {
+            if (other == null)
+            {
+                return;
+            }
+            var initialCount = NameToMemberMappers.Count;
+            for (int index = 0; index < other.NameToMemberMappers.Count; index++)
+            {
+                var otherNamedMapper = other.NameToMemberMappers[index];
+                if (index < initialCount)
+                {
+                    var namedMapper = NameToMemberMappers[index];
+                    if (namedMapper.GetType() == otherNamedMapper.GetType())
+                    {
+                        namedMapper.Merge(otherNamedMapper);
+                        continue;
+                    }
+                }
+                NameToMemberMappers.Add(otherNamedMapper);
+            }
+        }
     }
     public class PrePostfixName : ISourceToDestinationNameMapper
     {
-        public List<string> DestinationPrefixes { get; } = new();
-        public List<string> DestinationPostfixes { get; } = new();
+        public HashSet<string> DestinationPrefixes { get; } = new();
+        public HashSet<string> DestinationPostfixes { get; } = new();
         public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             MemberInfo member;
@@ -66,10 +89,16 @@ namespace AutoMapper.Configuration.Conventions
             }
             return null;
         }
+        public void Merge(ISourceToDestinationNameMapper otherNamedMapper)
+        {
+            var typedOther = (PrePostfixName)otherNamedMapper;
+            DestinationPrefixes.UnionWith(typedOther.DestinationPrefixes);
+            DestinationPostfixes.UnionWith(typedOther.DestinationPostfixes);
+        }
     }
     public class ReplaceName : ISourceToDestinationNameMapper
     {
-        public List<MemberNameReplacer> MemberNameReplacers { get; } = new();
+        public HashSet<MemberNameReplacer> MemberNameReplacers { get; } = new();
         public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
@@ -89,6 +118,11 @@ namespace AutoMapper.Configuration.Conventions
                 }
             }
             return null;
+        }
+        public void Merge(ISourceToDestinationNameMapper otherNamedMapper)
+        {
+            var typedOther = (ReplaceName)otherNamedMapper;
+            MemberNameReplacers.UnionWith(typedOther.MemberNameReplacers);
         }
         private string[] PossibleNames(string nameToSearch) =>
                 MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))

@@ -39,15 +39,15 @@ namespace AutoMapper
             ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
             var profileInternal = (IProfileExpressionInternal)profile;
             MemberConfiguration = profileInternal.MemberConfiguration;
-            GlobalMemberConfiguration = configuration.Internal()?.MemberConfiguration;
+            MemberConfiguration.Merge(configuration.Internal()?.MemberConfiguration);
             var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
             GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions).ToArray();
             AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions).ToArray();
             profileInternal.MemberConfiguration.Seal();
-            Prefixes = profileInternal.Prefixes.Concat(configuration?.Prefixes).Distinct().ToList();
-            Postfixes = profileInternal.Postfixes.Concat(configuration?.Postfixes).Distinct().ToList();
+            Prefixes = new(profileInternal.Prefixes.Concat(configuration?.Prefixes));
+            Postfixes = new(profileInternal.Postfixes.Concat(configuration?.Postfixes));
             TypeMapConfigs();
             OpenTypeMapConfigs();
             _typeDetails = new(2 * _typeMapConfigs.Length);
@@ -104,10 +104,9 @@ namespace AutoMapper
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         public HashSet<string> GlobalIgnores { get; }
         public MemberConfiguration MemberConfiguration { get; }
-        public MemberConfiguration GlobalMemberConfiguration { get; }
         public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
-        public List<string> Prefixes { get; }
-        public List<string> Postfixes { get; }
+        public HashSet<string> Prefixes { get; }
+        public HashSet<string> Postfixes { get; }
         public IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
         public TypeDetails CreateTypeDetails(Type type)
         {
@@ -255,9 +254,7 @@ namespace AutoMapper
             }
         }
         public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberName, List<MemberInfo> members, bool reverseNamingConventions) =>
-            destMemberName != null && 
-            (MemberConfiguration.IsMatch(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions) ||
-            GlobalMemberConfiguration?.IsMatch(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions) is true);
+            destMemberName != null && MemberConfiguration.IsMatch(this, sourceTypeDetails, destType, destMemberType, destMemberName, members, reverseNamingConventions);
         public bool AllowsNullDestinationValuesFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullDestinationValues;
         public bool AllowsNullCollectionsFor(MemberMap memberMap = null) => memberMap?.AllowNull ?? AllowNullCollections;
     }
