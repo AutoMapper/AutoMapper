@@ -1,43 +1,63 @@
 using System;
 using AutoMapper;
-
-
+using System.Collections.Generic;
+using System.Linq;
 namespace Benchmark.Flattening
 {
-    using System.Collections.Generic;
-    using System.Linq;
     static class Config
     {
         public static readonly IMapper Mapper = CreateMapper();
+        class DeepTypeProfile : Profile
+        {
+            public DeepTypeProfile()
+            {
+                CreateMap<Address, Address>();
+                CreateMap<Address, AddressDTO>();
+                CreateMap<Customer, CustomerDTO>();
+            }
+        }
+        class ComplexTypesProfile : Profile
+        {
+            public ComplexTypesProfile()
+            {
+                CreateMap<Foo, FooDest>();
+                CreateMap<InnerFoo, InnerFooDest>();
+            }
+        }
+        class ConstructorProfile : Profile
+        {
+            public ConstructorProfile() => CreateMap<Model11, Dto11>();
+        }
+        class FlatteningProfile : Profile
+        {
+            public FlatteningProfile()
+            {
+                CreateMap<ModelObject, ModelDto>();
+                CreateMap<Model1, Dto1>();
+                CreateMap<Model2, Dto2>();
+                CreateMap<Model3, Dto3>();
+                CreateMap<Model4, Dto4>();
+                CreateMap<Model5, Dto5>();
+                CreateMap<Model6, Dto6>();
+                CreateMap<Model7, Dto7>();
+                CreateMap<Model8, Dto8>();
+                CreateMap<Model9, Dto9>();
+                CreateMap<Model10, Dto10>();
+            }
+        }
         private static IMapper CreateMapper()
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Address, Address>();
-                cfg.CreateMap<Address, AddressDTO>();
-                cfg.CreateMap<Customer, CustomerDTO>();
-
-                cfg.CreateMap<Foo, FooDest>();
-                cfg.CreateMap<InnerFoo, InnerFooDest>();
-            
-                cfg.CreateMap<Model11, Dto11>();
-
-                cfg.CreateMap<ModelObject, ModelDto>();
-                cfg.CreateMap<Model1, Dto1>();
-                cfg.CreateMap<Model2, Dto2>();
-                cfg.CreateMap<Model3, Dto3>();
-                cfg.CreateMap<Model4, Dto4>();
-                cfg.CreateMap<Model5, Dto5>();
-                cfg.CreateMap<Model6, Dto6>();
-                cfg.CreateMap<Model7, Dto7>();
-                cfg.CreateMap<Model8, Dto8>();
-                cfg.CreateMap<Model9, Dto9>();
-                cfg.CreateMap<Model10, Dto10>();
+                cfg.AddProfile(new DeepTypeProfile());
+                cfg.AddProfile(new ComplexTypesProfile());
+                cfg.AddProfile(new ConstructorProfile());
+                cfg.AddProfile(new FlatteningProfile());
             });
             //config.AssertConfigurationIsValid();
             return config.CreateMapper();
         }
-        public static TDestination Map<TSource, TDestination>(TSource source) => Mapper.Map<TDestination>(source);
+        public static TDestination Map<TSource, TDestination>(TSource source) => Mapper.Map<TSource, TDestination>(source);
     }
     public class DeepTypeMapper : IObjectToObjectMapper
     {
