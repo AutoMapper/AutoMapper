@@ -90,7 +90,7 @@ namespace AutoMapper.Internal
             return null;
         }
 
-        public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetConstructors(InstanceFlags);
+        public static ConstructorInfo[] GetDeclaredConstructors(this Type type) => type.GetConstructors(InstanceFlags);
 
         public static int GenericParametersCount(this Type type) => type.GetTypeInfo().GenericTypeParameters.Length;
 

@@ -5,9 +5,8 @@ namespace AutoMapper.Internal
     [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
     public readonly record struct MapRequest(TypePair RequestedTypes, TypePair RuntimeTypes, MemberMap MemberMap)
     {
-        public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes) &&
-            (MemberMap == other.MemberMap || MemberMap.MapperEquals(other.MemberMap));
-        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes, MemberMap.MapperGetHashCode());
+        public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
+        public override int GetHashCode() => HashCode.Combine(RequestedTypes, RuntimeTypes);
     }
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public readonly record struct TypePair(Type SourceType, Type DestinationType)

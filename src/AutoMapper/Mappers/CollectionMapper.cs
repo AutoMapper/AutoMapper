@@ -75,7 +75,7 @@ namespace AutoMapper.Internal.Mappers
                 var overMaxDepth = OverMaxDepth(memberMap?.TypeMap);
                 if (overMaxDepth != null)
                 {
-                    addItems = Condition(overMaxDepth, ExpressionBuilder.Empty, addItems);
+                    addItems = IfThenElse(overMaxDepth, ExpressionBuilder.Empty, addItems);
                 }
                 var clearMethod = isIList ? IListClear : destinationCollectionType.GetMethod("Clear");
                 statements.Clear();

@@ -37,9 +37,8 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
         private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
         private static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
-        private static readonly Expression DisposeCall = IfNullElse(Disposable, Empty, Expression.Call(Disposable, DisposeMethod));
+        private static readonly Expression DisposeCall = IfThen(ReferenceNotEqual(Disposable, Null), Expression.Call(Disposable, DisposeMethod));
         private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
-        private static readonly ReadOnlyCollection<Expression> Indexes = Index.ToReadOnly<Expression>();
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
         public static DefaultExpression Default(this IGlobalConfiguration configuration, Type type) =>
@@ -147,7 +146,7 @@ namespace AutoMapper.Execution
                 var (variables, statements) = configuration.Scratchpad();
                 variables.Add(destinationVariable);
                 statements.Add(Assign(destinationVariable, destination));
-                statements.Add(Condition(ReferenceEqual(collection, Null), Empty, Expression.Call(collection, clearMethod)));
+                statements.Add(IfThen(ReferenceNotEqual(collection, Null), Expression.Call(collection, clearMethod)));
                 statements.Add(destinationVariable);
                 return Block(variables, statements);
             }
@@ -314,7 +313,7 @@ namespace AutoMapper.Execution
                 statements.Add(Loop(
                         IfThenElse(
                             LessThan(Index, ArrayLength(array)),
-                            Block(Assign(loopVar, ArrayAccess(array, Indexes)), loopContent, IncrementIndex),
+                            Block(Assign(loopVar, ArrayIndex(array, Index)), loopContent, IncrementIndex),
                             Break(breakLabel)
                         ),
                     breakLabel));

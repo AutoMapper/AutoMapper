@@ -141,8 +141,13 @@ namespace AutoMapper.Configuration
                 bool canMapResolve = true;
                 foreach (var parameter in destCtor.Parameters)
                 {
+                    var name = parameter.Name;
+                    if (name == null)
+                    {
+                        return;
+                    }
                     sourceMembers.Clear();
-                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, constructor.DeclaringType, parameter.ParameterType, parameter.Name, sourceMembers, IsReverseMap);
+                    var canResolve = typeMap.Profile.MapDestinationPropertyToSource(typeMap.SourceTypeDetails, constructor.DeclaringType, parameter.ParameterType, name, sourceMembers, IsReverseMap);
                     if (!canResolve && !parameter.IsOptional && !IsConfigured(parameter))
                     {
                         canMapResolve = false;
