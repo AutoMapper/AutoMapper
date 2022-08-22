@@ -1,14 +1,10 @@
 using System;
-using Xunit;
 using AutoMapper.Internal;
 using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using AutoMapper.Configuration;
-
 namespace AutoMapper.UnitTests;
-
 /// <summary>
 /// Ignore this member for validation and skip during mapping
 /// </summary>
@@ -46,10 +42,14 @@ public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     protected override void AssertConfigurationIsValid() => Configuration.Internal();
 }
 
-public abstract class NonValidatingSpecBase : SpecBase
+public abstract class NonValidatingSpecBase : IDisposable
 {
+    protected NonValidatingSpecBase()
+    {
+        Because_of();
+    }
     private IMapper _mapper;
-    protected abstract MapperConfiguration CreateConfiguration();
+    protected virtual MapperConfiguration CreateConfiguration() => throw new NotImplementedException();
     protected IGlobalConfiguration Configuration => Mapper.ConfigurationProvider.Internal();
     protected IMapper Mapper => _mapper ??= CreateMapper();
     IMapper CreateMapper()
@@ -71,41 +71,12 @@ public abstract class NonValidatingSpecBase : SpecBase
     protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
         Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
     public IEnumerable<ProfileMap> GetProfiles() => Configuration.Profiles;
-}
-
-public abstract class SpecBaseBase
-{
-    protected virtual void MainSetup()
-    {
-        Establish_context();
-        Because_of();
-    }
-
-    protected virtual void MainTeardown()
-    {
-        Cleanup();
-    }
-
-    protected virtual void Establish_context()
-    {
-    }
-
     protected virtual void Because_of()
     {
     }
-
     protected virtual void Cleanup()
     {
     }
-}
-public abstract class SpecBase : SpecBaseBase, IDisposable
-{
-    protected SpecBase()
-    {
-        Establish_context();
-        Because_of();
-    }
-
     public void Dispose()
     {
         Cleanup();

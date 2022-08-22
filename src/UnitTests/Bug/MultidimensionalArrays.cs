@@ -52,18 +52,14 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
-    public class FillMultidimensionalArray : SpecBase
+    public class FillMultidimensionalArray : NonValidatingSpecBase
     {
         int[,] _source;
         MultidimensionalArrayFiller _filler;
-        protected override void Establish_context()
+        protected override void Because_of()
         {
             _source = new int[4,3];
             _filler = new MultidimensionalArrayFiller(_source);
-        }
-
-        protected override void Because_of()
-        {
             for(int index = 0; index < _source.Length; index++)
             {
                 _filler.NewValue(index);

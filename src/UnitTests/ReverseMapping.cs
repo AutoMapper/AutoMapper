@@ -568,7 +568,7 @@ namespace AutoMapper.UnitTests
         public void Validate() => AssertConfigurationIsValid();
     }
 
-    public class When_reverse_mapping_and_ignoring : SpecBase
+    public class When_reverse_mapping_and_ignoring : NonValidatingSpecBase
     {
         public class Foo
         {

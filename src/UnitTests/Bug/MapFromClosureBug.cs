@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class MapFromClosureBug : SpecBaseBase
+    public class MapFromClosureBug : NonValidatingSpecBase
     {
         private static readonly IDateProvider _dateProvider = new DateProvider();
 

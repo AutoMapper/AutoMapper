@@ -110,6 +110,7 @@ public class AllowNullWithMapAtRuntime : AutoMapperSpecBase
     {
         var destination = Map<Destination>(new Source());
         destination.Inner.ShouldBeNull();
+        new Action(() => Map<DateTime>("")).ShouldThrow<AutoMapperMappingException>().Message.ShouldNotContain("Destination member");
     }
 }
 public class When_reusing_the_execution_plan : AutoMapperSpecBase

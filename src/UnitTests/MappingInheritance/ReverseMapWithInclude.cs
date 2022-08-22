@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class ReverseMapWithInclude : SpecBase
+    public class ReverseMapWithInclude : NonValidatingSpecBase
     {
         public class Duck : Animal { }
         public class DuckDto : AnimalDto { } 

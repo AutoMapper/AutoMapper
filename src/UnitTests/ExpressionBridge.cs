@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
     {
         public int BillOfMaterialsID { set; get; }
     }
-    public class When_mapping_using_expressions : SpecBase
+    public class When_mapping_using_expressions : NonValidatingSpecBase
     {
         private List<Product> _products;
         private Expression<Func<Product, SimpleProductDto>> _simpleProductConversionLinq;
@@ -109,7 +109,7 @@ namespace AutoMapper.UnitTests
         private List<ExtendedProductDto> _extendedProducts;
         private MapperConfiguration _config;
 
-        protected override void Establish_context()
+        protected override void Because_of()
         {
             _config = new MapperConfiguration(cfg =>
             {
@@ -160,16 +160,11 @@ namespace AutoMapper.UnitTests
                                 }
                 }
             };
-        }
-
-        protected override void Because_of()
-        {
             var queryable = _products.AsQueryable();
 
             _simpleProducts = queryable.Select(_simpleProductConversionLinq).ToList();
 
             _extendedProducts = queryable.Select(_extendedProductConversionLinq).ToList();
-
         }
 
         [Fact]

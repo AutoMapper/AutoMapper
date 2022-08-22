@@ -581,9 +581,6 @@ public class When_mapping_dto_with_fields_and_properties : AutoMapperSpecBase
 
 public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecBase
 {
-    private IReadOnlyCollection<TypeMap> _allTypeMaps;
-    private Source _source;
-
     public class Source
     {
         public string Value { get; set; }
@@ -609,7 +606,8 @@ public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecB
     [Fact]
     public void Should_not_report_it_as_unmapped()
     {
-        foreach (var typeMap in _allTypeMaps)
+        var allTypeMaps = Configuration.GetAllTypeMaps();
+        foreach (var typeMap in allTypeMaps)
         {
             typeMap.GetUnmappedPropertyNames().ShouldBeOfLength(0);
         }
@@ -618,15 +616,9 @@ public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecB
     [Fact]
     public void Should_map_successfully()
     {
-        var destination = Mapper.Map<Source, Destination>(_source);
+        var destination = Mapper.Map<Source, Destination>(new Source {Value = "foo"});
         destination.Value.ShouldBe("foo");
         destination.Ignored.ShouldBeTrue();
-    }
-
-    protected override void Establish_context()
-    {
-        _source = new Source {Value = "foo"};
-        _allTypeMaps = Configuration.GetAllTypeMaps();
     }
 }
 

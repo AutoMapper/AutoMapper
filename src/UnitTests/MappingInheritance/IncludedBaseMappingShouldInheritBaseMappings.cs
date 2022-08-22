@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests.Bug
     using AutoMapper;
     using CustomMapping;
 
-    public class IncludedMappingShouldInheritBaseMappings : SpecBase
+    public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
     {
 
         public class ModelObject

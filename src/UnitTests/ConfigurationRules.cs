@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class ConfigurationRules : SpecBase
+    public class ConfigurationRules : NonValidatingSpecBase
     {
         public class Source { }
         public class Dest { }

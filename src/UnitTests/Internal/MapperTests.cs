@@ -3,7 +3,7 @@ using Shouldly;
 
 namespace AutoMapper.UnitTests.Tests
 {
-    public class MapperTests : SpecBase
+    public class MapperTests : NonValidatingSpecBase
     {
         public class Source
         {

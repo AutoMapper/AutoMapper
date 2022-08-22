@@ -4,7 +4,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class NonExistingProperty : SpecBase
+    public class NonExistingProperty : NonValidatingSpecBase
     {
         public class Source
         {

@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Tests
         public string[] Split(string input) => SplittingExpression.Matches(input).Select(m=>m.Value).ToArray();
     }
 
-    public class When_constructing_type_maps_with_matching_property_names : SpecBase
+    public class When_constructing_type_maps_with_matching_property_names : NonValidatingSpecBase
     {
         public class Source
         {
@@ -95,7 +95,7 @@ namespace AutoMapper.UnitTests.Tests
         public void Should_split_using_naming_convention_rules() => AssertConfigurationIsValid();
     }
 
-    public class When_using_a_source_member_name_replacer : SpecBase
+    public class When_using_a_source_member_name_replacer : NonValidatingSpecBase
     {
         public class Source
         {
@@ -130,7 +130,7 @@ namespace AutoMapper.UnitTests.Tests
         }
     }
 
-    public class When_using_a_source_member_name_replacer_with_profile : SpecBase
+    public class When_using_a_source_member_name_replacer_with_profile : NonValidatingSpecBase
     {
         public class Source
         {

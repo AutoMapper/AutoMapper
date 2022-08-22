@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
             keyValue.Value.ShouldBe("value1");
         }
     }
-    public class IncludedBaseMappingShouldInheritBaseMappings : SpecBase
+    public class IncludedBaseMappingShouldInheritBaseMappings : NonValidatingSpecBase
     {
         public class ModelObject
         {

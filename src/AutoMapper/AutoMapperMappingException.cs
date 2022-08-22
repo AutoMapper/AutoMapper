@@ -53,7 +53,7 @@ namespace AutoMapper
                     message += newLine + $"{TypeMap.SourceType.Name} -> {TypeMap.DestinationType.Name}";
                     message += newLine + $"{TypeMap.SourceType.FullName} -> {TypeMap.DestinationType.FullName}";
                 }
-                if (MemberMap != null)
+                if (MemberMap?.TypeMap != null)
                 {
                     message = message + newLine + newLine + "Destination Member:";
                     message += newLine + $"{MemberMap}" + newLine;
