@@ -218,14 +218,12 @@ namespace AutoMapper
                 var destination = Parameter(destinationType, "mapperDestination");
                 var runtimeDestinationType = mapRequest.RuntimeTypes.DestinationType;
                 Expression fullExpression;
-                bool nullCheck;
                 if (mapper == null)
                 {
                     var exception = new AutoMapperMappingException("Missing type map configuration or unsupported mapping.", null, mapRequest.RuntimeTypes)
                     {
                         MemberMap = mapRequest.MemberMap
                     };
-                    nullCheck = true;
                     fullExpression = Throw(Constant(exception), runtimeDestinationType);
                 }
                 else
@@ -233,15 +231,11 @@ namespace AutoMapper
                     var checkNullValueTypeDest = CheckNullValueType(destination, runtimeDestinationType);
                     var mapperSource = ToType(source, mapRequest.RuntimeTypes.SourceType);
                     var map = mapper.MapExpression(this, Configuration, mapRequest.MemberMap, mapperSource, ToType(checkNullValueTypeDest, runtimeDestinationType));
-                    nullCheck = map != mapperSource;
                     var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest));
                     fullExpression = TryCatch(ToType(map, destinationType), Catch(ExceptionParameter, Throw(newException, destinationType)));
                 }
-                if (nullCheck)
-                {
-                    var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
-                    fullExpression = this.NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
-                }
+                var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
+                fullExpression = this.NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
                 return Lambda(fullExpression, source, destination, ContextParameter);
             }
         }

@@ -24,7 +24,7 @@ namespace AutoMapper
             : this(includedMemberMap, typeMap) => Details.IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
         private MemberMapDetails Details => _details ??= new();
         public MemberInfo DestinationMember { get; }
-        public override string DestinationName => DestinationMember.Name;
+        public override string DestinationName => DestinationMember?.Name;
         public override Type DestinationType { get; protected set; }
         public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
         public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);

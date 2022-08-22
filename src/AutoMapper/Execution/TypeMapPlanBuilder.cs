@@ -378,9 +378,10 @@ namespace AutoMapper.Execution
         Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
         {
             var typePair = memberMap.Types();
+            var profile = _typeMap.Profile;
             var mapMember = memberMap.Inline ?
-                _configuration.MapExpression(_typeMap.Profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
-                ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap);
+                _configuration.MapExpression(profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
+                _configuration.NullCheckSource(profile, resolvedValue, destinationMemberValue, ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap), memberMap);
             return memberMap.ApplyTransformers(mapMember);
         }
         private Expression BuildValueResolverFunc(MemberMap memberMap, Expression customSource, Expression destValueExpr)

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using Xunit;
 using Shouldly;
 using System.Linq;
@@ -10,7 +9,6 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
 using AutoMapper.Internal.Mappers;
-
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
     public class When_mapping_to_Existing_IEnumerable : AutoMapperSpecBase

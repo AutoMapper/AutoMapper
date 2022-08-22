@@ -16,7 +16,6 @@ namespace AutoMapper
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberMap : IValueResolver
     {
-        private static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Null);
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
         internal static readonly MemberMap Instance = new();
         internal static readonly MemberMap InstanceUseDestination = new PropertyMap(default(MemberInfo), null, null) { UseDestinationValue = true };
