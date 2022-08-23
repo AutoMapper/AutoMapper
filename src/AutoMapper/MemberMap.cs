@@ -18,7 +18,6 @@ namespace AutoMapper
     {
         protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
         internal static readonly MemberMap Instance = new();
-        internal static readonly MemberMap InstanceUseDestination = new PropertyMap(default(MemberInfo), null, null) { UseDestinationValue = true };
         public TypeMap TypeMap { get; protected set; }
         public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
         public bool IsResolveConfigured => Resolver != null && Resolver != this;

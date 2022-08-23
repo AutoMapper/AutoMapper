@@ -9,7 +9,7 @@ namespace AutoMapper.Configuration.Conventions
     public interface ISourceToDestinationNameMapper
     {
         MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch);
-        void Merge(ISourceToDestinationNameMapper otherNamedMapper);
+        void Merge(ISourceToDestinationNameMapper other);
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MemberConfiguration
@@ -35,9 +35,9 @@ namespace AutoMapper.Configuration.Conventions
             {
                 return sourceMember;
             }
-            foreach (var namedMapper in NameToMemberMappers)
+            foreach (var mapper in NameToMemberMappers)
             {
-                if ((sourceMember = namedMapper.GetSourceMember(sourceTypeDetails, destType, destMemberType, nameToSearch)) != null)
+                if ((sourceMember = mapper.GetSourceMember(sourceTypeDetails, destType, destMemberType, nameToSearch)) != null)
                 {
                     return sourceMember;
                 }
@@ -59,17 +59,17 @@ namespace AutoMapper.Configuration.Conventions
             var initialCount = NameToMemberMappers.Count;
             for (int index = 0; index < other.NameToMemberMappers.Count; index++)
             {
-                var otherNamedMapper = other.NameToMemberMappers[index];
+                var otherMapper = other.NameToMemberMappers[index];
                 if (index < initialCount)
                 {
-                    var namedMapper = NameToMemberMappers[index];
-                    if (namedMapper.GetType() == otherNamedMapper.GetType())
+                    var nameToMemberMapper = NameToMemberMappers[index];
+                    if (nameToMemberMapper.GetType() == otherMapper.GetType())
                     {
-                        namedMapper.Merge(otherNamedMapper);
+                        nameToMemberMapper.Merge(otherMapper);
                         continue;
                     }
                 }
-                NameToMemberMappers.Add(otherNamedMapper);
+                NameToMemberMappers.Add(otherMapper);
             }
         }
     }
@@ -89,9 +89,9 @@ namespace AutoMapper.Configuration.Conventions
             }
             return null;
         }
-        public void Merge(ISourceToDestinationNameMapper otherNamedMapper)
+        public void Merge(ISourceToDestinationNameMapper other)
         {
-            var typedOther = (PrePostfixName)otherNamedMapper;
+            var typedOther = (PrePostfixName)other;
             DestinationPrefixes.UnionWith(typedOther.DestinationPrefixes);
             DestinationPostfixes.UnionWith(typedOther.DestinationPostfixes);
         }
@@ -119,9 +119,9 @@ namespace AutoMapper.Configuration.Conventions
             }
             return null;
         }
-        public void Merge(ISourceToDestinationNameMapper otherNamedMapper)
+        public void Merge(ISourceToDestinationNameMapper other)
         {
-            var typedOther = (ReplaceName)otherNamedMapper;
+            var typedOther = (ReplaceName)other;
             MemberNameReplacers.UnionWith(typedOther.MemberNameReplacers);
         }
         private string[] PossibleNames(string nameToSearch) =>

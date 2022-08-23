@@ -258,7 +258,7 @@ namespace AutoMapper
         public void AddValueTransformation(ValueTransformerConfiguration config) => Details.AddValueTransformation(config);
         public void ConstructUsingServiceLocator() => CustomCtorFunction = Lambda(ServiceLocator(DestinationType));
         internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configuration) =>
-            Types.IsGenericTypeDefinition ? null : new TypeMapPlanBuilder(configuration, this).CreateMapperLambda();
+            Types.ContainsGenericParameters ? null : new TypeMapPlanBuilder(configuration, this).CreateMapperLambda();
         private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
         private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
         public void AsProxy() => CustomCtorFunction = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));

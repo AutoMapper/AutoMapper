@@ -12,7 +12,6 @@ namespace AutoMapper.Internal
     public readonly record struct TypePair(Type SourceType, Type DestinationType)
     {
         public bool IsConstructedGenericType => SourceType.IsConstructedGenericType || DestinationType.IsConstructedGenericType;
-        public bool IsGenericTypeDefinition => SourceType.IsGenericTypeDefinition || DestinationType.IsGenericTypeDefinition;
         public bool ContainsGenericParameters => SourceType.ContainsGenericParameters || DestinationType.ContainsGenericParameters;
         public TypePair CloseGenericTypes(TypePair closedTypes)
         {

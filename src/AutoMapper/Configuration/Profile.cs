@@ -158,7 +158,7 @@ namespace AutoMapper
             var types = new TypePair(sourceType, destinationType);
             var map = new MappingExpression(types, memberList);
             _typeMapConfigs.Add(map);
-            if (types.IsGenericTypeDefinition)
+            if (types.ContainsGenericParameters)
             {
                 _openTypeMapConfigs ??= new();
                 _openTypeMapConfigs.Add(map);

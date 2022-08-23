@@ -100,6 +100,7 @@ CannotChangeAttribute : Attribute 'System.Runtime.CompilerServices.IteratorState
 MembersMustExist : Member 'public System.Type System.Type AutoMapper.Internal.TypePair.DestinationType' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Type System.Type AutoMapper.Internal.TypePair.SourceType' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypePair.Equals(AutoMapper.Internal.TypePair)' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypePair.IsGenericTypeDefinition.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypePair.op_Equality(AutoMapper.Internal.TypePair, AutoMapper.Internal.TypePair)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Boolean AutoMapper.Internal.TypePair.op_Inequality(AutoMapper.Internal.TypePair, AutoMapper.Internal.TypePair)' does not exist in the implementation but it does exist in the contract.
 CannotRemoveBaseTypeOrInterface : Type 'AutoMapper.Internal.Mappers.CollectionMapper' does not implement interface 'AutoMapper.Internal.Mappers.IObjectMapperInfo' in the implementation but it does in the contract.
@@ -113,4 +114,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 114
+Total Issues: 115

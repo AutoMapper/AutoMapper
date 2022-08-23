@@ -113,7 +113,9 @@ namespace AutoMapper.Execution
             var destinationType = destination.Type;
             var isCollection = destinationType.IsCollection();
             var mustUseDestination = memberMap is { MustUseDestination: true };
-            var ifSourceNull = mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
+            var ifSourceNull = memberMap == null ? 
+                destination.IfNullElse(DefaultDestination(), ClearDestinationCollection()) :
+                mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
             return source.IfNullElse(ifSourceNull, mapExpression);
             Expression ClearDestinationCollection()
             {

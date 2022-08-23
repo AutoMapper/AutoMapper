@@ -5,44 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 namespace AutoMapper.UnitTests;
-/// <summary>
-/// Ignore this member for validation and skip during mapping
-/// </summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class IgnoreMapAttribute : Attribute
-{
-}
-static class Utils
-{
-    public static IMappingExpression<TSource, TDestination> Advanced<TSource, TDestination>(this IProjectionExpression<TSource, TDestination> projection) =>
-        (IMappingExpression<TSource, TDestination>)projection;
-    public static TypeMap FindTypeMapFor<TSource, TDestination>(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().FindTypeMapFor<TSource, TDestination>();
-    public static IReadOnlyCollection<TypeMap> GetAllTypeMaps(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetAllTypeMaps();
-    public static TypeMap ResolveTypeMap(this IConfigurationProvider configurationProvider, Type sourceType, Type destinationType) => configurationProvider.Internal().ResolveTypeMap(sourceType, destinationType);
-    public static void ForAllMaps(this IMapperConfigurationExpression configurationProvider, Action<TypeMap, IMappingExpression> configuration) => configurationProvider.Internal().ForAllMaps(configuration);
-    public static void ForAllPropertyMaps(this IMapperConfigurationExpression configurationProvider, Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> memberOptions) => 
-        configurationProvider.Internal().ForAllPropertyMaps(condition, memberOptions);
-    public static void AddIgnoreMapAttribute(this IMapperConfigurationExpression configuration)
-    {
-        configuration.ForAllMaps((typeMap, mapExpression) => mapExpression.ForAllMembers(memberOptions =>
-        {
-            if (memberOptions.DestinationMember.Has<IgnoreMapAttribute>())
-            {
-                memberOptions.Ignore();
-            }
-        }));
-        configuration.ForAllPropertyMaps(propertyMap => propertyMap.SourceMember?.Has<IgnoreMapAttribute>() == true, 
-            (_, memberOptions) => memberOptions.Ignore());
-    }
-}
-
 public abstract class AutoMapperSpecBase : NonValidatingSpecBase
 {
     protected override void OnConfig(MapperConfiguration mapperConfiguration) => mapperConfiguration.AssertConfigurationIsValid();
-    protected override void AssertConfigurationIsValid() => Configuration.Internal();
+    protected sealed override void AssertConfigurationIsValid() => Configuration.Internal();
 }
-
-public abstract class NonValidatingSpecBase : IDisposable
+public abstract class NonValidatingSpecBase
 {
     protected NonValidatingSpecBase()
     {
@@ -74,12 +42,35 @@ public abstract class NonValidatingSpecBase : IDisposable
     protected virtual void Because_of()
     {
     }
-    protected virtual void Cleanup()
+}
+/// <summary>
+/// Ignore this member for validation and skip during mapping
+/// </summary>
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+public class IgnoreMapAttribute : Attribute
+{
+}
+static class Utils
+{
+    public static IMappingExpression<TSource, TDestination> Advanced<TSource, TDestination>(this IProjectionExpression<TSource, TDestination> projection) =>
+        (IMappingExpression<TSource, TDestination>)projection;
+    public static TypeMap FindTypeMapFor<TSource, TDestination>(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().FindTypeMapFor<TSource, TDestination>();
+    public static IReadOnlyCollection<TypeMap> GetAllTypeMaps(this IConfigurationProvider configurationProvider) => configurationProvider.Internal().GetAllTypeMaps();
+    public static TypeMap ResolveTypeMap(this IConfigurationProvider configurationProvider, Type sourceType, Type destinationType) => configurationProvider.Internal().ResolveTypeMap(sourceType, destinationType);
+    public static void ForAllMaps(this IMapperConfigurationExpression configurationProvider, Action<TypeMap, IMappingExpression> configuration) => configurationProvider.Internal().ForAllMaps(configuration);
+    public static void ForAllPropertyMaps(this IMapperConfigurationExpression configurationProvider, Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> memberOptions) => 
+        configurationProvider.Internal().ForAllPropertyMaps(condition, memberOptions);
+    public static void AddIgnoreMapAttribute(this IMapperConfigurationExpression configuration)
     {
-    }
-    public void Dispose()
-    {
-        Cleanup();
+        configuration.ForAllMaps((typeMap, mapExpression) => mapExpression.ForAllMembers(memberOptions =>
+        {
+            if (memberOptions.DestinationMember.Has<IgnoreMapAttribute>())
+            {
+                memberOptions.Ignore();
+            }
+        }));
+        configuration.ForAllPropertyMaps(propertyMap => propertyMap.SourceMember?.Has<IgnoreMapAttribute>() == true, 
+            (_, memberOptions) => memberOptions.Ignore());
     }
 }
 class FirstOrDefaultCounter : ExpressionVisitor

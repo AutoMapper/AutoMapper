@@ -177,7 +177,7 @@ namespace AutoMapper
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
         public void CompileMappings()
         {
-            foreach (var request in _resolvedMaps.Keys.Where(t => !t.IsGenericTypeDefinition).Select(types => new MapRequest(types, types, MemberMap.Instance)).ToArray())
+            foreach (var request in _resolvedMaps.Keys.Where(t => !t.ContainsGenericParameters).Select(types => new MapRequest(types, types, MemberMap.Instance)).ToArray())
             {
                 GetExecutionPlan(request);
             }
@@ -234,7 +234,7 @@ namespace AutoMapper
                     var newException = Call(MappingError, ExceptionParameter, Constant(mapRequest));
                     fullExpression = TryCatch(ToType(map, destinationType), Catch(ExceptionParameter, Throw(newException, destinationType)));
                 }
-                var profileMap = mapRequest.MemberMap.Profile ?? Configuration;
+                var profileMap = mapRequest.MemberMap?.Profile ?? Configuration;
                 fullExpression = this.NullCheckSource(profileMap, source, destination, fullExpression, mapRequest.MemberMap);
                 return Lambda(fullExpression, source, destination, ContextParameter);
             }
