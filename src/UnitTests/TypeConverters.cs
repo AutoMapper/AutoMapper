@@ -133,43 +133,31 @@ namespace AutoMapper.UnitTests.CustomMapping
 
     public class When_specifying_type_converters_for_object_mapper_types : AutoMapperSpecBase
     {
-        Destination _destination;
-
         class Source
         {
             public IDictionary<int, int> Values { get; set; }
         }
-
         class Destination
         {
             public IDictionary<int, int> Values { get; set; }
         }
-
         protected override MapperConfiguration CreateConfiguration() => new(cfg =>
         {
             cfg.CreateMap(typeof(IDictionary<,>), typeof(IDictionary<,>)).ConvertUsing(typeof(DictionaryConverter<,>));
             cfg.CreateMap<Source, Destination>();
         });
-
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Destination>(new Source { Values = new Dictionary<int, int>() });
-        }
-
         [Fact]
         public void Should_override_the_built_in_mapper()
         {
-            _destination.Values.ShouldBeSameAs(DictionaryConverter<int, int>.Instance);
+            var destination = Mapper.Map<Destination>(new Source { Values = new Dictionary<int, int>() });
+            destination.Values.ShouldBeSameAs(DictionaryConverter<int, int>.Instance);
+            var destinationString = Mapper.Map<Dictionary<string, string>>(new Dictionary<string, string>());
+            destinationString.ShouldBeSameAs(DictionaryConverter<string, string>.Instance);
         }
-
         private class DictionaryConverter<TKey, TValue> : ITypeConverter<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>
         {
             public static readonly IDictionary<TKey, TValue> Instance = new Dictionary<TKey, TValue>();
-
-            public IDictionary<TKey, TValue> Convert(IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> destination, ResolutionContext context)
-            {
-                return Instance;
-            }
+            public IDictionary<TKey, TValue> Convert(IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> destination, ResolutionContext context) => Instance;
         }
     }
 

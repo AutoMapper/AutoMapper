@@ -233,6 +233,9 @@ namespace AutoMapper.UnitTests
             var destination = Map<Destination<string, string>>(new KeyValuePair<int, int>(1, 2));
             destination.MyKey.ShouldBe("1");
             destination.MyValue.ShouldBe("2");
+            var destinationString = Map<Destination<string, string>>(new KeyValuePair<string, string>("1", "2"));
+            destinationString.MyKey.ShouldBe("1");
+            destinationString.MyValue.ShouldBe("2");
         }
         [Fact]
         public void Should_map_closed_to_ienumerable_generic_destination()
