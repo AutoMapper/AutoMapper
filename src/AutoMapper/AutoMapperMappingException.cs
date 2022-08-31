@@ -154,7 +154,7 @@ namespace AutoMapper
                         string.Format(
                             "The following member on {0} cannot be mapped: \n\t{2} \nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
                             Types.Value.DestinationType.FullName, Types.Value.DestinationType.FullName,
-                            MemberMap?.DestinationName);
+                            MemberMap);
 
                     message += "\nContext:";
 
@@ -165,7 +165,7 @@ namespace AutoMapper
                         {
                             message += configExc.MemberMap == null
                               ? $"\n\tMapping from type {configExc.Types.Value.SourceType.FullName} to {configExc.Types.Value.DestinationType.FullName}"
-                              : $"\n\tMapping to member {configExc.MemberMap.DestinationName} from {configExc.Types.Value.SourceType.FullName} to {configExc.Types.Value.DestinationType.FullName}";
+                              : $"\n\tMapping to member {configExc.MemberMap} from {configExc.Types.Value.SourceType.FullName} to {configExc.Types.Value.DestinationType.FullName}";
                         }
 
                         exToUse = exToUse.InnerException;

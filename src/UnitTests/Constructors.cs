@@ -992,8 +992,8 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_say_what_parameter_fails()
         {
-            new Action(AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
-                  ex.MemberMap.ToString().ShouldBe("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest.Void .ctor(Dest).parameter foo"));
+            var ex = new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
+            ex.Message.ShouldContain("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest Void .ctor(Dest), parameter foo", Case.Sensitive);
         }
     }
 

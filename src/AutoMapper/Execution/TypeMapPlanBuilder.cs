@@ -18,6 +18,7 @@ namespace AutoMapper.Execution
         private readonly ParameterExpression _initialDestination;
         private readonly ParameterExpression[] _parameters;
         private readonly TypeMap _typeMap;
+        private readonly ParameterExpression _source;
         private List<ParameterExpression> _variables;
         private List<Expression> _expressions;
         private CatchBlock[] _catches;
@@ -25,20 +26,19 @@ namespace AutoMapper.Execution
         {
             _configuration = configuration;
             _typeMap = typeMap;
-            Source = Parameter(typeMap.SourceType, "source");
+            _source = Parameter(typeMap.SourceType, "source");
             _initialDestination = Parameter(typeMap.DestinationType, "destination");
-            _destination = Variable(_initialDestination.Type, "typeMapDestination");
+            _destination = Variable(typeMap.DestinationType, "typeMapDestination");
             _variables = configuration.Variables;
             _expressions = configuration.Expressions;
             _catches = configuration.Catches;
             _parameters = _configuration.Parameters ?? new ParameterExpression[] { null, null, ContextParameter };
         }
         public Type DestinationType => _destination.Type;
-        public ParameterExpression Source { get; }
         private static AutoMapperMappingException MemberMappingError(Exception innerException, MemberMap memberMap) => new("Error mapping types.", innerException, memberMap);
         ParameterExpression[] GetParameters(ParameterExpression first = null, ParameterExpression second = null)
         {
-            _parameters[0] = first ?? Source;
+            _parameters[0] = first ?? _source;
             _parameters[1] = second ?? _destination;
             return _parameters;
         }
@@ -88,7 +88,7 @@ namespace AutoMapper.Execution
         void IncludeMembers()
         {
             _variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
-            var source = Source;
+            var source = _source;
             _expressions.AddRange(_variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) => Assign(v, i.MemberExpression.ReplaceParameters(source).NullCheck(null))));
         }
         private static void CheckForCycles(IGlobalConfiguration configuration, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
@@ -166,7 +166,7 @@ namespace AutoMapper.Execution
             var getDest = DestinationType.IsValueType ? newDestFunc : Coalesce(_initialDestination, ToType(newDestFunc, DestinationType));
             var destinationFunc = Assign(_destination, getDest);
             return _typeMap.PreserveReferences ?
-                Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, Source, Constant(DestinationType), _destination), _destination) :
+                Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, _source, Constant(DestinationType), _destination), _destination) :
                 destinationFunc;
         }
         private Expression CreateAssignmentFunc(Expression createDestination)
@@ -248,7 +248,7 @@ namespace AutoMapper.Execution
             {
                 mapperFunc = Condition(overMaxDepth, _configuration.Default(DestinationType), mapperFunc);
             }
-            mapperFunc = _configuration.NullCheckSource(_typeMap.Profile, Source, _initialDestination, mapperFunc, null);
+            mapperFunc = _configuration.NullCheckSource(_typeMap.Profile, _source, _initialDestination, mapperFunc, null);
             return CheckReferencesCache(mapperFunc);
         }
         private Expression CheckReferencesCache(Expression valueBuilder)
@@ -257,7 +257,7 @@ namespace AutoMapper.Execution
             {
                 return valueBuilder;
             }
-            var getCachedDestination = Call(ContextParameter, GetDestinationMethod, Source, Constant(DestinationType));
+            var getCachedDestination = Call(ContextParameter, GetDestinationMethod, _source, Constant(DestinationType));
             return Coalesce(ToType(getCachedDestination, DestinationType), valueBuilder);
         }
         private Expression CreateNewDestinationFunc() => _typeMap switch
@@ -402,7 +402,7 @@ namespace AutoMapper.Execution
             }
             return valueResolverFunc;
         }
-        private ParameterExpression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? Source;
+        private ParameterExpression GetCustomSource(MemberMap memberMap) => memberMap.IncludedMember?.Variable ?? _source;
     }
     public interface IValueResolver
     {
@@ -515,7 +515,7 @@ namespace AutoMapper.Execution
                 var typeArgs =
                     iValueResolver.GenericTypeArguments.Zip(new[] { typeMap.SourceType, typeMap.DestinationType, sourceMember?.Type, destinationMember.Type }.Where(t => t != null),
                         (declaredType, runtimeType) => declaredType.ContainsGenericParameters ? runtimeType : declaredType).ToArray();
-                iValueResolver = InterfaceType.GetGenericTypeDefinition().MakeGenericType(typeArgs);
+                iValueResolver = iValueResolver.GetGenericTypeDefinition().MakeGenericType(typeArgs);
             }
             var parameters = new[] { source, destination, sourceMember, destinationMember }.Where(p => p != null)
                 .Zip(iValueResolver.GenericTypeArguments, ToType)

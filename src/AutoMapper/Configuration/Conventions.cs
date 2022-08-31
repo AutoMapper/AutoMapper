@@ -15,8 +15,8 @@ namespace AutoMapper.Configuration.Conventions
     public class MemberConfiguration
     {
         NameSplitMember _nameSplitMember;
-        public INamingConvention SourceMemberNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
-        public INamingConvention DestinationMemberNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
+        public INamingConvention SourceNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
+        public INamingConvention DestinationNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
         public List<ISourceToDestinationNameMapper> NameToMemberMappers { get; } = new();
         public bool IsMatch(ProfileMap options, TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
         {
@@ -46,7 +46,7 @@ namespace AutoMapper.Configuration.Conventions
         }
         public void Seal()
         {
-            var isDefault = SourceMemberNamingConvention == PascalCaseNamingConvention.Instance && DestinationMemberNamingConvention == PascalCaseNamingConvention.Instance;
+            var isDefault = SourceNamingConvention == PascalCaseNamingConvention.Instance && DestinationNamingConvention == PascalCaseNamingConvention.Instance;
             _nameSplitMember = isDefault ? new DefaultNameSplitMember() : new ConventionsNameSplitMember();
             _nameSplitMember.Parent = this;
         }
@@ -177,15 +177,15 @@ namespace AutoMapper.Configuration.Conventions
     {
         public sealed override bool IsMatch(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
         {
-            var destinationMemberNamingConvention = isReverseMap ? Parent.SourceMemberNamingConvention : Parent.DestinationMemberNamingConvention;
-            var matches = destinationMemberNamingConvention.Split(nameToSearch);
+            var destinationNamingConvention = isReverseMap ? Parent.SourceNamingConvention : Parent.DestinationNamingConvention;
+            var matches = destinationNamingConvention.Split(nameToSearch);
             var length = matches.Length;
             if (length < 2)
             {
                 return false;
             }
-            var sourceMemberNamingConvention = isReverseMap ? Parent.DestinationMemberNamingConvention : Parent.SourceMemberNamingConvention;
-            var separator = sourceMemberNamingConvention.SeparatorCharacter;
+            var sourceNamingConvention = isReverseMap ? Parent.DestinationNamingConvention : Parent.SourceNamingConvention;
+            var separator = sourceNamingConvention.SeparatorCharacter;
             for (var index = 1; index <= length; index++)
             {
                 var first = string.Join(separator, matches, 0, index);

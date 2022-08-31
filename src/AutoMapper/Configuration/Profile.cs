@@ -108,13 +108,13 @@ namespace AutoMapper
         public Func<ConstructorInfo, bool> ShouldUseConstructor { get; set; }
         public INamingConvention SourceMemberNamingConvention
         {
-            get => _memberConfiguration.SourceMemberNamingConvention;
-            set => _memberConfiguration.SourceMemberNamingConvention = value;
+            get => _memberConfiguration.SourceNamingConvention;
+            set => _memberConfiguration.SourceNamingConvention = value;
         }
         public INamingConvention DestinationMemberNamingConvention
         {
-            get => _memberConfiguration.DestinationMemberNamingConvention;
-            set => _memberConfiguration.DestinationMemberNamingConvention = value;
+            get => _memberConfiguration.DestinationNamingConvention;
+            set => _memberConfiguration.DestinationNamingConvention = value;
         }
         public List<ValueTransformerConfiguration> ValueTransformers => _valueTransformerConfigs ??= new();
         List<string> IProfileExpressionInternal.Prefixes => _prefixes;
