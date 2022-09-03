@@ -3,104 +3,103 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-namespace AutoMapper.Features
+namespace AutoMapper.Features;
+
+public interface IGlobalFeature
 {
-    public interface IGlobalFeature
+    void Configure(IGlobalConfiguration configuration);
+}
+public interface IMappingFeature
+{
+    void Configure(TypeMap typeMap);
+    IMappingFeature Reverse();
+}
+public interface IRuntimeFeature
+{
+    void Seal(IGlobalConfiguration configuration);
+}
+public class Features<TFeature> : IReadOnlyCollection<TFeature>
+{
+    private Dictionary<Type, TFeature> _features;
+    public int Count => _features?.Count ?? 0;
+    /// <summary>
+    /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
+    /// </summary>
+    /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
+    /// <returns>The feature or null if feature not exists.</returns>
+    public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature =>
+        _features == null ? default : (TFeatureToFind)_features.GetValueOrDefault(typeof(TFeatureToFind));
+    /// <summary>
+    /// Add or update the feature. Existing feature of the same type will be replaced.
+    /// </summary>
+    /// <param name="feature">The feature.</param>
+    public void Set(TFeature feature)
     {
-        void Configure(IGlobalConfiguration configuration);
+        _features ??= new Dictionary<Type, TFeature>();
+        _features[feature.GetType()] = feature;
     }
-    public interface IMappingFeature
+    public IEnumerator<TFeature> GetEnumerator() =>
+        _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+public static class FeatureExtensions
+{
+    public static IMapperConfigurationExpression SetFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
     {
-        void Configure(TypeMap typeMap);
-        IMappingFeature Reverse();
+        configuration.Internal().Features.Set(feature);
+        return configuration;
     }
-    public interface IRuntimeFeature
+    public static IMappingExpression<TSource, TDestination> SetFeature<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mapping, IMappingFeature feature)
     {
-        void Seal(IGlobalConfiguration configuration);
+        mapping.Features.Set(feature);
+        return mapping;
     }
-    public class Features<TFeature> : IReadOnlyCollection<TFeature>
+    internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
     {
-        private Dictionary<Type, TFeature> _features;
-        public int Count => _features?.Count ?? 0;
-        /// <summary>
-        /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
-        /// </summary>
-        /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
-        /// <returns>The feature or null if feature not exists.</returns>
-        public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature =>
-            _features == null ? default : (TFeatureToFind)_features.GetValueOrDefault(typeof(TFeatureToFind));
-        /// <summary>
-        /// Add or update the feature. Existing feature of the same type will be replaced.
-        /// </summary>
-        /// <param name="feature">The feature.</param>
-        public void Set(TFeature feature)
+        if (features.Count == 0)
         {
-            _features ??= new Dictionary<Type, TFeature>();
-            _features[feature.GetType()] = feature;
+            return;
         }
-        public IEnumerator<TFeature> GetEnumerator() =>
-            _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        foreach (var feature in features)
+        {
+            feature.Configure(mapperConfiguration);
+        }
     }
-    public static class FeatureExtensions
+    public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
     {
-        public static IMapperConfigurationExpression SetFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
+        if (features.Count == 0)
         {
-            configuration.Internal().Features.Set(feature);
-            return configuration;
+            return;
         }
-        public static IMappingExpression<TSource, TDestination> SetFeature<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mapping, IMappingFeature feature)
+        foreach (var feature in features)
         {
-            mapping.Features.Set(feature);
-            return mapping;
-        }
-        internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
-        {
-            if (features.Count == 0)
+            var reverse = feature.Reverse();
+            if (reverse != null)
             {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Configure(mapperConfiguration);
+                reversedFeatures.Set(reverse);
             }
         }
-        public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
+    }
+    internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+    {
+        if (features.Count == 0)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                var reverse = feature.Reverse();
-                if (reverse != null)
-                {
-                    reversedFeatures.Set(reverse);
-                }
-            }
+            return;
         }
-        internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+        foreach (var feature in features)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Configure(typeMap);
-            }
+            feature.Configure(typeMap);
         }
-        internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)
+    }
+    internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)
+    {
+        if (features.Count == 0)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Seal(configuration);
-            }
+            return;
+        }
+        foreach (var feature in features)
+        {
+            feature.Seal(configuration);
         }
     }
 }

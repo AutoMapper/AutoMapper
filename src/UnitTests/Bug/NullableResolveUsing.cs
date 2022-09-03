@@ -2,35 +2,34 @@
 using Shouldly;
 using System;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.Bug;
+
+public class NullableResolveUsing : AutoMapperSpecBase
 {
-    public class NullableResolveUsing : AutoMapperSpecBase
+    private Destination _destination;
+
+    class Source
     {
-        private Destination _destination;
+        public decimal? Number { get; set; }
+    }
+    class Destination
+    {
+        public decimal? OddNumber { get; set; }
+    }
 
-        class Source
-        {
-            public decimal? Number { get; set; }
-        }
-        class Destination
-        {
-            public decimal? OddNumber { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().ForMember(d => d.OddNumber, o => o.MapFrom(s => s.Number));
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>().ForMember(d => d.OddNumber, o => o.MapFrom(s => s.Number));
-        });
+    protected override void Because_of()
+    {
+        _destination = Mapper.Map<Destination>(new Source());
+    }
 
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Destination>(new Source());
-        }
-
-        [Fact]
-        public void Should_map_nullable_decimal_with_ResolveUsing()
-        {
-            _destination.OddNumber.ShouldBeNull();
-        }
+    [Fact]
+    public void Should_map_nullable_decimal_with_ResolveUsing()
+    {
+        _destination.OddNumber.ShouldBeNull();
     }
 }

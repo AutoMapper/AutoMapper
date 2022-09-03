@@ -1,50 +1,49 @@
-﻿namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug;
+
+using System;
+using Xunit;
+
+public class SelectiveConfigurationValidation : NonValidatingSpecBase
 {
-    using System;
-    using Xunit;
+    public class GoodSrc { }
+    public class GoodDest { }
 
-    public class SelectiveConfigurationValidation : NonValidatingSpecBase
+    public class BadSrc
     {
-        public class GoodSrc { }
-        public class GoodDest { }
+        public Type BlowUp { get; set; }
+    }
 
-        public class BadSrc
+    public class BadDest
+    {
+        public int Value { get; set; }
+        public int BlowUp { get; set; }
+    }
+    public class GoodProfile : Profile
+    {
+        public GoodProfile()
         {
-            public Type BlowUp { get; set; }
+            CreateMap<GoodSrc, GoodDest>();
         }
+    }
 
-        public class BadDest
+    public class BadProfile : Profile
+    {
+        public BadProfile()
         {
-            public int Value { get; set; }
-            public int BlowUp { get; set; }
+            CreateMap<BadSrc, BadDest>();
         }
-        public class GoodProfile : Profile
-        {
-            public GoodProfile()
-            {
-                CreateMap<GoodSrc, GoodDest>();
-            }
-        }
+    }
 
-        public class BadProfile : Profile
-        {
-            public BadProfile()
-            {
-                CreateMap<BadSrc, BadDest>();
-            }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.AddProfile<GoodProfile>();
+        cfg.AddProfile<BadProfile>();
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.AddProfile<GoodProfile>();
-            cfg.AddProfile<BadProfile>();
-        });
-
-        [Fact]
-        public void Should_pass_specific_profile_assertion()
-        {
-            typeof(AutoMapperConfigurationException)
-                .ShouldNotBeThrownBy(AssertConfigurationIsValid<GoodProfile>);
-        }
+    [Fact]
+    public void Should_pass_specific_profile_assertion()
+    {
+        typeof(AutoMapperConfigurationException)
+            .ShouldNotBeThrownBy(AssertConfigurationIsValid<GoodProfile>);
     }
 }

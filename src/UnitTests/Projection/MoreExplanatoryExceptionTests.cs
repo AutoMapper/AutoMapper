@@ -6,32 +6,31 @@ using System.Threading.Tasks;
 using Xunit;
 using AutoMapper.QueryableExtensions;
 
-namespace AutoMapper.UnitTests.Projection
+namespace AutoMapper.UnitTests.Projection;
+
+public class MoreExplanatoryExceptionTests
 {
-    public class MoreExplanatoryExceptionTests
+    [Fact]
+    public void ConstructorWithUnknownParameterTypeThrowsExplicitException()
     {
-        [Fact]
-        public void ConstructorWithUnknownParameterTypeThrowsExplicitException()
-        {
-            // Arrange
-            var config = new MapperConfiguration(cfg =>
-                cfg.CreateProjection<EntitySource, EntityDestination>());
+        // Arrange
+        var config = new MapperConfiguration(cfg =>
+            cfg.CreateProjection<EntitySource, EntityDestination>());
 
-            // Act
-            var exception = Assert.Throws<AutoMapperMappingException>(() =>
-                new EntitySource[0].AsQueryable().ProjectTo<EntityDestination>(config));
+        // Act
+        var exception = Assert.Throws<AutoMapperMappingException>(() =>
+            new EntitySource[0].AsQueryable().ProjectTo<EntityDestination>(config));
 
-            // Assert
-            Assert.Contains("parameter notSupported", exception.Message, StringComparison.OrdinalIgnoreCase);
-        }
+        // Assert
+        Assert.Contains("parameter notSupported", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
 
-        class EntitySource
-        {
-            public DateTime NotSupported;
-        }
-        class EntityDestination
-        {
-            public EntityDestination(int notSupported = 0) { }
-        }
+    class EntitySource
+    {
+        public DateTime NotSupported;
+    }
+    class EntityDestination
+    {
+        public EntityDestination(int notSupported = 0) { }
     }
 }

@@ -1,62 +1,61 @@
 ﻿using Xunit;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.Bug;
+
+using System;
+using Shouldly;
+
+public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
 {
-    using System;
-    using Shouldly;
+    public class SourceClass { }
 
-    public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
+    public class DestinationClass
     {
-        public class SourceClass { }
+        public DestinationClass() { }
 
-        public class DestinationClass
+        // Since the name of the parameter is 'type', Automapper.TypeMap chooses SourceClass.GetType()
+        // to fulfill the dependency, causing an InvalidCastException during Mapper.Map()
+        public DestinationClass(Int32 type)
         {
-            public DestinationClass() { }
-
-            // Since the name of the parameter is 'type', Automapper.TypeMap chooses SourceClass.GetType()
-            // to fulfill the dependency, causing an InvalidCastException during Mapper.Map()
-            public DestinationClass(Int32 type)
-            {
-                Type = type;
-            }
-
-            public Int32 Type { get; private set; }
+            Type = type;
         }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
-
-        [Fact]
-        public void Should_pick_a_ctor_which_best_matches()
-        {
-            var source = new SourceClass();
-
-            Mapper.Map<DestinationClass>(source);
-        }
+        public Int32 Type { get; private set; }
     }
-    public class MemberNamedTypeWrong : AutoMapperSpecBase
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
+
+    [Fact]
+    public void Should_pick_a_ctor_which_best_matches()
     {
-        public class SourceClass
-        {
-            public string Type { get; set; }
-        }
+        var source = new SourceClass();
 
-        public class DestinationClass
-        {
-            public string Type { get; set; }
-        }
-
-        [Fact]
-        public void Should_map_correctly()
-        {
-            var source = new SourceClass
-            {
-                Type = "Hello"
-            };
-
-            var result = Mapper.Map<DestinationClass>(source);
-            result.Type.ShouldBe(source.Type);
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
+        Mapper.Map<DestinationClass>(source);
     }
+}
+public class MemberNamedTypeWrong : AutoMapperSpecBase
+{
+    public class SourceClass
+    {
+        public string Type { get; set; }
+    }
+
+    public class DestinationClass
+    {
+        public string Type { get; set; }
+    }
+
+    [Fact]
+    public void Should_map_correctly()
+    {
+        var source = new SourceClass
+        {
+            Type = "Hello"
+        };
+
+        var result = Mapper.Map<DestinationClass>(source);
+        result.Type.ShouldBe(source.Type);
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
 }

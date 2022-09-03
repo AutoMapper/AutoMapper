@@ -1,205 +1,204 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using QueryableExtensions;
+using Shouldly;
+using Xunit;
+
+public class ParameterizedQueriesTests_with_anonymous_object_and_factory : AutoMapperSpecBase
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using QueryableExtensions;
-    using Shouldly;
-    using Xunit;
+    private Dest[] _dests;
+    private IQueryable<Source> _sources;
 
-    public class ParameterizedQueriesTests_with_anonymous_object_and_factory : AutoMapperSpecBase
+    public class Source
     {
-        private Dest[] _dests;
-        private IQueryable<Source> _sources;
-
-        public class Source
-        {
-        }
-
-        public class Dest
-        {
-            public int Value { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            int value = 0;
-
-            Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateProjection<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-        });
-
-        protected override void Because_of()
-        {
-            _sources = new[]
-            {
-                new Source()
-            }.AsQueryable();
-
-            _dests = _sources.ProjectTo<Dest>(Configuration, new { value = 10 }).ToArray();
-        }
-
-        [Fact]
-        public void Should_substitute_parameter_value()
-        {
-            _dests[0].Value.ShouldBe(15);
-        }
-
-        [Fact]
-        public void Should_not_cache_parameter_value()
-        {
-            var newDests = _sources.ProjectTo<Dest>(Configuration, new { value = 15 }).ToArray();
-
-            newDests[0].Value.ShouldBe(20);
-        }
     }
 
-    public class ParameterizedQueriesTests_with_anonymous_object : AutoMapperSpecBase
+    public class Dest
     {
-        private Dest[] _dests;
-        private IQueryable<Source> _sources;
-
-        public class Source
-        {
-        }
-
-        public class Dest
-        {
-            public int Value { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            int value = 0;
-
-            Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateProjection<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-        });
-
-        protected override void Because_of()
-        {
-            _sources = new[]
-            {
-                new Source()
-            }.AsQueryable();
-
-            _dests = _sources.ProjectTo<Dest>(Configuration, new { value = 10 }).ToArray();
-        }
-
-        [Fact]
-        public void Should_substitute_parameter_value()
-        {
-            _dests[0].Value.ShouldBe(15);
-        }
-
-        [Fact]
-        public void Should_not_cache_parameter_value()
-        {
-            var newDests = _sources.ProjectTo<Dest>(Configuration, new {value = 15}).ToArray();
-
-            newDests[0].Value.ShouldBe(20);
-        }
+        public int Value { get; set; }
     }
 
-    public class ParameterizedQueriesTests_with_dictionary_object : AutoMapperSpecBase
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        private Dest[] _dests;
-        private IQueryable<Source> _sources;
+        int value = 0;
 
-        public class Source
+        Expression<Func<Source, int>> sourceMember = src => value + 5;
+        cfg.CreateProjection<Source, Dest>()
+            .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+    });
+
+    protected override void Because_of()
+    {
+        _sources = new[]
         {
-        }
+            new Source()
+        }.AsQueryable();
 
-        public class Dest
-        {
-            public int Value { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            int value = 0;
-
-            Expression<Func<Source, int>> sourceMember = src => value + 5;
-            cfg.CreateProjection<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-        });
-
-        protected override void Because_of()
-        {
-            _sources = new[]
-            {
-                new Source()
-            }.AsQueryable();
-
-            _dests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object>{{"value", 10}}).ToArray();
-        }
-
-        [Fact]
-        public void Should_substitute_parameter_value()
-        {
-            _dests[0].Value.ShouldBe(15);
-        }
-
-        [Fact]
-        public void Should_not_cache_parameter_value()
-        {
-            var newDests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object> { { "value", 15 } }).ToArray();
-
-            newDests[0].Value.ShouldBe(20);
-        }  
+        _dests = _sources.ProjectTo<Dest>(Configuration, new { value = 10 }).ToArray();
     }
 
-    public class ParameterizedQueriesTests_with_filter : AutoMapperSpecBase
+    [Fact]
+    public void Should_substitute_parameter_value()
     {
-        public class User
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public DateTime? DateActivated { get; set; }
-        }
+        _dests[0].Value.ShouldBe(15);
+    }
 
-        public class UserViewModel
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public DateTime? DateActivated { get; set; }
-            public int position { get; set; }
-        }
+    [Fact]
+    public void Should_not_cache_parameter_value()
+    {
+        var newDests = _sources.ProjectTo<Dest>(Configuration, new { value = 15 }).ToArray();
 
-        public class DB
+        newDests[0].Value.ShouldBe(20);
+    }
+}
+
+public class ParameterizedQueriesTests_with_anonymous_object : AutoMapperSpecBase
+{
+    private Dest[] _dests;
+    private IQueryable<Source> _sources;
+
+    public class Source
+    {
+    }
+
+    public class Dest
+    {
+        public int Value { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        int value = 0;
+
+        Expression<Func<Source, int>> sourceMember = src => value + 5;
+        cfg.CreateProjection<Source, Dest>()
+            .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+    });
+
+    protected override void Because_of()
+    {
+        _sources = new[]
         {
-            public DB()
+            new Source()
+        }.AsQueryable();
+
+        _dests = _sources.ProjectTo<Dest>(Configuration, new { value = 10 }).ToArray();
+    }
+
+    [Fact]
+    public void Should_substitute_parameter_value()
+    {
+        _dests[0].Value.ShouldBe(15);
+    }
+
+    [Fact]
+    public void Should_not_cache_parameter_value()
+    {
+        var newDests = _sources.ProjectTo<Dest>(Configuration, new {value = 15}).ToArray();
+
+        newDests[0].Value.ShouldBe(20);
+    }
+}
+
+public class ParameterizedQueriesTests_with_dictionary_object : AutoMapperSpecBase
+{
+    private Dest[] _dests;
+    private IQueryable<Source> _sources;
+
+    public class Source
+    {
+    }
+
+    public class Dest
+    {
+        public int Value { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        int value = 0;
+
+        Expression<Func<Source, int>> sourceMember = src => value + 5;
+        cfg.CreateProjection<Source, Dest>()
+            .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+    });
+
+    protected override void Because_of()
+    {
+        _sources = new[]
+        {
+            new Source()
+        }.AsQueryable();
+
+        _dests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object>{{"value", 10}}).ToArray();
+    }
+
+    [Fact]
+    public void Should_substitute_parameter_value()
+    {
+        _dests[0].Value.ShouldBe(15);
+    }
+
+    [Fact]
+    public void Should_not_cache_parameter_value()
+    {
+        var newDests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object> { { "value", 15 } }).ToArray();
+
+        newDests[0].Value.ShouldBe(20);
+    }  
+}
+
+public class ParameterizedQueriesTests_with_filter : AutoMapperSpecBase
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public DateTime? DateActivated { get; set; }
+    }
+
+    public class UserViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public DateTime? DateActivated { get; set; }
+        public int position { get; set; }
+    }
+
+    public class DB
+    {
+        public DB()
+        {
+            Users = new List<User>()
             {
-                Users = new List<User>()
-                {
-                    new User {DateActivated = new DateTime(2000, 1, 1), Id = 1, Name = "Joe Schmoe"},
-                    new User {DateActivated = new DateTime(2000, 2, 1), Id = 2, Name = "John Schmoe"},
-                    new User {DateActivated = new DateTime(2000, 3, 1), Id = 3, Name = "Jim Schmoe"},
-                }.AsQueryable();
-            }
-            public IQueryable<User> Users { get; }
+                new User {DateActivated = new DateTime(2000, 1, 1), Id = 1, Name = "Joe Schmoe"},
+                new User {DateActivated = new DateTime(2000, 2, 1), Id = 2, Name = "John Schmoe"},
+                new User {DateActivated = new DateTime(2000, 3, 1), Id = 3, Name = "Jim Schmoe"},
+            }.AsQueryable();
         }
+        public IQueryable<User> Users { get; }
+    }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            DB db = null;
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        DB db = null;
 
-            cfg.CreateProjection<User, UserViewModel>()
-                .ForMember(a => a.position,
-                    opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
-        });
+        cfg.CreateProjection<User, UserViewModel>()
+            .ForMember(a => a.position,
+                opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
+    });
 
-        [Fact]
-        public void Should_only_replace_outer_parameters()
-        {
-            var db = new DB();
+    [Fact]
+    public void Should_only_replace_outer_parameters()
+    {
+        var db = new DB();
 
-            var user = db.Users.ProjectTo<UserViewModel>(Configuration, new { db }).FirstOrDefault(a => a.Id == 2);
+        var user = db.Users.ProjectTo<UserViewModel>(Configuration, new { db }).FirstOrDefault(a => a.Id == 2);
 
-            user.position.ShouldBe(1);
-        }
+        user.position.ShouldBe(1);
     }
 }

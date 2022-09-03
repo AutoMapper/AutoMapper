@@ -2,39 +2,38 @@
 using Shouldly;
 using System;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.Bug;
+
+public class ForAllMembersAndResolveUsing : AutoMapperSpecBase
 {
-    public class ForAllMembersAndResolveUsing : AutoMapperSpecBase
+    private Destination _destination;
+
+    class Source
     {
-        private Destination _destination;
+        public int Number { get; set; }
+    }
+    class Destination
+    {
+        public int Number { get; set; }
+    }
 
-        class Source
-        {
-            public int Number { get; set; }
-        }
-        class Destination
-        {
-            public int Number { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().ForAllMembers(opt => opt.MapFrom(s=>12));
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    protected override void Because_of()
+    {
+        var source = new Source
         {
-            cfg.CreateMap<Source, Destination>().ForAllMembers(opt => opt.MapFrom(s=>12));
-        });
+            Number = 23
+        };
+        _destination = Mapper.Map<Source, Destination>(source);
+    }
 
-        protected override void Because_of()
-        {
-            var source = new Source
-            {
-                Number = 23
-            };
-            _destination = Mapper.Map<Source, Destination>(source);
-        }
-
-        [Fact]
-        public void Should_work_together()
-        {
-            _destination.Number.ShouldBe(12);
-        }
+    [Fact]
+    public void Should_work_together()
+    {
+        _destination.Number.ShouldBe(12);
     }
 }

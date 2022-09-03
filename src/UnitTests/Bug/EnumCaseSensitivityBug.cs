@@ -1,42 +1,41 @@
 ﻿using Shouldly;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.Bug;
+
+using Xunit;
+
+public class EnumCaseSensitivityBug : AutoMapperSpecBase
 {
-    using Xunit;
+    private SecondEnum _resultSecondEnum;
+    private FirstEnum _resultFirstEnum;
 
-    public class EnumCaseSensitivityBug : AutoMapperSpecBase
+    public enum FirstEnum
     {
-        private SecondEnum _resultSecondEnum;
-        private FirstEnum _resultFirstEnum;
+        Dog,
+        Cat
+    }
 
-        public enum FirstEnum
-        {
-            Dog,
-            Cat
-        }
+    public enum SecondEnum
+    {
+        cat,
+        dog
+    }
 
-        public enum SecondEnum
-        {
-            cat,
-            dog
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        // not creating a map on purpose to trigger use of EnumToEnumMapper
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            // not creating a map on purpose to trigger use of EnumToEnumMapper
-        });
+    protected override void Because_of()
+    {
+        _resultSecondEnum = Mapper.Map<SecondEnum>(FirstEnum.Cat);
+        _resultFirstEnum = Mapper.Map<FirstEnum>(SecondEnum.dog);
+    }
 
-        protected override void Because_of()
-        {
-            _resultSecondEnum = Mapper.Map<SecondEnum>(FirstEnum.Cat);
-            _resultFirstEnum = Mapper.Map<FirstEnum>(SecondEnum.dog);
-        }
-
-        [Fact]
-        public void Should_match_on_the_name_even_if_values_match()
-        {
-            _resultSecondEnum.ShouldBe(SecondEnum.cat);
-            _resultFirstEnum.ShouldBe(FirstEnum.Dog);
-        }
+    [Fact]
+    public void Should_match_on_the_name_even_if_values_match()
+    {
+        _resultSecondEnum.ShouldBe(SecondEnum.cat);
+        _resultFirstEnum.ShouldBe(FirstEnum.Dog);
     }
 }

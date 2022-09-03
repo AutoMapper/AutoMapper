@@ -1,14 +1,13 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper.Execution;
-namespace AutoMapper.Internal.Mappers
+namespace AutoMapper.Internal.Mappers;
+
+public class NullableDestinationMapper : IObjectMapper
 {
-    public class NullableDestinationMapper : IObjectMapper
-    {
-        public bool IsMatch(TypePair context) => context.DestinationType.IsNullableType();
-        public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
-            configuration.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type), sourceExpression, memberMap);
-        public TypePair? GetAssociatedTypes(TypePair initialTypes) => GetAssociatedTypes(initialTypes.SourceType, initialTypes.DestinationType);
-        TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new(sourceType, Nullable.GetUnderlyingType(destinationType));
-    }
+    public bool IsMatch(TypePair context) => context.DestinationType.IsNullableType();
+    public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression) =>
+        configuration.MapExpression(profileMap, GetAssociatedTypes(sourceExpression.Type, destExpression.Type), sourceExpression, memberMap);
+    public TypePair? GetAssociatedTypes(TypePair initialTypes) => GetAssociatedTypes(initialTypes.SourceType, initialTypes.DestinationType);
+    TypePair GetAssociatedTypes(Type sourceType, Type destinationType) => new(sourceType, Nullable.GetUnderlyingType(destinationType));
 }

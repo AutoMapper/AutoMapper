@@ -3,80 +3,79 @@ using System.Linq;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests
+namespace AutoMapper.UnitTests;
+
+public class ReverseMapWithoutPreserveReferences : AutoMapperSpecBase
 {
-    public class ReverseMapWithoutPreserveReferences : AutoMapperSpecBase
+    UserDto _destination;
+
+    public class UserModel
     {
-        UserDto _destination;
+        public virtual CategoryModel Category { get; set; }
+        public virtual UserGroupModel Group { get; set; }
+    }
 
-        public class UserModel
+    public class CategoryModel
+    {
+        public CategoryModel Category { get; set; }
+    }
+
+    public class UserGroupModel
+    {
+        public UserGroupModel()
         {
-            public virtual CategoryModel Category { get; set; }
-            public virtual UserGroupModel Group { get; set; }
+            Users = new List<UserModel>();
         }
 
-        public class CategoryModel
+        public virtual ICollection<UserModel> Users { get; set; }
+    }
+
+    public class UserDto
+    {
+        public virtual CategoryDto Category { get; set; }
+        public virtual UserGroupDto Group { get; set; }
+    }
+
+    public class CategoryDto
+    {
+        public CategoryDto Category { get; set; }
+    }
+
+    public class UserGroupDto
+    {
+        public UserGroupDto()
         {
-            public CategoryModel Category { get; set; }
+            Users = new List<UserDto>();
         }
 
-        public class UserGroupModel
-        {
-            public UserGroupModel()
-            {
-                Users = new List<UserModel>();
-            }
+        public virtual ICollection<UserDto> Users { get; set; }
+    }
 
-            public virtual ICollection<UserModel> Users { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<CategoryModel, CategoryDto>(MemberList.Destination).ReverseMap();
+        cfg.CreateMap<UserModel, UserDto>(MemberList.Destination).ReverseMap();
+        cfg.CreateMap<UserGroupModel, UserGroupDto>(MemberList.Destination).ReverseMap();
+    });
 
-        public class UserDto
-        {
-            public virtual CategoryDto Category { get; set; }
-            public virtual UserGroupDto Group { get; set; }
-        }
+    protected override void Because_of()
+    {
+        var categoryModel = new CategoryModel();
+        categoryModel.Category = categoryModel;
 
-        public class CategoryDto
-        {
-            public CategoryDto Category { get; set; }
-        }
+        var userModel = new UserModel();
+        var userGroupModel = new UserGroupModel();
 
-        public class UserGroupDto
-        {
-            public UserGroupDto()
-            {
-                Users = new List<UserDto>();
-            }
+        userModel.Category = categoryModel;
+        userModel.Group = userGroupModel;
+        userGroupModel.Users.Add(userModel);
 
-            public virtual ICollection<UserDto> Users { get; set; }
-        }
+        _destination = Mapper.Map<UserDto>(userModel);
+    }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<CategoryModel, CategoryDto>(MemberList.Destination).ReverseMap();
-            cfg.CreateMap<UserModel, UserDto>(MemberList.Destination).ReverseMap();
-            cfg.CreateMap<UserGroupModel, UserGroupDto>(MemberList.Destination).ReverseMap();
-        });
-
-        protected override void Because_of()
-        {
-            var categoryModel = new CategoryModel();
-            categoryModel.Category = categoryModel;
-
-            var userModel = new UserModel();
-            var userGroupModel = new UserGroupModel();
-
-            userModel.Category = categoryModel;
-            userModel.Group = userGroupModel;
-            userGroupModel.Users.Add(userModel);
-
-            _destination = Mapper.Map<UserDto>(userModel);
-        }
-
-        [Fact]
-        public void Should_map_ok()
-        {
-            _destination.Group.Users.SequenceEqual(new[] { _destination }).ShouldBeTrue();
-        }
+    [Fact]
+    public void Should_map_ok()
+    {
+        _destination.Group.Users.SequenceEqual(new[] { _destination }).ShouldBeTrue();
     }
 }

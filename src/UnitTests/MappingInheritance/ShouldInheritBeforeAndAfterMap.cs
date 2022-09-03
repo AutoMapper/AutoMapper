@@ -3,142 +3,141 @@ using AutoMapper.Internal.Mappers;
 using Shouldly;
 using Xunit;
 
-namespace AutoMapper.UnitTests.MappingInheritance
+namespace AutoMapper.UnitTests.MappingInheritance;
+
+public class ShouldInheritBeforeAndAfterMapOnlyOnce : AutoMapperSpecBase
 {
-    public class ShouldInheritBeforeAndAfterMapOnlyOnce : AutoMapperSpecBase
+    int afterMapCount;
+    int beforeMapCount;
+
+    public abstract class BaseBaseSource { }
+    public class BaseSource : BaseBaseSource
     {
-        int afterMapCount;
-        int beforeMapCount;
+        public string Foo { get; set; }
+    }
+    public class Source : BaseSource { }
 
-        public abstract class BaseBaseSource { }
-        public class BaseSource : BaseBaseSource
-        {
-            public string Foo { get; set; }
-        }
-        public class Source : BaseSource { }
+    public abstract class BaseBaseDest
+    {
+    }
+    public class BaseDest : BaseBaseDest { }
+    public class Dest : BaseDest { }
 
-        public abstract class BaseBaseDest
-        {
-        }
-        public class BaseDest : BaseBaseDest { }
-        public class Dest : BaseDest { }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d)=>beforeMapCount++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
+        cfg.CreateMap<BaseSource, BaseDest>().Include<Source, Dest>();
+        cfg.CreateMap<Source, Dest>();
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d)=>beforeMapCount++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
-            cfg.CreateMap<BaseSource, BaseDest>().Include<Source, Dest>();
-            cfg.CreateMap<Source, Dest>();
-        });
-
-        protected override void Because_of()
-        {
-            Mapper.Map<Dest>(new Source());
-        }
-
-        [Fact]
-        public void Should_call_AfterMap_just_once()
-        {
-            afterMapCount.ShouldBe(1);
-            beforeMapCount.ShouldBe(1);
-        }
+    protected override void Because_of()
+    {
+        Mapper.Map<Dest>(new Source());
     }
 
-    public class ShouldInheritBeforeAndAfterMapOnlyOnceIncludeBase : AutoMapperSpecBase
+    [Fact]
+    public void Should_call_AfterMap_just_once()
     {
-        int afterMapCount;
-        int beforeMapCount;
+        afterMapCount.ShouldBe(1);
+        beforeMapCount.ShouldBe(1);
+    }
+}
 
-        public abstract class BaseBaseSource { }
-        public class BaseSource : BaseBaseSource
-        {
-            public string Foo { get; set; }
-        }
-        public class Source : BaseSource { }
+public class ShouldInheritBeforeAndAfterMapOnlyOnceIncludeBase : AutoMapperSpecBase
+{
+    int afterMapCount;
+    int beforeMapCount;
 
-        public abstract class BaseBaseDest
-        {
-        }
-        public class BaseDest : BaseBaseDest { }
-        public class Dest : BaseDest { }
+    public abstract class BaseBaseSource { }
+    public class BaseSource : BaseBaseSource
+    {
+        public string Foo { get; set; }
+    }
+    public class Source : BaseSource { }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d) => beforeMapCount++);
-            cfg.CreateMap<BaseSource, BaseDest>().IncludeBase<BaseBaseSource, BaseBaseDest>();
-            cfg.CreateMap<Source, Dest>().IncludeBase<BaseSource, BaseDest>();
-        });
+    public abstract class BaseBaseDest
+    {
+    }
+    public class BaseDest : BaseBaseDest { }
+    public class Dest : BaseDest { }
 
-        protected override void Because_of()
-        {
-            Mapper.Map<Dest>(new Source());
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d) => beforeMapCount++);
+        cfg.CreateMap<BaseSource, BaseDest>().IncludeBase<BaseBaseSource, BaseBaseDest>();
+        cfg.CreateMap<Source, Dest>().IncludeBase<BaseSource, BaseDest>();
+    });
 
-        [Fact]
-        public void Should_call_AfterMap_just_once()
-        {
-            afterMapCount.ShouldBe(1);
-            beforeMapCount.ShouldBe(1);
-        }
+    protected override void Because_of()
+    {
+        Mapper.Map<Dest>(new Source());
     }
 
-    public class ShouldInheritBeforeAndAfterMap
+    [Fact]
+    public void Should_call_AfterMap_just_once()
     {
-        public class BaseClass
+        afterMapCount.ShouldBe(1);
+        beforeMapCount.ShouldBe(1);
+    }
+}
+
+public class ShouldInheritBeforeAndAfterMap
+{
+    public class BaseClass
+    {
+        public string Prop { get; set; }
+    } 
+    public class Class : BaseClass {}
+
+    public class BaseDto
+    {
+        public string DifferentProp { get; set; }            
+    }
+    public class Dto : BaseDto {}
+
+    [Fact]
+    public void should_inherit_base_beforemap()
+    {
+        // arrange
+        var source = new Class{ Prop = "test" };
+        var configurationProvider = new MapperConfiguration(cfg =>
         {
-            public string Prop { get; set; }
-        } 
-        public class Class : BaseClass {}
+            cfg
+                .CreateMap<BaseClass, BaseDto>()
+                .BeforeMap((s, d) => d.DifferentProp = s.Prop)
+                .Include<Class, Dto>();
 
-        public class BaseDto
+            cfg.CreateMap<Class, Dto>();
+        });
+        var mappingEngine = configurationProvider.CreateMapper();
+
+        // act
+        var dest = mappingEngine.Map<Class, Dto>(source);
+
+        // assert
+        "test".ShouldBe(dest.DifferentProp);
+    }
+
+    [Fact]
+    public void should_inherit_base_aftermap()
+    {
+        // arrange
+        var source = new Class { Prop = "test" };
+        var configurationProvider = new MapperConfiguration(cfg =>
         {
-            public string DifferentProp { get; set; }            
-        }
-        public class Dto : BaseDto {}
+            cfg
+                .CreateMap<BaseClass, BaseDto>()
+                .AfterMap((s, d) => d.DifferentProp = s.Prop)
+                .Include<Class, Dto>();
 
-        [Fact]
-        public void should_inherit_base_beforemap()
-        {
-            // arrange
-            var source = new Class{ Prop = "test" };
-            var configurationProvider = new MapperConfiguration(cfg =>
-            {
-                cfg
-                    .CreateMap<BaseClass, BaseDto>()
-                    .BeforeMap((s, d) => d.DifferentProp = s.Prop)
-                    .Include<Class, Dto>();
+            cfg.CreateMap<Class, Dto>();
+        });
+        var mappingEngine = configurationProvider.CreateMapper();
 
-                cfg.CreateMap<Class, Dto>();
-            });
-            var mappingEngine = configurationProvider.CreateMapper();
+        // act
+        var dest = mappingEngine.Map<Class, Dto>(source);
 
-            // act
-            var dest = mappingEngine.Map<Class, Dto>(source);
-
-            // assert
-            "test".ShouldBe(dest.DifferentProp);
-        }
-
-        [Fact]
-        public void should_inherit_base_aftermap()
-        {
-            // arrange
-            var source = new Class { Prop = "test" };
-            var configurationProvider = new MapperConfiguration(cfg =>
-            {
-                cfg
-                    .CreateMap<BaseClass, BaseDto>()
-                    .AfterMap((s, d) => d.DifferentProp = s.Prop)
-                    .Include<Class, Dto>();
-
-                cfg.CreateMap<Class, Dto>();
-            });
-            var mappingEngine = configurationProvider.CreateMapper();
-
-            // act
-            var dest = mappingEngine.Map<Class, Dto>(source);
-
-            // assert
-            "test".ShouldBe(dest.DifferentProp);
-        }
+        // assert
+        "test".ShouldBe(dest.DifferentProp);
     }
 }

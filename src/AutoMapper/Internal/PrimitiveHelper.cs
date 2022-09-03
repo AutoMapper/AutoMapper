@@ -5,35 +5,34 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-namespace AutoMapper.Internal
+namespace AutoMapper.Internal;
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public static class PrimitiveHelper
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class PrimitiveHelper
+    public static ReadOnlyCollection<T> ToReadOnly<T>(this T item) where T : Expression => new ReadOnlyCollectionBuilder<T>{ item }.ToReadOnlyCollection();
+    public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
+    public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
     {
-        public static ReadOnlyCollection<T> ToReadOnly<T>(this T item) where T : Expression => new ReadOnlyCollectionBuilder<T>{ item }.ToReadOnlyCollection();
-        public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
-        public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)
+        if (otherCollection == null || otherCollection.Count == 0)
         {
-            if (otherCollection == null || otherCollection.Count == 0)
-            {
-                return collection;
-            }
-            if (collection.Count == 0)
-            {
-                return otherCollection;
-            }
-            return Enumerable.Concat(collection, otherCollection);
+            return collection;
         }
-        public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
+        if (collection.Count == 0)
         {
-            types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
-            types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
+            return otherCollection;
         }
-        public static bool IsCollection(this TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
-        public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
-        public static bool IsUnderlyingTypeToEnum(this TypePair context) =>
-            context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));
-        public static bool IsEnumToUnderlyingType(this TypePair context) =>
-            context.SourceType.IsEnum && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(context.SourceType));
+        return Enumerable.Concat(collection, otherCollection);
     }
+    public static void CheckIsDerivedFrom(this TypePair types, TypePair baseTypes)
+    {
+        types.SourceType.CheckIsDerivedFrom(baseTypes.SourceType);
+        types.DestinationType.CheckIsDerivedFrom(baseTypes.DestinationType);
+    }
+    public static bool IsCollection(this TypePair context) => context.SourceType.IsCollection() && context.DestinationType.IsCollection();
+    public static bool IsEnumToEnum(this TypePair context) => context.SourceType.IsEnum && context.DestinationType.IsEnum;
+    public static bool IsUnderlyingTypeToEnum(this TypePair context) =>
+        context.DestinationType.IsEnum && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));
+    public static bool IsEnumToUnderlyingType(this TypePair context) =>
+        context.SourceType.IsEnum && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(context.SourceType));
 }

@@ -4,57 +4,56 @@ using System.Collections.ObjectModel;
 using Xunit;
 using Shouldly;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.Bug;
+
+public class EFCollections : AutoMapperSpecBase
 {
-    public class EFCollections : AutoMapperSpecBase
+    private Dest _dest;
+
+    public class Source
     {
-        private Dest _dest;
+        public ICollection<Child> Children { get; set; }
 
-        public class Source
+    }
+
+    public class OtherSource : Source
+    {
+    }
+
+    public class OtherChild : Child
+    {
+
+    }
+
+    public class Dest
+    {
+        public ICollection<DestChild> Children { get; set; } 
+    }
+
+    public class DestChild {}
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Dest>();
+        cfg.CreateMap<Child, DestChild>();
+    });
+
+    protected override void Because_of()
+    {
+        var source = new OtherSource
         {
-            public ICollection<Child> Children { get; set; }
-
-        }
-
-        public class OtherSource : Source
-        {
-        }
-
-        public class OtherChild : Child
-        {
-
-        }
-
-        public class Dest
-        {
-            public ICollection<DestChild> Children { get; set; } 
-        }
-
-        public class DestChild {}
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<Source, Dest>();
-            cfg.CreateMap<Child, DestChild>();
-        });
-
-        protected override void Because_of()
-        {
-            var source = new OtherSource
+            Children = new Collection<Child>
             {
-                Children = new Collection<Child>
-                {
-                    new OtherChild(),
-                    new OtherChild()
-                }
-            };
-            _dest = Mapper.Map<Source, Dest>(source);
-        }
+                new OtherChild(),
+                new OtherChild()
+            }
+        };
+        _dest = Mapper.Map<Source, Dest>(source);
+    }
 
-        [Fact]
-        public void Should_map_collection_items()
-        {
-            _dest.Children.Count.ShouldBe(2);
-        }
+    [Fact]
+    public void Should_map_collection_items()
+    {
+        _dest.Children.Count.ShouldBe(2);
     }
 }

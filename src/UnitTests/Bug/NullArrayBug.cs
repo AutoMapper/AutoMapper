@@ -1,49 +1,48 @@
-﻿namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug;
+
+using Shouldly;
+using Xunit;
+
+public class NullArrayBug : AutoMapperSpecBase
 {
-    using Shouldly;
-    using Xunit;
+    private static Source _source;
+    private Destination _destination;
 
-    public class NullArrayBug : AutoMapperSpecBase
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        private static Source _source;
-        private Destination _destination;
+        cfg.AllowNullCollections = false;
+        cfg.CreateMap<Source, Destination>();
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.AllowNullCollections = false;
-            cfg.CreateMap<Source, Destination>();
+        _source = new Source {Name = null, Data = null};
+    });
 
-            _source = new Source {Name = null, Data = null};
-        });
+    protected override void Because_of()
+    {
+        _destination = Mapper.Map<Destination>(_source);
+    }
 
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Destination>(_source);
-        }
+    [Fact]
+    public void Should_map_name_to_null()
+    {
+        _destination.Name.ShouldBeNull();
+    }
 
-        [Fact]
-        public void Should_map_name_to_null()
-        {
-            _destination.Name.ShouldBeNull();
-        }
+    [Fact]
+    public void Should_map_null_array_to_empty()
+    {
+        _destination.Data.ShouldNotBeNull();
+        _destination.Data.ShouldBeEmpty();
+    }
 
-        [Fact]
-        public void Should_map_null_array_to_empty()
-        {
-            _destination.Data.ShouldNotBeNull();
-            _destination.Data.ShouldBeEmpty();
-        }
+    public class Source
+    {
+        public string Name { get; set; }
+        public string[] Data { get; set; }
+    }
 
-        public class Source
-        {
-            public string Name { get; set; }
-            public string[] Data { get; set; }
-        }
-
-        public class Destination
-        {
-            public string Name { get; set; }
-            public string[] Data { get; set; }
-        }
+    public class Destination
+    {
+        public string Name { get; set; }
+        public string[] Data { get; set; }
     }
 }
