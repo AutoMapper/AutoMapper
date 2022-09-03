@@ -170,6 +170,7 @@ namespace AutoMapper.Execution
                 Block(destinationFunc, Call(ContextParameter, CacheDestinationMethod, _source, Constant(DestinationType), _destination), _destination) :
                 destinationFunc;
         }
+        Expression ReplaceParameters(LambdaExpression lambda) => _configuration.ReplaceParameters(lambda, GetParameters());
         private Expression CreateAssignmentFunc(Expression createDestination)
         {
             List<Expression> actions = new() { createDestination };
@@ -182,7 +183,7 @@ namespace AutoMapper.Execution
             }
             foreach (var beforeMapAction in _typeMap.BeforeMapActions)
             {
-                actions.Add(_configuration.ReplaceParameters(beforeMapAction, GetParameters()));
+                actions.Add(ReplaceParameters(beforeMapAction));
             }
             foreach (var propertyMap in _typeMap.OrderedPropertyMaps())
             {
@@ -205,7 +206,7 @@ namespace AutoMapper.Execution
             }
             foreach (var afterMapAction in _typeMap.AfterMapActions)
             {
-                actions.Add(_configuration.ReplaceParameters(afterMapAction, GetParameters()));
+                actions.Add(ReplaceParameters(afterMapAction));
             }
             if (hasMaxDepth)
             {

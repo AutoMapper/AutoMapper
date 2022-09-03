@@ -133,22 +133,11 @@ namespace AutoMapper
         Func<Type, object> IGlobalConfigurationExpression.ServiceCtor => _serviceCtor;
 
         public void CreateProfile(string profileName, Action<IProfileExpression> config)
-            => AddProfile(new NamedProfile(profileName, config));
+            => AddProfile(new Profile(profileName, config));
 
         List<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
 
         Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
-
-        private class NamedProfile : Profile
-        {
-            public NamedProfile(string profileName) : base(profileName)
-            {
-            }
-
-            public NamedProfile(string profileName, Action<IProfileExpression> config) : base(profileName, config)
-            {
-            }
-        }
 
         public void AddProfile(Profile profile) => _profiles.Add(profile);
 
@@ -184,8 +173,8 @@ namespace AutoMapper
 
         private void AddMapsCore(IEnumerable<Assembly> assembliesToScan)
         {
-            var allTypes = assembliesToScan.Where(a => !a.IsDynamic && a != typeof(NamedProfile).Assembly).SelectMany(a => a.DefinedTypes).ToArray();
-            var autoMapAttributeProfile = new NamedProfile(nameof(AutoMapAttribute));
+            var allTypes = assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Profile).Assembly).SelectMany(a => a.DefinedTypes).ToArray();
+            var autoMapAttributeProfile = new Profile(nameof(AutoMapAttribute));
 
             foreach (var type in allTypes)
             {

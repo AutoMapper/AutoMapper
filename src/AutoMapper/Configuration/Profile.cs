@@ -60,7 +60,7 @@ namespace AutoMapper
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public abstract class Profile : IProfileExpressionInternal, IProfileConfiguration
+    public class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
         private readonly List<string> _prefixes = new() { "Get" };
         private readonly List<string> _postfixes = new();
@@ -75,13 +75,13 @@ namespace AutoMapper
         private List<MethodInfo> _sourceExtensionMethods;
         private List<ValueTransformerConfiguration> _valueTransformerConfigs;
         private bool? _constructorMappingEnabled;
-        protected Profile(string profileName) : this() => ProfileName = profileName;
+        protected internal Profile(string profileName) : this() => ProfileName = profileName;
         protected Profile()
         {
             ProfileName = GetType().FullName;
             _memberConfiguration = new(){ NameToMemberMappers = { _prePostfixName } };
         }
-        protected Profile(string profileName, Action<IProfileExpression> configurationAction) : this(profileName)  => configurationAction(this);
+        protected internal Profile(string profileName, Action<IProfileExpression> configurationAction) : this(profileName)  => configurationAction(this);
         MemberConfiguration IProfileExpressionInternal.MemberConfiguration => _memberConfiguration;
         bool? IProfileConfiguration.ConstructorMappingEnabled => _constructorMappingEnabled;
         bool? IProfileExpressionInternal.MethodMappingEnabled { get; set; }
