@@ -1,14 +1,6 @@
-using System.Linq;
 using System.Text.RegularExpressions;
-using Xunit;
-using Shouldly;
-using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests.Tests;
-
-using AutoMapper.Internal;
-using System;
-
 public class StubNamingConvention : INamingConvention
 {
     public Regex SplittingExpression { get; set; }

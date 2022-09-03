@@ -1,11 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 using StringKeyValuePair = KeyValuePair<string, string>;
 

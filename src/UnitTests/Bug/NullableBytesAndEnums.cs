@@ -1,6 +1,3 @@
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug;
 
 public class NullableBytesAndEnums : AutoMapperSpecBase

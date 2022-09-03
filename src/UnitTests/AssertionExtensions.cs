@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using Shouldly;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public static class AssertionExtensions
 {

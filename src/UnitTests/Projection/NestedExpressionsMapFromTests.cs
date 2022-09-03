@@ -2,12 +2,6 @@
 {
     namespace NestedExpressionTests
     {
-        using System.Collections.Generic;
-        using System.Linq;
-        using QueryableExtensions;
-        using Shouldly;
-        using Xunit;
-
         public class NestedExpressionMapFromTests
         {
             private MapperConfiguration _config;

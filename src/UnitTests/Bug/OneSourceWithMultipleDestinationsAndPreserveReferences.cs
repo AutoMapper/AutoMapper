@@ -1,7 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class OneSourceWithMultipleDestinationsAndPreserveReferences : AutoMapperSpecBase
 {

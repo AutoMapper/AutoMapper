@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace AutoMapper.Configuration.Annotations;
+﻿namespace AutoMapper.Configuration.Annotations;
 
 /// <summary>
 /// Map destination member using a custom value resolver.

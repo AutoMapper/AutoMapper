@@ -1,7 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Dynamic;
+﻿using System.Dynamic;
 
 namespace AutoMapper.UnitTests.Bug;
 

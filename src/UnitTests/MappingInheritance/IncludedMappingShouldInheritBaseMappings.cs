@@ -1,9 +1,4 @@
-﻿using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ReadonlyCollectionPropertiesOverride : AutoMapperSpecBase
 {

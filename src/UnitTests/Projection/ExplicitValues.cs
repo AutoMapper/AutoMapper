@@ -1,11 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Projection;
-
-using System.Collections.Generic;
-using System.Linq;
-using QueryableExtensions;
-using Shouldly;
-using Xunit;
-
 public class ExplicitValues : AutoMapperSpecBase
 {
     private List<Dest> _dests;

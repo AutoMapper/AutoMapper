@@ -1,11 +1,3 @@
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Shouldly;
-using Xunit;
-using System.Collections;
-using System;
-
 namespace AutoMapper.UnitTests.NullBehavior;
 
 public class NullCheckDefault : AutoMapperSpecBase

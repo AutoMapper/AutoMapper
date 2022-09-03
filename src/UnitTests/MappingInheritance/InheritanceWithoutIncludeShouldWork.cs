@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance;
-
-using Shouldly;
-using Xunit;
-
 public class InheritanceWithoutIncludeShouldWork : AutoMapperSpecBase
 {
     public class FooBase { }

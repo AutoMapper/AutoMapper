@@ -1,6 +1,3 @@
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests.Tests;
 
 public class MapperTests : NonValidatingSpecBase

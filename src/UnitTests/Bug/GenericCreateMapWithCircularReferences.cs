@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper.Internal.Mappers;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class GenericCreateMapsWithCircularReference : AutoMapperSpecBase
 {

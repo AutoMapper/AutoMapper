@@ -1,13 +1,6 @@
-﻿using System;
-using Shouldly;
-using System.Linq.Expressions;
-using AutoMapper.Internal.Mappers;
-using Xunit;
-using AutoMapper.Internal;
-using System.ComponentModel;
+﻿using AutoMapper.Internal.Mappers;
 using System.Globalization;
 namespace AutoMapper.UnitTests.Mappers;
-
 using static TypeDescriptor;
 public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
 {

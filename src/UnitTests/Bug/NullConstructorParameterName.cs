@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Reflection.Emit;
-using Xunit;
+﻿using System.Reflection.Emit;
 
 namespace AutoMapper.UnitTests.Bug;
 

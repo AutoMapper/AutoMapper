@@ -1,7 +1,3 @@
-using Xunit;
-using Shouldly;
-using System;
-
 namespace AutoMapper.UnitTests
 {
     namespace MappingOrder

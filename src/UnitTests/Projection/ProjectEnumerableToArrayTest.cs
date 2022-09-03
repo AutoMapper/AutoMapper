@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-using Shouldly;
-
-namespace AutoMapper.UnitTests.Projection;
-
-using QueryableExtensions;
-
+﻿namespace AutoMapper.UnitTests.Projection;
 public class ProjectEnumerableToArrayTest
 {
     private MapperConfiguration _config;

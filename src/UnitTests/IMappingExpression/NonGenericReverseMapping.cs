@@ -1,14 +1,7 @@
-using Xunit;
-using Shouldly;
-using System.Linq;
-
 namespace AutoMapper.UnitTests
 {
     namespace NonGenericReverseMapping
     {
-        using System;
-        using System.Text.RegularExpressions;
-
         public class When_reverse_mapping_classes_with_simple_properties : AutoMapperSpecBase
         {
             private Source _source;

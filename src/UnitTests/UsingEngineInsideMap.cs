@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests;
-
-using Shouldly;
-using Xunit;
-
 public class UsingEngineInsideMap : AutoMapperSpecBase
 {
     private Dest _dest;

@@ -1,9 +1,3 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests.ConditionalMapping;
 
 public class When_adding_a_condition_for_all_members : AutoMapperSpecBase

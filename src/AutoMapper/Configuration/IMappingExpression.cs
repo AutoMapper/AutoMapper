@@ -1,9 +1,4 @@
-using AutoMapper.Configuration;
-using System;
-using System.Linq.Expressions;
-
 namespace AutoMapper;
-
 /// <summary>
 /// Mapping configuration options for non-generic maps
 /// </summary>

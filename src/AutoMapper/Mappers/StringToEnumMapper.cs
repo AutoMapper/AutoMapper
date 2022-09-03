@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.Serialization;
 namespace AutoMapper.Internal.Mappers;
-
-using static Execution.ExpressionBuilder;
-using static Expression;
 public class StringToEnumMapper : IObjectMapper
 {
     private static readonly MethodInfo EqualsMethod = typeof(StringToEnumMapper).GetMethod(nameof(StringCompareOrdinalIgnoreCase));

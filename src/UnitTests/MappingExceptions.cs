@@ -1,8 +1,3 @@
-using System;
-using System.Diagnostics;
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests.MappingExceptions;
 
 public class When_encountering_a_member_mapping_problem_during_mapping : NonValidatingSpecBase

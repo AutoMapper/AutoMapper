@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance;
-
-using Shouldly;
-using System;
-using Xunit;
 public class Include : AutoMapperSpecBase
 {
     public class From

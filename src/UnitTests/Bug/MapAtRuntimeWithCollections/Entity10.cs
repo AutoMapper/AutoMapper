@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace OmmitedDatabaseModel3WithCollections;
+﻿namespace OmmitedDatabaseModel3WithCollections;
 
 public class Entity10 : BaseEntity
 {

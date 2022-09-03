@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OmmitedDTOModel3;
+﻿namespace OmmitedDTOModel3;
 
 public class EntityDTO9 : BaseEntity
 {

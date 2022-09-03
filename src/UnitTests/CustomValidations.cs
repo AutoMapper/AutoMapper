@@ -1,10 +1,5 @@
-using System;
-using System.Linq.Expressions;
 using AutoMapper.Configuration;
-using AutoMapper.Internal;
 using AutoMapper.Internal.Mappers;
-using Shouldly;
-using Xunit;
 
 namespace AutoMapper.UnitTests;
 

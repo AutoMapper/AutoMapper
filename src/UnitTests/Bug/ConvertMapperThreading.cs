@@ -1,12 +1,4 @@
-﻿using System;
-using Xunit;
-using AutoMapper;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Runtime.ExceptionServices;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ConvertMapperThreading
 {

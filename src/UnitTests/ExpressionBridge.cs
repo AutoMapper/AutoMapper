@@ -1,12 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using Shouldly;
-using Xunit;
-using System.Linq;
 using AutoMapper.QueryableExtensions.Impl;
-using AutoMapper.Internal;
-using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper.UnitTests
 {

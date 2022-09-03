@@ -1,8 +1,4 @@
-﻿using System;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.MappingInheritance;
+﻿namespace AutoMapper.UnitTests.MappingInheritance;
 
 public class AsWithMissingMap : NonValidatingSpecBase
 {

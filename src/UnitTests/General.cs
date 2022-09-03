@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Shouldly;
-using Xunit;
-using System.Linq;
-
 namespace AutoMapper.UnitTests
 {
     namespace General

@@ -1,9 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance;
-
-using System;
-using Shouldly;
-using Xunit;
-
 public class ReverseMapWithInclude : NonValidatingSpecBase
 {
     public class Duck : Animal { }

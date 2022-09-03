@@ -1,8 +1,3 @@
-using System;
-using Xunit;
-using Shouldly;
-using System.Linq;
-
 namespace AutoMapper.UnitTests.ValueTypes;
 
 public class When_value_types_are_the_source_of_map_cycles : AutoMapperSpecBase
@@ -181,8 +176,8 @@ public class When_destination_type_is_a_nullable_value_type : AutoMapperSpecBase
 
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        cfg.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
-        cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) Convert.ToInt32(s));
+        cfg.CreateMap<string, int>().ConvertUsing((string s) => System.Convert.ToInt32(s));
+        cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) System.Convert.ToInt32(s));
         cfg.CreateMap<Source, Destination>();
     });
 

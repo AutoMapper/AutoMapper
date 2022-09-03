@@ -1,12 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
-
-namespace AutoMapper;
-
-using Internal;
-using System.ComponentModel;
-
+﻿namespace AutoMapper;
 [DebuggerDisplay("{DestinationExpression}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class PathMap : MemberMap

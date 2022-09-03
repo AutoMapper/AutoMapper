@@ -1,9 +1,4 @@
-﻿using System;
-using AutoMapper.Internal.Mappers;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.MappingInheritance;
+﻿namespace AutoMapper.UnitTests.MappingInheritance;
 
 public class ShouldInheritBeforeAndAfterMapOnlyOnce : AutoMapperSpecBase
 {

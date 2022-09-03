@@ -1,10 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.CustomMapFrom;
+﻿namespace AutoMapper.IntegrationTests.CustomMapFrom;
 
 public class CustomMapFromTest : IntegrationTest<CustomMapFromTest.DatabaseInitializer>
 {

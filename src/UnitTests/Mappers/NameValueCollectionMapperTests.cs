@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
-using AutoMapper.Internal.Mappers;
-using Shouldly;
-using Xunit;
+﻿using System.Collections.Specialized;
 
 namespace AutoMapper.UnitTests.Mappers;
 

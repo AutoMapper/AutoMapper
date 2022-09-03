@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests.Bug
 {
     namespace DuplicateValuesBug

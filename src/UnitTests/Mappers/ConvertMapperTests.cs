@@ -1,8 +1,4 @@
-﻿using AutoMapper.Internal;
-using AutoMapper.Internal.Mappers;
-using Shouldly;
-using System;
-using Xunit;
+﻿using AutoMapper.Internal.Mappers;
 
 namespace AutoMapper.UnitTests.Mappers;
 

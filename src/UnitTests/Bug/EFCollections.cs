@@ -1,10 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Xunit;
-using Shouldly;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class EFCollections : AutoMapperSpecBase
 {

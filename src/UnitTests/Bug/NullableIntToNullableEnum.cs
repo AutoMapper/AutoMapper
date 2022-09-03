@@ -1,9 +1,4 @@
-﻿using System;
-using Shouldly;
-using AutoMapper;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class NullableIntToNullableEnum : AutoMapperSpecBase
 {

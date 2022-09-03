@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using OmmitedDatabaseModel3;
+﻿using OmmitedDatabaseModel3;
 using OmmitedDTOModel3;
-using Xunit;
 
 namespace AutoMapper.UnitTests;
 

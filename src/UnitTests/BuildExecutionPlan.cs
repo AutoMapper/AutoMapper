@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Shouldly;
-using Xunit;
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 public class BuildExecutionPlan : AutoMapperSpecBase
 {
     Model _source;

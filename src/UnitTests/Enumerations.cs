@@ -1,8 +1,5 @@
-using System;
 using System.Runtime.Serialization;
 using AutoMapper.UnitTests;
-using Shouldly;
-using Xunit;
 
 namespace AutoMapper.Tests;
 

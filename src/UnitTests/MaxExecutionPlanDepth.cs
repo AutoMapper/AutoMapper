@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using System;
-using System.Linq;
-using Xunit;
-using Shouldly;
-using AutoMapper.Internal;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class MaxExecutionPlanDepth : AutoMapperSpecBase
 {

@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
-using System;
-using Xunit;
-
 public class SelectiveConfigurationValidation : NonValidatingSpecBase
 {
     public class GoodSrc { }

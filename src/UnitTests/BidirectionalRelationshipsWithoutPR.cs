@@ -1,10 +1,3 @@
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests;
 
 public class CyclesWithInheritance : AutoMapperSpecBase

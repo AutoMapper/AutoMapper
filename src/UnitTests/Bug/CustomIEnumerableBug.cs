@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
-using AutoMapper.Internal.Mappers;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug;
 
 public class One

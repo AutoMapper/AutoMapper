@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ReverseMapWithoutPreserveReferences : AutoMapperSpecBase
 {

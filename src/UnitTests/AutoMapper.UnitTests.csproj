@@ -12,5 +12,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+    <Using Include="System.Collections" />
+    <Using Include="System.Collections.ObjectModel" />
+  </ItemGroup>
 </Project>

@@ -1,15 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.CustomMapFrom;
+﻿namespace AutoMapper.IntegrationTests.CustomMapFrom;
 
 public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryProjections.DatabaseInitializer>
 {

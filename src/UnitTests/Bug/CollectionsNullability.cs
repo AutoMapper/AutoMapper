@@ -1,9 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class CollectionsNullability : AutoMapperSpecBase
 {

@@ -1,11 +1,4 @@
-﻿using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
-
-using AutoMapper;
-using CustomMapping;
-
+﻿namespace AutoMapper.UnitTests.Bug;
 public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
 {
 

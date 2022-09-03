@@ -1,9 +1,4 @@
-﻿using AutoMapper.Internal;
-using Shouldly;
-using System.Linq;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public abstract class TypeMapIncludeBaseTypes
 {

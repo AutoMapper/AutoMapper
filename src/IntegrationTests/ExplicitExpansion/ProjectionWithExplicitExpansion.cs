@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
+﻿using System.Text.RegularExpressions;
 
 namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 

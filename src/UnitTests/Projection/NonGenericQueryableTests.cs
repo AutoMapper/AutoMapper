@@ -1,11 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Projection;
-
-using AutoMapper.QueryableExtensions;
-using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-
 public class NonGenericQueryableTests
 {
     private MapperConfiguration _config;

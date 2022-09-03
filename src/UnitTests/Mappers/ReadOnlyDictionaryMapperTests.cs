@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper;
+﻿namespace AutoMapper.UnitTests.Mappers.ReadOnlyDictionaryMapper;
 
 public class When_mapping_to_interface_readonly_dictionary : AutoMapperSpecBase
 {

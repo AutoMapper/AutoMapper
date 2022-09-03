@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace OmmitedDTOModel3WithCollections;
+﻿namespace OmmitedDTOModel3WithCollections;
 
 public class EntityDTO10 : BaseEntity
 {

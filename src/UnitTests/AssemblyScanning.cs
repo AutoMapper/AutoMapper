@@ -1,10 +1,4 @@
-﻿using System.Linq;
-using Shouldly;
-using System;
-using System.Reflection;
-using Xunit;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     namespace AssemblyScanning
     {

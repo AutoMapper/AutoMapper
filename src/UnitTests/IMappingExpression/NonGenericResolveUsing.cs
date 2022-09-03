@@ -1,7 +1,3 @@
-using Xunit;
-using Shouldly;
-using System.Linq;
-
 namespace AutoMapper.UnitTests;
 
 public class When_using_non_generic_ResolveUsing : AutoMapperSpecBase

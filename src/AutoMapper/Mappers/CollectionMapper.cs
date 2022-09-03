@@ -1,16 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Collections.Specialized;
-using System.Linq;
 namespace AutoMapper.Internal.Mappers;
-
-using Execution;
-using static Execution.ExpressionBuilder;
-using static Expression;
 using static ReflectionHelper;
 public class CollectionMapper : IObjectMapper
 {

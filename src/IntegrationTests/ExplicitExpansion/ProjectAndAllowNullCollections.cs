@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shouldly;
-using Xunit;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 

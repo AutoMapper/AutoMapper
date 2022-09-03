@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace AutoMapper.UnitTests.MappingInheritance;
+﻿namespace AutoMapper.UnitTests.MappingInheritance;
 
 public class IncludeBaseShouldNotCreateMaps : AutoMapperSpecBase
 {

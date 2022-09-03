@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 namespace AutoMapper;
 
-using QueryableExtensions;
 using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
 using Factory = Func<Type, object>;
-using Internal;
 public interface IMapperBase
 {
     /// <summary>

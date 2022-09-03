@@ -1,6 +1,3 @@
-using AutoMapper.Internal;
-using System;
-using System.Collections.Generic;
 namespace AutoMapper;
 
 /// <summary>

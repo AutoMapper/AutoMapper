@@ -1,10 +1,4 @@
-﻿using System;
-using Xunit;
-using Shouldly;
-using System.Linq;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ForCtorParam_MapFrom_String : AutoMapperSpecBase
 {

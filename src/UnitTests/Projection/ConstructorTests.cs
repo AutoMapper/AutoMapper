@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper.QueryableExtensions;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Projection;
+﻿namespace AutoMapper.UnitTests.Projection;
 
 public class ConstructorLetClause : AutoMapperSpecBase
 {

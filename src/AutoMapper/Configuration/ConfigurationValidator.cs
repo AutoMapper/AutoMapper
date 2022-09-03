@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using AutoMapper.Internal;
 using AutoMapper.Internal.Mappers;
 namespace AutoMapper.Configuration;
 

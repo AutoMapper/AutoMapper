@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using AutoMapper.Internal;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ConfigurationRules : NonValidatingSpecBase
 {

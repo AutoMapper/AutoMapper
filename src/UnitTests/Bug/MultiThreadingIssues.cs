@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper.Internal.Mappers;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
-
-using Shouldly;
-
+﻿namespace AutoMapper.UnitTests.Bug;
 public class MultiThreadingIssues
 {
     public class Type1

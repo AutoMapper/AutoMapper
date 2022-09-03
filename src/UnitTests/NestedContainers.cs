@@ -1,7 +1,3 @@
-using System;
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests
 {
     namespace NestedContainers

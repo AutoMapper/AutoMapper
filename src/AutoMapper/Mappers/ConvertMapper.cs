@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-namespace AutoMapper.Internal.Mappers;
-
-using static Expression;
+﻿namespace AutoMapper.Internal.Mappers;
 public class ConvertMapper : IObjectMapper
 {
     public static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type == typeof(decimal);

@@ -1,7 +1,4 @@
-﻿using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     namespace ValueTransformers
     {

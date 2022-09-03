@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests;
+﻿namespace AutoMapper.IntegrationTests;
 
 public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer>
 {

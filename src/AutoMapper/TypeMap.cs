@@ -1,18 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.ComponentModel;
 namespace AutoMapper;
-
-using Execution;
-using static Expression;
-using static Execution.ExpressionBuilder;
-using Configuration;
 using Features;
-using Internal;
 /// <summary>
 /// Main configuration object holding all mapping configuration for a source and destination type
 /// </summary>
@@ -128,7 +115,7 @@ public class TypeMap
     public bool ConstructorMapping => ConstructorMap is { CanResolve: true };
     public bool CustomConstruction => CustomCtorFunction != null;
     public bool HasTypeConverter => TypeConverter != null;
-    public TypeConverter TypeConverter { get; set; }
+    public Execution.TypeConverter TypeConverter { get; set; }
     public bool ShouldCheckForValid => ConfiguredMemberList != MemberList.None && !HasTypeConverter;
     public LambdaExpression[] IncludedMembers { get => _details?.IncludedMembers ?? Array.Empty<LambdaExpression>(); set => Details.IncludedMembers = value; }
     public string[] IncludedMembersNames { get => _details?.IncludedMembersNames ?? Array.Empty<string>(); set => Details.IncludedMembersNames = value; }

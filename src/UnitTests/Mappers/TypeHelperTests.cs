@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using AutoMapper.Internal;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Mappers;
 
 public class TypeHelperTests

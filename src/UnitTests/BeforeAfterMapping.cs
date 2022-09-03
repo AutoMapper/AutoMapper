@@ -1,11 +1,4 @@
-using System;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.BeforeAfterMapping;
-
-using Bug;
-
 public class When_configuring_before_and_after_methods
 {
     public class Source

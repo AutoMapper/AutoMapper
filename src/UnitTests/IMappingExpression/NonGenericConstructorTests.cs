@@ -1,12 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Projection;
-
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using QueryableExtensions;
-using Shouldly;
-using Xunit;
-
 public class NonGenericConstructorTests : AutoMapperSpecBase
 {
     private Dest[] _dest;

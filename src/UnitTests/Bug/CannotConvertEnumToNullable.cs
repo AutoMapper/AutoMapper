@@ -1,7 +1,4 @@
-﻿using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class CannotConvertEnumToNullable
 {

@@ -1,15 +1,9 @@
-﻿using Xunit;
-using Shouldly;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
     namespace NullableConverterBug
     {
         namespace AutoMapperIssue
         {
-            using System;
-            using System.Collections.Generic;
-            using AutoMapper;
             public class TestProblem
             {
                 [Fact]

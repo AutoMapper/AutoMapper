@@ -1,15 +1,5 @@
-using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using AutoMapper.Features;
-using AutoMapper.Internal;
 namespace AutoMapper.Configuration;
-
-using static Expression;
-using Execution;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class TypeMapConfiguration
 {
@@ -346,7 +336,7 @@ public abstract class MappingExpressionBase<TSource, TDestination, TMappingExpre
     }
     public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction) => ConvertUsingCore((src, dest, ctxt) => mappingFunction(src, dest));
     private void ConvertUsingCore(Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr) => SetTypeConverter(new LambdaTypeConverter(expr));
-    private void SetTypeConverter(TypeConverter typeConverter)
+    private void SetTypeConverter(Execution.TypeConverter typeConverter)
     {
         HasTypeConverter = true;
         TypeMapActions.Add(tm => tm.TypeConverter = typeConverter);

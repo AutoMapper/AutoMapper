@@ -1,8 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class NullSubstituteInnerClass : AutoMapperSpecBase
 {

@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
-using Shouldly;
-using Xunit;
-
 public class EmptyNullSubstituteBug : NonValidatingSpecBase
 {
     private Entity _destination;

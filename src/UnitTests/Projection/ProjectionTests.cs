@@ -1,11 +1,4 @@
-﻿using System.Linq;
-using Xunit;
-using Shouldly;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Projection;
+﻿namespace AutoMapper.UnitTests.Projection;
 
 public class NonNullableToNullable : AutoMapperSpecBase
 {

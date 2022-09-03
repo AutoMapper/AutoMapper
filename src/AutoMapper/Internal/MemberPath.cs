@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-namespace AutoMapper.Internal;
-
-using Execution;
+﻿namespace AutoMapper.Internal;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public readonly record struct MemberPath(MemberInfo[] Members)
 {

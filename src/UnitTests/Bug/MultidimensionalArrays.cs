@@ -1,9 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using AutoMapper.Internal.Mappers;
-using System.Collections.Generic;
-using System;
-using System.Linq;
+﻿using AutoMapper.Internal.Mappers;
 
 namespace AutoMapper.UnitTests.Bug;
 

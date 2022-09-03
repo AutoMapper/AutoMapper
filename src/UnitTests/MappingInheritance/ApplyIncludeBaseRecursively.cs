@@ -1,9 +1,4 @@
-﻿using System;
-using Shouldly;
-using AutoMapper;
-using Xunit;
-
-namespace AutoMapper.UnitTests.MappingInheritance;
+﻿namespace AutoMapper.UnitTests.MappingInheritance;
 
 public class ApplyIncludeBaseRecursively : AutoMapperSpecBase
 {

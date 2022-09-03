@@ -1,13 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Execution;
-using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
+﻿using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 namespace AutoMapper.Internal.Mappers;
-
-using static Expression;
-using static ExpressionBuilder;
 public class FromStringDictionaryMapper : IObjectMapper
 {
     private static readonly MethodInfo MapDynamicMethod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));

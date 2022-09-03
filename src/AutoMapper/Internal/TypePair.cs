@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics;
 namespace AutoMapper.Internal;
 
 [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]

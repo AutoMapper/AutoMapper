@@ -1,12 +1,4 @@
-﻿using System;
-
-namespace AutoMapper.UnitTests.Projection;
-
-using QueryableExtensions;
-using Shouldly;
-using System.Linq;
-using Xunit;
-
+﻿namespace AutoMapper.UnitTests.Projection;
 public class ProjectEnumTest
 {
     private MapperConfiguration _config;

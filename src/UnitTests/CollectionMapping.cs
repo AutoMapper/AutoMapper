@@ -1,12 +1,4 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Xunit;
-using Shouldly;
-using System.Collections;
-using AutoMapper.Internal;
 using System.Collections.Immutable;
 
 namespace AutoMapper.UnitTests;

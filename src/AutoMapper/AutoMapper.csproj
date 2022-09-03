@@ -47,5 +47,10 @@
     <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)ApiCompat\PreBuild.ps1&quot; -version $(Version)" />
     <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="&quot;$(ProjectDir)ApiCompat/PreBuild.sh&quot; $(Version)" />
   </Target>
-
+  <ItemGroup>
+    <Using Include="System.Linq.Expressions.Expression" Static="true" />
+    <Using Include="AutoMapper.Execution.ExpressionBuilder" Static="true" />
+    <Using Include="AutoMapper.Execution" />
+    <Using Include="AutoMapper.Configuration" />
+  </ItemGroup>
 </Project>

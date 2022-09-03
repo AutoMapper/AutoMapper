@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
-using Shouldly;
-using Xunit;
-
 public class NullArrayBug : AutoMapperSpecBase
 {
     private static Source _source;

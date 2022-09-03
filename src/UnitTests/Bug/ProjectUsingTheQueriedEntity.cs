@@ -1,10 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Linq;
-using AutoMapper.QueryableExtensions;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class ProjectUsingTheQueriedEntity : AutoMapperSpecBase
 {

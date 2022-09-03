@@ -1,8 +1,3 @@
-using System;
-using System.Collections.ObjectModel;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug;
 
 public class MappingToAReadOnlyCollection : AutoMapperSpecBase

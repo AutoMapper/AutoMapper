@@ -1,9 +1,6 @@
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug;
 
-    public class When_specifying_a_type_converter_implementing_multiple_type_converter_interfaces : AutoMapperSpecBase
+public class When_specifying_a_type_converter_implementing_multiple_type_converter_interfaces : AutoMapperSpecBase
     {
         private DestinationFoo _resultFoo;
         private DestinationBar _resultBar;

@@ -1,9 +1,4 @@
-﻿using Shouldly;
-
-namespace AutoMapper.UnitTests.Bug;
-
-using Xunit;
-
+﻿namespace AutoMapper.UnitTests.Bug;
 public class EnumCaseSensitivityBug : AutoMapperSpecBase
 {
     private SecondEnum _resultSecondEnum;

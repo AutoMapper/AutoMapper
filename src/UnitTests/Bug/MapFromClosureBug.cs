@@ -1,9 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
-using System;
-using Shouldly;
-using Xunit;
-
 public class MapFromClosureBug : NonValidatingSpecBase
 {
     private static readonly IDateProvider _dateProvider = new DateProvider();

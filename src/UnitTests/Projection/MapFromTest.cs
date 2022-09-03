@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Shouldly;
-using Xunit;
-using AutoMapper.QueryableExtensions;
-using AutoMapper.QueryableExtensions.Impl;
-using AutoMapper.Internal;
-
-namespace AutoMapper.UnitTests.Projection.MapFromTest;
+﻿namespace AutoMapper.UnitTests.Projection.MapFromTest;
 
 public class CustomMapFromExpressionTest
 {

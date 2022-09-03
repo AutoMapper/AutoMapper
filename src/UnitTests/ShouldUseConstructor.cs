@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ShouldUseConstructorInternal : NonValidatingSpecBase
 {

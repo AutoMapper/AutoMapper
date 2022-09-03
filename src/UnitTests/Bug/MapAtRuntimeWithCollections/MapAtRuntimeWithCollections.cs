@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using OmmitedDatabaseModel3WithCollections;
+﻿using OmmitedDatabaseModel3WithCollections;
 using OmmitedDTOModel3WithCollections;
-using Xunit;
 
 namespace AutoMapper.UnitTests;
 

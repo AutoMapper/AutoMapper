@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AutoMapper.Configuration.Annotations;
+﻿namespace AutoMapper.Configuration.Annotations;
 
 /// <summary>
 /// Do not precompute the execution plan for this member, just map it at runtime.

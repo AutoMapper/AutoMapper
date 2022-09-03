@@ -1,10 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Projection;
-
-using System.Linq;
-using QueryableExtensions;
-using Shouldly;
-using Xunit;
-
 public class GenericsTests : AutoMapperSpecBase
 {
     private Dest<string>[] _dests;

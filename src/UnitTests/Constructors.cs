@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Xunit;
-using Shouldly;
-using System.Collections.Generic;
-namespace AutoMapper.UnitTests.Constructors;
+﻿namespace AutoMapper.UnitTests.Constructors;
 
 public class RecordConstructorValidation : AutoMapperSpecBase
 {

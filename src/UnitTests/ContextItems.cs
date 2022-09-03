@@ -1,14 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     namespace ContextItems
     {
-        using Shouldly;
-        using System;
-        using Xunit;
-
         public class When_mapping_with_contextual_values
         {
             public class Source

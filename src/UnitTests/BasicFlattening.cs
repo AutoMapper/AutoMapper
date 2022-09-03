@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-using Shouldly;
-using System.Linq;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class BasicFlattening : AutoMapperSpecBase
 {

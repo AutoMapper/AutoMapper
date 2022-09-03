@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     namespace Source
     {

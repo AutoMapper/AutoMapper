@@ -1,11 +1,3 @@
-using AutoMapper.Configuration.Conventions;
-using AutoMapper.Internal;
-using Shouldly;
-using System;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug.NamingConventions;
 
 public class RemoveNameSplitMapper : NonValidatingSpecBase

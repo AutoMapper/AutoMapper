@@ -1,13 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
-
-using QueryableExtensions;
-
+﻿namespace AutoMapper.UnitTests.Bug;
 public class CreateMapExpressionWithIgnoredPropertyBug
 {
     [Fact]

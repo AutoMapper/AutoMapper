@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace AutoMapper.Configuration.Annotations;
+﻿namespace AutoMapper.Configuration.Annotations;
 
 /// <summary>
 /// Specify a value converter type to convert from the matching source member to the destination member

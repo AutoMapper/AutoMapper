@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Shouldly;
-
 namespace AutoMapper.UnitTests;
 
 public static class StopgapNBehaveExtensions

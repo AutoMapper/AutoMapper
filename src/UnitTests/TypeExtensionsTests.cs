@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests;
-
-using Shouldly;
-using Xunit;
-
 public class TypeExtensionsTests
 {
     public class Foo

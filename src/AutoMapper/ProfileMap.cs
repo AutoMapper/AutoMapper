@@ -1,18 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Execution;
-using AutoMapper.Internal;
-
 namespace AutoMapper;
-
-using static Expression;
 [DebuggerDisplay("{Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class ProfileMap

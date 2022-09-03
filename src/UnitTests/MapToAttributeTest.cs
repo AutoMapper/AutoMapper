@@ -1,12 +1,4 @@
-﻿using AutoMapper.Internal.Mappers;
-using AutoMapper.Configuration.Conventions;
-using Shouldly;
-using Xunit;
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper.Internal;
+﻿using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests;
 

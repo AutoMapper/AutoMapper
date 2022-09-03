@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Configuration;
-using AutoMapper.Configuration.Conventions;
-using AutoMapper.Execution;
+﻿using AutoMapper.Configuration.Conventions;
 using AutoMapper.Features;
 using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;

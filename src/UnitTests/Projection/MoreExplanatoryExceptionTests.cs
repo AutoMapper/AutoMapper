@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using AutoMapper.QueryableExtensions;
-
-namespace AutoMapper.UnitTests.Projection;
+﻿namespace AutoMapper.UnitTests.Projection;
 
 public class MoreExplanatoryExceptionTests
 {

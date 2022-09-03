@@ -1,10 +1,4 @@
-﻿using System;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.ForAllMembers;
-
-using Internal;
+﻿namespace AutoMapper.UnitTests.ForAllMembers;
 public class When_conditionally_applying_a_resolver_globally : AutoMapperSpecBase
 {
     public class Source

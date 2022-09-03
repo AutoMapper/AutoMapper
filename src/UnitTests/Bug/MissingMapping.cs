@@ -1,11 +1,4 @@
 ﻿namespace AutoMapper.UnitTests;
-
-using System.Linq;
-using Shouldly;
-using Xunit;
-using QueryableExtensions;
-using System;
-
 public class MissingMapping : AutoMapperSpecBase
 {
     public class Source

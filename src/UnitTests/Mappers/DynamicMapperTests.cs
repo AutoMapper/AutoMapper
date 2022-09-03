@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using Shouldly;
-using Xunit;
+﻿using System.Dynamic;
 
 namespace AutoMapper.UnitTests.Mappers.Dynamic;
 

@@ -1,14 +1,4 @@
-﻿﻿using Shouldly;
-﻿using Xunit;
-
-namespace AutoMapper.UnitTests.Projection;
-
-using System.Collections.Generic;
-using System.Linq;
-
-using AutoMapper;
-using QueryableExtensions;
-
+﻿namespace AutoMapper.UnitTests.Projection;
 public class ProjectIReadOnlyCollection
 {
     private MapperConfiguration _config;

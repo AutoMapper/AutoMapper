@@ -1,10 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class Self_referencing_existing_destination_without_PreserveReferences : AutoMapperSpecBase
 {

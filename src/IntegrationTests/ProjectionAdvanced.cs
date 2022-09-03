@@ -1,9 +1,4 @@
-﻿using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using System.Linq;
-using Xunit;
-namespace AutoMapper.IntegrationTests;
+﻿namespace AutoMapper.IntegrationTests;
 public class ProjectionAdvanced : IntegrationTest<ProjectionAdvanced.Initializer>
 {
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateProjection<Entity, Dto>().Advanced().ForAllMembers(o=>o.Ignore()));

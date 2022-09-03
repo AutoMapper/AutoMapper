@@ -1,13 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.Inheritance;
+﻿namespace AutoMapper.IntegrationTests.Inheritance;
 
 public class DerivedComplexTypes : IntegrationTest<DerivedComplexTypes.DatabaseInitializer>
 {

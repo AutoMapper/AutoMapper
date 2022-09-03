@@ -1,15 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reflection;
 namespace AutoMapper;
-
-using static Expression;
-using Execution;
-using Internal;
-using System.Diagnostics;
-
 /// <summary>
 /// The base class for member maps (property, constructor and path maps).
 /// </summary>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OmmitedDatabaseModel3;
+﻿namespace OmmitedDatabaseModel3;
 
 public class Entity19 : BaseEntity
 {

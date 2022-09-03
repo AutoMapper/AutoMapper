@@ -1,14 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.MaxDepth;
+﻿namespace AutoMapper.IntegrationTests.MaxDepth;
 
 public class NestedDtos : IntegrationTest<NestedDtos.DatabaseInitializer>
 {

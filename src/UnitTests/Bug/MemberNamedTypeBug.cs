@@ -1,10 +1,4 @@
-﻿using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
-
-using System;
-using Shouldly;
-
+﻿namespace AutoMapper.UnitTests.Bug;
 public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
 {
     public class SourceClass { }

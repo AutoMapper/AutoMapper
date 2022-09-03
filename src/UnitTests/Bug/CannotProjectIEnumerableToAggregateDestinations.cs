@@ -1,10 +1,4 @@
-﻿using Shouldly;
-using Xunit;
-using System.Linq;
-using AutoMapper.QueryableExtensions;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class CannotProjectIEnumerableToAggregateDestinations
 {

@@ -1,8 +1,4 @@
-﻿using Shouldly;
-using System;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class RecognizeDestinationPostfixes : AutoMapperSpecBase
 {

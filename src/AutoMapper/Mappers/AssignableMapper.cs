@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 namespace AutoMapper.Internal.Mappers;
 
 public class AssignableMapper : IObjectMapper

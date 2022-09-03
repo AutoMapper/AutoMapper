@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class SourceValidationWithInheritance : AutoMapperSpecBase
 {

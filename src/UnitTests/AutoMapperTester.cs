@@ -1,7 +1,3 @@
-using System;
-using Shouldly;
-using Xunit;
-
 namespace AutoMapper.UnitTests;
 
 public class AutoMapperTester : IDisposable

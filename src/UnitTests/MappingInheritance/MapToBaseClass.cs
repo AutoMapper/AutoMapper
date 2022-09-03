@@ -1,8 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance;
-
-using System;
-using Shouldly;
-using Xunit;
 public class MapToBaseClass : AutoMapperSpecBase
 {
     A _destination;

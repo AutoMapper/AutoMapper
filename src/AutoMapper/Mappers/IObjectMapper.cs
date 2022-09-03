@@ -1,10 +1,4 @@
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 namespace AutoMapper.Internal.Mappers;
-
-using static Expression;
-using static Execution.ExpressionBuilder;
 /// <summary>
 /// Mapping execution strategy, as a chain of responsibility
 /// </summary>

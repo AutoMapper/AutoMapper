@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AutoMapper.Configuration.Annotations;
+﻿namespace AutoMapper.Configuration.Annotations;
 
 /// <summary>
 /// Ignore this member for configuration validation and skip during mapping.

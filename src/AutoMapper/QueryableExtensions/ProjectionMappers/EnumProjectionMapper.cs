@@ -1,10 +1,4 @@
-﻿using AutoMapper.Internal;
-using System.ComponentModel;
-using System.Linq.Expressions;
-
-namespace AutoMapper.QueryableExtensions.Impl;
-
-using static Expression;
+﻿namespace AutoMapper.QueryableExtensions.Impl;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class EnumProjectionMapper : IProjectionMapper
 {

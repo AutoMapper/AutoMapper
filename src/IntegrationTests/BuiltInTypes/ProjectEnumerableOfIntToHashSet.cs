@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.BuiltInTypes;
+﻿namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
 public class ProjectEnumerableOfIntToHashSet : IntegrationTest<ProjectEnumerableOfIntToHashSet.DatabaseInitializer>
 {

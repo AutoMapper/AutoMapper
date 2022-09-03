@@ -1,10 +1,4 @@
-﻿using Shouldly;
-using Xunit;
-using System.Linq;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-
-namespace AutoMapper.UnitTests.Bug;
+﻿namespace AutoMapper.UnitTests.Bug;
 
 public class CannotProjectStringToNullableEnum
 {

@@ -1,13 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Projection;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using QueryableExtensions;
-using Shouldly;
-using Xunit;
-
 public class ParameterizedQueriesTests_with_anonymous_object_and_factory : AutoMapperSpecBase
 {
     private Dest[] _dests;

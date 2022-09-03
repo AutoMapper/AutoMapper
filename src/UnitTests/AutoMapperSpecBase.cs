@@ -1,9 +1,3 @@
-using System;
-using AutoMapper.Internal;
-using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 namespace AutoMapper.UnitTests;
 public abstract class AutoMapperSpecBase : NonValidatingSpecBase
 {

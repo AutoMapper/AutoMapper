@@ -1,15 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Diagnostics;
-using System.Reflection;
 namespace AutoMapper.Execution;
-
-using static Expression;
-using static ExpressionBuilder;
-using Internal;
-using Configuration;
 public struct TypeMapPlanBuilder
 {
     private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));

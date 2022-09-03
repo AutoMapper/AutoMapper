@@ -1,13 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
-using System;
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using Shouldly;
-using Xunit;
-
 public class ListSourceMapperBug
 {
     public class CustomCollection<T> : Collection<T>, IListSource

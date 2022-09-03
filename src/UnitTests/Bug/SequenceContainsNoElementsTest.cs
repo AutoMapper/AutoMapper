@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using Xunit;
-using Shouldly;
-
 namespace AutoMapper.UnitTests.Bug;
 
 public class SequenceContainsNoElementsTest : AutoMapperSpecBase

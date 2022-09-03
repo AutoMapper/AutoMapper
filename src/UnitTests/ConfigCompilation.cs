@@ -1,9 +1,4 @@
 ﻿namespace AutoMapper.UnitTests;
-
-using System.Collections.Generic;
-using Shouldly;
-using Xunit;
-
 public class ConfigCompilation : NonValidatingSpecBase
 {
     public class Source { }

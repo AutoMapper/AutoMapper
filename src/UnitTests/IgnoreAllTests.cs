@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using Xunit;
-using Shouldly;
-using System;
-
 namespace AutoMapper.UnitTests;
 
 public class When_overriding_global_ignore : AutoMapperSpecBase

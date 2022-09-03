@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
-using AutoMapper.Internal;
 namespace AutoMapper;
-
-using static Execution.ExpressionBuilder;
 public interface IProfileConfiguration
 {
     bool? FieldMappingEnabled { get; }

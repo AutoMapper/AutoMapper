@@ -1,13 +1,4 @@
-using AutoMapper.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 namespace AutoMapper.Configuration;
-
-using Execution;
-using static AutoMapper.Execution.ExpressionBuilder;
 public interface IPropertyMapConfiguration
 {
     void Configure(TypeMap typeMap);
