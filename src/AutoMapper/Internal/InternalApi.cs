@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Configuration.Conventions;
+using AutoMapper.Execution;
 using AutoMapper.Features;
 using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
@@ -162,6 +163,8 @@ namespace AutoMapper.Internal
         HashSet<TypeMap> TypeMapsPath { get; }
         CatchBlock[] Catches { get; }
         DefaultExpression GetDefault(Type type);
+        ParameterReplaceVisitor ParameterReplaceVisitor();
+        ConvertParameterReplaceVisitor ConvertParameterReplaceVisitor();
     }
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IProfileExpressionInternal : IProfileExpression

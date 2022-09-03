@@ -41,6 +41,14 @@ namespace AutoMapper.Execution
         private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
         private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
         private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
+        public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression newParameter) =>
+            configuration.ParameterReplaceVisitor().Replace(initialLambda, newParameter);
+        public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression[] newParameters) =>
+            configuration.ParameterReplaceVisitor().Replace(initialLambda, newParameters);
+        public static Expression ConvertReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression newParameter) =>
+            configuration.ConvertParameterReplaceVisitor().Replace(initialLambda, newParameter);
+        public static Expression ConvertReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression[] newParameters) =>
+            configuration.ConvertParameterReplaceVisitor().Replace(initialLambda, newParameters);
         public static DefaultExpression Default(this IGlobalConfiguration configuration, Type type) =>
             configuration == null ? Expression.Default(type) : configuration.GetDefault(type);
         public static (List<ParameterExpression> Variables, List<Expression> Expressions) Scratchpad(this IGlobalConfiguration configuration)
@@ -186,7 +194,7 @@ namespace AutoMapper.Execution
         public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
         public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
             Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
-        public static Expression ApplyTransformers(this MemberMap memberMap, Expression source)
+        public static Expression ApplyTransformers(this MemberMap memberMap, Expression source, IGlobalConfiguration configuration)
         {
             var perMember = memberMap.ValueTransformers;
             var perMap = memberMap.TypeMap.ValueTransformers;
@@ -196,11 +204,11 @@ namespace AutoMapper.Execution
                 return source;
             }
             var transformers = perMember.Concat(perMap).Concat(perProfile);
-            return Apply(transformers, memberMap, source);
-            static Expression Apply(IEnumerable<ValueTransformerConfiguration> transformers, MemberMap memberMap, Expression source) =>
-                transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source,
-                    (current, vtConfig) => ToType(vtConfig.TransformerExpression.ReplaceParameters(ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+            return memberMap.ApplyTransformers(source, configuration, transformers);
         }
+        static Expression ApplyTransformers(this MemberMap memberMap, Expression source, IGlobalConfiguration configuration, IEnumerable<ValueTransformerConfiguration> transformers) => 
+            transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source, (current, vtConfig) => 
+                ToType(configuration.ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
         public static LambdaExpression Lambda(this MemberInfo member) => new[] { member }.Lambda();
         public static LambdaExpression Lambda(this MemberInfo[] members)
         {
@@ -353,12 +361,6 @@ namespace AutoMapper.Execution
         public static Expression ToType(Expression expression, Type type) => expression.Type == type ? expression : Convert(expression, type);
         public static Expression ReplaceParameters(this LambdaExpression initialLambda, Expression newParameter) =>
             new ParameterReplaceVisitor().Replace(initialLambda, newParameter);
-        public static Expression ReplaceParameters(this LambdaExpression initialLambda, Expression[] newParameters) =>
-            new ParameterReplaceVisitor().Replace(initialLambda, newParameters);
-        public static Expression ConvertReplaceParameters(this LambdaExpression initialLambda, Expression newParameter) =>
-            new ConvertParameterReplaceVisitor().Replace(initialLambda, newParameter);
-        public static Expression ConvertReplaceParameters(this LambdaExpression initialLambda, Expression[] newParameters) =>
-            new ConvertParameterReplaceVisitor().Replace(initialLambda, newParameters);
         private static Expression Replace(this ParameterReplaceVisitor visitor, LambdaExpression initialLambda, Expression newParameter) =>
             visitor.Replace(initialLambda.Body, initialLambda.Parameters[0], newParameter);
         private static Expression Replace(this ParameterReplaceVisitor visitor, LambdaExpression initialLambda, Expression[] newParameters)
@@ -432,29 +434,30 @@ namespace AutoMapper.Execution
         public static Expression IfNullElse(this Expression expression, Expression then, Expression @else) => expression.Type.IsValueType ?
             (expression.Type.IsNullableType() ? Condition(Property(expression, "HasValue"), ToType(@else, then.Type), then) : @else) :
             Condition(ReferenceEqual(expression, Null), then, ToType(@else, then.Type));
-        class ReplaceVisitorBase : ExpressionVisitor
-        {
-            protected Expression _oldNode;
-            protected Expression _newNode;
-            public virtual Expression Replace(Expression target, Expression oldNode, Expression newNode)
-            {
-                _oldNode = oldNode;
-                _newNode = newNode;
-                return base.Visit(target);
-            }
-        }
-        class ReplaceVisitor : ReplaceVisitorBase
-        {
-            public override Expression Visit(Expression node) => _oldNode == node ? _newNode : base.Visit(node);
-        }
-        class ParameterReplaceVisitor : ReplaceVisitorBase
-        {
-            protected override Expression VisitParameter(ParameterExpression node) => _oldNode == node ? _newNode : base.VisitParameter(node);
-        }
-        class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
-        {
-            public override Expression Replace(Expression target, Expression oldNode, Expression newNode) => base.Replace(target, oldNode, ToType(newNode, oldNode.Type));
-        }
     }
     public readonly record struct Member(Expression Expression, MemberInfo MemberInfo, Expression Target);
+    public class ReplaceVisitorBase : ExpressionVisitor
+    {
+        private protected Expression _oldNode;
+        private protected Expression _newNode;
+        public virtual Expression Replace(Expression target, Expression oldNode, Expression newNode)
+        {
+            _oldNode = oldNode;
+            _newNode = newNode;
+            return base.Visit(target);
+        }
+    }
+    public class ReplaceVisitor : ReplaceVisitorBase
+    {
+        public override Expression Visit(Expression node) => _oldNode == node ? _newNode : base.Visit(node);
+    }
+    public class ParameterReplaceVisitor : ReplaceVisitorBase
+    {
+        protected override Expression VisitParameter(ParameterExpression node) => _oldNode == node ? _newNode : base.VisitParameter(node);
+    }
+    public class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
+    {
+        public override Expression Replace(Expression target, Expression oldNode, Expression newNode) => 
+            base.Replace(target, oldNode, ExpressionBuilder.ToType(newNode, oldNode.Type));
+    }
 }

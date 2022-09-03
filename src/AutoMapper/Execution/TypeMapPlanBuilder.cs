@@ -45,7 +45,7 @@ namespace AutoMapper.Execution
         public LambdaExpression CreateMapperLambda()
         {
             var parameters = GetParameters(second: _initialDestination);
-            var customExpression = _typeMap.TypeConverter?.GetExpression(parameters);
+            var customExpression = _typeMap.TypeConverter?.GetExpression(_configuration, parameters);
             if (customExpression != null)
             {
                 return Lambda(customExpression, parameters);
@@ -87,9 +87,10 @@ namespace AutoMapper.Execution
         }
         void IncludeMembers()
         {
+            var configuration = _configuration;
             _variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
             var source = _source;
-            _expressions.AddRange(_variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) => Assign(v, i.MemberExpression.ReplaceParameters(source).NullCheck(null))));
+            _expressions.AddRange(_variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) => Assign(v, configuration.ReplaceParameters(i.MemberExpression, source).NullCheck(null))));
         }
         private static void CheckForCycles(IGlobalConfiguration configuration, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
         {
@@ -181,7 +182,7 @@ namespace AutoMapper.Execution
             }
             foreach (var beforeMapAction in _typeMap.BeforeMapActions)
             {
-                actions.Add(beforeMapAction.ReplaceParameters(GetParameters()));
+                actions.Add(_configuration.ReplaceParameters(beforeMapAction, GetParameters()));
             }
             foreach (var propertyMap in _typeMap.OrderedPropertyMaps())
             {
@@ -204,7 +205,7 @@ namespace AutoMapper.Execution
             }
             foreach (var afterMapAction in _typeMap.AfterMapActions)
             {
-                actions.Add(afterMapAction.ReplaceParameters(GetParameters()));
+                actions.Add(_configuration.ReplaceParameters(afterMapAction, GetParameters()));
             }
             if (hasMaxDepth)
             {
@@ -215,7 +216,7 @@ namespace AutoMapper.Execution
         }
         private Expression TryPathMap(PathMap pathMap)
         {
-            var destination = ((MemberExpression) pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
+            var destination = ((MemberExpression)_configuration.ConvertReplaceParameters(pathMap.DestinationExpression, _destination)).Expression;
             var configuration = _configuration;
             var createInnerObjects = CreateInnerObjects(destination);
             var setFinalValue = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
@@ -262,7 +263,7 @@ namespace AutoMapper.Execution
         }
         private Expression CreateNewDestinationFunc() => _typeMap switch
         {
-            { CustomCtorFunction: LambdaExpression constructUsingFunc } => constructUsingFunc.ReplaceParameters(GetParameters(second: ContextParameter)),
+            { CustomCtorFunction: LambdaExpression constructUsingFunc } => _configuration.ReplaceParameters(constructUsingFunc, GetParameters(second: ContextParameter)),
             { ConstructorMap: { CanResolve: true } constructorMap } => ConstructorMapping(constructorMap),
             { DestinationType: { IsInterface: true } interfaceType } => Throw(Constant(new AutoMapperMappingException("Cannot create interface "+interfaceType, null, _typeMap)), interfaceType),
             _ => ObjectFactory.GenerateConstructorExpression(DestinationType, _configuration)
@@ -327,7 +328,7 @@ namespace AutoMapper.Execution
             if (memberMap.Condition != null)
             {
                 _expressions.Add(IfThen(
-                    memberMap.Condition.ConvertReplaceParameters(new[] { customSource, _destination, mappedMemberVariable, destinationMemberGetter, ContextParameter }),
+                    _configuration.ConvertReplaceParameters(memberMap.Condition, new[] { customSource, _destination, mappedMemberVariable, destinationMemberGetter, ContextParameter }),
                     mapperExpr));
             }
             else if (!destinationMemberReadOnly)
@@ -351,7 +352,7 @@ namespace AutoMapper.Execution
         }
         void Precondition(MemberMap memberMap, ParameterExpression customSource)
         {
-            var preCondition = memberMap.PreCondition.ConvertReplaceParameters(GetParameters(first: customSource));
+            var preCondition = _configuration.ConvertReplaceParameters(memberMap.PreCondition, GetParameters(first: customSource));
             var ifThen = IfThen(preCondition, Block(_expressions));
             _expressions.Clear();
             _expressions.Add(ifThen);
@@ -382,7 +383,7 @@ namespace AutoMapper.Execution
             var mapMember = memberMap.Inline ?
                 _configuration.MapExpression(profile, typePair, resolvedValue, memberMap, destinationMemberValue) :
                 _configuration.NullCheckSource(profile, resolvedValue, destinationMemberValue, ContextMap(typePair, resolvedValue, destinationMemberValue, memberMap), memberMap);
-            return memberMap.ApplyTransformers(mapMember);
+            return memberMap.ApplyTransformers(mapMember, _configuration);
         }
         private Expression BuildValueResolverFunc(MemberMap memberMap, Expression customSource, Expression destValueExpr)
         {
@@ -435,7 +436,7 @@ namespace AutoMapper.Execution
     {
         public FuncResolver(LambdaExpression lambda) : base(lambda) { }
         public Expression GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
-            Lambda.ConvertReplaceParameters(new[] { source, destination, destinationMember, ContextParameter });
+            configuration.ConvertReplaceParameters(Lambda, new[] { source, destination, destinationMember, ContextParameter });
         public MemberInfo GetSourceMember(MemberMap _) => null;
     }
     public class ExpressionResolver : LambdaValueResolver, IValueResolver
@@ -443,7 +444,7 @@ namespace AutoMapper.Execution
         public ExpressionResolver(LambdaExpression lambda) : base(lambda) { }
         public Expression GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression _, Expression destinationMember)
         {
-            var mapFrom = Lambda.ReplaceParameters(source);
+            var mapFrom = configuration.ReplaceParameters(Lambda, source);
             var nullCheckedExpression = mapFrom.NullCheck(configuration, memberMap, destinationMember);
             if (nullCheckedExpression != mapFrom)
             {
@@ -484,7 +485,7 @@ namespace AutoMapper.Execution
             var sourceMemberType = InterfaceType.GenericTypeArguments[0];
             var sourceMember = this switch
             {
-                { SourceMemberLambda: { } } => SourceMemberLambda.ReplaceParameters(source),
+                { SourceMemberLambda: { } } => configuration.ReplaceParameters(SourceMemberLambda, source),
                 { SourceMemberName: { } } => PropertyOrField(source, SourceMemberName),
                 _ when memberMap.SourceMembers.Length > 0 => memberMap.ChainSourceMembers(configuration, source, destinationMember),
                 _ => Throw(Constant(BuildExceptionMessage()), sourceMemberType)
@@ -508,7 +509,15 @@ namespace AutoMapper.Execution
         {
             var typeMap = memberMap.TypeMap;
             var resolverInstance = _instance ?? ServiceLocator(typeMap.MakeGenericType(ConcreteType));
-            var sourceMember = SourceMemberLambda?.ReplaceParameters(source) ?? (SourceMemberName != null ? PropertyOrField(source, SourceMemberName) : null);
+            Expression sourceMember;
+            if (SourceMemberLambda == null)
+            {
+                sourceMember = SourceMemberName == null ? null : PropertyOrField(source, SourceMemberName);
+            }
+            else
+            {
+                sourceMember = configuration.ReplaceParameters(SourceMemberLambda, source);
+            }
             var iValueResolver = InterfaceType;
             if (iValueResolver.ContainsGenericParameters)
             {
@@ -527,7 +536,7 @@ namespace AutoMapper.Execution
     }
     public abstract class TypeConverter
     {
-        public abstract Expression GetExpression(ParameterExpression[] parameters);
+        public abstract Expression GetExpression(IGlobalConfiguration configuration, ParameterExpression[] parameters);
         public virtual void CloseGenerics(TypeMapConfiguration openMapConfig, TypePair closedTypes) { }
         public virtual LambdaExpression ProjectToExpression => null;
     }
@@ -535,7 +544,8 @@ namespace AutoMapper.Execution
     {
         public LambdaTypeConverter(LambdaExpression lambda) => Lambda = lambda;
         public LambdaExpression Lambda { get; }
-        public override Expression GetExpression(ParameterExpression[] parameters) => Lambda.ConvertReplaceParameters(parameters);
+        public override Expression GetExpression(IGlobalConfiguration configuration, ParameterExpression[] parameters) => 
+            configuration.ConvertReplaceParameters(Lambda, parameters);
     }
     public class ExpressionTypeConverter : LambdaTypeConverter
     {
@@ -551,7 +561,7 @@ namespace AutoMapper.Execution
         }
         public Type ConverterType { get; private set; }
         public Type ConverterInterface { get; }
-        public override Expression GetExpression(ParameterExpression[] parameters) =>
+        public override Expression GetExpression(IGlobalConfiguration configuration, ParameterExpression[] parameters) =>
             Call(ToType(ServiceLocator(ConverterType), ConverterInterface), "Convert", parameters);
         public override void CloseGenerics(TypeMapConfiguration openMapConfig, TypePair closedTypes)
         {

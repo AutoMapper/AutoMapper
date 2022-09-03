@@ -143,7 +143,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         var projectionMapper = GetProjectionMapper();
                         mappedExpression = projectionMapper.Project(_configuration, memberRequest, resolvedSource, letPropertyMaps);
                     }
-                    return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression);
+                    return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression, _configuration);
                     Expression ResolveSource()
                     {
                         var customSource = memberMap.IncludedMember?.ProjectToCustomSource;
