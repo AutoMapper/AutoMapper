@@ -10,6 +10,9 @@ MembersMustExist : Member 'public System.Text.RegularExpressions.Regex AutoMappe
 InterfacesShouldHaveSameMembers : Interface member 'public TMappingExpression AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public void AutoMapper.IMappingExpressionBase<TSource, TDestination, TMappingExpression>.AsProxy()' does not exist in the implementation but it does exist in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.Dictionary<System.String, System.Object> AutoMapper.IMappingOperationOptions.Items.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IDictionary<System.String, System.Object> AutoMapper.IMappingOperationOptions.Items.get()' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public System.Collections.Generic.IDictionary<System.String, System.Object> AutoMapper.IMappingOperationOptions.Items.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public System.Text.RegularExpressions.Regex AutoMapper.INamingConvention.SplittingExpression' is present in the contract but not in the implementation.
 InterfacesShouldHaveSameMembers : Interface member 'public System.String AutoMapper.INamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' is present in the contract but not in the implementation.
 MembersMustExist : Member 'public System.String AutoMapper.INamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
@@ -28,6 +31,7 @@ MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection
 CannotSealType : Type 'AutoMapper.LowerUnderscoreNamingConvention' is actually (has the sealed modifier) sealed in the implementation but not sealed in the contract.
 MembersMustExist : Member 'public System.String AutoMapper.LowerUnderscoreNamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Text.RegularExpressions.Regex AutoMapper.LowerUnderscoreNamingConvention.SplittingExpression.get()' does not exist in the implementation but it does exist in the contract.
+MembersMustExist : Member 'public System.Collections.Generic.IDictionary<System.String, System.Object> AutoMapper.MappingOperationOptions<TSource, TDestination>.Items.get()' does not exist in the implementation but it does exist in the contract.
 CannotSealType : Type 'AutoMapper.PascalCaseNamingConvention' is actually (has the sealed modifier) sealed in the implementation but not sealed in the contract.
 MembersMustExist : Member 'public System.String AutoMapper.PascalCaseNamingConvention.ReplaceValue(System.Text.RegularExpressions.Match)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Text.RegularExpressions.Regex AutoMapper.PascalCaseNamingConvention.SplittingExpression.get()' does not exist in the implementation but it does exist in the contract.
@@ -35,6 +39,7 @@ CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.CompilerGener
 CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.CompilerGeneratedAttribute' exists on 'AutoMapper.Profile.DestinationMemberNamingConvention.set(AutoMapper.INamingConvention)' in the contract but not the implementation.
 CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.CompilerGeneratedAttribute' exists on 'AutoMapper.Profile.SourceMemberNamingConvention.get()' in the contract but not the implementation.
 CannotRemoveAttribute : Attribute 'System.Runtime.CompilerServices.CompilerGeneratedAttribute' exists on 'AutoMapper.Profile.SourceMemberNamingConvention.set(AutoMapper.INamingConvention)' in the contract but not the implementation.
+MembersMustExist : Member 'public System.Collections.Generic.IDictionary<System.String, System.Object> AutoMapper.ResolutionContext.Items.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public AutoMapper.IMappingOperationOptions AutoMapper.ResolutionContext.Options.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.ValueResolverConfiguration' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Linq.Expressions.LambdaExpression System.Linq.Expressions.LambdaExpression AutoMapper.ValueTransformerConfiguration.TransformerExpression' does not exist in the implementation but it does exist in the contract.
@@ -115,4 +120,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 116
+Total Issues: 121

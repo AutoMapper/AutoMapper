@@ -17,7 +17,7 @@ public interface IMappingOperationOptions
     /// <summary>
     /// Add context items to be accessed at map time inside an <see cref="IValueResolver{TSource, TDestination, TMember}"/> or <see cref="ITypeConverter{TSource, TDestination}"/>
     /// </summary>
-    IDictionary<string, object> Items { get; }
+    Dictionary<string, object> Items { get; }
 
     /// <summary>
     /// Execute a custom function to the source and/or destination types before member mapping
@@ -50,7 +50,7 @@ public class MappingOperationOptions<TSource, TDestination> : IMappingOperationO
     private StringDictionary _items;
     public MappingOperationOptions(Func<Type, object> serviceCtor) => ServiceCtor = serviceCtor;
     public Func<Type, object> ServiceCtor { get; private set; }
-    public IDictionary<string, object> Items => _items ??= new StringDictionary();
+    public Dictionary<string, object> Items => _items ??= new StringDictionary();
     public Action<TSource, TDestination> BeforeMapAction { get; protected set; }
     public Action<TSource, TDestination> AfterMapAction { get; protected set; }
     public void BeforeMap(Action<TSource, TDestination> beforeFunction) => BeforeMapAction = beforeFunction;

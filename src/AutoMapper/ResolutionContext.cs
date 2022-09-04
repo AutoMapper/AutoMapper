@@ -17,7 +17,7 @@ public class ResolutionContext : IInternalRuntimeMapper
     /// <summary>
     /// The items passed in the options of the Map call.
     /// </summary>
-    public IDictionary<string, object> Items
+    public Dictionary<string, object> Items
     {
         get
         {
