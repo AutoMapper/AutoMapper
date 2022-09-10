@@ -174,16 +174,20 @@ public struct TypeMapPlanBuilder
         {
             actions.Add(ReplaceParameters(beforeMapAction));
         }
-        foreach (var propertyMap in _typeMap.OrderedPropertyMaps())
+        var propertyMaps = _typeMap.OrderedPropertyMaps();
+        if (propertyMaps != null)
         {
-            if (propertyMap.CanResolveValue)
+            foreach (var propertyMap in propertyMaps)
             {
-                var property = TryPropertyMap(propertyMap);
-                if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                if (propertyMap.CanResolveValue)
                 {
-                    property = _initialDestination.IfNullElse(_configuration.Default(property.Type), property);
+                    var property = TryPropertyMap(propertyMap);
+                    if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                    {
+                        property = _initialDestination.IfNullElse(_configuration.Default(property.Type), property);
+                    }
+                    actions.Add(property);
                 }
-                actions.Add(property);
             }
         }
         foreach (var pathMap in _typeMap.PathMaps)

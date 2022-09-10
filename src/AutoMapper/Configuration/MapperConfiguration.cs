@@ -60,6 +60,7 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly Dictionary<Type, DefaultExpression> _defaults;
     private readonly ParameterReplaceVisitor _parameterReplaceVisitor = new();
     private readonly ConvertParameterReplaceVisitor _convertParameterReplaceVisitor = new();
+    private readonly List<Type> _typesInheritance = new();
     public MapperConfiguration(MapperConfigurationExpression configurationExpression)
     {
         var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -114,6 +115,7 @@ public class MapperConfiguration : IGlobalConfiguration
         _defaults = null;
         _convertParameterReplaceVisitor = null;
         _parameterReplaceVisitor = null;
+        _typesInheritance = null;
         _sealed = true;
         return;
         void Seal()
@@ -325,12 +327,25 @@ public class MapperConfiguration : IGlobalConfiguration
         {
             return typeMap;
         }
-        var allSourceTypes = GetTypeInheritance(initialTypes.SourceType);
-        var allDestinationTypes = GetTypeInheritance(initialTypes.DestinationType);
-        foreach (var destinationType in allDestinationTypes)
+        List<Type> typesInheritance;
+        if (_typesInheritance == null)
         {
-            foreach (var sourceType in allSourceTypes)
+            typesInheritance = new();
+        }
+        else
+        {
+            _typesInheritance.Clear();
+            typesInheritance = _typesInheritance;
+        }
+        GetTypeInheritance(typesInheritance, initialTypes.SourceType);
+        var sourceTypesLength = typesInheritance.Count;
+        GetTypeInheritance(typesInheritance, initialTypes.DestinationType);
+        for(int destinationIndex = sourceTypesLength; destinationIndex < typesInheritance.Count; destinationIndex++)
+        {
+            var destinationType = typesInheritance[destinationIndex];
+            for(int sourceIndex = 0; sourceIndex < sourceTypesLength; sourceIndex++)
             {
+                var sourceType = typesInheritance[sourceIndex];
                 if (sourceType == initialTypes.SourceType && destinationType == initialTypes.DestinationType)
                 {
                     continue;
@@ -348,11 +363,11 @@ public class MapperConfiguration : IGlobalConfiguration
             }
         }
         return null;
-        static List<Type> GetTypeInheritance(Type type)
+        static void GetTypeInheritance(List<Type> types, Type type)
         {
             var interfaces = type.GetInterfaces();
             var lastIndex = interfaces.Length - 1;
-            var types = new List<Type>(interfaces.Length + 2) { type };
+            types.Add(type);
             Type baseType = type;
             while ((baseType = baseType.BaseType) != null)
             {
@@ -371,7 +386,6 @@ public class MapperConfiguration : IGlobalConfiguration
             {
                 types.Add(interfaceType);
             }
-            return types;
         }
         TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {

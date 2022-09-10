@@ -9,7 +9,7 @@ public class TypeMap
 {
     private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
     private TypeMapDetails _details;
-    private Dictionary<string, PropertyMap> _propertyMaps;
+    private List<PropertyMap> _propertyMaps;
     private bool _sealed;
     public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration, List<MemberInfo> sourceMembers = null)
     {
@@ -88,8 +88,8 @@ public class TypeMap
     public bool PreserveReferences { get => (_details?.PreserveReferences).GetValueOrDefault(); set => Details.PreserveReferences = value; }
     public int MaxDepth { get => (_details?.MaxDepth).GetValueOrDefault(); set => Details.MaxDepth = value; }
     public bool DisableConstructorValidation { get => (_details?.DisableConstructorValidation).GetValueOrDefault(); set => Details.DisableConstructorValidation = value; }
-    public IReadOnlyCollection<PropertyMap> PropertyMaps => (_propertyMaps?.Values).NullCheck();
-    public IReadOnlyCollection<PathMap> PathMaps => (_details?.PathMaps?.Values).NullCheck();
+    public IReadOnlyCollection<PropertyMap> PropertyMaps => _propertyMaps.NullCheck();
+    public IReadOnlyCollection<PathMap> PathMaps => (_details?.PathMaps).NullCheck();
     public IEnumerable<MemberMap> MemberMaps
     {
         get
@@ -136,7 +136,7 @@ public class TypeMap
     private void AddPropertyMap(PropertyMap propertyMap)
     {
         _propertyMaps ??= new();
-        _propertyMaps.Add(propertyMap.DestinationName, propertyMap);
+        _propertyMaps.Add(propertyMap);
     }
     public string[] GetUnmappedPropertyNames()
     {
@@ -204,23 +204,20 @@ public class TypeMap
         SourceTypeDetails = null;
         DestinationTypeDetails = null;
     }
-    public IEnumerable<PropertyMap> OrderedPropertyMaps()
+    public List<PropertyMap> OrderedPropertyMaps()
     {
         if (HasMappingOrder())
         {
-            return PropertyMaps.OrderBy(map => map.MappingOrder);
+            _propertyMaps.Sort((left, right) => left.MappingOrder ?? int.MaxValue - right.MappingOrder ?? int.MaxValue);
         }
-        else
-        {
-            return PropertyMaps;
-        }
+        return _propertyMaps;
         bool HasMappingOrder()
         {
             if (_propertyMaps == null)
             {
                 return false;
             }
-            foreach (var propertyMap in _propertyMaps.Values)
+            foreach (var propertyMap in _propertyMaps)
             {
                 if (propertyMap.MappingOrder != null)
                 {
@@ -246,7 +243,21 @@ public class TypeMap
     public void ConstructUsingServiceLocator() => CustomCtorFunction = Lambda(ServiceLocator(DestinationType));
     internal LambdaExpression CreateMapperLambda(IGlobalConfiguration configuration) =>
         Types.ContainsGenericParameters ? null : new TypeMapPlanBuilder(configuration, this).CreateMapperLambda();
-    private PropertyMap GetPropertyMap(string name) => _propertyMaps?.GetValueOrDefault(name);
+    private PropertyMap GetPropertyMap(string name)
+    {
+        if (_propertyMaps == null)
+        {
+            return null;
+        }
+        foreach (var propertyMap in _propertyMaps)
+        {
+            if (propertyMap.DestinationName == name)
+            {
+                return propertyMap;
+            }
+        }
+        return null;
+    }
     private PropertyMap GetPropertyMap(PropertyMap propertyMap) => GetPropertyMap(propertyMap.DestinationName);
     public void AsProxy() => CustomCtorFunction = Lambda(Call(CreateProxyMethod, Constant(DestinationType)));
     internal void CopyInheritedMapsTo(TypeMap typeMap)
@@ -278,7 +289,7 @@ public class TypeMap
         public HashSet<LambdaExpression> BeforeMapActions { get; private set; }
         public HashSet<TypePair> IncludedDerivedTypes { get; private set; }
         public HashSet<TypePair> IncludedBaseTypes { get; private set; }
-        public Dictionary<MemberPath, PathMap> PathMaps { get; private set; }
+        public List<PathMap> PathMaps { get; private set; }
         public Dictionary<MemberInfo, SourceMemberConfig> SourceMemberConfigs { get; private set; }
         public HashSet<TypeMap> InheritedTypeMaps { get; private set; }
         public HashSet<IncludedMember> IncludedMembersTypeMaps { get; private set; }
@@ -338,7 +349,7 @@ public class TypeMap
         public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
         {
             PathMaps ??= new();
-            var pathMap = PathMaps.GetValueOrDefault(path);
+            var pathMap = GetPathMap(path);
             if (pathMap == null)
             {
                 pathMap = new(destinationExpression, path, typeMap);
@@ -346,7 +357,22 @@ public class TypeMap
             }
             return pathMap;
         }
-        private void AddPathMap(PathMap pathMap) => PathMaps.Add(pathMap.MemberPath, pathMap);
+        private PathMap GetPathMap(MemberPath memberPath)
+        {
+            if (PathMaps == null)
+            {
+                return null;
+            }
+            foreach (var pathMap in PathMaps)
+            {
+                if (pathMap.MemberPath == memberPath)
+                {
+                    return pathMap;
+                }
+            }
+            return null;
+        }
+        private void AddPathMap(PathMap pathMap) => PathMaps.Add(pathMap);
         public void IncludeBaseTypes(TypePair baseTypes)
         {
             IncludedBaseTypes ??= new();
@@ -438,7 +464,7 @@ public class TypeMap
             return;
             void ApplyInheritedPropertyMaps(TypeMap inheritedTypeMap, TypeMap thisMap)
             {
-                foreach (var inheritedMappedProperty in inheritedTypeMap._propertyMaps.Values)
+                foreach (var inheritedMappedProperty in inheritedTypeMap._propertyMaps)
                 {
                     if (!inheritedMappedProperty.IsMapped)
                     {
@@ -484,7 +510,7 @@ public class TypeMap
                 return Array.Empty<PathMap>();
             }
             PathMaps ??= new();
-            return inheritedTypeMap.PathMaps.Where(baseConfig => !PathMaps.ContainsKey(baseConfig.MemberPath)).ToArray();
+            return inheritedTypeMap.PathMaps.Where(baseConfig => GetPathMap(baseConfig.MemberPath) == null).ToArray();
         }
     }
 }
