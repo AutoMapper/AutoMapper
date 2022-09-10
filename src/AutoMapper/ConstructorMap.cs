@@ -52,13 +52,13 @@ public class ConstructorMap
     }
     public bool ApplyIncludedMember(IncludedMember includedMember)
     {
-        var typeMap = includedMember.TypeMap;
-        if (CanResolve || typeMap.ConstructorMap == null)
+        var includedMap = includedMember.TypeMap.ConstructorMap;
+        if (CanResolve || includedMap?.Ctor != Ctor)
         {
             return false;
         }
         bool canResolve = false;
-        var includedParams = typeMap.ConstructorMap._ctorParams;
+        var includedParams = includedMap._ctorParams;
         for(int index = 0; index < includedParams.Count; index++)
         {
             var includedParam = includedParams[index];
