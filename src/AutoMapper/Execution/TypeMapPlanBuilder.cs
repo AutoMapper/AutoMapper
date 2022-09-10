@@ -170,9 +170,13 @@ public struct TypeMapPlanBuilder
             typeMapExpression = Constant(_typeMap);
             actions.Add(Call(ContextParameter, IncTypeDepthInfo, typeMapExpression));
         }
-        foreach (var beforeMapAction in _typeMap.BeforeMapActions)
+        var beforeMap = _typeMap.BeforeMapActions;
+        if (beforeMap.Count > 0)
         {
-            actions.Add(ReplaceParameters(beforeMapAction));
+            foreach (var beforeMapAction in beforeMap)
+            {
+                actions.Add(ReplaceParameters(beforeMapAction));
+            }
         }
         var propertyMaps = _typeMap.OrderedPropertyMaps();
         if (propertyMaps != null)
@@ -190,16 +194,24 @@ public struct TypeMapPlanBuilder
                 }
             }
         }
-        foreach (var pathMap in _typeMap.PathMaps)
+        var pathMaps = _typeMap.PathMaps;
+        if (pathMaps.Count > 0)
         {
-            if (!pathMap.Ignored)
+            foreach (var pathMap in pathMaps)
             {
-                actions.Add(TryPathMap(pathMap));
+                if (!pathMap.Ignored)
+                {
+                    actions.Add(TryPathMap(pathMap));
+                }
             }
         }
-        foreach (var afterMapAction in _typeMap.AfterMapActions)
+        var afterMap = _typeMap.AfterMapActions;
+        if (afterMap.Count > 0)
         {
-            actions.Add(ReplaceParameters(afterMapAction));
+            foreach (var afterMapAction in afterMap)
+            {
+                actions.Add(ReplaceParameters(afterMapAction));
+            }
         }
         if (hasMaxDepth)
         {

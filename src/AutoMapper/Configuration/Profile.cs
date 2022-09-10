@@ -165,12 +165,12 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
             _replaceName = new();
             _memberConfiguration.NameToMemberMappers.Add(_replaceName);
         }
-        _replaceName.MemberNameReplacers.Add(new(original, newValue));
+        _replaceName.MemberNameReplacers.TryAdd(new MemberNameReplacer(original, newValue));
     }
-    public void RecognizePrefixes(params string[] prefixes) => _prefixes.AddRange(prefixes);
-    public void RecognizePostfixes(params string[] postfixes) => _postfixes.AddRange(postfixes);
-    public void RecognizeDestinationPrefixes(params string[] prefixes) => _prePostfixName.DestinationPrefixes.UnionWith(prefixes);
-    public void RecognizeDestinationPostfixes(params string[] postfixes) => _prePostfixName.DestinationPostfixes.UnionWith(postfixes);
+    public void RecognizePrefixes(params string[] prefixes) => _prefixes.TryAdd(prefixes);
+    public void RecognizePostfixes(params string[] postfixes) => _postfixes.TryAdd(postfixes);
+    public void RecognizeDestinationPrefixes(params string[] prefixes) => _prePostfixName.DestinationPrefixes.TryAdd(prefixes);
+    public void RecognizeDestinationPostfixes(params string[] postfixes) => _prePostfixName.DestinationPostfixes.TryAdd(postfixes);
     public void AddGlobalIgnore(string propertyNameStartingWith)
     {
         _globalIgnores ??= new();

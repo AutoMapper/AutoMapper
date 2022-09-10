@@ -45,7 +45,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
         {
             throw new AutoMapperConfigurationException(badTypeMaps);
         }
-        var typeMapsChecked = new List<TypeMap>();
+        var typeMapsChecked = new HashSet<TypeMap>();
         var configExceptions = new List<Exception>();
         foreach (var typeMap in maps)
         {
@@ -67,7 +67,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             throw configExceptions[0];
         }
     }
-    private void DryRunTypeMap(IGlobalConfiguration config, ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
+    private void DryRunTypeMap(IGlobalConfiguration config, HashSet<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
     {
         if(typeMap == null)
         {
@@ -107,7 +107,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             }
         }
     }
-    private void CheckPropertyMaps(IGlobalConfiguration config, ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
+    private void CheckPropertyMaps(IGlobalConfiguration config, HashSet<TypeMap> typeMapsChecked, TypeMap typeMap)
     {
         foreach (var memberMap in typeMap.MemberMaps)
         {

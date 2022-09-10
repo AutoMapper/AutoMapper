@@ -68,8 +68,6 @@ MembersMustExist : Member 'public System.Reflection.MemberInfo AutoMapper.Config
 InterfacesShouldHaveSameMembers : Interface member 'public System.Reflection.MemberInfo AutoMapper.Configuration.Conventions.ISourceToDestinationNameMapper.GetSourceMember(AutoMapper.Internal.TypeDetails, System.Type, System.Type, System.String)' is present in the implementation but not in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.Configuration.Conventions.ISourceToDestinationNameMapper.Merge(AutoMapper.Configuration.Conventions.ISourceToDestinationNameMapper)' is present in the implementation but not in the contract.
 TypesMustExist : Type 'AutoMapper.Configuration.Conventions.ParentSourceToDestinationNameMapper' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public System.Collections.Generic.List<System.String> AutoMapper.Configuration.Conventions.PrePostfixName.DestinationPostfixes.get()' does not exist in the implementation but it does exist in the contract.
-MembersMustExist : Member 'public System.Collections.Generic.List<System.String> AutoMapper.Configuration.Conventions.PrePostfixName.DestinationPrefixes.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Reflection.MemberInfo AutoMapper.Configuration.Conventions.PrePostfixName.GetMatchingMemberInfo(AutoMapper.Internal.TypeDetails, System.Type, System.Type, System.String)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.List<System.String> AutoMapper.Configuration.Conventions.PrePostfixName.Postfixes.get()' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.List<System.String> AutoMapper.Configuration.Conventions.PrePostfixName.Prefixes.get()' does not exist in the implementation but it does exist in the contract.
@@ -120,4 +118,4 @@ MembersMustExist : Member 'public AutoMapper.Internal.TypePair AutoMapper.Intern
 MembersMustExist : Member 'public System.Linq.IQueryable<TDestination> AutoMapper.QueryableExtensions.Extensions.Map<TSource, TDestination>(System.Linq.IQueryable<TSource>, System.Linq.IQueryable<TDestination>, AutoMapper.IConfigurationProvider)' does not exist in the implementation but it does exist in the contract.
 MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Reflection.MemberInfo> AutoMapper.QueryableExtensions.MemberVisitor.MemberPath.get()' does not exist in the implementation but it does exist in the contract.
 TypesMustExist : Type 'AutoMapper.QueryableExtensions.Impl.MemberAccessQueryMapperVisitor' does not exist in the implementation but it does exist in the contract.
-Total Issues: 121
+Total Issues: 119

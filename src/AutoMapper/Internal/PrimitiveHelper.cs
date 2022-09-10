@@ -5,6 +5,23 @@ namespace AutoMapper.Internal;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class PrimitiveHelper
 {
+    public static bool TryAdd<T>(this List<T> list, T value)
+    {
+        if (!list.Contains(value))
+        {
+            list.Add(value);
+            return true;
+        }
+        return false;
+    }
+    public static List<T> TryAdd<T>(this List<T> list, IEnumerable<T> values)
+    {
+        foreach (var value in values)
+        {
+            list.TryAdd(value);
+        }
+        return list;
+    }
     public static ReadOnlyCollection<T> ToReadOnly<T>(this T item) where T : Expression => new ReadOnlyCollectionBuilder<T>{ item }.ToReadOnlyCollection();
     public static IReadOnlyCollection<T> NullCheck<T>(this IReadOnlyCollection<T> source) => source ?? Array.Empty<T>();
     public static IEnumerable<T> Concat<T>(this IReadOnlyCollection<T> collection, IReadOnlyCollection<T> otherCollection)

@@ -33,8 +33,8 @@ public class ProfileMap
         AllPropertyMapActions = profile.AllPropertyMapActions.Concat(globalProfile?.AllPropertyMapActions).ToArray();
         AllTypeMapActions = profile.AllTypeMapActions.Concat(globalProfile?.AllTypeMapActions).ToArray();
         profileInternal.MemberConfiguration.Seal();
-        Prefixes = new(profileInternal.Prefixes.Concat(configuration?.Prefixes));
-        Postfixes = new(profileInternal.Postfixes.Concat(configuration?.Postfixes));
+        Prefixes.TryAdd(profileInternal.Prefixes.Concat(configuration?.Prefixes));
+        Postfixes.TryAdd(profileInternal.Postfixes.Concat(configuration?.Postfixes));
         TypeMapConfigs();
         OpenTypeMapConfigs();
         _typeDetails = new(2 * _typeMapConfigs.Length);
@@ -92,8 +92,8 @@ public class ProfileMap
     public HashSet<string> GlobalIgnores { get; }
     public MemberConfiguration MemberConfiguration { get; }
     public IEnumerable<MethodInfo> SourceExtensionMethods { get; }
-    public HashSet<string> Prefixes { get; }
-    public HashSet<string> Postfixes { get; }
+    public List<string> Prefixes { get; } = new();
+    public List<string> Postfixes { get; } = new();
     public IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers { get; }
     public TypeDetails CreateTypeDetails(Type type)
     {

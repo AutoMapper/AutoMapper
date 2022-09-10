@@ -69,8 +69,8 @@ public class MemberConfiguration
 }
 public class PrePostfixName : ISourceToDestinationNameMapper
 {
-    public HashSet<string> DestinationPrefixes { get; } = new();
-    public HashSet<string> DestinationPostfixes { get; } = new();
+    public List<string> DestinationPrefixes { get; } = new();
+    public List<string> DestinationPostfixes { get; } = new();
     public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
     {
         MemberInfo member;
@@ -86,13 +86,13 @@ public class PrePostfixName : ISourceToDestinationNameMapper
     public void Merge(ISourceToDestinationNameMapper other)
     {
         var typedOther = (PrePostfixName)other;
-        DestinationPrefixes.UnionWith(typedOther.DestinationPrefixes);
-        DestinationPostfixes.UnionWith(typedOther.DestinationPostfixes);
+        DestinationPrefixes.TryAdd(typedOther.DestinationPrefixes);
+        DestinationPostfixes.TryAdd(typedOther.DestinationPostfixes);
     }
 }
 public class ReplaceName : ISourceToDestinationNameMapper
 {
-    public HashSet<MemberNameReplacer> MemberNameReplacers { get; } = new();
+    public List<MemberNameReplacer> MemberNameReplacers { get; } = new();
     public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)
     {
         var possibleSourceNames = PossibleNames(nameToSearch);
@@ -116,7 +116,7 @@ public class ReplaceName : ISourceToDestinationNameMapper
     public void Merge(ISourceToDestinationNameMapper other)
     {
         var typedOther = (ReplaceName)other;
-        MemberNameReplacers.UnionWith(typedOther.MemberNameReplacers);
+        MemberNameReplacers.TryAdd(typedOther.MemberNameReplacers);
     }
     private string[] PossibleNames(string nameToSearch) =>
             MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))

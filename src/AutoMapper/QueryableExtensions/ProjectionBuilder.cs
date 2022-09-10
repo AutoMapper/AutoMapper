@@ -282,13 +282,13 @@ public class ProjectionBuilder : IProjectionBuilder
         class GePropertiesVisitor : ExpressionVisitor
         {
             private readonly Expression _target;
-            public HashSet<MemberInfo> Members { get; } = new();
+            public List<MemberInfo> Members { get; } = new();
             public GePropertiesVisitor(Expression target) => _target = target;
             protected override Expression VisitMember(MemberExpression node)
             {
                 if(node.Expression == _target)
                 {
-                    Members.Add(node.Member);
+                    Members.TryAdd(node.Member);
                 }
                 return base.VisitMember(node);
             }
@@ -415,8 +415,12 @@ abstract class ParameterExpressionVisitor : ExpressionVisitor
 [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
 public readonly record struct ProjectionRequest(Type SourceType, Type DestinationType, MemberPath[] MembersToExpand, ICollection<ProjectionRequest> PreviousRequests)
 {
-    public ProjectionRequest InnerRequest(Type sourceType, Type destinationType) => 
-        new(sourceType, destinationType, MembersToExpand, new HashSet<ProjectionRequest>(PreviousRequests) { this });
+    public ProjectionRequest InnerRequest(Type sourceType, Type destinationType)
+    {
+        var previousRequests = PreviousRequests.ToList();
+        previousRequests.TryAdd(this);
+        return new(sourceType, destinationType, MembersToExpand, previousRequests);
+    }
     public bool AlreadyExists => PreviousRequests.Contains(this);
     public bool Equals(ProjectionRequest other) => SourceType == other.SourceType && DestinationType == other.DestinationType &&
         MembersToExpand.SequenceEqual(other.MembersToExpand);
