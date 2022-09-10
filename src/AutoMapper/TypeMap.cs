@@ -208,7 +208,7 @@ public class TypeMap
     {
         if (HasMappingOrder())
         {
-            _propertyMaps.Sort((left, right) => left.MappingOrder ?? int.MaxValue - right.MappingOrder ?? int.MaxValue);
+            _propertyMaps.Sort((left, right) => Comparer<int?>.Default.Compare(left.MappingOrder, right.MappingOrder));
         }
         return _propertyMaps;
         bool HasMappingOrder()
