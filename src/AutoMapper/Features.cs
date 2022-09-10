@@ -15,7 +15,7 @@ public interface IRuntimeFeature
 }
 public class Features<TFeature> : IReadOnlyCollection<TFeature>
 {
-    private Dictionary<Type, TFeature> _features;
+    private List<TFeature> _features;
     public int Count => _features?.Count ?? 0;
     /// <summary>
     /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
@@ -23,18 +23,39 @@ public class Features<TFeature> : IReadOnlyCollection<TFeature>
     /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
     /// <returns>The feature or null if feature not exists.</returns>
     public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature =>
-        _features == null ? default : (TFeatureToFind)_features.GetValueOrDefault(typeof(TFeatureToFind));
+        _features == null ? default : (TFeatureToFind)GetFeature(typeof(TFeatureToFind));
     /// <summary>
     /// Add or update the feature. Existing feature of the same type will be replaced.
     /// </summary>
     /// <param name="feature">The feature.</param>
     public void Set(TFeature feature)
     {
-        _features ??= new Dictionary<Type, TFeature>();
-        _features[feature.GetType()] = feature;
+        _features ??= new();
+        int index = 0;
+        var featureType = feature.GetType();
+        for (; index < _features.Count && _features[index].GetType() != featureType; index++);
+        if (index < _features.Count)
+        {
+            _features[index] = feature;
+        }
+        else
+        {
+            _features.Add(feature);
+        }
+    }
+    object GetFeature(Type featureType)
+    {
+        foreach (var feature in _features)
+        {
+            if (feature.GetType() == featureType)
+            {
+                return feature;
+            }
+        }
+        return null;
     }
     public IEnumerator<TFeature> GetEnumerator() =>
-        _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.Values.GetEnumerator();
+        _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 public static class FeatureExtensions

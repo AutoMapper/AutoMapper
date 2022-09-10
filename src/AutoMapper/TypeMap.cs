@@ -151,7 +151,7 @@ public class TypeMap
         }
         else
         {
-            var ignoredSourceMembers = _details?.SourceMemberConfigs?.Values
+            var ignoredSourceMembers = _details?.SourceMemberConfigs?
                 .Where(smc => smc.IsIgnored())
                 .Select(pm => pm.SourceMember.Name);
             properties = Profile.CreateTypeDetails(SourceType).ReadAccessors
@@ -290,7 +290,7 @@ public class TypeMap
         public HashSet<TypePair> IncludedDerivedTypes { get; private set; }
         public HashSet<TypePair> IncludedBaseTypes { get; private set; }
         public List<PathMap> PathMaps { get; private set; }
-        public Dictionary<MemberInfo, SourceMemberConfig> SourceMemberConfigs { get; private set; }
+        public List<SourceMemberConfig> SourceMemberConfigs { get; private set; }
         public HashSet<TypeMap> InheritedTypeMaps { get; private set; }
         public HashSet<IncludedMember> IncludedMembersTypeMaps { get; private set; }
         public List<ValueTransformerConfiguration> ValueTransformerConfigs { get; private set; }
@@ -391,13 +391,24 @@ public class TypeMap
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
         {
             SourceMemberConfigs ??= new();
-            var config = SourceMemberConfigs.GetValueOrDefault(sourceMember);
-
-            if (config != null) return config;
-
-            config = new(sourceMember);
-            SourceMemberConfigs.Add(config.SourceMember, config);
+            var config = GetSourceMemberConfig(sourceMember);
+            if (config == null)
+            {
+                config = new(sourceMember);
+                SourceMemberConfigs.Add(config);
+            }
             return config;
+        }
+        private SourceMemberConfig GetSourceMemberConfig(MemberInfo sourceMember)
+        {
+            foreach (var sourceConfig in SourceMemberConfigs)
+            {
+                if (sourceConfig.SourceMember == sourceMember)
+                {
+                    return sourceConfig;
+                }
+            }
+            return null;
         }
         public bool AddInheritedMap(TypeMap inheritedTypeMap)
         {
@@ -484,9 +495,12 @@ public class TypeMap
             void ApplyInheritedSourceMembers(TypeMapDetails inheritedTypeMap)
             {
                 SourceMemberConfigs ??= new();
-                foreach (var inheritedSourceConfig in inheritedTypeMap.SourceMemberConfigs.Values)
+                foreach (var inheritedSourceConfig in inheritedTypeMap.SourceMemberConfigs)
                 {
-                    SourceMemberConfigs.TryAdd(inheritedSourceConfig.SourceMember, inheritedSourceConfig);
+                    if (GetSourceMemberConfig(inheritedSourceConfig.SourceMember) == null)
+                    {
+                        SourceMemberConfigs.Add(inheritedSourceConfig);
+                    }
                 }
             }
         }
