@@ -23,10 +23,10 @@ public class MappingExpressionFeatureWithoutReverseTest
 
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(2);
+        typeMap.Features.Count.ShouldBe(2);
 
         var typeMapReverse = config.ResolveTypeMap(typeof(Dest), typeof(Source));
-        typeMapReverse.Features.Count().ShouldBe(0);
+        typeMapReverse.Features.Count.ShouldBe(0);
 
         Validate(featureA);
         Validate(featureB);
@@ -50,10 +50,10 @@ public class MappingExpressionFeatureWithoutReverseTest
         });
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(1);
+        typeMap.Features.Count.ShouldBe(1);
 
         var typeMapReverse = config.ResolveTypeMap(typeof(Dest), typeof(Source));
-        typeMapReverse.Features.Count().ShouldBe(0);
+        typeMapReverse.Features.Count.ShouldBe(0);
 
         Validate<TypeMapFeatureA>(featureA);
 
@@ -82,10 +82,10 @@ public class MappingExpressionFeatureWithoutReverseTest
         });
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(1);
+        typeMap.Features.Count.ShouldBe(1);
 
         var typeMapReverse = config.FindTypeMapFor<Dest, Source>();
-        typeMapReverse.Features.Count().ShouldBe(0);
+        typeMapReverse.Features.Count.ShouldBe(0);
 
         Validate<TypeMapFeatureA>(featureA);
         
@@ -117,10 +117,10 @@ public class MappingExpressionFeatureWithoutReverseTest
 
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(2);
+        typeMap.Features.Count.ShouldBe(2);
 
         var typeMapReverse = config.ResolveTypeMap(typeof(Dest), typeof(Source));
-        typeMapReverse.Features.Count().ShouldBe(0);
+        typeMapReverse.Features.Count.ShouldBe(0);
 
         Validate<TypeMapFeatureA>(featureA);
         Validate<TypeMapFeatureB>(featureB);
@@ -152,10 +152,10 @@ public class MappingExpressionFeatureWithoutReverseTest
         });
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(2);
+        typeMap.Features.Count.ShouldBe(2);
 
         var typeMapReverse = config.FindTypeMapFor<Dest, Source>();
-        typeMapReverse.Features.Count().ShouldBe(0);
+        typeMapReverse.Features.Count.ShouldBe(0);
 
         Validate<TypeMapFeatureA>(featureA);
         Validate<TypeMapFeatureB>(featureB);
@@ -189,10 +189,10 @@ public class MappingExpressionFeatureWithoutReverseTest
         });
 
         var typeMap = config.FindTypeMapFor<Source, Dest>();
-        typeMap.Features.Count().ShouldBe(2);
+        typeMap.Features.Count.ShouldBe(2);
 
         var typeMapReverse = config.FindTypeMapFor<Dest, Source>();
-        typeMapReverse.Features.Count().ShouldBe(1);
+        typeMapReverse.Features.Count.ShouldBe(1);
 
         Validate<TypeMapFeatureA>(featureA, typeMap);
         Validate<TypeMapFeatureB>(featureB, typeMap);
@@ -210,7 +210,6 @@ public class MappingExpressionFeatureWithoutReverseTest
             typeMapFeature.SealedCount.ShouldBe(1);
         }
     }
-
     public class MappingExpressionFeatureA : MappingExpressionFeatureBase<TypeMapFeatureA>
     {
         public MappingExpressionFeatureA(int value) : base(value, new TypeMapFeatureA(value))

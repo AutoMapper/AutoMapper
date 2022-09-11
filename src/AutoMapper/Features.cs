@@ -13,7 +13,7 @@ public interface IRuntimeFeature
 {
     void Seal(IGlobalConfiguration configuration);
 }
-public class Features<TFeature> : IReadOnlyCollection<TFeature>
+public class Features<TFeature>
 {
     private List<TFeature> _features;
     public int Count => _features?.Count ?? 0;
@@ -22,41 +22,35 @@ public class Features<TFeature> : IReadOnlyCollection<TFeature>
     /// </summary>
     /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
     /// <returns>The feature or null if feature not exists.</returns>
-    public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature =>
-        _features == null ? default : (TFeatureToFind)GetFeature(typeof(TFeatureToFind));
+    public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature
+    {
+        var index = IndexOf(typeof(TFeatureToFind));
+        return index < Count ? (TFeatureToFind)_features[index] : default;
+    }
     /// <summary>
     /// Add or update the feature. Existing feature of the same type will be replaced.
     /// </summary>
     /// <param name="feature">The feature.</param>
     public void Set(TFeature feature)
     {
-        _features ??= new();
-        int index = 0;
-        var featureType = feature.GetType();
-        for (; index < _features.Count && _features[index].GetType() != featureType; index++);
-        if (index < _features.Count)
+        var index = IndexOf(feature.GetType());
+        if (index < Count)
         {
             _features[index] = feature;
         }
         else
         {
+            _features ??= new();
             _features.Add(feature);
         }
     }
-    object GetFeature(Type featureType)
+    private int IndexOf(Type featureType)
     {
-        foreach (var feature in _features)
-        {
-            if (feature.GetType() == featureType)
-            {
-                return feature;
-            }
-        }
-        return null;
+        int index = 0;
+        for (; index < Count && _features[index].GetType() != featureType; index++);
+        return index;
     }
-    public IEnumerator<TFeature> GetEnumerator() =>
-        _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public List<TFeature>.Enumerator GetEnumerator() => _features.GetEnumerator();
 }
 public static class FeatureExtensions
 {
