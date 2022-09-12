@@ -41,7 +41,7 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
     private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
     private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
-    private readonly ProjectionBuilder _projectionBuilder;
+    private ProjectionBuilder _projectionBuilder;
     private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
@@ -71,13 +71,10 @@ public class MapperConfiguration : IGlobalConfiguration
         _mappers = configuration.Mappers.ToArray();
         _executionPlans = new(CompileExecutionPlan);
         _validator = new(configuration);
-        _projectionBuilder = new(this, configuration.ProjectionMappers.ToArray());
-
         _serviceCtor = configuration.ServiceCtor;
         _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
         _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
         _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
-
         Configuration = new((IProfileConfiguration)configuration);
         int typeMapsCount = Configuration.TypeMapsCount;
         int openTypeMapsCount = Configuration.OpenTypeMapsCount;
@@ -235,7 +232,18 @@ public class MapperConfiguration : IGlobalConfiguration
             return Lambda(fullExpression, source, destination, ContextParameter);
         }
     }
-    IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder;
+    IProjectionBuilder IGlobalConfiguration.ProjectionBuilder
+    {
+        get
+        {
+            if (_projectionBuilder == null)
+            {
+                CreateProjectionBuilder();
+            }
+            return _projectionBuilder;
+            void CreateProjectionBuilder() => Interlocked.CompareExchange(ref _projectionBuilder, new(this, _validator.Expression.ProjectionMappers.ToArray()), null);
+        }
+    }
     Func<Type, object> IGlobalConfiguration.ServiceCtor => _serviceCtor;
     bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
     int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;

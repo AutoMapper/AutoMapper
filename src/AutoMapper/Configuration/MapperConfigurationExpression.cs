@@ -91,6 +91,7 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
     private readonly List<Validator> _validators = new();
     private readonly List<IObjectMapper> _mappers;
     private Func<Type, object> _serviceCtor = Activator.CreateInstance;
+    private List<IProjectionMapper> _projectionMappers;
 
     public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
 
@@ -115,7 +116,7 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
 
     List<Validator> IGlobalConfigurationExpression.Validators => _validators;
 
-    List<IProjectionMapper> IGlobalConfigurationExpression.ProjectionMappers { get; } = ProjectionBuilder.DefaultProjectionMappers();
+    List<IProjectionMapper> IGlobalConfigurationExpression.ProjectionMappers => _projectionMappers ??= ProjectionBuilder.DefaultProjectionMappers();
 
     /// <summary>
     /// How many levels deep should recursive queries be expanded.
