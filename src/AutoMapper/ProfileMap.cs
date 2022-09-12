@@ -1,4 +1,5 @@
 using AutoMapper.Configuration.Conventions;
+using System.Collections.Concurrent;
 namespace AutoMapper;
 [DebuggerDisplay("{Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -8,7 +9,7 @@ public class ProfileMap
     private TypeMapConfiguration[] _typeMapConfigs;
     private Dictionary<TypePair, TypeMapConfiguration> _openTypeMapConfigs;
     private Dictionary<Type, TypeDetails> _typeDetails;
-    private ConcurrentDictionaryWrapper<Type, TypeDetails> _runtimeTypeDetails;
+    private ConcurrentDictionary<Type, TypeDetails> _runtimeTypeDetails;
     public ProfileMap(IProfileConfiguration profile, IGlobalConfigurationExpression configuration = null)
     {
         var globalProfile = (IProfileConfiguration)configuration;
@@ -74,7 +75,6 @@ public class ProfileMap
     {
         _typeDetails = null;
         _typeMapConfigs = null;
-        _runtimeTypeDetails = new(TypeDetailsFactory, 2 * _openTypeMapConfigs.Count);
     }
     public bool AllowNullCollections { get; }
     public bool AllowNullDestinationValues { get; }
@@ -99,17 +99,24 @@ public class ProfileMap
     {
         if (_typeDetails == null)
         {
-            return _runtimeTypeDetails.GetOrAdd(type);
+            return CreateRuntimeTypeDetails(type);
         }
         if (_typeDetails.TryGetValue(type, out var typeDetails))
         {
             return typeDetails;
         }
-        typeDetails = TypeDetailsFactory(type);
+        typeDetails = new(type, this);
         _typeDetails.Add(type, typeDetails);
         return typeDetails;
+        TypeDetails CreateRuntimeTypeDetails(Type type)
+        {
+            if (_runtimeTypeDetails == null)
+            {
+                Interlocked.CompareExchange(ref _runtimeTypeDetails, new(Environment.ProcessorCount, 2 * _openTypeMapConfigs.Count), null);
+            }
+            return _runtimeTypeDetails.GetOrAdd(type, (type, profile) => new(type, profile), this);
+        }
     }
-    private TypeDetails TypeDetailsFactory(Type type) => new(type, this);
     public void Register(IGlobalConfiguration configuration)
     {
         foreach (var config in _typeMapConfigs)
