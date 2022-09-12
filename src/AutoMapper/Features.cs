@@ -1,5 +1,4 @@
-﻿using System.Collections;
-namespace AutoMapper.Features;
+﻿namespace AutoMapper.Features;
 public interface IGlobalFeature
 {
     void Configure(IGlobalConfiguration configuration);

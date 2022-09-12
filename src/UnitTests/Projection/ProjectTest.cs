@@ -20,6 +20,12 @@ public class ProjectWithFields : AutoMapperSpecBase
     public void Should_work()
     {
         new[] { new Foo() }.AsQueryable().ProjectTo<FooDto>(Configuration).Single().A.ShouldBe(0);
+
+        var p1 = Configuration.Internal().ProjectionBuilder;
+        var p2 = Configuration.Internal().ProjectionBuilder;
+        p2.ShouldBe(p1);
+        var profile = Configuration.Internal().Profiles[0];
+        profile.CreateTypeDetails(typeof(DateTime)).ShouldBe(profile.CreateTypeDetails(typeof(DateTime)));
     } 
 }
 

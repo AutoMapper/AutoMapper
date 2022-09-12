@@ -41,7 +41,7 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly Dictionary<TypePair, TypeMap> _configuredMaps;
     private readonly Dictionary<TypePair, TypeMap> _resolvedMaps;
     private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
-    private ProjectionBuilder _projectionBuilder;
+    private LazyValue<ProjectionBuilder> _projectionBuilder;
     private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
@@ -74,6 +74,7 @@ public class MapperConfiguration : IGlobalConfiguration
         _serviceCtor = configuration.ServiceCtor;
         _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
         _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
+        _projectionBuilder = new(CreateProjectionBuilder);
         _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
         Configuration = new((IProfileConfiguration)configuration);
         int typeMapsCount = Configuration.TypeMapsCount;
@@ -232,18 +233,8 @@ public class MapperConfiguration : IGlobalConfiguration
             return Lambda(fullExpression, source, destination, ContextParameter);
         }
     }
-    IProjectionBuilder IGlobalConfiguration.ProjectionBuilder
-    {
-        get
-        {
-            if (_projectionBuilder == null)
-            {
-                CreateProjectionBuilder();
-            }
-            return _projectionBuilder;
-            void CreateProjectionBuilder() => Interlocked.CompareExchange(ref _projectionBuilder, new(this, _validator.Expression.ProjectionMappers.ToArray()), null);
-        }
-    }
+    ProjectionBuilder CreateProjectionBuilder() => new(this, _validator.Expression.ProjectionMappers.ToArray());
+    IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder.Value;
     Func<Type, object> IGlobalConfiguration.ServiceCtor => _serviceCtor;
     bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
     int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
@@ -493,7 +484,7 @@ public class MapperConfiguration : IGlobalConfiguration
     void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(this, new[] { typeMap });
     void IGlobalConfiguration.AssertConfigurationIsValid(string profileName)
     {
-        if (Profiles.All(x => x.Name != profileName))
+        if (Array.TrueForAll(Profiles, x => x.Name != profileName))
         {
             throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
         }
@@ -502,4 +493,11 @@ public class MapperConfiguration : IGlobalConfiguration
     void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
     void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>
         _resolvedMaps[typeMapConfiguration.Types] = GetIncludedTypeMap(new(typeMapConfiguration.SourceType, typeMapConfiguration.DestinationTypeOverride));
+}
+struct LazyValue<T> where T : class
+{
+    readonly Func<T> _factory;
+    T _value = null;
+    public T Value => LazyInitializer.EnsureInitialized(ref _value, _factory);
+    public LazyValue(Func<T> factory) => _factory = factory;
 }

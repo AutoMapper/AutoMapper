@@ -9,7 +9,7 @@ public class ProfileMap
     private TypeMapConfiguration[] _typeMapConfigs;
     private Dictionary<TypePair, TypeMapConfiguration> _openTypeMapConfigs;
     private Dictionary<Type, TypeDetails> _typeDetails;
-    private ConcurrentDictionary<Type, TypeDetails> _runtimeTypeDetails;
+    private LazyValue<ConcurrentDictionary<Type, TypeDetails>> _runtimeTypeDetails;
     public ProfileMap(IProfileConfiguration profile, IGlobalConfigurationExpression configuration = null)
     {
         var globalProfile = (IProfileConfiguration)configuration;
@@ -39,6 +39,7 @@ public class ProfileMap
         TypeMapConfigs();
         OpenTypeMapConfigs();
         _typeDetails = new(2 * _typeMapConfigs.Length);
+       _runtimeTypeDetails = new(()=>new(Environment.ProcessorCount, 2 * _openTypeMapConfigs.Count));
         return;
         void TypeMapConfigs()
         {
@@ -99,7 +100,7 @@ public class ProfileMap
     {
         if (_typeDetails == null)
         {
-            return CreateRuntimeTypeDetails(type);
+            return _runtimeTypeDetails.Value.GetOrAdd(type, (type, profile) => new(type, profile), this);
         }
         if (_typeDetails.TryGetValue(type, out var typeDetails))
         {
@@ -108,14 +109,6 @@ public class ProfileMap
         typeDetails = new(type, this);
         _typeDetails.Add(type, typeDetails);
         return typeDetails;
-        TypeDetails CreateRuntimeTypeDetails(Type type)
-        {
-            if (_runtimeTypeDetails == null)
-            {
-                Interlocked.CompareExchange(ref _runtimeTypeDetails, new(Environment.ProcessorCount, 2 * _openTypeMapConfigs.Count), null);
-            }
-            return _runtimeTypeDetails.GetOrAdd(type, (type, profile) => new(type, profile), this);
-        }
     }
     public void Register(IGlobalConfiguration configuration)
     {
@@ -187,7 +180,7 @@ public class ProfileMap
         {
             foreach (var propertyMap in typeMap.PropertyMaps)
             {
-                var memberExpression = new MappingExpression.MemberConfigurationExpression(propertyMap.DestinationMember, typeMap.SourceType);
+                var memberExpression = new MemberConfigurationExpression(propertyMap.DestinationMember, typeMap.SourceType);
                 action(propertyMap, memberExpression);
                 memberExpression.Configure(typeMap);
             }

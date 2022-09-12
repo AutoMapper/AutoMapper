@@ -52,33 +52,6 @@ public class MappingExpression : MappingExpressionBase<object, object, IMappingE
         memberOptions(expression);
         return expression;
     }
-    public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
-    {
-        public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType){}
-        public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));
-        public void MapFrom(Type valueResolverType, string sourceMemberName) =>
-             MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
-            {
-                SourceMemberName = sourceMemberName
-            });
-        public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName) =>
-            MapFromCore(new(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
-            {
-                SourceMemberName = sourceMemberName
-            });
-        public void ConvertUsing(Type valueConverterType) => ConvertUsingCore(valueConverterType);
-        public void ConvertUsing(Type valueConverterType, string sourceMemberName) => ConvertUsingCore(valueConverterType, sourceMemberName);
-        public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName) =>
-            base.ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
-            {
-                SourceMemberName = sourceMemberName
-            });
-        private void ConvertUsingCore(Type valueConverterType, string sourceMemberName = null) =>
-            base.ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
-            {
-                SourceMemberName = sourceMemberName
-            });
-    }
 }
 public class MappingExpression<TSource, TDestination> : MappingExpressionBase<TSource, TDestination, IMappingExpression<TSource, TDestination>>,
     IMappingExpression<TSource, TDestination>, IProjectionExpression<TSource, TDestination>
