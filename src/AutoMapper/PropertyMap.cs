@@ -11,8 +11,20 @@ public class PropertyMap : MemberMap
         DestinationMember = destinationMember;
         DestinationType = destinationMemberType;
     }
-    public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
-        : this(inheritedMappedProperty.DestinationMember, inheritedMappedProperty.DestinationType, typeMap) => ApplyInheritedPropertyMap(inheritedMappedProperty);
+    public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap) : base(typeMap)
+    {
+        DestinationMember = inheritedMappedProperty.DestinationMember;
+        if (DestinationMember.DeclaringType.ContainsGenericParameters)
+        {
+            DestinationMember = typeMap.DestinationSetters.Single(m => m.Name == DestinationMember.Name);
+        }
+        DestinationType = inheritedMappedProperty.DestinationType;
+        if (DestinationType.ContainsGenericParameters)
+        {
+            DestinationType = DestinationMember.GetMemberType();
+        }
+        ApplyInheritedPropertyMap(inheritedMappedProperty);
+    }
     public PropertyMap(PropertyMap includedMemberMap, TypeMap typeMap, IncludedMember includedMember)
         : this(includedMemberMap, typeMap) => Details.IncludedMember = includedMember.Chain(includedMemberMap.IncludedMember);
     private MemberMapDetails Details => _details ??= new();
@@ -39,7 +51,7 @@ public class PropertyMap : MemberMap
             if (inheritedMappedProperty.IsResolveConfigured)
             {
                 _sourceType = inheritedMappedProperty._sourceType;
-                Resolver = inheritedMappedProperty.Resolver;
+                Resolver = inheritedMappedProperty.Resolver.CloseGenerics(TypeMap);
             }
             else if (Resolver == null)
             {

@@ -40,7 +40,7 @@ public class MemberMap : IValueResolver
     public void MapFrom(string sourceMembersPath, MemberInfo[] members)
     {
         var sourceType = TypeMap.SourceType;
-        var sourceMembers = sourceType.ContainsGenericParameters ? null :// just a placeholder so the member is mapped
+        var sourceMembers = sourceType.ContainsGenericParameters ? members :
             members[0].DeclaringType.ContainsGenericParameters ? ReflectionHelper.GetMemberPath(sourceType, sourceMembersPath, TypeMap) : members;
         Resolver = new MemberPathResolver(sourceMembers);
     }

@@ -45,9 +45,10 @@ public static class ReflectionHelper
         FieldInfo field => field.GetValue(target),
         _ => throw Expected(propertyOrField)
     };
-    public static MemberInfo[] GetMemberPath(Type type, string fullMemberName, TypeMap typeMap = null)
+    public static MemberInfo[] GetMemberPath(Type type, string fullMemberName, TypeMap typeMap = null) => 
+        GetMemberPath(type, fullMemberName.Split('.'), typeMap);
+    public static MemberInfo[] GetMemberPath(Type type, string[] memberNames, TypeMap typeMap = null)
     {
-        var memberNames = fullMemberName.Split('.');
         var sourceDetails = typeMap?.SourceTypeDetails;
         if (sourceDetails != null && memberNames.Length == 1)
         {

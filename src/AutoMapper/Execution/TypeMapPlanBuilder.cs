@@ -418,6 +418,7 @@ public interface IValueResolver
     Type ResolvedType { get; }
     string SourceMemberName => null;
     LambdaExpression ProjectToExpression => null;
+    IValueResolver CloseGenerics(TypeMap typeMap) => this;
 }
 public class MemberPathResolver : IValueResolver
 {
@@ -431,6 +432,8 @@ public class MemberPathResolver : IValueResolver
     }
     public MemberInfo GetSourceMember(MemberMap memberMap) => _members.Length == 1 ? _members[0] : null;
     public LambdaExpression ProjectToExpression => _members.Lambda();
+    public IValueResolver CloseGenerics(TypeMap typeMap) => _members[0].DeclaringType.ContainsGenericParameters ?
+        new MemberPathResolver(ReflectionHelper.GetMemberPath(typeMap.SourceType, Array.ConvertAll(_members, m => m.Name), typeMap)) : this;
 }
 public abstract class LambdaValueResolver
 {

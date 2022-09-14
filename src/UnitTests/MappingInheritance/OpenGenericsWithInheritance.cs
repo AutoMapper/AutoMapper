@@ -219,3 +219,29 @@ public class OpenGenericsAndNonGenericsWithIncludeBase : AutoMapperSpecBase
         model.SubMember.ShouldBe("bar");
     }
 }
+public class IncludeBaseOpenGenerics : AutoMapperSpecBase
+{
+    public abstract class OrderModel<T>
+    {
+        public string Number { get; set; }
+    }
+    public class InternetOrderModel : OrderModel<int>
+    {
+    }
+    public abstract class Order<T>
+    {
+        public string OrderNumber { get; set; }
+    }
+    public class InternetOrder : Order<int>
+    {
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap(typeof(OrderModel<>), typeof(Order<>))
+            .ForMember("OrderNumber", o => o.MapFrom("Number"));
+        c.CreateMap<InternetOrderModel, InternetOrder>()
+            .IncludeBase(typeof(OrderModel<>), typeof(Order<>));
+    });
+    [Fact]
+    public void Shoud_work() => Mapper.Map<InternetOrder>(new InternetOrderModel { Number = "42" }).OrderNumber.ShouldBe("42");
+}
