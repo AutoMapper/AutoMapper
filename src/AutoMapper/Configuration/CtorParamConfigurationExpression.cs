@@ -45,12 +45,12 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
     }
 
     public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
-        _ctorParamActions.Add(cpm => cpm.SetResolver(sourceMember));
+        _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMember));
 
     public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
     {
         Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
-        _ctorParamActions.Add(cpm => cpm.Resolver = new FuncResolver(resolverExpression));
+        _ctorParamActions.Add(cpm => cpm.SetResolver(new FuncResolver(resolverExpression)));
     }
 
     public void MapFrom(string sourceMembersPath)

@@ -185,7 +185,7 @@ public abstract class TypeMapConfiguration
 
             var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
 
-            pathMap.SetResolver(customExpression);
+            pathMap.MapFrom(customExpression);
         });
     }
     protected void ForSourceMemberCore(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)

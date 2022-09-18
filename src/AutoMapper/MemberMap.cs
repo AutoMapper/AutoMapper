@@ -10,7 +10,12 @@ public class MemberMap : IValueResolver
     public TypeMap TypeMap { get; protected set; }
     public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
     public bool IsResolveConfigured => Resolver != null && Resolver != this;
-    public void SetResolver(LambdaExpression lambda) => Resolver = new ExpressionResolver(lambda);
+    public void MapFrom(LambdaExpression lambda) => SetResolver(new ExpressionResolver(lambda));
+    public void SetResolver(IValueResolver resolver)
+    {
+        Resolver = resolver;
+        Ignored = false;
+    }
     public virtual Type SourceType => default;
     public virtual MemberInfo[] SourceMembers { get => Array.Empty<MemberInfo>(); set { } }
     public virtual IncludedMember IncludedMember => null;
@@ -27,22 +32,17 @@ public class MemberMap : IValueResolver
     public virtual object NullSubstitute { get => default; set { } }
     public virtual LambdaExpression PreCondition { get => default; set { } }
     public virtual LambdaExpression Condition { get => default; set { } }
-    public IValueResolver Resolver { get; set; }
+    public IValueResolver Resolver { get; protected set; }
     public virtual IReadOnlyCollection<ValueTransformerConfiguration> ValueTransformers => Array.Empty<ValueTransformerConfiguration>();
     public MemberInfo SourceMember => Resolver?.GetSourceMember(this);
     public string GetSourceMemberName() => Resolver?.SourceMemberName ?? SourceMember?.Name;
     public bool MustUseDestination => UseDestinationValue is true || !CanBeSet;
-    public void MapFrom(LambdaExpression sourceMember)
-    {
-        SetResolver(sourceMember);
-        Ignored = false;
-    }
     public void MapFrom(string sourceMembersPath, MemberInfo[] members)
     {
         var sourceType = TypeMap.SourceType;
         var sourceMembers = sourceType.ContainsGenericParameters ? members :
             members[0].DeclaringType.ContainsGenericParameters ? ReflectionHelper.GetMemberPath(sourceType, sourceMembersPath, TypeMap) : members;
-        Resolver = new MemberPathResolver(sourceMembers);
+        SetResolver(new MemberPathResolver(sourceMembers));
     }
     public override string ToString() => DestinationName;
     public Expression ChainSourceMembers(Expression source) => SourceMembers.Chain(source);

@@ -24,7 +24,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     public void MapFrom<TValueResolver>() where TValueResolver : IValueResolver<TSource, TDestination, TMember> =>
         MapFromCore(new(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>)));
     protected void MapFromCore(ClassValueResolver config) => SetResolver(config);
-    protected void SetResolver(IValueResolver config) => PropertyMapActions.Add(pm => pm.Resolver = config);
+    protected void SetResolver(IValueResolver config) => PropertyMapActions.Add(pm => pm.SetResolver(config));
     public void MapFrom<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
             MapFromCore<TValueResolver, TSourceMember>(sourceMember);
