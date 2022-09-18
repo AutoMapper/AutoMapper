@@ -5,7 +5,7 @@ public class ToStringMapper : IObjectMapper
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
     {
         var sourceType = sourceExpression.Type;
-        var toStringCall = Call(sourceExpression, ExpressionBuilder.ObjectToString);
+        var toStringCall = Call(sourceExpression, ObjectToString);
         return sourceType.IsEnum ? StringToEnumMapper.CheckEnumMember(sourceExpression, sourceType, toStringCall) : toStringCall;
     }
 }

@@ -7,6 +7,6 @@ public class ConstructorMapper : IObjectMapper
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
     {
         var constructor = GetConstructor(sourceExpression.Type, destExpression.Type);
-        return Expression.New(constructor, ToType(sourceExpression, constructor.FirstParameterType()));
+        return New(constructor, ToType(sourceExpression, constructor.FirstParameterType()));
     }
 }

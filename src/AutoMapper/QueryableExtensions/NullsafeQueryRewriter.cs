@@ -95,17 +95,17 @@ internal class NullsafeQueryRewriter : ExpressionVisitor
         if (fallback != null)
         {
             // coalesce instead, a bit intrusive but fast...
-            return update(Expression.Coalesce(target, fallback));
+            return update(Coalesce(target, fallback));
         }
 
         // target can be null, which is why we are actually here...
-        var targetFallback = Expression.Constant(null, target.Type);
+        var targetFallback = Constant(null, target.Type);
 
         // expression can be default or null, which is basically the same...
         var expressionFallback = !IsNullableOrReferenceType(expression.Type)
-            ? (Expression)Expression.Default(expression.Type) : Expression.Constant(null, expression.Type);
+            ? (Expression)Default(expression.Type) : Constant(null, expression.Type);
 
-        return Expression.Condition(Expression.Equal(target, targetFallback), expressionFallback, expression);
+        return Condition(Equal(target, targetFallback), expressionFallback, expression);
     }
 
     static bool IsSafe(Expression expression)
@@ -129,7 +129,7 @@ internal class NullsafeQueryRewriter : ExpressionVisitor
         // default value for arrays
         if (type.IsArray)
         {
-            return Expression.NewArrayInit(type.GetElementType());
+            return NewArrayInit(type.GetElementType());
         }
 
         return null;
@@ -142,7 +142,7 @@ internal class NullsafeQueryRewriter : ExpressionVisitor
         // try if an instance of this collection would suffice
         if (type.GetTypeInfo().IsAssignableFrom(collection.GetTypeInfo()))
         {
-            return Expression.Convert(Expression.New(collection), type);
+            return Convert(New(collection), type);
         }
 
         return null;

@@ -9,7 +9,7 @@ public static class Extensions
 {
     static readonly MethodInfo SelectMethod = typeof(Queryable).StaticGenericMethod("Select", parametersCount: 2);
     static IQueryable Select(IQueryable source, LambdaExpression lambda) => source.Provider.CreateQuery(
-        Expression.Call(SelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType), source.Expression, Expression.Quote(lambda)));
+        Call(SelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType), source.Expression, Quote(lambda)));
     /// <summary>
     /// Extension method to project from a queryable using the provided mapping engine
     /// </summary>

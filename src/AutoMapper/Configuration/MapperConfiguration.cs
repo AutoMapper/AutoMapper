@@ -45,10 +45,6 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
-    private readonly int _recursiveQueriesMaxDepth;
-    private readonly int _maxExecutionPlanDepth;
-    private readonly bool _enableNullPropagationForQueryMapping;
-    private readonly Func<Type, object> _serviceCtor;
     private readonly bool _sealed;
     private readonly bool _hasOpenMaps;
     private readonly HashSet<TypeMap> _typeMapsPath = new();
@@ -71,11 +67,7 @@ public class MapperConfiguration : IGlobalConfiguration
         _mappers = configuration.Mappers.ToArray();
         _executionPlans = new(CompileExecutionPlan);
         _validator = new(configuration);
-        _serviceCtor = configuration.ServiceCtor;
-        _enableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping ?? false;
-        _maxExecutionPlanDepth = configuration.MaxExecutionPlanDepth + 1;
         _projectionBuilder = new(CreateProjectionBuilder);
-        _recursiveQueriesMaxDepth = configuration.RecursiveQueriesMaxDepth;
         Configuration = new((IProfileConfiguration)configuration);
         int typeMapsCount = Configuration.TypeMapsCount;
         int openTypeMapsCount = Configuration.OpenTypeMapsCount;
@@ -233,15 +225,16 @@ public class MapperConfiguration : IGlobalConfiguration
             return Lambda(fullExpression, source, destination, ContextParameter);
         }
     }
-    ProjectionBuilder CreateProjectionBuilder() => new(this, _validator.Expression.ProjectionMappers.ToArray());
+    IGlobalConfigurationExpression ConfigurationExpression => _validator.Expression;
+    ProjectionBuilder CreateProjectionBuilder() => new(this, ConfigurationExpression.ProjectionMappers.ToArray());
     IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder.Value;
-    Func<Type, object> IGlobalConfiguration.ServiceCtor => _serviceCtor;
-    bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => _enableNullPropagationForQueryMapping;
-    int IGlobalConfiguration.MaxExecutionPlanDepth => _maxExecutionPlanDepth;
+    Func<Type, object> IGlobalConfiguration.ServiceCtor => ConfigurationExpression.ServiceCtor;
+    bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => ConfigurationExpression.EnableNullPropagationForQueryMapping.GetValueOrDefault();
+    int IGlobalConfiguration.MaxExecutionPlanDepth => ConfigurationExpression.MaxExecutionPlanDepth + 1;
     private ProfileMap Configuration { get; }
     ProfileMap[] IGlobalConfiguration.Profiles => Profiles;
     internal ProfileMap[] Profiles { get; }
-    int IGlobalConfiguration.RecursiveQueriesMaxDepth => _recursiveQueriesMaxDepth;
+    int IGlobalConfiguration.RecursiveQueriesMaxDepth => ConfigurationExpression.RecursiveQueriesMaxDepth;
     Features<IRuntimeFeature> IGlobalConfiguration.Features => _features;
     List<MemberInfo> IGlobalConfiguration.SourceMembers => _sourceMembers;
     List<ParameterExpression> IGlobalConfiguration.Variables => _variables;

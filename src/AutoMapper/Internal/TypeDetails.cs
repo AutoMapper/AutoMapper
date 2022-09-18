@@ -93,7 +93,7 @@ public class TypeDetails
     {
         readonly MethodInfo _genericMethod;
         readonly Type _genericInterface;
-        MethodInfo _closedMethod = ExpressionBuilder.DecTypeDepthInfo;
+        MethodInfo _closedMethod = DecTypeDepthInfo;
         public GenericMethod(MethodInfo genericMethod, Type genericInterface)
         {
             _genericMethod = genericMethod;
@@ -101,7 +101,7 @@ public class TypeDetails
         }
         public MethodInfo Close()
         {
-            if (_closedMethod == ExpressionBuilder.DecTypeDepthInfo)
+            if (_closedMethod == DecTypeDepthInfo)
             {
                 // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
                 // in order to catch exceptions resulting from the generic arguments not being compatible

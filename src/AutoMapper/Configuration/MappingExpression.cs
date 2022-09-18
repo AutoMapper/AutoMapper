@@ -89,7 +89,7 @@ public class MappingExpression<TSource, TDestination> : MappingExpressionBase<TS
             e =>
             {
                 var bodyIsCastToObject = e.Body.NodeType == ExpressionType.Convert && e.Body.Type == typeof(object);
-                return bodyIsCastToObject ? Expression.Lambda(((UnaryExpression)e.Body).Operand, e.Parameters) : e;
+                return bodyIsCastToObject ? Lambda(((UnaryExpression)e.Body).Operand, e.Parameters) : e;
             });
         IncludeMembersCore(memberExpressionsWithoutCastToObject);
         return this;

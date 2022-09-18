@@ -449,5 +449,5 @@ public class ParameterReplaceVisitor : ReplaceVisitorBase
 public class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
 {
     public override Expression Replace(Expression target, Expression oldNode, Expression newNode) => 
-        base.Replace(target, oldNode, ExpressionBuilder.ToType(newNode, oldNode.Type));
+        base.Replace(target, oldNode, ToType(newNode, oldNode.Type));
 }

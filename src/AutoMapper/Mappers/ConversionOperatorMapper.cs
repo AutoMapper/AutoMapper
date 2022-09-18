@@ -18,6 +18,6 @@ public class ConversionOperatorMapper : IObjectMapper
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
     {
         var conversionOperator = GetConversionOperator(sourceExpression.Type, destExpression.Type);
-        return Expression.Call(conversionOperator, ToType(sourceExpression, conversionOperator.FirstParameterType()));
+        return Call(conversionOperator, ToType(sourceExpression, conversionOperator.FirstParameterType()));
     }
 }

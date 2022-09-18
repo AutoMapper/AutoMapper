@@ -12,6 +12,6 @@ public class KeyValueMapper : IObjectMapper
         var values = new TypePair(sourceArguments[1], destinationArguments[1]);
         var mapKeys = configuration.MapExpression(profileMap, keys, ExpressionBuilder.Property(sourceExpression, "Key"));
         var mapValues = configuration.MapExpression(profileMap, values, ExpressionBuilder.Property(sourceExpression, "Value"));
-        return Expression.New(destinationType.GetConstructor(destinationArguments), mapKeys, mapValues);
+        return New(destinationType.GetConstructor(destinationArguments), mapKeys, mapValues);
     }
 }
