@@ -1,5 +1,19 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
+public class UseDestinationValueNullable : AutoMapperSpecBase
+{
+    class Source
+    {
+        public int? Value;
+    }
+    class Destination
+    {
+        public int Value = 42;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+        c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseDestinationValue()));
+    [Fact]
+    public void Should_keep_existing_value() => Map<Destination>(new Source()).Value.ShouldBe(42);
+}
 public class UseDestinationValue : AutoMapperSpecBase
 {
     public class OrganizationDTO
