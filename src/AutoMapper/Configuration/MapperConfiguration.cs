@@ -45,7 +45,6 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
-    private readonly bool _sealed;
     private readonly bool _hasOpenMaps;
     private readonly HashSet<TypeMap> _typeMapsPath = new();
     private readonly List<MemberInfo> _sourceMembers = new();
@@ -84,7 +83,6 @@ public class MapperConfiguration : IGlobalConfiguration
         _defaults = new(3 * typeMapsCount);
         _configuredMaps = new(typeMapsCount);
         _hasOpenMaps = openTypeMapsCount > 0;
-        _runtimeMaps = new(GetTypeMap, openTypeMapsCount);
         _resolvedMaps = new(2 * typeMapsCount);
         configuration.Features.Configure(this);
 
@@ -106,7 +104,7 @@ public class MapperConfiguration : IGlobalConfiguration
         _convertParameterReplaceVisitor = null;
         _parameterReplaceVisitor = null;
         _typesInheritance = null;
-        _sealed = true;
+        _runtimeMaps = new(GetTypeMap, openTypeMapsCount);
         return;
         void Seal()
         {
@@ -289,7 +287,16 @@ public class MapperConfiguration : IGlobalConfiguration
         {
             return typeMap;
         }
-        if (_sealed)
+        if (_runtimeMaps.IsDefault)
+        {
+            typeMap = GetTypeMap(typePair);
+            _resolvedMaps.Add(typePair, typeMap);
+            if (typeMap != null && typeMap.MapExpression == null)
+            {
+                typeMap.Seal(this);
+            }
+        }
+        else
         {
             typeMap = _runtimeMaps.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
@@ -299,15 +306,6 @@ public class MapperConfiguration : IGlobalConfiguration
                 {
                     typeMap.Seal(this);
                 }
-            }
-        }
-        else
-        {
-            typeMap = GetTypeMap(typePair);
-            _resolvedMaps.Add(typePair, typeMap);
-            if (typeMap != null && typeMap.MapExpression == null)
-            {
-                typeMap.Seal(this);
             }
         }
         return typeMap;

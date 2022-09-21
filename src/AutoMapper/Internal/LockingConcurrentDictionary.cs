@@ -10,4 +10,5 @@ public readonly struct LockingConcurrentDictionary<TKey, TValue>
         _dictionary = new(Environment.ProcessorCount, capacity);
     }
     public TValue GetOrAdd(in TKey key) => _dictionary.GetOrAdd(key, _valueFactory).Value;
+    public bool IsDefault => _dictionary == null;
 }
