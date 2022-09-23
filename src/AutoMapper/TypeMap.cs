@@ -183,9 +183,12 @@ public class TypeMap
     }
     internal void IgnorePaths(MemberInfo destinationMember)
     {
-        foreach (var pathMap in PathMaps.Where(pm => pm.MemberPath.First == destinationMember))
+        foreach (var pathMap in PathMaps)
         {
-            pathMap.Ignored = true;
+            if (pathMap.MemberPath.First == destinationMember)
+            {
+                pathMap.Ignored = true;
+            }
         }
     }
     public bool HasDerivedTypesToInclude => IncludedDerivedTypes.Count > 0;
