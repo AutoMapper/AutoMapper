@@ -99,6 +99,6 @@ public class ConstructorParameterMap : MemberMap
     public override MemberInfo[] SourceMembers { get; set; }
     public override string DestinationName => Parameter.Name;
     public Expression DefaultValue(IGlobalConfiguration configuration) => Parameter.IsOptional ? Parameter.GetDefaultValue(configuration) : configuration.Default(DestinationType);
-    public override string ToString() => $"{Constructor.DeclaringType} {Constructor}, parameter {DestinationName}";
+    public override string ToString() => $"{Constructor}, parameter {DestinationName}";
     private MemberInfo Constructor => Parameter.Member;
 }

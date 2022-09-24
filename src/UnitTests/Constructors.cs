@@ -987,7 +987,7 @@ public class When_mapping_constructor_argument_fails : NonValidatingSpecBase
     public void Should_say_what_parameter_fails()
     {
         var ex = new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>();
-        ex.Message.ShouldContain("AutoMapper.UnitTests.Constructors.When_mapping_constructor_argument_fails+Dest Void .ctor(Dest), parameter foo", Case.Sensitive);
+        ex.Message.ShouldContain("Void .ctor(Dest), parameter foo", Case.Sensitive);
     }
 }
 

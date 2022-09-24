@@ -29,7 +29,7 @@ public class ConstructorMappingValidation : NonValidatingSpecBase
 
     [Fact]
     public void Should_fail_validation() => new Action(AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex=>
-        ex.MemberMap.ToString().ShouldBe("AutoMapper.UnitTests.ConfigurationValidation.ConstructorMappingValidation+Destination Void .ctor(ComplexType), parameter myComplexMember"));
+        ex.MemberMap.ToString().ShouldBe("Void .ctor(ComplexType), parameter myComplexMember"));
 }
 
 public class When_using_a_type_converter : AutoMapperSpecBase
