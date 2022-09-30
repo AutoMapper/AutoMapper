@@ -1,12 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.BuiltInTypes;
+﻿namespace AutoMapper.IntegrationTests.BuiltInTypes;
 
 public class EnumToUnderlyingType : IntegrationTest<EnumToUnderlyingType.DatabaseInitializer>
 {

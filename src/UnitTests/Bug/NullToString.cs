@@ -1,39 +1,34 @@
-﻿using Xunit;
-using Shouldly;
-using System;
+﻿namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class NullToString : AutoMapperSpecBase
 {
-    public class NullToString : AutoMapperSpecBase
+    private Destination _destination;
+
+    class Source
     {
-        private Destination _destination;
+        public InnerSource Inner { get; set; }
+    }
+    class InnerSource
+    {
+    }
+    class Destination
+    {
+        public string Inner { get; set; }
+    }
 
-        class Source
-        {
-            public InnerSource Inner { get; set; }
-        }
-        class InnerSource
-        {
-        }
-        class Destination
-        {
-            public string Inner { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>();
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<Source, Destination>();
-        });
+    protected override void Because_of()
+    {
+        _destination = Mapper.Map<Source, Destination>(new Source());
+    }
 
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Source, Destination>(new Source());
-        }
-
-        [Fact]
-        public void Should_map_int_to_nullable_decimal()
-        {
-            _destination.Inner.ShouldBeNull();
-        }
+    [Fact]
+    public void Should_map_int_to_nullable_decimal()
+    {
+        _destination.Inner.ShouldBeNull();
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace AutoMapper.Configuration
+﻿namespace AutoMapper.Configuration;
+
+public interface IMemberConfigurationProvider
 {
-    public interface IMemberConfigurationProvider
-    {
-        void ApplyConfiguration(IMemberConfigurationExpression memberConfigurationExpression);
-    }
+    void ApplyConfiguration(IMemberConfigurationExpression memberConfigurationExpression);
 }

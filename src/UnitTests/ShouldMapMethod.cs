@@ -1,8 +1,4 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-
-namespace AutoMapper.UnitTests;
+﻿namespace AutoMapper.UnitTests;
 
 public class ShouldIgnoreOpenGenericMethods : NonValidatingSpecBase
 {

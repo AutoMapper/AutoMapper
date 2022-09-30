@@ -1,13 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests;
+﻿namespace AutoMapper.IntegrationTests;
 
 public class ParameterizedQueries : IntegrationTest<ParameterizedQueries.DatabaseInitializer>
 {

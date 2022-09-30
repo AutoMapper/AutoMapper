@@ -1,8 +1,4 @@
 ﻿using AutoMapper.Configuration.Annotations;
-using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 
 namespace AutoMapper.UnitTests
 {

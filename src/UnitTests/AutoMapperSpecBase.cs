@@ -1,14 +1,42 @@
-using System;
-using Xunit;
-using AutoMapper.Internal;
-using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using AutoMapper.Configuration;
-
 namespace AutoMapper.UnitTests;
-
+public abstract class AutoMapperSpecBase : NonValidatingSpecBase
+{
+    protected override void OnConfig(MapperConfiguration mapperConfiguration) => mapperConfiguration.AssertConfigurationIsValid();
+    protected sealed override void AssertConfigurationIsValid() => Configuration.Internal();
+}
+public abstract class NonValidatingSpecBase
+{
+    protected NonValidatingSpecBase()
+    {
+        Because_of();
+    }
+    private IMapper _mapper;
+    protected virtual MapperConfiguration CreateConfiguration() => throw new NotImplementedException();
+    protected IGlobalConfiguration Configuration => Mapper.ConfigurationProvider.Internal();
+    protected IMapper Mapper => _mapper ??= CreateMapper();
+    IMapper CreateMapper()
+    {
+        var config = CreateConfiguration();
+        OnConfig(config);
+        return config.CreateMapper();
+    }
+    protected virtual void OnConfig(MapperConfiguration mapperConfiguration) { }
+    protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
+    protected TypeMap FindTypeMapFor<TSource, TDestination>() => Configuration.FindTypeMapFor<TSource, TDestination>();
+    protected virtual void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
+    protected void AssertConfigurationIsValid<TSource, TDestination>() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<TSource, TDestination>());
+    protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(sourceType, destinationType));
+    public void AssertConfigurationIsValid(string profileName) => Configuration.AssertConfigurationIsValid(profileName);
+    public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => Configuration.AssertConfigurationIsValid<TProfile>();
+    protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
+        Mapper.ProjectTo(source, parameters, membersToExpand);
+    protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
+        Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
+    public IEnumerable<ProfileMap> GetProfiles() => Configuration.Profiles;
+    protected virtual void Because_of()
+    {
+    }
+}
 /// <summary>
 /// Ignore this member for validation and skip during mapping
 /// </summary>
@@ -37,78 +65,6 @@ static class Utils
         }));
         configuration.ForAllPropertyMaps(propertyMap => propertyMap.SourceMember?.Has<IgnoreMapAttribute>() == true, 
             (_, memberOptions) => memberOptions.Ignore());
-    }
-}
-
-public abstract class AutoMapperSpecBase : NonValidatingSpecBase
-{
-    protected override void OnConfig(MapperConfiguration mapperConfiguration) => mapperConfiguration.AssertConfigurationIsValid();
-    protected override void AssertConfigurationIsValid() => Configuration.Internal();
-}
-
-public abstract class NonValidatingSpecBase : SpecBase
-{
-    private IMapper _mapper;
-    protected abstract MapperConfiguration CreateConfiguration();
-    protected IGlobalConfiguration Configuration => Mapper.ConfigurationProvider.Internal();
-    protected IMapper Mapper => _mapper ??= CreateMapper();
-    IMapper CreateMapper()
-    {
-        var config = CreateConfiguration();
-        OnConfig(config);
-        return config.CreateMapper();
-    }
-    protected virtual void OnConfig(MapperConfiguration mapperConfiguration) { }
-    protected TDestination Map<TDestination>(object source) => Mapper.Map<TDestination>(source);
-    protected TypeMap FindTypeMapFor<TSource, TDestination>() => Configuration.FindTypeMapFor<TSource, TDestination>();
-    protected virtual void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
-    protected void AssertConfigurationIsValid<TSource, TDestination>() => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor<TSource, TDestination>());
-    protected void AssertConfigurationIsValid(Type sourceType, Type destinationType) => Configuration.AssertConfigurationIsValid(Configuration.FindTypeMapFor(sourceType, destinationType));
-    public void AssertConfigurationIsValid(string profileName) => Configuration.AssertConfigurationIsValid(profileName);
-    public void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new() => Configuration.AssertConfigurationIsValid<TProfile>();
-    protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters = null, params Expression<Func<TDestination, object>>[] membersToExpand) => 
-        Mapper.ProjectTo(source, parameters, membersToExpand);
-    protected IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand) =>
-        Mapper.ProjectTo<TDestination>(source, parameters, membersToExpand);
-    public IEnumerable<ProfileMap> GetProfiles() => Configuration.Profiles;
-}
-
-public abstract class SpecBaseBase
-{
-    protected virtual void MainSetup()
-    {
-        Establish_context();
-        Because_of();
-    }
-
-    protected virtual void MainTeardown()
-    {
-        Cleanup();
-    }
-
-    protected virtual void Establish_context()
-    {
-    }
-
-    protected virtual void Because_of()
-    {
-    }
-
-    protected virtual void Cleanup()
-    {
-    }
-}
-public abstract class SpecBase : SpecBaseBase, IDisposable
-{
-    protected SpecBase()
-    {
-        Establish_context();
-        Because_of();
-    }
-
-    public void Dispose()
-    {
-        Cleanup();
     }
 }
 class FirstOrDefaultCounter : ExpressionVisitor

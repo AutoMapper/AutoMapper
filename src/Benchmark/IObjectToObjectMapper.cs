@@ -1,11 +1,8 @@
-using System;
+namespace Benchmark;
 
-namespace Benchmark
+public interface IObjectToObjectMapper
 {
-    public interface IObjectToObjectMapper
-    {
-        string Name { get; }
-        void Initialize();
-        object Map();
-    }
+    string Name { get; }
+    void Initialize();
+    object Map();
 }

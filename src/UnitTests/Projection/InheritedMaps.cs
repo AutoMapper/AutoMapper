@@ -2,11 +2,6 @@
 {
     namespace InheritedMaps
     {
-        using System.Linq;
-        using QueryableExtensions;
-        using Shouldly;
-        using Xunit;
-
         public class SourceBase
         {
             public int OtherValue { get; set; }

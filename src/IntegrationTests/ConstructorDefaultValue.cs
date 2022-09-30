@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using System.Linq;
-using Xunit;
-namespace AutoMapper.IntegrationTests;
+﻿namespace AutoMapper.IntegrationTests;
 public class ConstructorDefaultValue : IntegrationTest<ConstructorDefaultValue.DatabaseInitializer>
 {
     public class Customer

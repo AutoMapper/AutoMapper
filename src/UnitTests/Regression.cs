@@ -1,11 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Shouldly;
-using Xunit;
-using System.Linq;
-
 namespace AutoMapper.UnitTests
 {
     namespace Regression

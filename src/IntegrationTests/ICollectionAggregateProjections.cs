@@ -1,16 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests;
-
-using UnitTests;
-using QueryableExtensions;
-using System.Collections.Generic;
-
+﻿namespace AutoMapper.IntegrationTests;
 public class ICollectionAggregateProjections : IntegrationTest<ICollectionAggregateProjections.DatabaseInitializer>
 {
     public class Customer

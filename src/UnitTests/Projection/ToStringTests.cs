@@ -1,85 +1,78 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection;
+public class ToStringTests : AutoMapperSpecBase
 {
-    using System.Linq;
-    using QueryableExtensions;
-    using Shouldly;
-    using Xunit;
+    private Dest[] _dests;
 
-    public class ToStringTests : AutoMapperSpecBase
+    public class Source
     {
-        private Dest[] _dests;
-
-        public class Source
-        {
-            public int Value { get; set; }
-        }
-
-        public class Dest
-        {
-            public string Value { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateProjection<Source, Dest>();
-        });
-
-        protected override void Because_of()
-        {
-            var sources = new[]
-            {
-                new Source
-                {
-                    Value = 5
-                }
-            }.AsQueryable();
-
-            _dests = sources.ProjectTo<Dest>(Configuration).ToArray();
-        }
-
-        [Fact]
-        public void Should_convert_to_string()
-        {
-            _dests[0].Value.ShouldBe("5");
-        }
+        public int Value { get; set; }
     }
 
-    public class NullableToStringTests : AutoMapperSpecBase
+    public class Dest
     {
-        private Dest[] _dests;
+        public string Value { get; set; }
+    }
 
-        public class Source
-        {
-            public int? Value { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateProjection<Source, Dest>();
+    });
 
-        public class Dest
+    protected override void Because_of()
+    {
+        var sources = new[]
         {
-            public string Value { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateProjection<Source, Dest>();
-        });
-
-        protected override void Because_of()
-        {
-            var sources = new[]
+            new Source
             {
-                new Source
-                {
-                    Value = 5
-                }
-            }.AsQueryable();
+                Value = 5
+            }
+        }.AsQueryable();
 
-            _dests = sources.ProjectTo<Dest>(Configuration).ToArray();
-        }
+        _dests = sources.ProjectTo<Dest>(Configuration).ToArray();
+    }
 
-        [Fact]
-        public void Should_convert_to_string()
+    [Fact]
+    public void Should_convert_to_string()
+    {
+        _dests[0].Value.ShouldBe("5");
+    }
+}
+
+public class NullableToStringTests : AutoMapperSpecBase
+{
+    private Dest[] _dests;
+
+    public class Source
+    {
+        public int? Value { get; set; }
+    }
+
+    public class Dest
+    {
+        public string Value { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateProjection<Source, Dest>();
+    });
+
+    protected override void Because_of()
+    {
+        var sources = new[]
         {
-            _dests[0].Value.ShouldBe("5");
-        }
+            new Source
+            {
+                Value = 5
+            }
+        }.AsQueryable();
+
+        _dests = sources.ProjectTo<Dest>(Configuration).ToArray();
+    }
+
+    [Fact]
+    public void Should_convert_to_string()
+    {
+        _dests[0].Value.ShouldBe("5");
     }
 }

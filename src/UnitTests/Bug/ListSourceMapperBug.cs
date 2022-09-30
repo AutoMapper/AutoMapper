@@ -1,46 +1,36 @@
-﻿namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug;
+public class ListSourceMapperBug
 {
-    using System;
-    using System.Collections;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Linq;
-    using Shouldly;
-    using Xunit;
-
-    public class ListSourceMapperBug
+    public class CustomCollection<T> : Collection<T>, IListSource
     {
-        public class CustomCollection<T> : Collection<T>, IListSource
+        public IList GetList()
         {
-            public IList GetList()
-            {
-                return new ReadOnlyCollection<T>(this.ToList());
-            }
-
-            public bool ContainsListCollection
-            {
-                get { return true; }
-            }
+            return new ReadOnlyCollection<T>(this.ToList());
         }
 
-        public class Source
+        public bool ContainsListCollection
         {
+            get { return true; }
         }
+    }
 
-        public class Dest
-        {
-        }
+    public class Source
+    {
+    }
 
-        [Fact]
-        public void CustomListSourceShouldNotBlowUp()
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
+    public class Dest
+    {
+    }
 
-            var source = new CustomCollection<Source> {new Source()};
+    [Fact]
+    public void CustomListSourceShouldNotBlowUp()
+    {
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
-            var dests = config.CreateMapper().Map<CustomCollection<Source>, CustomCollection<Dest>>(source);
+        var source = new CustomCollection<Source> {new Source()};
 
-            dests.Count.ShouldBe(1);
-        }
+        var dests = config.CreateMapper().Map<CustomCollection<Source>, CustomCollection<Dest>>(source);
+
+        dests.Count.ShouldBe(1);
     }
 }

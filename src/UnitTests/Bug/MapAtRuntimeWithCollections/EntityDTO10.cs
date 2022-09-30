@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
+﻿namespace OmmitedDTOModel3WithCollections;
 
-namespace OmmitedDTOModel3WithCollections
+public class EntityDTO10 : BaseEntity
 {
-    public class EntityDTO10 : BaseEntity
+    public EntityDTO10()
     {
-        public EntityDTO10()
-        {
-            this.Entities11 = new List<EntityDTO11>();
-        }
-        public ICollection<EntityDTO11> Entities11 { get; set; }
+        this.Entities11 = new List<EntityDTO11>();
     }
+    public ICollection<EntityDTO11> Entities11 { get; set; }
 }

@@ -1,14 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.UnitTests;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.IntegrationTests.ExplicitExpansion;
+﻿namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 
 public class ExpandCollections : IntegrationTest<ExpandCollections.DatabaseInitializer>
 {

@@ -2,10 +2,6 @@
 {
     namespace ConditionBug
     {
-        using System.Collections.Generic;
-        using Shouldly;
-        using Xunit;
-
         public class Example : AutoMapperSpecBase
         {
             public class SubSource
@@ -93,10 +89,6 @@
 
     namespace ConditionPropertyBug
     {
-        using System;
-        using Shouldly;
-        using Xunit;
-
         public class Example : AutoMapperSpecBase
         {
             public class Source
@@ -157,9 +149,6 @@
 
     namespace SourceValueConditionPropertyBug
     {
-        using Shouldly;
-        using Xunit;
-
         public class Source
         {
             public int Value { get; set; }
@@ -198,11 +187,6 @@
 
     namespace SourceValueExceptionConditionPropertyBug
     {
-        using System;
-        using System.Collections.Generic;
-        using Shouldly;
-        using Xunit;
-
         public enum Property
         {
             Value1 = 0,

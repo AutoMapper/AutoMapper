@@ -1,10 +1,7 @@
-﻿using System;
+﻿namespace OmmitedDTOModel3WithCollections;
 
-namespace OmmitedDTOModel3WithCollections
+public class EntityDTO19 : BaseEntity
 {
-    public class EntityDTO19 : BaseEntity
-    {
-        public Guid Entity25Id { get; set; }
-        public EntityDTO25 Entity25 { get; set; }
-    }
+    public Guid Entity25Id { get; set; }
+    public EntityDTO25 Entity25 { get; set; }
 }

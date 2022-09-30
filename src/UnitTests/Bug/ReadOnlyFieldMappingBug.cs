@@ -1,39 +1,35 @@
-﻿using Shouldly;
-using Xunit;
+﻿namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class ReadOnlyFieldMappingBug : AutoMapperSpecBase
 {
-    public class ReadOnlyFieldMappingBug : AutoMapperSpecBase
+    public class Source
     {
-        public class Source
+        public string Value { get; set; }
+    }
+
+    public class Destination
+    {
+        public readonly string Value;
+
+        public Destination(string value)
         {
-            public string Value { get; set; }
+            Value = value;
         }
+    }
 
-        public class Destination
-        {
-            public readonly string Value;
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        // BUG. ArgumentException : Expression must be writeable
+        cfg.CreateMap<Source, Destination>();
+    });
 
-            public Destination(string value)
-            {
-                Value = value;
-            }
-        }
+    [Fact]
+    public void Should_map_over_constructor()
+    {
+        var source = new Source { Value = "value" };
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            // BUG. ArgumentException : Expression must be writeable
-            cfg.CreateMap<Source, Destination>();
-        });
+        var dest = Mapper.Map<Destination>(source);
 
-        [Fact]
-        public void Should_map_over_constructor()
-        {
-            var source = new Source { Value = "value" };
-
-            var dest = Mapper.Map<Destination>(source);
-
-            dest.Value.ShouldBe(source.Value);
-        }
+        dest.Value.ShouldBe(source.Value);
     }
 }

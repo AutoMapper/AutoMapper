@@ -1,45 +1,38 @@
-﻿using Shouldly;
-using Xunit;
-using System.Linq;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class CannotProjectStringToNullableEnum
 {
-    public class CannotProjectStringToNullableEnum
+    public enum DummyTypes : int
     {
-        public enum DummyTypes : int
+        Foo = 1,
+        Bar = 2
+    }
+
+    public class DummySource
+    {
+        public string Dummy { get; set; }
+    }
+
+    public class DummyDestination
+    {
+        public DummyTypes? Dummy { get; set; }
+    }
+
+    [Fact]
+    public void Should_project_string_to_nullable_enum()
+    {
+        var config = new MapperConfiguration(cfg =>
         {
-            Foo = 1,
-            Bar = 2
-        }
+            cfg.CreateProjection<string, DummyTypes?>().ConvertUsing(s => (DummyTypes)System.Enum.Parse(typeof(DummyTypes),s));
+            cfg.CreateProjection<DummySource, DummyDestination>();
+        });
 
-        public class DummySource
-        {
-            public string Dummy { get; set; }
-        }
+        config.AssertConfigurationIsValid();
 
-        public class DummyDestination
-        {
-            public DummyTypes? Dummy { get; set; }
-        }
+        var src = new DummySource[] { new DummySource { Dummy = "Foo" } };
 
-        [Fact]
-        public void Should_project_string_to_nullable_enum()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateProjection<string, DummyTypes?>().ConvertUsing(s => (DummyTypes)System.Enum.Parse(typeof(DummyTypes),s));
-                cfg.CreateProjection<DummySource, DummyDestination>();
-            });
+        var destination = src.AsQueryable().ProjectTo<DummyDestination>(config).First();
 
-            config.AssertConfigurationIsValid();
-
-            var src = new DummySource[] { new DummySource { Dummy = "Foo" } };
-
-            var destination = src.AsQueryable().ProjectTo<DummyDestination>(config).First();
-
-            destination.Dummy.ShouldBe(DummyTypes.Foo);
-        }
+        destination.Dummy.ShouldBe(DummyTypes.Foo);
     }
 }

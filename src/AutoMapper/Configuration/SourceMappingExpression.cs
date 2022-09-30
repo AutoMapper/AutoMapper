@@ -1,56 +1,51 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+namespace AutoMapper.Configuration;
 
-namespace AutoMapper.Configuration
+public interface ISourceMemberConfiguration
 {
-    public interface ISourceMemberConfiguration
-    {
-        void Configure(TypeMap typeMap);
-    }
+    void Configure(TypeMap typeMap);
+}
+/// <summary>
+/// Source member configuration options
+/// </summary>
+public interface ISourceMemberConfigurationExpression
+{
     /// <summary>
-    /// Source member configuration options
+    /// Ignore this member when validating source members, MemberList.Source.
+    /// Does not affect validation for the default case, MemberList.Destination.
     /// </summary>
-    public interface ISourceMemberConfigurationExpression
+    void DoNotValidate();
+}
+public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
+{
+    private readonly MemberInfo _sourceMember;
+    private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new List<Action<SourceMemberConfig>>();
+
+    public SourceMappingExpression(MemberInfo sourceMember) => _sourceMember = sourceMember;
+
+    public void DoNotValidate() => _sourceMemberActions.Add(smc => smc.Ignore());
+
+    public void Configure(TypeMap typeMap)
     {
-        /// <summary>
-        /// Ignore this member when validating source members, MemberList.Source.
-        /// Does not affect validation for the default case, MemberList.Destination.
-        /// </summary>
-        void DoNotValidate();
-    }
-    public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
-    {
-        private readonly MemberInfo _sourceMember;
-        private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new List<Action<SourceMemberConfig>>();
+        var sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(_sourceMember);
 
-        public SourceMappingExpression(MemberInfo sourceMember) => _sourceMember = sourceMember;
-
-        public void DoNotValidate() => _sourceMemberActions.Add(smc => smc.Ignore());
-
-        public void Configure(TypeMap typeMap)
+        foreach (var action in _sourceMemberActions)
         {
-            var sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(_sourceMember);
-
-            foreach (var action in _sourceMemberActions)
-            {
-                action(sourcePropertyConfig);
-            }
+            action(sourcePropertyConfig);
         }
     }
-    /// <summary>
-    /// Contains member configuration relating to source members
-    /// </summary>
-    public class SourceMemberConfig
-    {
-        private bool _ignored;
+}
+/// <summary>
+/// Contains member configuration relating to source members
+/// </summary>
+public class SourceMemberConfig
+{
+    private bool _ignored;
 
-        public SourceMemberConfig(MemberInfo sourceMember) => SourceMember = sourceMember;
+    public SourceMemberConfig(MemberInfo sourceMember) => SourceMember = sourceMember;
 
-        public MemberInfo SourceMember { get; }
+    public MemberInfo SourceMember { get; }
 
-        public void Ignore() => _ignored = true;
+    public void Ignore() => _ignored = true;
 
-        public bool IsIgnored() => _ignored;
-    }
+    public bool IsIgnored() => _ignored;
 }

@@ -1,14 +1,7 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
-    using System.Collections.Generic;
-
     namespace ProjectCollectionsBug
     {
-        using System;
-        using System.Linq;
-        using QueryableExtensions;
-        using Xunit;
-
         public class A
         {
             public int AP1 { get; set; }

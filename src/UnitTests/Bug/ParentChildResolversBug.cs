@@ -2,9 +2,6 @@
 {
     namespace ParentChildResolversBug
     {
-        using Shouldly;
-        using Xunit;
-
         public enum DestEnum
         {
             a,

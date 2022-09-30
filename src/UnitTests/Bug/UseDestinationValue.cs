@@ -1,195 +1,203 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using System.Collections.Generic;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug;
+public class UseDestinationValueNullable : AutoMapperSpecBase
 {
-    public class UseDestinationValue : AutoMapperSpecBase
+    class Source
     {
-        public class OrganizationDTO
-        {
-            public long? ID { get; set; }
-            public string Name { get; set; }
+        public int? Value;
+    }
+    class Destination
+    {
+        public int Value = 42;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+        c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseDestinationValue()));
+    [Fact]
+    public void Should_keep_existing_value() => Map<Destination>(new Source()).Value.ShouldBe(42);
+}
+public class UseDestinationValue : AutoMapperSpecBase
+{
+    public class OrganizationDTO
+    {
+        public long? ID { get; set; }
+        public string Name { get; set; }
 
-            private CollectionDTOController<BranchDTO, short> _branchCollection;
-            public CollectionDTOController<BranchDTO, short> BranchCollection
+        private CollectionDTOController<BranchDTO, short> _branchCollection;
+        public CollectionDTOController<BranchDTO, short> BranchCollection
+        {
+            get
             {
-                get
-                {
-                    if(_branchCollection == null)
-                        _branchCollection = new CollectionDTOController<BranchDTO, short>();
+                if(_branchCollection == null)
+                    _branchCollection = new CollectionDTOController<BranchDTO, short>();
 
-                    return _branchCollection;
-                }
-                set { _branchCollection = value; }
+                return _branchCollection;
             }
-        }
-
-        public class BranchDTO
-        {
-            public short? ID { get; set; }
-            public string Name { get; set; }
-
-        }
-
-        public class CollectionDTOController<T, K>
-           where T : class
-           where K : struct
-        {
-            public IEnumerable<T> Models { get; set; }
-            public K? SelectedID { get; set; }
-        }
-
-        public class Organization
-        {
-            public long? ID { get; set; }
-            public string Name { get; set; }
-
-            private CollectionController<Branch, short, EventArgs> _BranchCollection;
-            public CollectionController<Branch, short, EventArgs> BranchCollection
-            {
-                get
-                {
-                    if(_BranchCollection == null)
-                        _BranchCollection = new CollectionController<Branch, short, EventArgs>(this);
-
-                    return _BranchCollection;
-                }
-                set { _BranchCollection = value; }
-            }
-        }
-
-        public class Branch
-        {
-            public short? ID { get; set; }
-            public string Name { get; set; }
-
-        }
-
-        public class CollectionController<T, K, Z>
-            where T : class
-            where K : struct
-            where Z : EventArgs
-        {
-            private object _owner;
-            public CollectionController(object owner)
-            {
-                _owner = owner;
-            }
-            public IEnumerable<T> Models { get; set; }
-            public K? SelectedID { get; set; }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.CreateMap<OrganizationDTO, Organization>().ForMember(d=>d.BranchCollection, o=>o.UseDestinationValue());
-            cfg.CreateMap<BranchDTO, Branch>();
-            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
-        });
-        [Fact]
-        public void Should_work()
-        {
-            var branchDto = new BranchDTO { ID = 51, Name = "B1" };
-            var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };
-            orgDto.BranchCollection.Models = new BranchDTO[] { branchDto };
-
-            Mapper.Map<Organization>(orgDto);
+            set { _branchCollection = value; }
         }
     }
 
-    public class DontUseDestinationValue : NonValidatingSpecBase
+    public class BranchDTO
     {
-        public class OrganizationDTO
-        {
-            public long? ID { get; set; }
-            public string Name { get; set; }
+        public short? ID { get; set; }
+        public string Name { get; set; }
 
-            private CollectionDTOController<BranchDTO, short> _branchCollection;
-            public CollectionDTOController<BranchDTO, short> BranchCollection
+    }
+
+    public class CollectionDTOController<T, K>
+       where T : class
+       where K : struct
+    {
+        public IEnumerable<T> Models { get; set; }
+        public K? SelectedID { get; set; }
+    }
+
+    public class Organization
+    {
+        public long? ID { get; set; }
+        public string Name { get; set; }
+
+        private CollectionController<Branch, short, EventArgs> _BranchCollection;
+        public CollectionController<Branch, short, EventArgs> BranchCollection
+        {
+            get
             {
-                get
-                {
-                    if(_branchCollection == null)
-                        _branchCollection = new CollectionDTOController<BranchDTO, short>();
+                if(_BranchCollection == null)
+                    _BranchCollection = new CollectionController<Branch, short, EventArgs>(this);
 
-                    return _branchCollection;
-                }
-                set { _branchCollection = value; }
+                return _BranchCollection;
             }
+            set { _BranchCollection = value; }
         }
+    }
 
-        public class BranchDTO
+    public class Branch
+    {
+        public short? ID { get; set; }
+        public string Name { get; set; }
+
+    }
+
+    public class CollectionController<T, K, Z>
+        where T : class
+        where K : struct
+        where Z : EventArgs
+    {
+        private object _owner;
+        public CollectionController(object owner)
         {
-            public short? ID { get; set; }
-            public string Name { get; set; }
-
+            _owner = owner;
         }
+        public IEnumerable<T> Models { get; set; }
+        public K? SelectedID { get; set; }
+    }
 
-        public class CollectionDTOController<T, K>
-           where T : class
-           where K : struct
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<OrganizationDTO, Organization>().ForMember(d=>d.BranchCollection, o=>o.UseDestinationValue());
+        cfg.CreateMap<BranchDTO, Branch>();
+        cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
+    });
+    [Fact]
+    public void Should_work()
+    {
+        var branchDto = new BranchDTO { ID = 51, Name = "B1" };
+        var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };
+        orgDto.BranchCollection.Models = new BranchDTO[] { branchDto };
+
+        Mapper.Map<Organization>(orgDto);
+    }
+}
+
+public class DontUseDestinationValue : NonValidatingSpecBase
+{
+    public class OrganizationDTO
+    {
+        public long? ID { get; set; }
+        public string Name { get; set; }
+
+        private CollectionDTOController<BranchDTO, short> _branchCollection;
+        public CollectionDTOController<BranchDTO, short> BranchCollection
         {
-            public IEnumerable<T> Models { get; set; }
-            public K? SelectedID { get; set; }
-        }
-
-        public class Organization
-        {
-            public long? ID { get; set; }
-            public string Name { get; set; }
-
-            private CollectionController<Branch, short, EventArgs> _BranchCollection;
-            public CollectionController<Branch, short, EventArgs> BranchCollection
+            get
             {
-                get
-                {
-                    if(_BranchCollection == null)
-                        _BranchCollection = new CollectionController<Branch, short, EventArgs>(this);
+                if(_branchCollection == null)
+                    _branchCollection = new CollectionDTOController<BranchDTO, short>();
 
-                    return _BranchCollection;
-                }
-                set { _BranchCollection = value; }
+                return _branchCollection;
             }
+            set { _branchCollection = value; }
         }
+    }
 
-        public class Branch
+    public class BranchDTO
+    {
+        public short? ID { get; set; }
+        public string Name { get; set; }
+
+    }
+
+    public class CollectionDTOController<T, K>
+       where T : class
+       where K : struct
+    {
+        public IEnumerable<T> Models { get; set; }
+        public K? SelectedID { get; set; }
+    }
+
+    public class Organization
+    {
+        public long? ID { get; set; }
+        public string Name { get; set; }
+
+        private CollectionController<Branch, short, EventArgs> _BranchCollection;
+        public CollectionController<Branch, short, EventArgs> BranchCollection
         {
-            public short? ID { get; set; }
-            public string Name { get; set; }
-
-        }
-
-        public class CollectionController<T, K, Z>
-            where T : class
-            where K : struct
-            where Z : EventArgs
-        {
-            private object _owner;
-            public CollectionController(object owner)
+            get
             {
-                _owner = owner;
+                if(_BranchCollection == null)
+                    _BranchCollection = new CollectionController<Branch, short, EventArgs>(this);
+
+                return _BranchCollection;
             }
-            public IEnumerable<T> Models { get; set; }
-            public K? SelectedID { get; set; }
+            set { _BranchCollection = value; }
         }
+    }
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    public class Branch
+    {
+        public short? ID { get; set; }
+        public string Name { get; set; }
+
+    }
+
+    public class CollectionController<T, K, Z>
+        where T : class
+        where K : struct
+        where Z : EventArgs
+    {
+        private object _owner;
+        public CollectionController(object owner)
         {
-            cfg.CreateMap<OrganizationDTO, Organization>();
-            cfg.CreateMap<BranchDTO, Branch>();
-            cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
-        });
-
-        [Fact]
-        public void Should_report_missing_constructor()
-        {
-            var branchDto = new BranchDTO { ID = 51, Name = "B1" };
-            var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };
-            orgDto.BranchCollection.Models = new BranchDTO[] { branchDto };
-
-            new Action(()=>Mapper.Map<Organization>(orgDto)).ShouldThrowException<AutoMapperMappingException>(
-                ex=>ex.InnerException.Message.ShouldStartWith(typeof(CollectionController<Branch, short, EventArgs>) + " needs to have a constructor with 0 args or only optional args"));
+            _owner = owner;
         }
+        public IEnumerable<T> Models { get; set; }
+        public K? SelectedID { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<OrganizationDTO, Organization>();
+        cfg.CreateMap<BranchDTO, Branch>();
+        cfg.CreateMap(typeof(CollectionDTOController<,>), typeof(CollectionController<,,>), MemberList.None);
+    });
+
+    [Fact]
+    public void Should_report_missing_constructor()
+    {
+        var branchDto = new BranchDTO { ID = 51, Name = "B1" };
+        var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };
+        orgDto.BranchCollection.Models = new BranchDTO[] { branchDto };
+
+        new Action(()=>Mapper.Map<Organization>(orgDto)).ShouldThrowException<AutoMapperMappingException>(
+            ex=>ex.InnerException.Message.ShouldStartWith(typeof(CollectionController<Branch, short, EventArgs>) + " needs to have a constructor with 0 args or only optional args"));
     }
 }

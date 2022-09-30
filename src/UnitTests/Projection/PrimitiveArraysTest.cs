@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-using System.Linq;
-using Shouldly;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
     namespace PrimitiveArrays
     {
-        using AutoMapper.Internal;
-        using QueryableExtensions;
-        using QueryableExtensions.Impl;
-
         public class PrimitiveArraysExpressionTest
         {
             [Fact]

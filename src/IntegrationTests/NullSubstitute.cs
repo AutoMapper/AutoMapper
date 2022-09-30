@@ -1,14 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using Shouldly;
-using Xunit;
+﻿namespace AutoMapper.IntegrationTests;
 
-namespace AutoMapper.IntegrationTests;
-
-using UnitTests;
-        
 public class NullSubstitute : IntegrationTest<NullSubstitute.DatabaseInitializer>
 {
     public class Customer

@@ -1,16 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Shouldly;
-using Xunit;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace AutoMapper.IntegrationTests;
-
-using System;
-using UnitTests;
+﻿namespace AutoMapper.IntegrationTests;
 public class NullCheckCollectionsFirstOrDefault : IntegrationTest<NullCheckCollectionsFirstOrDefault.DatabaseInitializer>
 {
     public class SourceType

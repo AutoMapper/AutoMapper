@@ -1,101 +1,96 @@
-﻿using Xunit;
-using Shouldly;
-using System;
+﻿namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class ReverseMapAndReplaceMemberName : AutoMapperSpecBase
 {
-    public class ReverseMapAndReplaceMemberName : AutoMapperSpecBase
+    const string SomeId = "someId";
+    const string SomeOtherId = "someOtherId";
+    private Source _source;
+    private Destination _destination;
+
+    class Source
     {
-        const string SomeId = "someId";
-        const string SomeOtherId = "someOtherId";
-        private Source _source;
-        private Destination _destination;
+        public string AccountId { get; set; }
+    }
+    class Destination
+    {
+        public string UserId { get; set; }
+    }
 
-        class Source
-        {
-            public string AccountId { get; set; }
-        }
-        class Destination
-        {
-            public string UserId { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.ReplaceMemberName("Account", "User");
+        cfg.ReplaceMemberName("User", "Account");
+        cfg.CreateMap<Source, Destination>().ReverseMap();
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    protected override void Because_of()
+    {
+        _source = Mapper.Map<Destination, Source>(new Destination
         {
-            cfg.ReplaceMemberName("Account", "User");
-            cfg.ReplaceMemberName("User", "Account");
-            cfg.CreateMap<Source, Destination>().ReverseMap();
+            UserId = SomeId
         });
-
-        protected override void Because_of()
+        _destination = Mapper.Map<Source, Destination>(new Source
         {
-            _source = Mapper.Map<Destination, Source>(new Destination
-            {
-                UserId = SomeId
-            });
-            _destination = Mapper.Map<Source, Destination>(new Source
-            {
-                AccountId = SomeOtherId
-            });
-        }
+            AccountId = SomeOtherId
+        });
+    }
 
-        [Fact]
-        public void Should_work_together()
+    [Fact]
+    public void Should_work_together()
+    {
+        _source.AccountId.ShouldBe(SomeId);
+        _destination.UserId.ShouldBe(SomeOtherId);
+    }
+}
+
+public class ReverseMapAndReplaceMemberNameWithProfile : AutoMapperSpecBase
+{
+    const string SomeId = "someId";
+    const string SomeOtherId = "someOtherId";
+    private Source _source;
+    private Destination _destination;
+
+    class Source
+    {
+        public string AccountId { get; set; }
+    }
+
+    class Destination
+    {
+        public string UserId { get; set; }
+    }
+
+    class MyProfile : Profile
+    {
+        public MyProfile()
         {
-            _source.AccountId.ShouldBe(SomeId);
-            _destination.UserId.ShouldBe(SomeOtherId);
+            ReplaceMemberName("Account", "User");
+            ReplaceMemberName("User", "Account");
+            CreateMap<Source, Destination>().ReverseMap();
         }
     }
 
-    public class ReverseMapAndReplaceMemberNameWithProfile : AutoMapperSpecBase
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        const string SomeId = "someId";
-        const string SomeOtherId = "someOtherId";
-        private Source _source;
-        private Destination _destination;
+        cfg.AddProfile<MyProfile>();
+    });
 
-        class Source
+    protected override void Because_of()
+    {
+        _source = Mapper.Map<Destination, Source>(new Destination
         {
-            public string AccountId { get; set; }
-        }
-
-        class Destination
-        {
-            public string UserId { get; set; }
-        }
-
-        class MyProfile : Profile
-        {
-            public MyProfile()
-            {
-                ReplaceMemberName("Account", "User");
-                ReplaceMemberName("User", "Account");
-                CreateMap<Source, Destination>().ReverseMap();
-            }
-        }
-
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
-        {
-            cfg.AddProfile<MyProfile>();
+            UserId = SomeId
         });
-
-        protected override void Because_of()
+        _destination = Mapper.Map<Source, Destination>(new Source
         {
-            _source = Mapper.Map<Destination, Source>(new Destination
-            {
-                UserId = SomeId
-            });
-            _destination = Mapper.Map<Source, Destination>(new Source
-            {
-                AccountId = SomeOtherId
-            });
-        }
+            AccountId = SomeOtherId
+        });
+    }
 
-        [Fact]
-        public void Should_work_together()
-        {
-            _source.AccountId.ShouldBe(SomeId);
-            _destination.UserId.ShouldBe(SomeOtherId);
-        }
+    [Fact]
+    public void Should_work_together()
+    {
+        _source.AccountId.ShouldBe(SomeId);
+        _destination.UserId.ShouldBe(SomeOtherId);
     }
 }

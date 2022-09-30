@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OmmitedDTOModel3;
 
-namespace OmmitedDTOModel3
+public class EntityDTO3 : BaseEntity
 {
-    public class EntityDTO3 : BaseEntity
+    public EntityDTO3()
     {
-        public EntityDTO3()
-        {
-            //this.Entities4 = new EntityDTO4();
-            //this.Entities8 = new EntityDTO8();
-        }
-        public EntityDTO4 Entities4 { get; set; }
-        public EntityDTO8 Entities8 { get; set; }
+        //this.Entities4 = new EntityDTO4();
+        //this.Entities8 = new EntityDTO8();
     }
+    public EntityDTO4 Entities4 { get; set; }
+    public EntityDTO8 Entities8 { get; set; }
 }

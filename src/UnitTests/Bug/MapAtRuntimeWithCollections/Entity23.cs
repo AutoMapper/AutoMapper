@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OmmitedDatabaseModel3WithCollections;
 
-namespace OmmitedDatabaseModel3WithCollections
+public class Entity23 : BaseEntity
 {
-    public class Entity23 : BaseEntity
-    {
-        public Guid Entity5Id { get; set; }
-        public Entity5 Entity5 { get; set; }
-    }
+    public Guid Entity5Id { get; set; }
+    public Entity5 Entity5 { get; set; }
 }

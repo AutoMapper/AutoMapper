@@ -1,106 +1,114 @@
-﻿using AutoMapper.Internal;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-namespace AutoMapper.Features
+﻿namespace AutoMapper.Features;
+public interface IGlobalFeature
 {
-    public interface IGlobalFeature
+    void Configure(IGlobalConfiguration configuration);
+}
+public interface IMappingFeature
+{
+    void Configure(TypeMap typeMap);
+    IMappingFeature Reverse();
+}
+public interface IRuntimeFeature
+{
+    void Seal(IGlobalConfiguration configuration);
+}
+public class Features<TFeature>
+{
+    private List<TFeature> _features;
+    public int Count => _features?.Count ?? 0;
+    /// <summary>
+    /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
+    /// </summary>
+    /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
+    /// <returns>The feature or null if feature not exists.</returns>
+    public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature
     {
-        void Configure(IGlobalConfiguration configurationProvider);
+        var index = IndexOf(typeof(TFeatureToFind));
+        return index < Count ? (TFeatureToFind)_features[index] : default;
     }
-    public interface IMappingFeature
+    /// <summary>
+    /// Add or update the feature. Existing feature of the same type will be replaced.
+    /// </summary>
+    /// <param name="feature">The feature.</param>
+    public void Set(TFeature feature)
     {
-        void Configure(TypeMap typeMap);
-        IMappingFeature Reverse();
+        var index = IndexOf(feature.GetType());
+        if (index < Count)
+        {
+            _features[index] = feature;
+        }
+        else
+        {
+            _features ??= new();
+            _features.Add(feature);
+        }
     }
-    public interface IRuntimeFeature
+    private int IndexOf(Type featureType)
     {
-        void Seal(IGlobalConfiguration configurationProvider);
+        int index = 0;
+        for (; index < Count && _features[index].GetType() != featureType; index++);
+        return index;
     }
-    public class Features<TFeature> : IReadOnlyCollection<TFeature>
+    public List<TFeature>.Enumerator GetEnumerator() => _features.GetEnumerator();
+}
+public static class FeatureExtensions
+{
+    public static IMapperConfigurationExpression SetFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
     {
-        private Dictionary<Type, TFeature> _features;
-        public int Count => _features?.Count ?? 0;
-        /// <summary>
-        /// Gets the feature of type <typeparamref name="TFeatureToFind"/>.
-        /// </summary>
-        /// <typeparam name="TFeatureToFind">The type of the feature.</typeparam>
-        /// <returns>The feature or null if feature not exists.</returns>
-        public TFeatureToFind Get<TFeatureToFind>() where TFeatureToFind : TFeature =>
-            _features == null ? default : (TFeatureToFind)_features.GetValueOrDefault(typeof(TFeatureToFind));
-        /// <summary>
-        /// Add or update the feature. Existing feature of the same type will be replaced.
-        /// </summary>
-        /// <param name="feature">The feature.</param>
-        public void Set(TFeature feature)
-        {
-            _features ??= new Dictionary<Type, TFeature>();
-            _features[feature.GetType()] = feature;
-        }
-        public IEnumerator<TFeature> GetEnumerator() =>
-            _features == null ? Enumerable.Empty<TFeature>().GetEnumerator() : _features.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        configuration.Internal().Features.Set(feature);
+        return configuration;
     }
-    public static class FeatureExtensions
+    public static IMappingExpression<TSource, TDestination> SetFeature<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mapping, IMappingFeature feature)
     {
-        public static IMapperConfigurationExpression SetFeature(this IMapperConfigurationExpression configuration, IGlobalFeature feature)
+        mapping.Features.Set(feature);
+        return mapping;
+    }
+    internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
+    {
+        if (features.Count == 0)
         {
-            configuration.Internal().Features.Set(feature);
-            return configuration;
+            return;
         }
-        public static IMappingExpression<TSource, TDestination> SetFeature<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mapping, IMappingFeature feature)
+        foreach (var feature in features)
         {
-            mapping.Features.Set(feature);
-            return mapping;
+            feature.Configure(mapperConfiguration);
         }
-        internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
+    }
+    public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
+    {
+        if (features.Count == 0)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Configure(mapperConfiguration);
-            }
+            return;
         }
-        public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
+        foreach (var feature in features)
         {
-            if (features.Count == 0)
+            var reverse = feature.Reverse();
+            if (reverse != null)
             {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                var reverse = feature.Reverse();
-                if (reverse != null)
-                {
-                    reversedFeatures.Set(reverse);
-                }
+                reversedFeatures.Set(reverse);
             }
         }
-        internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+    }
+    internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+    {
+        if (features.Count == 0)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Configure(typeMap);
-            }
+            return;
         }
-        internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configurationProvider)
+        foreach (var feature in features)
         {
-            if (features.Count == 0)
-            {
-                return;
-            }
-            foreach (var feature in features)
-            {
-                feature.Seal(configurationProvider);
-            }
+            feature.Configure(typeMap);
+        }
+    }
+    internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)
+    {
+        if (features.Count == 0)
+        {
+            return;
+        }
+        foreach (var feature in features)
+        {
+            feature.Seal(configuration);
         }
     }
 }

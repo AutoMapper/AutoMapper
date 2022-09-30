@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OmmitedDTOModel3;
 
-namespace OmmitedDTOModel3
+public class EntityDTO14 : BaseEntity
 {
-    public class EntityDTO14 : BaseEntity
+    public EntityDTO14()
     {
-        public EntityDTO14()
-        {
-            this.Entities12 = new EntityDTO12();
-            this.Entities1 = new EntityDTO1();
-        }
-
-        //public Address Address { get; set; }
-        public EntityDTO12 Entities12 { get; set; }
-        public EntityDTO1 Entities1 { get; set; }
+        this.Entities12 = new EntityDTO12();
+        this.Entities1 = new EntityDTO1();
     }
+
+    //public Address Address { get; set; }
+    public EntityDTO12 Entities12 { get; set; }
+    public EntityDTO1 Entities1 { get; set; }
 }

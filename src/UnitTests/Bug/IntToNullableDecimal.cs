@@ -1,40 +1,35 @@
-﻿using Xunit;
-using Shouldly;
-using System;
+﻿namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class IntToNullableDecimal : AutoMapperSpecBase
 {
-    public class IntToNullableDecimal : AutoMapperSpecBase
+    private Destination _destination;
+
+    class Source
     {
-        private Destination _destination;
+        public int Number { get; set; }
+    }
+    class Destination
+    {
+        public decimal? Number { get; set; }
+    }
 
-        class Source
-        {
-            public int Number { get; set; }
-        }
-        class Destination
-        {
-            public decimal? Number { get; set; }
-        }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>();
+    });
 
-        protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    protected override void Because_of()
+    {
+        var source = new Source
         {
-            cfg.CreateMap<Source, Destination>();
-        });
+            Number = 23
+        };
+        _destination = Mapper.Map<Source, Destination>(source);
+    }
 
-        protected override void Because_of()
-        {
-            var source = new Source
-            {
-                Number = 23
-            };
-            _destination = Mapper.Map<Source, Destination>(source);
-        }
-
-        [Fact]
-        public void Should_map_int_to_nullable_decimal()
-        {
-            _destination.Number.ShouldBe(23);
-        }
+    [Fact]
+    public void Should_map_int_to_nullable_decimal()
+    {
+        _destination.Number.ShouldBe(23);
     }
 }

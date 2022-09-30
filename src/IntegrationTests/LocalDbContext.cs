@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace AutoMapper.IntegrationTests;
+﻿namespace AutoMapper.IntegrationTests;
 
 public abstract class LocalDbContext : DbContext
 {

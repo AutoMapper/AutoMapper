@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Mappers
+﻿namespace AutoMapper.UnitTests.Mappers
 {
     namespace ReadOnlyCollections
     {

@@ -1,34 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Shouldly;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug;
+public class CreateMapExpressionWithIgnoredPropertyBug
 {
-    using QueryableExtensions;
-
-    public class CreateMapExpressionWithIgnoredPropertyBug
+    [Fact]
+    public void ShouldNotMapPropertyWhenItIsIgnored()
     {
-        [Fact]
-        public void ShouldNotMapPropertyWhenItIsIgnored()
+        var config = new MapperConfiguration(cfg =>
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateProjection<Person, Person>()
-                    .ForMember(x => x.Name, x => x.Ignore());
-            });
+            cfg.CreateProjection<Person, Person>()
+                .ForMember(x => x.Name, x => x.Ignore());
+        });
 
-            IQueryable<Person> collection = (new List<Person> { new Person { Name = "Person1" } }).AsQueryable();
+        IQueryable<Person> collection = (new List<Person> { new Person { Name = "Person1" } }).AsQueryable();
 
-            List<Person> result = collection.ProjectTo<Person>(config).ToList();
+        List<Person> result = collection.ProjectTo<Person>(config).ToList();
 
-            result.ForEach(x => x.Name.ShouldBeNull());
-        }
+        result.ForEach(x => x.Name.ShouldBeNull());
+    }
 
-        public class Person
-        {
-            public string Name { get; set; }
-        }
+    public class Person
+    {
+        public string Name { get; set; }
     }
 }

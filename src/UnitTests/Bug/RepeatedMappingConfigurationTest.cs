@@ -1,44 +1,41 @@
-using Xunit;
+namespace AutoMapper.UnitTests.Bug;
 
-namespace AutoMapper.UnitTests.Bug
+public class When_mapping_for_derived_class_is_duplicated : NonValidatingSpecBase
 {
-    public class When_mapping_for_derived_class_is_duplicated : SpecBase
+    public class ModelObject
     {
-        public class ModelObject
+        public string BaseString { get; set; }
+    }
+
+    public class ModelSubObject : ModelObject
+    {
+        public string SubString { get; set; }
+    }
+
+    public class DtoObject
+    {
+        public string BaseString { get; set; }
+    }
+
+    public class DtoSubObject : DtoObject
+    {
+        public string SubString { get; set; }
+    }
+
+    [Fact]
+    public void should_not_throw_duplicated_key_exception()
+    {
+        new MapperConfiguration(cfg =>
         {
-            public string BaseString { get; set; }
-        }
+            cfg.CreateMap<ModelSubObject, DtoObject>()
+                .Include<ModelSubObject, DtoSubObject>();
 
-        public class ModelSubObject : ModelObject
-        {
-            public string SubString { get; set; }
-        }
+            cfg.CreateMap<ModelSubObject, DtoSubObject>();
 
-        public class DtoObject
-        {
-            public string BaseString { get; set; }
-        }
+            cfg.CreateMap<ModelSubObject, DtoObject>()
+                .Include<ModelSubObject, DtoSubObject>();
 
-        public class DtoSubObject : DtoObject
-        {
-            public string SubString { get; set; }
-        }
-
-        [Fact]
-        public void should_not_throw_duplicated_key_exception()
-        {
-            new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<ModelSubObject, DtoObject>()
-                    .Include<ModelSubObject, DtoSubObject>();
-
-                cfg.CreateMap<ModelSubObject, DtoSubObject>();
-
-                cfg.CreateMap<ModelSubObject, DtoObject>()
-                    .Include<ModelSubObject, DtoSubObject>();
-
-                cfg.CreateMap<ModelSubObject, DtoSubObject>();
-            });
-        }
+            cfg.CreateMap<ModelSubObject, DtoSubObject>();
+        });
     }
 }

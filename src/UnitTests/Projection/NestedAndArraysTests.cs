@@ -2,12 +2,6 @@
 {
     namespace NestedAndArraysTests
     {
-        using System.Collections.Generic;
-        using QueryableExtensions.Impl;
-        using Xunit;
-        using System.Linq;
-        using AutoMapper.Internal;
-
         public class LinqTests
         {
 

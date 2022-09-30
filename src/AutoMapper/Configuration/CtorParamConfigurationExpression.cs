@@ -1,87 +1,82 @@
-﻿using AutoMapper.Execution;
-using AutoMapper.Internal;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Runtime.CompilerServices;
+namespace AutoMapper.Configuration;
 
-namespace AutoMapper.Configuration
+public interface ICtorParamConfigurationExpression
 {
-    public interface ICtorParamConfigurationExpression
+    /// <summary>
+    /// Specify the source member(s) to map from.
+    /// </summary>
+    /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
+    void MapFrom(string sourceMembersPath);
+}
+public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
+{
+    /// <summary>
+    /// Map constructor parameter from member expression
+    /// </summary>
+    /// <typeparam name="TMember">Member type</typeparam>
+    /// <param name="sourceMember">Member expression</param>
+    void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
+
+    /// <summary>
+    /// Map constructor parameter from custom func that has access to <see cref="ResolutionContext"/>
+    /// </summary>
+    /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
+    /// <param name="resolver">Custom func</param>
+    void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
+}
+public interface ICtorParameterConfiguration
+{
+    string CtorParamName { get; }
+    void Configure(TypeMap typeMap);
+}
+[EditorBrowsable(EditorBrowsableState.Never)]
+public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
+{
+    public string CtorParamName { get; }
+    public Type SourceType { get; }
+
+    private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
+
+    public CtorParamConfigurationExpression(string ctorParamName, Type sourceType)
     {
-        /// <summary>
-        /// Specify the source member(s) to map from.
-        /// </summary>
-        /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
-        void MapFrom(string sourceMembersPath);
+        CtorParamName = ctorParamName;
+        SourceType = sourceType;
     }
-    public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
-    {
-        /// <summary>
-        /// Map constructor parameter from member expression
-        /// </summary>
-        /// <typeparam name="TMember">Member type</typeparam>
-        /// <param name="sourceMember">Member expression</param>
-        void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
 
-        /// <summary>
-        /// Map constructor parameter from custom func that has access to <see cref="ResolutionContext"/>
-        /// </summary>
-        /// <remarks>Not used for LINQ projection (ProjectTo)</remarks>
-        /// <param name="resolver">Custom func</param>
-        void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
+    public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
+        _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMember));
+
+    public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
+    {
+        Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
+        _ctorParamActions.Add(cpm => cpm.SetResolver(new FuncResolver(resolverExpression)));
     }
-    public interface ICtorParameterConfiguration
+
+    public void MapFrom(string sourceMembersPath)
     {
-        string CtorParamName { get; }
-        void Configure(TypeMap typeMap);
+        var sourceMembers = ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
+        _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
+
+    public void Configure(TypeMap typeMap)
     {
-        public string CtorParamName { get; }
-        public Type SourceType { get; }
-
-        private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
-
-        public CtorParamConfigurationExpression(string ctorParamName, Type sourceType)
+        var ctorMap = typeMap.ConstructorMap;
+        if (ctorMap == null)
         {
-            CtorParamName = ctorParamName;
-            SourceType = sourceType;
+            throw new AutoMapperConfigurationException($"The type {typeMap.DestinationType.Name} does not have a constructor.\n{typeMap.DestinationType.FullName}");
         }
-
-        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember) =>
-            _ctorParamActions.Add(cpm => cpm.SetResolver(sourceMember));
-
-        public void MapFrom<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
+        var parameter = ctorMap[CtorParamName];
+        if (parameter == null)
         {
-            Expression<Func<TSource, TDestination, TMember, ResolutionContext, TMember>> resolverExpression = (src, dest, destMember, ctxt) => resolver(src, ctxt);
-            _ctorParamActions.Add(cpm => cpm.Resolver = new FuncResolver(resolverExpression));
+            throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord(ctorMap.Ctor)}");
         }
-
-        public void MapFrom(string sourceMembersPath)
+        foreach (var action in _ctorParamActions)
         {
-            ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
-            _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath));
+            action(parameter);
         }
-
-        public void Configure(TypeMap typeMap)
-        {
-            var ctorMap = typeMap.ConstructorMap;
-            if (ctorMap == null)
-            {
-                throw new AutoMapperConfigurationException($"The type {typeMap.DestinationType.Name} does not have a constructor.\n{typeMap.DestinationType.FullName}");
-            }
-            var parameter = ctorMap[CtorParamName];
-            if (parameter == null)
-            {
-                throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}");
-            }
-            foreach (var action in _ctorParamActions)
-            {
-                action(parameter);
-            }
-        }
+        return;
+        static string CheckRecord(ConstructorInfo ctor) => ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
+            " When mapping to records, consider excluding non-public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     }
 }

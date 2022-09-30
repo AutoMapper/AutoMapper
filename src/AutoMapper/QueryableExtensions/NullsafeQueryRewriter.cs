@@ -21,146 +21,140 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-using AutoMapper.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace AutoMapper.QueryableExtensions
+namespace AutoMapper.QueryableExtensions;
+
+/// <summary>
+/// Expression visitor for making member access null-safe.
+/// </summary>
+/// <remarks>
+/// NullSafeQueryRewriter is copied from the NeinLinq project, licensed under the MIT license.
+/// Copyright (c) 2014-2018 Axel Heer.
+/// See https://github.com/axelheer/nein-linq/blob/master/src/NeinLinq/NullsafeQueryRewriter.cs
+/// </remarks>
+internal class NullsafeQueryRewriter : ExpressionVisitor
 {
-    /// <summary>
-    /// Expression visitor for making member access null-safe.
-    /// </summary>
-    /// <remarks>
-    /// NullSafeQueryRewriter is copied from the NeinLinq project, licensed under the MIT license.
-    /// Copyright (c) 2014-2018 Axel Heer.
-    /// See https://github.com/axelheer/nein-linq/blob/master/src/NeinLinq/NullsafeQueryRewriter.cs
-    /// </remarks>
-    internal class NullsafeQueryRewriter : ExpressionVisitor
+    static readonly LockingConcurrentDictionary<Type, Expression> Cache = new(Fallback);
+
+    public static Expression NullCheck(Expression expression) => new NullsafeQueryRewriter().Visit(expression);
+
+    /// <inheritdoc />
+    protected override Expression VisitMember(MemberExpression node)
     {
-        static readonly LockingConcurrentDictionary<Type, Expression> Cache = new(Fallback);
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
 
-        public static Expression NullCheck(Expression expression) => new NullsafeQueryRewriter().Visit(expression);
+        var target = Visit(node.Expression);
 
-        /// <inheritdoc />
-        protected override Expression VisitMember(MemberExpression node)
+        if (!IsSafe(target))
         {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
+            // insert null-check before accessing property or field
+            return BeSafe(target, node, node.Update);
+        }
 
-            var target = Visit(node.Expression);
+        return node.Update(target);
+    }
 
-            if (!IsSafe(target))
+    /// <inheritdoc />
+    protected override Expression VisitMethodCall(MethodCallExpression node)
+    {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
+        var target = Visit(node.Object);
+
+        if (!IsSafe(target))
+        {
+            // insert null-check before invoking instance method
+            return BeSafe(target, node, fallback => node.Update(fallback, node.Arguments));
+        }
+
+        var arguments = Visit(node.Arguments);
+
+        if (IsExtensionMethod(node.Method) && !IsSafe(arguments[0]))
+        {
+            // insert null-check before invoking extension method
+            return BeSafe(arguments[0], node.Update(null, arguments), fallback =>
             {
-                // insert null-check before accessing property or field
-                return BeSafe(target, node, node.Update);
-            }
+                var args = new Expression[arguments.Count];
+                arguments.CopyTo(args, 0);
+                args[0] = fallback;
 
-            return node.Update(target);
+                return node.Update(null, args);
+            });
         }
 
-        /// <inheritdoc />
-        protected override Expression VisitMethodCall(MethodCallExpression node)
+        return node.Update(target, arguments);
+    }
+
+    static Expression BeSafe(Expression target, Expression expression, Func<Expression, Expression> update)
+    {
+        var fallback = Cache.GetOrAdd(target.Type);
+
+        if (fallback != null)
         {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            var target = Visit(node.Object);
-
-            if (!IsSafe(target))
-            {
-                // insert null-check before invoking instance method
-                return BeSafe(target, node, fallback => node.Update(fallback, node.Arguments));
-            }
-
-            var arguments = Visit(node.Arguments);
-
-            if (IsExtensionMethod(node.Method) && !IsSafe(arguments[0]))
-            {
-                // insert null-check before invoking extension method
-                return BeSafe(arguments[0], node.Update(null, arguments), fallback =>
-                {
-                    var args = new Expression[arguments.Count];
-                    arguments.CopyTo(args, 0);
-                    args[0] = fallback;
-
-                    return node.Update(null, args);
-                });
-            }
-
-            return node.Update(target, arguments);
+            // coalesce instead, a bit intrusive but fast...
+            return update(Coalesce(target, fallback));
         }
 
-        static Expression BeSafe(Expression target, Expression expression, Func<Expression, Expression> update)
+        // target can be null, which is why we are actually here...
+        var targetFallback = Constant(null, target.Type);
+
+        // expression can be default or null, which is basically the same...
+        var expressionFallback = !IsNullableOrReferenceType(expression.Type)
+            ? (Expression)Default(expression.Type) : Constant(null, expression.Type);
+
+        return Condition(Equal(target, targetFallback), expressionFallback, expression);
+    }
+
+    static bool IsSafe(Expression expression)
+    {
+        // in method call results and constant values we trust to avoid too much conditions...
+        return expression == null
+            || expression.NodeType == ExpressionType.Call
+            || expression.NodeType == ExpressionType.Constant
+            || !IsNullableOrReferenceType(expression.Type);
+    }
+
+    static Expression Fallback(Type type)
+    {
+        // default values for generic collections
+        if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
         {
-            var fallback = Cache.GetOrAdd(target.Type);
-
-            if (fallback != null)
-            {
-                // coalesce instead, a bit intrusive but fast...
-                return update(Expression.Coalesce(target, fallback));
-            }
-
-            // target can be null, which is why we are actually here...
-            var targetFallback = Expression.Constant(null, target.Type);
-
-            // expression can be default or null, which is basically the same...
-            var expressionFallback = !IsNullableOrReferenceType(expression.Type)
-                ? (Expression)Expression.Default(expression.Type) : Expression.Constant(null, expression.Type);
-
-            return Expression.Condition(Expression.Equal(target, targetFallback), expressionFallback, expression);
+            return CollectionFallback(typeof(List<>), type)
+                ?? CollectionFallback(typeof(HashSet<>), type);
         }
 
-        static bool IsSafe(Expression expression)
+        // default value for arrays
+        if (type.IsArray)
         {
-            // in method call results and constant values we trust to avoid too much conditions...
-            return expression == null
-                || expression.NodeType == ExpressionType.Call
-                || expression.NodeType == ExpressionType.Constant
-                || !IsNullableOrReferenceType(expression.Type);
+            return NewArrayInit(type.GetElementType());
         }
 
-        static Expression Fallback(Type type)
+        return null;
+    }
+
+    static Expression CollectionFallback(Type definition, Type type)
+    {
+        var collection = definition.MakeGenericType(type.GetTypeInfo().GenericTypeArguments);
+
+        // try if an instance of this collection would suffice
+        if (type.GetTypeInfo().IsAssignableFrom(collection.GetTypeInfo()))
         {
-            // default values for generic collections
-            if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
-            {
-                return CollectionFallback(typeof(List<>), type)
-                    ?? CollectionFallback(typeof(HashSet<>), type);
-            }
-
-            // default value for arrays
-            if (type.IsArray)
-            {
-                return Expression.NewArrayInit(type.GetElementType());
-            }
-
-            return null;
+            return Convert(New(collection), type);
         }
 
-        static Expression CollectionFallback(Type definition, Type type)
-        {
-            var collection = definition.MakeGenericType(type.GetTypeInfo().GenericTypeArguments);
+        return null;
+    }
 
-            // try if an instance of this collection would suffice
-            if (type.GetTypeInfo().IsAssignableFrom(collection.GetTypeInfo()))
-            {
-                return Expression.Convert(Expression.New(collection), type);
-            }
+    static bool IsExtensionMethod(MethodInfo element)
+    {
+        return element.IsDefined(typeof(ExtensionAttribute), false);
+    }
 
-            return null;
-        }
-
-        static bool IsExtensionMethod(MethodInfo element)
-        {
-            return element.IsDefined(typeof(ExtensionAttribute), false);
-        }
-
-        static bool IsNullableOrReferenceType(Type type)
-        {
-            return !type.GetTypeInfo().IsValueType || Nullable.GetUnderlyingType(type) != null;
-        }
+    static bool IsNullableOrReferenceType(Type type)
+    {
+        return !type.GetTypeInfo().IsValueType || Nullable.GetUnderlyingType(type) != null;
     }
 }
