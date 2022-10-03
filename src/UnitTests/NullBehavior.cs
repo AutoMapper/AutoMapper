@@ -1,5 +1,34 @@
 namespace AutoMapper.UnitTests.NullBehavior;
-
+public class NullToExistingValue : AutoMapperSpecBase
+{
+    private record Person
+    {
+        public string Name { get; set; }
+        public Address TheAddress { get; set; } = new();
+    }
+    private record Address
+    {
+        public string Street { get; set; }
+        public int Number { get; set; }
+    }
+    private record PersonModel
+    {
+        public string Name { get; set; }
+        public AddressModel TheAddress { get; set; }
+    }
+    private record AddressModel
+    {
+        public string Street { get; set; }
+        public int Number { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+    	c.CreateMap<PersonModel, Person>();
+    	c.CreateMap<AddressModel, Address>();
+    });
+    [Fact]
+    public void Should_overwrite() => Mapper.Map(new PersonModel(), new Person()).TheAddress.ShouldBeNull();
+}
 public class NullCheckDefault : AutoMapperSpecBase
 {
     class Source

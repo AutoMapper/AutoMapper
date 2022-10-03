@@ -74,7 +74,8 @@ public static class ExpressionBuilder
         if (typeMap != null)
         {
             var allowNull = memberMap?.AllowNull;
-            nullCheck = !typeMap.HasTypeConverter && allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues;
+            nullCheck = !typeMap.HasTypeConverter && (destination.NodeType != ExpressionType.Default ||
+                (allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues));
             if (!typeMap.HasDerivedTypesToInclude)
             {
                 typeMap.Seal(configuration);

@@ -288,7 +288,7 @@ public struct TypeMapPlanBuilder
         var customSource = GetCustomSource(ctorParamMap);
         var resolvedExpression = BuildValueResolverFunc(ctorParamMap, customSource, defaultValue);
         var resolvedValue = Variable(resolvedExpression.Type, "resolvedValue");
-        var mapMember = MapMember(ctorParamMap, defaultValue, resolvedValue);
+        var mapMember = MapMember(ctorParamMap, resolvedValue, defaultValue);
         _variables.Clear();
         _variables.Add(resolvedValue);
         _expressions.Clear();
@@ -328,7 +328,7 @@ public struct TypeMapPlanBuilder
         var valueResolver = BuildValueResolverFunc(memberMap, customSource, destinationMemberGetter);
         var resolvedValueVariable = Variable(valueResolver.Type, "resolvedValue");
         var destinationMemberValue = DestinationMemberValue(memberMap, destinationMemberGetter, destinationMemberReadOnly);
-        var mappedMember = MapMember(memberMap, destinationMemberValue, resolvedValueVariable);
+        var mappedMember = MapMember(memberMap, resolvedValueVariable, destinationMemberValue);
         var mappedMemberVariable = SetVariables(valueResolver, resolvedValueVariable, mappedMember);
         var mapperExpr = destinationMemberReadOnly ? (Expression)mappedMemberVariable : Assign(destinationMemberAccess, mappedMemberVariable);
         if (memberMap.Condition != null)
@@ -382,7 +382,7 @@ public struct TypeMapPlanBuilder
         }
         return mappedMemberVariable;
     }
-    Expression MapMember(MemberMap memberMap, Expression destinationMemberValue, ParameterExpression resolvedValue)
+    Expression MapMember(MemberMap memberMap, ParameterExpression resolvedValue, Expression destinationMemberValue)
     {
         var typePair = memberMap.Types();
         var profile = _typeMap.Profile;
