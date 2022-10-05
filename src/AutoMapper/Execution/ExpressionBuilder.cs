@@ -11,6 +11,7 @@ public static class ExpressionBuilder
     public static readonly Expression True = Constant(true, typeof(bool));
     public static readonly Expression Null = Constant(null, typeof(object));
     public static readonly Expression Empty = Empty();
+    public static readonly LambdaExpression EmptyLambda = Expression.Lambda(Empty);
     public static readonly Expression Zero = Constant(0, typeof(int));
     public static readonly ParameterExpression ExceptionParameter = Parameter(typeof(Exception), "ex");
     public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
@@ -74,7 +75,8 @@ public static class ExpressionBuilder
         if (typeMap != null)
         {
             var allowNull = memberMap?.AllowNull;
-            nullCheck = !typeMap.HasTypeConverter && allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues;
+            nullCheck = !typeMap.HasTypeConverter && (destination.NodeType != ExpressionType.Default ||
+                (allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues));
             if (!typeMap.HasDerivedTypesToInclude)
             {
                 typeMap.Seal(configuration);

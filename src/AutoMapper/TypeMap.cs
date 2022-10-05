@@ -200,10 +200,7 @@ public class TypeMap
         }
         _sealed = true;
         _details?.Seal(configuration, this);
-        if (!Projection)
-        {
-            MapExpression = CreateMapperLambda(configuration);
-        }
+        MapExpression = Projection ? EmptyLambda : CreateMapperLambda(configuration);
         SourceTypeDetails = null;
         DestinationTypeDetails = null;
     }
