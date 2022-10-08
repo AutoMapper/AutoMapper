@@ -208,7 +208,6 @@ public class ProfileMap
         {
             baseMap.IncludeDerivedTypes(currentMap.Types);
             derivedMap.AddInheritedMap(baseMap);
-            ApplyBaseMaps(derivedMap, baseMap, configuration);
         }
     }
     private void ApplyMemberMaps(TypeMap currentMap, IGlobalConfiguration configuration)
@@ -237,7 +236,6 @@ public class ProfileMap
         {
             derivedMap.IncludeBaseTypes(typeMap.Types);
             derivedMap.AddInheritedMap(baseMap);
-            ApplyDerivedMaps(baseMap, derivedMap, configuration);
         }
     }
     public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberName, List<MemberInfo> members, bool reverseNamingConventions) =>

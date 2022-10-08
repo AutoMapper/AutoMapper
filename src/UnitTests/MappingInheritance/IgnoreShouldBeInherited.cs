@@ -1,5 +1,4 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
 public class IgnoreShouldBeInheritedRegardlessOfMapOrder : AutoMapperSpecBase
 {
     public class BaseDomain
@@ -103,5 +102,97 @@ public class IgnoreShouldBeInheritedWithOpenGenerics : AutoMapperSpecBase
         var userEntity = Mapper.Map<ConcreteUserEntity>(user);
         userEntity.Id.ShouldBeNull();
         userEntity.Name.ShouldBe("my-User");
+    }
+}
+public class IgnoreOverrideShouldBeInherited : AutoMapperSpecBase
+{
+    class Foo
+    {
+        public string FooText { get; set; }
+        public string Text { get; set; }
+    }
+    class Bar { public string FooText { get; set; } }
+    class Boo : Bar { }
+    protected override MapperConfiguration CreateConfiguration() => new(c=>
+    {
+        c.CreateMap<object, Foo>().ForMember(d => d.FooText, o => o.Ignore()).ForMember(d=>d.Text, o=>o.MapFrom(s=>"")).Include<Bar, Foo>();
+        c.CreateMap<Bar, Foo>().ForMember(d => d.FooText, o => o.MapFrom(s => s.FooText)).Include<Boo, Foo>();
+        c.CreateMap<Boo, Foo>();
+    });
+    [Fact]
+    public void Should_map()
+    {
+        var dest = Map<Foo>(new Boo { FooText = "hi" });
+        dest.FooText.ShouldBe("hi");
+        dest.Text.ShouldBe("");
+    }
+}
+public class IgnoreOverrideShouldBeOverriden : AutoMapperSpecBase
+{
+    class Foo
+    {
+        public string FooText { get; set; }
+        public string Text { get; set; }
+    }
+    class Bar { public string FooText { get; set; } }
+    class Boo : Bar { }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<object, Foo>().ForMember(d => d.FooText, o => o.Ignore()).ForMember(d => d.Text, o => o.MapFrom(s=>"")).Include<Bar, Foo>();
+        c.CreateMap<Bar, Foo>().ForMember(d => d.FooText, o => o.MapFrom(s => s.FooText)).Include<Boo, Foo>();
+        c.CreateMap<Boo, Foo>().ForMember(d => d.FooText, o => o.Ignore());
+    });
+    [Fact]
+    public void Should_not_map()
+    {
+        var dest = Map<Foo>(new Boo { FooText = "hi" });
+        dest.FooText.ShouldBeNull();
+        dest.Text.ShouldBe("");
+    }
+}
+public class IgnoreOverrideShouldBeInheritedIncludeBase : AutoMapperSpecBase
+{
+    class Foo
+    {
+        public string FooText { get; set; }
+        public string Text { get; set; }
+    }
+    class Bar { public string FooText { get; set; } }
+    class Boo : Bar { }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<object, Foo>().ForMember(d => d.FooText, o => o.Ignore()).ForMember(d => d.Text, o => o.MapFrom(s=>""));
+        c.CreateMap<Bar, Foo>().ForMember(d => d.FooText, o => o.MapFrom(s => s.FooText)).IncludeBase<object, Foo>();
+        c.CreateMap<Boo, Foo>().IncludeBase<Bar, Foo>();
+    });
+    [Fact]
+    public void Should_map()
+    {
+        var dest = Map<Foo>(new Boo { FooText = "hi" });
+        dest.FooText.ShouldBe("hi");
+        dest.Text.ShouldBe("");
+    }
+}
+public class IgnoreOverrideShouldBeOverridenIncludeBase : AutoMapperSpecBase
+{
+    class Foo
+    {
+        public string FooText { get; set; }
+        public string Text { get; set; }
+    }
+    class Bar { public string FooText { get; set; } }
+    class Boo : Bar { }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<object, Foo>().ForMember(d => d.FooText, o => o.Ignore()).ForMember(d => d.Text, o => o.MapFrom(s=>""));
+        c.CreateMap<Bar, Foo>().ForMember(d => d.FooText, o => o.MapFrom(s => s.FooText)).IncludeBase<object, Foo>();
+        c.CreateMap<Boo, Foo>().ForMember(d => d.FooText, o => o.Ignore()).IncludeBase<Bar, Foo>();
+    });
+    [Fact]
+    public void Should_not_map()
+    {
+        var dest = Map<Foo>(new Boo { FooText = "hi" });
+        dest.FooText.ShouldBeNull();
+        dest.Text.ShouldBe("");
     }
 }
