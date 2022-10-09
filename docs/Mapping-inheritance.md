@@ -25,9 +25,11 @@ CreateMap<DerivedEntity, DerivedDto>()
     .IncludeBase<BaseEntity, BaseDto>();
 ```
 
-In each case above, the derived mapping inherits the custom mapping configuration from the base mapping configuration.
+In each case above, the derived mapping inherits the custom mapping configuration from the base map.
 
-To include all derived maps, from the base type map configuration:
+`Include`/`IncludeBase` applies recursively, so you only need to include the closest level in the hierarchy.
+
+If for some base class you have many directly derived classes, as a convenience, you can include all derived maps from the base type map configuration:
 
 ```c#
 CreateMap<BaseEntity, BaseDto>()
@@ -35,6 +37,7 @@ CreateMap<BaseEntity, BaseDto>()
 
 CreateMap<DerivedEntity, DerivedDto>();
 ```
+Note that this will search all your mappings for derived types and it will be slower than explicitly specifying the derived maps.
 
 ### Runtime polymorphism
 
