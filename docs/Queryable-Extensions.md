@@ -91,6 +91,13 @@ select new InstructorIndexData.InstructorModel
 
 This map through AutoMapper will result in a SELECT N+1 problem, as each child `Course` will be queried one at a time, unless specified through your ORM to eagerly fetch. With LINQ projection, no special configuration or specification is needed with your ORM. The ORM uses the LINQ projection to build the exact SQL query needed.
 
+That means that you don't need to use explicit eager loading (`Include`) with `ProjectTo`. If you need something like filtered `Include`, have the filter in your map:
+
+```c#
+
+    CreateProjection<Entity, Dto>().ForMember(d => d.Collection, o => o.MapFrom(s => s.Collection.Where(i => ...));
+```
+
 ### Custom projection
 
 In the case where members names don't line up, or you want to create calculated property, you can use MapFrom (the expression-based overload) to supply a custom expression for a destination member:
