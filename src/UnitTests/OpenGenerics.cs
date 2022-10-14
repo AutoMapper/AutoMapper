@@ -1,5 +1,17 @@
 ﻿namespace AutoMapper.UnitTests;
-
+public class ConstructorValidationGenerics : NonValidatingSpecBase
+{
+    record Source<T>(T Value);
+    record Destination<T>(T OtherValue);
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)));
+    [Fact]
+    public void Should_work()
+    {
+        var error = new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors.Single();
+        error.CanConstruct.ShouldBeFalse();
+        error.UnmappedPropertyNames.Single().ShouldBe("OtherValue");
+    }
+}
 public class SealGenerics : AutoMapperSpecBase
 {
     public record SourceProperty<T>(T Value, SourceProperty<T> Recursive = null);

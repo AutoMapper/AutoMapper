@@ -107,7 +107,6 @@ public class TypeMap
         || CustomConstruction
         || ConstructorMapping
         || DestinationType.IsAbstract
-        || DestinationType.IsGenericTypeDefinition
         || DestinationType.IsValueType
         || TypeDetails.GetConstructors(DestinationType, Profile).Any(c => c.AllParametersOptional());
     public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;
