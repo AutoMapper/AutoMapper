@@ -1,16 +1,20 @@
 namespace AutoMapper.Execution;
 public struct TypeMapPlanBuilder
 {
-    private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
-    private readonly IGlobalConfiguration _configuration;
-    private readonly ParameterExpression _destination;
-    private readonly ParameterExpression _initialDestination;
-    private readonly ParameterExpression[] _parameters;
-    private readonly TypeMap _typeMap;
-    private readonly ParameterExpression _source;
-    private List<ParameterExpression> _variables;
-    private List<Expression> _expressions;
-    private CatchBlock[] _catches;
+    static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
+    static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.IncrementTypeDepth));
+    static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.DecrementTypeDepth));
+    static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
+    static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
+    readonly IGlobalConfiguration _configuration;
+    readonly ParameterExpression _destination;
+    readonly ParameterExpression _initialDestination;
+    readonly ParameterExpression[] _parameters;
+    readonly TypeMap _typeMap;
+    readonly ParameterExpression _source;
+    List<ParameterExpression> _variables;
+    List<Expression> _expressions;
+    CatchBlock[] _catches;
     public TypeMapPlanBuilder(IGlobalConfiguration configuration, TypeMap typeMap)
     {
         _configuration = configuration;

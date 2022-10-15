@@ -7,10 +7,11 @@ using Features;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TypeMap
 {
-    private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
-    private TypeMapDetails _details;
-    private List<PropertyMap> _propertyMaps;
-    private bool _sealed;
+    static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Empty);
+    static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
+    TypeMapDetails _details;
+    List<PropertyMap> _propertyMaps;
+    bool _sealed;
     public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration, List<MemberInfo> sourceMembers = null)
     {
         Types = new(sourceType, destinationType);
