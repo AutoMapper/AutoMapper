@@ -61,7 +61,8 @@ public struct TypeMapPlanBuilder
         }
         _expressions.Add(mapperFunc);
         _variables.Add(_destination);
-        return Lambda(Block(_variables, _expressions), GetParameters(second: _initialDestination));
+        mapperFunc = Block(_variables, _expressions);
+        return Lambda(_configuration.NullCheckSource(_typeMap.Profile, _source, _initialDestination, mapperFunc, null), GetParameters(second: _initialDestination));
         static void Clear(ref HashSet<TypeMap> typeMapsPath)
         {
             if (typeMapsPath == null)
@@ -255,7 +256,6 @@ public struct TypeMapPlanBuilder
         {
             mapperFunc = Condition(overMaxDepth, _configuration.Default(DestinationType), mapperFunc);
         }
-        mapperFunc = _configuration.NullCheckSource(_typeMap.Profile, _source, _initialDestination, mapperFunc, null);
         return CheckReferencesCache(mapperFunc);
     }
     private Expression CheckReferencesCache(Expression valueBuilder)
