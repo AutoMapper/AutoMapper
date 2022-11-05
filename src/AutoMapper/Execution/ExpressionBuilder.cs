@@ -183,12 +183,17 @@ public static class ExpressionBuilder
         var result = source;
         if (perMember.Count > 0 || perMap.Count > 0 || perProfile.Count > 0)
         {
-            foreach (var transformer in perMember.Concat(perMap).Concat(perProfile))
+            result = memberMap.ApplyTransformers(source, configuration, perMember.Concat(perMap).Concat(perProfile));
+        }
+        return result;
+    }
+    static Expression ApplyTransformers(this MemberMap memberMap, Expression result, IGlobalConfiguration configuration, IEnumerable<ValueTransformerConfiguration> transformers)
+    {
+        foreach (var transformer in transformers)
+        {
+            if (transformer.IsMatch(memberMap))
             {
-                if (transformer.IsMatch(memberMap))
-                {
-                    result = ToType(configuration.ReplaceParameters(transformer.TransformerExpression, ToType(result, transformer.ValueType)), memberMap.DestinationType);
-                }
+                result = ToType(configuration.ReplaceParameters(transformer.TransformerExpression, ToType(result, transformer.ValueType)), memberMap.DestinationType);
             }
         }
         return result;
