@@ -101,4 +101,5 @@ public class ConstructorParameterMap : MemberMap
     public Expression DefaultValue(IGlobalConfiguration configuration) => Parameter.IsOptional ? Parameter.GetDefaultValue(configuration) : configuration.Default(DestinationType);
     public override string ToString() => $"{Constructor}, parameter {DestinationName}";
     private MemberInfo Constructor => Parameter.Member;
+    public override bool? ExplicitExpansion { get; set; }
 }

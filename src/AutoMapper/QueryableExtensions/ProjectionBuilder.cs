@@ -90,21 +90,21 @@ public class ProjectionBuilder : IProjectionBuilder
                 pm.CanResolveValue && pm.DestinationMember.CanBeSet() && !typeMap.ConstructorParameterMatches(pm.DestinationName))
                 .OrderBy(pm => pm.DestinationMember.MetadataToken))
             {
-                var propertyProjection = TryProjectMember(propertyMap, propertyMap.ExplicitExpansion);
+                var propertyProjection = TryProjectMember(propertyMap);
                 if (propertyProjection != null)
                 {
                     propertiesProjections.Add(Bind(propertyMap.DestinationMember, propertyProjection));
                 }
             }
         }
-        Expression TryProjectMember(MemberMap memberMap, bool? explicitExpansion = null, Expression defaultSource = null)
+        Expression TryProjectMember(MemberMap memberMap, Expression defaultSource = null)
         {
             var memberProjection = new MemberProjection(memberMap);
             letPropertyMaps.Push(memberProjection);
             var memberExpression = ShouldExpand() ? ProjectMemberCore() : null;
             letPropertyMaps.Pop();
             return memberExpression;
-            bool ShouldExpand() => explicitExpansion != true || request.ShouldExpand(letPropertyMaps.GetCurrentPath());
+            bool ShouldExpand() => memberMap.ExplicitExpansion != true || request.ShouldExpand(letPropertyMaps.GetCurrentPath());
             Expression ProjectMemberCore()
             {
                 var memberTypeMap = _configuration.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType);
@@ -189,7 +189,7 @@ public class ProjectionBuilder : IProjectionBuilder
         {
             { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => 
-                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, null, map.DefaultValue(null)) ?? Default(map.DestinationType))),
+                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
             _ => New(typeMap.DestinationType)
         };
     }

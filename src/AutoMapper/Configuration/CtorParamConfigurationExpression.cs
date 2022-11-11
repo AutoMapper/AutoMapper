@@ -8,6 +8,10 @@ public interface ICtorParamConfigurationExpression
     /// </summary>
     /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
     void MapFrom(string sourceMembersPath);
+    /// <summary>
+    /// Ignore this member for LINQ projections unless explicitly expanded during projection
+    /// </summary>
+    void ExplicitExpansion();
 }
 public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
 {
@@ -58,6 +62,8 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         var sourceMembers = ReflectionHelper.GetMemberPath(SourceType, sourceMembersPath);
         _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
+
+    public void ExplicitExpansion() => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = true);
 
     public void Configure(TypeMap typeMap)
     {
