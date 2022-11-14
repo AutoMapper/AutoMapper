@@ -1,5 +1,13 @@
 ﻿namespace AutoMapper.UnitTests;
-
+public class ForCtorParamValidation : AutoMapperSpecBase
+{
+    record Source(float Value = 0);
+    record Destination(DateTime Value);
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+        c.CreateMap<Source, Destination>().ForCtorParam("Value", o => o.MapFrom(s => DateTime.MinValue)));
+    [Fact]
+    public void Should_map_ok() => Map<Destination>(new Source()).Value.ShouldBe(DateTime.MinValue);
+}
 public class ForCtorParam_MapFrom_String : AutoMapperSpecBase
 {
     public class Destination

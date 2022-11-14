@@ -111,7 +111,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
     {
         foreach (var memberMap in typeMap.MemberMaps)
         {
-            if(memberMap.Ignored)
+            if(memberMap.Ignored || (memberMap is PropertyMap && typeMap.ConstructorParameterMatches(memberMap.DestinationName)))
             {
                 continue;
             }
