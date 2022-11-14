@@ -117,9 +117,10 @@ public class ProfileMap
             if (config.DestinationTypeOverride == null)
             {
                 BuildTypeMap(configuration, config);
-                if (config.ReverseTypeMap != null)
+                var reverseMap = config.ReverseTypeMap;
+                if (reverseMap != null && reverseMap.DestinationTypeOverride == null)
                 {
-                    BuildTypeMap(configuration, config.ReverseTypeMap);
+                    BuildTypeMap(configuration, reverseMap);
                 }
             }
         }
@@ -138,9 +139,17 @@ public class ProfileMap
             if (typeMapConfiguration.DestinationTypeOverride == null)
             {
                 Configure(typeMapConfiguration, configuration);
-                if (typeMapConfiguration.ReverseTypeMap != null)
+                var reverseMap = typeMapConfiguration.ReverseTypeMap;
+                if (reverseMap != null)
                 {
-                    Configure(typeMapConfiguration.ReverseTypeMap, configuration);
+                    if (reverseMap.DestinationTypeOverride == null)
+                    {
+                        Configure(reverseMap, configuration);
+                    }
+                    else
+                    {
+                        configuration.RegisterAsMap(reverseMap);
+                    }
                 }
             }
             else
