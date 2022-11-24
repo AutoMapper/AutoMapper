@@ -1,16 +1,20 @@
 ﻿namespace AutoMapper.UnitTests.Constructors;
-
 public class RecordConstructorValidation : AutoMapperSpecBase
 {
-    class Source
-    {
-    }
-    record Destination(int Value, int Other){}
-    protected override MapperConfiguration CreateConfiguration() => new(c =>
-        c.CreateMap<Source, Destination>().ForCtorParam(nameof(Destination.Value), o => o.MapFrom(s => 0)));
+    record Destination(int Value) { }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<string, Destination>());
     [Fact]
     public void Validate() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Message.
-        ShouldContainWithoutWhitespace("When mapping to records, consider excluding non-public constructors.");
+        ShouldContainWithoutWhitespace("When mapping to records, consider using only public constructors.");
+}
+public class RecordConstructorValidationForCtorParam : AutoMapperSpecBase
+{
+    record Destination(int Value, int Other){}
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+        c.CreateMap<string, Destination>().ForCtorParam(nameof(Destination.Value), o => o.MapFrom(s => 0)));
+    [Fact]
+    public void Validate() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Message.
+        ShouldContainWithoutWhitespace("When mapping to records, consider using only public constructors.");
 }
 public class ConstructorValidation : AutoMapperSpecBase
 {

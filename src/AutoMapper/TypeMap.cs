@@ -1,5 +1,7 @@
 namespace AutoMapper;
 using Features;
+using System.Runtime.CompilerServices;
+
 /// <summary>
 /// Main configuration object holding all mapping configuration for a source and destination type
 /// </summary>
@@ -40,6 +42,8 @@ public class TypeMap
             }
         }
     }
+    public string CheckRecord() => ConstructorMap?.Ctor is ConstructorInfo ctor && ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
+        " When mapping to records, consider using only public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     public Features<IRuntimeFeature> Features => Details.Features;
     private TypeMapDetails Details => _details ??= new();
     public void CheckProjection()

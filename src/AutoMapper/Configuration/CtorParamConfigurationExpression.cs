@@ -75,14 +75,11 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         var parameter = ctorMap[CtorParamName];
         if (parameter == null)
         {
-            throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord(ctorMap.Ctor)}");
+            throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{typeMap.CheckRecord()}");
         }
         foreach (var action in _ctorParamActions)
         {
             action(parameter);
         }
-        return;
-        static string CheckRecord(ConstructorInfo ctor) => ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
-            " When mapping to records, consider excluding non-public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     }
 }

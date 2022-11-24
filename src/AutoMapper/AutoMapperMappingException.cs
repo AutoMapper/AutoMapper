@@ -200,7 +200,7 @@ public class AutoMapperConfigurationException : Exception
                     }
                     if (!error.CanConstruct)
                     {
-                        message.AppendLine("No available constructor.");
+                        message.AppendLine($"No available constructor.{error.TypeMap.CheckRecord()}");
                     }
                 }
                 return message.ToString();
