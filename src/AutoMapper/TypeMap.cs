@@ -65,7 +65,7 @@ public class TypeMap
     public TypePair Types;
     public ConstructorMap ConstructorMap { get; set; }
     public TypeDetails SourceTypeDetails { get; private set; }
-    private TypeDetails DestinationTypeDetails { get; set; }
+    public TypeDetails DestinationTypeDetails { get; private set; }
     public Type SourceType => Types.SourceType;
     public Type DestinationType => Types.DestinationType;
     public ProfileMap Profile { get; }

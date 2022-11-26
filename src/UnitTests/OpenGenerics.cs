@@ -1,4 +1,30 @@
 ﻿namespace AutoMapper.UnitTests;
+public class ReadonlyPropertiesGenerics : AutoMapperSpecBase
+{
+    class Source
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Value;
+    }
+    class Destination<T>
+    {
+        public readonly InnerDestination Inner = new();
+    }
+    class InnerDestination
+    {
+        public int Value;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap(typeof(Source), typeof(Destination<>)).ForMember("Inner", o => o.MapFrom("Inner"));
+        c.CreateMap<InnerSource, InnerDestination>();
+    });
+    [Fact]
+    public void Should_work() => Map<Destination<int>>(new Source { Inner = new() { Value = 42 } }).Inner.Value.ShouldBe(42);
+}
 public class ConstructorValidationGenerics : NonValidatingSpecBase
 {
     record Source<T>(T Value);
