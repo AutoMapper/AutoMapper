@@ -1,4 +1,14 @@
 namespace AutoMapper.UnitTests.NullBehavior;
+public class NullToExistingDestination : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<string, string>().DisableCtorValidation());
+    [Fact]
+    public void Should_return_the_destination()
+    {
+        var destination = "42";
+        Mapper.Map(default(string), destination).ShouldBeSameAs(destination);
+    }
+}
 public class NullToExistingValue : AutoMapperSpecBase
 {
     private record Person
