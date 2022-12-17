@@ -1,4 +1,15 @@
 ﻿namespace AutoMapper.UnitTests;
+public class Context_try_get_items : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<int, int>().ConvertUsing((s, _, c) => 
+        c.TryGetItems(out var items) ? (int)items["override"] : s));
+    [Fact]
+    public void Should_not_throw()
+    {
+        Map<int>(42).ShouldBe(42);
+        Mapper.Map<int>(42, o=>o.Items["override"] = 43).ShouldBe(43);
+    }
+}
 public class When_mapping_with_contextual_values
 {
     public class Source
@@ -59,7 +70,7 @@ public class When_mapping_with_contextual_values_wrong_overload : AutoMapperSpec
         {
             var inner = ex.InnerException;
             inner.ShouldBeOfType<InvalidOperationException>();
-            inner.Message.ShouldBe("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>!");
+            inner.Message.ShouldBe("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>! Consider using Context.TryGetItems instead.");
         });
     }
 }

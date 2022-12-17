@@ -29,6 +29,10 @@ public class ResolutionContext : IInternalRuntimeMapper
         }
     }
     /// <summary>
+    /// The items passed in the options of the Map call. Returns false when no context was passed.
+    /// </summary>
+    public bool TryGetItems(out Dictionary<string, object> items) => (items = _options?.Items) != null;
+    /// <summary>
     /// Current mapper
     /// </summary>
     public IRuntimeMapper Mapper => this;
@@ -97,6 +101,6 @@ public class ResolutionContext : IInternalRuntimeMapper
             ThrowInvalidMap();
         }
     }
-    private static void ThrowInvalidMap() => throw new InvalidOperationException("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>!");
+    private static void ThrowInvalidMap() => throw new InvalidOperationException("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>! Consider using Context.TryGetItems instead.");
 }
 public readonly record struct ContextCacheKey(object Source, Type DestinationType);
