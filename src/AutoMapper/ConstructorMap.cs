@@ -42,14 +42,8 @@ public class ConstructorMap
             return null;
         }
     }
-    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap)
-    {
-        if (parameter.Name == null)
-        {
-            return;
-        }
+    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap) =>
         _ctorParams.Add(new(typeMap, parameter, sourceMembers.ToArray()));
-    }
     public bool ApplyIncludedMember(IncludedMember includedMember)
     {
         var includedMap = includedMember.TypeMap.ConstructorMap;

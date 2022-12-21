@@ -50,7 +50,7 @@ public class Nullable_enum_default_value : AutoMapperSpecBase
     }
     protected override MapperConfiguration CreateConfiguration() => new(cfg=>cfg.CreateMap<Source, Target>());
     [Fact]
-    void Should_work() => Mapper.Map<Target>(new Source { Enum = SourceEnum.B }).Enum.ShouldBe(TargetEnum.B);
+    public void Should_work() => Mapper.Map<Target>(new Source { Enum = SourceEnum.B }).Enum.ShouldBe(TargetEnum.B);
 }
 public class Nullable_enum_default_value_null : AutoMapperSpecBase
 {
@@ -68,7 +68,7 @@ public class Nullable_enum_default_value_null : AutoMapperSpecBase
     }
     protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Target>());
     [Fact]
-    void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBeNull();
+    public void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBeNull();
 }
 public class Nullable_enum_default_value_not_null : AutoMapperSpecBase
 {
@@ -86,7 +86,7 @@ public class Nullable_enum_default_value_not_null : AutoMapperSpecBase
     }
     protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Target>());
     [Fact]
-    void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBe(TargetEnum.B);
+    public void Should_work() => Mapper.Map<Target>(new Source()).Enum.ShouldBe(TargetEnum.B);
 }
 public class Dynamic_constructor_mapping : AutoMapperSpecBase
 {

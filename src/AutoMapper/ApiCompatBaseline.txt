@@ -9,4 +9,5 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.UseExistingValueAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
-Total Issues: 10
+TypeCannotChangeClassification : Type 'AutoMapper.Execution.TypeMapPlanBuilder' is a 'ref struct' in the implementation but is a 'struct' in the contract.
+Total Issues: 11

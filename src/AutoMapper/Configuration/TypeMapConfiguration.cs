@@ -134,6 +134,7 @@ public abstract class TypeMapConfiguration
                 var name = parameter.Name;
                 if (name == null)
                 {
+                    ctorMap.CanResolve = false;
                     return;
                 }
                 sourceMembers.Clear();
