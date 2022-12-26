@@ -1,5 +1,4 @@
 namespace AutoMapper.Internal;
-
 /// <summary>
 /// Contains cached reflection information for easy retrieval
 /// </summary>

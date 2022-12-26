@@ -114,14 +114,15 @@ public class ProfileMap
     {
         foreach (var config in _typeMapConfigs)
         {
-            if (config.DestinationTypeOverride == null)
+            if (config.DestinationTypeOverride != null)
             {
-                BuildTypeMap(configuration, config);
-                var reverseMap = config.ReverseTypeMap;
-                if (reverseMap != null && reverseMap.DestinationTypeOverride == null)
-                {
-                    BuildTypeMap(configuration, reverseMap);
-                }
+                continue;
+            }
+            BuildTypeMap(configuration, config);
+            var reverseMap = config.ReverseTypeMap;
+            if (reverseMap != null && reverseMap.DestinationTypeOverride == null)
+            {
+                BuildTypeMap(configuration, reverseMap);
             }
         }
     }
@@ -136,25 +137,24 @@ public class ProfileMap
     {
         foreach (var typeMapConfiguration in _typeMapConfigs)
         {
-            if (typeMapConfiguration.DestinationTypeOverride == null)
+            if (typeMapConfiguration.DestinationTypeOverride != null)
             {
-                Configure(typeMapConfiguration, configuration);
-                var reverseMap = typeMapConfiguration.ReverseTypeMap;
-                if (reverseMap != null)
-                {
-                    if (reverseMap.DestinationTypeOverride == null)
-                    {
-                        Configure(reverseMap, configuration);
-                    }
-                    else
-                    {
-                        configuration.RegisterAsMap(reverseMap);
-                    }
-                }
+                configuration.RegisterAsMap(typeMapConfiguration);
+                continue;
+            }
+            Configure(typeMapConfiguration, configuration);
+            var reverseMap = typeMapConfiguration.ReverseTypeMap;
+            if (reverseMap == null)
+            {
+                continue;
+            }
+            if (reverseMap.DestinationTypeOverride == null)
+            {
+                Configure(reverseMap, configuration);
             }
             else
             {
-                configuration.RegisterAsMap(typeMapConfiguration);
+                configuration.RegisterAsMap(reverseMap);
             }
         }
     }
