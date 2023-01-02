@@ -1,4 +1,40 @@
 ﻿namespace AutoMapper.UnitTests;
+public class ForPathGenericsSource : AutoMapperSpecBase
+{
+    class Source<T>
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Id;
+    }
+    class Destination
+    {
+        public int InnerId;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination)).ReverseMap());
+    [Fact]
+    public void Should_work() => Map<Destination>(new Source<int> { Inner = new() { Id = 42 } }).InnerId.ShouldBe(42);
+}
+public class ForPathGenerics : AutoMapperSpecBase
+{
+    class Source<T>
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Id;
+    }
+    class Destination<T>
+    {
+        public int InnerId;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)).ReverseMap());
+    [Fact]
+    public void Should_work() => Map<Destination<int>>(new Source<int> { Inner = new() { Id = 42 } }).InnerId.ShouldBe(42);
+}
 public class ReadonlyPropertiesGenerics : AutoMapperSpecBase
 {
     class Source

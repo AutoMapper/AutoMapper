@@ -104,7 +104,10 @@ public abstract class TypeMapConfiguration
     }
     private void ConfigureReverseMap(TypeMap typeMap)
     {
-        ReverseSourceMembers(typeMap);
+        if (!typeMap.Types.ContainsGenericParameters)
+        {
+            ReverseSourceMembers(typeMap);
+        }
         foreach (var destProperty in typeMap.PropertyMaps.Where(pm => pm.Ignored))
         {
             ReverseMapExpression.ForSourceMemberCore(destProperty.DestinationName, opt => opt.DoNotValidate());
