@@ -1,5 +1,14 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
-
+public class ForAllMapsTypeConverter : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<int, int>().ConvertUsing(s => s+1);
+        c.ForAllMaps((_, m) => m.ForAllMembers(_ => { }));
+    });
+    [Fact]
+    public void Should_work() => Map<int>(42).ShouldBe(43);
+}
 public class ForAllMaps : AutoMapperSpecBase
 {
     private Destination _destination;

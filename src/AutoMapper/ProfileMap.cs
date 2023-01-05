@@ -179,6 +179,10 @@ public class ProfileMap
     }
     private void Configure(TypeMap typeMap, IGlobalConfiguration configuration)
     {
+        if (typeMap.HasTypeConverter)
+        {
+            return;
+        }
         foreach (var action in AllTypeMapActions)
         {
             var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
