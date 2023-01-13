@@ -1,5 +1,79 @@
 ﻿namespace AutoMapper.UnitTests;
-
+public class ForPathGenericsSource : AutoMapperSpecBase
+{
+    class Source<T>
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Id;
+    }
+    class Destination
+    {
+        public int InnerId;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination)).ReverseMap());
+    [Fact]
+    public void Should_work() => Map<Destination>(new Source<int> { Inner = new() { Id = 42 } }).InnerId.ShouldBe(42);
+}
+public class ForPathGenerics : AutoMapperSpecBase
+{
+    class Source<T>
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Id;
+    }
+    class Destination<T>
+    {
+        public int InnerId;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)).ReverseMap());
+    [Fact]
+    public void Should_work() => Map<Destination<int>>(new Source<int> { Inner = new() { Id = 42 } }).InnerId.ShouldBe(42);
+}
+public class ReadonlyPropertiesGenerics : AutoMapperSpecBase
+{
+    class Source
+    {
+        public InnerSource Inner;
+    }
+    class InnerSource
+    {
+        public int Value;
+    }
+    class Destination<T>
+    {
+        public readonly InnerDestination Inner = new();
+    }
+    class InnerDestination
+    {
+        public int Value;
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap(typeof(Source), typeof(Destination<>)).ForMember("Inner", o => o.MapFrom("Inner"));
+        c.CreateMap<InnerSource, InnerDestination>();
+    });
+    [Fact]
+    public void Should_work() => Map<Destination<int>>(new Source { Inner = new() { Value = 42 } }).Inner.Value.ShouldBe(42);
+}
+public class ConstructorValidationGenerics : NonValidatingSpecBase
+{
+    record Source<T>(T Value);
+    record Destination<T>(T OtherValue);
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)));
+    [Fact]
+    public void Should_work()
+    {
+        var error = new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().Errors.Single();
+        error.CanConstruct.ShouldBeFalse();
+        error.UnmappedPropertyNames.Single().ShouldBe("OtherValue");
+    }
+}
 public class SealGenerics : AutoMapperSpecBase
 {
     public record SourceProperty<T>(T Value, SourceProperty<T> Recursive = null);

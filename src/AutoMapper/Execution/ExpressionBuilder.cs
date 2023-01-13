@@ -7,32 +7,26 @@ using static Internal.ReflectionHelper;
 public static class ExpressionBuilder
 {
     public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
-    private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
     public static readonly Expression True = Constant(true, typeof(bool));
-    public static readonly Expression Null = Constant(null, typeof(object));
+    public static readonly Expression Null = Expression.Default(typeof(object));
     public static readonly Expression Empty = Empty();
-    public static readonly LambdaExpression EmptyLambda = Expression.Lambda(Empty);
-    public static readonly Expression Zero = Constant(0, typeof(int));
+    public static readonly Expression Zero = Expression.Default(typeof(int));
     public static readonly ParameterExpression ExceptionParameter = Parameter(typeof(Exception), "ex");
     public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
     public static readonly MethodInfo IListClear = typeof(IList).GetMethod(nameof(IList.Clear));
-    public static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
-    public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.IncrementTypeDepth));
-    public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.DecrementTypeDepth));
-    private static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
-    public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
-    public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
-    public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
-    private static readonly MethodCallExpression CheckContextCall = Expression.Call(
+    static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
+    static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
+    static readonly MethodCallExpression CheckContextCall = Expression.Call(
         typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext)), ContextParameter);
-    private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
-    private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
-    private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
-    private static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
-    private static readonly Expression DisposeCall = IfThen(ReferenceNotEqual(Disposable, Null), Expression.Call(Disposable, DisposeMethod));
-    private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
-    private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
-    private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
+    static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
+    static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
+    static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
+    static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
+    static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
+    static readonly Expression DisposeCall = IfThen(ReferenceNotEqual(Disposable, Null), Expression.Call(Disposable, DisposeMethod));
+    static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
+    static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
+    static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
     public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression newParameter) =>
         configuration.ParameterReplaceVisitor().Replace(initialLambda, newParameter);
     public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression[] newParameters) =>
@@ -103,7 +97,7 @@ public static class ExpressionBuilder
         mapExpression ??= ContextMap(typePair, source, destination, memberMap);
         return nullCheck ? configuration.NullCheckSource(profileMap, source, destination, mapExpression, memberMap) : mapExpression;
     }
-    public static Expression NullCheckSource(this IGlobalConfiguration configuration, ProfileMap profileMap, Expression source, Expression destination, 
+    public static Expression NullCheckSource(this IGlobalConfiguration configuration, ProfileMap profileMap, Expression source, Expression destination,
         Expression mapExpression, MemberMap memberMap)
     {
         var sourceType = source.Type;
@@ -114,7 +108,7 @@ public static class ExpressionBuilder
         var destinationType = destination.Type;
         var isCollection = destinationType.IsCollection();
         var mustUseDestination = memberMap is { MustUseDestination: true };
-        var ifSourceNull = memberMap == null ? 
+        var ifSourceNull = memberMap == null ?
             destination.IfNullElse(DefaultDestination(), ClearDestinationCollection()) :
             mustUseDestination ? ClearDestinationCollection() : DefaultDestination();
         return source.IfNullElse(ifSourceNull, mapExpression);
@@ -176,32 +170,34 @@ public static class ExpressionBuilder
         var mapMethod = ContextMapMethod.MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
         return Expression.Call(ContextParameter, mapMethod, sourceParameter, destinationParameter, Constant(memberMap, typeof(MemberMap)));
     }
-    public static Expression CheckContext(TypeMap typeMap)
-    {
-        if (typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
-        {
-            return CheckContextCall;
-        }
-        return null;
-    }
-    public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
+    public static Expression CheckContext(TypeMap typeMap) => typeMap.PreserveReferences || typeMap.MaxDepth > 0 ? CheckContextCall : null;
+    public static Expression OverMaxDepth(TypeMap typeMap) => typeMap?.MaxDepth > 0 ? 
+        Expression.Call(ContextParameter, OverTypeDepthMethod, Constant(typeMap)) : null;
     public static Expression NullSubstitute(this MemberMap memberMap, Expression sourceExpression) =>
         Coalesce(sourceExpression, ToType(Constant(memberMap.NullSubstitute), sourceExpression.Type));
     public static Expression ApplyTransformers(this MemberMap memberMap, Expression source, IGlobalConfiguration configuration)
     {
         var perMember = memberMap.ValueTransformers;
         var perMap = memberMap.TypeMap.ValueTransformers;
-        var perProfile = memberMap.TypeMap.Profile.ValueTransformers;
-        if (perMember.Count == 0 && perMap.Count == 0 && perProfile.Count == 0)
+        var perProfile = memberMap.Profile.ValueTransformers;
+        var result = source;
+        if (perMember.Count > 0 || perMap.Count > 0 || perProfile.Count > 0)
         {
-            return source;
+            result = memberMap.ApplyTransformers(source, configuration, perMember.Concat(perMap).Concat(perProfile));
         }
-        var transformers = perMember.Concat(perMap).Concat(perProfile);
-        return memberMap.ApplyTransformers(source, configuration, transformers);
+        return result;
     }
-    static Expression ApplyTransformers(this MemberMap memberMap, Expression source, IGlobalConfiguration configuration, IEnumerable<ValueTransformerConfiguration> transformers) => 
-        transformers.Where(vt => vt.IsMatch(memberMap)).Aggregate(source, (current, vtConfig) => 
-            ToType(configuration.ReplaceParameters(vtConfig.TransformerExpression, ToType(current, vtConfig.ValueType)), memberMap.DestinationType));
+    static Expression ApplyTransformers(this MemberMap memberMap, Expression result, IGlobalConfiguration configuration, IEnumerable<ValueTransformerConfiguration> transformers)
+    {
+        foreach (var transformer in transformers)
+        {
+            if (transformer.IsMatch(memberMap))
+            {
+                result = ToType(configuration.ReplaceParameters(transformer.TransformerExpression, ToType(result, transformer.ValueType)), memberMap.DestinationType);
+            }
+        }
+        return result;
+    }
     public static LambdaExpression Lambda(this MemberInfo member) => new[] { member }.Lambda();
     public static LambdaExpression Lambda(this MemberInfo[] members)
     {

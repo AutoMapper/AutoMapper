@@ -130,7 +130,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
         var destMember = DestinationMember;
         if(destMember.DeclaringType.ContainsGenericParameters)
         {
-            destMember = typeMap.DestinationSetters.Single(m => m.Name == destMember.Name);
+            destMember = Array.Find(typeMap.DestinationTypeDetails.ReadAccessors, m => m.MetadataToken == destMember.MetadataToken);
         }
         var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember, typeof(TMember) == typeof(object) ? destMember.GetMemberType() : typeof(TMember));
         Apply(propertyMap);

@@ -114,13 +114,15 @@ public class ProfileMap
     {
         foreach (var config in _typeMapConfigs)
         {
-            if (config.DestinationTypeOverride == null)
+            if (config.DestinationTypeOverride != null)
             {
-                BuildTypeMap(configuration, config);
-                if (config.ReverseTypeMap != null)
-                {
-                    BuildTypeMap(configuration, config.ReverseTypeMap);
-                }
+                continue;
+            }
+            BuildTypeMap(configuration, config);
+            var reverseMap = config.ReverseTypeMap;
+            if (reverseMap != null && reverseMap.DestinationTypeOverride == null)
+            {
+                BuildTypeMap(configuration, reverseMap);
             }
         }
     }
@@ -135,17 +137,24 @@ public class ProfileMap
     {
         foreach (var typeMapConfiguration in _typeMapConfigs)
         {
-            if (typeMapConfiguration.DestinationTypeOverride == null)
+            if (typeMapConfiguration.DestinationTypeOverride != null)
             {
-                Configure(typeMapConfiguration, configuration);
-                if (typeMapConfiguration.ReverseTypeMap != null)
-                {
-                    Configure(typeMapConfiguration.ReverseTypeMap, configuration);
-                }
+                configuration.RegisterAsMap(typeMapConfiguration);
+                continue;
+            }
+            Configure(typeMapConfiguration, configuration);
+            var reverseMap = typeMapConfiguration.ReverseTypeMap;
+            if (reverseMap == null)
+            {
+                continue;
+            }
+            if (reverseMap.DestinationTypeOverride == null)
+            {
+                Configure(reverseMap, configuration);
             }
             else
             {
-                configuration.RegisterAsMap(typeMapConfiguration);
+                configuration.RegisterAsMap(reverseMap);
             }
         }
     }
@@ -170,6 +179,10 @@ public class ProfileMap
     }
     private void Configure(TypeMap typeMap, IGlobalConfiguration configuration)
     {
+        if (typeMap.HasTypeConverter)
+        {
+            return;
+        }
         foreach (var action in AllTypeMapActions)
         {
             var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
@@ -208,7 +221,6 @@ public class ProfileMap
         {
             baseMap.IncludeDerivedTypes(currentMap.Types);
             derivedMap.AddInheritedMap(baseMap);
-            ApplyBaseMaps(derivedMap, baseMap, configuration);
         }
     }
     private void ApplyMemberMaps(TypeMap currentMap, IGlobalConfiguration configuration)
@@ -237,7 +249,6 @@ public class ProfileMap
         {
             derivedMap.IncludeBaseTypes(typeMap.Types);
             derivedMap.AddInheritedMap(baseMap);
-            ApplyDerivedMaps(baseMap, derivedMap, configuration);
         }
     }
     public bool MapDestinationPropertyToSource(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string destMemberName, List<MemberInfo> members, bool reverseNamingConventions) =>

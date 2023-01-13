@@ -8,6 +8,10 @@ public interface ICtorParamConfigurationExpression
     /// </summary>
     /// <param name="sourceMembersPath">Property name referencing the source member to map against. Or a dot separated member path.</param>
     void MapFrom(string sourceMembersPath);
+    /// <summary>
+    /// Ignore this member for LINQ projections unless explicitly expanded during projection
+    /// </summary>
+    void ExplicitExpansion();
 }
 public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
 {
@@ -59,6 +63,8 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
 
+    public void ExplicitExpansion() => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = true);
+
     public void Configure(TypeMap typeMap)
     {
         var ctorMap = typeMap.ConstructorMap;
@@ -69,14 +75,11 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         var parameter = ctorMap[CtorParamName];
         if (parameter == null)
         {
-            throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{CheckRecord(ctorMap.Ctor)}");
+            throw new AutoMapperConfigurationException($"{typeMap.DestinationType.Name} does not have a matching constructor with a parameter named '{CtorParamName}'.\n{typeMap.DestinationType.FullName}.{typeMap.CheckRecord()}");
         }
         foreach (var action in _ctorParamActions)
         {
             action(parameter);
         }
-        return;
-        static string CheckRecord(ConstructorInfo ctor) => ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
-            " When mapping to records, consider excluding non-public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     }
 }

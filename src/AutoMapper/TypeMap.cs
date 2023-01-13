@@ -1,5 +1,7 @@
 namespace AutoMapper;
 using Features;
+using System.Runtime.CompilerServices;
+
 /// <summary>
 /// Main configuration object holding all mapping configuration for a source and destination type
 /// </summary>
@@ -7,10 +9,11 @@ using Features;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TypeMap
 {
-    private static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
-    private TypeMapDetails _details;
-    private List<PropertyMap> _propertyMaps;
-    private bool _sealed;
+    static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Empty);
+    static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
+    TypeMapDetails _details;
+    List<PropertyMap> _propertyMaps;
+    bool _sealed;
     public TypeMap(Type sourceType, Type destinationType, ProfileMap profile, TypeMapConfiguration typeMapConfiguration, List<MemberInfo> sourceMembers = null)
     {
         Types = new(sourceType, destinationType);
@@ -39,6 +42,8 @@ public class TypeMap
             }
         }
     }
+    public string CheckRecord() => ConstructorMap?.Ctor is ConstructorInfo ctor && ctor.IsFamily && ctor.Has<CompilerGeneratedAttribute>() ?
+        " When mapping to records, consider using only public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     public Features<IRuntimeFeature> Features => Details.Features;
     private TypeMapDetails Details => _details ??= new();
     public void CheckProjection()
@@ -60,7 +65,7 @@ public class TypeMap
     public TypePair Types;
     public ConstructorMap ConstructorMap { get; set; }
     public TypeDetails SourceTypeDetails { get; private set; }
-    private TypeDetails DestinationTypeDetails { get; set; }
+    public TypeDetails DestinationTypeDetails { get; private set; }
     public Type SourceType => Types.SourceType;
     public Type DestinationType => Types.DestinationType;
     public ProfileMap Profile { get; }
@@ -107,7 +112,6 @@ public class TypeMap
         || CustomConstruction
         || ConstructorMapping
         || DestinationType.IsAbstract
-        || DestinationType.IsGenericTypeDefinition
         || DestinationType.IsValueType
         || TypeDetails.GetConstructors(DestinationType, Profile).Any(c => c.AllParametersOptional());
     public MemberInfo[] DestinationSetters => DestinationTypeDetails.WriteAccessors;

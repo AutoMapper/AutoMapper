@@ -67,7 +67,7 @@ public class PropertyMap : MemberMap
     public override IncludedMember IncludedMember => _details?.IncludedMember;
     public override bool? AllowNull { get => _details?.AllowNull; set => Details.AllowNull = value; }
     public int? MappingOrder { get => _details?.MappingOrder; set => Details.MappingOrder = value; }
-    public bool? ExplicitExpansion { get => _details?.ExplicitExpansion; set => Details.ExplicitExpansion = value; }
+    public override bool? ExplicitExpansion { get => _details?.ExplicitExpansion; set => Details.ExplicitExpansion = value; }
     public override bool? UseDestinationValue { get => _details?.UseDestinationValue; set => Details.UseDestinationValue = value; }
     public override object NullSubstitute { get => _details?.NullSubstitute; set => Details.NullSubstitute = value; }
     public override LambdaExpression PreCondition { get => _details?.PreCondition; set => Details.PreCondition = value; }

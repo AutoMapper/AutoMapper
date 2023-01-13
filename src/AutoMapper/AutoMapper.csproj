@@ -14,6 +14,7 @@
     <PackageProjectUrl>https://automapper.org</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
+    <MinVerDefaultPreReleasePhase>preview</MinVerDefaultPreReleasePhase>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

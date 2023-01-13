@@ -1,4 +1,26 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance;
+public class ReverseMapAs : AutoMapperSpecBase
+{
+    public interface IModel
+    {
+        int First { get; }
+    }
+    public record Model : IModel
+    {
+        public int First { get; set; }
+    }
+    public record Dto
+    {
+        public int First { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<IModel, Dto>().ReverseMap().As<Model>();
+        c.CreateMap<Dto, Model>();
+    });
+    [Fact]
+    public void Should_work() => Map<IModel>(new Dto { First = 1}).First.ShouldBe(1);
+}
 public class MapToBaseClass : AutoMapperSpecBase
 {
     A _destination;

@@ -1752,3 +1752,28 @@ public class IncludeMembersMultipleConstructorMapping : AutoMapperSpecBase
         dest.Level1Field.ShouldBe(3);
     }
 }
+public class IncludeMembersNullCheck : AutoMapperSpecBase
+{
+    class Source
+    {
+        public string Name { get; set; }
+        public InnerSource InnerSource { get; set; }
+    }
+    class InnerSource
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+    class Destination
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource);
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+    });
+    [Fact]
+    public void Should_flatten() => Mapper.Map<Destination[]>(new[] { default(Source) })[0].ShouldBeNull();
+}

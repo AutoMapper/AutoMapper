@@ -168,14 +168,12 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
 
     private void AddMapsCore(IEnumerable<Assembly> assembliesToScan)
     {
-        var allTypes = assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Profile).Assembly).SelectMany(a => a.DefinedTypes).ToArray();
         var autoMapAttributeProfile = new Profile(nameof(AutoMapAttribute));
-
-        foreach (var type in allTypes)
+        foreach (var type in assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Profile).Assembly).SelectMany(a => a.GetTypes()))
         {
-            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract)
+            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
             {
-                AddProfile(type.AsType());
+                AddProfile(type);
             }
 
             foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())

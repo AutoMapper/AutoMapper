@@ -1,16 +1,20 @@
 namespace AutoMapper.Execution;
-public struct TypeMapPlanBuilder
+public ref struct TypeMapPlanBuilder
 {
-    private static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
-    private readonly IGlobalConfiguration _configuration;
-    private readonly ParameterExpression _destination;
-    private readonly ParameterExpression _initialDestination;
-    private readonly ParameterExpression[] _parameters;
-    private readonly TypeMap _typeMap;
-    private readonly ParameterExpression _source;
-    private List<ParameterExpression> _variables;
-    private List<Expression> _expressions;
-    private CatchBlock[] _catches;
+    static readonly MethodInfo MappingError = typeof(TypeMapPlanBuilder).GetStaticMethod(nameof(MemberMappingError));
+    static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.IncrementTypeDepth));
+    static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.DecrementTypeDepth));
+    static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
+    static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
+    readonly IGlobalConfiguration _configuration;
+    readonly ParameterExpression _destination;
+    readonly ParameterExpression _initialDestination;
+    readonly ParameterExpression[] _parameters;
+    readonly TypeMap _typeMap;
+    readonly ParameterExpression _source;
+    List<ParameterExpression> _variables;
+    List<Expression> _expressions;
+    CatchBlock[] _catches;
     public TypeMapPlanBuilder(IGlobalConfiguration configuration, TypeMap typeMap)
     {
         _configuration = configuration;
@@ -61,7 +65,8 @@ public struct TypeMapPlanBuilder
         }
         _expressions.Add(mapperFunc);
         _variables.Add(_destination);
-        return Lambda(Block(_variables, _expressions), GetParameters(second: _initialDestination));
+        mapperFunc = Block(_variables, _expressions);
+        return Lambda(_configuration.NullCheckSource(_typeMap.Profile, _source, _initialDestination, mapperFunc, null), GetParameters(second: _initialDestination));
         static void Clear(ref HashSet<TypeMap> typeMapsPath)
         {
             if (typeMapsPath == null)
@@ -76,10 +81,12 @@ public struct TypeMapPlanBuilder
     }
     void IncludeMembers()
     {
-        var configuration = _configuration;
-        _variables.AddRange(_typeMap.IncludedMembersTypeMaps.Select(i => i.Variable));
-        var source = _source;
-        _expressions.AddRange(_variables.Zip(_typeMap.IncludedMembersTypeMaps, (v, i) => Assign(v, configuration.ReplaceParameters(i.MemberExpression, source).NullCheck(null))));
+        foreach (var includedMap in _typeMap.IncludedMembersTypeMaps)
+        {
+            var variable = includedMap.Variable;
+            _variables.Add(variable);
+            _expressions.Add(Assign(variable, _configuration.ReplaceParameters(includedMap.MemberExpression, _source).NullCheck(null)));
+        }
     }
     private static void CheckForCycles(IGlobalConfiguration configuration, TypeMap typeMap, HashSet<TypeMap> typeMapsPath)
     {
@@ -170,49 +177,10 @@ public struct TypeMapPlanBuilder
             typeMapExpression = Constant(_typeMap);
             actions.Add(Call(ContextParameter, IncTypeDepthInfo, typeMapExpression));
         }
-        var beforeMap = _typeMap.BeforeMapActions;
-        if (beforeMap.Count > 0)
-        {
-            foreach (var beforeMapAction in beforeMap)
-            {
-                actions.Add(ReplaceParameters(beforeMapAction));
-            }
-        }
-        var propertyMaps = _typeMap.OrderedPropertyMaps();
-        if (propertyMaps != null)
-        {
-            foreach (var propertyMap in propertyMaps)
-            {
-                if (propertyMap.CanResolveValue)
-                {
-                    var property = TryPropertyMap(propertyMap);
-                    if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
-                    {
-                        property = _initialDestination.IfNullElse(_configuration.Default(property.Type), property);
-                    }
-                    actions.Add(property);
-                }
-            }
-        }
-        var pathMaps = _typeMap.PathMaps;
-        if (pathMaps.Count > 0)
-        {
-            foreach (var pathMap in pathMaps)
-            {
-                if (!pathMap.Ignored)
-                {
-                    actions.Add(TryPathMap(pathMap));
-                }
-            }
-        }
-        var afterMap = _typeMap.AfterMapActions;
-        if (afterMap.Count > 0)
-        {
-            foreach (var afterMapAction in afterMap)
-            {
-                actions.Add(ReplaceParameters(afterMapAction));
-            }
-        }
+        AddBeforeMap(actions);
+        AddPropertyMaps(actions);
+        AddPathMaps(actions);
+        AddAfterMap(actions);
         if (hasMaxDepth)
         {
             actions.Add(Call(ContextParameter, DecTypeDepthInfo, typeMapExpression));
@@ -220,32 +188,88 @@ public struct TypeMapPlanBuilder
         actions.Add(_destination);
         return Block(actions);
     }
+    private void AddAfterMap(List<Expression> actions)
+    {
+        var afterMap = _typeMap.AfterMapActions;
+        if (afterMap.Count == 0)
+        {
+            return;
+        }
+        foreach (var afterMapAction in afterMap)
+        {
+            actions.Add(ReplaceParameters(afterMapAction));
+        }
+    }
+    private void AddPathMaps(List<Expression> actions)
+    {
+        var pathMaps = _typeMap.PathMaps;
+        if (pathMaps.Count == 0)
+        {
+            return;
+        }
+        foreach (var pathMap in pathMaps)
+        {
+            if (pathMap.Ignored)
+            {
+                continue;
+            }
+            actions.Add(TryPathMap(pathMap));
+        }
+    }
+    private void AddBeforeMap(List<Expression> actions)
+    {
+        var beforeMap = _typeMap.BeforeMapActions;
+        if (beforeMap.Count == 0)
+        {
+            return;
+        }
+        foreach (var beforeMapAction in beforeMap)
+        {
+            actions.Add(ReplaceParameters(beforeMapAction));
+        }
+    }
+    private void AddPropertyMaps(List<Expression> actions)
+    {
+        var propertyMaps = _typeMap.OrderedPropertyMaps();
+        if (propertyMaps == null)
+        {
+            return;
+        }
+        foreach (var propertyMap in propertyMaps)
+        {
+            if (!propertyMap.CanResolveValue)
+            {
+                continue;
+            }
+            var property = TryMemberMap(propertyMap, CreatePropertyMapFunc(propertyMap, _destination, propertyMap.DestinationMember));
+            if (_typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+            {
+                property = _initialDestination.IfNullElse(_configuration.Default(property.Type), property);
+            }
+            actions.Add(property);
+        }
+    }
     private Expression TryPathMap(PathMap pathMap)
     {
         var destination = ((MemberExpression)_configuration.ConvertReplaceParameters(pathMap.DestinationExpression, _destination)).Expression;
-        var configuration = _configuration;
-        var createInnerObjects = CreateInnerObjects(destination);
-        var setFinalValue = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
-        var pathMapExpression = Block(createInnerObjects, setFinalValue);
-        return TryMemberMap(pathMap, pathMapExpression);
-        Expression CreateInnerObjects(Expression destination)
+        var pathMapFunc = CreatePropertyMapFunc(pathMap, destination, pathMap.MemberPath.Last);
+        _expressions.Clear();
+        foreach (var member in destination.GetMemberExpressions())
         {
-            return Block(destination.GetMemberExpressions().Select(NullCheck).Append(ExpressionBuilder.Empty));
-            Expression NullCheck(MemberExpression memberExpression)
-            {
-                var setter = GetSetter(memberExpression);
-                var ifNull = setter == null
-                    ? Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath.")), memberExpression.Type)
-                    : (Expression)Assign(setter, ObjectFactory.GenerateConstructorExpression(memberExpression.Type, configuration));
-                return memberExpression.IfNullElse(ifNull, configuration.Default(memberExpression.Type));
-            }
-            static Expression GetSetter(MemberExpression memberExpression) => memberExpression.Member switch
-            {
-                PropertyInfo { CanWrite: true } property => Property(memberExpression.Expression, property),
-                FieldInfo { IsInitOnly: false } field => Field(memberExpression.Expression, field),
-                _ => null,
-            };
+            var setter = GetSetter(member);
+            var ifNull = setter == null
+                ? Throw(Constant(new NullReferenceException($"{member} cannot be null because it's used by ForPath.")), member.Type)
+                : (Expression)Assign(setter, ObjectFactory.GenerateConstructorExpression(member.Type, _configuration));
+            _expressions.Add(member.IfNullElse(ifNull, _configuration.Default(member.Type)));
         }
+        _expressions.Add(pathMapFunc);
+        return TryMemberMap(pathMap, Block(_expressions));
+        static Expression GetSetter(MemberExpression memberExpression) => memberExpression.Member switch
+        {
+            PropertyInfo { CanWrite: true } property => Property(memberExpression.Expression, property),
+            FieldInfo { IsInitOnly: false } field => Field(memberExpression.Expression, field),
+            _ => null,
+        };
     }
     private Expression CreateMapperFunc(Expression assignmentFunc)
     {
@@ -255,7 +279,6 @@ public struct TypeMapPlanBuilder
         {
             mapperFunc = Condition(overMaxDepth, _configuration.Default(DestinationType), mapperFunc);
         }
-        mapperFunc = _configuration.NullCheckSource(_typeMap.Profile, _source, _initialDestination, mapperFunc, null);
         return CheckReferencesCache(mapperFunc);
     }
     private Expression CheckReferencesCache(Expression valueBuilder)
@@ -276,10 +299,15 @@ public struct TypeMapPlanBuilder
     };
     private Expression ConstructorMapping(ConstructorMap constructorMap)
     {
-        var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
-        var variables = constructorMap.Ctor.GetParameters().Select(parameter => Variable(parameter.ParameterType, parameter.Name)).ToArray();
-        var body = variables.Zip(ctorArgs, (variable, expression) => (Expression)Assign(variable, ToType(expression, variable.Type)))
-            .Append(CheckReferencesCache(New(constructorMap.Ctor, variables)));
+        List<ParameterExpression> variables = new();
+        List<Expression> body = new();
+        foreach (var parameter in constructorMap.CtorParams)
+        {
+            var variable = Variable(parameter.DestinationType, parameter.DestinationName);
+            variables.Add(variable);
+            body.Add(Assign(variable, CreateConstructorParameterExpression(parameter)));
+        }
+        body.Add(CheckReferencesCache(New(constructorMap.Ctor, variables)));
         return Block(variables, body);
     }
     private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
@@ -295,11 +323,6 @@ public struct TypeMapPlanBuilder
         _expressions.Add(Assign(resolvedValue, resolvedExpression));
         _expressions.Add(mapMember);
         return TryMemberMap(ctorParamMap, Block(_variables, _expressions));
-    }
-    private Expression TryPropertyMap(PropertyMap propertyMap)
-    {
-        var propertyMapExpression = CreatePropertyMapFunc(propertyMap, _destination, propertyMap.DestinationMember);
-        return TryMemberMap(propertyMap, propertyMapExpression);
     }
     private Expression TryMemberMap(MemberMap memberMap, Expression memberMapExpression)
     {

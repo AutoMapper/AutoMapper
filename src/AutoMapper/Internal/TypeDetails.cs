@@ -1,5 +1,4 @@
 namespace AutoMapper.Internal;
-
 /// <summary>
 /// Contains cached reflection information for easy retrieval
 /// </summary>
@@ -93,7 +92,7 @@ public class TypeDetails
     {
         readonly MethodInfo _genericMethod;
         readonly Type _genericInterface;
-        MethodInfo _closedMethod = DecTypeDepthInfo;
+        MethodInfo _closedMethod = ObjectToString;
         public GenericMethod(MethodInfo genericMethod, Type genericInterface)
         {
             _genericMethod = genericMethod;
@@ -101,7 +100,7 @@ public class TypeDetails
         }
         public MethodInfo Close()
         {
-            if (_closedMethod == DecTypeDepthInfo)
+            if (_closedMethod == ObjectToString)
             {
                 // Use method.MakeGenericMethod(genericArguments) wrapped in a try/catch(ArgumentException)
                 // in order to catch exceptions resulting from the generic arguments not being compatible

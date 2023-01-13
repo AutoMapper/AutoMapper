@@ -25,6 +25,7 @@ public class MemberMap : IValueResolver
     public bool CanResolveValue => !Ignored && Resolver != null;
     public bool IsMapped => Ignored || CanResolveValue;
     public virtual bool Ignored { get => default; set { } }
+    public virtual bool? ExplicitExpansion { get => default; set { } }
     public virtual bool Inline { get; set; } = true;
     public virtual bool? AllowNull { get => null; set { } }
     public virtual bool CanBeSet => true;

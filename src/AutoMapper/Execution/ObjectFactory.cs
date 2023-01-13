@@ -3,7 +3,8 @@ namespace AutoMapper.Execution;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class ObjectFactory
 {
-    private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new(GenerateConstructor);
+    static readonly Expression EmptyString = Constant(string.Empty);
+    static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new(GenerateConstructor);
     public static object CreateInstance(Type type) => CtorCache.GetOrAdd(type)();
     private static Func<object> GenerateConstructor(Type type) =>
         Lambda<Func<object>>(GenerateConstructorExpression(type, null).ToObject()).Compile();
@@ -11,7 +12,7 @@ public static class ObjectFactory
     public static Expression GenerateConstructorExpression(Type type, IGlobalConfiguration configuration) => type switch
     {
         { IsValueType: true } => configuration.Default(type),
-        Type stringType when stringType == typeof(string) => Constant(string.Empty),
+        Type stringType when stringType == typeof(string) => EmptyString,
         { IsInterface: true } => CreateInterfaceExpression(type),
         { IsAbstract: true } => InvalidType(type, $"Cannot create an instance of abstract type {type}."),
         _ => CallConstructor(type, configuration)

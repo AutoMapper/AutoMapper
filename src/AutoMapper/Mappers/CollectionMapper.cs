@@ -5,6 +5,7 @@ namespace AutoMapper.Internal.Mappers;
 using static ReflectionHelper;
 public class CollectionMapper : IObjectMapper
 {
+    static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
     public TypePair? GetAssociatedTypes(TypePair context) => new(GetElementType(context.SourceType), GetElementType(context.DestinationType));
     public bool IsMatch(TypePair context) => context.IsCollection();
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)

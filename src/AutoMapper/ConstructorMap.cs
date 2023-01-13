@@ -42,14 +42,8 @@ public class ConstructorMap
             return null;
         }
     }
-    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap)
-    {
-        if (parameter.Name == null)
-        {
-            return;
-        }
+    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap) =>
         _ctorParams.Add(new(typeMap, parameter, sourceMembers.ToArray()));
-    }
     public bool ApplyIncludedMember(IncludedMember includedMember)
     {
         var includedMap = includedMember.TypeMap.ConstructorMap;
@@ -101,4 +95,5 @@ public class ConstructorParameterMap : MemberMap
     public Expression DefaultValue(IGlobalConfiguration configuration) => Parameter.IsOptional ? Parameter.GetDefaultValue(configuration) : configuration.Default(DestinationType);
     public override string ToString() => $"{Constructor}, parameter {DestinationName}";
     private MemberInfo Constructor => Parameter.Member;
+    public override bool? ExplicitExpansion { get; set; }
 }

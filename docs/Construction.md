@@ -53,3 +53,4 @@ You can configure which constructors are considered for the destination object:
 // use only public constructors
 var configuration = new MapperConfiguration(cfg => cfg.ShouldUseConstructor = constructor => constructor.IsPublic);
 ```
+When mapping to records, consider using only public constructors.
