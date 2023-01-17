@@ -19,7 +19,7 @@ public static class ObjectFactory
     };
     private static Expression CallConstructor(Type type, IGlobalConfiguration configuration)
     {
-        var defaultCtor = type.GetConstructor(TypeExtensions.InstanceFlags, null, Type.EmptyTypes, null);
+        var defaultCtor = type.GetConstructor(Internal.TypeExtensions.InstanceFlags, null, Type.EmptyTypes, null);
         if (defaultCtor != null)
         {
             return New(defaultCtor);

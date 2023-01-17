@@ -180,6 +180,6 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
         _sourceExtensionMethods ??= new();
         _sourceExtensionMethods.AddRange(
-            type.GetMethods(TypeExtensions.StaticFlags).Where(m => m.Has<ExtensionAttribute>() && m.GetParameters().Length == 1));
+            type.GetMethods(Internal.TypeExtensions.StaticFlags).Where(m => m.Has<ExtensionAttribute>() && m.GetParameters().Length == 1));
     }
 }
