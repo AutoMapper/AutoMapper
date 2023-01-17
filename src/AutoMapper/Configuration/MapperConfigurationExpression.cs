@@ -184,7 +184,7 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
                 {
                     foreach (var memberConfigurationProvider in memberInfo.GetCustomAttributes().OfType<IMemberConfigurationProvider>())
                     {
-                        mappingExpression.ForMember(memberInfo, cfg => memberConfigurationProvider.ApplyConfiguration(cfg));
+                        mappingExpression.ForMember(memberInfo, memberConfigurationProvider.ApplyConfiguration);
                     }
                 }
 
@@ -195,5 +195,5 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
         AddProfile(autoMapAttributeProfile);
     }
 
-    public void ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor;
+    public void ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor ?? throw new ArgumentNullException(nameof(constructor));
 }
