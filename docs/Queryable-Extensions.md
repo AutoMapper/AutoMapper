@@ -210,6 +210,14 @@ dbContext.Courses.ProjectTo<CourseModel>(Config, new Dictionary<string, object> 
 
 However, using a dictionary will result in hard-coded values in the query instead of a parameterized query, so use with caution.
 
+### Recursive models
+
+Ideally, you would avoid models that reference themselves (do some research). But if you must, you need to enable them:
+
+```c#
+configuration.Internal().RecursiveQueriesMaxDepth = someRandomNumber;
+```
+
 ### Supported mapping options
 
 Not all mapping options can be supported, as the expression generated must be interpreted by a LINQ provider. Only what is supported by LINQ providers is supported by AutoMapper:
