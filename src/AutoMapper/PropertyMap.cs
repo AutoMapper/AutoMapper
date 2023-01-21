@@ -32,7 +32,7 @@ public class PropertyMap : MemberMap
     public override string DestinationName => DestinationMember?.Name;
     public override Type DestinationType { get; protected set; }
     public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
-    public override bool CanBeSet => ReflectionHelper.CanBeSet(DestinationMember);
+    public override bool CanBeSet => DestinationMember.CanBeSet();
     public override bool Ignored { get; set; }
     public override Type SourceType => _sourceType ??= GetSourceType();
     public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)

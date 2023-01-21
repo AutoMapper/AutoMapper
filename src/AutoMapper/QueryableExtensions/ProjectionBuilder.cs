@@ -86,10 +86,12 @@ public class ProjectionBuilder : IProjectionBuilder
         }
         void ProjectProperties()
         {
-            foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => 
-                pm.CanResolveValue && pm.DestinationMember.CanBeSet() && !typeMap.ConstructorParameterMatches(pm.DestinationName))
-                .OrderBy(pm => pm.DestinationMember.MetadataToken))
+            foreach (var propertyMap in typeMap.PropertyMaps)
             {
+                if (!propertyMap.CanResolveValue || !propertyMap.CanBeSet || typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                {
+                    continue;
+                }
                 var propertyProjection = TryProjectMember(propertyMap);
                 if (propertyProjection != null)
                 {
