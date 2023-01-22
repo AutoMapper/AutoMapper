@@ -185,7 +185,7 @@ public class ProfileMap
         }
         foreach (var action in AllTypeMapActions)
         {
-            var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+            var expression = new MappingExpression(typeMap);
             action(typeMap, expression);
             expression.Configure(typeMap, configuration.SourceMembers);
         }

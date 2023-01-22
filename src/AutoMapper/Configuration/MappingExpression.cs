@@ -2,6 +2,7 @@ namespace AutoMapper.Configuration;
 public class MappingExpression : MappingExpressionBase<object, object, IMappingExpression>, IMappingExpression
 {
     public MappingExpression(TypePair types, MemberList memberList) : base(memberList, types){}
+    public MappingExpression(TypeMap typeMap) : this(typeMap.Types, typeMap.ConfiguredMemberList) => Projection = typeMap.Projection;
     public string[] IncludedMembersNames { get; internal set; } = Array.Empty<string>();
     public IMappingExpression ReverseMap()
     {
