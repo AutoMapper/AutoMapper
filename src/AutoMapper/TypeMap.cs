@@ -305,7 +305,8 @@ public class TypeMap
             {
                 foreach (var inheritedTypeMap in InheritedTypeMaps)
                 {
-                    var includedMaps = inheritedTypeMap?._details?.IncludedMembersTypeMaps;
+                    inheritedTypeMap.Seal(configuration);
+                    var includedMaps = inheritedTypeMap._details?.IncludedMembersTypeMaps;
                     if (includedMaps != null)
                     {
                         IncludedMembersTypeMaps ??= new();
