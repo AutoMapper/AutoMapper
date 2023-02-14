@@ -1,4 +1,22 @@
 namespace AutoMapper.UnitTests.NullBehavior;
+public class NullDestinationType : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(c => { });
+    [Fact]
+    public void Should_require_destination_object()
+    {
+        new Action(() => Mapper.Map("", null, null)).ShouldThrow<ArgumentNullException>().ParamName.ShouldBe("destinationType");
+        new Action(() => Mapper.Map("", null, null, _=>{ })).ShouldThrow<ArgumentNullException>().ParamName.ShouldBe("destinationType");
+        Mapper.Map("", "", null, null).ShouldBe("");
+        Mapper.Map("", null, null, typeof(string)).ShouldBe("");
+        Mapper.Map("", "", null, null, _ => { }).ShouldBe("");
+        Mapper.Map("", null, null, typeof(string), _=>{ }).ShouldBe("");
+        Mapper.Map<string>("").ShouldBe("");
+        Mapper.Map("", default(string)).ShouldBe("");
+        Mapper.Map<string>("", _ => { }).ShouldBe("");
+        Mapper.Map("", default(string), _ => { }).ShouldBe("");
+    }
+}
 public class NullToExistingDestination : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<string, string>().DisableCtorValidation());
