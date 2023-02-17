@@ -1,5 +1,26 @@
 namespace AutoMapper.UnitTests.CustomMapping;
-
+public class StringToEnumConverter : AutoMapperSpecBase
+{
+    class Source
+    {
+        public string Enum { get; set; }
+    }
+    class Destination
+    {
+        public ConsoleColor Enum { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => 
+    { 
+        c.CreateMap<string, Enum>().ConvertUsing(s => ConsoleColor.DarkCyan);
+        c.CreateMap<Source, Destination>();
+    });
+    [Fact]
+    public void Should_work()
+    {
+        Map<ConsoleColor>("").ShouldBe(ConsoleColor.DarkCyan);
+        Map<Destination>(new Source()).Enum.ShouldBe(ConsoleColor.DarkCyan);
+    }
+}
 public class NullableConverter : AutoMapperSpecBase
 {
     public enum GreekLetters

@@ -87,14 +87,13 @@ public static class ExpressionBuilder
             {
                 mapExpression = mapper.MapExpression(configuration, profileMap, memberMap, source, destination);
                 nullCheck = mapExpression != source;
-                mapExpression = ToType(mapExpression, typePair.DestinationType);
             }
             else
             {
                 nullCheck = true;
             }
         }
-        mapExpression ??= ContextMap(typePair, source, destination, memberMap);
+        mapExpression = mapExpression == null ? ContextMap(typePair, source, destination, memberMap) : ToType(mapExpression, typePair.DestinationType);
         return nullCheck ? configuration.NullCheckSource(profileMap, source, destination, mapExpression, memberMap) : mapExpression;
     }
     public static Expression NullCheckSource(this IGlobalConfiguration configuration, ProfileMap profileMap, Expression source, Expression destination,
