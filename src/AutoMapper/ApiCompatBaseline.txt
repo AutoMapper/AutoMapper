@@ -1,5 +1,8 @@
 Compat issues with assembly AutoMapper:
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.AutoMapAttribute' changed from '[AttributeUsageAttribute(1036, AllowMultiple=true)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct, AllowMultiple=true)]' in the implementation.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IReadOnlyCollection<AutoMapper.PropertyMapAction> AutoMapper.IProfileConfiguration.AllPropertyMapActions.get()' is present in the implementation but not in the contract.
+InterfacesShouldHaveSameMembers : Interface member 'public System.Collections.Generic.IReadOnlyCollection<System.Action<AutoMapper.PropertyMap, AutoMapper.IMemberConfigurationExpression>> AutoMapper.IProfileConfiguration.AllPropertyMapActions.get()' is present in the contract but not in the implementation.
+MembersMustExist : Member 'public System.Collections.Generic.IReadOnlyCollection<System.Action<AutoMapper.PropertyMap, AutoMapper.IMemberConfigurationExpression>> AutoMapper.IProfileConfiguration.AllPropertyMapActions.get()' does not exist in the implementation but it does exist in the contract.
 InterfacesShouldHaveSameMembers : Interface member 'public void AutoMapper.Configuration.ICtorParamConfigurationExpression.ExplicitExpansion()' is present in the implementation but not in the contract.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.IgnoreAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.MapAtRuntimeAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
@@ -10,4 +13,4 @@ CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMappe
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueConverterAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 CannotChangeAttribute : Attribute 'System.AttributeUsageAttribute' on 'AutoMapper.Configuration.Annotations.ValueResolverAttribute' changed from '[AttributeUsageAttribute(384)]' in the contract to '[AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Property)]' in the implementation.
 TypeCannotChangeClassification : Type 'AutoMapper.Execution.TypeMapPlanBuilder' is a 'ref struct' in the implementation but is a 'struct' in the contract.
-Total Issues: 11
+Total Issues: 14
