@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+
 namespace AutoMapper;
 /// <summary>
 /// The base class for member maps (property, constructor and path maps).
@@ -5,6 +7,7 @@ namespace AutoMapper;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class MemberMap : IValueResolver
 {
+    private protected Type _sourceType;
     protected MemberMap(TypeMap typeMap = null) => TypeMap = typeMap;
     internal static readonly MemberMap Instance = new();
     public TypeMap TypeMap { get; protected set; }
@@ -14,9 +17,10 @@ public class MemberMap : IValueResolver
     public void SetResolver(IValueResolver resolver)
     {
         Resolver = resolver;
+        _sourceType = resolver.ResolvedType;
         Ignored = false;
     }
-    public virtual Type SourceType => default;
+    public virtual Type SourceType => _sourceType ??= GetSourceType();
     public virtual MemberInfo[] SourceMembers { get => Array.Empty<MemberInfo>(); set { } }
     public virtual IncludedMember IncludedMember => null;
     public virtual string DestinationName => default;

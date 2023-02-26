@@ -70,7 +70,6 @@ public class ConstructorMap
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class ConstructorParameterMap : MemberMap
 {
-    private Type _sourceType;
     public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap)
     {
         Parameter = parameter;
@@ -87,7 +86,6 @@ public class ConstructorParameterMap : MemberMap
         this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers) =>
         IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
     public ParameterInfo Parameter { get; }
-    public override Type SourceType => _sourceType ??= GetSourceType();
     public override Type DestinationType => Parameter.ParameterType;
     public override IncludedMember IncludedMember { get; }
     public override MemberInfo[] SourceMembers { get; set; }

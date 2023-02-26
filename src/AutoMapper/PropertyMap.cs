@@ -5,7 +5,6 @@ namespace AutoMapper;
 public class PropertyMap : MemberMap
 {
     private MemberMapDetails _details;
-    private Type _sourceType;
     public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap) : base(typeMap)
     {
         DestinationMember = destinationMember;
@@ -34,7 +33,6 @@ public class PropertyMap : MemberMap
     public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
     public override bool CanBeSet => DestinationMember.CanBeSet();
     public override bool Ignored { get; set; }
-    public override Type SourceType => _sourceType ??= GetSourceType();
     public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
     {
         if (Ignored)

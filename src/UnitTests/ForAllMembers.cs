@@ -77,3 +77,27 @@ public class When_conditionally_applying_a_resolver_per_profile : AutoMapperSpec
         dest.OtherDate.ShouldBe(source.OtherDate.AddDays(1));
     }
 }
+public class ForAllPropertyMaps_ConvertUsing : AutoMapperSpecBase
+{
+    public class Well
+    {
+        public SpecialTags SpecialTags { get; set; }
+    }
+    [Flags]
+    public enum SpecialTags { None, SendState, NotSendZeroWhenOpen }
+    public class PostPutWellViewModel
+    {
+        public SpecialTags[] SpecialTags { get; set; } = Array.Empty<SpecialTags>();
+    }
+    class EnumToArray : IValueConverter<object, object>
+    {
+        public object Convert(object sourceMember, ResolutionContext context) => new[] { SpecialTags.SendState };
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Well, PostPutWellViewModel>();
+        cfg.Internal().ForAllPropertyMaps(pm => pm.SourceType != null, (tm, mapper) => mapper.ConvertUsing(new EnumToArray()));
+    });
+    [Fact]
+    public void ShouldWork() => Map<PostPutWellViewModel>(new Well()).SpecialTags.Single().ShouldBe(SpecialTags.SendState);
+}
