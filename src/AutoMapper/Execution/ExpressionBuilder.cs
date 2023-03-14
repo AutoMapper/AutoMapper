@@ -68,6 +68,7 @@ public static class ExpressionBuilder
         bool nullCheck;
         if (typeMap != null)
         {
+            typeMap.CheckProjection();
             var allowNull = memberMap?.AllowNull;
             nullCheck = !typeMap.HasTypeConverter && (destination.NodeType != ExpressionType.Default ||
                 (allowNull.HasValue && allowNull != profileMap.AllowNullDestinationValues));
