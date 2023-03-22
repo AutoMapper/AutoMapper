@@ -1,5 +1,92 @@
 ﻿namespace AutoMapper.IntegrationTests.CustomMapFrom;
-
+public class MultipleLevelsSubquery : IntegrationTest<MultipleLevelsSubquery.DatabaseInitializer>
+{
+    [Fact]
+    public void Should_work()
+    {
+        using var context = new Context();
+        var resultQuery = ProjectTo<FooModel>(context.Foos);
+        resultQuery.Single().MyBar.MyBaz.FirstWidget.Id.ShouldBe(1);
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<Foo, FooModel>().ForMember(f => f.MyBar, opts => opts.MapFrom(src => src.Bar));
+        c.CreateMap<Bar, BarModel>().ForMember(f => f.MyBaz, opts => opts.MapFrom(src => src.Baz));
+        c.CreateMap<Baz, BazModel>().ForMember(f => f.FirstWidget, opts => opts.MapFrom(src => src.Widgets.FirstOrDefault()));
+        c.CreateMap<Widget, WidgetModel>();
+    });
+    public class Context : LocalDbContext
+    {
+        public virtual DbSet<Foo> Foos { get; set; }
+        public virtual DbSet<Baz> Bazs { get; set; }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    {
+        protected override void Seed(Context context)
+        {
+            var testBaz = new Baz();
+            testBaz.Widgets.Add(new Widget());
+            testBaz.Widgets.Add(new Widget());
+            var testBar = new Bar();
+            testBar.Foos.Add(new Foo());
+            testBaz.Bars.Add(testBar);
+            context.Bazs.Add(testBaz);
+        }
+    }
+    public class Foo
+    {
+        public int Id { get; set; }
+        public int BarId { get; set; }
+        public virtual Bar Bar { get; set; }
+    }
+    public class Bar
+    {
+        public Bar() => Foos = new HashSet<Foo>();
+        public int Id { get; set; }
+        public int BazId { get; set; }
+        public virtual Baz Baz { get; set; }
+        public virtual ICollection<Foo> Foos { get; set; }
+    }
+    public class Baz
+    {
+        public Baz()
+        {
+            Bars = new HashSet<Bar>();
+            Widgets = new HashSet<Widget>();
+        }
+        public int Id { get; set; }
+        public virtual ICollection<Bar> Bars { get; set; }
+        public virtual ICollection<Widget> Widgets { get; set; }
+    }
+    public partial class Widget
+    {
+        public int Id { get; set; }
+        public int BazId { get; set; }
+        public virtual Baz Baz { get; set; }
+    }
+    public class FooModel
+    {
+        public int Id { get; set; }
+        public int BarId { get; set; }
+        public BarModel MyBar { get; set; }
+    }
+    public class BarModel
+    {
+        public int Id { get; set; }
+        public int BazId { get; set; }
+        public BazModel MyBaz { get; set; }
+    }
+    public class BazModel
+    {
+        public int Id { get; set; }
+        public WidgetModel FirstWidget { get; set; }
+    }
+    public class WidgetModel
+    {
+        public int Id { get; set; }
+        public int BazId { get; set; }
+    }
+}
 public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryProjections.DatabaseInitializer>
 {
     public class Customer

@@ -262,18 +262,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 for (int index = 0; index < Members.Length - 1; index++)
                 {
                     var sourceMember = Members[index].Expression;
-                    if (sourceMember is LambdaExpression lambda)
-                    {
-                        sourceExpression = lambda.ReplaceParameters(sourceExpression);
-                    }
-                    else
-                    {
-                        var chain = sourceMember.GetChain();
-                        if (chain.TryPeek(out var first))
-                        {
-                            sourceExpression = sourceMember.Replace(first.Target, sourceExpression);
-                        }
-                    }
+                    sourceExpression = sourceMember is LambdaExpression lambda ? lambda.ReplaceParameters(sourceExpression) : sourceMember;
                 }
                 return sourceExpression;
             }
