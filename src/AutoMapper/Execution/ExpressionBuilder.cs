@@ -6,11 +6,20 @@ using static Internal.ReflectionHelper;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class ExpressionBuilder
 {
+    public static object GetDefault(this Type type)
+    {
+        if (type.IsValueType)
+        {
+            return Activator.CreateInstance(type);
+        }
+        return null;
+    }
+
     public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
     public static readonly Expression True = Constant(true, typeof(bool));
-    public static readonly Expression Null = Expression.Default(typeof(object));
+    public static readonly Expression Null = Expression.Constant(typeof(object).GetDefault(), typeof(object));
     public static readonly Expression Empty = Empty();
-    public static readonly Expression Zero = Expression.Default(typeof(int));
+    public static readonly Expression Zero = Expression.Constant(typeof(int).GetDefault(), typeof(int)); 
     public static readonly ParameterExpression ExceptionParameter = Parameter(typeof(Exception), "ex");
     public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
     public static readonly MethodInfo IListClear = typeof(IList).GetMethod(nameof(IList.Clear));
@@ -35,8 +44,8 @@ public static class ExpressionBuilder
         configuration.ConvertParameterReplaceVisitor().Replace(initialLambda, newParameter);
     public static Expression ConvertReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression[] newParameters) =>
         configuration.ConvertParameterReplaceVisitor().Replace(initialLambda, newParameters);
-    public static DefaultExpression Default(this IGlobalConfiguration configuration, Type type) =>
-        configuration == null ? Expression.Default(type) : configuration.GetDefault(type);
+    public static ConstantExpression Default(this IGlobalConfiguration configuration, Type type) =>
+        configuration == null ? Expression.Constant(type.GetDefault(), type) : configuration.GetDefault(type);
     public static (List<ParameterExpression> Variables, List<Expression> Expressions) Scratchpad(this IGlobalConfiguration configuration)
     {
         var variables = configuration?.Variables;

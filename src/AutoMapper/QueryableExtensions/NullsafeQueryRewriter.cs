@@ -103,7 +103,7 @@ internal class NullsafeQueryRewriter : ExpressionVisitor
 
         // expression can be default or null, which is basically the same...
         var expressionFallback = !IsNullableOrReferenceType(expression.Type)
-            ? (Expression)Default(expression.Type) : Constant(null, expression.Type);
+            ? (Expression)Expression.Constant(expression.Type.GetDefault(), expression.Type) : Constant(null, expression.Type);
 
         return Condition(Equal(target, targetFallback), expressionFallback, expression);
     }

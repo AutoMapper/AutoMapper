@@ -45,11 +45,11 @@ public class ProjectionBuilder : IProjectionBuilder
         }
         return cachedExpressions.Prepare(_configuration.EnableNullPropagationForQueryMapping, parameters);
     }
-    private QueryExpressions CreateProjection(ProjectionRequest request) => 
+    private QueryExpressions CreateProjection(ProjectionRequest request) =>
         CreateProjection(request, new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, new()));
     public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
     {
-        var instanceParameter = Parameter(request.SourceType, "dto"+ request.SourceType.Name);
+        var instanceParameter = Parameter(request.SourceType, "dto" + request.SourceType.Name);
         var typeMap = _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
         var projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
         return letPropertyMaps.Count > 0 ?
@@ -86,7 +86,7 @@ public class ProjectionBuilder : IProjectionBuilder
         }
         void ProjectProperties()
         {
-            foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => 
+            foreach (var propertyMap in typeMap.PropertyMaps.Where(pm =>
                 pm.CanResolveValue && pm.DestinationMember.CanBeSet() && !typeMap.ConstructorParameterMatches(pm.DestinationName))
                 .OrderBy(pm => pm.DestinationMember.MetadataToken))
             {
@@ -119,7 +119,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 if (memberTypeMap != null)
                 {
                     mappedExpression = CreateProjectionCore(memberRequest, resolvedSource, memberTypeMap, letPropertyMaps);
-                    if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues && 
+                    if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues &&
                         resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
                     {
                         // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
@@ -138,7 +138,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     var resolvedSource = memberMap switch
                     {
                         { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource()),
+                        { SourceMembers.Length: > 0 } => memberMap.ChainSourceMembers(CheckCustomSource()),
                         _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                     };
                     if (NullSubstitute())
@@ -188,8 +188,8 @@ public class ProjectionBuilder : IProjectionBuilder
         NewExpression CreateDestination() => typeMap switch
         {
             { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
-            { ConstructorMap: { CanResolve: true } constructorMap } => 
-                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
+            { ConstructorMap: { CanResolve: true } constructorMap } =>
+                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Expression.Constant(map.DestinationType.GetDefault(), map.DestinationType))),
             _ => New(typeMap.DestinationType)
         };
     }
@@ -202,7 +202,7 @@ public class ProjectionBuilder : IProjectionBuilder
         readonly Stack<MemberProjection> _currentPath = new();
         readonly List<SubQueryPath> _savedPaths = new();
         readonly MemberPath _parentPath;
-        public FirstPassLetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections) : base(configuration, builtProjections) 
+        public FirstPassLetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections) : base(configuration, builtProjections)
             => _parentPath = parentPath;
         public override Expression GetSubQueryMarker(LambdaExpression letExpression)
         {
@@ -225,13 +225,13 @@ public class ProjectionBuilder : IProjectionBuilder
         {
             var letMapInfos = _savedPaths.Select(path =>
                 (path.LetExpression,
-                MapFromSource : path.GetSourceExpression(instanceParameter),
-                Property : path.GetPropertyDescription(),
+                MapFromSource: path.GetSourceExpression(instanceParameter),
+                Property: path.GetPropertyDescription(),
                 path.Marker)).ToArray();
             var properties = letMapInfos.Select(m => m.Property).Concat(GePropertiesVisitor.Retrieve(projection, instanceParameter));
             var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
             TypeMap letTypeMap;
-            lock(Configuration)
+            lock (Configuration)
             {
                 letTypeMap = new(request.SourceType, letType, typeMap.Profile, null);
             }
@@ -241,7 +241,7 @@ public class ProjectionBuilder : IProjectionBuilder
             return new(Lambda(projection, secondParameter), Lambda(letClause, instanceParameter));
             void ReplaceSubQueries()
             {
-                foreach(var letMapInfo in letMapInfos)
+                foreach (var letMapInfo in letMapInfos)
                 {
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                     var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
@@ -253,7 +253,7 @@ public class ProjectionBuilder : IProjectionBuilder
         }
         readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
         {
-            public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression) : this(members, letExpression, Default(letExpression.Body.Type)){ }
+            public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression) : this(members, letExpression, Expression.Constant(letExpression.Body.Type.GetDefault(), letExpression.Body.Type)) { }
             public Expression GetSourceExpression(Expression parameter)
             {
                 Expression sourceExpression = parameter;
@@ -286,7 +286,7 @@ public class ProjectionBuilder : IProjectionBuilder
             public GePropertiesVisitor(Expression target) => _target = target;
             protected override Expression VisitMember(MemberExpression node)
             {
-                if(node.Expression == _target)
+                if (node.Expression == _target)
                 {
                     Members.TryAdd(node.Member);
                 }
@@ -309,7 +309,7 @@ public class ProjectionBuilder : IProjectionBuilder
             }
             protected override Expression VisitMember(MemberExpression node)
             {
-                if(node.Expression != _oldObject)
+                if (node.Expression != _oldObject)
                 {
                     return base.VisitMember(node);
                 }
@@ -339,7 +339,7 @@ public class LetPropertyMaps
     public virtual Expression GetSubQueryMarker(LambdaExpression letExpression) => letExpression.Body;
     public virtual void Push(MemberProjection memberProjection) { }
     public virtual MemberPath GetCurrentPath() => MemberPath.Empty;
-    public virtual void Pop() {}
+    public virtual void Pop() { }
     public virtual int Count => 0;
     public IGlobalConfiguration Configuration { get; }
     public virtual LetPropertyMaps New() => new(Configuration, BuiltProjections);

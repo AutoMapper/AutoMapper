@@ -155,7 +155,7 @@ public interface IGlobalConfiguration : IConfigurationProvider
     List<Expression> Expressions { get; }
     HashSet<TypeMap> TypeMapsPath { get; }
     CatchBlock[] Catches { get; }
-    DefaultExpression GetDefault(Type type);
+    ConstantExpression GetDefault(Type type);
     ParameterReplaceVisitor ParameterReplaceVisitor();
     ConvertParameterReplaceVisitor ConvertParameterReplaceVisitor();
 }

@@ -52,7 +52,7 @@ public class MapperConfiguration : IGlobalConfiguration
     private readonly ParameterExpression[] _parameters = new[] { null, null, ContextParameter };
     private readonly CatchBlock[] _catches = new CatchBlock[1];
     private readonly List<Expression> _expressions = new();
-    private readonly Dictionary<Type, DefaultExpression> _defaults;
+    private readonly Dictionary<Type, ConstantExpression> _defaults;
     private readonly ParameterReplaceVisitor _parameterReplaceVisitor = new();
     private readonly ConvertParameterReplaceVisitor _convertParameterReplaceVisitor = new();
     private readonly List<Type> _typesInheritance = new();
@@ -194,7 +194,7 @@ public class MapperConfiguration : IGlobalConfiguration
             return Lambda(ToType(typeMap.Invoke(source, checkNullValueTypeDest), requestedDestinationType), source, destination, ContextParameter);
         }
         static Expression CheckNullValueType(Expression expression, Type runtimeType) =>
-            !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, Default(runtimeType)) : expression;
+            !expression.Type.IsValueType && runtimeType.IsValueType ? Coalesce(expression, Expression.Constant(runtimeType.GetDefault(), runtimeType)) : expression;
         LambdaExpression GenerateObjectMapperExpression(in MapRequest mapRequest, IObjectMapper mapper)
         {
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
@@ -242,15 +242,15 @@ public class MapperConfiguration : IGlobalConfiguration
     CatchBlock[] IGlobalConfiguration.Catches => _catches;
     ConvertParameterReplaceVisitor IGlobalConfiguration.ConvertParameterReplaceVisitor() => _convertParameterReplaceVisitor ?? new();
     ParameterReplaceVisitor IGlobalConfiguration.ParameterReplaceVisitor() => _parameterReplaceVisitor ?? new();
-    DefaultExpression IGlobalConfiguration.GetDefault(Type type)
+    ConstantExpression IGlobalConfiguration.GetDefault(Type type)
     {
         if (_defaults == null)
         {
-            return Default(type);
+            return Expression.Constant(type.GetDefault(), type);
         }
         if (!_defaults.TryGetValue(type, out var defaultExpression))
         {
-            defaultExpression = Default(type);
+            defaultExpression = Expression.Constant(type.GetDefault(), type);
             _defaults.Add(type, defaultExpression);
         }
         return defaultExpression;
