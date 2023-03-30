@@ -11,10 +11,6 @@ other simple objects, whose design is better suited for serialization,
 communication, messaging, or simply an anti-corruption layer between the
 domain and application layer.
 
-AutoMapper supports the following platforms:
-
-* `.NET Standard 2.1+ <https://docs.microsoft.com/en-us/dotnet/standard/net-standard>`_
-
 New to AutoMapper? Check out the :doc:`Getting-started` page first.
 
 .. _user-docs:
