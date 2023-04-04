@@ -125,7 +125,7 @@ public class ProjectionBuilder : IProjectionBuilder
                         resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
                     {
                         // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
-                        mappedExpression = resolvedSource.IfNullElse(Constant(null, mappedExpression.Type), mappedExpression);
+                        mappedExpression = resolvedSource.IfNullElse(Default(mappedExpression.Type), mappedExpression);
                     }
                 }
                 else
