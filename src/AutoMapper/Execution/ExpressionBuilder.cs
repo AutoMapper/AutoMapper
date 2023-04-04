@@ -100,8 +100,7 @@ public static class ExpressionBuilder
     public static Expression NullCheckSource(this IGlobalConfiguration configuration, ProfileMap profileMap, Expression source, Expression destination,
         Expression mapExpression, MemberMap memberMap)
     {
-        var sourceType = source.Type;
-        if (sourceType.IsValueType && !sourceType.IsNullableType())
+        if (!source.Type.CanAssignNull())
         {
             return mapExpression;
         }

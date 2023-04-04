@@ -6,6 +6,8 @@ public static class TypeExtensions
     public const BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
     public const BindingFlags StaticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
+    public static bool CanAssignNull(this Type type) => !type.IsValueType || type.IsNullableType();
+
     public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
     {
         foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, StaticFlags & ~BindingFlags.NonPublic))
