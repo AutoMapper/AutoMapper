@@ -32,6 +32,6 @@ public class ConstructUsingForStruct : AutoMapperSpecBase
         _dest = values.ProjectTo<Dest>(Configuration).ToArray();
     }
 
-    [Fact(Skip = "Bug has not been fixed yet")]
+    [Fact]
     public void Should_return_expected_result() => _dest[0].Value.ShouldBe(new DateOnly(2033, 01, 02));
 }

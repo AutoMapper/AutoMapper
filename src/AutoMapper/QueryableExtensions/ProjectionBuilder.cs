@@ -122,8 +122,13 @@ public class ProjectionBuilder : IProjectionBuilder
                     if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues && 
                         resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
                     {
-                        // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
-                        mappedExpression = resolvedSource.IfNullElse(Constant(null, mappedExpression.Type), mappedExpression);
+                        if (mappedExpression.Type.CanAssignNull())
+                        {
+                            ConstantExpression defaultValue;
+                            defaultValue = Constant(null, mappedExpression.Type);
+                            // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
+                            mappedExpression = resolvedSource.IfNullElse(defaultValue, mappedExpression);
+                        }
                     }
                 }
                 else
