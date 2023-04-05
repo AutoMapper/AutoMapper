@@ -13,19 +13,16 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
     }
     public void AssertConfigurationExpressionIsValid(IGlobalConfiguration config, IEnumerable<TypeMap> typeMaps)
     {
-        if (!Expression.AllowAdditiveTypeMapCreation)
+        var duplicateTypeMapConfigs = Expression.Profiles.Append((Profile)Expression)
+            .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
+            .GroupBy(x => x.typeMap.Types)
+            .Where(g => g.Count() > 1)
+            .Select(g => (TypePair : g.Key, ProfileNames : g.Select(tmc => tmc.profile.ProfileName).ToArray()))
+            .Select(g => new DuplicateTypeMapConfigurationException.TypeMapConfigErrors(g.TypePair, g.ProfileNames))
+            .ToArray();
+        if (duplicateTypeMapConfigs.Any())
         {
-            var duplicateTypeMapConfigs = Expression.Profiles.Append((Profile)Expression)
-                .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
-                .GroupBy(x => x.typeMap.Types)
-                .Where(g => g.Count() > 1)
-                .Select(g => (TypePair : g.Key, ProfileNames : g.Select(tmc => tmc.profile.ProfileName).ToArray()))
-                .Select(g => new DuplicateTypeMapConfigurationException.TypeMapConfigErrors(g.TypePair, g.ProfileNames))
-                .ToArray();
-            if (duplicateTypeMapConfigs.Any())
-            {
-                throw new DuplicateTypeMapConfigurationException(duplicateTypeMapConfigs);
-            }
+            throw new DuplicateTypeMapConfigurationException(duplicateTypeMapConfigs);
         }
         AssertConfigurationIsValid(config, typeMaps);
     }

@@ -101,13 +101,6 @@ public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpres
     /// <param name="validator">the validation callback</param>
     void IGlobalConfigurationExpression.Validator(Validator validator) => 
         _validators.Add(validator ?? throw new ArgumentNullException(nameof(validator)));
-
-    /// <summary>
-    /// Allow the same map to exist in different profiles.
-    /// The default is to throw an exception, true means the maps are merged.
-    /// </summary>
-    bool IGlobalConfigurationExpression.AllowAdditiveTypeMapCreation { get; set; }
-
     /// <summary>
     /// How many levels deep should AutoMapper try to inline the execution plan for child classes.
     /// See <a href="https://automapper.readthedocs.io/en/latest/Understanding-your-mapping.html">the docs</a> for details.
