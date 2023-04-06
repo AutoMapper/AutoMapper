@@ -86,10 +86,12 @@ public class ProjectionBuilder : IProjectionBuilder
         }
         void ProjectProperties()
         {
-            foreach (var propertyMap in typeMap.PropertyMaps.Where(pm => 
-                pm.CanResolveValue && pm.DestinationMember.CanBeSet() && !typeMap.ConstructorParameterMatches(pm.DestinationName))
-                .OrderBy(pm => pm.DestinationMember.MetadataToken))
+            foreach (var propertyMap in typeMap.PropertyMaps)
             {
+                if (!propertyMap.CanResolveValue || !propertyMap.CanBeSet || typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                {
+                    continue;
+                }
                 var propertyProjection = TryProjectMember(propertyMap);
                 if (propertyProjection != null)
                 {
@@ -123,7 +125,7 @@ public class ProjectionBuilder : IProjectionBuilder
                         resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
                     {
                         // Handles null source property so it will not create an object with possible non-nullable properties which would result in an exception.
-                        mappedExpression = resolvedSource.IfNullElse(Constant(null, mappedExpression.Type), mappedExpression);
+                        mappedExpression = resolvedSource.IfNullElse(Default(mappedExpression.Type), mappedExpression);
                     }
                 }
                 else
@@ -260,18 +262,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 for (int index = 0; index < Members.Length - 1; index++)
                 {
                     var sourceMember = Members[index].Expression;
-                    if (sourceMember is LambdaExpression lambda)
-                    {
-                        sourceExpression = lambda.ReplaceParameters(sourceExpression);
-                    }
-                    else
-                    {
-                        var chain = sourceMember.GetChain();
-                        if (chain.TryPeek(out var first))
-                        {
-                            sourceExpression = sourceMember.Replace(first.Target, sourceExpression);
-                        }
-                    }
+                    sourceExpression = sourceMember is LambdaExpression lambda ? lambda.ReplaceParameters(sourceExpression) : sourceMember;
                 }
                 return sourceExpression;
             }

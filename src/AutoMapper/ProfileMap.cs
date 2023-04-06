@@ -88,7 +88,7 @@ public class ProfileMap
     public Func<PropertyInfo, bool> ShouldMapProperty { get; }
     public Func<MethodInfo, bool> ShouldMapMethod { get; }
     public Func<ConstructorInfo, bool> ShouldUseConstructor { get; }
-    public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+    public IEnumerable<PropertyMapAction> AllPropertyMapActions { get; }
     public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
     public HashSet<string> GlobalIgnores { get; }
     public MemberConfiguration MemberConfiguration { get; }
@@ -185,7 +185,7 @@ public class ProfileMap
         }
         foreach (var action in AllTypeMapActions)
         {
-            var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+            var expression = new MappingExpression(typeMap);
             action(typeMap, expression);
             expression.Configure(typeMap, configuration.SourceMembers);
         }
@@ -193,8 +193,12 @@ public class ProfileMap
         {
             foreach (var propertyMap in typeMap.PropertyMaps)
             {
+                if (!action.Condition(propertyMap))
+                {
+                    continue;
+                }
                 var memberExpression = new MemberConfigurationExpression(propertyMap.DestinationMember, typeMap.SourceType);
-                action(propertyMap, memberExpression);
+                action.Action(propertyMap, memberExpression);
                 memberExpression.Configure(typeMap);
             }
         }

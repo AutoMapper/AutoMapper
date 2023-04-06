@@ -87,3 +87,26 @@ public class ProjectCollectionListTest
         }
     }
 }
+public class MapProjection : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateProjection<Address, AddressDto>();
+        cfg.CreateMap<Customer, CustomerDto>();
+    });
+    [Fact]
+    public void ShouldNotMap() => new Action(() => Map<CustomerDto>(new Customer())).ShouldThrow<AutoMapperConfigurationException>().Message.ShouldBe("CreateProjection works with ProjectTo, not with Map.");
+    public class Customer
+    {
+        public IList<Address> Addresses { get; set; }
+    }
+    public record class Address(string Street);
+    public class CustomerDto
+    {
+        public IList<AddressDto> Addresses { get; set; }
+    }
+    public class AddressDto
+    {
+        public string Street { get; set; }
+    }
+}

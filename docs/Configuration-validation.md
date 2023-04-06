@@ -50,7 +50,7 @@ var configuration = new MapperConfiguration(cfg =>
 );
 ```
 
-To skip validation altogether for this map, use `MemberList.None`.
+To skip validation altogether for this map, use `MemberList.None`. That's the default for `ReverseMap`.
 
 
 ## Custom validations

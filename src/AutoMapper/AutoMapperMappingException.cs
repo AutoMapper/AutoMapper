@@ -81,15 +81,13 @@ public class DuplicateTypeMapConfigurationException : Exception
     {
         Errors = errors;
         var builder = new StringBuilder();
-        builder.AppendLine("The following type maps were found in multiple profiles:");
+        builder.AppendLine("Duplicate CreateMap calls:");
         foreach (var error in Errors)
         {
             builder.AppendLine($"{error.Types.SourceType.FullName} to {error.Types.DestinationType.FullName} defined in profiles:");
             builder.AppendLine(string.Join(Environment.NewLine, error.ProfileNames));
         }
-        builder.AppendLine("This can cause configuration collisions and inconsistent mapping.");
-        builder.AppendLine("Consolidate the CreateMap calls into one profile, or set the root Internal().AllowAdditiveTypeMapCreation configuration value to 'true'.");
-
+        builder.AppendLine("This can cause configuration collisions and inconsistent mappings. Use a single CreateMap call per type pair.");
         Message = builder.ToString();
     }
 

@@ -1,5 +1,34 @@
 ﻿namespace AutoMapper.UnitTests;
-
+public class IncludeBaseIndirectBase : AutoMapperSpecBase
+{
+    public class FooBaseBase
+    {
+    }
+    public class FooBase : FooBaseBase
+    {
+    }
+    public class Foo : FooBase
+    {
+    }
+    public class FooDtoBaseBase
+    {
+        public DateTime Date { get; set; }
+    }
+    public class FooDtoBase : FooDtoBaseBase
+    {
+    }
+    public class FooDto : FooDtoBase
+    {
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<Foo, FooDto>().IncludeBase<FooBase, FooDtoBase>();
+        c.CreateMap<FooBase, FooDtoBase>().IncludeBase<FooBaseBase, FooDtoBaseBase>();
+        c.CreateMap<FooBaseBase, FooDtoBaseBase>().ForMember(d => d.Date, o => o.MapFrom(s => DateTime.MaxValue));
+    });
+    [Fact]
+    public void Should_work() => Map<FooDto>(new Foo()).Date.ShouldBe(DateTime.MaxValue);
+}
 public class ReadonlyCollectionPropertiesOverride : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>

@@ -1,8 +1,29 @@
 using System.Runtime.Serialization;
 using AutoMapper.UnitTests;
-
 namespace AutoMapper.Tests;
-
+public class CreateProjectionEnum : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public string Name { get; set; }
+        public SourceEnum Value { get; set; }
+    }
+    public class Dest
+    {
+        public string Name { get; set; }
+        public DestEnum Value { get; set; }
+    }
+    public enum SourceEnum { A, B }
+    public enum DestEnum { A, B }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateProjection<SourceEnum, DestEnum>().ConvertUsing(src => src == SourceEnum.A ? DestEnum.A : DestEnum.B);
+        c.CreateProjection<Source, Dest>();
+        c.Internal().ForAllMaps(static (_, _) => { });
+    });
+    [Fact]
+    public void Should_work() => ProjectTo<Dest>(new[] { new Source() }.AsQueryable()).Single().Value.ShouldBe(DestEnum.A);
+}
 public class InvalidStringToEnum : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(_=> { });

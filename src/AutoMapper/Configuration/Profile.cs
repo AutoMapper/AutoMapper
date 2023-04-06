@@ -10,7 +10,7 @@ public interface IProfileConfiguration
     bool? AllowNullCollections { get; }
     bool? EnableNullPropagationForQueryMapping { get; }
     IReadOnlyCollection<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
-    IReadOnlyCollection<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+    IReadOnlyCollection<PropertyMapAction> AllPropertyMapActions { get; }
 
     /// <summary>
     /// Source extension methods included for search
@@ -60,7 +60,7 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
     private readonly PrePostfixName _prePostfixName = new();
     private ReplaceName _replaceName;
     private readonly MemberConfiguration _memberConfiguration;
-    private List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions;
+    private List<PropertyMapAction> _allPropertyMapActions;
     private List<Action<TypeMap, IMappingExpression>> _allTypeMapActions;
     private List<string> _globalIgnores;
     private List<TypeMapConfiguration> _openTypeMapConfigs;
@@ -81,7 +81,7 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
     bool? IProfileExpressionInternal.FieldMappingEnabled { get; set; }
     bool? IProfileConfiguration.FieldMappingEnabled => this.Internal().FieldMappingEnabled;
     bool? IProfileConfiguration.EnableNullPropagationForQueryMapping => this.Internal().EnableNullPropagationForQueryMapping;
-    IReadOnlyCollection<Action<PropertyMap, IMemberConfigurationExpression>> IProfileConfiguration.AllPropertyMapActions
+    IReadOnlyCollection<PropertyMapAction> IProfileConfiguration.AllPropertyMapActions
         => _allPropertyMapActions.NullCheck();
     IReadOnlyCollection<Action<TypeMap, IMappingExpression>> IProfileConfiguration.AllTypeMapActions => _allTypeMapActions.NullCheck();
     IReadOnlyCollection<string> IProfileConfiguration.GlobalIgnores => _globalIgnores.NullCheck();
@@ -122,10 +122,7 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
     void IProfileExpressionInternal.ForAllPropertyMaps(Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> configuration)
     {
         _allPropertyMapActions ??= new();
-        _allPropertyMapActions.Add((pm, cfg) =>
-        {
-            if (condition(pm)) configuration(pm, cfg);
-        });
+        _allPropertyMapActions.Add(new(condition, configuration));
     }
     public IProjectionExpression<TSource, TDestination> CreateProjection<TSource, TDestination>() =>
         CreateProjection<TSource, TDestination>(MemberList.Destination);
@@ -180,6 +177,7 @@ public class Profile : IProfileExpressionInternal, IProfileConfiguration
     {
         _sourceExtensionMethods ??= new();
         _sourceExtensionMethods.AddRange(
-            type.GetMethods(TypeExtensions.StaticFlags).Where(m => m.Has<ExtensionAttribute>() && m.GetParameters().Length == 1));
+            type.GetMethods(Internal.TypeExtensions.StaticFlags).Where(m => m.Has<ExtensionAttribute>() && m.GetParameters().Length == 1));
     }
 }
+public readonly record struct PropertyMapAction(Func<PropertyMap, bool> Condition, Action<PropertyMap, IMemberConfigurationExpression> Action);
