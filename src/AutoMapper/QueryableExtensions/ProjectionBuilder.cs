@@ -63,7 +63,6 @@ public class ProjectionBuilder : IProjectionBuilder
         {
             return customProjection;
         }
-        var propertiesProjections = new List<MemberBinding>();
         int depth;
         if (OverMaxDepth())
         {
@@ -72,23 +71,35 @@ public class ProjectionBuilder : IProjectionBuilder
                 return null;
             }
         }
-        else
-        {
-            ProjectProperties();
-        }
+
         var constructorExpression = CreateDestination();
-        var expression = MemberInit(constructorExpression, propertiesProjections);
+        var propertyBindings = ProjectProperties(typeMap, false);
+        var expression = (Expression)MemberInit(constructorExpression, propertyBindings);
+        foreach (var derivedType in _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
+        {
+            var derivedContructorExpression = New(derivedType.DestinationType);
+            var derivedExpression = MemberInit(derivedContructorExpression, propertyBindings.Concat(ProjectProperties(derivedType, true)));
+            var condition = TypeIs(instanceParameter, derivedType.SourceType);
+
+            expression = Condition(condition, Convert(derivedExpression, typeMap.DestinationType), expression);
+        }
         return expression;
         bool OverMaxDepth()
         {
             depth = letPropertyMaps.IncrementDepth(request);
             return typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth;
         }
-        void ProjectProperties()
+        List<MemberBinding> ProjectProperties(TypeMap localTypeMap, bool polimorph)
         {
-            foreach (var propertyMap in typeMap.PropertyMaps)
+            var propertiesProjections = new List<MemberBinding>();
+            foreach (var propertyMap in localTypeMap.PropertyMaps)
             {
                 if (!propertyMap.CanResolveValue || !propertyMap.CanBeSet || typeMap.ConstructorParameterMatches(propertyMap.DestinationName))
+                {
+                    continue;
+                }
+
+                if (polimorph && propertyMap.DestinationMember.DeclaringType != localTypeMap.DestinationType)
                 {
                     continue;
                 }
@@ -98,6 +109,8 @@ public class ProjectionBuilder : IProjectionBuilder
                     propertiesProjections.Add(Bind(propertyMap.DestinationMember, propertyProjection));
                 }
             }
+
+            return propertiesProjections;
         }
         Expression TryProjectMember(MemberMap memberMap, Expression defaultSource = null)
         {
@@ -140,7 +153,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     var resolvedSource = memberMap switch
                     {
                         { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource()),
+                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource(memberMap)),
                         _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                     };
                     if (NullSubstitute())
@@ -164,13 +177,23 @@ public class ProjectionBuilder : IProjectionBuilder
                         return letPropertyMaps.GetSubQueryMarker(newMapFrom);
                     }
                     bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
-                    Expression CheckCustomSource()
+                    Expression CheckCustomSource(MemberMap member = null)
                     {
                         if (customSource == null)
                         {
+                            if (member != null && member.SourceMember.DeclaringType != instanceParameter.Type)
+                            {
+                                return Convert(instanceParameter, member.TypeMap.SourceType);
+                            }
+
                             return instanceParameter;
                         }
-                        return customSource.IsMemberPath(out _) ? customSource.ReplaceParameters(instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
+                        if (customSource.IsMemberPath(out _)) 
+                        {
+                            return customSource.ReplaceParameters(instanceParameter);
+                        } 
+                        
+                        return letPropertyMaps.GetSubQueryMarker(customSource);
                     }
                 }
                 IProjectionMapper GetProjectionMapper()
@@ -225,12 +248,21 @@ public class ProjectionBuilder : IProjectionBuilder
         public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(Configuration, GetCurrentPath(), BuiltProjections);
         public override QueryExpressions GetSubQueryExpression(ProjectionBuilder builder, Expression projection, TypeMap typeMap, in ProjectionRequest request, ParameterExpression instanceParameter)
         {
+            var sParam = Parameter(typeMap.SourceType, "s");
+
             var letMapInfos = _savedPaths.Select(path =>
                 (path.LetExpression,
                 MapFromSource : path.GetSourceExpression(instanceParameter),
                 Property : path.GetPropertyDescription(),
-                path.Marker)).ToArray();
-            var properties = letMapInfos.Select(m => m.Property).Concat(GePropertiesVisitor.Retrieve(projection, instanceParameter));
+                path.Marker)).Append(new
+            (
+                Lambda(sParam, sParam),
+                instanceParameter,
+                new PropertyDescription("__src", typeMap.SourceType),
+                instanceParameter
+            )).ToArray();
+
+            var properties = letMapInfos.Select(m => m.Property);
             var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
             TypeMap letTypeMap;
             lock(Configuration)
@@ -250,7 +282,6 @@ public class ProjectionBuilder : IProjectionBuilder
                     letPropertyMap.MapFrom(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
-                projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
             }
         }
         readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
@@ -269,43 +300,6 @@ public class ProjectionBuilder : IProjectionBuilder
             public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
-        }
-        class GePropertiesVisitor : ExpressionVisitor
-        {
-            private readonly Expression _target;
-            public List<MemberInfo> Members { get; } = new();
-            public GePropertiesVisitor(Expression target) => _target = target;
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if(node.Expression == _target)
-                {
-                    Members.TryAdd(node.Member);
-                }
-                return base.VisitMember(node);
-            }
-            public static IEnumerable<PropertyDescription> Retrieve(Expression expression, Expression target)
-            {
-                var visitor = new GePropertiesVisitor(target);
-                visitor.Visit(expression);
-                return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
-            }
-        }
-        class ReplaceMemberAccessesVisitor : ExpressionVisitor
-        {
-            private readonly Expression _oldObject, _newObject;
-            public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
-            {
-                _oldObject = oldObject;
-                _newObject = newObject;
-            }
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if(node.Expression != _oldObject)
-                {
-                    return base.VisitMember(node);
-                }
-                return PropertyOrField(_newObject, node.Member.Name);
-            }
         }
     }
 }
