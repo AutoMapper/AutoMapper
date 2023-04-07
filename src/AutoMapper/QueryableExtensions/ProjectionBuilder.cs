@@ -72,12 +72,12 @@ public class ProjectionBuilder : IProjectionBuilder
             }
         }
 
-        var constructorExpression = CreateDestination();
+        var constructorExpression = CreateDestination(typeMap);
         var propertyBindings = ProjectProperties(typeMap, false);
         var expression = (Expression)MemberInit(constructorExpression, propertyBindings);
         foreach (var derivedType in _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
         {
-            var derivedContructorExpression = New(derivedType.DestinationType);
+            var derivedContructorExpression = CreateDestination(derivedType);
             var derivedExpression = MemberInit(derivedContructorExpression, propertyBindings.Concat(ProjectProperties(derivedType, true)));
             var condition = TypeIs(instanceParameter, derivedType.SourceType);
 
@@ -153,7 +153,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     var resolvedSource = memberMap switch
                     {
                         { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource(memberMap)),
+                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource(memberMap.SourceMember.DeclaringType)),
                         _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                     };
                     if (NullSubstitute())
@@ -163,8 +163,14 @@ public class ProjectionBuilder : IProjectionBuilder
                     return resolvedSource;
                     Expression MapFromExpression(LambdaExpression mapFrom)
                     {
-                        if (memberTypeMap == null || mapFrom.IsMemberPath(out _) || mapFrom.Body is ParameterExpression)
+                        if (memberTypeMap == null || mapFrom.IsMemberPath(out var member) || mapFrom.Body is ParameterExpression)
                         {
+                            var parmaterExtractor = new ParameterExpressionExtractorVisitor();
+                            parmaterExtractor.Visit(mapFrom.Body);
+                            if (parmaterExtractor.Parameter != null)
+                            {
+                                return mapFrom.ReplaceParameters(CheckCustomSource(parmaterExtractor.Parameter.Type));
+                            }
                             return mapFrom.ReplaceParameters(CheckCustomSource());
                         }
                         if (customSource == null)
@@ -177,13 +183,13 @@ public class ProjectionBuilder : IProjectionBuilder
                         return letPropertyMaps.GetSubQueryMarker(newMapFrom);
                     }
                     bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
-                    Expression CheckCustomSource(MemberMap member = null)
+                    Expression CheckCustomSource(Type declaringType = null)
                     {
                         if (customSource == null)
                         {
-                            if (member != null && member.SourceMember.DeclaringType != instanceParameter.Type)
+                            if (declaringType != null && declaringType != instanceParameter.Type)
                             {
-                                return Convert(instanceParameter, member.TypeMap.SourceType);
+                                return Convert(instanceParameter, declaringType);
                             }
 
                             return instanceParameter;
@@ -210,12 +216,20 @@ public class ProjectionBuilder : IProjectionBuilder
                 }
             }
         }
-        NewExpression CreateDestination() => typeMap switch
+        Expression GetConstructorParameter(TypeMap localTypeMap) 
         {
-            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
+            if (localTypeMap.SourceType != instanceParameter.Type)
+            {
+                return Convert(instanceParameter, localTypeMap.SourceType);
+            }
+            return instanceParameter;
+        }
+        NewExpression CreateDestination(TypeMap localTypeMap) => localTypeMap switch
+        {
+            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(GetConstructorParameter(localTypeMap)),
             { ConstructorMap: { CanResolve: true } constructorMap } => 
                 New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
-            _ => New(typeMap.DestinationType)
+            _ => New(localTypeMap.DestinationType)
         };
     }
     private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new(
@@ -352,6 +366,15 @@ public class MemberProjection
     public MemberProjection(MemberMap memberMap) => MemberMap = memberMap;
     public Expression Expression { get; set; }
     public MemberMap MemberMap { get; }
+}
+class ParameterExpressionExtractorVisitor : ExpressionVisitor
+{
+    public ParameterExpression Parameter { get; set; }
+    protected override Expression VisitParameter(ParameterExpression node)
+    {
+        Parameter ??= node;
+        return base.VisitParameter(node);
+    }
 }
 abstract class ParameterExpressionVisitor : ExpressionVisitor
 {
