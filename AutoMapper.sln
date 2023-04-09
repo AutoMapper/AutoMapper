@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.UnitTests", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.IntegrationTests", "src\IntegrationTests\AutoMapper.IntegrationTests.csproj", "{24B47F4C-0035-4F29-AAD9-4C47E1AAD98E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.Extensions.Microsoft.DependencyInjection.Tests", "src\AutoMapper.Extensions.Microsoft.DependencyInjection.Tests\AutoMapper.Extensions.Microsoft.DependencyInjection.Tests.csproj", "{BEBD620A-8BAA-463F-BE0F-8319AD3C1644}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper.DI.Tests", "src\AutoMapper.Extensions.Microsoft.DependencyInjection.Tests\AutoMapper.DI.Tests.csproj", "{BEBD620A-8BAA-463F-BE0F-8319AD3C1644}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "src\TestApp\TestApp.csproj", "{35CED3AE-B825-4703-992D-A58B5BE646DC}"
 EndProject
