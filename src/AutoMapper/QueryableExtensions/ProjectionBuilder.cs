@@ -272,7 +272,7 @@ public class ProjectionBuilder : IProjectionBuilder
         {
             var sParam = Parameter(typeMap.SourceType, "s");
 
-            var letMapInfos = _savedPaths.Select(path =>
+            var letMapInfos = _savedPaths.Select(path => new LetMapInfo
                 (path.LetExpression,
                 MapFromSource : path.GetSourceExpression(instanceParameter),
                 Property : path.GetPropertyDescription(),
@@ -297,25 +297,43 @@ public class ProjectionBuilder : IProjectionBuilder
             return new(Lambda(projection, secondParameter), Lambda(letClause, instanceParameter));
             void ReplaceSubQueries()
             {
-                foreach(var letMapInfo in letMapInfos)
+                for (int i = 0; i < letMapInfos.Length; i++)
                 {
+                    var letMapInfo = letMapInfos[i];
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                     var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
 
+                    var source = letMapInfo.MapFromSource;
+                    var extractor = new ParameterExpressionExtractorVisitor();
+                    extractor.Visit(source);
+
                     var type = letMapInfo.LetExpression.Parameters.First().Type;
-                    if (letMapInfo.MapFromSource.Type != type)
+                    if (source is ConditionalExpression condition) 
                     {
-                        letPropertyMap.MapFrom(Lambda(Condition(TypeIs(letMapInfo.MapFromSource, type), letMapInfo.LetExpression.ReplaceParameters(Convert(letMapInfo.MapFromSource, type)), letMapInfo.Marker), secondParameter));
+                        source = Condition(condition.Test, letMapInfo.LetExpression.ReplaceParameters(condition.IfTrue), letMapInfo.Marker);
+                    }
+                    else if (extractor.Parameter.Type != type && source.Type != type)
+                    {
+                        source = Condition(TypeIs(source, type), letMapInfo.LetExpression.ReplaceParameters(Convert(source, type)), letMapInfo.Marker);
+                        for (int j = i+1; j < letMapInfos.Length; j++)
+                        {
+                            if (letMapInfos[j].MapFromSource.Type == letMapInfo.Marker.Type)
+                            {
+                                letMapInfos[j] = letMapInfos[j] with { MapFromSource = source };
+                            }
+                        }
                     }
                     else
                     {
-                        letPropertyMap.MapFrom(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
+                        source = letMapInfo.LetExpression.ReplaceParameters(source);
                     }
 
+                    letPropertyMap.MapFrom(Lambda(source, secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
             }
         }
+        record LetMapInfo(LambdaExpression LetExpression, Expression MapFromSource, PropertyDescription Property, Expression Marker);
         readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
         {
             public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression) : this(members, letExpression, Default(letExpression.Body.Type)){ }
@@ -335,7 +353,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 var type = initialLambda.Parameters.First().Type;
                 if (newParameter.Type != type)
                 {
-                    return Condition(TypeIs(newParameter, type), initialLambda.ReplaceParameters(Convert(newParameter, type)), Expression.Default(initialLambda.ReturnType));
+                    return initialLambda.Body;
                 }
                 else
                 {
