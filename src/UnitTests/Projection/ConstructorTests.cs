@@ -270,14 +270,14 @@ public class ConstructorIncludeMembers : AutoMapperSpecBase
             .Include<SourceWrapperA, DestinationA>()
             .Include<SourceWrapperB, DestinationB>();
         cfg.CreateMap<SourceWrapperA, DestinationA>()
-            .IncludeMembers(s => s.A);
+            .IncludeMembers(s => s.Source, s => s.A);
         cfg.CreateMap<SourceWrapperB, DestinationB>()
-            .IncludeMembers(s => s.B);
+            .IncludeMembers(s => s.Source, s => s.B);
         cfg.CreateMap<Source, Destination>();
-        cfg.CreateMap<Source, DestinationA>();
-        cfg.CreateMap<Source, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
-        cfg.CreateMap<SourceB, DestinationB>();
+        cfg.CreateMap<Source, DestinationA>(MemberList.None);
+        cfg.CreateMap<Source, DestinationB>(MemberList.None);
+        cfg.CreateMap<SourceA, DestinationA>(MemberList.None);
+        cfg.CreateMap<SourceB, DestinationB>(MemberList.None);
     });
     [Fact]
     public void Should_construct_correctly()

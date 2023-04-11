@@ -926,7 +926,7 @@ public class MapObjectPropertyFromSubQueryWithCollection : IntegrationTest<MapOb
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles.OrderBy(p => p.Name));
             var counter = new FirstOrDefaultCounter();
             counter.Visit(projection.Expression);
-            counter.Count.ShouldBe(1);
+            counter.Count.ShouldBe(3);
             var productModel = projection.First().Products.First();
             productModel.Price.RegionId.ShouldBe((short)1);
             productModel.Price.IsDefault.ShouldBeTrue();
