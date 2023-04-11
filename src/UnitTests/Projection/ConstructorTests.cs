@@ -68,10 +68,10 @@ public class ConstructorLetClause : AutoMapperSpecBase
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
         cfg.CreateMap<SourceA, DestinationA>()
-            .ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault()))
+            .ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault())) //TODO: required for CTOR Validation but should not be required and messes up mapping
             .ForCtorParam("a", o => o.MapFrom(s => s.A));
         cfg.CreateMap<SourceB, DestinationB>()
-            .ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault()))
+            .ForCtorParam("item", o => o.MapFrom(s => s.Items.FirstOrDefault())) //TODO: required for CTOR Validation but should not be required and messes up mapping
             .ForCtorParam("b", o => o.MapFrom(s => s.B));
 
         cfg.CreateMap<SourceItem, DestinationItem>().ForCtorParam("destinationValue", o=>o.MapFrom(s=>s.Values.FirstOrDefault()));

@@ -102,7 +102,6 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
     }
     public class CustomerA : Customer 
     {
-        public string A { get; set; }
     }
     public class CustomerB : Customer
     {
@@ -113,10 +112,18 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
         public int Id { get; set; }
         public int Code { get; set; }
     }
+    public class ItemA : Item
+    {
+        public string A { get; set; }
+    }
     public class ItemModel
     {
         public int Id { get; set; }
         public int Code { get; set; }
+    }
+    public class ItemModelA : ItemModel
+    {
+        public string A { get; set; }
     }
     public class CustomerViewModel
     {
@@ -125,7 +132,7 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
     }
     public class CustomerAViewModel : CustomerViewModel
     {
-        public string A { get; set; }
+        public ItemModelA FirstItemA { get; set; }
     }
     public class CustomerBViewModel : CustomerViewModel
     {
@@ -145,6 +152,7 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<CustomerA>();
             modelBuilder.Entity<CustomerB>();
+            modelBuilder.Entity<ItemA>();
         }
     }
     public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
@@ -155,8 +163,7 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
             {
                 FirstName = "Alice",
                 LastName = "Smith",
-                A = "a",
-                Items = new[] { new Item { Code = 1 }, new Item { Code = 3 }, new Item { Code = 5 } }
+                Items = new[] { new Item { Code = 1 }, new ItemA { Code = 3, A = "a", }, new Item { Code = 5 } }
             }); 
             context.Customers.Add(new CustomerB
             {
@@ -182,10 +189,13 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
             .Include<CustomerB, CustomerBViewModel>();
 
 
-        cfg.CreateMap<CustomerA, CustomerAViewModel>();
+        cfg.CreateMap<CustomerA, CustomerAViewModel>()
+            .ForMember(dst => dst.FirstItemA, opt => opt.MapFrom(src => src.Items.OfType<ItemA>().FirstOrDefault()));
         cfg.CreateMap<CustomerB, CustomerBViewModel>();
         cfg.CreateMap<Customer, CustomerNameModel>();
-        cfg.CreateMap<Item, ItemModel>();
+        cfg.CreateMap<Item, ItemModel>()
+            .Include<ItemA, ItemModelA>();
+        cfg.CreateMap<ItemA, ItemModelA>();
     });
     [Fact]
     public void Should_work()
@@ -199,7 +209,7 @@ public class MemberWithSubQueryProjections : IntegrationTest<MemberWithSubQueryP
             resultA.Name.FirstName.ShouldBe("Alice");
             resultA.Name.LastName.ShouldBe("Smith");
             resultA.FirstItem.Code.ShouldBe(1);
-            resultA.A.ShouldBe("a");
+            resultA.FirstItemA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<CustomerBViewModel>();
             resultB.Name.FirstName.ShouldBe("Bob");
@@ -1035,16 +1045,20 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
         cfg.CreateMap<ProductArticle, ProductArticleModel>()
-            .Include<ProductArticleA, ProductArticleAModel>()
+            .Include<ProductArticleA, ECommerceProductArticleModel>()
             .Include<ProductArticleB, ProductArticleBModel>();
-        cfg.CreateMap<ProductArticleA, ProductArticleAModel>();
+        cfg.CreateMap<ProductArticleA, ECommerceProductArticleModel>()
+            .ForMember(d => d.ECommerceProducts, o => o.MapFrom(source => source.Products.Where(p => p.ECommercePublished)));
         cfg.CreateMap<ProductArticleB, ProductArticleBModel>();
         cfg.CreateMap<Product, ProductModel>()
             .ForMember(d => d.ArticlesModel, o => o.MapFrom(s => s))
-            .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()));
+            .ForMember(d => d.Articles, o => o.MapFrom(source => source.Articles.Where(x => x.IsDefault && x.NationId == 1 && source.ECommercePublished).FirstOrDefault()))
+            .Include<Product, ECommerceProductModel>();
         cfg.CreateMap<Product, ArticlesModel>();
         cfg.CreateMap<Article, PriceModel>()
             .ForMember(d => d.RegionId, o => o.MapFrom(s => s.NationId));
+
+        cfg.CreateMap<Product, ECommerceProductModel>();
     });
 
     [Fact]
@@ -1055,7 +1069,11 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles.OrderBy(p => p.Name));
             var counter = new FirstOrDefaultCounter();
             counter.Visit(projection.Expression);
-            counter.Count.ShouldBe(1);
+            counter.Count.ShouldBe(4);
+            var ecommerce = projection.ToList().OfType<ECommerceProductArticleModel>().First();
+            ecommerce.ECommerceProducts.Count.ShouldBe(1);
+            ecommerce.Products.Count.ShouldBe(2);
+
             var productModel = projection.First().Products.First();
             Check(productModel.Articles);
             productModel.Id.ShouldBe(1);
@@ -1110,9 +1128,9 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
         public ICollection<ProductModel> Products { get; set; }
     }
 
-    public class ProductArticleAModel : ProductArticleModel
+    public class ECommerceProductArticleModel : ProductArticleModel
     {
-        public string A { get; set; }
+        public ICollection<ECommerceProductModel> ECommerceProducts { get; set; }
     }
 
     public class ProductArticleBModel : ProductArticleModel
@@ -1152,6 +1170,10 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
         public ArticlesModel ArticlesModel { get; set; }
     }
 
+    public class ECommerceProductModel : ProductModel
+    {
+    }
+
     public class ArticlesModel
     {
         public ICollection<PriceModel> Articles { get; set; }
@@ -1162,7 +1184,8 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameName : NonValidating
         protected override void Seed(ClientContext context)
         {
             var product = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
-            context.ProductArticles.Add(new ProductArticleA { Name = "P1", A = "a", Products = new[] { product.Entity } });
+            var product2 = context.Products.Add(new Product { ECommercePublished = false, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
+            context.ProductArticles.Add(new ProductArticleA { Name = "P1", A = "a", Products = new[] { product.Entity, product2.Entity } });
             product = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
             context.ProductArticles.Add(new ProductArticleB { Name = "P2", B = "b", Products = new[] { product.Entity } });
             product = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });

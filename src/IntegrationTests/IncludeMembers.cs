@@ -11,7 +11,7 @@ public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer
     }
     public class SourceA : Source 
     {
-        public string A { get; set; }
+        public InnerSourceA InnerSourceA { get; set; }
     }
     public class SourceB : Source
     {
@@ -22,6 +22,11 @@ public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -61,7 +66,7 @@ public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            var sourceA = new SourceA { Name = "name1", InnerSourceA = new InnerSourceA() { A = "a" }, InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
             context.Sources.Add(sourceB);
@@ -73,13 +78,14 @@ public class IncludeMembers : IntegrationTest<IncludeMembers.DatabaseInitializer
 
     protected override MapperConfiguration CreateConfiguration() => new(cfg=>
     {
-        cfg.CreateMap<Source, Destination>().IncludeMembers(s=>s.InnerSource, s=>s.OtherInnerSource)
+        cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourceA);
         cfg.CreateMap<SourceB, DestinationB>();
-        cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
-        cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
     });
     [Fact]
     public void Should_flatten()
@@ -119,7 +125,7 @@ public class IncludeMembersExplicitExpansion : IntegrationTest<IncludeMembersExp
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public InnerSourceA InnerSourceA { get; set; }
     }
     public class SourceB : Source
     {
@@ -130,6 +136,11 @@ public class IncludeMembersExplicitExpansion : IntegrationTest<IncludeMembersExp
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -169,7 +180,7 @@ public class IncludeMembersExplicitExpansion : IntegrationTest<IncludeMembersExp
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            var sourceA = new SourceA { Name = "name1", InnerSourceA = new InnerSourceA { A = "a" }, InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
             context.Sources.Add(sourceB);
@@ -184,17 +195,18 @@ public class IncludeMembersExplicitExpansion : IntegrationTest<IncludeMembersExp
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourceA);
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.ExplicitExpansion());
         cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None).ForMember(d=>d.Title, o=>o.ExplicitExpansion());
+        cfg.CreateProjection<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.A, o => o.ExplicitExpansion());
     });
     [Fact]
     public void Should_flatten()
     {
         using (var context = new Context())
         {
-            var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name), null, d=>d.Title);
+            var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name), null, d=>d.Title, d => d.GetType() == typeof(DestinationA) ? ((DestinationA)d).A : null);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -227,7 +239,7 @@ public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstO
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -239,6 +251,11 @@ public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstO
         public string Name { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -283,7 +300,7 @@ public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstO
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
+                InnerSourcesA = { new InnerSourceA { A = "a" } },
                 InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
                 OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
             };
@@ -311,10 +328,11 @@ public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstO
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
-        cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
-        cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
     });
     [Fact]
     public void Should_flatten()
@@ -322,7 +340,7 @@ public class IncludeMembersFirstOrDefault : IntegrationTest<IncludeMembersFirstO
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 2);
+            FirstOrDefaultCounter.Assert(projectTo, 3);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -361,7 +379,7 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -373,6 +391,12 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest
         public string Name { get; set; }
         public string Description1 { get; set; }
         public string Publisher { get; set; }
+    }
+
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -417,7 +441,7 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
+                InnerSourcesA = { new InnerSourceA { A = "a" } },
                 InnerSources = { new InnerSource { Description1 = "description", Publisher = "publisher" } },
                 OtherInnerSources = { new OtherInnerSource { Title1 = "title", Author = "author" } }
             };
@@ -445,10 +469,11 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
-        cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom(s => s.Description1));
-        cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.Title, o => o.MapFrom(s => s.Title1));
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Description, o => o.MapFrom(s => s.Description1));
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.Title, o => o.MapFrom(s => s.Title1));
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.A, o => o.MapFrom(s => s.A));
     });
     [Fact]
     public void Should_flatten()
@@ -456,7 +481,7 @@ public class IncludeMembersFirstOrDefaultWithMapFromExpression : IntegrationTest
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 2);
+            FirstOrDefaultCounter.Assert(projectTo, 3);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -495,7 +520,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -507,11 +532,22 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public List<InnerSourceDetailsA> InnerSourceDetails { get; } = new List<InnerSourceDetailsA>();
+    }
+
     public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceDetailsA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -535,7 +571,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
     }
     public class DestinationA : Destination
     {
-        public string A { get; set; }
+        public DestinationADetails DetailsA { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -545,6 +581,10 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class DestinationADetails
+    {
+        public string A { get; set; }
     }
     public class OtherDestinationDetails
     {
@@ -569,7 +609,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
+                InnerSourcesA = { new InnerSourceA { InnerSourceDetails = { new InnerSourceDetailsA { A = "a" } } } },
                 InnerSources = { new InnerSource { InnerSourceDetails = { new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
@@ -597,12 +637,14 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSourceDetails.FirstOrDefault()));
         cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.OtherDetails, o => o.MapFrom(s => s.OtherInnerSourceDetails.FirstOrDefault()));
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.DetailsA, o => o.MapFrom(s => s.InnerSourceDetails.FirstOrDefault()));
         cfg.CreateMap<InnerSourceDetails, DestinationDetails>();
         cfg.CreateMap<OtherInnerSourceDetails, OtherDestinationDetails>();
+        cfg.CreateMap<InnerSourceDetailsA, DestinationADetails>();
     });
     [Fact]
     public void Should_flatten()
@@ -610,7 +652,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 4);
+            FirstOrDefaultCounter.Assert(projectTo, 6);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -619,7 +661,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
             resultA.Details.Publisher.ShouldBe("publisher");
             resultA.OtherDetails.Title.ShouldBe("title");
             resultA.OtherDetails.Author.ShouldBe("author");
-            resultA.A.ShouldBe("a");
+            resultA.DetailsA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
@@ -649,7 +691,7 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceWrapperA> InnerSourceWrappersA { get; set; } = new List<InnerSourceWrapperA>();
     }
     public class SourceB : Source
     {
@@ -660,22 +702,43 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
         public int Id { get; set; }
         public InnerSource InnerSource { get; set; }
     }
+    public class InnerSourceWrapperA
+    {
+        public int Id { get; set; }
+        public InnerSourceA InnerSource { get; set; }
+    }
     public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetailsWrapper> InnerSourceDetailsWrapper { get; } = new List<InnerSourceDetailsWrapper>();
     }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSourceDetailsWrapperA> InnerSourceDetailsWrapperA { get; } = new List<InnerSourceDetailsWrapperA>();
+    }
     public class InnerSourceDetailsWrapper
     {
         public int Id { get; set; }
         public InnerSourceDetails InnerSourceDetails { get; set; }
+    }
+    public class InnerSourceDetailsWrapperA
+    {
+        public int Id { get; set; }
+        public InnerSourceDetailsA InnerSourceDetailsA { get; set; }
     }
     public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceDetailsA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -699,7 +762,7 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
     }
     public class DestinationA : Destination
     {
-        public string A { get; set; }
+        public DestinationDetailsA DetailsA { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -709,6 +772,10 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class DestinationDetailsA
+    {
+        public string A { get; set; }
     }
     public class OtherDestinationDetails
     {
@@ -733,9 +800,8 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappersA = { new InnerSourceWrapperA { InnerSource = new InnerSourceA { InnerSourceDetailsWrapperA = { new InnerSourceDetailsWrapperA { InnerSourceDetailsA = new InnerSourceDetailsA { A = "a" } } } } } },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(sourceA);
@@ -743,16 +809,14 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
             {
                 Name = "name2",
                 B = "b",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(sourceB);
             var source = new Source
             {
                 Name = "name3",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(source);
@@ -764,12 +828,14 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSourceWrappers.Select(s => s.InnerSource).FirstOrDefault(), s => s.OtherInnerSources.Select(s => s).FirstOrDefault())
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourceWrappersA.Select(s => s.InnerSource).FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d => d.Details, o => o.MapFrom(s => s.InnerSourceDetailsWrapper.Select(s => s.InnerSourceDetails).FirstOrDefault()));
         cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.OtherDetails, o => o.MapFrom(s => s.OtherInnerSourceDetails.Select(s => s).FirstOrDefault()));
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.DetailsA, o => o.MapFrom(s => s.InnerSourceDetailsWrapperA.Select(s => s.InnerSourceDetailsA).FirstOrDefault()));
         cfg.CreateMap<InnerSourceDetails, DestinationDetails>();
         cfg.CreateMap<OtherInnerSourceDetails, OtherDestinationDetails>();
+        cfg.CreateMap<InnerSourceDetailsA, DestinationDetailsA>();
     });
     [Fact]
     public void Should_flatten()
@@ -777,7 +843,7 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 4);
+            FirstOrDefaultCounter.Assert(projectTo, 6);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -786,7 +852,7 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
             resultA.Details.Publisher.ShouldBe("publisher");
             resultA.OtherDetails.Title.ShouldBe("title");
             resultA.OtherDetails.Author.ShouldBe("author");
-            resultA.A.ShouldBe("a");
+            resultA.DetailsA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
@@ -816,7 +882,7 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -828,11 +894,22 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSourceDetailsA> InnerSourceDetailsA { get; } = new List<InnerSourceDetailsA>();
+    }
     public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceDetailsA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -856,7 +933,7 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
     }
     public class DestinationA : Destination
     {
-        public string A { get; set; }
+        public DestinationDetailsA DetailsA { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -866,6 +943,10 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class DestinationDetailsA
+    {
+        public string A { get; set; }
     }
     public class OtherDestinationDetails
     {
@@ -890,7 +971,7 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
+                InnerSourcesA = { new InnerSourceA { InnerSourceDetailsA = { new InnerSourceDetailsA { A = "a" } } } },
                 InnerSources = { new InnerSource { InnerSourceDetails = { new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
@@ -920,12 +1001,15 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
             .ForMember(d => d.OtherDetails, o => o.MapFrom(s => s.OtherInnerSources.FirstOrDefault()))
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>()
+            .ForMember(d => d.DetailsA, o => o.MapFrom(s => s.InnerSourcesA.FirstOrDefault()));
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateMap<InnerSource, DestinationDetails>().IncludeMembers(s => s.InnerSourceDetails.FirstOrDefault());
         cfg.CreateMap<OtherInnerSource, OtherDestinationDetails>().IncludeMembers(s => s.OtherInnerSourceDetails.FirstOrDefault());
+        cfg.CreateMap<InnerSourceA, DestinationDetailsA>().IncludeMembers(s => s.InnerSourceDetailsA.FirstOrDefault());
         cfg.CreateMap<InnerSourceDetails, DestinationDetails>();
         cfg.CreateMap<OtherInnerSourceDetails, OtherDestinationDetails>();
+        cfg.CreateMap<InnerSourceDetailsA, DestinationDetailsA>();
     });
     [Fact]
     public void Should_flatten()
@@ -933,7 +1017,7 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 6);
+            FirstOrDefaultCounter.Assert(projectTo, 9);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -942,7 +1026,7 @@ public class SubqueryMapFromWithIncludeMembersFirstOrDefault : IntegrationTest<S
             resultA.Details.Publisher.ShouldBe("publisher");
             resultA.OtherDetails.Title.ShouldBe("title");
             resultA.OtherDetails.Author.ShouldBe("author");
-            resultA.A.ShouldBe("a");
+            resultA.DetailsA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
@@ -972,7 +1056,7 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -984,11 +1068,22 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
         public string Name { get; set; }
         public List<InnerSourceDetails> InnerSourceDetails { get; } = new List<InnerSourceDetails>();
     }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSourceDetailsA> InnerSourceDetailsA { get; } = new List<InnerSourceDetailsA>();
+    }
     public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceDetailsA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -1012,7 +1107,7 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
     }
     public class DestinationA : Destination
     {
-        public string A { get; set; }
+        public DestinationDetailsA DetailsA { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -1022,6 +1117,10 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class DestinationDetailsA
+    {
+        public string A { get; set; }
     }
     public class OtherDestinationDetails
     {
@@ -1046,7 +1145,7 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
+                InnerSourcesA = { new InnerSourceA { InnerSourceDetailsA = { new InnerSourceDetailsA { A = "a" } } } },
                 InnerSources = { new InnerSource { InnerSourceDetails = { new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
@@ -1076,12 +1175,15 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
             .ForMember(d => d.OtherDetails, o => o.MapFrom(s => s.OtherInnerSources.Select(s => s).FirstOrDefault()))
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>()
+            .ForMember(d => d.DetailsA, o => o.MapFrom(s => s.InnerSourcesA.Select(s => s).FirstOrDefault()));
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateMap<InnerSource, DestinationDetails>().IncludeMembers(s => s.InnerSourceDetails.Select(s => s).FirstOrDefault());
         cfg.CreateMap<OtherInnerSource, OtherDestinationDetails>().IncludeMembers(s => s.OtherInnerSourceDetails.Select(s => s).FirstOrDefault());
+        cfg.CreateMap<InnerSourceA, DestinationDetailsA>().IncludeMembers(s => s.InnerSourceDetailsA.Select(s => s).FirstOrDefault());
         cfg.CreateMap<InnerSourceDetails, DestinationDetails>();
         cfg.CreateMap<OtherInnerSourceDetails, OtherDestinationDetails>();
+        cfg.CreateMap<InnerSourceDetailsA, DestinationDetailsA>();
     });
     [Fact]
     public void Should_flatten()
@@ -1089,7 +1191,7 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 6);
+            FirstOrDefaultCounter.Assert(projectTo, 9);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -1098,7 +1200,7 @@ public class SubqueryMapFromWithIncludeMembersSelectFirstOrDefault : Integration
             resultA.Details.Publisher.ShouldBe("publisher");
             resultA.OtherDetails.Title.ShouldBe("title");
             resultA.OtherDetails.Author.ShouldBe("author");
-            resultA.A.ShouldBe("a");
+            resultA.DetailsA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
@@ -1128,7 +1230,7 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceWrapperA> InnerSourceWrappersA { get; set; } = new List<InnerSourceWrapperA>();
     }
     public class SourceB : Source
     {
@@ -1139,22 +1241,43 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
         public int Id { get; set; }
         public InnerSource InnerSource { get; set; }
     }
+    public class InnerSourceWrapperA
+    {
+        public int Id { get; set; }
+        public InnerSourceA InnerSourceA { get; set; }
+    }
     public class InnerSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public List<InnerSourceDetailsWrapper> InnerSourceDetailsWrapper { get; } = new List<InnerSourceDetailsWrapper>();
     }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSourceDetailsWrapperA> InnerSourceDetailsWrapperA { get; } = new List<InnerSourceDetailsWrapperA>();
+    }
     public class InnerSourceDetailsWrapper
     {
         public int Id { get; set; }
         public InnerSourceDetails InnerSourceDetails { get; set; }
+    }
+    public class InnerSourceDetailsWrapperA
+    {
+        public int Id { get; set; }
+        public InnerSourceDetailsA InnerSourceDetailsA { get; set; }
     }
     public class InnerSourceDetails
     {
         public int Id { get; set; }
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class InnerSourceDetailsA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -1178,7 +1301,7 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
     }
     public class DestinationA : Destination
     {
-        public string A { get; set; }
+        public DestinationDetailsA DetailsA { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -1188,6 +1311,10 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
     {
         public string Description { get; set; }
         public string Publisher { get; set; }
+    }
+    public class DestinationDetailsA
+    {
+        public string A { get; set; }
     }
     public class OtherDestinationDetails
     {
@@ -1212,9 +1339,8 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
             var sourceA = new SourceA
             {
                 Name = "name1",
-                A = "a",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappersA = { new InnerSourceWrapperA { InnerSourceA = new InnerSourceA { InnerSourceDetailsWrapperA = { new InnerSourceDetailsWrapperA { InnerSourceDetailsA = new InnerSourceDetailsA { A = "a" } } } } } },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(sourceA);
@@ -1222,16 +1348,14 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
             {
                 Name = "name2",
                 B = "b",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(sourceB);
             var source = new Source
             {
                 Name = "name3",
-                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } }
-                },
+                InnerSourceWrappers = { new InnerSourceWrapper { InnerSource = new InnerSource { InnerSourceDetailsWrapper = { new InnerSourceDetailsWrapper { InnerSourceDetails = new InnerSourceDetails { Description = "description", Publisher = "publisher" } } } } } },
                 OtherInnerSources = { new OtherInnerSource { OtherInnerSourceDetails = { new OtherInnerSourceDetails { Title = "title", Author = "author" } } } }
             };
             context.Sources.Add(source);
@@ -1245,12 +1369,15 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
             .ForMember(d => d.OtherDetails, o => o.MapFrom(s => s.OtherInnerSources.Select(s => s).FirstOrDefault()))
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>()
+            .ForMember(d => d.DetailsA, o => o.MapFrom(s => s.InnerSourceWrappersA.Select(s => s.InnerSourceA).FirstOrDefault()));
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateMap<InnerSource, DestinationDetails>().IncludeMembers(s => s.InnerSourceDetailsWrapper.Select(s => s.InnerSourceDetails).FirstOrDefault());
         cfg.CreateMap<OtherInnerSource, OtherDestinationDetails>().IncludeMembers(s => s.OtherInnerSourceDetails.Select(s => s).FirstOrDefault());
+        cfg.CreateMap<InnerSourceA, DestinationDetailsA>().IncludeMembers(s => s.InnerSourceDetailsWrapperA.Select(s => s.InnerSourceDetailsA).FirstOrDefault());
         cfg.CreateMap<InnerSourceDetails, DestinationDetails>();
         cfg.CreateMap<OtherInnerSourceDetails, OtherDestinationDetails>();
+        cfg.CreateMap<InnerSourceDetailsA, DestinationDetailsA>();
     });
     [Fact]
     public void Should_flatten()
@@ -1258,7 +1385,7 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 6);
+            FirstOrDefaultCounter.Assert(projectTo, 9);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -1267,7 +1394,7 @@ public class SubqueryMapFromWithIncludeMembersSelectMemberFirstOrDefault : Integ
             resultA.Details.Publisher.ShouldBe("publisher");
             resultA.OtherDetails.Title.ShouldBe("title");
             resultA.OtherDetails.Author.ShouldBe("author");
-            resultA.A.ShouldBe("a");
+            resultA.DetailsA.A.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
@@ -1297,7 +1424,7 @@ public class IncludeMembersWithMapFromExpression : IntegrationTest<IncludeMember
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public InnerSourceA InnerSourceA { get; set; }
     }
     public class SourceB : Source
     {
@@ -1308,6 +1435,11 @@ public class IncludeMembersWithMapFromExpression : IntegrationTest<IncludeMember
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description1 { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -1347,7 +1479,7 @@ public class IncludeMembersWithMapFromExpression : IntegrationTest<IncludeMember
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", InnerSource = new InnerSource { Description1 = "description" }, OtherInnerSource = new OtherInnerSource { Title1 = "title" } };
+            var sourceA = new SourceA { Name = "name1", InnerSourceA = new InnerSourceA { A = "a" }, InnerSource = new InnerSource { Description1 = "description" }, OtherInnerSource = new OtherInnerSource { Title1 = "title" } };
             context.Sources.Add(sourceA); 
             var sourceB = new SourceB { Name = "name2", B = "b", InnerSource = new InnerSource { Description1 = "description" }, OtherInnerSource = new OtherInnerSource { Title1 = "title" } };
             context.Sources.Add(sourceB); 
@@ -1361,10 +1493,11 @@ public class IncludeMembersWithMapFromExpression : IntegrationTest<IncludeMember
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourceA);
         cfg.CreateMap<SourceB, DestinationB>();
-        cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.MapFrom(s=>s.Description1));
-        cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None).ForMember(d=>d.Title, o=>o.MapFrom(s=>s.Title1));
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None).ForMember(d=>d.Description, o=>o.MapFrom(s=>s.Description1));
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None).ForMember(d=>d.Title, o=>o.MapFrom(s=>s.Title1));
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.A, o => o.MapFrom(s => s.A));
     });
     [Fact]
     public void Should_flatten_with_MapFrom()
@@ -1403,7 +1536,7 @@ public class IncludeMembersWithNullSubstitute : IntegrationTest<IncludeMembersWi
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public InnerSourceA InnerSourceA { get; set; }
     }
     public class SourceB : Source
     {
@@ -1414,6 +1547,11 @@ public class IncludeMembersWithNullSubstitute : IntegrationTest<IncludeMembersWi
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -1453,7 +1591,7 @@ public class IncludeMembersWithNullSubstitute : IntegrationTest<IncludeMembersWi
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", };
+            var sourceA = new SourceA { Name = "name1" };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", };
             context.Sources.Add(sourceB);
@@ -1468,10 +1606,11 @@ public class IncludeMembersWithNullSubstitute : IntegrationTest<IncludeMembersWi
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourceA);
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Code, o => o.NullSubstitute(5));
         cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.OtherCode, o => o.NullSubstitute(7));
+        cfg.CreateProjection<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.A, o => o.NullSubstitute("a"));
     });
     [Fact]
     public void Should_flatten()
@@ -1510,7 +1649,7 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : Integration
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
     }
     public class SourceB : Source
     {
@@ -1521,6 +1660,11 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : Integration
         public int Id { get; set; }
         public string Name { get; set; }
         public int? Code { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class OtherInnerSource
     {
@@ -1559,7 +1703,7 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : Integration
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", };
+            var sourceA = new SourceA { Name = "name1" };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", };
             context.Sources.Add(sourceB);
@@ -1573,10 +1717,11 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : Integration
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateProjection<InnerSource, Destination>(MemberList.None).ForMember(d => d.Code, o => o.NullSubstitute(5));
         cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None).ForMember(d => d.OtherCode, o => o.NullSubstitute(7));
+        cfg.CreateProjection<InnerSourceA, DestinationA>(MemberList.None).ForMember(d => d.A, o => o.NullSubstitute("a"));
     });
     [Fact]
     public void Should_flatten()
@@ -1584,7 +1729,7 @@ public class IncludeMembersMembersFirstOrDefaultWithNullSubstitute : Integration
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 2);
+            FirstOrDefaultCounter.Assert(projectTo, 3);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -1616,7 +1761,7 @@ public class CascadedIncludeMembers : IntegrationTest<CascadedIncludeMembers.Dat
     }
     public class SourceA : Source
     {
-        public string A { get; set; }
+        public Level1A FieldLevel1A { get; set; }
     }
     public class SourceB : Source
     {
@@ -1631,6 +1776,17 @@ public class CascadedIncludeMembers : IntegrationTest<CascadedIncludeMembers.Dat
     {
         public int Id{ get; set; }
         public long TheField{ get; set; }
+    }
+
+    public class Level1A
+    {
+        public int Id { get; set; }
+        public Level2A FieldLevel2A { get; set; }
+    }
+    public class Level2A
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
     }
     public class Destination
     {
@@ -1651,10 +1807,12 @@ public class CascadedIncludeMembers : IntegrationTest<CascadedIncludeMembers.Dat
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.FieldLevel1)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.FieldLevel1A);
         cfg.CreateMap<SourceB, DestinationB>();
-        cfg.CreateProjection<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
-        cfg.CreateProjection<Level2, Destination>(MemberList.None);
+        cfg.CreateMap<Level1, Destination>(MemberList.None).IncludeMembers(s => s.FieldLevel2);
+        cfg.CreateMap<Level2, Destination>(MemberList.None);
+        cfg.CreateMap<Level1A, DestinationA>(MemberList.None).IncludeMembers(s => s.FieldLevel2A);
+        cfg.CreateMap<Level2A, DestinationA>(MemberList.None);
     });
     public class Context : LocalDbContext
     {
@@ -1671,7 +1829,7 @@ public class CascadedIncludeMembers : IntegrationTest<CascadedIncludeMembers.Dat
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", FieldLevel1 = new Level1 { FieldLevel2 = new Level2 { TheField = 2 } } };
+            var sourceA = new SourceA { Name = "name1", FieldLevel1A = new Level1A { FieldLevel2A = new Level2A { A = "a" } }, FieldLevel1 = new Level1 { FieldLevel2 = new Level2 { TheField = 2 } } };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", FieldLevel1 = new Level1 { FieldLevel2 = new Level2 { TheField = 2 } } };
             context.Sources.Add(sourceB);
