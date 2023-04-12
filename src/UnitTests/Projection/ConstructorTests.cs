@@ -228,11 +228,11 @@ public class ConstructorIncludeMembers : AutoMapperSpecBase
     }
     class SourceWrapperA : SourceWrapper
     {
-        public SourceA A { get; set; }
+        public SourceA SourceA { get; set; }
     }
     class SourceWrapperB : SourceWrapper
     {
-        public SourceB B { get; set; }
+        public SourceB SourceB { get; set; }
     }
     class Source
     {
@@ -270,9 +270,9 @@ public class ConstructorIncludeMembers : AutoMapperSpecBase
             .Include<SourceWrapperA, DestinationA>()
             .Include<SourceWrapperB, DestinationB>();
         cfg.CreateMap<SourceWrapperA, DestinationA>()
-            .IncludeMembers(s => s.Source, s => s.A);
+            .IncludeMembers(s => s.Source, s => s.SourceA);
         cfg.CreateMap<SourceWrapperB, DestinationB>()
-            .IncludeMembers(s => s.Source, s => s.B);
+            .IncludeMembers(s => s.Source, s => s.SourceB);
         cfg.CreateMap<Source, Destination>();
         cfg.CreateMap<Source, DestinationA>(MemberList.None);
         cfg.CreateMap<Source, DestinationB>(MemberList.None);
@@ -285,8 +285,8 @@ public class ConstructorIncludeMembers : AutoMapperSpecBase
         var list = new[] 
         {
             new SourceWrapper { Source = new Source { Value = 5 } },
-            new SourceWrapperA { Source = new Source { Value = 5 }, A = new SourceA() { A = "a" } },
-            new SourceWrapperB { Source = new Source { Value = 5 }, B = new SourceB() { B = "b" } }
+            new SourceWrapperA { Source = new Source { Value = 5 }, SourceA = new SourceA() { A = "a" } },
+            new SourceWrapperB { Source = new Source { Value = 5 }, SourceB = new SourceB() { B = "b" } }
         }.AsQueryable().ProjectTo<Destination>(Configuration);
         
         list.All(p => p.Value == "5").ShouldBeTrue();
