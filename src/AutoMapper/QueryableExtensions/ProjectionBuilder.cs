@@ -297,9 +297,8 @@ public class ProjectionBuilder : IProjectionBuilder
             return new(Lambda(projection, secondParameter), Lambda(letClause, instanceParameter));
             void ReplaceSubQueries()
             {
-                for (int i = 0; i < letMapInfos.Length; i++)
+                foreach (var letMapInfo in letMapInfos)
                 {
-                    var letMapInfo = letMapInfos[i];
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                     var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
 
@@ -315,13 +314,6 @@ public class ProjectionBuilder : IProjectionBuilder
                     else if (extractor.Parameter.Type != type && source.Type != type)
                     {
                         source = Condition(TypeIs(source, type), letMapInfo.LetExpression.ReplaceParameters(Convert(source, type)), letMapInfo.Marker);
-                        for (int j = i+1; j < letMapInfos.Length; j++)
-                        {
-                            if (letMapInfos[j].MapFromSource.Type == letMapInfo.Marker.Type)
-                            {
-                                letMapInfos[j] = letMapInfos[j] with { MapFromSource = source };
-                            }
-                        }
                     }
                     else
                     {
@@ -353,7 +345,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 var type = initialLambda.Parameters.First().Type;
                 if (newParameter.Type != type)
                 {
-                    return initialLambda.Body;
+                    return Condition(TypeIs(newParameter, type), initialLambda.ReplaceParameters(Convert(newParameter, type)), Default(initialLambda.ReturnType));
                 }
                 else
                 {
