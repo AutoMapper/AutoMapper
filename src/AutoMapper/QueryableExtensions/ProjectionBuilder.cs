@@ -337,7 +337,24 @@ public class ProjectionBuilder : IProjectionBuilder
                 }
                 return sourceExpression;
             }
-            public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", Members.Select(p => ((LambdaExpression)p.Expression).Parameters.First().Type.Name + "_" + p.MemberMap.DestinationName)), LetExpression.Body.Type);
+            public PropertyDescription GetPropertyDescription()
+            {
+                return new("__" + string.Join("#", Members.Select(p => GetSourceTypeName(p.Expression) + "_" + p.MemberMap.DestinationName)), LetExpression.Body.Type);
+            
+                string GetSourceTypeName(Expression e) 
+                {
+                    switch(e)
+                    {
+                        case LambdaExpression lamda:
+                            return lamda.Parameters.First().Type.Name;
+                        case MemberExpression member:
+                            return member.Member.DeclaringType.Name;
+                        default:
+                            return string.Empty;
+                    }
+                }    
+            }
+
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
         }
