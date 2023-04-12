@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using AutoMapper.Execution;
+using System.Runtime.CompilerServices;
 namespace AutoMapper.QueryableExtensions.Impl;
 using ParameterBag = IDictionary<string, object>;
 using TypePairCount = Dictionary<ProjectionRequest, int>;
@@ -163,7 +164,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     return resolvedSource;
                     Expression MapFromExpression(LambdaExpression mapFrom)
                     {
-                        if (memberTypeMap == null || mapFrom.IsMemberPath(out var member) || mapFrom.Body is ParameterExpression)
+                        if (memberTypeMap == null || mapFrom.IsMemberPath(out _) || mapFrom.Body is ParameterExpression)
                         {
                             var parmaterExtractor = new ParameterExpressionExtractorVisitor();
                             parmaterExtractor.Visit(mapFrom.Body);
@@ -196,15 +197,9 @@ public class ProjectionBuilder : IProjectionBuilder
                         }
                         if (customSource.IsMemberPath(out _))
                         {
-                            var type = customSource.Parameters.First().Type;
-                            if (instanceParameter.Type != type)
-                            {
-                                return Condition(TypeIs(instanceParameter, type), customSource.ReplaceParameters(Convert(instanceParameter, type)), Default(declaringType));
-                            }
-                            else
-                            {
-                                return customSource.ReplaceParameters(instanceParameter);
-                            }
+                            var param = customSource.Parameters.First();
+                            var result = ChainSources(customSource.Body, param, instanceParameter, param.Type);
+                            return result;
                         } 
                         
                         return letPropertyMaps.GetSubQueryMarker(customSource);
@@ -239,6 +234,26 @@ public class ProjectionBuilder : IProjectionBuilder
                 New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
             _ => New(localTypeMap.DestinationType)
         };
+    }
+    private static Expression ChainSources(Expression source, Expression oldParameter, Expression newParameter, Type type)
+    {
+        if (newParameter is ConditionalExpression condition)
+        {
+            return Condition(condition.Test, source.Replace(oldParameter, condition.IfTrue), Default(source.Type));
+        }
+        if (newParameter.Type != type)
+        {
+            return Condition(TypeIs(newParameter, type), source.Replace(oldParameter, Convert(newParameter, type)), Default(source.Type));
+        }
+        else
+        {
+            if (source == oldParameter)
+            {
+                return newParameter;
+            }
+
+            return source.Replace(oldParameter, newParameter);
+        }
     }
     private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new(
         $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
@@ -301,25 +316,9 @@ public class ProjectionBuilder : IProjectionBuilder
                 {
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                     var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
-
                     var source = letMapInfo.MapFromSource;
-                    var extractor = new ParameterExpressionExtractorVisitor();
-                    extractor.Visit(source);
-
-                    var type = letMapInfo.LetExpression.Parameters.First().Type;
-                    if (source is ConditionalExpression condition) 
-                    {
-                        source = Condition(condition.Test, letMapInfo.LetExpression.ReplaceParameters(condition.IfTrue), letMapInfo.Marker);
-                    }
-                    else if (extractor.Parameter.Type != type && source.Type != type)
-                    {
-                        source = Condition(TypeIs(source, type), letMapInfo.LetExpression.ReplaceParameters(Convert(source, type)), letMapInfo.Marker);
-                    }
-                    else
-                    {
-                        source = letMapInfo.LetExpression.ReplaceParameters(source);
-                    }
-
+                    var param = letMapInfo.LetExpression.Parameters.First();
+                    source = ChainSources(letMapInfo.LetExpression.Body, param, source, param.Type);
                     letPropertyMap.MapFrom(Lambda(source, secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
@@ -335,24 +334,10 @@ public class ProjectionBuilder : IProjectionBuilder
                 for (int index = 0; index < Members.Length - 1; index++)
                 {
                     var sourceMember = Members[index].Expression;
-                    sourceExpression = sourceMember is LambdaExpression lambda ? ReplaceParametersWhenTypeMatches(lambda, sourceExpression) : sourceMember;
+                    sourceExpression = sourceMember is LambdaExpression lambda ? ChainSources(lambda.Body, lambda.Parameters.First(), sourceExpression, lambda.Parameters.First().Type) : sourceMember;
                 }
                 return sourceExpression;
             }
-
-            private static Expression ReplaceParametersWhenTypeMatches(LambdaExpression initialLambda, Expression newParameter)
-            {
-                var type = initialLambda.Parameters.First().Type;
-                if (newParameter.Type != type)
-                {
-                    return Condition(TypeIs(newParameter, type), initialLambda.ReplaceParameters(Convert(newParameter, type)), Default(initialLambda.ReturnType));
-                }
-                else
-                {
-                    return initialLambda.ReplaceParameters(newParameter);
-                }
-            }
-
             public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
