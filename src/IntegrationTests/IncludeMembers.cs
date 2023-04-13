@@ -1982,3 +1982,118 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
         }
     }
 }
+
+public class IncludeMultipleExpressions : IntegrationTest<IncludeMultipleExpressions.DatabaseInitializer>
+{
+    public class Source
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public InnerSource InnerSource { get; set; }
+        public OtherInnerSource OtherInnerSource { get; set; }
+        public int ImNotIncluded { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
+    }
+    public class SourceA : Source
+    {
+        public List<InnerSourceA> InnerSourcesAFallback { get; set; } = new List<InnerSourceA>();
+    }
+
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public int ImNotIncludedA { get; set; }
+        public string IAmIncluded { get; set; }
+    }
+    public class SourceB : Source
+    {
+        public string B { get; set; }
+        public int ImNotIncludedB { get; set; }
+    }
+    public class InnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+    public class OtherInnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+    }
+    public class Destination
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+    public class DestinationA : Destination
+    {
+        public string IAmIncluded { get; set; }
+    }
+    public class DestinationB : Destination
+    {
+        public string B { get; set; }
+    }
+    public class Context : LocalDbContext
+    {
+        public DbSet<Source> Sources { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SourceA>();
+            modelBuilder.Entity<SourceB>();
+        }
+    }
+
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    {
+        protected override void Seed(Context context)
+        {
+            var sourceA = new SourceA { Name = "name1", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" }, InnerSourcesAFallback = { new InnerSourceA { IAmIncluded = "fallback" } } };
+            context.Sources.Add(sourceA);
+            var sourceB = new SourceB { Name = "name2", B = "b", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            context.Sources.Add(sourceB);
+            var sourceC = new Source { Name = "name3", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            context.Sources.Add(sourceC);
+            base.Seed(context);
+        }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
+            .Include<SourceA, DestinationA>()
+            .Include<SourceB, DestinationB>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault() ?? s.InnerSourcesAFallback.FirstOrDefault());
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
+        cfg.CreateMap<SourceB, DestinationB>();
+        cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
+        cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None);
+    });
+    [Fact]
+    public void Should_flatten()
+    {
+        using (var context = new Context())
+        {
+            var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
+            var list = projectTo.ToList();
+            var resultA = list[0].ShouldBeOfType<DestinationA>();
+            resultA.Name.ShouldBe("name1");
+            resultA.Description.ShouldBe("description");
+            resultA.IAmIncluded.ShouldBe("fallback");
+
+            var resultB = list[1].ShouldBeOfType<DestinationB>();
+            resultB.Name.ShouldBe("name2");
+            resultB.Description.ShouldBe("description");
+            resultB.B.ShouldBe("b");
+
+            var resultC = list[2].ShouldBeOfType<Destination>();
+            resultC.Name.ShouldBe("name3");
+            resultC.Description.ShouldBe("description");
+        }
+    }
+}

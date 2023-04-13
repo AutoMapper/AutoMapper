@@ -165,10 +165,10 @@ public class ProjectionBuilder : IProjectionBuilder
                     {
                         if (memberTypeMap == null || mapFrom.IsMemberPath(out _) || mapFrom.Body is ParameterExpression)
                         {
-                            var member = MemberAccessExpressionExtractorVisitor.Extract(mapFrom.Body, mapFrom.Parameters.First());
-                            if (member != null)
+                            var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(mapFrom.Body, mapFrom.Parameters.First());
+                            if (type != null)
                             {
-                                return mapFrom.ReplaceParameters(CheckCustomSource(member.Member.DeclaringType));
+                                return mapFrom.ReplaceParameters(CheckCustomSource(type));
                             }
                             return mapFrom.ReplaceParameters(CheckCustomSource());
                         }
@@ -228,7 +228,7 @@ public class ProjectionBuilder : IProjectionBuilder
             return Condition(condition.Test, source.ReplaceParameters(condition.IfTrue), Default(source.Body.Type));
         }
         var param = source.Parameters.First();
-        var type = MemberAccessExpressionExtractorVisitor.Extract(source, param)?.Member?.DeclaringType ?? param.Type;
+        var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(source, param) ?? param.Type;
         if (newParameter.Type != type)
         {
             return Condition(TypeIs(newParameter, type), source.ReplaceParameters(Convert(newParameter, type)), Default(source.Body.Type));
@@ -376,30 +376,6 @@ public class MemberProjection
     public Expression Expression { get; set; }
     public MemberMap MemberMap { get; }
 }
-class MemberAccessExpressionExtractorVisitor : ExpressionVisitor
-{
-    private readonly Expression _parameter;
-    private MemberExpression _member;
-    public MemberAccessExpressionExtractorVisitor(Expression parameter)
-    {
-        _parameter = parameter;
-    }
-    protected override Expression VisitMember(MemberExpression node)
-    {
-        if (node.Expression == _parameter)
-        {
-            _member ??= node;
-        }
-        return base.VisitMember(node);
-    }
-    public static MemberExpression Extract(Expression expression, Expression parameter)
-    {
-        var parmaterExtractor = new MemberAccessExpressionExtractorVisitor(parameter);
-        parmaterExtractor.Visit(expression);
-        return parmaterExtractor._member;
-    }
-}
-
 class AllMemberAccessExpressionExtractorVisitor : ExpressionVisitor
 {
     private readonly Expression _source;
@@ -421,6 +397,25 @@ class AllMemberAccessExpressionExtractorVisitor : ExpressionVisitor
         var parmaterExtractor = new AllMemberAccessExpressionExtractorVisitor(source);
         parmaterExtractor.Visit(expression);
         return parmaterExtractor._members;
+    }
+
+    public static Type ExtractMostDerivedType(Expression expression, Expression source) 
+    {
+        var members = Extract(expression, source);
+        return members.Select(m => m.Member.DeclaringType).OrderByDescending(m => GetDerivationLevel(m)).FirstOrDefault();
+    }
+
+    private static int GetDerivationLevel(Type t) 
+    {
+        var level = 1;
+
+        while (t != typeof(object))
+        {
+            level++;
+            t = t.BaseType;
+        }
+
+        return level;
     }
 }
 
