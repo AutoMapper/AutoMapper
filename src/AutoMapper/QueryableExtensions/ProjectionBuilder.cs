@@ -282,7 +282,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 instanceParameter
             )).ToArray();
 
-            var properties = letMapInfos.Select(m => m.Property);
+            var properties = letMapInfos.Select(m => m.Property); 
             var letType = ProxyGenerator.GetSimilarType(typeof(object), properties);
             TypeMap letTypeMap;
             lock(Configuration)
@@ -299,7 +299,8 @@ public class ProjectionBuilder : IProjectionBuilder
                 {
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
                     var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
-                    letPropertyMap.MapFrom(Lambda(ChainSources(letMapInfo.LetExpression, letMapInfo.MapFromSource), secondParameter));
+                    var let = InjectSelectRequiredPropertiesExpressionVisitor.Inject(letMapInfo.LetExpression, AllMemberAccessExpressionExtractorVisitor.Extract(projection, letMapInfo.Marker).DistinctBy(p => p.Member.Name));
+                    letPropertyMap.MapFrom(Lambda(ChainSources(let, letMapInfo.MapFromSource), secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
             }
@@ -398,6 +399,69 @@ class MemberAccessExpressionExtractorVisitor : ExpressionVisitor
         return parmaterExtractor._member;
     }
 }
+
+class AllMemberAccessExpressionExtractorVisitor : ExpressionVisitor
+{
+    private readonly Expression _source;
+    private readonly List<MemberExpression> _members = new List<MemberExpression>();
+    public AllMemberAccessExpressionExtractorVisitor(Expression source)
+    {
+        _source = source;
+    }
+    protected override Expression VisitMember(MemberExpression node)
+    {
+        if (node.Expression == _source)
+        {
+            _members.Add(node);
+        }
+        return base.VisitMember(node);
+    }
+    public static List<MemberExpression> Extract(Expression expression, Expression source)
+    {
+        var parmaterExtractor = new AllMemberAccessExpressionExtractorVisitor(source);
+        parmaterExtractor.Visit(expression);
+        return parmaterExtractor._members;
+    }
+}
+
+class InjectSelectRequiredPropertiesExpressionVisitor : ExpressionVisitor
+{
+    private readonly IEnumerable<MemberExpression> _members;
+    private static MethodInfo EnumerableSelect = typeof(Enumerable).GetMethods().First(m => m.Name == nameof(Enumerable.Select));
+    public InjectSelectRequiredPropertiesExpressionVisitor(IEnumerable<MemberExpression> members)
+    {
+        _members = members;
+    }
+    protected override Expression VisitMethodCall(MethodCallExpression node)
+    {
+        if (node.Method.Name == nameof(Enumerable.FirstOrDefault))
+        {
+            var firstOrDefaultSource = node.Arguments.First();
+
+            var param = Parameter(node.Type, "__p");
+            var letSelectMember = Lambda(MemberInit(New(node.Type), _members.Select(m => Bind(m.Member, Expression.Property(param, m.Member.Name)))), param);
+
+            var select = Call(EnumerableSelect.MakeGenericMethod(node.Type, node.Type), firstOrDefaultSource, letSelectMember);
+
+            if (node.Arguments.Count == 1)
+            {
+                return Call(node.Method, select);
+            }
+            else
+            {
+                return Call(node.Method, select, node.Arguments[1]);
+            }
+        }
+        return base.VisitMethodCall(node);
+    }
+    public static LambdaExpression Inject(LambdaExpression expression, IEnumerable<MemberExpression> members)
+    {
+        var parmaterExtractor = new InjectSelectRequiredPropertiesExpressionVisitor(members);
+        var result = parmaterExtractor.Visit(expression);
+        return (LambdaExpression)result;
+    }
+}
+
 abstract class ParameterExpressionVisitor : ExpressionVisitor
 {
     public static Expression SetParameters(object parameters, Expression expression)

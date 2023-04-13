@@ -1876,6 +1876,14 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
     {
         public string A { get; set; }
         public int ImNotIncludedA { get; set; }
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
+    }
+
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public int ImNotIncludedA { get; set; }
+        public string IAmIncluded { get; set; }
     }
     public class SourceB : Source
     {
@@ -1904,6 +1912,7 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
     public class DestinationA : Destination
     {
         public string A { get; set; }
+        public string IAmIncluded { get; set; }
     }
     public class DestinationB : Destination
     {
@@ -1925,7 +1934,7 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
     {
         protected override void Seed(Context context)
         {
-            var sourceA = new SourceA { Name = "name1", A = "a", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
+            var sourceA = new SourceA { Name = "name1", A = "a", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" }, InnerSourcesA = { new InnerSourceA { IAmIncluded = "a" } } };
             context.Sources.Add(sourceA);
             var sourceB = new SourceB { Name = "name2", B = "b", InnerSource = new InnerSource { Description = "description" }, OtherInnerSource = new OtherInnerSource { Title = "title" } };
             context.Sources.Add(sourceB);
@@ -1940,7 +1949,8 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSource, s => s.OtherInnerSource)
             .Include<SourceA, DestinationA>()
             .Include<SourceB, DestinationB>();
-        cfg.CreateMap<SourceA, DestinationA>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
         cfg.CreateMap<SourceB, DestinationB>();
         cfg.CreateProjection<InnerSource, Destination>(MemberList.None);
         cfg.CreateProjection<OtherInnerSource, Destination>(MemberList.None);
@@ -1959,6 +1969,7 @@ public class IncludeOnlySelectedMembers : IntegrationTest<IncludeOnlySelectedMem
             resultA.Name.ShouldBe("name1");
             resultA.Description.ShouldBe("description");
             resultA.A.ShouldBe("a");
+            resultA.IAmIncluded.ShouldBe("a");
 
             var resultB = list[1].ShouldBeOfType<DestinationB>();
             resultB.Name.ShouldBe("name2");
