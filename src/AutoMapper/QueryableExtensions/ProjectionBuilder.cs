@@ -186,12 +186,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     {
                         if (customSource == null)
                         {
-                            if (declaringType != null && declaringType != instanceParameter.Type)
-                            {
-                                return Convert(instanceParameter, declaringType);
-                            }
-
-                            return instanceParameter;
+                            return GetConvertedParameter(declaringType);
                         }
                         return customSource.IsMemberPath(out _) ? ChainSources(customSource, instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
                     }
@@ -210,17 +205,17 @@ public class ProjectionBuilder : IProjectionBuilder
                 }
             }
         }
-        Expression GetConstructorParameter(TypeMap localTypeMap) 
+        Expression GetConvertedParameter(Type targetType) 
         {
-            if (localTypeMap.SourceType != instanceParameter.Type)
+            if (targetType != null && targetType != instanceParameter.Type)
             {
-                return Convert(instanceParameter, localTypeMap.SourceType);
+                return Convert(instanceParameter, targetType);
             }
             return instanceParameter;
         }
         NewExpression CreateDestination(TypeMap localTypeMap) => localTypeMap switch
         {
-            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(GetConstructorParameter(localTypeMap)),
+            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(GetConvertedParameter(localTypeMap.SourceType)),
             { ConstructorMap: { CanResolve: true } constructorMap } => 
                 New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
             _ => New(localTypeMap.DestinationType)
