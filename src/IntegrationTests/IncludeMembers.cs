@@ -652,7 +652,7 @@ public class IncludeMembersFirstOrDefaultWithSubqueryMapFrom : IntegrationTest<I
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 6);
+            FirstOrDefaultCounter.Assert(projectTo, 8);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();
@@ -843,7 +843,7 @@ public class IncludeMembersSelectFirstOrDefaultWithSubqueryMapFrom : Integration
         using (var context = new Context())
         {
             var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
-            FirstOrDefaultCounter.Assert(projectTo, 6);
+            FirstOrDefaultCounter.Assert(projectTo, 8);
             var list = projectTo.ToList();
 
             var resultA = list[0].ShouldBeOfType<DestinationA>();

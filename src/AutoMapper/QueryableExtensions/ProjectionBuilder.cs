@@ -175,11 +175,27 @@ public class ProjectionBuilder : IProjectionBuilder
                         if (customSource == null)
                         {
                             memberProjection.Expression = mapFrom;
-                            return letPropertyMaps.GetSubQueryMarker(mapFrom);
+                            var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(mapFrom.Body, mapFrom.Parameters.First());
+                            if (type == instanceParameter.Type)
+                            {
+                                return letPropertyMaps.GetSubQueryMarker(mapFrom);
+                            }
+                            else
+                            {
+                                return mapFrom.ReplaceParameters(GetConvertedParameter(type));
+                            }
                         }
                         var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
                         memberProjection.Expression = newMapFrom;
-                        return letPropertyMaps.GetSubQueryMarker(newMapFrom);
+                        var declaringType = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(newMapFrom.Body, newMapFrom.Parameters.First());
+                        if (declaringType == instanceParameter.Type)
+                        {
+                            return letPropertyMaps.GetSubQueryMarker(newMapFrom);
+                        }
+                        else
+                        {
+                            return newMapFrom.ReplaceParameters(GetConvertedParameter(declaringType));
+                        }
                     }
                     bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
                     Expression CheckCustomSource(Type declaringType = null)
@@ -188,7 +204,12 @@ public class ProjectionBuilder : IProjectionBuilder
                         {
                             return GetConvertedParameter(declaringType);
                         }
-                        return customSource.IsMemberPath(out _) ? ChainSources(customSource, instanceParameter) : letPropertyMaps.GetSubQueryMarker(customSource);
+                        var param = customSource.Parameters.First();
+                        if (customSource.IsMemberPath(out _) || param.Type != instanceParameter.Type || ConvertExpressionExtractorVisitor.Extract(instanceParameter) != null) 
+                        {
+                            return customSource.ReplaceParameters(GetConvertedParameter(param.Type));
+                        }                        
+                        return letPropertyMaps.GetSubQueryMarker(customSource);
                     }
                 }
                 IProjectionMapper GetProjectionMapper()
@@ -220,23 +241,6 @@ public class ProjectionBuilder : IProjectionBuilder
                 New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
             _ => New(localTypeMap.DestinationType)
         };
-    }
-    private static Expression ChainSources(LambdaExpression source, Expression newParameter)
-    {
-        if (newParameter is ConditionalExpression condition)
-        {
-            return Condition(condition.Test, source.ReplaceParameters(condition.IfTrue), Default(source.Body.Type));
-        }
-        var param = source.Parameters.First();
-        var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(source, param) ?? param.Type;
-        if (newParameter.Type != type)
-        {
-            return Condition(TypeIs(newParameter, type), source.ReplaceParameters(Convert(newParameter, type)), Default(source.Body.Type));
-        }
-        else
-        {
-            return source.ReplaceParameters(newParameter);
-        }
     }
     private static AutoMapperMappingException CannotMap(MemberMap memberMap, Type sourceType) => new(
         $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
@@ -298,9 +302,8 @@ public class ProjectionBuilder : IProjectionBuilder
                 foreach(var letMapInfo in letMapInfos)
                 {
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
-                    var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
-                    var let = InjectSelectRequiredPropertiesExpressionVisitor.Inject(letMapInfo.LetExpression, AllMemberAccessExpressionExtractorVisitor.Extract(projection, letMapInfo.Marker).DistinctBy(p => p.Member.Name));
-                    letPropertyMap.MapFrom(Lambda(ChainSources(let, letMapInfo.MapFromSource), secondParameter));
+                    var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type); 
+                    letPropertyMap.MapFrom(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
             }
@@ -315,12 +318,11 @@ public class ProjectionBuilder : IProjectionBuilder
                 for (int index = 0; index < Members.Length - 1; index++)
                 {
                     var sourceMember = Members[index].Expression;
-                    sourceExpression = sourceMember is LambdaExpression lambda ? ChainSources(lambda, sourceExpression) : sourceMember;
+                    sourceExpression = sourceMember is LambdaExpression lambda ? lambda.ReplaceParameters(sourceExpression) : sourceMember;
                 }
                 return sourceExpression;
             }
             public PropertyDescription GetPropertyDescription() => new("__" + string.Join("#", Members.Select(p => p.MemberMap.DestinationName)), LetExpression.Body.Type);
-
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
         }
@@ -418,45 +420,24 @@ class AllMemberAccessExpressionExtractorVisitor : ExpressionVisitor
         return level;
     }
 }
-
-class InjectSelectRequiredPropertiesExpressionVisitor : ExpressionVisitor
+class ConvertExpressionExtractorVisitor : ExpressionVisitor
 {
-    private readonly IEnumerable<MemberExpression> _members;
-    private static MethodInfo EnumerableSelect = typeof(Enumerable).GetMethods().First(m => m.Name == nameof(Enumerable.Select));
-    public InjectSelectRequiredPropertiesExpressionVisitor(IEnumerable<MemberExpression> members)
+    private UnaryExpression _convert;
+    protected override Expression VisitUnary(UnaryExpression node)
     {
-        _members = members;
-    }
-    protected override Expression VisitMethodCall(MethodCallExpression node)
-    {
-        if (node.Method.Name == nameof(Enumerable.FirstOrDefault))
+        if (node.NodeType == ExpressionType.Convert)
         {
-            var firstOrDefaultSource = node.Arguments.First();
-
-            var param = Parameter(node.Type, "__p");
-            var letSelectMember = Lambda(MemberInit(New(node.Type), _members.Select(m => Bind(m.Member, Expression.Property(param, m.Member.Name)))), param);
-
-            var select = Call(EnumerableSelect.MakeGenericMethod(node.Type, node.Type), firstOrDefaultSource, letSelectMember);
-
-            if (node.Arguments.Count == 1)
-            {
-                return Call(node.Method, select);
-            }
-            else
-            {
-                return Call(node.Method, select, node.Arguments[1]);
-            }
+            _convert = node;
         }
-        return base.VisitMethodCall(node);
+        return base.VisitUnary(node);
     }
-    public static LambdaExpression Inject(LambdaExpression expression, IEnumerable<MemberExpression> members)
+    public static UnaryExpression Extract(Expression expression)
     {
-        var parmaterExtractor = new InjectSelectRequiredPropertiesExpressionVisitor(members);
-        var result = parmaterExtractor.Visit(expression);
-        return (LambdaExpression)result;
+        var parmaterExtractor = new ConvertExpressionExtractorVisitor();
+        parmaterExtractor.Visit(expression);
+        return parmaterExtractor._convert;
     }
 }
-
 abstract class ParameterExpressionVisitor : ExpressionVisitor
 {
     public static Expression SetParameters(object parameters, Expression expression)
