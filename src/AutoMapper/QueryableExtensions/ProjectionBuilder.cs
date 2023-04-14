@@ -172,29 +172,20 @@ public class ProjectionBuilder : IProjectionBuilder
                             }
                             return mapFrom.ReplaceParameters(CheckCustomSource());
                         }
-                        if (customSource == null)
+                        var source = mapFrom;
+                        if (customSource != null)
                         {
-                            memberProjection.Expression = mapFrom;
-                            var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(mapFrom.Body, mapFrom.Parameters.First());
-                            if (type == instanceParameter.Type)
-                            {
-                                return letPropertyMaps.GetSubQueryMarker(mapFrom);
-                            }
-                            else
-                            {
-                                return mapFrom.ReplaceParameters(GetConvertedParameter(type));
-                            }
+                            source = IncludedMember.Chain(customSource, mapFrom);
                         }
-                        var newMapFrom = IncludedMember.Chain(customSource, mapFrom);
-                        memberProjection.Expression = newMapFrom;
-                        var declaringType = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(newMapFrom.Body, newMapFrom.Parameters.First());
+                        memberProjection.Expression = source;
+                        var declaringType = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(source.Body, source.Parameters.First());
                         if (declaringType == instanceParameter.Type)
                         {
-                            return letPropertyMaps.GetSubQueryMarker(newMapFrom);
+                            return letPropertyMaps.GetSubQueryMarker(source);
                         }
                         else
                         {
-                            return newMapFrom.ReplaceParameters(GetConvertedParameter(declaringType));
+                            return source.ReplaceParameters(GetConvertedParameter(declaringType));
                         }
                     }
                     bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
@@ -274,11 +265,11 @@ public class ProjectionBuilder : IProjectionBuilder
         {
             var sParam = Parameter(typeMap.SourceType, "s");
 
-            var letMapInfos = _savedPaths.Select(path => new LetMapInfo
+            var letMapInfos = _savedPaths.Select(path =>  
                 (path.LetExpression,
                 MapFromSource : path.GetSourceExpression(instanceParameter),
                 Property : path.GetPropertyDescription(),
-                path.Marker)).Append(new
+                path.Marker)).Append(
             (
                 Lambda(sParam, sParam),
                 instanceParameter,
@@ -302,13 +293,12 @@ public class ProjectionBuilder : IProjectionBuilder
                 foreach(var letMapInfo in letMapInfos)
                 {
                     var letProperty = letType.GetProperty(letMapInfo.Property.Name);
-                    var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type); 
+                    var letPropertyMap = letTypeMap.FindOrCreatePropertyMapFor(letProperty, letMapInfo.Property.Type);
                     letPropertyMap.MapFrom(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
             }
         }
-        record LetMapInfo(LambdaExpression LetExpression, Expression MapFromSource, PropertyDescription Property, Expression Marker);
         readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
         {
             public SubQueryPath(MemberProjection[] members, LambdaExpression letExpression) : this(members, letExpression, Default(letExpression.Body.Type)){ }
