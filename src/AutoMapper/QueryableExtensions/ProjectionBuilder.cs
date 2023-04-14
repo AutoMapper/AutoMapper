@@ -72,13 +72,15 @@ public class ProjectionBuilder : IProjectionBuilder
             }
         }
 
-        var constructorExpression = CreateDestination(typeMap);
-        var propertyBindings = ProjectProperties(typeMap, false);
+        var polimorph = ConvertExpressionExtractorVisitor.Extract(instanceParameter) != null;
+        var constructorExpression = CreateDestination(typeMap, polimorph, instanceParameter);
+        var propertyBindings = ProjectProperties(typeMap, polimorph, instanceParameter);
         var expression = (Expression)MemberInit(constructorExpression, propertyBindings);
         foreach (var derivedType in _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes))
         {
-            var derivedContructorExpression = CreateDestination(derivedType);
-            var derivedExpression = MemberInit(derivedContructorExpression, propertyBindings.Concat(ProjectProperties(derivedType, true)));
+            var derivedParameter = Convert(instanceParameter, derivedType.SourceType);
+            var derivedContructorExpression = CreateDestination(derivedType, true, derivedParameter);
+            var derivedExpression = MemberInit(derivedContructorExpression, propertyBindings.Concat(ProjectProperties(derivedType, true, derivedParameter)));
             var condition = TypeIs(instanceParameter, derivedType.SourceType);
 
             expression = Condition(condition, Convert(derivedExpression, typeMap.DestinationType), expression);
@@ -89,7 +91,7 @@ public class ProjectionBuilder : IProjectionBuilder
             depth = letPropertyMaps.IncrementDepth(request);
             return typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth;
         }
-        List<MemberBinding> ProjectProperties(TypeMap localTypeMap, bool polimorph)
+        List<MemberBinding> ProjectProperties(TypeMap localTypeMap, bool polimorph, Expression instanceParameter)
         {
             var propertiesProjections = new List<MemberBinding>();
             foreach (var propertyMap in localTypeMap.PropertyMaps)
@@ -103,7 +105,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 {
                     continue;
                 }
-                var propertyProjection = TryProjectMember(propertyMap);
+                var propertyProjection = TryProjectMember(propertyMap, polimorph, instanceParameter);
                 if (propertyProjection != null)
                 {
                     propertiesProjections.Add(Bind(propertyMap.DestinationMember, propertyProjection));
@@ -112,18 +114,18 @@ public class ProjectionBuilder : IProjectionBuilder
 
             return propertiesProjections;
         }
-        Expression TryProjectMember(MemberMap memberMap, Expression defaultSource = null)
+        Expression TryProjectMember(MemberMap memberMap, bool polimorph, Expression instanceParameter, Expression defaultSource = null)
         {
             var memberProjection = new MemberProjection(memberMap);
             letPropertyMaps.Push(memberProjection);
-            var memberExpression = ShouldExpand() ? ProjectMemberCore() : null;
+            var memberExpression = ShouldExpand() ? ProjectMemberCore(instanceParameter) : null;
             letPropertyMaps.Pop();
             return memberExpression;
             bool ShouldExpand() => memberMap.ExplicitExpansion != true || request.ShouldExpand(letPropertyMaps.GetCurrentPath());
-            Expression ProjectMemberCore()
+            Expression ProjectMemberCore(Expression instanceParameter)
             {
                 var memberTypeMap = _configuration.ResolveTypeMap(memberMap.SourceType, memberMap.DestinationType);
-                var resolvedSource = ResolveSource();
+                var resolvedSource = ResolveSource(polimorph, instanceParameter);
                 memberProjection.Expression ??= resolvedSource;
                 var memberRequest = request.InnerRequest(resolvedSource.Type, memberMap.DestinationType);
                 if (memberRequest.AlreadyExists && depth >= _configuration.RecursiveQueriesMaxDepth)
@@ -147,13 +149,13 @@ public class ProjectionBuilder : IProjectionBuilder
                     mappedExpression = projectionMapper.Project(_configuration, memberRequest, resolvedSource, letPropertyMaps);
                 }
                 return mappedExpression == null ? null : memberMap.ApplyTransformers(mappedExpression, _configuration);
-                Expression ResolveSource()
+                Expression ResolveSource(bool polimorph, Expression instanceParameter)
                 {
                     var customSource = memberMap.IncludedMember?.ProjectToCustomSource;
                     var resolvedSource = memberMap switch
                     {
-                        { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom),
-                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource(memberMap.SourceMember.DeclaringType)),
+                        { CustomMapExpression: LambdaExpression mapFrom } => MapFromExpression(mapFrom, polimorph, instanceParameter),
+                        { SourceMembers.Length: > 0  } => memberMap.ChainSourceMembers(CheckCustomSource(polimorph, instanceParameter)),
                         _ => defaultSource ?? throw CannotMap(memberMap, request.SourceType)
                     };
                     if (NullSubstitute())
@@ -161,16 +163,11 @@ public class ProjectionBuilder : IProjectionBuilder
                         return memberMap.NullSubstitute(resolvedSource);
                     }
                     return resolvedSource;
-                    Expression MapFromExpression(LambdaExpression mapFrom)
+                    Expression MapFromExpression(LambdaExpression mapFrom, bool polimorph, Expression instanceParameter)
                     {
                         if (memberTypeMap == null || mapFrom.IsMemberPath(out _) || mapFrom.Body is ParameterExpression)
                         {
-                            var type = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(mapFrom.Body, mapFrom.Parameters.First());
-                            if (type != null)
-                            {
-                                return mapFrom.ReplaceParameters(CheckCustomSource(type));
-                            }
-                            return mapFrom.ReplaceParameters(CheckCustomSource());
+                            return mapFrom.ReplaceParameters(CheckCustomSource(polimorph, instanceParameter));
                         }
                         var source = mapFrom;
                         if (customSource != null)
@@ -178,27 +175,25 @@ public class ProjectionBuilder : IProjectionBuilder
                             source = IncludedMember.Chain(customSource, mapFrom);
                         }
                         memberProjection.Expression = source;
-                        var declaringType = AllMemberAccessExpressionExtractorVisitor.ExtractMostDerivedType(source.Body, source.Parameters.First());
-                        if (declaringType == instanceParameter.Type)
+                        if (!polimorph)
                         {
                             return letPropertyMaps.GetSubQueryMarker(source);
                         }
                         else
                         {
-                            return source.ReplaceParameters(GetConvertedParameter(declaringType));
+                            return source.ReplaceParameters(instanceParameter);
                         }
                     }
                     bool NullSubstitute() => memberMap.NullSubstitute != null && resolvedSource is MemberExpression && (resolvedSource.Type.IsNullableType() || resolvedSource.Type == typeof(string));
-                    Expression CheckCustomSource(Type declaringType = null)
+                    Expression CheckCustomSource(bool polimorph, Expression instanceParameter)
                     {
                         if (customSource == null)
                         {
-                            return GetConvertedParameter(declaringType);
+                            return instanceParameter;
                         }
-                        var param = customSource.Parameters.First();
-                        if (customSource.IsMemberPath(out _) || param.Type != instanceParameter.Type || ConvertExpressionExtractorVisitor.Extract(instanceParameter) != null) 
+                        if (customSource.IsMemberPath(out _) || polimorph) 
                         {
-                            return customSource.ReplaceParameters(GetConvertedParameter(param.Type));
+                            return customSource.ReplaceParameters(instanceParameter);
                         }                        
                         return letPropertyMaps.GetSubQueryMarker(customSource);
                     }
@@ -217,19 +212,11 @@ public class ProjectionBuilder : IProjectionBuilder
                 }
             }
         }
-        Expression GetConvertedParameter(Type targetType) 
+        NewExpression CreateDestination(TypeMap localTypeMap, bool polimorph, Expression instanceParameter) => localTypeMap switch
         {
-            if (targetType != null && targetType != instanceParameter.Type)
-            {
-                return Convert(instanceParameter, targetType);
-            }
-            return instanceParameter;
-        }
-        NewExpression CreateDestination(TypeMap localTypeMap) => localTypeMap switch
-        {
-            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(GetConvertedParameter(localTypeMap.SourceType)),
+            { CustomCtorExpression: LambdaExpression ctorExpression } => (NewExpression)ctorExpression.ReplaceParameters(instanceParameter),
             { ConstructorMap: { CanResolve: true } constructorMap } => 
-                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, map.DefaultValue(null)) ?? Default(map.DestinationType))),
+                New(constructorMap.Ctor, constructorMap.CtorParams.Select(map => TryProjectMember(map, polimorph, instanceParameter, map.DefaultValue(null)) ?? Default(map.DestinationType))),
             _ => New(localTypeMap.DestinationType)
         };
     }
@@ -367,48 +354,6 @@ public class MemberProjection
     public MemberProjection(MemberMap memberMap) => MemberMap = memberMap;
     public Expression Expression { get; set; }
     public MemberMap MemberMap { get; }
-}
-class AllMemberAccessExpressionExtractorVisitor : ExpressionVisitor
-{
-    private readonly Expression _source;
-    private readonly List<MemberExpression> _members = new List<MemberExpression>();
-    public AllMemberAccessExpressionExtractorVisitor(Expression source)
-    {
-        _source = source;
-    }
-    protected override Expression VisitMember(MemberExpression node)
-    {
-        if (node.Expression == _source)
-        {
-            _members.Add(node);
-        }
-        return base.VisitMember(node);
-    }
-    public static List<MemberExpression> Extract(Expression expression, Expression source)
-    {
-        var parmaterExtractor = new AllMemberAccessExpressionExtractorVisitor(source);
-        parmaterExtractor.Visit(expression);
-        return parmaterExtractor._members;
-    }
-
-    public static Type ExtractMostDerivedType(Expression expression, Expression source) 
-    {
-        var members = Extract(expression, source);
-        return members.Select(m => m.Member.DeclaringType).OrderByDescending(m => GetDerivationLevel(m)).FirstOrDefault();
-    }
-
-    private static int GetDerivationLevel(Type t) 
-    {
-        var level = 1;
-
-        while (t != typeof(object))
-        {
-            level++;
-            t = t.BaseType;
-        }
-
-        return level;
-    }
 }
 class ConvertExpressionExtractorVisitor : ExpressionVisitor
 {
