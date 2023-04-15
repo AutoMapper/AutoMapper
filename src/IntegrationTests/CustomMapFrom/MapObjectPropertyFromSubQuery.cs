@@ -2172,7 +2172,7 @@ public class MapObjectPropertyFromSubQueryWithCollectionSameNameWithInheritance 
             var projection = ProjectTo<ProductArticleModel>(context.ProductArticles.OrderBy(p => p.Name));
             var counter = new FirstOrDefaultCounter();
             counter.Visit(projection.Expression);
-            counter.Count.ShouldBe(28);
+            counter.Count.ShouldBe(16);
             var ecommerce = projection.ToList().OfType<ECommerceProductArticleModel>().First();
             ecommerce.ECommerceProducts.Count.ShouldBe(1);
             ecommerce.Products.Count.ShouldBe(2);

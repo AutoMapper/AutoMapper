@@ -1374,6 +1374,288 @@ public class IncludeMembersFirstOrDefaultWithIheritance : IntegrationTest<Includ
         }
     }
 }
+public class IncludeMembersFirstOrDefaultMixedPolymorhism : IntegrationTest<IncludeMembersFirstOrDefaultMixedPolymorhism.DatabaseInitializer>
+{
+    public class Source
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
+        public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
+    }
+    public class SourceA : Source
+    {
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
+    }
+    public class SourceB : Source
+    {
+        public string B { get; set; }
+    }
+    public class InnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Publisher { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
+    }
+    public class OtherInnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+    }
+    public class Destination
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Publisher { get; set; }
+    }
+    public class DestinationA : Destination
+    {
+        public string A { get; set; }
+    }
+    public class DestinationB : Destination
+    {
+        public string B { get; set; }
+    }
+    public class Context : LocalDbContext
+    {
+        public DbSet<Source> Sources { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SourceA>();
+            modelBuilder.Entity<SourceB>();
+        }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    {
+        protected override void Seed(Context context)
+        {
+            var sourceA = new SourceA
+            {
+                Name = "name1",
+                InnerSourcesA = { new InnerSourceA { A = "a" } },
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(sourceA);
+            var sourceB = new SourceB
+            {
+                Name = "name2",
+                B = "b",
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(sourceB);
+            var source = new Source
+            {
+                Name = "name3",
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(source);
+            base.Seed(context);
+        }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
+            .Include<Source, DestinationB>()
+            .Include<SourceA, Destination>()
+            .Include<SourceA, DestinationA>()
+            .Include<SourceB, DestinationB>();
+        cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
+        cfg.CreateMap<SourceB, DestinationB>();
+        cfg.CreateMap<SourceA, Destination>();
+        cfg.CreateMap<Source, DestinationB>().ForMember(s => s.B, o => o.MapFrom(s => "b"));
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
+    });
+    [Fact]
+    public void Should_flatten()
+    {
+        using (var context = new Context())
+        {
+            var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
+            var list = projectTo.ToList();
+
+            var resultA = list[0].ShouldBeOfType<DestinationA>();
+            resultA.Name.ShouldBe("name1");
+            resultA.Description.ShouldBe("description");
+            resultA.Title.ShouldBe("title");
+            resultA.Author.ShouldBe("author");
+            resultA.Publisher.ShouldBe("publisher");
+            resultA.A.ShouldBe("a");
+
+            var resultB = list[1].ShouldBeOfType<DestinationB>();
+            resultB.Name.ShouldBe("name2");
+            resultB.Description.ShouldBe("description");
+            resultB.Title.ShouldBe("title");
+            resultB.Author.ShouldBe("author");
+            resultB.Publisher.ShouldBe("publisher");
+            resultB.B.ShouldBe("b");
+
+            var result = list[2].ShouldBeOfType<Destination>();
+            result.Name.ShouldBe("name3");
+            result.Description.ShouldBe("description");
+            result.Title.ShouldBe("title");
+            result.Author.ShouldBe("author");
+            result.Publisher.ShouldBe("publisher");
+        }
+    }
+}
+public class IncludeMembersFirstOrDefaultNoPolymorhism : IntegrationTest<IncludeMembersFirstOrDefaultNoPolymorhism.DatabaseInitializer>
+{
+    public class Source
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<InnerSource> InnerSources { get; set; } = new List<InnerSource>();
+        public List<OtherInnerSource> OtherInnerSources { get; set; } = new List<OtherInnerSource>();
+    }
+    public class SourceA : Source
+    {
+        public List<InnerSourceA> InnerSourcesA { get; set; } = new List<InnerSourceA>();
+    }
+    public class SourceB : Source
+    {
+        public string B { get; set; }
+    }
+    public class InnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Publisher { get; set; }
+    }
+    public class InnerSourceA
+    {
+        public int Id { get; set; }
+        public string A { get; set; }
+    }
+    public class OtherInnerSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+    }
+    public class Destination
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Publisher { get; set; }
+    }
+    public class DestinationA : Destination
+    {
+        public string A { get; set; }
+    }
+    public class DestinationB : Destination
+    {
+        public string B { get; set; }
+    }
+    public class Context : LocalDbContext
+    {
+        public DbSet<Source> Sources { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SourceA>();
+            modelBuilder.Entity<SourceB>();
+        }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context>
+    {
+        protected override void Seed(Context context)
+        {
+            var sourceA = new SourceA
+            {
+                Name = "name1",
+                InnerSourcesA = { new InnerSourceA { A = "a" } },
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(sourceA);
+            var sourceB = new SourceB
+            {
+                Name = "name2",
+                B = "b",
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(sourceB);
+            var source = new Source
+            {
+                Name = "name3",
+                InnerSources = { new InnerSource { Description = "description", Publisher = "publisher" } },
+                OtherInnerSources = { new OtherInnerSource { Title = "title", Author = "author" } }
+            };
+            context.Sources.Add(source);
+            base.Seed(context);
+        }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
+            .Include<Source, DestinationB>()
+            .Include<SourceA, Destination>();
+        cfg.CreateMap<SourceA, Destination>().ForMember(d=>d.Description, o=>o.MapFrom(s=>"descriptionA"));
+        cfg.CreateMap<Source, DestinationB>().ForMember(s => s.B, o => o.MapFrom(s => "b"));
+        cfg.CreateMap<InnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<OtherInnerSource, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, Destination>(MemberList.None);
+        cfg.CreateMap<InnerSourceA, DestinationA>(MemberList.None);
+    });
+    [Fact]
+    public void Should_flatten()
+    {
+        using (var context = new Context())
+        {
+            var projectTo = ProjectTo<Destination>(context.Sources.OrderBy(p => p.Name));
+            var list = projectTo.ToList();
+
+            var resultA = list[0].ShouldBeOfType<Destination>();
+            resultA.Name.ShouldBe("name1");
+            resultA.Description.ShouldBe("descriptionA");
+            resultA.Title.ShouldBe("title");
+            resultA.Author.ShouldBe("author");
+            resultA.Publisher.ShouldBe("publisher");
+
+            var resultB = list[1].ShouldBeOfType<Destination>();
+            resultB.Name.ShouldBe("name2");
+            resultB.Description.ShouldBe("description");
+            resultB.Title.ShouldBe("title");
+            resultB.Author.ShouldBe("author");
+            resultB.Publisher.ShouldBe("publisher");
+
+            var result = list[2].ShouldBeOfType<Destination>();
+            result.Name.ShouldBe("name3");
+            result.Description.ShouldBe("description");
+            result.Title.ShouldBe("title");
+            result.Author.ShouldBe("author");
+            result.Publisher.ShouldBe("publisher");
+        }
+    }
+}
 public class IncludeMembersFirstOrDefaultWithMapFromExpressionWithIheritance : IntegrationTest<IncludeMembersFirstOrDefaultWithMapFromExpressionWithIheritance.DatabaseInitializer>
 {
     public class Source

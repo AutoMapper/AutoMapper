@@ -47,29 +47,34 @@ public class ProjectionBuilder : IProjectionBuilder
     }
     private QueryExpressions CreateProjection(ProjectionRequest request)
     {
-        var typeMap = ResolveMap(request);
-        return CreateProjection(request, typeMap.HasDerivedTypesToInclude ? new LetPropertyMaps(_configuration, MemberPath.Empty, new()) : new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, new()), typeMap);
+        var (typeMap, polymorphicMaps) = GetPolymorphicMaps(request);
+        var letPropertyMaps = polymorphicMaps.Length > 0 ? new LetPropertyMaps(_configuration, MemberPath.Empty, new()) : new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, new());
+        return CreateProjection(request, letPropertyMaps, typeMap, polymorphicMaps);
     }
-    public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps) => CreateProjection(request, letPropertyMaps, null);
-    public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap)
+    private (TypeMap, TypeMap[]) GetPolymorphicMaps(in ProjectionRequest request)
+    {
+        var typeMap = _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
+        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes.Where(tp => tp.SourceType != typeMap.SourceType).ToArray()));
+    }
+    public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
+    {
+        var (typeMap, polymorphicMaps) = GetPolymorphicMaps(request);
+        return CreateProjection(request, letPropertyMaps, typeMap, polymorphicMaps);
+    }
+    QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap, TypeMap[] polymorphicMaps)
     {
         var instanceParameter = Parameter(request.SourceType, "dto" + request.SourceType.Name);
-        typeMap ??= ResolveMap(request);
-        Expression projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
-        if (typeMap.HasDerivedTypesToInclude)
+        var projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
+        foreach(var derivedMap in polymorphicMaps)
         {
-            projection = Include(_configuration.GetIncludedTypeMaps(typeMap), request, projection, instanceParameter, letPropertyMaps);
+            var sourceType = derivedMap.SourceType;
+            var derivedRequest = request.InnerRequest(sourceType, derivedMap.DestinationType);
+            var derivedProjection = CreateProjectionCore(derivedRequest, Convert(instanceParameter, sourceType), derivedMap, letPropertyMaps);
+            projection = Condition(TypeIs(instanceParameter, sourceType), derivedProjection, projection, projection.Type);
         }
         return letPropertyMaps.Count > 0 ?
             letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
             new(projection, instanceParameter);
-    }
-    private TypeMap ResolveMap(in ProjectionRequest request) => _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
-    Expression Include(ReadOnlySpan<TypeMap> typeMaps, in ProjectionRequest request, Expression last, ParameterExpression instanceParameter, LetPropertyMaps letPropertyMaps)
-    {
-        var derivedMap = typeMaps[0];
-        var derivedProjection = CreateProjectionCore(request.InnerRequest(derivedMap.SourceType, derivedMap.DestinationType), ToType(instanceParameter, derivedMap.SourceType), derivedMap, letPropertyMaps);
-        return Condition(TypeIs(instanceParameter, derivedMap.SourceType), derivedProjection, typeMaps.Length == 1 ? last : Include(typeMaps[1..], request, last, instanceParameter, letPropertyMaps), last.Type);
     }
     private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
     {

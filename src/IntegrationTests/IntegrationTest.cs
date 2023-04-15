@@ -24,3 +24,9 @@ public class DropCreateDatabaseAlways<TContext> : IInitializer where TContext : 
         await context.SaveChangesAsync();
     }
 }
+public abstract class LocalDbContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(
+        @$"Data Source=(localdb)\mssqllocaldb;Integrated Security=True;MultipleActiveResultSets=True;Database={GetType()};Connection Timeout=300",
+        o => o.EnableRetryOnFailure(maxRetryCount: 10).CommandTimeout(120));
+}
