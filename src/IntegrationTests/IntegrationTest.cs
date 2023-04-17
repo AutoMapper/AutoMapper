@@ -15,9 +15,10 @@ public class DropCreateDatabaseAlways<TContext> : IInitializer where TContext : 
     public async Task Migrate()
     {
         await using var context = new TContext();
-
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        var database = context.Database;
+        await database.EnsureDeletedAsync();
+        var strategy = database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () => await database.EnsureCreatedAsync());
 
         Seed(context);
 
