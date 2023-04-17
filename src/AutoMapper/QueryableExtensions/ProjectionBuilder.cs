@@ -54,7 +54,7 @@ public class ProjectionBuilder : IProjectionBuilder
     private (TypeMap, TypeMap[]) GetPolymorphicMaps(in ProjectionRequest request)
     {
         var typeMap = _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
-        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes.Where(tp => tp.SourceType != typeMap.SourceType).ToArray()));
+        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes.Where(tp => tp.SourceType != typeMap.SourceType).DistinctBy(tp => tp.SourceType).ToArray()));
     }
     public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
     {

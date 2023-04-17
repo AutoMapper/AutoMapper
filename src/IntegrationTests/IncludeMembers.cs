@@ -1473,8 +1473,8 @@ public class IncludeMembersFirstOrDefaultMixedPolymorhism : IntegrationTest<Incl
     {
         cfg.CreateMap<Source, Destination>().IncludeMembers(s => s.InnerSources.FirstOrDefault(), s => s.OtherInnerSources.FirstOrDefault())
             .Include<Source, DestinationB>()
-            .Include<SourceA, Destination>()
             .Include<SourceA, DestinationA>()
+            .Include<SourceA, Destination>()
             .Include<SourceB, DestinationB>();
         cfg.CreateMap<SourceA, DestinationA>().IncludeMembers(s => s.InnerSourcesA.FirstOrDefault());
         cfg.CreateMap<SourceB, DestinationB>();
