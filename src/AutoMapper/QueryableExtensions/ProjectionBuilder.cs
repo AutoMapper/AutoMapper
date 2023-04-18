@@ -250,7 +250,7 @@ public class ProjectionBuilder : IProjectionBuilder
                     letPropertyMap.MapFrom(Lambda(letMapInfo.LetExpression.ReplaceParameters(letMapInfo.MapFromSource), secondParameter));
                     projection = projection.Replace(letMapInfo.Marker, Property(secondParameter, letProperty));
                 }
-                projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
+                projection = new ReplaceMemberAccessesAndParametersVisitor(instanceParameter, secondParameter).Visit(projection);
             }
         }
         readonly record struct SubQueryPath(MemberProjection[] Members, LambdaExpression LetExpression, Expression Marker)
@@ -290,10 +290,10 @@ public class ProjectionBuilder : IProjectionBuilder
                 return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
             }
         }
-        class ReplaceMemberAccessesVisitor : ExpressionVisitor
+        class ReplaceMemberAccessesAndParametersVisitor : ExpressionVisitor
         {
             private readonly Expression _oldObject, _newObject;
-            public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
+            public ReplaceMemberAccessesAndParametersVisitor(Expression oldObject, Expression newObject)
             {
                 _oldObject = oldObject;
                 _newObject = newObject;
@@ -305,6 +305,13 @@ public class ProjectionBuilder : IProjectionBuilder
                     return base.VisitMember(node);
                 }
                 return PropertyOrField(_newObject, node.Member.Name);
+            }
+            protected override Expression VisitParameter(ParameterExpression node) {
+                if (node != _oldObject) {
+                    return base.VisitParameter(node);
+                }
+                else
+                    return _newObject;
             }
         }
     }
