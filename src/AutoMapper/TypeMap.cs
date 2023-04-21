@@ -76,14 +76,7 @@ public class TypeMap
     public MemberList ConfiguredMemberList
     {
         get => (_details?.ConfiguredMemberList).GetValueOrDefault();
-        set
-        {
-            if (value == default)
-            {
-                return;
-            }
-            Details.ConfiguredMemberList = value;
-        }
+        set { Details.ConfiguredMemberList = value; }
     }
     public IReadOnlyCollection<TypePair> IncludedDerivedTypes => (_details?.IncludedDerivedTypes).NullCheck();
     public IReadOnlyCollection<TypePair> IncludedBaseTypes => (_details?.IncludedBaseTypes).NullCheck();
