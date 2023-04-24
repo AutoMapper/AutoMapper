@@ -442,6 +442,13 @@ public class When_reverse_mapping_classes_with_simple_properties : AutoMapperSpe
     {
         _source.Value.ShouldBe(10);
     }
+    
+    [Fact]
+    public void Should_not_initialize_details_on_initial_mapping()
+    {
+        var map = FindTypeMapFor<Source, Destination>();
+        map.HasDetails.ShouldBeFalse();
+    }
 }
 
 public class When_validating_only_against_source_members_and_source_matches : AutoMapperSpecBase
