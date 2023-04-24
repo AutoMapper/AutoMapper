@@ -674,3 +674,30 @@ public class When_reverse_mapping_open_generics_with_MapFrom : AutoMapperSpecBas
         source.StringValue.ShouldBe("StringValue2");
     }
 }
+
+public class When_validating_reverse_mapping_classes_with_missing_properties : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public int SomeValue { get; set; }
+        public int SomeValue2 { get; set; }
+    }
+
+    public class Destination
+    {
+        public int SomeValue { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>(MemberList.Destination)
+           .ReverseMap()
+           .ValidateMemberList(MemberList.Destination);
+    });
+
+    [Fact]
+    public void Should_throw_a_configuration_validation_error()
+    {
+        typeof(AutoMapperConfigurationException).ShouldBeThrownBy(AssertConfigurationIsValid);
+    }
+}
