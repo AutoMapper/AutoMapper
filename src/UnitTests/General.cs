@@ -441,5 +441,31 @@ namespace AutoMapper.UnitTests
                 _dest.Value.Item2.ShouldBe(11);
             }
         }
+
+        public class When_mapping_dto_with_default_validation : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public string Value { get; set; }
+            }
+
+            public class Destination
+            {
+                public string Value { get; set; }
+            }
+
+            protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+            });
+
+            [Fact]
+            public void Should_not_initialize_details()
+            {
+                TypeMap map;
+                map = FindTypeMapFor<Source, Destination>();
+                map.HasDetails.ShouldBeFalse();
+            }
+        }
     }
 }
