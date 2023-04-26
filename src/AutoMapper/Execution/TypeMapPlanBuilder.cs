@@ -109,7 +109,7 @@ public ref struct TypeMapPlanBuilder
             }
             if (typeMapsPath.Contains(memberTypeMap))
             {
-                if (memberTypeMap.SourceType.IsValueType)
+                if (memberTypeMap.SourceType.IsValueType || memberTypeMap.DestinationType.IsValueType)
                 {
                     if (memberTypeMap.MaxDepth == 0)
                     {
