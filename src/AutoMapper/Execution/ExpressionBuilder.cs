@@ -362,10 +362,10 @@ public static class ExpressionBuilder
         return newLambda;
     }
     public static Expression Replace(this Expression exp, Expression old, Expression replace) => new ReplaceVisitor().Replace(exp, old, replace);
-    public static Expression NullCheck(this Expression expression, IGlobalConfiguration configuration, MemberMap memberMap = null, Expression defaultValue = null)
+    public static Expression NullCheck(this Expression expression, IGlobalConfiguration configuration, MemberMap memberMap = null, Expression defaultValue = null, IncludedMember includedMember = null)
     {
         var chain = expression.GetChain();
-        var min = memberMap?.IncludedMember == null ? 2 : 1;
+        var min = (includedMember ?? memberMap?.IncludedMember) == null ? 2 : 1;
         if (chain.Count < min || chain.Peek().Target is not ParameterExpression parameter)
         {
             return expression;
