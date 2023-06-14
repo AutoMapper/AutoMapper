@@ -64,7 +64,10 @@ public class ProjectionBuilder : IProjectionBuilder
     QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap, TypeMap[] polymorphicMaps)
     {
         var instanceParameter = Parameter(request.SourceType, "dto" + request.SourceType.Name);
-        var projection = CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
+        var projection = !typeMap.DestinationType.IsAbstract
+            ? CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps)
+            : Default(typeMap.DestinationType);
+
         foreach(var derivedMap in polymorphicMaps)
         {
             var sourceType = derivedMap.SourceType;
