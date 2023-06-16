@@ -6,7 +6,7 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<Step> Steps { get; set; } = new HashSet<Step>();
+        public virtual List<Step> Steps { get; set; } = new();
     }
     public abstract class Step
     {
@@ -17,12 +17,13 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     }
     public class CheckingStep : Step { }
     public class InstructionStep : Step { }
+    public abstract class AbstractStep : Step { }
 
     public class StepGroupModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<StepModel> Steps { get; set; } = new HashSet<StepModel>();
+        public List<StepModel> Steps { get; set; } = new();
     }
     public abstract class StepModel
     {
@@ -31,6 +32,7 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     }
     public class CheckingStepModel : StepModel { }
     public class InstructionStepModel : StepModel { }
+    public abstract class AbstractStepModel : StepModel { }
 
     public class Context : LocalDbContext
     {
@@ -62,6 +64,8 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
                 .IncludeBase<Step, StepModel>();
             cfg.CreateMap<InstructionStep, InstructionStepModel>()
                 .IncludeBase<Step, StepModel>();
+            cfg.CreateMap<AbstractStep, AbstractStepModel>()
+                .IncludeBase<Step, StepModel>();
         });
     }
 
@@ -92,12 +96,9 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     [Fact]
     public void ProjectCollectionWithElementInheritingAbstractClass()
     {
-        using (var context = new Context())
-        {
-            var stepGroups = ProjectTo<StepGroupModel>(context.StepGroups).First();
-
-            stepGroups.ShouldNotBeNull();
-            stepGroups.Steps.ShouldNotBeEmpty();
-        }
+        using var context = new Context();
+        var steps = ProjectTo<StepGroupModel>(context.StepGroups).Single().Steps;
+        steps[0].ShouldBeOfType<CheckingStepModel>().Name.ShouldBe("CheckingStep");
+        steps[1].ShouldBeOfType<InstructionStepModel>().Name.ShouldBe("InstructionStep");
     }
 }

@@ -54,7 +54,8 @@ public class ProjectionBuilder : IProjectionBuilder
     private (TypeMap, TypeMap[]) GetPolymorphicMaps(in ProjectionRequest request)
     {
         var typeMap = _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
-        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes.Where(tp => tp.SourceType != typeMap.SourceType).DistinctBy(tp => tp.SourceType).ToArray()));
+        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes
+            .Where(tp => tp.SourceType != typeMap.SourceType && !tp.DestinationType.IsAbstract).DistinctBy(tp => tp.SourceType).ToArray()));
     }
     public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
     {
@@ -64,10 +65,9 @@ public class ProjectionBuilder : IProjectionBuilder
     QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap, TypeMap[] polymorphicMaps)
     {
         var instanceParameter = Parameter(request.SourceType, "dto" + request.SourceType.Name);
-        var projection = !typeMap.DestinationType.IsAbstract
-            ? CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps)
-            : Default(typeMap.DestinationType);
-
+        var destinationType = typeMap.DestinationType;
+        var projection = polymorphicMaps.Length > 0 && destinationType.IsAbstract ? 
+            Default(destinationType) : CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
         foreach(var derivedMap in polymorphicMaps)
         {
             var sourceType = derivedMap.SourceType;
