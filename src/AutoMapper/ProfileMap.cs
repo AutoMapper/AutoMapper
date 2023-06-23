@@ -61,11 +61,11 @@ public class ProfileMap
             _openTypeMapConfigs = new(profile.OpenTypeMapConfigs.Count);
             foreach (var openTypeMapConfig in profile.OpenTypeMapConfigs)
             {
-                _openTypeMapConfigs.Add(openTypeMapConfig.Types, openTypeMapConfig);
+                _openTypeMapConfigs.TryAdd(openTypeMapConfig.Types, openTypeMapConfig);
                 var reverseMap = openTypeMapConfig.ReverseTypeMap;
                 if (reverseMap != null)
                 {
-                    _openTypeMapConfigs.Add(reverseMap.Types, reverseMap);
+                    _openTypeMapConfigs.TryAdd(reverseMap.Types, reverseMap);
                 }
             }
         }
