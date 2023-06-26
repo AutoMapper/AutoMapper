@@ -457,6 +457,10 @@ public class TypeMap
             {
                 ApplyInheritedPropertyMaps(inheritedTypeMap, thisMap);
             }
+            if (inheritedTypeMap.ConstructorMap != null)
+            {
+                ApplyInheritedConstructorMaps(inheritedTypeMap, thisMap);
+            }
             var inheritedDetails = inheritedTypeMap._details;
             if (inheritedDetails == null)
             {
@@ -495,6 +499,62 @@ public class TypeMap
                     {
                         thisMap.AddPropertyMap(new(inheritedMappedProperty, thisMap));
                     }
+                }
+            }
+            void ApplyInheritedConstructorMaps(TypeMap inheritedTypeMap, TypeMap thisMap)
+            {
+                if (thisMap.ConstructorMap != null && thisMap.ConstructorMap.CanResolve)
+                {
+                    return;
+                }
+
+                ConstructorMap ctorMap = new();
+                foreach (var destCtor in thisMap.DestinationConstructors)
+                {
+                    var constructor = destCtor.Constructor;
+                    ctorMap.Reset(constructor);
+                    bool canMapResolve = true;
+                    foreach (var parameter in destCtor.Parameters)
+                    {
+                        var name = parameter.Name;
+                        if (name == null)
+                        {
+                            ctorMap.CanResolve = false;
+                            return;
+                        }
+                        var inheritedParameterMap = inheritedTypeMap.ConstructorMap[name];
+                        if (inheritedParameterMap != null)
+                        {
+                            ctorMap.AddParameter(inheritedParameterMap.Parameter, inheritedParameterMap.SourceMembers, thisMap);
+                            continue;
+                        }
+                        var thisParameterMap = thisMap.ConstructorMap[name];
+                        if (thisParameterMap != null)
+                        {
+                            ctorMap.AddParameter(thisParameterMap.Parameter, thisParameterMap.SourceMembers, thisMap);
+                            continue;
+                        }
+                        List<MemberInfo> sourceMembers = new();
+                        if (thisMap.Profile.MapDestinationPropertyToSource(thisMap.SourceTypeDetails, constructor.DeclaringType, parameter.ParameterType, name, sourceMembers, false))
+                        {
+                            ctorMap.AddParameter(parameter, sourceMembers, thisMap);
+                            continue;
+                        }
+
+                        if (!parameter.IsOptional)
+                        {
+                            canMapResolve = false;
+                        }
+                    }
+                    if (canMapResolve)
+                    {
+                        ctorMap.CanResolve = true;
+                        break;
+                    }
+                }
+                if (ctorMap.CanResolve) 
+                { 
+                    thisMap.ConstructorMap = ctorMap;
                 }
             }
             void ApplyInheritedSourceMembers(TypeMapDetails inheritedTypeMap)

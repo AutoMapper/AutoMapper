@@ -27,6 +27,27 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
         public string SubString { get; set; }
     }
 
+    public record class RecordObject(string DifferentBaseString)
+    {
+    }
+
+    public record class RecordSubObject(string DifferentBaseString, string SubString) : RecordObject(DifferentBaseString)
+    {
+    }
+
+    public record class RecordSubObjectWithExtraParam(string DifferentBaseString, string SubString, string ExtraString) : RecordObject(DifferentBaseString)
+    {
+    }
+
+    public record class RecordOtherObject(string BaseString)
+    {
+    }
+
+    public record class RecordOtherSubObject(string BaseString, string SubString) : RecordOtherObject(BaseString)
+    {
+    }
+
+
     [Fact]
     public void included_mapping_should_inherit_base_mappings_should_not_throw()
     {
@@ -319,6 +340,22 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
         var dest = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject());
 
         dest.BaseString.ShouldBe("12345");
+    }
+
+    [Fact]
+    public void included_mapping_should_inherit_base_constructor_mappings_should_not_throw()
+    {
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<RecordOtherObject, RecordObject>()
+                .ForCtorParam(nameof(RecordObject.DifferentBaseString), m => m.MapFrom(s => s.BaseString))
+                .Include<RecordOtherSubObject, RecordSubObject>()
+                .Include<RecordOtherSubObject, RecordSubObjectWithExtraParam>();
+            cfg.CreateMap<RecordOtherSubObject, RecordSubObject>();
+            cfg.CreateMap<RecordOtherSubObject, RecordSubObjectWithExtraParam>()
+                .ForCtorParam(nameof(RecordSubObjectWithExtraParam.ExtraString), m => m.MapFrom(s => s.BaseString + s.SubString));
+        });
+        config.AssertConfigurationIsValid();
     }
 }
 
