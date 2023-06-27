@@ -347,6 +347,7 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
     {
         var config = new MapperConfiguration(cfg =>
         {
+            cfg.ShouldUseConstructor = constructor => constructor.IsPublic;
             cfg.CreateMap<RecordOtherObject, RecordObject>()
                 .ForCtorParam(nameof(RecordObject.DifferentBaseString), m => m.MapFrom(s => s.BaseString))
                 .Include<RecordOtherSubObject, RecordSubObject>()
