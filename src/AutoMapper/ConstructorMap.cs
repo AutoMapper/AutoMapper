@@ -66,6 +66,31 @@ public class ConstructorMap
         }
         return canResolve;
     }
+    public void ApplyInheritedMap(TypeMap inheritedTypeMap)
+    {
+        var inheritedMap = inheritedTypeMap.ConstructorMap;
+        if (CanResolve)
+        {
+            return;
+        }
+        bool canResolve = true;
+        for (int index = 0; index < _ctorParams.Count; index++)
+        {
+            var thisParam = _ctorParams[index];
+            if (thisParam.CanResolveValue)
+            {
+                continue;
+            }
+            var inheritedParam = inheritedMap[thisParam.DestinationName];
+            if (inheritedParam == null || !inheritedParam.CanResolveValue)
+            {
+                canResolve = false;
+                continue;
+            }
+            _ctorParams[index] = new(inheritedTypeMap, inheritedParam.Parameter, inheritedParam.SourceMembers);
+        }
+        _canResolve = canResolve;
+    }
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class ConstructorParameterMap : MemberMap
