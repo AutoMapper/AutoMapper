@@ -459,7 +459,7 @@ public class TypeMap
             }
             if (inheritedTypeMap.ConstructorMap != null)
             {
-                thisMap.ConstructorMap?.ApplyInheritedMap(inheritedTypeMap);
+                thisMap.ConstructorMap?.ApplyInheritedMap(inheritedTypeMap, thisMap);
             }
             var inheritedDetails = inheritedTypeMap._details;
             if (inheritedDetails == null)

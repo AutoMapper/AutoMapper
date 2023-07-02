@@ -35,10 +35,6 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
     {
     }
 
-    public record class RecordSubObjectWithExtraParam(string DifferentBaseString, string SubString, string ExtraString) : RecordObject(DifferentBaseString)
-    {
-    }
-
     public record class RecordOtherObject(string BaseString)
     {
     }
@@ -47,6 +43,49 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
     {
     }
 
+    public record class RecordOtherSubObjectWithExtraParam(string BaseString, string SubString, string ExtraString) : RecordOtherObject(BaseString)
+    {
+    }
+
+    public class ModelObjectWithConstructor
+    {
+        public ModelObjectWithConstructor(string onePrime)
+        {
+            OnePrime = onePrime;
+        }
+
+        public string OnePrime { get; }
+    }
+
+    public class ModelSubObjectWithConstructor : ModelObjectWithConstructor
+    {
+        public ModelSubObjectWithConstructor(string onePrime, string two) : base(onePrime)
+        {
+            Two = two;
+        }
+
+        public string Two { get; }
+    }
+
+    public class DtoObjectWithConstructor
+    {
+        public DtoObjectWithConstructor(string one)
+        {
+            One = one;
+        }
+
+        public string One { get; }
+    }
+
+    public class DtoSubObjectWithConstructorAndWrongType : DtoObjectWithConstructor
+    {
+        public DtoSubObjectWithConstructorAndWrongType(int one, string two) : base(one.ToString())
+        {
+            Two = two;
+        }
+
+        public string Two { get; }
+    }
 
     [Fact]
     public void included_mapping_should_inherit_base_mappings_should_not_throw()
@@ -348,15 +387,36 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
         var config = new MapperConfiguration(cfg =>
         {
             cfg.ShouldUseConstructor = constructor => constructor.IsPublic;
-            cfg.CreateMap<RecordOtherObject, RecordObject>()
-                .ForCtorParam(nameof(RecordObject.DifferentBaseString), m => m.MapFrom(s => s.BaseString))
-                .Include<RecordOtherSubObject, RecordSubObject>()
-                .Include<RecordOtherSubObject, RecordSubObjectWithExtraParam>();
-            cfg.CreateMap<RecordOtherSubObject, RecordSubObject>();
-            cfg.CreateMap<RecordOtherSubObject, RecordSubObjectWithExtraParam>()
-                .ForCtorParam(nameof(RecordSubObjectWithExtraParam.ExtraString), m => m.MapFrom(s => s.BaseString + s.SubString));
+            cfg.CreateMap<RecordObject, RecordOtherObject>()
+                .ForCtorParam(nameof(RecordOtherObject.BaseString), m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<RecordSubObject, RecordOtherSubObject>()
+                .Include<RecordSubObject, RecordOtherSubObjectWithExtraParam>();
+            cfg.CreateMap<RecordSubObject, RecordOtherSubObject>();
+            cfg.CreateMap<RecordSubObject, RecordOtherSubObjectWithExtraParam>()
+                .ForCtorParam(nameof(RecordOtherSubObjectWithExtraParam.ExtraString), m => m.MapFrom(s => s.DifferentBaseString + s.SubString));
         });
         config.AssertConfigurationIsValid();
+
+        var mapper = config.CreateMapper();
+        var dest = mapper.Map<RecordOtherSubObjectWithExtraParam>(new RecordSubObject("base", "sub"));
+
+        dest.BaseString.ShouldBe("base");
+        dest.SubString.ShouldBe("sub");
+        dest.ExtraString.ShouldBe("basesub");
+    }
+
+    [Fact]
+    public void included_mapping_with_parameter_has_same_name_but_diffent_type_should_throw()
+    {
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<ModelObjectWithConstructor, DtoObjectWithConstructor>()
+                .ForCtorParam("one", m => m.MapFrom(s => s.OnePrime))
+                .Include<ModelSubObjectWithConstructor, DtoSubObjectWithConstructorAndWrongType>();
+            cfg.CreateMap<ModelSubObjectWithConstructor, DtoSubObjectWithConstructorAndWrongType>();
+        });
+
+        Assert.Throws<AutoMapperConfigurationException>(config.AssertConfigurationIsValid);
     }
 }
 

@@ -66,9 +66,8 @@ public class ConstructorMap
         }
         return canResolve;
     }
-    public void ApplyInheritedMap(TypeMap inheritedTypeMap)
+    public void ApplyInheritedMap(TypeMap inheritedMap, TypeMap thisMap)
     {
-        var inheritedMap = inheritedTypeMap.ConstructorMap;
         if (CanResolve)
         {
             return;
@@ -81,13 +80,13 @@ public class ConstructorMap
             {
                 continue;
             }
-            var inheritedParam = inheritedMap[thisParam.DestinationName];
-            if (inheritedParam == null || !inheritedParam.CanResolveValue)
+            var inheritedParam = inheritedMap.ConstructorMap[thisParam.DestinationName];
+            if (inheritedParam == null || !inheritedParam.CanResolveValue || thisParam.DestinationType != inheritedParam.DestinationType)
             {
                 canResolve = false;
                 continue;
             }
-            _ctorParams[index] = new(inheritedTypeMap, inheritedParam.Parameter, inheritedParam.SourceMembers);
+            _ctorParams[index] = new(thisMap, inheritedParam);
         }
         _canResolve = canResolve;
     }
@@ -107,9 +106,14 @@ public class ConstructorParameterMap : MemberMap
             SourceMembers = Array.Empty<MemberInfo>();
         }
     }
-    public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : 
+    public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) :
         this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers) =>
         IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
+    public ConstructorParameterMap(TypeMap typeMap, ConstructorParameterMap inheritedParameterMap) : base(typeMap)
+    {
+        Parameter = inheritedParameterMap.Parameter;
+        Resolver = inheritedParameterMap.Resolver;
+    }
     public ParameterInfo Parameter { get; }
     public override Type DestinationType => Parameter.ParameterType;
     public override IncludedMember IncludedMember { get; }
