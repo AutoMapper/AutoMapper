@@ -458,6 +458,10 @@ public class TypeMap
             {
                 ApplyInheritedPropertyMaps(inheritedTypeMap, thisMap);
             }
+            if (inheritedTypeMap.ConstructorMap != null)
+            {
+                thisMap.ConstructorMap?.ApplyInheritedMap(inheritedTypeMap, thisMap);
+            }
             var inheritedDetails = inheritedTypeMap._details;
             if (inheritedDetails == null)
             {
