@@ -416,7 +416,7 @@ public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
             cfg.CreateMap<ModelSubObjectWithConstructor, DtoSubObjectWithConstructorAndWrongType>();
         });
 
-        Assert.Throws<AutoMapperConfigurationException>(config.AssertConfigurationIsValid);
+        Assert.Throws<AutoMapperConfigurationException>(config.AssertConfigurationIsValid).Errors.Single().CanConstruct.ShouldBeFalse();
     }
 }
 
