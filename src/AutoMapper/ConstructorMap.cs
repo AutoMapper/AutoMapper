@@ -106,14 +106,11 @@ public class ConstructorParameterMap : MemberMap
             SourceMembers = Array.Empty<MemberInfo>();
         }
     }
-    public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) :
-        this(includedMember.TypeMap, parameterMap.Parameter, parameterMap.SourceMembers) =>
+    public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : this(includedMember.TypeMap, parameterMap) =>
         IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
-    public ConstructorParameterMap(TypeMap typeMap, ConstructorParameterMap inheritedParameterMap) : base(typeMap)
-    {
-        Parameter = inheritedParameterMap.Parameter;
+    public ConstructorParameterMap(TypeMap typeMap, ConstructorParameterMap inheritedParameterMap) : 
+        this(typeMap, inheritedParameterMap.Parameter, inheritedParameterMap.SourceMembers) =>
         Resolver = inheritedParameterMap.Resolver;
-    }
     public ParameterInfo Parameter { get; }
     public override Type DestinationType => Parameter.ParameterType;
     public override IncludedMember IncludedMember { get; }
