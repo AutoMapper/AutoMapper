@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-namespace AutoMapper.Configuration;
-
+﻿namespace AutoMapper.Configuration;
 public interface ICtorParamConfigurationExpression
 {
     /// <summary>

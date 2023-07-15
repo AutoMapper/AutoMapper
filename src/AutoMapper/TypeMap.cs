@@ -429,7 +429,7 @@ public class TypeMap
                 .Select(p => new PropertyMap(p, thisMap, includedMember))
                 .ToArray();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            var appliedConstructorMap = thisMap.ConstructorMap?.ApplyIncludedMember(includedMember);
+            var appliedConstructorMap = thisMap.ConstructorMap?.ApplyMap(typeMap, includedMember);
             if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0 && appliedConstructorMap is not true)
             {
                 return;
@@ -458,10 +458,7 @@ public class TypeMap
             {
                 ApplyInheritedPropertyMaps(inheritedTypeMap, thisMap);
             }
-            if (inheritedTypeMap.ConstructorMap != null)
-            {
-                thisMap.ConstructorMap?.ApplyInheritedMap(inheritedTypeMap, thisMap);
-            }
+            thisMap.ConstructorMap?.ApplyMap(inheritedTypeMap);
             var inheritedDetails = inheritedTypeMap._details;
             if (inheritedDetails == null)
             {

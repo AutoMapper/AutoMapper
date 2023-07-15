@@ -1,5 +1,3 @@
-using System.Security.AccessControl;
-
 namespace AutoMapper;
 /// <summary>
 /// The base class for member maps (property, constructor and path maps).
@@ -22,12 +20,12 @@ public class MemberMap : IValueResolver
     }
     public virtual Type SourceType => _sourceType ??= GetSourceType();
     public virtual MemberInfo[] SourceMembers { get => Array.Empty<MemberInfo>(); set { } }
-    public virtual IncludedMember IncludedMember => null;
+    public virtual IncludedMember IncludedMember { get => default; protected set { } }
     public virtual string DestinationName => default;
     public virtual Type DestinationType { get => default; protected set { } }
     public virtual TypePair Types() => new(SourceType, DestinationType);
     public bool CanResolveValue => !Ignored && Resolver != null;
-    public bool IsMapped => Ignored || CanResolveValue;
+    public bool IsMapped => Ignored || Resolver != null;
     public virtual bool Ignored { get => default; set { } }
     public virtual bool? ExplicitExpansion { get => default; set { } }
     public virtual bool Inline { get; set; } = true;
@@ -64,6 +62,31 @@ public class MemberMap : IValueResolver
         Debug.Assert(sourceMembers.Length > 0);
         SourceMembers = sourceMembers;
         Resolver = this;
+    }
+    protected bool ApplyInheritedMap(MemberMap inheritedMap)
+    {
+        if(Ignored || IsResolveConfigured)
+        {
+            return false;
+        }
+        if(inheritedMap.Ignored)
+        {
+            Ignored = true;
+            return true;
+        }
+        if(inheritedMap.IsResolveConfigured)
+        {
+            _sourceType = inheritedMap._sourceType;
+            Resolver = inheritedMap.Resolver.CloseGenerics(TypeMap);
+            return true;
+        }
+        if(Resolver == null)
+        {
+            _sourceType = inheritedMap._sourceType;
+            MapByConvention(inheritedMap.SourceMembers);
+            return true;
+        }
+        return false;
     }
     Expression IValueResolver.GetExpression(IGlobalConfiguration configuration, MemberMap memberMap, Expression source, Expression destination, Expression destinationMember) =>
         ChainSourceMembers(configuration, source, destinationMember);

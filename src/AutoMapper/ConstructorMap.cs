@@ -17,11 +17,11 @@ public class ConstructorMap
         get => _canResolve ??= ParametersCanResolve();
         set => _canResolve = value;
     }
-    private bool ParametersCanResolve()
+    bool ParametersCanResolve()
     {
         foreach (var param in _ctorParams)
         {
-            if (!param.CanResolveValue)
+            if (!param.IsMapped)
             {
                 return false;
             }
@@ -42,53 +42,26 @@ public class ConstructorMap
             return null;
         }
     }
-    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap) =>
-        _ctorParams.Add(new(typeMap, parameter, sourceMembers.ToArray()));
-    public bool ApplyIncludedMember(IncludedMember includedMember)
+    public void AddParameter(ParameterInfo parameter, IEnumerable<MemberInfo> sourceMembers, TypeMap typeMap) => _ctorParams.Add(new(typeMap, parameter, sourceMembers.ToArray()));
+    public bool ApplyMap(TypeMap typeMap, IncludedMember includedMember = null)
     {
-        var includedMap = includedMember.TypeMap.ConstructorMap;
-        if (CanResolve || includedMap?.Ctor != Ctor)
+        var constructorMap = typeMap.ConstructorMap;
+        if(constructorMap == null)
         {
             return false;
         }
-        bool canResolve = false;
-        var includedParams = includedMap._ctorParams;
-        for(int index = 0; index < includedParams.Count; index++)
+        bool applied = false;
+        foreach(var parameterMap in _ctorParams)
         {
-            var includedParam = includedParams[index];
-            if (!includedParam.CanResolveValue || _ctorParams[index].CanResolveValue)
+            var inheritedParameterMap = constructorMap[parameterMap.DestinationName];
+            if(inheritedParameterMap is not { IsMapped: true, DestinationType: var type } || type != parameterMap.DestinationType || !parameterMap.ApplyMap(inheritedParameterMap, includedMember))
             {
                 continue;
             }
-            canResolve = true;
+            applied = true;
             _canResolve = null;
-            _ctorParams[index] = new(includedParam, includedMember);
         }
-        return canResolve;
-    }
-    public void ApplyInheritedMap(TypeMap inheritedMap, TypeMap thisMap)
-    {
-        if (CanResolve)
-        {
-            return;
-        }
-        bool canResolve = true;
-        for (int index = 0; index < _ctorParams.Count; index++)
-        {
-            var thisParam = _ctorParams[index];
-            if (thisParam.CanResolveValue)
-            {
-                continue;
-            }
-            var inheritedParam = inheritedMap.ConstructorMap[thisParam.DestinationName];
-            if (inheritedParam == null || !inheritedParam.CanResolveValue || thisParam.DestinationType != inheritedParam.DestinationType)
-            {
-                canResolve = false;
-                continue;
-            }
-            _ctorParams[index] = new(thisMap, inheritedParam);
-        }
-        _canResolve = canResolve;
+        return applied;
     }
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -106,18 +79,26 @@ public class ConstructorParameterMap : MemberMap
             SourceMembers = Array.Empty<MemberInfo>();
         }
     }
-    public ConstructorParameterMap(ConstructorParameterMap parameterMap, IncludedMember includedMember) : this(includedMember.TypeMap, parameterMap) =>
-        IncludedMember = includedMember.Chain(parameterMap.IncludedMember);
-    public ConstructorParameterMap(TypeMap typeMap, ConstructorParameterMap inheritedParameterMap) : 
-        this(typeMap, inheritedParameterMap.Parameter, inheritedParameterMap.SourceMembers) =>
-        Resolver = inheritedParameterMap.Resolver;
     public ParameterInfo Parameter { get; }
     public override Type DestinationType => Parameter.ParameterType;
-    public override IncludedMember IncludedMember { get; }
+    public override IncludedMember IncludedMember { get; protected set; }
     public override MemberInfo[] SourceMembers { get; set; }
     public override string DestinationName => Parameter.Name;
     public Expression DefaultValue(IGlobalConfiguration configuration) => Parameter.IsOptional ? Parameter.GetDefaultValue(configuration) : configuration.Default(DestinationType);
-    public override string ToString() => $"{Constructor}, parameter {DestinationName}";
-    private MemberInfo Constructor => Parameter.Member;
+    public override string ToString() => $"{Parameter.Member}, parameter {DestinationName}";
+    public bool ApplyMap(ConstructorParameterMap inheritedParameterMap, IncludedMember includedMember)
+    {
+        if(includedMember != null && IsMapped)
+        {
+            return false;
+        }
+        ExplicitExpansion ??= inheritedParameterMap.ExplicitExpansion;
+        if(ApplyInheritedMap(inheritedParameterMap))
+        {
+            IncludedMember = includedMember?.Chain(inheritedParameterMap.IncludedMember);
+            return true;
+        }
+        return false;
+    }
     public override bool? ExplicitExpansion { get; set; }
 }

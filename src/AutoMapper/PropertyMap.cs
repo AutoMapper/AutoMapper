@@ -33,33 +33,12 @@ public class PropertyMap : MemberMap
     public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
     public override bool CanBeSet => DestinationMember.CanBeSet();
     public override bool Ignored { get; set; }
-    public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
+    public void ApplyInheritedPropertyMap(PropertyMap inheritedMap)
     {
-        if (Ignored)
+        ApplyInheritedMap(inheritedMap);
+        if (!Ignored && inheritedMap._details != null)
         {
-            return;
-        }
-        if (!IsResolveConfigured)
-        {
-            if (inheritedMappedProperty.Ignored)
-            {
-                Ignored = true;
-                return;
-            }
-            if (inheritedMappedProperty.IsResolveConfigured)
-            {
-                _sourceType = inheritedMappedProperty._sourceType;
-                Resolver = inheritedMappedProperty.Resolver.CloseGenerics(TypeMap);
-            }
-            else if (Resolver == null)
-            {
-                _sourceType = inheritedMappedProperty._sourceType;
-                MapByConvention(inheritedMappedProperty.SourceMembers);
-            }
-        }
-        if (inheritedMappedProperty._details != null)
-        {
-            Details.ApplyInheritedPropertyMap(inheritedMappedProperty._details);
+            Details.ApplyInheritedPropertyMap(inheritedMap._details);
         }
     }
     public override IncludedMember IncludedMember => _details?.IncludedMember;
