@@ -47,39 +47,42 @@ public class ProjectionBuilder : IProjectionBuilder
     }
     private QueryExpressions CreateProjection(ProjectionRequest request)
     {
-        var (typeMap, polymorphicMaps) = GetPolymorphicMaps(request);
+        var (typeMap, polymorphicMaps) = PolymorphicMaps(request);
         var letPropertyMaps = polymorphicMaps.Length > 0 ? new LetPropertyMaps(_configuration, MemberPath.Empty, new()) : new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, new());
         return CreateProjection(request, letPropertyMaps, typeMap, polymorphicMaps);
     }
-    private (TypeMap, TypeMap[]) GetPolymorphicMaps(in ProjectionRequest request)
+    private (TypeMap, TypeMap[]) PolymorphicMaps(in ProjectionRequest request)
     {
         var typeMap = _configuration.ResolveTypeMap(request.SourceType, request.DestinationType) ?? throw TypeMap.MissingMapException(request.SourceType, request.DestinationType);
-        return (typeMap, _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes
-            .Where(tp => tp.SourceType != typeMap.SourceType && !tp.DestinationType.IsAbstract).DistinctBy(tp => tp.SourceType).ToArray()));
+        return (typeMap, PolymorphicMaps(typeMap));
     }
+    TypeMap[] PolymorphicMaps(TypeMap typeMap) => _configuration.GetIncludedTypeMaps(typeMap.IncludedDerivedTypes
+        .Where(tp => tp.SourceType != typeMap.SourceType && !tp.DestinationType.IsAbstract).DistinctBy(tp => tp.SourceType).ToArray());
     public QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps)
     {
-        var (typeMap, polymorphicMaps) = GetPolymorphicMaps(request);
+        var (typeMap, polymorphicMaps) = PolymorphicMaps(request);
         return CreateProjection(request, letPropertyMaps, typeMap, polymorphicMaps);
     }
     QueryExpressions CreateProjection(in ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap, TypeMap[] polymorphicMaps)
     {
         var instanceParameter = Parameter(request.SourceType, "dto" + request.SourceType.Name);
+        var projection = CreateProjectionCore(request, letPropertyMaps, typeMap, polymorphicMaps, instanceParameter);
+        return letPropertyMaps.Count > 0 ? letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) : new(projection, instanceParameter);
+    }
+    Expression CreateProjectionCore(ProjectionRequest request, LetPropertyMaps letPropertyMaps, TypeMap typeMap, TypeMap[] polymorphicMaps, Expression source)
+    {
         var destinationType = typeMap.DestinationType;
-        var projection = polymorphicMaps.Length > 0 && destinationType.IsAbstract ? 
-            Default(destinationType) : CreateProjectionCore(request, instanceParameter, typeMap, letPropertyMaps);
+        var projection = (polymorphicMaps.Length > 0 && destinationType.IsAbstract) ? Default(destinationType) : CreateProjectionCore(request, source, typeMap, letPropertyMaps);
         foreach(var derivedMap in polymorphicMaps)
         {
             var sourceType = derivedMap.SourceType;
             var derivedRequest = request.InnerRequest(sourceType, derivedMap.DestinationType);
-            var derivedProjection = CreateProjectionCore(derivedRequest, Convert(instanceParameter, sourceType), derivedMap, letPropertyMaps);
-            projection = Condition(TypeIs(instanceParameter, sourceType), derivedProjection, projection, projection.Type);
+            var derivedProjection = CreateProjectionCore(derivedRequest, Convert(source, sourceType), derivedMap, letPropertyMaps);
+            projection = Condition(TypeIs(source, sourceType), derivedProjection, projection, projection.Type);
         }
-        return letPropertyMaps.Count > 0 ?
-            letPropertyMaps.GetSubQueryExpression(this, projection, typeMap, request, instanceParameter) :
-            new(projection, instanceParameter);
+        return projection;
     }
-    private Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
+    Expression CreateProjectionCore(ProjectionRequest request, Expression instanceParameter, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
     {
         var customProjection = typeMap.CustomMapExpression?.ReplaceParameters(instanceParameter);
         if (customProjection != null)
@@ -143,7 +146,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 Expression mappedExpression;
                 if (memberTypeMap != null)
                 {
-                    mappedExpression = CreateProjectionCore(memberRequest, resolvedSource, memberTypeMap, letPropertyMaps);
+                    mappedExpression = CreateProjectionCore(memberRequest, letPropertyMaps, memberTypeMap, PolymorphicMaps(memberTypeMap), resolvedSource);
                     if (mappedExpression != null && memberTypeMap.CustomMapExpression == null && memberMap.AllowsNullDestinationValues && 
                         resolvedSource is not ParameterExpression && !resolvedSource.Type.IsCollection())
                     {
