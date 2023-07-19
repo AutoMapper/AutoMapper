@@ -104,21 +104,20 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
                 {
                     new InstructionStep
                     {
-                        Name = "InstructionStep"
+                        Name = "InstructionStep",
+                        StepInputs = new List<StepInput>
+                        {
+                            new StepInput
+                            {
+                                Input = "Input"
+                            }
+                        }
                     },
                     new CheckingStep
                     {
                         Name = "CheckingStep"
                     }
                 }
-            });
-
-            context.SaveChanges();
-
-            context.StepInputs.Add(new StepInput
-            {
-                StepId = 1,
-                Input = "Input"
             });
 
             base.Seed(context);
@@ -130,8 +129,8 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     {
         using var context = new Context();
         var steps = ProjectTo<StepGroupModel>(context.StepGroups).Single().Steps;
-        steps[0].ShouldBeOfType<CheckingStepModel>();
-        steps[1].ShouldBeOfType<InstructionStepModel>();
+        steps[0].ShouldBeOfType<CheckingStepModel>().Name.ShouldBe("CheckingStep");
+        steps[1].ShouldBeOfType<InstructionStepModel>().Name.ShouldBe("InstructionStep");
     }
 
     [Fact]
@@ -139,6 +138,6 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     {
         using var context = new Context();
         var stepInput = ProjectTo<StepInputModel>(context.StepInputs).Single();
-        stepInput.Step.ShouldBeOfType<InstructionStepModel>();
+        stepInput.Step.ShouldBeOfType<InstructionStepModel>().Name.ShouldBe("InstructionStep");
     }
 }
