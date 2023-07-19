@@ -14,11 +14,18 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
         public string Name { get; set; }
         public int StepGroupId { get; set; }
         public virtual StepGroup StepGroup { get; set; }
+        public virtual ICollection<StepInput> StepInputs { get; set; } = new HashSet<StepInput>();
     }
     public class CheckingStep : Step { }
     public class InstructionStep : Step { }
     public abstract class AbstractStep : Step { }
-
+    public class StepInput
+    {
+        public int Id { get; set; }
+        public int StepId { get; set; }
+        public string Input { get; set; }
+        public virtual Step Step { get; set; }
+    }
     public class StepGroupModel
     {
         public int Id { get; set; }
@@ -29,16 +36,26 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public ICollection<StepInputModel> StepInputs { get; set; } = new HashSet<StepInputModel>();
     }
     public class CheckingStepModel : StepModel { }
     public class InstructionStepModel : StepModel { }
     public abstract class AbstractStepModel : StepModel { }
+    public class StepInputModel
+    {
+        public int Id { get; set; }
+        public int StepId { get; set; }
+        public string Input { get; set; }
+        public StepModel Step { get; set; }
+    }
 
     public class Context : LocalDbContext
     {
         public DbSet<StepGroup> StepGroups { get; set; }
 
         public DbSet<Step> Steps { get; set; }
+
+        public DbSet<StepInput> StepInputs { get; set; }
 
         public DbSet<CheckingStep> CheckingSteps { get; set; }
 
@@ -50,6 +67,12 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
             {
                 entity.HasOne(d => d.StepGroup).WithMany(p => p.Steps)
                     .HasForeignKey(d => d.StepGroupId);
+            });
+
+            modelBuilder.Entity<StepInput>(entity =>
+            {
+                entity.HasOne(d => d.Step).WithMany(p => p.StepInputs)
+                    .HasForeignKey(d => d.StepId);
             });
         }
     }
@@ -66,6 +89,7 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
                 .IncludeBase<Step, StepModel>();
             cfg.CreateMap<AbstractStep, AbstractStepModel>()
                 .IncludeBase<Step, StepModel>();
+            cfg.CreateMap<StepInput, StepInputModel>();
         });
     }
 
@@ -80,7 +104,14 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
                 {
                     new InstructionStep
                     {
-                        Name = "InstructionStep"
+                        Name = "InstructionStep",
+                        StepInputs = new List<StepInput>
+                        {
+                            new StepInput
+                            {
+                                Input = "Input"
+                            }
+                        }
                     },
                     new CheckingStep
                     {
@@ -100,5 +131,13 @@ public class ProjectToAbstractTypeWithInheritance : IntegrationTest<ProjectToAbs
         var steps = ProjectTo<StepGroupModel>(context.StepGroups).Single().Steps;
         steps[0].ShouldBeOfType<CheckingStepModel>().Name.ShouldBe("CheckingStep");
         steps[1].ShouldBeOfType<InstructionStepModel>().Name.ShouldBe("InstructionStep");
+    }
+
+    [Fact]
+    public void ProjectIncludingPolymorphicElement()
+    {
+        using var context = new Context();
+        var stepInput = ProjectTo<StepInputModel>(context.StepInputs).Single();
+        stepInput.Step.ShouldBeOfType<InstructionStepModel>().Name.ShouldBe("InstructionStep");
     }
 }
