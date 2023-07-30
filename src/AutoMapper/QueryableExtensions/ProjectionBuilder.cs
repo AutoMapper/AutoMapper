@@ -378,37 +378,36 @@ public readonly record struct QueryExpressions(LambdaExpression Projection, Lamb
         }
     }
 }
-public class MemberProjection
+public record MemberProjection(MemberMap MemberMap)
 {
-    public MemberProjection(MemberMap memberMap) => MemberMap = memberMap;
     public Expression Expression { get; set; }
-    public MemberMap MemberMap { get; }
 }
 abstract class ParameterExpressionVisitor : ExpressionVisitor
 {
     public static Expression SetParameters(object parameters, Expression expression)
     {
-        var visitor = parameters is ParameterBag dictionary ? (ParameterExpressionVisitor)new ConstantExpressionReplacementVisitor(dictionary) : new ObjectParameterExpressionReplacementVisitor(parameters);
+        ParameterExpressionVisitor visitor = parameters is ParameterBag dictionary ? new ConstantExpressionReplacementVisitor(dictionary) : new ObjectParameterExpressionReplacementVisitor(parameters);
         return visitor.Visit(expression);
     }
     protected abstract Expression GetValue(string name);
     protected override Expression VisitMember(MemberExpression node)
     {
-        if (!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
+        var member = node.Member;
+        if (!member.DeclaringType.Has<CompilerGeneratedAttribute>())
         {
             return base.VisitMember(node);
         }
-        var parameterName = node.Member.Name;
+        var parameterName = member.Name;
         var parameterValue = GetValue(parameterName);
         if (parameterValue == null)
         {
             const string VbPrefix = "$VB$Local_";
-            if (!parameterName.StartsWith(VbPrefix, StringComparison.Ordinal) || (parameterValue = GetValue(parameterName.Substring(VbPrefix.Length))) == null)
+            if (!parameterName.StartsWith(VbPrefix, StringComparison.Ordinal) || (parameterValue = GetValue(parameterName[VbPrefix.Length..])) == null)
             {
                 return base.VisitMember(node);
             }
         }
-        return ToType(parameterValue, node.Member.GetMemberType());
+        return ToType(parameterValue, member.GetMemberType());
     }
     class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
     {
