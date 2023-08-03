@@ -9,7 +9,8 @@ public interface ICtorParamConfigurationExpression
     /// <summary>
     /// Ignore this member for LINQ projections unless explicitly expanded during projection
     /// </summary>
-    void ExplicitExpansion();
+    /// <param name="explicitExpansion">Is explicitExpansion active</param>
+    void ExplicitExpansion(Boolean explicitExpansion = true);
 }
 public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
 {
@@ -61,7 +62,7 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
 
-    public void ExplicitExpansion() => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = true);
+    public void ExplicitExpansion(Boolean explicitExpansion = true) => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = explicitExpansion);
 
     public void Configure(TypeMap typeMap)
     {
