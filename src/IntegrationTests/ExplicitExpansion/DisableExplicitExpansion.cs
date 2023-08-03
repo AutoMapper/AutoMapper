@@ -128,3 +128,29 @@ public class DisableExplicitExpansion : IntegrationTest<DisableExplicitExpansion
     }
 
 }
+
+public class ConstructorNoExplicitExpansion : IntegrationTest<ConstructorNoExplicitExpansion.DatabaseInitializer> {
+    public class Entity {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+    record Dto(string Name) { }
+    public class Context : LocalDbContext {
+        public DbSet<Entity> Entities { get; set; }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context> {
+        protected override void Seed(Context context) {
+            context.Entities.Add(new() { Name = "Name" });
+            base.Seed(context);
+        }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateProjection<Entity, Dto>().ForCtorParam("Name", o => o.ExplicitExpansion(false)));
+    [Fact]
+    public void Should_work() {
+        using var context = new Context();
+        var dto = ProjectTo<Dto>(context.Entities).Single();
+        dto.Name.ShouldBe("Name");
+        dto = ProjectTo<Dto>(context.Entities, null, d => d.Name).Single();
+        dto.Name.ShouldBe("Name");
+    }
+}
