@@ -796,3 +796,25 @@ public class When_configuring_a_resolver : AutoMapperSpecBase
     [Fact]
     public void Validate() => AssertConfigurationIsValid();
 }
+public class ObjectPropertyAndNestedTypes : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<RootLevel, RootLevelDto>());
+    public class RootLevel
+    {
+        public object ObjectProperty { get; set; }
+        public SecondLevel SecondLevel { get; set; }
+    }
+    public class RootLevelDto
+    {
+        public object ObjectProperty { get; set; }
+        public SecondLevelDto SecondLevel { get; set; }
+    }
+    public class SecondLevel
+    {
+    }
+    public class SecondLevelDto
+    {
+    }
+    [Fact]
+    public void Should_fail_validation() => new Action(AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>().MemberMap.DestinationName.ShouldBe(nameof(RootLevelDto.SecondLevel));
+}
