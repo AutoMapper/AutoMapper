@@ -10,14 +10,8 @@ public class DisableExplicitExpansion : IntegrationTest<DisableExplicitExpansion
         public String Name { get; set; }
         public String Code { get; set; }
     }
-    public class DtoWithoutOverride
+    public class Dto
     {
-        public String Name { get; set; }
-        public String Code { get; set; }
-        public Nullable<int> Desc { get; set; }
-    }
-
-    public class DtoWithOverride {
         public String Name { get; set; }
         public String Code { get; set; }
         public Nullable<int> Desc { get; set; }
@@ -55,72 +49,33 @@ public class DisableExplicitExpansion : IntegrationTest<DisableExplicitExpansion
 
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
     {
-        cfg.CreateMap<Source, DtoWithOverride>()
-            .ForMember(dto => dto.Desc, conf => conf.ExplicitExpansion())
-            .ForMember(dto => dto.Name, conf => conf.MapFrom(src => src.Name))
+        cfg.CreateMap<Source, Dto>()
             .ForMember(dto => dto.Code, conf => conf.ExplicitExpansion(false))
             .ForAllMembers(conf => conf.ExplicitExpansion())
-            ;
-
-        cfg.CreateMap<Source, DtoWithoutOverride>()
-            .ForMember(dto => dto.Desc, conf => conf.ExplicitExpansion())
-            .ForMember(dto => dto.Name, conf => conf.MapFrom(src => src.Name))
-            .ForMember(dto => dto.Code, conf => conf.ExplicitExpansion(false))
-            .ForAllMembers(conf => conf.ExplicitExpansion(overrideExpansion: false))
             ;});
 
     [Fact]
-    public void NoExplicitExpansion() {
+    public void Should_CodeBeExpanded() {
         using (var ctx = new Context()) {
-            var dto = ProjectTo<DtoWithOverride>(ctx.Sources).ToList().First();
+            var dto = ProjectTo<Dto>(ctx.Sources).ToList().First();
             var sqlSelect = ctx.GetLastSelectSqlLogEntry();
             sqlSelect.SqlFromShouldStartWith(nameof(ctx.Sources));
             sqlSelect.ShouldNotContain("JOIN");
 
             sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Name)); dto.Name.ShouldBeNull();
-            sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Code)); dto.Code.ShouldBeNull();
+            sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Code)); dto.Code.ShouldBe(_iqf.Code);
             sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc)); dto.Desc.ShouldBeNull();
         }
     }
 
     [Fact]
-    public void OnlyExplicitExpansionForCode()
-    {
-        using (var ctx = new Context())
-        {
-            var dto = ProjectTo<DtoWithoutOverride>(ctx.Sources).ToList().First();
+    public void Should_NameAndCodeBeExpanded() {
+        using (var ctx = new Context()) {
+            var dto = ProjectTo<Dto>(ctx.Sources, null, _ => _.Name).First();
             var sqlSelect = ctx.GetLastSelectSqlLogEntry();
             sqlSelect.SqlFromShouldStartWith(nameof(ctx.Sources));
             sqlSelect.ShouldNotContain("JOIN");
             
-            sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Name));   dto.Name.ShouldBeNull();
-            sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Code));      dto.Code.ShouldNotBeNull();
-            sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc));   dto.Desc.ShouldBeNull();
-        }
-    }
-
-    [Fact]
-    public void ProjectNoExplicit() {
-        using (var ctx = new Context()) {
-            var dto = ProjectTo<DtoWithOverride>(ctx.Sources, null, _ => _.Name).First();
-            var sqlSelect = ctx.GetLastSelectSqlLogEntry();
-            sqlSelect.SqlFromShouldStartWith(nameof(ctx.Sources));
-            sqlSelect.ShouldNotContain("JOIN");
-            
-            dto.Name.ShouldBe(_iqf.Name); sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Name));
-            dto.Code.ShouldBeNull(_iqf.Code); sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Code));
-            dto.Desc.ShouldBeNull(); sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc));
-        }
-    }
-
-    [Fact]
-    public void ProjectWithCodeImplicit() {
-        using (var ctx = new Context()) {
-            var dto = ProjectTo<DtoWithoutOverride>(ctx.Sources, null, _ => _.Name).First();
-            var sqlSelect = ctx.GetLastSelectSqlLogEntry();
-            sqlSelect.SqlFromShouldStartWith(nameof(ctx.Sources));
-            sqlSelect.ShouldNotContain("JOIN");
-
             dto.Name.ShouldBe(_iqf.Name); sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Name));
             dto.Code.ShouldBe(_iqf.Code); sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Code));
             dto.Desc.ShouldBeNull(); sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc));
