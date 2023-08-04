@@ -219,7 +219,7 @@ public class ProfileMap
         return closedMap;
     }
     public TypeMapConfiguration GetGenericMap(TypePair genericPair) => _openTypeMapConfigs.GetValueOrDefault(genericPair);
-    private void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configuration)
+    private static void ApplyBaseMaps(TypeMap derivedMap, TypeMap currentMap, IGlobalConfiguration configuration)
     {
         foreach (var baseMap in configuration.GetIncludedTypeMaps(currentMap.IncludedBaseTypes))
         {
@@ -247,7 +247,7 @@ public class ProfileMap
             }
         }
     }
-    private void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IGlobalConfiguration configuration)
+    private static void ApplyDerivedMaps(TypeMap baseMap, TypeMap typeMap, IGlobalConfiguration configuration)
     {
         foreach (var derivedMap in configuration.GetIncludedTypeMaps(typeMap))
         {

@@ -56,7 +56,7 @@ public class ExpandMembersPath : IntegrationTest<ExpandMembersPath.DatabaseIniti
         Check(dtos);
     }
 
-    private void Check(Class1DTO[] dtos)
+    private static void Check(Class1DTO[] dtos)
     {
         dtos.Length.ShouldBe(3);
         dtos.Select(d => d.IdDTO).ToArray().ShouldBe(new[] { 1, 2, 3 });

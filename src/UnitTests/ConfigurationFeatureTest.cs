@@ -50,7 +50,7 @@ public class ConfigurationFeatureTest
         Validate<ConfigurationFeatureB>(featureB, config);
     }
 
-    private void Validate<TFeature>(ConfigurationExpressionFeatureBase feature, MapperConfiguration config)
+    private static void Validate<TFeature>(ConfigurationExpressionFeatureBase feature, MapperConfiguration config)
         where TFeature : ConfigurationFeatureBase
     {
         feature.ConfigurationProviders.ShouldBeOfLength(1);

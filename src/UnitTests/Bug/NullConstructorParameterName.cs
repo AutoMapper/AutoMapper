@@ -13,7 +13,7 @@ public class NullConstructorParameterName
 
     public class ResourcePointDTO { }
 
-    object CreateDynamicObject()
+    static object CreateDynamicObject()
     {
         var assemblyName = new AssemblyName("TestClass");
         AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
