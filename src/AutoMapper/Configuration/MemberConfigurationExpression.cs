@@ -80,7 +80,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
         PropertyMapActions.Add(pm => pm.PreCondition = expr);
     public void AddTransform(Expression<Func<TMember, TMember>> transformer) =>
         PropertyMapActions.Add(pm => pm.AddValueTransformation(new ValueTransformerConfiguration(pm.DestinationType, transformer)));
-    public void ExplicitExpansion(bool value = true) => PropertyMapActions.Add(pm => pm.ExplicitExpansion = pm.ExplicitExpansion == null ? value : pm.ExplicitExpansion);
+    public void ExplicitExpansion(bool value) => PropertyMapActions.Add(pm => pm.ExplicitExpansion = value);
     public void Ignore() => Ignore(ignorePaths: true);
     public void Ignore(bool ignorePaths)
     {

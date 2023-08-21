@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.IntegrationTests.ExplicitExpansion;
 
-public class ExpandCollectionsWithoutExplicit : IntegrationTest<ExpandCollectionsWithoutExplicit.DatabaseInitializer>
+public class ExpandCollectionsOverride : IntegrationTest<ExpandCollectionsOverride.DatabaseInitializer>
 {
     TrainingCourseDto _course;
 

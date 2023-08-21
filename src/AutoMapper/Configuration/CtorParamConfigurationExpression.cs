@@ -62,7 +62,7 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
 
-    public void ExplicitExpansion(bool value = true) => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = value);
+    public void ExplicitExpansion(bool value) => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = value);
 
     public void Configure(TypeMap typeMap)
     {
