@@ -109,3 +109,44 @@ public class ConstructorNoExplicitExpansion : IntegrationTest<ConstructorNoExpli
         dto.Name.ShouldBe("Name");
     }
 }
+
+public class ConstructorWithInheritanceNoExplicitExpansion : IntegrationTest<ConstructorWithInheritanceNoExplicitExpansion.DatabaseInitializer> {
+    public class Entity {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class SubEntity : Entity {
+        public string Caption { get; set; }
+    }
+
+    record Dto(string Name) { }
+    record SubDto(string Name, string Caption) : Dto(Name) { }
+
+    public class Context : LocalDbContext {
+        public DbSet<SubEntity> Entities { get; set; }
+    }
+    public class DatabaseInitializer : DropCreateDatabaseAlways<Context> {
+        protected override void Seed(Context context) {
+            context.Entities.Add(new() { Name = "Name", Caption = "Caption" });
+            base.Seed(context);
+        }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => {
+        c.CreateMap<Entity, Dto>().ForCtorParam("Name", o => o.ExplicitExpansion());
+        c.CreateMap<SubEntity, SubDto>()
+            .IncludeBase<Entity, Dto>()
+            .ForCtorParam("Name", o => o.ExplicitExpansion(false))
+            .ForCtorParam("Caption", o => o.ExplicitExpansion(false));
+    });
+    [Fact]
+    public void Should_work() {
+        using var context = new Context();
+        var dto = ProjectTo<SubDto>(context.Entities).Single();
+        dto.Name.ShouldBe("Name");
+        dto.Caption.ShouldBe("Caption");
+        dto = ProjectTo<SubDto>(context.Entities, null, d => d.Name, d => d.Caption).Single();
+        dto.Name.ShouldBe("Name");
+        dto.Caption.ShouldBe("Caption");
+    }
+}
