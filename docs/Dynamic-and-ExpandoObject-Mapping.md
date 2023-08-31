@@ -13,6 +13,7 @@ foo.Bar = 5;
 foo.Baz = 6;
 
 var configuration = new MapperConfiguration(cfg => {});
+var mapper = configuration.CreateMapper();
 
 var result = mapper.Map<Foo>(foo);
 result.Bar.ShouldEqual(5);
