@@ -27,7 +27,7 @@ public interface IMapperBase
     /// <typeparam name="TDestination">Destination type</typeparam>
     /// <param name="source">Source object to map from</param>
     /// <param name="destination">Destination object to map into</param>
-    /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+    /// <returns>The mapped destination object</returns>
     TDestination? Map<TSource, TDestination>(TSource? source, TDestination? destination);
     /// <summary>
     /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects
@@ -44,7 +44,7 @@ public interface IMapperBase
     /// <param name="destination">Destination object to map into</param>
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to use</param>
-    /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+    /// <returns>Mapped destination object</returns>
     object? Map(object? source, object? destination, Type? sourceType, Type? destinationType);
 }
 public interface IMapper : IMapperBase
@@ -74,7 +74,7 @@ public interface IMapper : IMapperBase
     /// <param name="source">Source object to map from</param>
     /// <param name="destination">Destination object to map into</param>
     /// <param name="opts">Mapping options</param>
-    /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+    /// <returns>The mapped destination object</returns>
     TDestination? Map<TSource, TDestination>(TSource? source, TDestination? destination, Action<IMappingOperationOptions<TSource, TDestination>> opts);
     /// <summary>
     /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects and supplied mapping options.
@@ -93,7 +93,7 @@ public interface IMapper : IMapperBase
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to use</param>
     /// <param name="opts">Mapping options</param>
-    /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
+    /// <returns>Mapped destination object</returns>
     object? Map(object? source, object? destination, Type? sourceType, Type? destinationType, Action<IObjectMappingOperationOptions> opts);
     /// <summary>
     /// Configuration provider for performing maps
