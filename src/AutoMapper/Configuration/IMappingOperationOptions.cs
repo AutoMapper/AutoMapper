@@ -1,5 +1,4 @@
 ﻿namespace AutoMapper;
-
 using StringDictionary = Dictionary<string, object>;
 /// <summary>
 /// Options for a single map operation
@@ -7,24 +6,26 @@ using StringDictionary = Dictionary<string, object>;
 public interface IMappingOperationOptions
 {
     Func<Type, object> ServiceCtor { get; }
-
     /// <summary>
     /// Construct services using this callback. Use this for child/nested containers
     /// </summary>
     /// <param name="constructor"></param>
     void ConstructServicesUsing(Func<Type, object> constructor);
-
     /// <summary>
-    /// Add context items to be accessed at map time inside an <see cref="IValueResolver{TSource, TDestination, TMember}"/> or <see cref="ITypeConverter{TSource, TDestination}"/>
+    /// Add state to be accessed at map time inside an <see cref="IValueResolver{TSource, TDestination, TMember}"/> or <see cref="ITypeConverter{TSource, TDestination}"/>.
+    /// Mutually exclusive with <see cref="Items"/> per Map call.
     /// </summary>
-    Dictionary<string, object> Items { get; }
-
+    object State { get; set; }
+    /// <summary>
+    /// Add context items to be accessed at map time inside an <see cref="IValueResolver{TSource, TDestination, TMember}"/> or <see cref="ITypeConverter{TSource, TDestination}"/>.
+    /// Mutually exclusive with <see cref="State"/> per Map call.
+    /// </summary>
+    StringDictionary Items { get; }
     /// <summary>
     /// Execute a custom function to the source and/or destination types before member mapping
     /// </summary>
     /// <param name="beforeFunction">Callback for the source/destination types</param>
     void BeforeMap(Action<object, object> beforeFunction);
-
     /// <summary>
     /// Execute a custom function to the source and/or destination types after member mapping
     /// </summary>
@@ -38,7 +39,6 @@ public interface IMappingOperationOptions<TSource, TDestination> : IMappingOpera
     /// </summary>
     /// <param name="beforeFunction">Callback for the source/destination types</param>
     void BeforeMap(Action<TSource, TDestination> beforeFunction);
-
     /// <summary>
     /// Execute a custom function to the source and/or destination types after member mapping
     /// </summary>
@@ -47,10 +47,10 @@ public interface IMappingOperationOptions<TSource, TDestination> : IMappingOpera
 }
 public class MappingOperationOptions<TSource, TDestination> : IMappingOperationOptions<TSource, TDestination>
 {
-    private StringDictionary _items;
     public MappingOperationOptions(Func<Type, object> serviceCtor) => ServiceCtor = serviceCtor;
     public Func<Type, object> ServiceCtor { get; private set; }
-    public Dictionary<string, object> Items => _items ??= new StringDictionary();
+    public StringDictionary Items => (StringDictionary) (State ??= new StringDictionary());
+    public object State { get; set; }
     public Action<TSource, TDestination> BeforeMapAction { get; protected set; }
     public Action<TSource, TDestination> AfterMapAction { get; protected set; }
     public void BeforeMap(Action<TSource, TDestination> beforeFunction) => BeforeMapAction = beforeFunction;

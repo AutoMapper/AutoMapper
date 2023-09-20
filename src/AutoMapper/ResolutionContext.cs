@@ -15,7 +15,13 @@ public class ResolutionContext : IInternalRuntimeMapper
         _options = options;
     }
     /// <summary>
+    /// The state passed in the options of the Map call.
+    /// Mutually exclusive with <see cref="Items"/> per Map call.
+    /// </summary>
+    public object State => _options?.State;
+    /// <summary>
     /// The items passed in the options of the Map call.
+    /// Mutually exclusive with <see cref="State"/> per Map call.
     /// </summary>
     public Dictionary<string, object> Items
     {

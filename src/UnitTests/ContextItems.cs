@@ -1,4 +1,30 @@
 ﻿namespace AutoMapper.UnitTests;
+public class When_mapping_with_context_state
+{
+    public class Source
+    {
+        public int Value { get; set; }
+    }
+    public class Dest
+    {
+        public int Value { get; set; }
+    }
+    public class ContextResolver : IMemberValueResolver<Source, Dest, int, int>
+    {
+        public int Resolve(Source src, Dest d, int source, int dest, ResolutionContext context) => source + (int)context.State;
+    }
+    [Fact]
+    public void Should_use_value_passed_in()
+    {
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Dest>()
+                .ForMember(d => d.Value, opt => opt.MapFrom<ContextResolver, int>(src => src.Value));
+        });
+        var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => { opt.State = 10; });
+        dest.Value.ShouldBe(15);
+    }
+}
 public class Context_try_get_items : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<int, int>().ConvertUsing((s, _, c) => 
