@@ -138,7 +138,7 @@ internal interface IInternalRuntimeMapper : IRuntimeMapper
     ResolutionContext DefaultContext { get; }
     Factory ServiceCtor { get; }
 }
-public class Mapper : IMapper, IInternalRuntimeMapper
+public sealed class Mapper : IMapper, IInternalRuntimeMapper
 {
     private readonly IGlobalConfiguration _configuration;
     private readonly Factory _serviceCtor;

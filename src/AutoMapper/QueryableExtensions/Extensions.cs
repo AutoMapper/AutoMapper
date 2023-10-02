@@ -73,7 +73,7 @@ public static class Extensions
         configuration.Internal().ProjectionBuilder.GetProjection(source.ElementType, destinationType, parameters, memberPathsToExpand.Select(m => new MemberPath(m)).ToArray())
         .Chain(source, Select);
 }
-public class MemberVisitor : ExpressionVisitor
+public sealed class MemberVisitor : ExpressionVisitor
 {
     private readonly List<MemberInfo> _members = new();
     public static MemberInfo[] GetMemberPath(Expression expression)

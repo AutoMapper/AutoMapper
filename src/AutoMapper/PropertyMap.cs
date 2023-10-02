@@ -2,7 +2,7 @@ namespace AutoMapper;
 
 [DebuggerDisplay("{DestinationMember.Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class PropertyMap : MemberMap
+public sealed class PropertyMap : MemberMap
 {
     private MemberMapDetails _details;
     public PropertyMap(MemberInfo destinationMember, Type destinationMemberType, TypeMap typeMap) : base(typeMap)

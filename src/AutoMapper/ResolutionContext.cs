@@ -3,7 +3,7 @@ namespace AutoMapper;
 /// <summary>
 /// Context information regarding resolution of a destination value
 /// </summary>
-public class ResolutionContext : IInternalRuntimeMapper
+public sealed class ResolutionContext : IInternalRuntimeMapper
 {
     private Dictionary<ContextCacheKey, object> _instanceCache;
     private Dictionary<TypePair, int> _typeDepth;

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace AutoMapper;
 [DebuggerDisplay("{Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class ProfileMap
+public sealed class ProfileMap
 {
     private static readonly HashSet<string> EmptyHashSet = new();
     private TypeMapConfiguration[] _typeMapConfigs;

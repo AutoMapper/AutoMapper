@@ -15,7 +15,7 @@ public interface IProjectionMapper
     Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps);
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class ProjectionBuilder : IProjectionBuilder
+public sealed class ProjectionBuilder : IProjectionBuilder
 {
     internal static List<IProjectionMapper> DefaultProjectionMappers() =>
         new(capacity: 5)
@@ -225,7 +225,7 @@ public class ProjectionBuilder : IProjectionBuilder
         $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
         null, memberMap);
     [EditorBrowsable(EditorBrowsableState.Never)]
-    class FirstPassLetPropertyMaps : LetPropertyMaps
+    sealed class FirstPassLetPropertyMaps : LetPropertyMaps
     {
         readonly List<SubQueryPath> _savedPaths = new();
         public FirstPassLetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections) : base(configuration, parentPath, builtProjections) { }
@@ -290,7 +290,7 @@ public class ProjectionBuilder : IProjectionBuilder
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
         }
-        class GePropertiesVisitor : ExpressionVisitor
+        sealed class GePropertiesVisitor : ExpressionVisitor
         {
             readonly Expression _target;
             public List<MemberInfo> Members { get; } = new();
@@ -310,7 +310,7 @@ public class ProjectionBuilder : IProjectionBuilder
                 return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
             }
         }
-        class ReplaceMemberAccessesVisitor : ExpressionVisitor
+        sealed class ReplaceMemberAccessesVisitor : ExpressionVisitor
         {
             readonly Expression _oldObject, _newObject;
             public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
@@ -378,7 +378,7 @@ public readonly record struct QueryExpressions(LambdaExpression Projection, Lamb
         }
     }
 }
-public record MemberProjection(MemberMap MemberMap)
+public sealed record MemberProjection(MemberMap MemberMap)
 {
     public Expression Expression { get; set; }
 }
@@ -409,7 +409,7 @@ abstract class ParameterExpressionVisitor : ExpressionVisitor
         }
         return ToType(parameterValue, member.GetMemberType());
     }
-    class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
+    sealed class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
     {
         readonly object _parameters;
         public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
@@ -419,7 +419,7 @@ abstract class ParameterExpressionVisitor : ExpressionVisitor
             return matchingMember != null ? Property(Constant(_parameters), matchingMember) : null;
         }
     }
-    class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
+    sealed class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
     {
         readonly ParameterBag _paramValues;
         public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;

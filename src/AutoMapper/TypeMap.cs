@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// </summary>
 [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TypeMap
+public sealed class TypeMap
 {
     static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Empty);
     static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));

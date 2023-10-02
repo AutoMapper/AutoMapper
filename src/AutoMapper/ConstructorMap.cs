@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper;
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class ConstructorMap
+public sealed class ConstructorMap
 {
     private bool? _canResolve;
     private readonly List<ConstructorParameterMap> _ctorParams = new();

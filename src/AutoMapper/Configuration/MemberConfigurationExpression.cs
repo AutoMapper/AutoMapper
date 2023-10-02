@@ -12,7 +12,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
 {
     private MemberInfo[] _sourceMembers;
     private readonly Type _sourceType;
-    protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
+    protected List<Action<PropertyMap>> PropertyMapActions { get; } = new();
     public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
     {
         DestinationMember = destinationMember;
@@ -166,7 +166,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     }
     public void DoNotUseDestinationValue() => SetUseDestinationValue(false);
 }
-public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+public sealed class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
 {
     public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType){}
     public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));

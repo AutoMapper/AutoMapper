@@ -34,7 +34,7 @@ public interface IConfigurationProvider
     /// </summary>
     void CompileMappings();
 }
-public class MapperConfiguration : IGlobalConfiguration
+public sealed class MapperConfiguration : IGlobalConfiguration
 {
     private static readonly MethodInfo MappingError = typeof(MapperConfiguration).GetMethod(nameof(GetMappingError));
     private readonly IObjectMapper[] _mappers;

@@ -21,11 +21,11 @@ public interface IPathConfigurationExpression<TSource, TDestination, TMember>
     void Condition(Func<ConditionParameters<TSource, TDestination, TMember>, bool> condition);
 }
 public readonly record struct ConditionParameters<TSource, TDestination, TMember>(TSource Source, TDestination Destination, TMember SourceMember, TMember DestinationMember, ResolutionContext Context);
-public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
+public sealed class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
 {
     private readonly LambdaExpression _destinationExpression;
     private LambdaExpression _sourceExpression;
-    protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
+    List<Action<PathMap>> PathMapActions { get; } = new();
     public PathConfigurationExpression(LambdaExpression destinationExpression, Stack<Member> chain)
     {
         _destinationExpression = destinationExpression;

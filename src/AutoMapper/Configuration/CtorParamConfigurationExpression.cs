@@ -34,7 +34,7 @@ public interface ICtorParameterConfiguration
     void Configure(TypeMap typeMap);
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
+public sealed class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
 {
     public string CtorParamName { get; }
     public Type SourceType { get; }

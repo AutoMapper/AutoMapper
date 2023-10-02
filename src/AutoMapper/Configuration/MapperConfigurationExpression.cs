@@ -85,7 +85,7 @@ public interface IMapperConfigurationExpression : IProfileExpression
     /// <param name="config">Profile configuration</param>
     void CreateProfile(string profileName, Action<IProfileExpression> config);
 }
-public class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
+public sealed class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
 {
     private readonly List<Profile> _profiles = new();
     private readonly List<Validator> _validators = new();

@@ -4,7 +4,7 @@ namespace AutoMapper.Internal;
 /// </summary>
 [DebuggerDisplay("{Type}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TypeDetails
+public sealed class TypeDetails
 {
     private Dictionary<string, MemberInfo> _nameToMember;
     private ConstructorParameters[] _constructors;
@@ -88,7 +88,7 @@ public class TypeDetails
                 select new GenericMethod(method, genericInterface));
         }
     }
-    class GenericMethod : MemberInfo
+    sealed class GenericMethod : MemberInfo
     {
         readonly MethodInfo _genericMethod;
         readonly Type _genericInterface;
