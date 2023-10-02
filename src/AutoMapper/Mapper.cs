@@ -145,8 +145,10 @@ public class Mapper : IMapper, IInternalRuntimeMapper
     public Mapper(IConfigurationProvider configuration) : this(configuration, configuration.Internal().ServiceCtor) { }
     public Mapper(IConfigurationProvider configuration, Factory serviceCtor)
     {
-        _configuration = (IGlobalConfiguration)configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _serviceCtor = serviceCtor ?? throw new NullReferenceException(nameof(serviceCtor));
+        ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentNullException.ThrowIfNull(serviceCtor);
+        _configuration = (IGlobalConfiguration)configuration;
+        _serviceCtor = serviceCtor;
         DefaultContext = new(this);
     }
     internal ResolutionContext DefaultContext { get; }
@@ -172,9 +174,9 @@ public class Mapper : IMapper, IInternalRuntimeMapper
     }
     private static void CheckDestination(object destination, Type destinationType)
     {
-        if (destination == null && destinationType == null)
+        if (destination == null)
         {
-            throw new ArgumentNullException(nameof(destinationType));
+            ArgumentNullException.ThrowIfNull(destinationType);
         }
     }
     public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts)
