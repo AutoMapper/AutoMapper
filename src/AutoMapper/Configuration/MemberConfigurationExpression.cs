@@ -44,15 +44,15 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
             SourceMemberLambda = sourceMember
         });
     public void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest));
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest));
     public void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember));
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember));
     public void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt));
-    private void MapFromResult<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) => 
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt));
+    private void MapFromFunc<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) => 
         SetResolver(new FuncResolver(expr));
-    public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression) => MapFromUntyped(mapExpression);
-    internal void MapFromUntyped(LambdaExpression sourceExpression)
+    public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression) => MapFromExpression(mapExpression);
+    internal void MapFromExpression(LambdaExpression sourceExpression)
     {
         SourceExpression = sourceExpression;
         PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));

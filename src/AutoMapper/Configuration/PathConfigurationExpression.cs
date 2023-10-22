@@ -62,7 +62,7 @@ public sealed class PathConfigurationExpression<TSource, TDestination, TMember> 
         if (reversed.MemberPath.Length == 1)
         {
             var reversedMemberExpression = new MemberConfigurationExpression<TSource, TDestination, object>(reversed.DestinationMember, typeof(TSource));
-            reversedMemberExpression.MapFromUntyped(source);
+            reversedMemberExpression.MapFromExpression(source);
             return reversedMemberExpression;
         }
         reversed.MapFromUntyped(source);
