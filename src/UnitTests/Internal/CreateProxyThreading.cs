@@ -5,13 +5,13 @@ namespace AutoMapper.UnitTests;
 public class CreateProxyThreading
 {
     [Fact]
-    public void Should_create_the_proxy_once()
+    public async Task Should_create_the_proxy_once()
     {
         var tasks = Enumerable.Range(0, 5).Select(i => Task.Factory.StartNew(() =>
         {
             ProxyGenerator.GetProxyType(typeof(ISomeDto));
         })).ToArray();
-        Task.WaitAll(tasks);
+        await Task.WhenAll(tasks);
     }
 
     public interface ISomeDto

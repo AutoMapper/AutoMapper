@@ -4,13 +4,13 @@ namespace AutoMapper.UnitTests;
 
 public class GenerateSimilarType
 {
-    public partial class Article
+    public partial record struct Article
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
         public bool IsDefault { get; set; }
         public short NationId { get; set; }
-        public virtual Product Product { get; set; }
+        public Product Product { get; set; }
     }
 
     public partial class Product
@@ -45,7 +45,7 @@ public class GenerateSimilarType
         instance.ECommercePublished = true;
         instance.Short = short.MaxValue;
         instance.Long = long.MaxValue;
-        var articles = new Article[] { new Article(), null, null };
+        var articles = new Article[] { new Article(), default, default };
         instance.Articles = articles;
         instance.Article = articles[0];
 

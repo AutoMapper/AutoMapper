@@ -13,7 +13,7 @@ public class ConvertMapperThreading
     }
 
     [Fact]
-    public void Should_work()
+    public async Task Should_work()
     {
         var tasks = Enumerable.Range(0, 5).Select(i => Task.Factory.StartNew(() =>
         {
@@ -21,7 +21,7 @@ public class ConvertMapperThreading
         })).ToArray();
         try
         {
-            Task.WaitAll(tasks);
+            await Task.WhenAll(tasks);
         }
         catch(AggregateException ex)
         {
