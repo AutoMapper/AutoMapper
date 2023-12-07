@@ -3,6 +3,42 @@ using System.Collections.Immutable;
 
 namespace AutoMapper.UnitTests;
 
+public class When_mapping_interface_to_interface_readonly_set : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public IReadOnlySet<int> Values { get; set; }
+    }
+    public class Destination
+    {
+        public IReadOnlySet<int> Values { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(config => config.CreateMap<Source, Destination>());
+    [Fact]
+    public void Should_map_readonly_values()
+    {
+        HashSet<int> values = [1, 2, 3, 4];
+        Map<Destination>(new Source { Values = values }).Values.ShouldBe(values);
+    }
+}
+public class When_mapping_hashset_to_interface_readonly_set : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public HashSet<int> Values { get; set; }
+    }
+    public class Destination
+    {
+        public IReadOnlySet<int> Values { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(config => config.CreateMap<Source, Destination>());
+    [Fact]
+    public void Should_map_readonly_values()
+    {
+        HashSet<int> values = [1, 2, 3, 4];
+        Map<Destination>(new Source { Values = values }).Values.ShouldBe(values);
+    }
+}
 public class NonPublicEnumeratorCurrent : AutoMapperSpecBase
 {
     class Source

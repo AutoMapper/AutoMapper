@@ -109,7 +109,8 @@ public class CollectionMapper : IObjectMapper
                             return;
                         }
                         destinationElementType = GetEnumerableElementType(destinationType);
-                        destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+                        destinationCollectionType = destinationType.IsGenericType(typeof(IReadOnlySet<>)) ? typeof(HashSet<>) : typeof(ICollection<>);
+                        destinationCollectionType = destinationCollectionType.MakeGenericType(destinationElementType);
                         destExpression = Convert(mustUseDestination ? destExpression : Null, destinationCollectionType);
                         addMethod = destinationCollectionType.GetMethod("Add");
                     }
