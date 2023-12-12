@@ -42,10 +42,10 @@ var configuration = new MapperConfiguration(cfg => {
 });
 ```
 
-### Asp.Net Core and `AutoMapper.Extensions.Microsoft.DependencyInjection`
-If you are using Asp.Net Core and the `AutoMapper.Extensions.Microsoft.DependencyInjection` package, this is also a good way of using Dependency Injection. You can't inject dependencies into `Profile` classes, but you can do it in `IMappingAction` implementations.
+### Dependency Injection
+You can't inject dependencies into `Profile` classes, but you can do it in `IMappingAction` implementations.
 
-The following example shows how to connect an `IMappingAction` accessing the current `HttpContext` to a `Profile` after map action, leveraging Dependency Injection:
+The following example shows how to connect an `IMappingAction` accessing the current `HttpContext` to a `Profile` after map action, leveraging dependency injection:
 
 ``` csharp
 public class SetTraceIdentifierAction : IMappingAction<SomeModel, SomeOtherModel>
@@ -85,5 +85,3 @@ public class Startup
     //..
 }
 ```
-
-*See `AutoMapper.Extensions.Microsoft.DependencyInjection` for more info.*
