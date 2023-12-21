@@ -1,8 +1,25 @@
 using System.Collections.Specialized;
 using System.Collections.Immutable;
-
 namespace AutoMapper.UnitTests;
-
+public class UnsupportedCollection : AutoMapperSpecBase
+{
+    class Source
+    {
+        public MyList<DateTime> List { get; set; } = new();
+    }
+    class Destination
+    {
+        public MyList<int> List { get; set; }
+    }
+    class MyList<T> : IEnumerable
+    {
+        public IEnumerator GetEnumerator() => new List<T>.Enumerator();
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
+    [Fact]
+    public void ThrowsAtMapTime() => new Action(()=>Map<Destination>(new Source())).ShouldThrow<AutoMapperMappingException>()
+        .InnerException.ShouldBeOfType<NotSupportedException>().Message.ShouldBe($"Unknown collection. Consider a custom type converter from {typeof(MyList<DateTime>)} to {typeof(MyList<int>)}.");
+}
 public class When_mapping_interface_to_interface_readonly_set : AutoMapperSpecBase
 {
     public class Source

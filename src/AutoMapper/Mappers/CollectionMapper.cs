@@ -49,11 +49,9 @@ public class CollectionMapper : IObjectMapper
             var sourceElementType = GetEnumerableElementType(sourceType);
             if (destinationCollectionType == null || (sourceType == sourceElementType && destinationType == destinationElementType))
             {
-                if (destinationType.IsAssignableFrom(sourceType))
-                {
-                    return sourceExpression;
-                }
-                throw new NotSupportedException($"Unknown collection. Consider a custom type converter from {sourceType} to {destinationType}.");
+                return destinationType.IsAssignableFrom(sourceType) ? 
+                            sourceExpression : 
+                            Throw(Constant(new NotSupportedException($"Unknown collection. Consider a custom type converter from {sourceType} to {destinationType}.")), destinationType);
             }
             var itemParam = Parameter(sourceElementType, "item");
             var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
