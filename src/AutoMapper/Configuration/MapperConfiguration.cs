@@ -343,6 +343,10 @@ public sealed class MapperConfiguration : IGlobalConfiguration
                 var types = new TypePair(sourceType, destinationType);
                 if (_resolvedMaps.TryGetValue(types, out typeMap))
                 {
+                    if(typeMap == null)
+                    {
+                        continue;
+                    }
                     return typeMap;
                 }
                 typeMap = FindClosedGenericTypeMapFor(types);

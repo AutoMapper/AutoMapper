@@ -1,5 +1,26 @@
 namespace AutoMapper.UnitTests.InterfaceMapping;
-
+public class InterfaceWithObjectProperty : AutoMapperSpecBase
+{
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<ISourceModel, IDestModel>());
+    public interface ISourceModel
+    {
+        object Id { get; set; }
+    }
+    public interface IDestModel
+    {
+        object Id { get; set; }
+    }
+    public class SourceModel : ISourceModel
+    {
+        public object Id { get; set; }
+    }
+    public class DestModel : IDestModel
+    {
+        public object Id { get; set; }
+    }
+    [Fact]
+    public void Should_work() => Mapper.Map(new SourceModel { Id = 42 }, new DestModel()).Id.ShouldBe(42);
+}
 public class InterfaceInheritance : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(cfg =>
