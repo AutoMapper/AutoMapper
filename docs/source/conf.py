@@ -6,9 +6,6 @@ project = 'AutoMapper'
 copyright = '2024, Jimmy Bogard'
 author = 'Jimmy Bogard'
 
-release = '0.1'
-version = '0.1.0'
-
 # -- General configuration
 
 extensions = [
@@ -16,8 +13,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'myst_parser'
+    'sphinx.ext.intersphinx'
 ]
 
 intersphinx_mapping = {
