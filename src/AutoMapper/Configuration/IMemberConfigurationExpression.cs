@@ -290,7 +290,8 @@ public interface IProjectionMemberConfiguration<TSource, TDestination, TMember>
     /// <summary>
     /// Ignore this member for LINQ projections unless explicitly expanded during projection
     /// </summary>
-    void ExplicitExpansion();
+    /// <param name="value">Is explicitExpansion active</param>
+    void ExplicitExpansion(bool value = true);
     /// <summary>
     /// Apply a transformation function after any resolved destination member value with the given type
     /// </summary>

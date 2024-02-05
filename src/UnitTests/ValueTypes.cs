@@ -198,3 +198,11 @@ public class When_destination_type_is_a_nullable_value_type : AutoMapperSpecBase
         _destination.Value1.ShouldBe(10);
     }
 }
+public class ValueTypeDestinationPreserveReferences : AutoMapperSpecBase
+{
+    record Source(List<Source> List);
+    record struct Destination(List<Destination> List);
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Destination>());
+    [Fact]
+    public void ShouldWork() => Map<Destination>(new Source(new() { new Source(null) })).List.Single().List.ShouldBeEmpty();
+}

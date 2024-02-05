@@ -1777,3 +1777,34 @@ public class IncludeMembersNullCheck : AutoMapperSpecBase
     [Fact]
     public void Should_flatten() => Mapper.Map<Destination[]>(new[] { default(Source) })[0].ShouldBeNull();
 }
+public class IncludeMembersCascadedNullCheck : AutoMapperSpecBase
+{
+    public class Grandchild
+    {
+        public string C { get; set; }
+    }
+    public class Child
+    {
+        public string B { get; set; }
+        public Grandchild Grandchild { get; set; }
+    }
+    public class Parent
+    {
+        public string A { get; set; }
+        public Child Child { get; set; }
+    }
+    public class Dto
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+        public string C { get; set; }
+    }
+    protected override MapperConfiguration CreateConfiguration() => new(c =>
+    {
+        c.CreateMap<Parent, Dto>().IncludeMembers(s => s.Child);
+        c.CreateMap<Child, Dto>(MemberList.None).IncludeMembers(s => s.Grandchild);
+        c.CreateMap<Grandchild, Dto>(MemberList.None);
+    });
+    [Fact]
+    public void Should_flatten() => Mapper.Map<Dto>(new Parent { A = "a" }).A.ShouldBe("a");
+}

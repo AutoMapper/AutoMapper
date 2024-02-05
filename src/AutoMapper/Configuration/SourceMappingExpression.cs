@@ -15,7 +15,7 @@ public interface ISourceMemberConfigurationExpression
     /// </summary>
     void DoNotValidate();
 }
-public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
+public sealed class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
 {
     private readonly MemberInfo _sourceMember;
     private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new List<Action<SourceMemberConfig>>();
@@ -37,7 +37,7 @@ public class SourceMappingExpression : ISourceMemberConfigurationExpression, ISo
 /// <summary>
 /// Contains member configuration relating to source members
 /// </summary>
-public class SourceMemberConfig
+public sealed class SourceMemberConfig
 {
     private bool _ignored;
 

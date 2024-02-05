@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper;
 [DebuggerDisplay("{DestinationExpression}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class PathMap : MemberMap
+public sealed class PathMap : MemberMap
 {
     public PathMap(PathMap pathMap, TypeMap typeMap, IncludedMember includedMember) : this(pathMap.DestinationExpression, pathMap.MemberPath, typeMap)
     {
@@ -22,6 +22,6 @@ public class PathMap : MemberMap
     public override string DestinationName => MemberPath.ToString();
     public override bool CanBeSet => ReflectionHelper.CanBeSet(MemberPath.Last);
     public override bool Ignored { get; set; }
-    public override IncludedMember IncludedMember { get; }
+    public override IncludedMember IncludedMember { get; protected set; }
     public override LambdaExpression Condition { get; set; }
 }

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace AutoMapper;
 [DebuggerDisplay("{Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class ProfileMap
+public sealed class ProfileMap
 {
     private static readonly HashSet<string> EmptyHashSet = new();
     private TypeMapConfiguration[] _typeMapConfigs;
@@ -242,7 +242,7 @@ public class ProfileMap
                 ApplyMemberMaps(includedMap, configuration);
                 foreach (var inheritedIncludedMember in includedMap.IncludedMembersTypeMaps)
                 {
-                    currentMap.AddMemberMap(includedMember.Chain(inheritedIncludedMember));
+                    currentMap.AddMemberMap(includedMember.Chain(inheritedIncludedMember, configuration));
                 }
             }
         }
@@ -275,13 +275,13 @@ public class IncludedMember : IEquatable<IncludedMember>
         Variable = variable;
         ProjectToCustomSource = projectToCustomSource;
     }
-    public IncludedMember Chain(IncludedMember other)
+    public IncludedMember Chain(IncludedMember other, IGlobalConfiguration configuration = null)
     {
         if (other == null)
         {
             return this;
         }
-        return new(other.TypeMap, Chain(other.MemberExpression), other.Variable, Chain(MemberExpression, other.MemberExpression));
+        return new(other.TypeMap, Chain(other.MemberExpression, other, configuration), other.Variable, Chain(MemberExpression, other.MemberExpression));
     }
     public static LambdaExpression Chain(LambdaExpression customSource, LambdaExpression lambda) => 
         Lambda(lambda.ReplaceParameters(customSource.Body), customSource.Parameters);
@@ -289,7 +289,9 @@ public class IncludedMember : IEquatable<IncludedMember>
     public LambdaExpression MemberExpression { get; }
     public ParameterExpression Variable { get; }
     public LambdaExpression ProjectToCustomSource { get; }
-    public LambdaExpression Chain(LambdaExpression lambda) => Lambda(lambda.ReplaceParameters(Variable), lambda.Parameters);
+    public LambdaExpression Chain(LambdaExpression lambda) => Chain(lambda, null, null);
+    public LambdaExpression Chain(LambdaExpression lambda, IncludedMember includedMember, IGlobalConfiguration configuration) => 
+        Lambda(lambda.ReplaceParameters(Variable).NullCheck(configuration, includedMember: includedMember), lambda.Parameters);
     public bool Equals(IncludedMember other) => TypeMap == other?.TypeMap;
     public override int GetHashCode() => TypeMap.GetHashCode();
 }

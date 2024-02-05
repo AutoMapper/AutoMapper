@@ -1,9 +1,9 @@
+using System.Runtime.CompilerServices;
 namespace AutoMapper;
-
 /// <summary>
 /// Context information regarding resolution of a destination value
 /// </summary>
-public class ResolutionContext : IInternalRuntimeMapper
+public sealed class ResolutionContext : IInternalRuntimeMapper
 {
     private Dictionary<ContextCacheKey, object> _instanceCache;
     private Dictionary<TypePair, int> _typeDepth;
@@ -15,7 +15,13 @@ public class ResolutionContext : IInternalRuntimeMapper
         _options = options;
     }
     /// <summary>
+    /// The state passed in the options of the Map call.
+    /// Mutually exclusive with <see cref="Items"/> per Map call.
+    /// </summary>
+    public object State => _options?.State;
+    /// <summary>
     /// The items passed in the options of the Map call.
+    /// Mutually exclusive with <see cref="State"/> per Map call.
     /// </summary>
     public Dictionary<string, object> Items
     {
@@ -103,4 +109,8 @@ public class ResolutionContext : IInternalRuntimeMapper
     }
     private static void ThrowInvalidMap() => throw new InvalidOperationException("Context.Items are only available when using a Map overload that takes Action<IMappingOperationOptions>! Consider using Context.TryGetItems instead.");
 }
-public readonly record struct ContextCacheKey(object Source, Type DestinationType);
+public readonly record struct ContextCacheKey(object Source, Type DestinationType)
+{
+    public override int GetHashCode() => HashCode.Combine(DestinationType, RuntimeHelpers.GetHashCode(Source));
+    public bool Equals(ContextCacheKey other) => DestinationType == other.DestinationType && Source == other.Source;
+}

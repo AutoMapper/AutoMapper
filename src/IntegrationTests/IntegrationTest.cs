@@ -15,12 +15,19 @@ public class DropCreateDatabaseAlways<TContext> : IInitializer where TContext : 
     public async Task Migrate()
     {
         await using var context = new TContext();
-
-        await context.Database.EnsureDeletedAsync();
-        await context.Database.EnsureCreatedAsync();
+        var database = context.Database;
+        await database.EnsureDeletedAsync();
+        var strategy = database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () => await database.EnsureCreatedAsync());
 
         Seed(context);
 
         await context.SaveChangesAsync();
     }
+}
+public abstract class LocalDbContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(
+        @$"Data Source=(localdb)\mssqllocaldb;Integrated Security=True;MultipleActiveResultSets=True;Database={GetType()};Connection Timeout=300",
+        o => o.EnableRetryOnFailure(maxRetryCount: 10).CommandTimeout(120));
 }

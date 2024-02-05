@@ -432,7 +432,7 @@ public class When_mapping_with_a_bidirectional_relationship_that_includes_arrays
         object.ReferenceEquals(_dtoParent.Children[0].Parents[0], _dtoParent).ShouldBeTrue();
     }
 
-    public class Parent
+    public class Parent : IEquatable<Parent>
     {
         public Guid Id { get; private set; }
 
@@ -445,26 +445,9 @@ public class When_mapping_with_a_bidirectional_relationship_that_includes_arrays
             Id = Guid.NewGuid();
             Children = new List<Child>();
         }
-
-        public bool Equals(Parent other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return other.Id.Equals(Id);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Parent)) return false;
-            return Equals((Parent) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
+        public bool Equals(Parent other) => throw new NotImplementedException();
+        public override bool Equals(object obj) => throw new NotImplementedException();
+        public override int GetHashCode() => throw new NotImplementedException();
     }
 
     public class Child

@@ -12,7 +12,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
 {
     private MemberInfo[] _sourceMembers;
     private readonly Type _sourceType;
-    protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
+    protected List<Action<PropertyMap>> PropertyMapActions { get; } = new();
     public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
     {
         DestinationMember = destinationMember;
@@ -44,15 +44,15 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
             SourceMemberLambda = sourceMember
         });
     public void MapFrom<TResult>(Func<TSource, TDestination, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest));
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest));
     public void MapFrom<TResult>(Func<TSource, TDestination, TMember, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember));
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember));
     public void MapFrom<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> mappingFunction) =>
-        MapFromResult((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt));
-    private void MapFromResult<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) => 
+        MapFromFunc((src, dest, destMember, ctxt) => mappingFunction(src, dest, destMember, ctxt));
+    private void MapFromFunc<TResult>(Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr) => 
         SetResolver(new FuncResolver(expr));
-    public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression) => MapFromUntyped(mapExpression);
-    internal void MapFromUntyped(LambdaExpression sourceExpression)
+    public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> mapExpression) => MapFromExpression(mapExpression);
+    internal void MapFromExpression(LambdaExpression sourceExpression)
     {
         SourceExpression = sourceExpression;
         PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));
@@ -80,7 +80,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
         PropertyMapActions.Add(pm => pm.PreCondition = expr);
     public void AddTransform(Expression<Func<TMember, TMember>> transformer) =>
         PropertyMapActions.Add(pm => pm.AddValueTransformation(new ValueTransformerConfiguration(pm.DestinationType, transformer)));
-    public void ExplicitExpansion() => PropertyMapActions.Add(pm => pm.ExplicitExpansion = true);
+    public void ExplicitExpansion(bool value) => PropertyMapActions.Add(pm => pm.ExplicitExpansion = value);
     public void Ignore() => Ignore(ignorePaths: true);
     public void Ignore(bool ignorePaths)
     {
@@ -166,7 +166,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     }
     public void DoNotUseDestinationValue() => SetUseDestinationValue(false);
 }
-public class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+public sealed class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
 {
     public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType){}
     public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));

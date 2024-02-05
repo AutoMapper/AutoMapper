@@ -613,7 +613,7 @@ public class ResolveWithGenericMap
     }
 
     [Fact]
-    public void Should_work()
+    public async Task Should_work()
     {
         var sourceType = typeof(Entity<>);
         var destinationType = typeof(Dto<>);
@@ -646,7 +646,7 @@ public class ResolveWithGenericMap
             .ToArray()
             .Select(s => Task.Factory.StartNew(() => c.ResolveTypeMap(s.SourceType, s.DestinationType)))
             .ToArray();
-        Task.WaitAll(tasks);
+        await Task.WhenAll(tasks);
     }
 }
 
@@ -1144,7 +1144,7 @@ public class ResolveGenericTypeMapThreadingIssues
     }
 
     [Fact]
-    public void Should_work()
+    public async Task Should_work()
     {
         var sourceType = typeof(Entity<>);
         var destinationType = typeof(Dto<>);
@@ -1178,6 +1178,6 @@ public class ResolveGenericTypeMapThreadingIssues
             .ToArray()
             .Select(s => Task.Factory.StartNew(() => mapper.Map(null, s.SourceType, s.DestinationType)))
             .ToArray();
-        Task.WaitAll(tasks);
+        await Task.WhenAll(tasks);
     }
 }

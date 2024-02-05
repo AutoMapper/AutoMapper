@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-namespace AutoMapper.Configuration;
-
+﻿namespace AutoMapper.Configuration;
 public interface ICtorParamConfigurationExpression
 {
     /// <summary>
@@ -11,7 +9,8 @@ public interface ICtorParamConfigurationExpression
     /// <summary>
     /// Ignore this member for LINQ projections unless explicitly expanded during projection
     /// </summary>
-    void ExplicitExpansion();
+    /// <param name="value">Is explicitExpansion active</param>
+    void ExplicitExpansion(bool value = true);
 }
 public interface ICtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression
 {
@@ -35,7 +34,7 @@ public interface ICtorParameterConfiguration
     void Configure(TypeMap typeMap);
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
+public sealed class CtorParamConfigurationExpression<TSource, TDestination> : ICtorParamConfigurationExpression<TSource>, ICtorParameterConfiguration
 {
     public string CtorParamName { get; }
     public Type SourceType { get; }
@@ -63,7 +62,7 @@ public class CtorParamConfigurationExpression<TSource, TDestination> : ICtorPara
         _ctorParamActions.Add(cpm => cpm.MapFrom(sourceMembersPath, sourceMembers));
     }
 
-    public void ExplicitExpansion() => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = true);
+    public void ExplicitExpansion(bool value) => _ctorParamActions.Add(cpm => cpm.ExplicitExpansion = value);
 
     public void Configure(TypeMap typeMap)
     {

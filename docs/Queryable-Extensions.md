@@ -227,6 +227,7 @@ Not all mapping options can be supported, as the expression generated must be in
 * NullSubstitute
 * Value transformers
 * IncludeMembers
+* Runtime polymorphic mapping with Include/IncludeBase
 
 Not supported:
 * Condition
@@ -238,5 +239,4 @@ Not supported:
 * Custom type converters
 * ForPath
 * Value converters
-* Runtime polymorphic mapping with Include/IncludeBase
 * **Any calculated property on your domain object**

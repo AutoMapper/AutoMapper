@@ -127,6 +127,7 @@ This is how to setup the mapping for this custom resolver
 cfg.CreateMap<Source, Dest>()
     .ForMember(dest => dest.Foo, opt => opt.MapFrom((src, dest, destMember, context) => context.Items["Foo"]));
 ```
+Starting with version 13.0, you can use `context.State` instead, in a similar way. Note that `State` and `Items` are mutually exclusive per `Map` call.
 
 ### ForPath
 

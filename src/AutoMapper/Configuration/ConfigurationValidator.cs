@@ -116,7 +116,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             // when we don't know what the source type is, bail
             if (sourceType.IsGenericParameter || sourceType == typeof(object))
             {
-                return;
+                continue;
             }
             DryRunTypeMap(config, typeMapsChecked, new(sourceType, memberMap.DestinationType), null, memberMap);
         }

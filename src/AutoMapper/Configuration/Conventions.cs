@@ -5,7 +5,7 @@ public interface ISourceToDestinationNameMapper
     void Merge(ISourceToDestinationNameMapper other);
 }
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class MemberConfiguration
+public sealed class MemberConfiguration
 {
     NameSplitMember _nameSplitMember;
     public INamingConvention SourceNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
@@ -66,7 +66,7 @@ public class MemberConfiguration
         }
     }
 }
-public class PrePostfixName : ISourceToDestinationNameMapper
+public sealed class PrePostfixName : ISourceToDestinationNameMapper
 {
     public List<string> DestinationPrefixes { get; } = new();
     public List<string> DestinationPostfixes { get; } = new();
@@ -89,7 +89,7 @@ public class PrePostfixName : ISourceToDestinationNameMapper
         DestinationPostfixes.TryAdd(typedOther.DestinationPostfixes);
     }
 }
-public class ReplaceName : ISourceToDestinationNameMapper
+public sealed class ReplaceName : ISourceToDestinationNameMapper
 {
     public List<MemberNameReplacer> MemberNameReplacers { get; } = new();
     public MemberInfo GetSourceMember(TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch)

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// </summary>
 [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TypeMap
+public sealed class TypeMap
 {
     static readonly LambdaExpression EmptyLambda = Lambda(ExpressionBuilder.Empty);
     static readonly MethodInfo CreateProxyMethod = typeof(ObjectFactory).GetStaticMethod(nameof(ObjectFactory.CreateInterfaceProxy));
@@ -46,6 +46,7 @@ public class TypeMap
         " When mapping to records, consider using only public constructors. See https://docs.automapper.org/en/latest/Construction.html." : null;
     public Features<IRuntimeFeature> Features => Details.Features;
     private TypeMapDetails Details => _details ??= new();
+    public bool HasDetails => _details != null;
     public void CheckProjection()
     {
         if (Projection)
@@ -76,9 +77,9 @@ public class TypeMap
     public MemberList ConfiguredMemberList
     {
         get => (_details?.ConfiguredMemberList).GetValueOrDefault();
-        set
+        set 
         {
-            if (value == default)
+            if (_details == null && value == default)
             {
                 return;
             }
@@ -428,7 +429,7 @@ public class TypeMap
                 .Select(p => new PropertyMap(p, thisMap, includedMember))
                 .ToArray();
             var notOverridenPathMaps = NotOverridenPathMaps(typeMap);
-            var appliedConstructorMap = thisMap.ConstructorMap?.ApplyIncludedMember(includedMember);
+            var appliedConstructorMap = thisMap.ConstructorMap?.ApplyMap(typeMap, includedMember);
             if (includedMemberMaps.Length == 0 && notOverridenPathMaps.Length == 0 && appliedConstructorMap is not true)
             {
                 return;
@@ -457,6 +458,7 @@ public class TypeMap
             {
                 ApplyInheritedPropertyMaps(inheritedTypeMap, thisMap);
             }
+            thisMap.ConstructorMap?.ApplyMap(inheritedTypeMap);
             var inheritedDetails = inheritedTypeMap._details;
             if (inheritedDetails == null)
             {

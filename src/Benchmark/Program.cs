@@ -13,7 +13,7 @@ public class Program
                 { "Complex", new IObjectToObjectMapper[] { new ComplexTypeMapper(), new ManualComplexTypeMapper() } },
                 { "Deep", new IObjectToObjectMapper[] { new DeepTypeMapper(), new ManualDeepTypeMapper() } }
             };
-        //while (true)
+        while (true)
         {
             foreach (var pair in mappers)
             {
@@ -22,7 +22,7 @@ public class Program
                     new BenchEngine(mapper, pair.Key).Start();
                 }
             }
-            //Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }

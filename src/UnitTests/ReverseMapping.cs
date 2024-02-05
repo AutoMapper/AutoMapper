@@ -442,6 +442,13 @@ public class When_reverse_mapping_classes_with_simple_properties : AutoMapperSpe
     {
         _source.Value.ShouldBe(10);
     }
+    
+    [Fact]
+    public void Should_not_initialize_details_on_initial_mapping()
+    {
+        var map = FindTypeMapFor<Source, Destination>();
+        map.HasDetails.ShouldBeFalse();
+    }
 }
 
 public class When_validating_only_against_source_members_and_source_matches : AutoMapperSpecBase
@@ -672,5 +679,32 @@ public class When_reverse_mapping_open_generics_with_MapFrom : AutoMapperSpecBas
         Source<int> source = Mapper.Map<Destination<int>, Source<int>>(destination);
         source.Value.ShouldBe(1337);
         source.StringValue.ShouldBe("StringValue2");
+    }
+}
+
+public class When_validating_reverse_mapping_classes_with_missing_properties : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public int SomeValue { get; set; }
+        public int SomeValue2 { get; set; }
+    }
+
+    public class Destination
+    {
+        public int SomeValue { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() => new(cfg =>
+    {
+        cfg.CreateMap<Source, Destination>(MemberList.Destination)
+           .ReverseMap()
+           .ValidateMemberList(MemberList.Destination);
+    });
+
+    [Fact]
+    public void Should_throw_a_configuration_validation_error()
+    {
+        typeof(AutoMapperConfigurationException).ShouldBeThrownBy(AssertConfigurationIsValid);
     }
 }
