@@ -20,7 +20,6 @@ New to AutoMapper? Check out the :doc:`Getting-started` page first.
    :caption: Overview
    
    Getting-started
-   Quickstart
    Understanding-your-mapping
    The-MyGet-build
 
