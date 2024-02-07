@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace AutoMapper;
 using IObjectMappingOperationOptions = IMappingOperationOptions<object, object>;
 using Factory = Func<Type, object>;
@@ -11,7 +13,7 @@ public interface IMapperBase
     /// <typeparam name="TDestination">Destination type to create</typeparam>
     /// <param name="source">Source object to map from</param>
     /// <returns>Mapped destination object</returns>
-    TDestination? Map<TDestination>(object? source);
+    TDestination Map<TDestination>(object source);
     /// <summary>
     /// Execute a mapping from the source object to a new destination object.
     /// </summary>
@@ -19,6 +21,7 @@ public interface IMapperBase
     /// <typeparam name="TDestination">Destination type to create</typeparam>
     /// <param name="source">Source object to map from</param>
     /// <returns>Mapped destination object</returns>
+    [return: NotNullIfNotNull(nameof(source))]
     TDestination? Map<TSource, TDestination>(TSource? source);
     /// <summary>
     /// Execute a mapping from the source object to the existing destination object.
@@ -36,7 +39,8 @@ public interface IMapperBase
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to create</param>
     /// <returns>Mapped destination object</returns>
-    object? Map(object? source, Type? sourceType, Type destinationType);
+    [return: NotNullIfNotNull(nameof(source))]
+    object? Map(object? source, Type sourceType, Type destinationType);
     /// <summary>
     /// Execute a mapping from the source object to existing destination object with explicit <see cref="System.Type"/> objects
     /// </summary>
@@ -45,7 +49,7 @@ public interface IMapperBase
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to use</param>
     /// <returns>Mapped destination object</returns>
-    object? Map(object? source, object? destination, Type? sourceType, Type? destinationType);
+    object? Map(object? source, object? destination, Type sourceType, Type destinationType);
 }
 public interface IMapper : IMapperBase
 {
@@ -56,7 +60,7 @@ public interface IMapper : IMapperBase
     /// <param name="source">Source object to map from</param>
     /// <param name="opts">Mapping options</param>
     /// <returns>Mapped destination object</returns>
-    TDestination? Map<TDestination>(object? source, Action<IMappingOperationOptions<object, TDestination>> opts);
+    TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts);
     /// <summary>
     /// Execute a mapping from the source object to a new destination object with supplied mapping options.
     /// </summary>
@@ -65,6 +69,7 @@ public interface IMapper : IMapperBase
     /// <param name="source">Source object to map from</param>
     /// <param name="opts">Mapping options</param>
     /// <returns>Mapped destination object</returns>
+    [return: NotNullIfNotNull(nameof(source))]
     TDestination? Map<TSource, TDestination>(TSource? source, Action<IMappingOperationOptions<TSource, TDestination>> opts);
     /// <summary>
     /// Execute a mapping from the source object to the existing destination object with supplied mapping options.
@@ -84,7 +89,8 @@ public interface IMapper : IMapperBase
     /// <param name="destinationType">Destination type to create</param>
     /// <param name="opts">Mapping options</param>
     /// <returns>Mapped destination object</returns>
-    object? Map(object? source, Type? sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
+    [return: NotNullIfNotNull(nameof(source))]
+    object? Map(object? source, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
     /// <summary>
     /// Execute a mapping from the source object to existing destination object with supplied mapping options and explicit <see cref="System.Type"/> objects
     /// </summary>
@@ -94,7 +100,7 @@ public interface IMapper : IMapperBase
     /// <param name="destinationType">Destination type to use</param>
     /// <param name="opts">Mapping options</param>
     /// <returns>Mapped destination object</returns>
-    object? Map(object? source, object? destination, Type? sourceType, Type? destinationType, Action<IObjectMappingOperationOptions> opts);
+    object? Map(object? source, object? destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
     /// <summary>
     /// Configuration provider for performing maps
     /// </summary>
@@ -117,7 +123,7 @@ public interface IMapper : IMapperBase
     /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
     /// <param name="membersToExpand">Explicit members to expand</param>
     /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-    IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object>? parameters, params string[] membersToExpand);
+    IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object>? parameters = null, params string[] membersToExpand);
     /// <summary>
     /// Project the input queryable.
     /// </summary>
@@ -155,8 +161,18 @@ public sealed class Mapper : IMapper, IInternalRuntimeMapper
     ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
     Factory IInternalRuntimeMapper.ServiceCtor => _serviceCtor;
     public IConfigurationProvider ConfigurationProvider => _configuration;
-    public TDestination Map<TDestination>(object source) => Map(source, default(TDestination));
-    public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts) => Map(source, default, opts);
+    public TDestination Map<TDestination>(object source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return Map(source, default(TDestination));
+    }
+
+    public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions<object, TDestination>> opts)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return Map(source, default, opts);
+    }
+
     public TDestination Map<TSource, TDestination>(TSource source) => Map(source, default(TDestination));
     public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
         Map(source, default, opts);

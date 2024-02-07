@@ -17,6 +17,7 @@ public class NullDestinationType : AutoMapperSpecBase
         Mapper.Map("", default(string), _ => { }).ShouldBe("");
     }
 }
+
 public class NullToExistingDestination : AutoMapperSpecBase
 {
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<string, string>().DisableCtorValidation());
@@ -25,6 +26,27 @@ public class NullToExistingDestination : AutoMapperSpecBase
     {
         var destination = "42";
         Mapper.Map(default(string), destination).ShouldBeSameAs(destination);
+    }
+}
+
+public class ComplexDestinationNullBehavior : AutoMapperSpecBase
+{
+    public class Source {}
+    public class Dest {}
+    protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Dest>());
+    [Fact]
+    public void Should_return_null_when_value_is_null()
+    {
+        Mapper.Map<Source, Dest>(null).ShouldBeNull();
+        Mapper.Map<Source, Dest>(new Source()).ShouldNotBeNull();
+        Mapper.Map<Source, Dest>(null, new Dest()).ShouldNotBeNull();
+        Mapper.Map<Source, Dest>(new Source(), (Dest)null).ShouldNotBeNull();
+        Mapper.Map<Source, Dest>(null, (Dest) null).ShouldBeNull();
+        Mapper.Map(null, typeof(Source), typeof(Dest)).ShouldBeNull();
+        Mapper.Map(new Source(), typeof(Source), typeof(Dest)).ShouldNotBeNull();
+        Mapper.Map(null, new Dest(), typeof(Source), typeof(Dest)).ShouldNotBeNull();
+        Mapper.Map(new Source(), null, typeof(Source), typeof(Dest)).ShouldNotBeNull();
+        Mapper.Map(null, null, typeof(Source), typeof(Dest)).ShouldBeNull();
     }
 }
 public class NullToExistingValue : AutoMapperSpecBase
