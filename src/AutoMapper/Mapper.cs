@@ -44,7 +44,7 @@ public interface IMapperBase
     /// <param name="destination">Destination object to map into</param>
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to use</param>
-    /// <returns>Mapped destination object</returns>
+    /// <returns>The mapped destination object</returns>
     object Map(object source, object destination, Type sourceType, Type destinationType);
 }
 public interface IMapper : IMapperBase
@@ -93,7 +93,7 @@ public interface IMapper : IMapperBase
     /// <param name="sourceType">Source type to use</param>
     /// <param name="destinationType">Destination type to use</param>
     /// <param name="opts">Mapping options</param>
-    /// <returns>Mapped destination object</returns>
+    /// <returns>The mapped destination object</returns>
     object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts);
     /// <summary>
     /// Configuration provider for performing maps
@@ -166,23 +166,10 @@ public sealed class Mapper : IMapper, IInternalRuntimeMapper
     public object Map(object source, Type sourceType, Type destinationType) => Map(source, null, sourceType, destinationType);
     public object Map(object source, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
         Map(source, null, sourceType, destinationType, opts);
-    public object Map(object source, object destination, Type sourceType, Type destinationType)
-    {
-        CheckDestination(destination, destinationType);
-        return MapCore(source, destination, DefaultContext, sourceType, destinationType);
-    }
-    private static void CheckDestination(object destination, Type destinationType)
-    {
-        if (destination == null)
-        {
-            ArgumentNullException.ThrowIfNull(destinationType);
-        }
-    }
-    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts)
-    {
-        CheckDestination(destination, destinationType);
-        return MapWithOptions(source, destination, opts, sourceType, destinationType);
-    }
+    public object Map(object source, object destination, Type sourceType, Type destinationType) =>
+        MapCore(source, destination, DefaultContext, sourceType, destinationType);
+    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
+        MapWithOptions(source, destination, opts, sourceType, destinationType);
     public IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         => source.ProjectTo(ConfigurationProvider, parameters, membersToExpand);
     public IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand)
