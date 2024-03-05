@@ -2933,8 +2933,12 @@ namespace FastExpressionCompiler
                         il.DmarkLabel(labelDone);
                     }
                 }
-                else
+                else if (targetType.IsEnum && sourceType == typeof(Enum))
                 {
+                    il.Demit(OpCodes.Unbox_Any, targetType); // a special case, see AutoMapper StringToEnumConverter.Should_work
+                }
+                else
+                { 
                     if (targetType.IsEnum)
                         targetType = Enum.GetUnderlyingType(targetType);
 

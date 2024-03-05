@@ -26,6 +26,9 @@
 
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
     <AdditionalApiCompatOptions>--exclude-non-browsable --exclude-compiler-generated</AdditionalApiCompatOptions>
+
+    <SignAssembly>false</SignAssembly>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +45,11 @@
     <PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="7.0.0-beta.22074.1" PrivateAssets="All" />  
+  </ItemGroup>
+
+  <!--todo: @wip in the DEBUG configuration only-->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FastExpressionCompiler\test\FastExpressionCompiler.ILDecoder\FastExpressionCompiler.ILDecoder.csproj" />
   </ItemGroup>
 
   <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">

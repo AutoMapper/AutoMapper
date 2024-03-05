@@ -2,6 +2,8 @@ namespace AutoMapper;
 using Features;
 using Internal.Mappers;
 using QueryableExtensions.Impl;
+using FastExpressionCompiler.ILDecoder;
+
 public interface IConfigurationProvider
 {
     /// <summary>
@@ -148,10 +150,24 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             var executionPlan = ((IGlobalConfiguration)this).BuildExecutionPlan(mapRequest);
 #if DEBUG
             var fs = executionPlan.Compile(); // breakpoint here to inspect all execution plans
-            
+            Debug.WriteLine(fs.Method.ToILString().ToString());
+
             Debug.WriteLine(executionPlan.ToCSharpString());
             Debug.WriteLine(executionPlan.ToExpressionString());
-            var ff = executionPlan.CompileFast(true, CompilerFlags.NoInvocationLambdaInlining);
+            Delegate ff;
+            // if (executionPlan is LambdaExpression lambda && 
+            //     (lambda.Body is InvocationExpression || 
+            //     lambda.Body is UnaryExpression ue && ue.NodeType == ExpressionType.Convert && ue.Operand is InvocationExpression))
+            // {
+            //     ff = executionPlan.CompileFast(true);
+            //     Debug.WriteLine(ff.Method.ToILString().ToString());
+            // }
+            // else
+            // {
+                // todo: @wip @fixme no inlining for nested invocation expression
+                ff = executionPlan.CompileFast(true, CompilerFlags.NoInvocationLambdaInlining);
+            // }
+
             Debug.Assert(ff != null);
 #else
             var ff = executionPlan.CompileFast();
