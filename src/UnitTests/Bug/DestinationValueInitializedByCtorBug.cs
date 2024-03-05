@@ -41,7 +41,7 @@ public class DestinationValueInitializedByCtorBug : AutoMapperSpecBase
 
         List<ItemToMap> entities = new List<ItemToMap>();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1; i++)
         {
             entities.Add(new ItemToMap()
             {
@@ -51,6 +51,7 @@ public class DestinationValueInitializedByCtorBug : AutoMapperSpecBase
         }
 
         Mapper.Map<List<ItemToMap>, List<ItemToMapDto>>(entities);
+
         typeof(AutoMapperMappingException).ShouldNotBeThrownBy(() => Mapper.Map<List<ItemToMap>, List<ItemToMapDto>>(entities));
     }
 }

@@ -146,7 +146,17 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         Delegate CompileExecutionPlan(MapRequest mapRequest)
         {
             var executionPlan = ((IGlobalConfiguration)this).BuildExecutionPlan(mapRequest);
-            return executionPlan.Compile(); // breakpoint here to inspect all execution plans
+#if DEBUG
+            var fs = executionPlan.Compile(); // breakpoint here to inspect all execution plans
+            
+            Debug.WriteLine(executionPlan.ToCSharpString());
+            Debug.WriteLine(executionPlan.ToExpressionString());
+            var ff = executionPlan.CompileFast(true);
+            Debug.Assert(ff != null);
+#else
+            var ff = executionPlan.CompileFast();
+#endif
+            return ff;
         }
     }
     public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(Build(configure)){}

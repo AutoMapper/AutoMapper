@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Jimmy Bogard</Authors>
     <LangVersion>latest</LangVersion>
-    <NoWarn>$(NoWarn);CS1701;CS1702;CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1701;CS1702;CS1591;CS3009</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Features>strict</Features>
     <ImplicitUsings>enable</ImplicitUsings>

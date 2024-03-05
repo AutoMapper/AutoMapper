@@ -53,5 +53,6 @@
     <Using Include="AutoMapper.Execution.ExpressionBuilder" Static="true" />
     <Using Include="AutoMapper.Execution" />
     <Using Include="AutoMapper.Configuration" />
+    <Using Include="FastExpressionCompiler" />
   </ItemGroup>
 </Project>
