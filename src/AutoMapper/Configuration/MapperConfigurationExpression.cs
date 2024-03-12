@@ -166,13 +166,16 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
         var autoMapAttributeProfile = new Profile(nameof(AutoMapAttribute));
         foreach (var type in assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Profile).Assembly).SelectMany(a => a.GetTypes()))
         {
-            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)
+            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract)
             {
-                AddProfile(type);
-            }
-            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract && type.ContainsGenericParameters)
-            {
-                AddGenericProfile(type);
+                if (type.ContainsGenericParameters)
+                {
+                    AddGenericProfile(type);
+                }
+                else
+                {
+                    AddProfile(type);    
+                }
             }
 
             foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
