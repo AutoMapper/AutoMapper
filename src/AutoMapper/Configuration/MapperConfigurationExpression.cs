@@ -91,7 +91,7 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
     private readonly List<Profile> _profiles = new();
     private readonly List<Validator> _validators = new();
     private readonly List<IObjectMapper> _mappers;
-    private Func<Type, object> _serviceCtor = GetInstanceOf;
+    private Func<Type, object> _serviceCtor = Activator.CreateInstance;
     private List<IProjectionMapper> _projectionMappers;
 
     public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
@@ -132,7 +132,7 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
 
     public void AddProfile<TProfile>() where TProfile : Profile, new() => AddProfile(new TProfile());
 
-    public void AddProfile(Type profileType) => AddProfile((Profile)GetInstanceOf(profileType));
+    public void AddProfile(Type profileType) => AddProfile((Profile)Activator.CreateInstance(profileType));
     public void AddGenericProfile(Type profileType) => AddProfile((Profile)GetInstanceOfGeneric(profileType));
 
     public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
@@ -204,7 +204,7 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
         var typeArgs = GetGenericArguments(genericType);
         var constructedType = genericType.MakeGenericType(typeArgs);
 
-        return GetInstanceOf(constructedType);
+        return Activator.CreateInstance(constructedType);
     }
 
     private static Type[] GetGenericArguments(
@@ -212,10 +212,4 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
         genericType.GetGenericArguments()
             .Select(_ => typeof(object))
             .ToArray();
-
-    private static object GetInstanceOf(Type type) =>
-        type.GetConstructor(Type.EmptyTypes) != null 
-            ? Activator.CreateInstance(type)! :
-            // Type without parameterless constructor
-            RuntimeHelpers.GetUninitializedObject(type);
 }
