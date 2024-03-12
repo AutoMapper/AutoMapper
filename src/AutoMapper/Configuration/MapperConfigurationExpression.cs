@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using AutoMapper.Features;
 using AutoMapper.Internal.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
@@ -90,7 +91,7 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
     private readonly List<Profile> _profiles = new();
     private readonly List<Validator> _validators = new();
     private readonly List<IObjectMapper> _mappers;
-    private Func<Type, object> _serviceCtor = Activator.CreateInstance;
+    private Func<Type, object> _serviceCtor = GetInstanceOf;
     private List<IProjectionMapper> _projectionMappers;
 
     public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
@@ -131,7 +132,8 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
 
     public void AddProfile<TProfile>() where TProfile : Profile, new() => AddProfile(new TProfile());
 
-    public void AddProfile(Type profileType) => AddProfile((Profile)Activator.CreateInstance(profileType));
+    public void AddProfile(Type profileType) => AddProfile((Profile)GetInstanceOf(profileType));
+    public void AddGenericProfile(Type profileType) => AddProfile((Profile)GetInstanceOfGeneric(profileType));
 
     public void AddProfiles(IEnumerable<Profile> enumerableOfProfiles)
     {
@@ -168,6 +170,10 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
             {
                 AddProfile(type);
             }
+            if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract && type.ContainsGenericParameters)
+            {
+                AddGenericProfile(type);
+            }
 
             foreach (var autoMapAttribute in type.GetCustomAttributes<AutoMapAttribute>())
             {
@@ -189,4 +195,24 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
     }
 
     public void ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor ?? throw new ArgumentNullException(nameof(constructor));
+    
+    private static object GetInstanceOfGeneric(Type genericType)
+    {
+        var typeArgs = GetGenericArguments(genericType);
+        var constructedType = genericType.MakeGenericType(typeArgs);
+
+        return GetInstanceOf(constructedType);
+    }
+
+    private static Type[] GetGenericArguments(
+        Type genericType) =>
+        genericType.GetGenericArguments()
+            .Select(_ => typeof(object))
+            .ToArray();
+
+    private static object GetInstanceOf(Type type) =>
+        type.GetConstructor(Type.EmptyTypes) != null 
+            ? Activator.CreateInstance(type)! :
+            // Type without parameterless constructor
+            RuntimeHelpers.GetUninitializedObject(type);
 }
