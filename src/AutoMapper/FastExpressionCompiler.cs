@@ -4845,7 +4845,7 @@ namespace FastExpressionCompiler
                         if (m.IsSpecialName && m.IsStatic && m.Name == methodName)
                         {
                             var ps = m.GetParameters();
-                            if (ps.Length == 2 && ps[0].ParameterType == leftOpType && ps[1].ParameterType == leftOpType)
+                            if (ps.Length == 2 && ps[0].ParameterType == leftOpType && ps[1].ParameterType == rightOpType)
                             {
                                 var ok = EmitMethodCall(il, m);
                                 if (leftIsNullable)
