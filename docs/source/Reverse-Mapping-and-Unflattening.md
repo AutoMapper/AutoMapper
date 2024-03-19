@@ -87,7 +87,7 @@ cfg.CreateMap<Order, OrderDto>()
 ```
 ### IncludeMembers
 
-`ReverseMap` also integrates with [`IncludeMembers`](Flattening.html#includemembers) and configuration like 
+`ReverseMap` also integrates with [`IncludeMembers`](Flattening.md#includemembers) and configuration like 
 ```c#
 ForMember(destination => destination.IncludedMember, member => member.MapFrom(source => source))
 ```

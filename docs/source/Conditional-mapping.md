@@ -21,7 +21,7 @@ var configuration = new MapperConfiguration(cfg => {
     .ForMember(dest => dest.baz, opt => opt.Condition(src => (src.baz >= 0)));
 });
 ```
-If you have a resolver, see [here](Custom-value-resolvers.html#resolvers-and-conditions) for a concrete example.
+If you have a resolver, see [here](Custom-value-resolvers.md#resolvers-and-conditions) for a concrete example.
   
 ## Preconditions
 
@@ -39,6 +39,6 @@ var configuration = new MapperConfiguration(cfg => {
 });
 ```
 
-You can [see the steps](Understanding-your-mapping.html) yourself.
+You can [see the steps](Understanding-your-mapping.md) yourself.
 
-See [here](Custom-value-resolvers.html#resolvers-and-conditions) for a concrete example.
+See [here](Custom-value-resolvers.md#resolvers-and-conditions) for a concrete example.

@@ -27,8 +27,8 @@ Executing this code produces an AutoMapperConfigurationException, with a descrip
 
 To fix a configuration error (besides renaming the source/destination members), you have three choices for providing an alternate configuration:
 
-* [Custom Value Resolvers](Custom-value-resolvers.html)
-* [Projection](Projection.html)
+* [Custom Value Resolvers](Custom-value-resolvers.md)
+* [Projection](Projection.md)
 * Use the Ignore() option
 
 With the third option, we have a member on the destination type that we will fill with alternative means, and not through the Map operation.

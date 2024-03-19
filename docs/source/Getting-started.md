@@ -10,11 +10,11 @@ Mapping code is boring.  Testing mapping code is even more boring.  AutoMapper p
 
 ## How do I use AutoMapper?
 
-First, you need both a source and destination type to work with.  The destination type's design can be influenced by the layer in which it lives, but AutoMapper works best as long as the names of the members match up to the source type's members.  If you have a source member called "FirstName", this will automatically be mapped to a destination member with the name "FirstName".  AutoMapper also supports [Flattening](Flattening.html).
+First, you need both a source and destination type to work with.  The destination type's design can be influenced by the layer in which it lives, but AutoMapper works best as long as the names of the members match up to the source type's members.  If you have a source member called "FirstName", this will automatically be mapped to a destination member with the name "FirstName".  AutoMapper also supports [Flattening](Flattening.md).
 
-AutoMapper will ignore null reference exceptions when mapping your source to your target. This is by design. If you don't like this approach, you can combine AutoMapper's approach with [custom value resolvers](Custom-value-resolvers.html) if needed.
+AutoMapper will ignore null reference exceptions when mapping your source to your target. This is by design. If you don't like this approach, you can combine AutoMapper's approach with [custom value resolvers](Custom-value-resolvers.md) if needed.
 
-Once you have your types you can create a map for the two types using a `MapperConfiguration` and CreateMap. You only need one `MapperConfiguration` instance typically per AppDomain and should be instantiated during startup. More examples of initial setup can be seen in [Setup](Setup.html).
+Once you have your types you can create a map for the two types using a `MapperConfiguration` and CreateMap. You only need one `MapperConfiguration` instance typically per AppDomain and should be instantiated during startup. More examples of initial setup can be seen in [Setup](Setup.md).
 
 ```c#
 var config = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto>());
@@ -37,7 +37,7 @@ AutoMapper also has non-generic versions of these methods, for those cases where
 
 Configuration should only happen once per AppDomain.  That means the best place to put the configuration code is in application startup, such as the Global.asax file for ASP.NET applications.  Typically, the configuration bootstrapper class is in its own class, and this bootstrapper class is called from the startup method. The bootstrapper class should construct a `MapperConfiguration` object to configure the type maps.
 
-For ASP.NET Core the [Dependency Injection](Dependency-injection.html#asp-net-core) article shows how to configure AutoMapper in your application.
+For ASP.NET Core the [Dependency Injection](Dependency-injection.md#aspnet-core) article shows how to configure AutoMapper in your application.
 
 ## How do I test my mappings?
 

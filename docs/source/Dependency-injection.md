@@ -8,7 +8,7 @@ There is a [NuGet package](https://www.nuget.org/packages/AutoMapper.Extensions.
 
 Starting with version 13.0, `AddAutoMapper` is part of the core package and the DI package is discontinued.
 
-You define the configuration using [profiles](Configuration.html#profile-instances). And then you let AutoMapper know in what assemblies are those profiles defined by calling the `IServiceCollection` extension method `AddAutoMapper` at startup:
+You define the configuration using [profiles](Configuration.md#profile-instances). And then you let AutoMapper know in what assemblies are those profiles defined by calling the `IServiceCollection` extension method `AddAutoMapper` at startup:
 ```c#
 services.AddAutoMapper(profileAssembly1, profileAssembly2 /*, ...*/);
 ```
@@ -36,7 +36,7 @@ Also, check [this blog](https://dotnetfalcon.com/autofac-support-for-automapper/
 
 ## Low level API-s
 
-AutoMapper supports the ability to construct [Custom Value Resolvers](Custom-value-resolvers.html), [Custom Type Converters](Custom-type-converters.html), and [Value Converters](Value-converters.html) using static service location:
+AutoMapper supports the ability to construct [Custom Value Resolvers](Custom-value-resolvers.md), [Custom Type Converters](Custom-type-converters.md), and [Value Converters](Value-converters.md) using static service location:
 
 ```c#
 var configuration = new MapperConfiguration(cfg =>
@@ -59,4 +59,4 @@ var dest = mapper.Map<Source, Destination>(new Source { Value = 15 });
 
 Starting with 8.0 you can use `IMapper.ProjectTo`. For older versions you need to pass the configuration to the extension method ``` IQueryable.ProjectTo<T>(IConfigurationProvider) ```.
 
-Note that `ProjectTo` is [more limited](Queryable-Extensions.html#supported-mapping-options) than `Map`, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with `Map`.
+Note that `ProjectTo` is [more limited](Queryable-Extensions.md#supported-mapping-options) than `Map`, as only what is allowed by the underlying LINQ provider is supported. That means you cannot use DI with value resolvers and converters as you can with `Map`.

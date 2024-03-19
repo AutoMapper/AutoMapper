@@ -1,6 +1,6 @@
 # Value Converters
 
-Value converters are a cross between [Type Converters](Custom-type-converters.html) and [Value Resolvers](Custom-value-resolvers.html). Type converters are globally scoped, so that any time you map from type `Foo` to type `Bar` in any mapping, the type converter will be used. Value converters are scoped to a single map, and receive the source and destination objects to resolve to a value to map to the destination member. Optionally value converters can receive the source member as well.
+Value converters are a cross between [Type Converters](Custom-type-converters.md) and [Value Resolvers](Custom-value-resolvers.md). Type converters are globally scoped, so that any time you map from type `Foo` to type `Bar` in any mapping, the type converter will be used. Value converters are scoped to a single map, and receive the source and destination objects to resolve to a value to map to the destination member. Optionally value converters can receive the source member as well.
 
 In simplified syntax:
 
@@ -41,7 +41,7 @@ You can customize the source member when the source member name does not match:
  });
  ```
 
-If you need the value converters instantiated by the [service locator](Dependency-injection.html), you can specify the type instead:
+If you need the value converters instantiated by the [service locator](Dependency-injection.md), you can specify the type instead:
 
  ```c#
  public class CurrencyFormatter : IValueConverter<decimal, string> {
@@ -73,4 +73,4 @@ If you do not know the types or member names at runtime, use the various overloa
  });
  ```
 
- Value converters are only used for in-memory mapping execution. They will not work for [`ProjectTo`](Queryable-Extensions.html).
+ Value converters are only used for in-memory mapping execution. They will not work for [`ProjectTo`](Queryable-Extensions.md).
