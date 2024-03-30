@@ -1306,7 +1306,7 @@ namespace FastExpressionCompiler
 #else
                                 var pars = la.Parameters;
                                 var paramCount = paramExprs.Count;
-                                var exprs = new Expression[argCount + 1]; // todo: @perf @mem @wip optimize with SmallList
+                                var exprs = new Expression[argCount + 1]; // todo: @perf @mem optimize with SmallList
 #endif
                                 List<ParameterExpression> vars = null;
                                 var reusingParameters = false;
@@ -1798,9 +1798,9 @@ namespace FastExpressionCompiler
         [RequiresUnreferencedCode(Trimming.Message)]
         public static class EmittingVisitor
         {
+            // todo: @perf use UnsafeAccessAttribute
             private static readonly MethodInfo _getTypeFromHandleMethod =
                 ((Func<RuntimeTypeHandle, Type>)Type.GetTypeFromHandle).Method;
-
             private static readonly MethodInfo _objectEqualsMethod =
                 ((Func<object, object, bool>)object.Equals).Method;
 
@@ -1900,7 +1900,7 @@ namespace FastExpressionCompiler
                         case ExpressionType.Equal:
                         case ExpressionType.NotEqual:
                             var binaryExpr = (BinaryExpression)expr;
-                            return TryEmitComparison(binaryExpr.Left, binaryExpr.Right, nodeType, expr.Type, paramExprs, il, ref closure, setup, parent);
+                            return TryEmitComparison(binaryExpr.Left, binaryExpr.Right, expr.Type, nodeType, paramExprs, il, ref closure, setup, parent);
 
                         case ExpressionType.Add:
                         case ExpressionType.AddChecked:
@@ -1926,7 +1926,8 @@ namespace FastExpressionCompiler
                             return TryEmitCoalesceOperator((BinaryExpression)expr, paramExprs, il, ref closure, setup, parent);
 
                         case ExpressionType.Conditional:
-                            return TryEmitConditional((ConditionalExpression)expr, paramExprs, il, ref closure, setup, parent);
+                            var condExpr = (ConditionalExpression)expr;
+                            return TryEmitConditional(condExpr.Test, condExpr.IfTrue, condExpr.IfFalse, paramExprs, il, ref closure, setup, parent);
 
                         case ExpressionType.PostIncrementAssign:
                         case ExpressionType.PreIncrementAssign:
@@ -1969,6 +1970,18 @@ namespace FastExpressionCompiler
                                 var statementCount = statementExprs.Count;
                                 if (statementCount == 0)
                                     return true; // yeah, it is a valid thing
+
+                                // todo: @perf we may simplify the blocks with the known block structure, e.g:
+                                // X t;
+                                // t = a.X;
+                                // b.Y = t;
+                                // recognize this kind of block
+                                // if (blockVarCount == 1)
+                                // {
+                                //     if (statementCount == 2)
+                                //     {
+                                //     }
+                                // }
 
                                 expr = statementExprs[statementCount - 1]; // The last (result) statement in block will provide the result
 
@@ -2756,7 +2769,7 @@ namespace FastExpressionCompiler
                 var op = expr.Operand;
                 if (op.NodeType == ExpressionType.Equal)
                     return TryEmitComparison(((BinaryExpression)op).Left, ((BinaryExpression)op).Right,
-                        ExpressionType.NotEqual, expr.Type, paramExprs, il, ref closure, setup, parent);
+                        expr.Type, ExpressionType.NotEqual, paramExprs, il, ref closure, setup, parent);
 
                 if (!TryEmit(op, paramExprs, il, ref closure, setup, parent))
                     return false;
@@ -2938,7 +2951,7 @@ namespace FastExpressionCompiler
                     il.Demit(OpCodes.Unbox_Any, targetType); // a special case, see AutoMapper StringToEnumConverter.Should_work
                 }
                 else
-                { 
+                {
                     if (targetType.IsEnum)
                         targetType = Enum.GetUnderlyingType(targetType);
 
@@ -3668,7 +3681,7 @@ namespace FastExpressionCompiler
                         // We may avoid it in case of not returning the value or PreIncrement/PreDecrement, but let's do less checks and branching.
                         var baseFlags = parent & ~ParentFlags.IgnoreResult & ~ParentFlags.InstanceCall;
                         var rightOnlyFlags = baseFlags | ParentFlags.AssignmentRightValue;
-                        
+
                         var memberOrIndexFlags = leftMemberExpr != null ? ParentFlags.MemberAccess : ParentFlags.IndexAccess;
                         var leftArLeastFlags = baseFlags | ParentFlags.AssignmentLeftValue | memberOrIndexFlags;
 
@@ -3693,7 +3706,7 @@ namespace FastExpressionCompiler
                             // Emit the left-value instance and index(es) (for the index access)
                             if (leftMemberExpr != null)
                             {
-                                if (objExpr != null && 
+                                if (objExpr != null &&
                                     !TryEmit(objExpr, paramExprs, il, ref closure, setup, leftArLeastFlags | ParentFlags.InstanceAccess))
                                     return false;
                             }
@@ -4366,7 +4379,7 @@ namespace FastExpressionCompiler
                 if (!objIsValueType)
                     ok = EmitMethodCallOrVirtualCall(il, method);
                 else if (method.DeclaringType != typeof(Enum) &&
-                    (!method.IsVirtual || 
+                    (!method.IsVirtual ||
                     method.DeclaringType == objExpr.Type ||
                     objExpr is ParameterExpression pe && pe.IsByRef))
                     ok = EmitMethodCall(il, method);
@@ -4696,26 +4709,133 @@ namespace FastExpressionCompiler
                 CompilerFlags setup, ParentFlags parent)
 #endif
             {
-                // todo: @perf
-                //- use switch statement for int comparison (if int difference is less or equal 3 -> use IL switch)
-                //- TryEmitComparison should not emit "CEQ" so we could use Beq_S instead of Brtrue_S (not always possible (nullable))
-                //- if switch SwitchValue is a nullable parameter, we should call getValue only once and store the result.
-                //- use comparison methods (when defined)
-
-                var endLabel = il.DefineLabel();
+                // todo: @perf #398 use switch statement for int comparison, e.g. if int difference is less or equal 3 -> use IL switch
+                var switchValueExpr = expr.SwitchValue;
+                var customEqualMethod = expr.Comparison;
                 var cases = expr.Cases;
+                if (cases.Count == 1)
+                {
+                    var cs0 = cases[0];
+                    if (cs0.TestValues.Count == 1)
+                    {
+                        Expression testExpr = customEqualMethod == null
+                            ? Equal(switchValueExpr, cs0.TestValues[0])
+                            : Call(customEqualMethod, switchValueExpr, cs0.TestValues[0]);
+                        return TryEmitConditional(testExpr, cs0.Body, expr.DefaultBody, paramExprs, il, ref closure, setup, parent);
+                    }
+                }
+
+                var switchValueType = switchValueExpr.Type;
+                var switchValueIsNullable = switchValueType.IsNullable();
+                Type switchNullableUnderlyingValueType = null;
+                MethodInfo switchNullableHasValueMethod = null;
+                FieldInfo switchNullableUnsafeValueField = null;
+                if (switchValueIsNullable)
+                {
+                    switchNullableUnderlyingValueType = Nullable.GetUnderlyingType(switchValueType);
+                    switchNullableHasValueMethod = switchValueType.GetNullableHasValueGetterMethod();
+                    switchNullableUnsafeValueField = switchValueType.GetNullableValueUnsafeAkaGetValueOrDefaultMethod();
+                }
+
+                var checkType = switchNullableUnderlyingValueType ?? switchValueType;
+                var equalityMethod = customEqualMethod != null
+                    ? customEqualMethod
+                    : !checkType.IsPrimitive && !checkType.IsEnum
+                        ? FindComparisonMethod(il, "op_Equality", switchValueType, switchValueType) ?? _objectEqualsMethod
+                        : null;
+
+                var operandParent = parent & ~ParentFlags.IgnoreResult & ~ParentFlags.InstanceAccess;
+                var isEqualityMethodForUnderlyingNullable = false;
+                int param0ByRefIndex = -1, param1ByRefIndex = -1;
+                if (equalityMethod != null)
+                {
+                    operandParent |= ParentFlags.Call;
+                    var paramInfos = equalityMethod.GetParameters();
+                    Debug.Assert(paramInfos.Length == 2);
+                    var paramType = paramInfos[0].ParameterType;
+                    isEqualityMethodForUnderlyingNullable = paramType == switchNullableUnderlyingValueType;
+                    if (paramType.IsByRef)
+                        param0ByRefIndex = 0;
+                    if (paramInfos[1].ParameterType.IsByRef)
+                        param1ByRefIndex = 1;
+                }
+
+                // Emit the switch value once and store it in the local variable for comparison in cases below
+                if (!TryEmit(switchValueExpr, paramExprs, il, ref closure, setup, operandParent, param0ByRefIndex))
+                    return false;
+
+                var switchValueVar = EmitStoreLocalVariable(il, switchValueType);
+
+                var switchEndLabel = il.DefineLabel();
                 var labels = new Label[cases.Count];
-                var dontIgnoreTestResult = parent & ~ParentFlags.IgnoreResult;
+
                 for (var caseIndex = 0; caseIndex < cases.Count; ++caseIndex)
                 {
                     var cs = cases[caseIndex];
-                    labels[caseIndex] = il.DefineLabel();
+                    var caseBodyLabel = il.DefineLabel();
+                    labels[caseIndex] = caseBodyLabel;
 
                     foreach (var caseTestValue in cs.TestValues)
                     {
-                        if (!TryEmitComparison(expr.SwitchValue, caseTestValue, ExpressionType.Equal, typeof(bool), paramExprs, il, ref closure, setup, dontIgnoreTestResult))
+                        if (!switchValueIsNullable)
+                        {
+                            EmitLoadLocalVariable(il, switchValueVar);
+                            if (!TryEmit(caseTestValue, paramExprs, il, ref closure, setup, operandParent, param1ByRefIndex))
+                                return false;
+                            if (equalityMethod == null)
+                            {
+                                il.Demit(OpCodes.Beq, caseBodyLabel);
+                                continue;
+                            }
+
+                            if (!EmitMethodCall(il, equalityMethod))
+                                return false;
+                            il.Demit(OpCodes.Brtrue, caseBodyLabel);
+                            continue;
+                        }
+
+                        if (equalityMethod != null & !isEqualityMethodForUnderlyingNullable)
+                        {
+                            EmitLoadLocalVariable(il, switchValueVar);
+                            if (!TryEmit(caseTestValue, paramExprs, il, ref closure, setup, operandParent, param1ByRefIndex) ||
+                                !EmitMethodCall(il, equalityMethod))
+                                return false;
+                            il.Demit(OpCodes.Brtrue, caseBodyLabel);
+                            continue;
+                        }
+
+                        if (equalityMethod == null)
+                        {
+                            // short-circuit the comparison with the null, if the switch value has value == false the let's do a Brfalse
+                            if (caseTestValue is ConstantExpression r && r.Value == null)
+                            {
+                                EmitLoadLocalVariableAddress(il, switchValueVar);
+                                EmitMethodCall(il, switchNullableHasValueMethod);
+                                il.Demit(OpCodes.Brfalse, caseBodyLabel);
+                                continue;
+                            }
+                        }
+
+                        // Compare the switch value with the case value via Ceq or comparison method and then compare the HasValue of both
+                        EmitLoadLocalVariableAddress(il, switchValueVar);
+                        il.Demit(OpCodes.Ldfld, switchNullableUnsafeValueField);
+                        if (!TryEmit(caseTestValue, paramExprs, il, ref closure, setup, operandParent, param1ByRefIndex))
                             return false;
-                        il.Demit(OpCodes.Brtrue, labels[caseIndex]);
+                        var caseValueVar = EmitStoreAndLoadLocalVariableAddress(il, switchValueType);
+                        il.Demit(OpCodes.Ldfld, switchNullableUnsafeValueField);
+                        if (equalityMethod == null)
+                            il.Demit(OpCodes.Ceq);
+                        else if (!EmitMethodCall(il, equalityMethod))
+                            return false;
+
+                        EmitLoadLocalVariableAddress(il, switchValueVar);
+                        EmitMethodCall(il, switchNullableHasValueMethod);
+                        EmitLoadLocalVariableAddress(il, caseValueVar);
+                        EmitMethodCall(il, switchNullableHasValueMethod);
+                        il.Demit(OpCodes.Ceq);
+
+                        il.Demit(OpCodes.And); // both the Nullable values and HashValue results need to be true
+                        il.Demit(OpCodes.Brtrue, caseBodyLabel);
                     }
                 }
 
@@ -4723,7 +4843,7 @@ namespace FastExpressionCompiler
                 {
                     if (!TryEmit(expr.DefaultBody, paramExprs, il, ref closure, setup, parent))
                         return false;
-                    il.Demit(OpCodes.Br, endLabel);
+                    il.Demit(OpCodes.Br, switchEndLabel);
                 }
 
                 for (var caseIndex = 0; caseIndex < cases.Count; ++caseIndex)
@@ -4734,14 +4854,31 @@ namespace FastExpressionCompiler
                         return false;
 
                     if (caseIndex != cases.Count - 1)
-                        il.Demit(OpCodes.Br, endLabel);
+                        il.Demit(OpCodes.Br, switchEndLabel);
                 }
 
-                il.DmarkLabel(endLabel);
+                il.DmarkLabel(switchEndLabel);
                 return true;
             }
 
-            private static bool TryEmitComparison(Expression left, Expression right, ExpressionType nodeType, Type exprType,
+            private static MethodInfo FindComparisonMethod(ILGenerator il, string methodName, Type leftOpType, Type rightOpType)
+            {
+                var methods = leftOpType.GetMethods();
+                for (var i = 0; i < methods.Length; i++)
+                {
+                    var m = methods[i];
+                    if (m.IsSpecialName && m.IsStatic && m.Name == methodName)
+                    {
+                        var ps = m.GetParameters();
+                        if (ps.Length == 2 && ps[0].ParameterType == leftOpType && ps[1].ParameterType == rightOpType)
+                            return m;
+                    }
+                }
+                return null;
+            }
+
+            private static bool TryEmitComparison(
+                Expression left, Expression right, Type exprType, ExpressionType nodeType,
 #if LIGHT_EXPRESSION
                 IParameterProvider paramExprs,
 #else
@@ -4755,11 +4892,11 @@ namespace FastExpressionCompiler
 
                 // if on member is `null` object then list its type to match other member
                 var rightIsNull = right is ConstantExpression r && r.Value == null;
-                if (rightIsNull && rightOpType == typeof(object))
+                if (rightIsNull & rightOpType == typeof(object))
                     rightOpType = leftOpType;
 
                 var leftIsNull = left is ConstantExpression l && l.Value == null;
-                if (leftIsNull && leftOpType == typeof(object))
+                if (leftIsNull & leftOpType == typeof(object))
                     leftOpType = rightOpType;
 
                 var operandParent = parent & ~ParentFlags.IgnoreResult & ~ParentFlags.InstanceAccess;
@@ -4806,11 +4943,11 @@ namespace FastExpressionCompiler
                     return false;
 
                 if (leftOpType != rightOpType && leftOpType.IsClass && rightOpType.IsClass &&
-                    (leftOpType == typeof(object) || rightOpType == typeof(object)))
+                    (leftOpType == typeof(object) | rightOpType == typeof(object)))
                 {
                     if (!isEqualityOp)
                         return false;
-                    il.Demit(OpCodes.Ceq); // todo: @? test it, why it is not _objectEqualsMethod 
+                    il.Demit(OpCodes.Ceq); // todo: @question test it, why it is not _objectEqualsMethod 
                     if (nodeType == ExpressionType.NotEqual)
                         EmitEqualToZeroOrNull(il);
                     return il.EmitPopIfIgnoreResult(parent);
@@ -4833,26 +4970,16 @@ namespace FastExpressionCompiler
                         : nodeType == ExpressionType.LessThan ? "op_LessThan"
                         : nodeType == ExpressionType.LessThanOrEqual ? "op_LessThanOrEqual"
                         : null;
-
                     if (methodName == null)
                         return false;
-
-                    // todo: @bug? for now handling only parameters of the same type
-                    var methods = leftOpType.GetMethods();
-                    for (var i = 0; i < methods.Length; i++)
+                    // todo: @bug? for now handling only the parameters of the same type
+                    var method = FindComparisonMethod(il, methodName, leftOpType, rightOpType);
+                    if (method != null)
                     {
-                        var m = methods[i];
-                        if (m.IsSpecialName && m.IsStatic && m.Name == methodName)
-                        {
-                            var ps = m.GetParameters();
-                            if (ps.Length == 2 && ps[0].ParameterType == leftOpType && ps[1].ParameterType == rightOpType)
-                            {
-                                var ok = EmitMethodCall(il, m);
-                                if (leftIsNullable)
-                                    goto nullableCheck;
-                                return ok;
-                            }
-                        }
+                        var ok = EmitMethodCall(il, method);
+                        if (leftIsNullable)
+                            goto nullableCheck;
+                        return ok;
                     }
 
                     if (!isEqualityOp)
@@ -5162,7 +5289,9 @@ namespace FastExpressionCompiler
                 return true;
             }
 
-            private static bool TryEmitConditional(ConditionalExpression expr,
+            private static bool TryEmitConditional(
+                Expression testExpr, Expression ifTrueExpr, Expression ifFalseExpr,
+                // Type type, // todo: @wip what about the type, what if it is a void?
 #if LIGHT_EXPRESSION
                 IParameterProvider paramExprs,
 #else
@@ -5170,8 +5299,8 @@ namespace FastExpressionCompiler
 #endif
                 ILGenerator il, ref ClosureInfo closure, CompilerFlags setup, ParentFlags parent)
             {
-                var testExpr = TryReduceCondition(expr.Test);
-                var nodeType = testExpr.NodeType;
+                testExpr = TryReduceCondition(testExpr);
+                var testNodeType = testExpr.NodeType;
 
                 // Detect a simplistic case when we can use `Brtrue` or `Brfalse`.
                 // We are checking the negative result to go into the `IfFalse` branch,
@@ -5189,64 +5318,57 @@ namespace FastExpressionCompiler
 
                 var useBrFalseOrTrue = -1; // 0 - is comparison with Zero (0, null, false), 1 - is comparison with (true)
                 Type nullOfValueType = null;
-                if (testExpr is BinaryExpression b)
+                if (testExpr is BinaryExpression tb &&
+                    (testNodeType == ExpressionType.Equal | testNodeType == ExpressionType.NotEqual))
                 {
-                    if (nodeType == ExpressionType.Equal | nodeType == ExpressionType.NotEqual)
+                    var testLeftExpr = tb.Left;
+                    var testRightExpr = tb.Right;
+                    Expression oppositeTestExpr = null;
+                    var sideConstExpr = testRightExpr as ConstantExpression ?? testLeftExpr as ConstantExpression;
+                    if (sideConstExpr != null)
                     {
-                        object constVal = null;
-                        if (b.Right is ConstantExpression rc)
+                        oppositeTestExpr = sideConstExpr == testLeftExpr ? testRightExpr : testLeftExpr;
+                        var sideConstVal = sideConstExpr.Value;
+                        if (sideConstVal == null)
                         {
-                            constVal = rc.Value;
-                            if (constVal == null)
+                            useBrFalseOrTrue = 0;
+                            if (oppositeTestExpr.Type.IsNullable())
                             {
-                                useBrFalseOrTrue = 0;
-                                // The null comparison for the nullable is actually a `nullable.HasValue` check,
-                                // which implies member access on nullable struct - therefore loading it by address
-                                if (b.Left.Type.IsNullable())
-                                {
-                                    nullOfValueType = b.Left.Type;
-                                    parent |= ParentFlags.MemberAccess;
-                                }
+                                nullOfValueType = oppositeTestExpr.Type;
+                                parent |= ParentFlags.MemberAccess; // `for the `nullable.HasValue` check
                             }
-                            else if (constVal is bool rcb)
-                            {
-                                useBrFalseOrTrue = rcb ? 1 : 0;
-                            }
-                            else if (constVal is int n && n == 0 || constVal is byte bn && bn == 0)
-                            {
-                                useBrFalseOrTrue = 0;
-                            }
-
-                            if (useBrFalseOrTrue != -1 &&
-                                !TryEmit(b.Left, paramExprs, il, ref closure, setup, parent & ~ParentFlags.IgnoreResult))
-                                return false;
                         }
-                        else if (b.Left is ConstantExpression lc)
+                        else if (sideConstVal is bool boolConst)
+                            useBrFalseOrTrue = boolConst ? 1 : 0;
+                        else if (sideConstVal is int intConst && intConst == 0)
+                            useBrFalseOrTrue = 0; // Brtrue does not work for `1`, you need to use Beq, or similar
+                        else if (sideConstVal is byte bytConst && bytConst == 0)
+                            useBrFalseOrTrue = 0;
+                    }
+                    else
+                    {
+                        var sideDefaultExpr = testRightExpr as DefaultExpression ?? testLeftExpr as DefaultExpression;
+                        if (sideDefaultExpr != null)
                         {
-                            constVal = lc.Value;
-                            if (constVal == null)
+                            oppositeTestExpr = sideDefaultExpr == testLeftExpr ? testRightExpr : testLeftExpr;
+                            var testSideType = sideDefaultExpr.Type;
+                            if (testSideType.IsPrimitiveWithZeroDefault())
+                                useBrFalseOrTrue = 0;
+                            else if (testSideType.IsClass || testSideType.IsNullable())
                             {
                                 useBrFalseOrTrue = 0;
-                                if (b.Right.Type.IsNullable())
+                                if (oppositeTestExpr.Type.IsNullable())
                                 {
-                                    nullOfValueType = b.Right.Type;
-                                    parent |= ParentFlags.MemberAccess;
+                                    nullOfValueType = oppositeTestExpr.Type;
+                                    parent |= ParentFlags.MemberAccess; // `for the `nullable.HasValue` check
                                 }
                             }
-                            else if (constVal is bool lcb)
-                            {
-                                useBrFalseOrTrue = lcb ? 1 : 0;
-                            }
-                            else if (constVal is int n && n == 0 || constVal is byte bn && bn == 0)
-                            {
-                                useBrFalseOrTrue = 0;
-                            }
-
-                            if (useBrFalseOrTrue != -1 &&
-                                !TryEmit(b.Right, paramExprs, il, ref closure, setup, parent & ~ParentFlags.IgnoreResult))
-                                return false;
                         }
                     }
+
+                    if (useBrFalseOrTrue != -1 &&
+                        !TryEmit(oppositeTestExpr, paramExprs, il, ref closure, setup, parent & ~ParentFlags.IgnoreResult))
+                        return false;
                 }
 
                 if (useBrFalseOrTrue == -1)
@@ -5263,8 +5385,8 @@ namespace FastExpressionCompiler
                 }
 
                 var labelIfFalse = il.DefineLabel();
-                if ((nodeType == ExpressionType.Equal & useBrFalseOrTrue == 0) ||
-                    (nodeType == ExpressionType.NotEqual & useBrFalseOrTrue == 1))
+                if ((testNodeType == ExpressionType.Equal & useBrFalseOrTrue == 0) ||
+                    (testNodeType == ExpressionType.NotEqual & useBrFalseOrTrue == 1))
                 {
                     // todo: @perf incomplete:
                     // try to recognize the pattern like in #301(300) `if (b == null) { goto return_label; }` 
@@ -5275,10 +5397,9 @@ namespace FastExpressionCompiler
                 else
                     il.Demit(OpCodes.Brfalse, labelIfFalse);
 
-                if (!TryEmit(expr.IfTrue, paramExprs, il, ref closure, setup, parent))
+                if (!TryEmit(ifTrueExpr, paramExprs, il, ref closure, setup, parent))
                     return false;
 
-                var ifFalseExpr = expr.IfFalse;
                 if (ifFalseExpr.NodeType == ExpressionType.Default && ifFalseExpr.Type == typeof(void))
                     il.DmarkLabel(labelIfFalse);
                 else
@@ -5293,7 +5414,6 @@ namespace FastExpressionCompiler
                 return true;
             }
 
-            // todo: @perf too many ifs - lets optimize it
             private static Expression TryReduceCondition(Expression testExpr)
             {
                 // removing Not by turning Equal -> NotEqual, NotEqual -> Equal
@@ -5642,6 +5762,31 @@ namespace FastExpressionCompiler
             type == typeof(uint) ||
             type == typeof(ulong);
 
+        internal static bool IsPrimitiveWithZeroDefault(this Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Boolean:
+                case TypeCode.Char:
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Decimal:
+                    return true;
+                // case TypeCode.DateTime:
+                // case TypeCode.String:
+                default:
+                    return false;
+            }
+        }
+
         [MethodImpl((MethodImplOptions)256)]
         internal static bool IsNullable(this Type type) =>
             (type.IsValueType & type.IsGenericType) && type.GetGenericTypeDefinition() == typeof(Nullable<>);
@@ -5688,9 +5833,9 @@ namespace FastExpressionCompiler
             public static readonly Type NullableType = typeof(T?);
             public static readonly MethodInfo ValueGetterMethod =
                 NullableType.GetProperty("Value").GetMethod;
-            public static readonly MethodInfo HasValueGetterMethod = 
+            public static readonly MethodInfo HasValueGetterMethod =
                 NullableType.GetProperty("HasValue").GetMethod;
-            public static readonly FieldInfo ValueField = 
+            public static readonly FieldInfo ValueField =
                 NullableType.GetField("value", BindingFlags.Instance | BindingFlags.NonPublic);
             public static readonly ConstructorInfo Constructor =
                 NullableType.GetConstructors()[0];
@@ -5699,7 +5844,7 @@ namespace FastExpressionCompiler
         [RequiresUnreferencedCode(Trimming.Message)]
         [MethodImpl((MethodImplOptions)256)]
         internal static MethodInfo FindNullableValueGetterMethod(this Type type) =>
-            type == typeof(int?) 
+            type == typeof(int?)
                 ? NullableReflected<int>.ValueGetterMethod
                 : type.GetProperty("Value").GetMethod;
 
@@ -5720,7 +5865,7 @@ namespace FastExpressionCompiler
         [RequiresUnreferencedCode(Trimming.Message)]
         [MethodImpl((MethodImplOptions)256)]
         internal static ConstructorInfo GetNullableConstructor(this Type type) =>
-            type == typeof(int?) 
+            type == typeof(int?)
                 ? NullableReflected<int>.Constructor
                 : type.GetConstructors()[0];
 
@@ -5933,7 +6078,9 @@ namespace FastExpressionCompiler
         public static void Demit(this ILGenerator il, OpCode opcode, FieldInfo value, [CallerMemberName] string emitterName = null, [CallerLineNumber] int emitterLine = 0)
         {
             il.Emit(opcode, value);
-            Debug.WriteLine($"{opcode} {value}  -- {emitterName}:{emitterLine}");
+            var t = value.DeclaringType;
+            var fieldStr = value.FieldType.Name + " " + t.Name + "." + value.Name;
+            Debug.WriteLine($"{opcode} {fieldStr}  -- {emitterName}:{emitterLine}");
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -6823,11 +6970,14 @@ namespace FastExpressionCompiler
             /// <summary>Return expression</summary>
             Return,
             /// <summary>Instructs the client code to avoid parenthesis for the generated C# code, e.g. if we have as single argument in a method</summary>
-            AvoidParens
+            AvoidParens,
+            /// <summary>The instance when calling the instance method or accessing the instance member</summary>
+            Instance,
         }
 
         internal static StringBuilder ToCSharpString(this Expression e, StringBuilder sb, EnclosedIn enclosedIn,
-            int lineIdent = 0, bool stripNamespace = false, Func<Type, string, string> printType = null, int identSpaces = 4, CodePrinter.ObjectToCode notRecognizedToCode = null)
+            int lineIdent = 0, bool stripNamespace = false, Func<Type, string, string> printType = null, int identSpaces = 4,
+            CodePrinter.ObjectToCode notRecognizedToCode = null)
         {
 #if LIGHT_EXPRESSION
             if (e.IsCustomToCSharpString)
@@ -6884,7 +7034,7 @@ namespace FastExpressionCompiler
                         if (diffTypes) sb.Append("((").Append(mc.Type.ToCode(stripNamespace, printType)).Append(')');
 
                         if (mc.Object != null)
-                            mc.Object.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            mc.Object.ToCSharpString(sb, EnclosedIn.Instance, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         else // for the static method or the static extension method we need to qualify with the class
                             sb.Append(mc.Method.DeclaringType.ToCode(stripNamespace, printType));
 
@@ -6909,10 +7059,10 @@ namespace FastExpressionCompiler
                         if (args.Count == 1)
                         {
                             var p = pars[0];
-                            if (p.ParameterType.IsByRef)
+                            var a = args[0];
+                            if (p.ParameterType.IsByRef && !IsConstantOrDefault(a))
                                 sb.Append(p.IsOut ? "out " : p.IsIn ? "in" : "ref ");
-                            args[0].ToCSharpString(sb, EnclosedIn.AvoidParens,
-                                lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            a.ToCSharpString(sb, EnclosedIn.AvoidParens, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         }
                         else if (args.Count > 1)
                         {
@@ -6920,12 +7070,10 @@ namespace FastExpressionCompiler
                             {
                                 (i == 0 ? sb : sb.Append(',')).NewLineIdent(lineIdent);
                                 var p = pars[i];
-                                if (p.ParameterType.IsByRef)
+                                var a = args[i];
+                                if (p.ParameterType.IsByRef && !IsConstantOrDefault(a))
                                     sb.Append(p.IsOut ? "out " : p.IsIn ? "in " : "ref ");
-
-                                // @debug
-                                // sb.Append($"[lineIdent:{lineIdent}]");
-                                args[i].ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                                a.ToCSharpString(sb, EnclosedIn.AvoidParens, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             }
                         }
                         // for the different return and expression types wrapping the whole expression including the cast with additional parentheses
@@ -7001,10 +7149,11 @@ namespace FastExpressionCompiler
                         // `(DeserializerDlg<Word>)((ref ReadOnlySequence<Byte> input, Word value, out Int64 bytesRead) => {...})`
                         // 
                         sb.Append('(').Append(e.Type.ToCode(stripNamespace, printType)).Append(")((");
+                        var lambdaMethod = x.Type.FindDelegateInvokeMethod();
                         var count = x.Parameters.Count;
                         if (count > 0)
                         {
-                            var pars = x.Type.FindDelegateInvokeMethod().GetParameters();
+                            var pars = lambdaMethod.GetParameters();
                             for (var i = 0; i < count; i++)
                             {
                                 if (i > 0)
@@ -7021,12 +7170,12 @@ namespace FastExpressionCompiler
                             }
                         }
 
-                        sb.Append(") =>");
+                        sb.Append(") => //").Append(lambdaMethod.ReturnType.ToCode(stripNamespace, printType));
                         var body = x.Body;
                         var bNodeType = body.NodeType;
-                        var isBodyExpression = bNodeType != ExpressionType.Block && bNodeType != ExpressionType.Try && bNodeType != ExpressionType.Loop;
+                        var isReturnableExpression = IsReturnable(bNodeType);
                         var ignoresResult = x.ReturnType == typeof(void);
-                        if (isBodyExpression & !ignoresResult)
+                        if (isReturnableExpression & !ignoresResult)
                             sb.NewLineIdentCs(body, EnclosedIn.LambdaBody, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         else
                         {
@@ -7038,7 +7187,7 @@ namespace FastExpressionCompiler
                             else
                             {
                                 sb.NewLineIdentCs(body, EnclosedIn.LambdaBody, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
-                                if (isBodyExpression)
+                                if (isReturnableExpression)
                                     sb.AddSemicolonIfFits();
                             }
                             sb.NewLine(lineIdent, identSpaces).Append('}');
@@ -7106,7 +7255,7 @@ namespace FastExpressionCompiler
                                 if (ifTrue is BlockExpression bl)
                                     bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
                                 else
-                                    sb.NewLineIdentCs(ifTrue,  lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                                    sb.NewLineIdentCs(ifTrue, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                                 sb.NewLineIdent(lineIdent).Append("}) : ");
                             }
                             else
@@ -7191,7 +7340,7 @@ namespace FastExpressionCompiler
                             else
                             {
                                 sb.NewLineIdent(lineIdent);
-                                if (returnsValue && CanBeReturned(part.NodeType))
+                                if (returnsValue && IsReturnable(part.NodeType))
                                     sb.Append("return ");
                                 part.ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
                             }
@@ -7253,7 +7402,7 @@ namespace FastExpressionCompiler
                             if (gtValue == null)
                                 return sb.Append("return;");
 
-                            if (CanBeReturned(gtValue.NodeType))
+                            if (IsReturnable(gtValue.NodeType))
                                 sb.Append("return ");
                             gtValue.ToCSharpString(sb, lineIdent - identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             return sb;
@@ -7276,24 +7425,43 @@ namespace FastExpressionCompiler
                             }
 
                             sb.NewLineIdent(lineIdent + identSpaces);
-                            cs.Body.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
+                            if (enclosedIn == EnclosedIn.LambdaBody)
+                            {
+                                if (cs.Body is BlockExpression bl)
+                                    bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
+                                else
+                                    cs.Body.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
+                            }
+                            else
+                                cs.Body.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
                         }
 
                         if (x.DefaultBody != null)
                         {
                             sb.NewLineIdent(lineIdent).Append("default:").NewLineIdent(lineIdent + identSpaces);
-                            x.DefaultBody.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
+                            if (enclosedIn == EnclosedIn.LambdaBody)
+                            {
+                                if (x.DefaultBody is BlockExpression bl)
+                                    bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
+                                else
+                                    x.DefaultBody.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
+                            }
+                            else
+                                x.DefaultBody.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonIfFits();
                         }
 
                         return sb.NewLine(lineIdent, identSpaces).Append("}");
                     }
                 case ExpressionType.Default:
                     {
+                        var encloseInParens = enclosedIn == EnclosedIn.Instance;
                         return e.Type == typeof(void) ? sb // `default(void)` does not make sense in the C#
                             : e.Type == typeof(object) ? sb.Append("null")
                             : e.Type.IsValueType && !e.Type.IsNullable()
-                            ? sb.Append("default(").Append(e.Type.ToCode(stripNamespace, printType)).Append(')')
-                            : sb.Append('(').Append(e.Type.ToCode(stripNamespace, printType)).Append(")null");
+                                ? sb.Append("default(").Append(e.Type.ToCode(stripNamespace, printType)).Append(')')
+                                : sb.Append(encloseInParens ? "((" : "(")
+                                    .Append(e.Type.ToCode(stripNamespace, printType)).Append(")null")
+                                    .Append(encloseInParens ? ")" : "");
                     }
                 case ExpressionType.TypeIs:
                 case ExpressionType.TypeEqual:
@@ -7349,7 +7517,7 @@ namespace FastExpressionCompiler
 
                                 case ExpressionType.Not: // either the bool not or the binary not
                                     return op.ToCSharpString(
-                                        e.Type == typeof(bool) ? sb.Append("!(") : sb.Append("~("),
+                                        e.Type == typeof(bool) ? sb.Append("!(") : sb.Append("~("), enclosedIn,
                                         lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).Append(')');
 
                                 case ExpressionType.Convert:
@@ -7452,8 +7620,7 @@ namespace FastExpressionCompiler
 
                                 sb.Append(OperatorToCSharpString(nodeType));
 
-                                var isByRefAssignment = b.Left is ParameterExpression leftParam && leftParam.IsByRef;
-                                if (isByRefAssignment)
+                                if (b.Left is ParameterExpression leftParam && leftParam.IsByRef && !IsConstantOrDefault(b.Right))
                                     sb.Append("ref ");
 
                                 return b.Right.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
@@ -7514,12 +7681,29 @@ namespace FastExpressionCompiler
             return sb;
         }
 
-        private static bool CanBeReturned(ExpressionType nt) =>
-            nt != ExpressionType.Goto &&
-            nt != ExpressionType.Throw &&
-            nt != ExpressionType.Block &&
-            nt != ExpressionType.Try &&
-            nt != ExpressionType.Loop;
+        private static bool IsReturnable(ExpressionType nodeType) =>
+            nodeType != ExpressionType.Goto &
+            nodeType != ExpressionType.Label &
+            nodeType != ExpressionType.Throw &
+            nodeType != ExpressionType.Block &
+            nodeType != ExpressionType.Try &
+            nodeType != ExpressionType.Switch &
+            nodeType != ExpressionType.Loop;
+
+        private static bool IsBlockLike(ExpressionType nodeType) =>
+            nodeType == ExpressionType.Try &
+            nodeType == ExpressionType.Conditional &
+            nodeType == ExpressionType.Switch &
+            nodeType == ExpressionType.Block &
+            nodeType == ExpressionType.Loop;
+
+        private static bool IsConstantOrDefault(Expression expr)
+        {
+            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
+                return IsConstantOrDefault(unary.Operand);
+            var nodeType = expr.NodeType;
+            return nodeType == ExpressionType.Constant | nodeType == ExpressionType.Default;
+        }
 
         private static string GetCSharpName(this MemberInfo m)
         {
@@ -7622,7 +7806,8 @@ namespace FastExpressionCompiler
                     if (gt.Value == null)
                         sb.Append("return;");
                     else
-                        gt.Value.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
+                        gt.Value.ToCSharpString(sb.Append("return "),
+                            EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                             .AddSemicolonIfFits();
 
                     sb.NewLineIdent(lineIdent);
@@ -7630,7 +7815,8 @@ namespace FastExpressionCompiler
                     if (label.DefaultValue == null)
                         return sb.AppendLine(); // no return because we may have other expressions after label
                     sb.NewLineIdent(lineIdent);
-                    return label.DefaultValue.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
+                    return label.DefaultValue.ToCSharpString(sb.Append("return "),
+                        EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                         .AddSemicolonIfFits();
                 }
 
@@ -7649,15 +7835,10 @@ namespace FastExpressionCompiler
                         expr.ToCSharpString(sb, EnclosedIn.Block, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
                     // Preventing the `};` kind of situation and separating the conditional block with empty line
-                    if (expr is BlockExpression ||
-                        expr is ConditionalExpression ||
-                        expr is TryExpression ||
-                        expr is LoopExpression ||
-                        expr is SwitchExpression)
+                    var nodeType = expr.NodeType;
+                    if (IsBlockLike(nodeType))
                         sb.NewLineIdent(lineIdent);
-                    else if (!(
-                        expr is LabelExpression ||
-                        expr is DefaultExpression))
+                    else if (nodeType != ExpressionType.Label & nodeType != ExpressionType.Default)
                         sb.AddSemicolonIfFits();
                 }
             }
@@ -7862,7 +8043,7 @@ namespace FastExpressionCompiler
         }
 
         internal static StringBuilder AppendName<T>(this StringBuilder sb, string name, string typeCode, T identity, string suffix = "") =>
-            name != null 
+            name != null
                 ? sb.Append(name + suffix)
                 : sb.Append(typeCode.Replace('.', '_').Replace('<', '_').Replace('>', '_').Replace(", ", "_").Replace("?", "").ToLowerInvariant())
                     .Append("__").Append(identity.GetHashCode())
