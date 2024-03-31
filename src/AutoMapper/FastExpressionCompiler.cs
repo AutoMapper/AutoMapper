@@ -2330,18 +2330,18 @@ namespace FastExpressionCompiler
             }
 
 #if LIGHT_EXPRESSION
-            private static bool TryEmitCoalesceOperator(BinaryExpression exprObj, IParameterProvider paramExprs, ILGenerator il, ref ClosureInfo closure,
+            private static bool TryEmitCoalesceOperator(BinaryExpression expr, IParameterProvider paramExprs, ILGenerator il, ref ClosureInfo closure,
                 CompilerFlags setup, ParentFlags parent)
 #else
-            private static bool TryEmitCoalesceOperator(BinaryExpression exprObj, IReadOnlyList<PE> paramExprs, ILGenerator il, ref ClosureInfo closure,
+            private static bool TryEmitCoalesceOperator(BinaryExpression expr, IReadOnlyList<PE> paramExprs, ILGenerator il, ref ClosureInfo closure,
                 CompilerFlags setup, ParentFlags parent)
 #endif
             {
                 var labelFalse = il.DefineLabel(); // todo: @perf define only if needed
                 var labelDone = il.DefineLabel();
 
-                var left = exprObj.Left;
-                var right = exprObj.Right;
+                var left = expr.Left;
+                var right = expr.Right;
 
                 // we won't OpCodes.Pop inside the Coalesce as it may leave the Il in invalid state - instead we will pop at the end here (#284)
                 var flags = (parent & ~ParentFlags.IgnoreResult) | ParentFlags.Coalesce;
@@ -2350,14 +2350,24 @@ namespace FastExpressionCompiler
                     return false;
 
                 var leftType = left.Type;
-                if (leftType.IsValueType) // Nullable -> It's the only ValueType comparable to null
+                if (leftType.IsValueType)
                 {
+                    Debug.Assert(leftType.IsNullable(), "Expecting Nullable, it is the only ValueType comparable to null");
+
                     var varIndex = EmitStoreAndLoadLocalVariableAddress(il, leftType);
                     EmitMethodCall(il, leftType.GetNullableHasValueGetterMethod());
 
                     il.Demit(OpCodes.Brfalse, labelFalse);
-                    EmitLoadLocalVariableAddress(il, varIndex);
-                    il.Demit(OpCodes.Ldfld, leftType.GetNullableValueUnsafeAkaGetValueOrDefaultMethod());
+
+                    if (expr.Type == leftType.GetUnderlyingNullableTypeUnsafe())
+                    {
+                        // if the target expression type is of underlying nullable, and the left operand is not null,
+                        // then extract its underlying value
+                        EmitLoadLocalVariableAddress(il, varIndex);
+                        il.Demit(OpCodes.Ldfld, leftType.GetNullableValueUnsafeAkaGetValueOrDefaultMethod());
+                    }
+                    else
+                        EmitLoadLocalVariable(il, varIndex); // loading the value (not address) to return it
 
                     il.Demit(OpCodes.Br, labelDone);
                     il.DmarkLabel(labelFalse);
@@ -2375,16 +2385,16 @@ namespace FastExpressionCompiler
                     if (!TryEmit(right, paramExprs, il, ref closure, setup, flags))
                         return false;
 
-                    if (right.Type != exprObj.Type)
+                    if (right.Type != expr.Type)
                         il.TryEmitBoxOf(right.Type);
 
-                    if (left.Type == exprObj.Type)
+                    if (left.Type == expr.Type)
                         il.DmarkLabel(labelFalse);
                     else
                     {
                         il.Demit(OpCodes.Br, labelDone);
                         il.DmarkLabel(labelFalse); // todo: @bug? should we insert the boxing for the Nullable value type before the Castclass
-                        il.Demit(OpCodes.Castclass, exprObj.Type);
+                        il.Demit(OpCodes.Castclass, expr.Type);
                         il.DmarkLabel(labelDone);
                     }
                 }
@@ -5795,6 +5805,9 @@ namespace FastExpressionCompiler
         internal static Type GetUnderlyingNullableTypeOrNull(this Type type) =>
             (type.IsValueType & type.IsGenericType) && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? type.GetGenericArguments()[0] : null;
 
+        [MethodImpl((MethodImplOptions)256)]
+        internal static Type GetUnderlyingNullableTypeUnsafe(this Type type) => type.GetGenericArguments()[0];
+
         public static string GetArithmeticBinaryOperatorMethodName(this ExpressionType nodeType) =>
             nodeType switch
             {
@@ -6094,7 +6107,8 @@ namespace FastExpressionCompiler
         public static void Demit(this ILGenerator il, OpCode opcode, ConstructorInfo value, [CallerMemberName] string emitterName = null, [CallerLineNumber] int emitterLine = 0)
         {
             il.Emit(opcode, value);
-            Debug.WriteLine($"{opcode} {value}  -- {emitterName}:{emitterLine}");
+            var ctorStr = value.ToString().Replace(".", value.DeclaringType.Name + ".");
+            Debug.WriteLine($"{opcode} {ctorStr}  -- {emitterName}:{emitterLine}");
         }
 
         [MethodImpl((MethodImplOptions)256)]
