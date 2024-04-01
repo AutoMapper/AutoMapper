@@ -18,7 +18,7 @@ public interface ISourceMemberConfigurationExpression
 public sealed class SourceMappingExpression : ISourceMemberConfigurationExpression, ISourceMemberConfiguration
 {
     private readonly MemberInfo _sourceMember;
-    private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new List<Action<SourceMemberConfig>>();
+    private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new();
 
     public SourceMappingExpression(MemberInfo sourceMember) => _sourceMember = sourceMember;
 
