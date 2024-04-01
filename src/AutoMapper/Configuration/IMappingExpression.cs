@@ -101,7 +101,7 @@ public interface IMappingExpression<TSource, TDestination> : IMappingExpressionB
     /// <typeparam name="T">Destination type to use</typeparam>
     void As<T>() where T : TDestination;
 }
-public interface IProjectionExpression<TSource, TDestination, TMappingExpression> : IProjectionExpressionBase<TSource, TDestination, TMappingExpression>
+public interface IProjectionExpression<TSource, TDestination, out TMappingExpression> : IProjectionExpressionBase<TSource, TDestination, TMappingExpression>
     where TMappingExpression : IProjectionExpressionBase<TSource, TDestination, TMappingExpression>
 {
     /// <summary>
