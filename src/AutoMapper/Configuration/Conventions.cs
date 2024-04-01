@@ -7,7 +7,7 @@ public interface ISourceToDestinationNameMapper
 [EditorBrowsable(EditorBrowsableState.Never)]
 public sealed class MemberConfiguration
 {
-    NameSplitMember _nameSplitMember;
+    private NameSplitMember _nameSplitMember;
     public INamingConvention SourceNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
     public INamingConvention DestinationNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
     public List<ISourceToDestinationNameMapper> NameToMemberMappers { get; } = new();
