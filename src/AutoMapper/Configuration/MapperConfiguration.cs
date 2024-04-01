@@ -46,16 +46,16 @@ public sealed class MapperConfiguration : IGlobalConfiguration
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
     private readonly bool _hasOpenMaps;
-    private readonly HashSet<TypeMap> _typeMapsPath = new();
-    private readonly List<MemberInfo> _sourceMembers = new();
-    private readonly List<ParameterExpression> _variables = new();
-    private readonly ParameterExpression[] _parameters = new[] { null, null, ContextParameter };
-    private readonly CatchBlock[] _catches = new CatchBlock[1];
-    private readonly List<Expression> _expressions = new();
+    private readonly HashSet<TypeMap> _typeMapsPath;
+    private readonly List<MemberInfo> _sourceMembers;
+    private readonly List<ParameterExpression> _variables;
+    private readonly ParameterExpression[] _parameters;
+    private readonly CatchBlock[] _catches;
+    private readonly List<Expression> _expressions;
     private readonly Dictionary<Type, DefaultExpression> _defaults;
-    private readonly ParameterReplaceVisitor _parameterReplaceVisitor = new();
-    private readonly ConvertParameterReplaceVisitor _convertParameterReplaceVisitor = new();
-    private readonly List<Type> _typesInheritance = new();
+    private readonly ParameterReplaceVisitor _parameterReplaceVisitor;
+    private readonly ConvertParameterReplaceVisitor _convertParameterReplaceVisitor;
+    private readonly List<Type> _typesInheritance;
     public MapperConfiguration(MapperConfigurationExpression configurationExpression)
     {
         var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -291,7 +291,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         {
             typeMap = GetTypeMap(typePair);
             _resolvedMaps.Add(typePair, typeMap);
-            if (typeMap != null && typeMap.MapExpression == null)
+            if (typeMap is { MapExpression: null })
             {
                 typeMap.Seal(this);
             }
@@ -300,7 +300,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         {
             typeMap = _runtimeMaps.GetOrAdd(typePair);
             // if it's a dynamically created type map, we need to seal it outside GetTypeMap to handle recursion
-            if (typeMap != null && typeMap.MapExpression == null)
+            if (typeMap is { MapExpression: null })
             {
                 lock (typeMap)
                 {
