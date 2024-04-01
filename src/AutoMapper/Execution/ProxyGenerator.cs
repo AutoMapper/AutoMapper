@@ -28,7 +28,7 @@ public static class ProxyGenerator
             GeneratePropertyChanged();
         }
         GenerateFields();
-        return typeBuilder.CreateTypeInfo().AsType();
+        return typeBuilder.CreateTypeInfo()?.AsType();
         TypeBuilder GenerateType()
         {
             var propertyNames = string.Join("_", typeDescription.AdditionalProperties.Select(p => p.Name));
