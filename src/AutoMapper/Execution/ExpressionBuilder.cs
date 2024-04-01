@@ -2,7 +2,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 namespace AutoMapper.Execution;
-using static Internal.ReflectionHelper;
+using static ReflectionHelper;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class ExpressionBuilder
 {
@@ -427,22 +427,22 @@ public static class ExpressionBuilder
 public readonly record struct Member(Expression Expression, MemberInfo MemberInfo, Expression Target);
 public class ReplaceVisitorBase : ExpressionVisitor
 {
-    private protected Expression _oldNode;
-    private protected Expression _newNode;
+    private protected Expression OldNode;
+    private protected Expression NewNode;
     public virtual Expression Replace(Expression target, Expression oldNode, Expression newNode)
     {
-        _oldNode = oldNode;
-        _newNode = newNode;
+        OldNode = oldNode;
+        NewNode = newNode;
         return base.Visit(target);
     }
 }
 public class ReplaceVisitor : ReplaceVisitorBase
 {
-    public override Expression Visit(Expression node) => _oldNode == node ? _newNode : base.Visit(node);
+    public override Expression Visit(Expression node) => OldNode == node ? NewNode : base.Visit(node);
 }
 public class ParameterReplaceVisitor : ReplaceVisitorBase
 {
-    protected override Expression VisitParameter(ParameterExpression node) => _oldNode == node ? _newNode : base.VisitParameter(node);
+    protected override Expression VisitParameter(ParameterExpression node) => OldNode == node ? NewNode : base.VisitParameter(node);
 }
 public class ConvertParameterReplaceVisitor : ParameterReplaceVisitor
 {
