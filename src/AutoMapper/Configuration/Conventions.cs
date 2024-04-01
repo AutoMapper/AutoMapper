@@ -133,7 +133,7 @@ public abstract class NameSplitMember
 [EditorBrowsable(EditorBrowsableState.Never)]
 public sealed class DefaultNameSplitMember : NameSplitMember
 {
-    public sealed override bool IsMatch(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
+    public override bool IsMatch(ProfileMap options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
     {
         MemberInfo matchingMemberInfo = null;
         int index = 1;
