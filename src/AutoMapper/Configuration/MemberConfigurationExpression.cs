@@ -128,7 +128,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     public void Configure(TypeMap typeMap)
     {
         var destMember = DestinationMember;
-        if(destMember.DeclaringType.ContainsGenericParameters)
+        if(destMember.DeclaringType is { ContainsGenericParameters: true })
         {
             destMember = Array.Find(typeMap.DestinationTypeDetails.ReadAccessors, m => m.MetadataToken == destMember.MetadataToken);
         }
