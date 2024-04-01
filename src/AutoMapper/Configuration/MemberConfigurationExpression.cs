@@ -158,7 +158,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
             reversedMemberConfiguration.MapFrom(DestinationMember.Name);
             return reversedMemberConfiguration;
         }
-        if (destinationType.IsGenericTypeDefinition) // .ForMember("InnerSource", o => o.MapFrom(s => s))
+        if (destinationType is { IsGenericTypeDefinition: true }) // .ForMember("InnerSource", o => o.MapFrom(s => s))
         {
             return null;
         }
