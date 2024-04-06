@@ -8,9 +8,9 @@ public interface ISourceToDestinationNameMapper
 public sealed class MemberConfiguration
 {
     NameSplitMember _nameSplitMember;
-    public INamingConvention SourceNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
-    public INamingConvention DestinationNamingConvention { get; set; } = PascalCaseNamingConvention.Instance;
-    public List<ISourceToDestinationNameMapper> NameToMemberMappers { get; } = new();
+    public INamingConvention SourceNamingConvention { get; set; }
+    public INamingConvention DestinationNamingConvention { get; set; }
+    public List<ISourceToDestinationNameMapper> NameToMemberMappers { get; } = [];
     public bool IsMatch(ProfileMap options, TypeDetails sourceTypeDetails, Type destType, Type destMemberType, string nameToSearch, List<MemberInfo> resolvers, bool isReverseMap)
     {
         var matchingMemberInfo = GetSourceMember(sourceTypeDetails, destType, destMemberType, nameToSearch);
@@ -45,10 +45,6 @@ public sealed class MemberConfiguration
     }
     public void Merge(MemberConfiguration other)
     {
-        if (other == null)
-        {
-            return;
-        }
         var initialCount = NameToMemberMappers.Count;
         for (int index = 0; index < other.NameToMemberMappers.Count; index++)
         {
@@ -64,6 +60,8 @@ public sealed class MemberConfiguration
             }
             NameToMemberMappers.Add(otherMapper);
         }
+        SourceNamingConvention ??= other.SourceNamingConvention;
+        DestinationNamingConvention ??= other.DestinationNamingConvention;
     }
 }
 public sealed class PrePostfixName : ISourceToDestinationNameMapper

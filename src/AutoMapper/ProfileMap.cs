@@ -27,7 +27,15 @@ public sealed class ProfileMap
         ValueTransformers = profile.ValueTransformers.Concat(configuration?.ValueTransformers).ToArray();
         var profileInternal = (IProfileExpressionInternal)profile;
         MemberConfiguration = profileInternal.MemberConfiguration;
-        MemberConfiguration.Merge(configuration.Internal()?.MemberConfiguration);
+        if(configuration == null)
+        {
+            MemberConfiguration.SourceNamingConvention ??= PascalCaseNamingConvention.Instance;
+            MemberConfiguration.DestinationNamingConvention ??= PascalCaseNamingConvention.Instance;
+        }
+        else
+        {
+            MemberConfiguration.Merge(configuration.Internal().MemberConfiguration);
+        }
         var globalIgnores = profile.GlobalIgnores.Concat(globalProfile?.GlobalIgnores);
         GlobalIgnores = globalIgnores == Array.Empty<string>() ? EmptyHashSet : new HashSet<string>(globalIgnores);
         SourceExtensionMethods = profile.SourceExtensionMethods.Concat(globalProfile?.SourceExtensionMethods).ToArray();
