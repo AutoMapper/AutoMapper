@@ -1971,17 +1971,17 @@ namespace FastExpressionCompiler
                                 if (statementCount == 0)
                                     return true; // yeah, it is a valid thing
 
-                                // todo: @perf we may simplify the blocks with the known block structure, e.g:
-                                // X t;
-                                // t = a.X;
-                                // b.Y = t;
-                                // recognize this kind of block
-                                // if (blockVarCount == 1)
-                                // {
-                                //     if (statementCount == 2)
-                                //     {
-                                //     }
-                                // }
+                                // we may simplify the blocks with the known block structure, e.g from the AutoMapper `X t; t = a.X; b.Y = t;`
+                                if (blockVarCount == 1 & statementCount == 2 &&
+                                    statementExprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
+                                    statementExprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
+                                    st0.Left == blockVarExprs[0] && st1.Right == blockVarExprs[0])
+                                {
+                                    TryEmitArithmeticAndOrAssign(st1.Left, st0.Right, st0.Left.Type,
+                                        ExpressionType.Assign, false, paramExprs, il, ref closure, setup, parent);
+                                    closure.PopBlock();
+                                    return true;
+                                }
 
                                 expr = statementExprs[statementCount - 1]; // The last (result) statement in block will provide the result
 
@@ -6987,6 +6987,8 @@ namespace FastExpressionCompiler
             AvoidParens,
             /// <summary>The instance when calling the instance method or accessing the instance member</summary>
             Instance,
+            /// <summary>Says that the parent is the expression which does not require the ';' after the statements, e.g. for `=> a ?? throw ex` in Coalesce we don't need the `ex;`</summary> 
+            Expression
         }
 
         internal static StringBuilder ToCSharpString(this Expression e, StringBuilder sb, EnclosedIn enclosedIn,
@@ -7003,11 +7005,15 @@ namespace FastExpressionCompiler
                     {
                         var x = (ConstantExpression)e;
                         if (x.Value == null)
-                            return x.Type == null
-                                ? sb.Append("null")
-                                : x.Type.IsValueType && !x.Type.IsNullable()
-                                ? sb.Append("default(").Append(x.Type.ToCode(stripNamespace, printType)).Append(')')
-                                : sb.Append('(').Append(x.Type.ToCode(stripNamespace, printType)).Append(")null");
+                        {
+                            var cType = x.Type;
+                            return 
+                                cType == null | cType == typeof(object) | cType.IsClass
+                                    ? sb.Append("null")
+                                : cType.IsValueType && !cType.IsNullable()
+                                    ? sb.Append("default(").Append(cType.ToCode(stripNamespace, printType)).Append(')')
+                                    : sb.Append('(').Append(cType.ToCode(stripNamespace, printType)).Append(")null");
+                        }
 
                         if (x.Value is Type t)
                             return sb.AppendTypeOf(t, stripNamespace, printType);
@@ -7502,7 +7508,7 @@ namespace FastExpressionCompiler
                         var x = (BinaryExpression)e;
                         x.Left.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces);
                         sb.Append(" ?? ").NewLineIdent(lineIdent);
-                        return x.Right.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                        return x.Right.ToCSharpString(sb, EnclosedIn.Expression, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                     }
                 case ExpressionType.Extension:
                     {
@@ -7587,12 +7593,9 @@ namespace FastExpressionCompiler
 
                                 case ExpressionType.Throw:
                                     if (op is null)
-                                        return sb.Append("throw;");
-                                    else
-                                    {
-                                        sb.Append("throw ");
-                                        return op.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).Append(';');
-                                    }
+                                        return enclosedIn == EnclosedIn.Expression ? sb.Append("throw") : sb.Append("throw;");
+                                    op.ToCSharpString(sb.Append("throw "), lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                                    return enclosedIn == EnclosedIn.Expression ? sb : sb.AddSemicolonIfFits();
 
                                 case ExpressionType.Unbox: // output it as the cast
                                     sb.Append("((").Append(e.Type.ToCode(stripNamespace, printType)).Append(')');
@@ -7687,13 +7690,8 @@ namespace FastExpressionCompiler
             _ => false
         };
 
-        private static StringBuilder AddSemicolonIfFits(this StringBuilder sb)
-        {
-            var lastChar = sb[sb.Length - 1];
-            if (lastChar != ';')
-                return sb.Append(";");
-            return sb;
-        }
+        private static StringBuilder AddSemicolonIfFits(this StringBuilder sb) =>
+            sb[sb.Length - 1] != ';' ? sb.Append(";") : sb;
 
         private static bool IsReturnable(ExpressionType nodeType) =>
             nodeType != ExpressionType.Goto &
@@ -7791,6 +7789,15 @@ namespace FastExpressionCompiler
         {
             var vars = b.Variables.AsList();
             var exprs = b.Expressions.AsList();
+            
+            // handling the special case, AutoMapper like using the tmp variable to reassign the property
+            if (vars.Count == 1 & exprs.Count == 2 &&
+                exprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
+                exprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
+                st0.Left == vars[0] && st1.Right == vars[0])
+                return Assign(st1.Left, st0.Right).ToCSharpString(sb.NewLineIdent(lineIdent), 
+                    EnclosedIn.Block, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+
             foreach (var v in vars)
             {
                 sb.NewLineIdent(lineIdent);
@@ -7863,8 +7870,8 @@ namespace FastExpressionCompiler
 
             if (lastExpr is BlockExpression lastBlock)
                 return lastBlock.BlockToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode,
-                inTheLastBlock, // the last block is marked so if only it is itself in the last block
-                blockResultAssignment);
+                    inTheLastBlock, // the last block is marked so if only it is itself in the last block
+                    blockResultAssignment);
 
             // todo: @improve the label is already used by the Return GoTo we should skip it output here OR we need to replace the Return Goto `return` with `goto`  
             if (lastExpr is LabelExpression) // keep the last label on the same vertical line
