@@ -155,20 +155,9 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             Debug.WriteLine(executionPlan.ToCSharpString());
             Debug.WriteLine(executionPlan.ToExpressionString());
             Delegate ff;
-            // if (executionPlan is LambdaExpression lambda && 
-            //     (lambda.Body is InvocationExpression || 
-            //     lambda.Body is UnaryExpression ue && ue.NodeType == ExpressionType.Convert && ue.Operand is InvocationExpression))
-            // {
-            //     ff = executionPlan.CompileFast(true);
-            //     Debug.WriteLine(ff.Method.ToILString().ToString());
-            // }
-            // else
-            // {
-                // todo: @wip @fixme no inlining for nested invocation expression
-                ff = executionPlan.CompileFast(true, CompilerFlags.NoInvocationLambdaInlining);
-            // }
-
+            ff = executionPlan.CompileFast(true, CompilerFlags.NoInvocationLambdaInlining);
             Debug.Assert(ff != null);
+            Debug.WriteLine(ff.Method.ToILString().ToString());
 #else
             var ff = executionPlan.CompileFast();
 #endif
