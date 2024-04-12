@@ -6990,17 +6990,14 @@ namespace FastExpressionCompiler
         }
 
         private static StringBuilder NullConstantOrDefaultToCSharpString(Type exprType, StringBuilder sb, EnclosedIn encloseIn, 
-            bool stripNamespace, Func<Type, string, string> printType)
-        {
-            var encloseInParens = encloseIn == EnclosedIn.Instance; // when the method is called with the costant or default as instance, we need to wrap it in the parens
-            return exprType == typeof(object) | exprType.IsClass
+            bool stripNamespace, Func<Type, string, string> printType) =>
+            exprType == typeof(object)
                 ? sb.Append("null")
             : exprType.IsValueType && !exprType.IsNullable()
                 ? sb.Append("default(").Append(exprType.ToCode(stripNamespace, printType)).Append(')')
-                : sb.Append(encloseInParens ? "((" : "(")
+                : sb.Append(encloseIn == EnclosedIn.Instance ? "((" : "(")
                     .Append(exprType.ToCode(stripNamespace, printType)).Append(")null")
-                    .Append(encloseInParens ? ")" : "");
-        }
+                    .Append(encloseIn == EnclosedIn.Instance ? ")" : "");
 
         private static StringBuilder InsertTopFFuncDefinitionIfNeeded(StringBuilder sb) =>
             sb[0] != 'T' || sb[2] != '_' || sb[3] != '_' || sb[4] != 'f' || sb[5] != '<'
