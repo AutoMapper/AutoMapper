@@ -1069,7 +1069,9 @@ namespace FastExpressionCompiler
             /// <summary>Not supported assignment target</summary>
             NotSupported_Assign_Target = 1008,
             /// <summary>TypeEqual is not supported </summary>
-            NotSupported_TypeEqual = 1009
+            NotSupported_TypeEqual = 1009,
+            /// <summary>`when` in catch is not supported yet</summary>
+            NotSupported_ExceptionCatchFilter = 1010
         }
 
         /// <summary>Wraps the call to `TryCollectInfo` for the compatibility and provide the root place to check the returned error code.
@@ -1386,6 +1388,18 @@ namespace FastExpressionCompiler
 
                         var varExprs = blockExpr.Variables;
                         var varExprCount = varExprs?.Count ?? 0; // todo: @perf optimize for an empty and a single variable
+                        
+                        if (varExprCount == 1 & blockExprCount == 2 &&
+                            blockExprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
+                            blockExprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
+                            st0.Left == blockExprs[0] && st1.Right == blockExprs[0])
+                        {
+                            if ((r = TryCollectInfo(ref closure, st0.Right, paramExprs, nestedLambda, ref rootNestedLambdas, flags)) != Result.OK)
+                                return r;
+                            expr = st1.Left;
+                            continue;
+                        }
+
                         if (varExprCount == 1)
                             closure.PushBlockWithVars(varExprs[0]);
                         else if (varExprCount != 0)
@@ -1396,8 +1410,8 @@ namespace FastExpressionCompiler
                                 return r;
 
                         expr = blockExprs[blockExprCount - 1];
-                        if (varExprCount == 0) // in case of no variables we can collect the last exp without recursion
-                            continue;
+                        if (varExprCount == 0)
+                            continue; // in case of no variables we can collect the last exp without recursion
 
                         if ((r = TryCollectInfo(ref closure, expr, paramExprs, nestedLambda, ref rootNestedLambdas, flags)) != Result.OK)
                             return r;
@@ -1963,25 +1977,20 @@ namespace FastExpressionCompiler
                                 var blockExpr = (BlockExpression)expr;
                                 var blockVarExprs = blockExpr.Variables;
                                 var blockVarCount = blockVarExprs?.Count ?? 0;
-                                if (blockVarCount != 0)
-                                    closure.PushBlockAndConstructLocalVars(blockVarExprs, il);
-
                                 var statementExprs = blockExpr.Expressions; // Trim the expressions after the Throw - #196
                                 var statementCount = statementExprs.Count;
                                 if (statementCount == 0)
                                     return true; // yeah, it is a valid thing
 
-                                // we may simplify the blocks with the known block structure, e.g from the AutoMapper `X t; t = a.X; b.Y = t;`
                                 if (blockVarCount == 1 & statementCount == 2 &&
                                     statementExprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
                                     statementExprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
                                     st0.Left == blockVarExprs[0] && st1.Right == blockVarExprs[0])
-                                {
-                                    TryEmitArithmeticAndOrAssign(st1.Left, st0.Right, st0.Left.Type,
+                                    return TryEmitArithmeticAndOrAssign(st1.Left, st0.Right, st0.Left.Type,
                                         ExpressionType.Assign, false, paramExprs, il, ref closure, setup, parent);
-                                    closure.PopBlock();
-                                    return true;
-                                }
+
+                                if (blockVarCount != 0)
+                                    closure.PushBlockAndConstructLocalVars(blockVarExprs, il);
 
                                 expr = statementExprs[statementCount - 1]; // The last (result) statement in block will provide the result
 
@@ -2462,7 +2471,11 @@ namespace FastExpressionCompiler
                 {
                     var catchBlock = catchBlocks[i];
                     if (catchBlock.Filter != null)
-                        return false; // todo: Add support for filters in catch expression
+                    {
+                        if ((setup & CompilerFlags.ThrowOnNotSupportedExpression) != 0)
+                            throw new NotSupportedExpressionException(Result.NotSupported_ExceptionCatchFilter);
+                        return false;
+                    }
 
                     il.BeginCatchBlock(catchBlock.Test);
 
@@ -2470,7 +2483,7 @@ namespace FastExpressionCompiler
                     // we will store into local variable.
                     var exVarExpr = catchBlock.Variable;
 #if DEMIT
-                Debug.WriteLine($"}} catch {{");
+                    Debug.WriteLine($"}} catch {{");
 #endif
                     if (exVarExpr != null)
                     {
@@ -6989,7 +7002,7 @@ namespace FastExpressionCompiler
             Instance
         }
 
-        private static StringBuilder NullConstantOrDefaultToCSharpString(Type exprType, StringBuilder sb, EnclosedIn encloseIn, 
+        private static StringBuilder NullConstantOrDefaultToCSharpString(Type exprType, StringBuilder sb, EnclosedIn encloseIn,
             bool stripNamespace, Func<Type, string, string> printType) =>
             exprType == typeof(object)
                 ? sb.Append("null")
@@ -7018,7 +7031,7 @@ namespace FastExpressionCompiler
                     {
                         var x = (ConstantExpression)e;
                         if (x.Value == null)
-                            return x.Type == null ? sb.Append("null") : NullConstantOrDefaultToCSharpString(x.Type, sb, enclosedIn, stripNamespace, printType); 
+                            return x.Type == null ? sb.Append("null") : NullConstantOrDefaultToCSharpString(x.Type, sb, enclosedIn, stripNamespace, printType);
 
                         if (x.Value is Type t)
                             return sb.AppendTypeOf(t, stripNamespace, printType);
@@ -7245,9 +7258,9 @@ namespace FastExpressionCompiler
                             x.Test.ToCSharpString(sb, EnclosedIn.IfTest, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             sb.Append(')');
                             x.IfTrue.ToCSharpBlock(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
-                        
+
                             if (x.IfFalse.NodeType != ExpressionType.Default || x.IfFalse.Type != typeof(void))
-                                x.IfFalse.ToCSharpBlock(sb.NewLine(lineIdent, identSpaces).Append("else"), 
+                                x.IfFalse.ToCSharpBlock(sb.NewLine(lineIdent, identSpaces).Append("else"),
                                     lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         }
                         else
@@ -7428,9 +7441,9 @@ namespace FastExpressionCompiler
                         return sb.NewLine(lineIdent, identSpaces).Append("}");
                     }
                 case ExpressionType.Default:
-                        return e.Type == typeof(void) 
-                                ? sb // `default(void)` does not make sense in the C#
-                                : NullConstantOrDefaultToCSharpString(e.Type, sb, enclosedIn, stripNamespace, printType);
+                    return e.Type == typeof(void)
+                            ? sb // `default(void)` does not make sense in the C#
+                            : NullConstantOrDefaultToCSharpString(e.Type, sb, enclosedIn, stripNamespace, printType);
 
                 case ExpressionType.TypeIs:
                 case ExpressionType.TypeEqual:
@@ -7542,7 +7555,7 @@ namespace FastExpressionCompiler
                                     return sb;
 
                                 case ExpressionType.Throw:
-                                    return  op is null ? sb.Append("throw") : 
+                                    return op is null ? sb.Append("throw") :
                                         op.ToCSharpString(sb.Append("throw "), lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
                                 case ExpressionType.Unbox: // output it as the cast
@@ -7634,7 +7647,7 @@ namespace FastExpressionCompiler
         {
             if (!IsBlockLike(expr.NodeType))
                 return newLineExpr
-                    ? sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode) 
+                    ? sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                     : expr.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
             InsertTopFFuncDefinitionIfNeeded(sb);
@@ -7764,13 +7777,13 @@ namespace FastExpressionCompiler
         {
             var vars = b.Variables.AsList();
             var exprs = b.Expressions.AsList();
-            
+
             // handling the special case, AutoMapper like using the tmp variable to reassign the property
             if (vars.Count == 1 & exprs.Count == 2 &&
                 exprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
                 exprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
                 st0.Left == vars[0] && st1.Right == vars[0])
-                return Assign(st1.Left, st0.Right).ToCSharpString(sb.NewLineIdent(lineIdent), 
+                return Assign(st1.Left, st0.Right).ToCSharpString(sb.NewLineIdent(lineIdent),
                     EnclosedIn.Block, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                     .AddSemicolonOnce();
 
