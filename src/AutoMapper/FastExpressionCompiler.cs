@@ -816,7 +816,9 @@ namespace FastExpressionCompiler
             public int GetDefinedLocalVarOrDefault(ParameterExpression varParamExpr)
             {
                 ref var blocks = ref _varInBlockMap.TryGetValueRef(varParamExpr, out var found);
-                return found ? (int)(blocks.GetLastSurePresentItem() & ushort.MaxValue) : -1;
+                return found & blocks.Count != 0 // rare case with the block count 0 may occur when we collected the block and vars, but not yet defined the variable for it
+                    ? (int)(blocks.GetLastSurePresentItem() & ushort.MaxValue) 
+                    : -1;
             }
         }
 
@@ -2487,7 +2489,11 @@ namespace FastExpressionCompiler
 #endif
                     if (exVarExpr != null)
                     {
-                        var exVarIndex = il.GetNextLocalVarIndex(exVarExpr.Type);
+                        // first, check if the exception variable was used before and supposed to be reused in the new catch 
+                        // (this is decided by creator of expression)
+                        var exVarIndex = closure.GetDefinedLocalVarOrDefault(exVarExpr);
+                        if (exVarIndex == -1)
+                            exVarIndex = il.GetNextLocalVarIndex(exVarExpr.Type);
                         closure.PushBlockWithVars(exVarExpr, exVarIndex);
                         EmitStoreLocalVariable(il, exVarIndex);
                     }
@@ -3716,7 +3722,7 @@ namespace FastExpressionCompiler
 
                             // if the right part is the TryCatch block we will evaluate it first and then assignment of its result
                             var rightVar = -1;
-                            if (right.NodeType == ExpressionType.Try) // todo: @improve mm... what about Block, IfElse, etc?
+                            if (right.NodeType.IsBlockLikeOrConditional())
                             {
                                 if (!TryEmit(right, paramExprs, il, ref closure, setup, rightOnlyFlags))
                                     return false;
@@ -5835,6 +5841,65 @@ namespace FastExpressionCompiler
                 _ => null
             };
 
+        internal static bool IsAssignNodeType(this ExpressionType nodeType) => nodeType switch
+        {
+            ExpressionType.Assign => true,
+            ExpressionType.PowerAssign => true,
+            ExpressionType.AndAssign => true,
+            ExpressionType.OrAssign => true,
+            ExpressionType.AddAssign => true,
+            ExpressionType.ExclusiveOrAssign => true,
+            ExpressionType.AddAssignChecked => true,
+            ExpressionType.SubtractAssign => true,
+            ExpressionType.SubtractAssignChecked => true,
+            ExpressionType.MultiplyAssign => true,
+            ExpressionType.MultiplyAssignChecked => true,
+            ExpressionType.DivideAssign => true,
+            ExpressionType.LeftShiftAssign => true,
+            ExpressionType.RightShiftAssign => true,
+            ExpressionType.ModuloAssign => true,
+            _ => false
+        };
+
+        internal static bool IsBlockLike(this ExpressionType nodeType) =>
+            nodeType == ExpressionType.Try |
+            nodeType == ExpressionType.Switch |
+            nodeType == ExpressionType.Block |
+            nodeType == ExpressionType.Loop;
+
+        internal static bool IsReturnable(this ExpressionType nodeType) =>
+            nodeType != ExpressionType.Goto &
+            nodeType != ExpressionType.Label &
+            nodeType != ExpressionType.Throw &&
+            !IsBlockLike(nodeType);
+
+        internal static bool IsBlockLikeOrConditional(this ExpressionType nodeType) =>
+            nodeType == ExpressionType.Conditional | nodeType == ExpressionType.Coalesce || IsBlockLike(nodeType);
+
+        internal static bool IsConstantOrDefault(this Expression expr)
+        {
+            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
+                return IsConstantOrDefault(unary.Operand);
+            var nodeType = expr.NodeType;
+            return nodeType == ExpressionType.Constant | nodeType == ExpressionType.Default;
+        }
+
+        internal static string GetCSharpName(this MemberInfo m)
+        {
+            var name = m.Name;
+            if (m is FieldInfo fi && m.DeclaringType.IsValueType)
+            {
+                // btw, `fi.IsSpecialName` returns `false` :/
+                if (name[0] == '<') // a backing field for the properties in struct, e.g. <Key>k__BackingField
+                {
+                    var end = name.IndexOf('>');
+                    if (end > 1)
+                        name = name.Substring(1, end - 1);
+                }
+            }
+            return name;
+        }
+
         [RequiresUnreferencedCode(Trimming.Message)]
         internal static MethodInfo FindMethod(this Type type, string methodName)
         {
@@ -7098,7 +7163,7 @@ namespace FastExpressionCompiler
                         {
                             var p = pars[0];
                             var a = args[0];
-                            if (p.ParameterType.IsByRef && !IsConstantOrDefault(a))
+                            if (p.ParameterType.IsByRef && !a.IsConstantOrDefault())
                                 sb.Append(p.IsOut ? "out " : p.IsIn ? "in" : "ref ");
                             a.ToCSharpString(sb, EnclosedIn.AvoidParens, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         }
@@ -7109,7 +7174,7 @@ namespace FastExpressionCompiler
                                 (i == 0 ? sb : sb.Append(',')).NewLineIdent(lineIdent);
                                 var p = pars[i];
                                 var a = args[i];
-                                if (p.ParameterType.IsByRef && !IsConstantOrDefault(a))
+                                if (p.ParameterType.IsByRef && !a.IsConstantOrDefault())
                                     sb.Append(p.IsOut ? "out " : p.IsIn ? "in " : "ref ");
                                 a.ToCSharpString(sb, EnclosedIn.AvoidParens, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             }
@@ -7211,7 +7276,7 @@ namespace FastExpressionCompiler
                         sb.Append(") => //").Append(lambdaMethod.ReturnType.ToCode(stripNamespace, printType));
                         var body = x.Body;
                         var bNodeType = body.NodeType;
-                        var isReturnableExpression = IsReturnable(bNodeType);
+                        var isReturnableExpression = bNodeType.IsReturnable();
                         var ignoresResult = x.ReturnType == typeof(void);
                         if (isReturnableExpression & !ignoresResult)
                             sb.NewLineIdentCs(body, EnclosedIn.LambdaBody, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
@@ -7328,7 +7393,7 @@ namespace FastExpressionCompiler
                             else
                             {
                                 sb.NewLineIdent(lineIdent);
-                                if (returnsValue && IsReturnable(part.NodeType))
+                                if (returnsValue && part.NodeType.IsReturnable())
                                     sb.Append("return ");
                                 part.ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
                             }
@@ -7390,7 +7455,7 @@ namespace FastExpressionCompiler
                             if (gtValue == null)
                                 return sb.Append("return;");
 
-                            if (IsReturnable(gtValue.NodeType))
+                            if (gtValue.NodeType.IsReturnable())
                                 sb.Append("return ");
                             gtValue.ToCSharpString(sb, lineIdent - identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             return sb;
@@ -7576,7 +7641,7 @@ namespace FastExpressionCompiler
                                 return b.Right.ToCSharpString(sb.Append("["), lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).Append("]");
                             }
 
-                            if (IsAssignNodeType(nodeType))
+                            if (nodeType.IsAssignNodeType())
                             {
                                 // todo: @perf handle the right part is condition with the blocks for If and/or Else, e.g. see #261 test `Serialize_the_nullable_struct_array` 
                                 if (b.Right is BlockExpression rightBlock) // it is valid to assign the block and it is used to my surprise
@@ -7598,7 +7663,7 @@ namespace FastExpressionCompiler
 
                                 sb.Append(OperatorToCSharpString(nodeType));
 
-                                if (b.Left is ParameterExpression leftParam && leftParam.IsByRef && !IsConstantOrDefault(b.Right))
+                                if (b.Left is ParameterExpression leftParam && leftParam.IsByRef && !b.Right.IsConstantOrDefault())
                                     sb.Append("ref ");
 
                                 return b.Right.ToCSharpExpression(sb, false, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
@@ -7645,7 +7710,7 @@ namespace FastExpressionCompiler
         private static StringBuilder ToCSharpExpression(this Expression expr, StringBuilder sb, bool newLineExpr,
             int lineIdent, bool stripNamespace, Func<Type, string, string> printType, int identSpaces, CodePrinter.ObjectToCode notRecognizedToCode)
         {
-            if (!IsBlockLike(expr.NodeType))
+            if (!expr.NodeType.IsBlockLike())
                 return newLineExpr
                     ? sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                     : expr.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
@@ -7659,67 +7724,8 @@ namespace FastExpressionCompiler
             return sb.NewLineIdent(lineIdent).Append("})");
         }
 
-        private static bool IsAssignNodeType(ExpressionType nodeType) => nodeType switch
-        {
-            ExpressionType.Assign => true,
-            ExpressionType.PowerAssign => true,
-            ExpressionType.AndAssign => true,
-            ExpressionType.OrAssign => true,
-            ExpressionType.AddAssign => true,
-            ExpressionType.ExclusiveOrAssign => true,
-            ExpressionType.AddAssignChecked => true,
-            ExpressionType.SubtractAssign => true,
-            ExpressionType.SubtractAssignChecked => true,
-            ExpressionType.MultiplyAssign => true,
-            ExpressionType.MultiplyAssignChecked => true,
-            ExpressionType.DivideAssign => true,
-            ExpressionType.LeftShiftAssign => true,
-            ExpressionType.RightShiftAssign => true,
-            ExpressionType.ModuloAssign => true,
-            _ => false
-        };
-
         private static StringBuilder AddSemicolonOnce(this StringBuilder sb) =>
             sb[sb.Length - 1] != ';' ? sb.Append(";") : sb;
-
-        private static bool IsBlockLike(ExpressionType nodeType) =>
-            nodeType == ExpressionType.Try |
-            nodeType == ExpressionType.Switch |
-            nodeType == ExpressionType.Block |
-            nodeType == ExpressionType.Loop;
-
-        private static bool IsReturnable(ExpressionType nodeType) =>
-            nodeType != ExpressionType.Goto &
-            nodeType != ExpressionType.Label &
-            nodeType != ExpressionType.Throw &&
-            !IsBlockLike(nodeType);
-
-        private static bool IsBlockLikeOrConditional(ExpressionType nodeType) =>
-            nodeType == ExpressionType.Conditional || IsBlockLike(nodeType);
-
-        private static bool IsConstantOrDefault(Expression expr)
-        {
-            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
-                return IsConstantOrDefault(unary.Operand);
-            var nodeType = expr.NodeType;
-            return nodeType == ExpressionType.Constant | nodeType == ExpressionType.Default;
-        }
-
-        private static string GetCSharpName(this MemberInfo m)
-        {
-            var name = m.Name;
-            if (m is FieldInfo fi && m.DeclaringType.IsValueType)
-            {
-                // btw, `fi.IsSpecialName` returns `false` :/
-                if (name[0] == '<') // a backing field for the properties in struct, e.g. <Key>k__BackingField
-                {
-                    var end = name.IndexOf('>');
-                    if (end > 1)
-                        name = name.Substring(1, end - 1);
-                }
-            }
-            return name;
-        }
 
         private const string NotSupportedExpression = "// NOT_SUPPORTED_EXPRESSION: ";
 
@@ -7846,7 +7852,7 @@ namespace FastExpressionCompiler
 
                     // Preventing the `};` kind of situation and separating the conditional block with empty line
                     var nodeType = expr.NodeType;
-                    if (IsBlockLikeOrConditional(nodeType))
+                    if (nodeType.IsBlockLikeOrConditional())
                         sb.NewLineIdent(lineIdent);
                     else if (nodeType != ExpressionType.Label & nodeType != ExpressionType.Default)
                         sb.AddSemicolonOnce();
@@ -7890,7 +7896,7 @@ namespace FastExpressionCompiler
                 // todo: @hack if the last expression is the Assignment BinaryExpression, 
                 // it is very doubtful that it is supposed to be returned result.
                 // but I need to find a better indicator later.
-                if (!IsAssignNodeType(lastExpr.NodeType))
+                if (!lastExpr.NodeType.IsAssignNodeType())
                 {
                     enclosedIn = EnclosedIn.Return;
                     sb.Append("return ");
