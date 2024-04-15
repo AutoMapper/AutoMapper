@@ -489,7 +489,8 @@ public class When_mapping_to_member_typed_as_IEnumerable : AutoMapperSpecBase
     [Fact]
     public void Should_map_ok()
     {
-        Mapper.Map<DestB>(new SourceB()).Items.ShouldBeEmpty();
+        var destB = Mapper.Map<DestB>(new SourceB());
+        destB.Items.ShouldBeEmpty();
     }
 }
 

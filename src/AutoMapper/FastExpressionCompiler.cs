@@ -817,7 +817,7 @@ namespace FastExpressionCompiler
             {
                 ref var blocks = ref _varInBlockMap.TryGetValueRef(varParamExpr, out var found);
                 return found & blocks.Count != 0 // rare case with the block count 0 may occur when we collected the block and vars, but not yet defined the variable for it
-                    ? (int)(blocks.GetLastSurePresentItem() & ushort.MaxValue) 
+                    ? (int)(blocks.GetLastSurePresentItem() & ushort.MaxValue)
                     : -1;
             }
         }
@@ -1390,7 +1390,7 @@ namespace FastExpressionCompiler
 
                         var varExprs = blockExpr.Variables;
                         var varExprCount = varExprs?.Count ?? 0; // todo: @perf optimize for an empty and a single variable
-                        
+
                         if (varExprCount == 1 & blockExprCount == 2 &&
                             blockExprs[0] is BinaryExpression st0 && st0.NodeType == ExpressionType.Assign &&
                             blockExprs[1] is BinaryExpression st1 && st1.NodeType == ExpressionType.Assign &&
@@ -2512,7 +2512,7 @@ namespace FastExpressionCompiler
                 if (finallyExpr != null)
                 {
 #if DEMIT
-                Debug.WriteLine("} finally {" + finallyExpr);
+                    Debug.WriteLine("} finally {" + finallyExpr);
 #endif
                     il.BeginFinallyBlock();
                     if (!TryEmit(finallyExpr, paramExprs, il, ref closure, setup, parent))
@@ -5876,12 +5876,21 @@ namespace FastExpressionCompiler
         internal static bool IsBlockLikeOrConditional(this ExpressionType nodeType) =>
             nodeType == ExpressionType.Conditional | nodeType == ExpressionType.Coalesce || IsBlockLike(nodeType);
 
+        internal static Expression StripConvertRecursively(this Expression expr) =>
+            expr is UnaryExpression convert && convert.NodeType == ExpressionType.Convert
+                ? StripConvertRecursively(convert.Operand)
+                : expr;
+
         internal static bool IsConstantOrDefault(this Expression expr)
         {
-            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
-                return IsConstantOrDefault(unary.Operand);
-            var nodeType = expr.NodeType;
+            var nodeType = StripConvertRecursively(expr).NodeType;
             return nodeType == ExpressionType.Constant | nodeType == ExpressionType.Default;
+        }
+
+        internal static bool IsParamOrConstantOrDefault(this Expression expr)
+        {
+            var nodeType = StripConvertRecursively(expr).NodeType;
+            return nodeType == ExpressionType.Parameter | nodeType == ExpressionType.Constant | nodeType == ExpressionType.Default;
         }
 
         internal static string GetCSharpName(this MemberInfo m)
@@ -7077,7 +7086,7 @@ namespace FastExpressionCompiler
                     .Append(exprType.ToCode(stripNamespace, printType)).Append(")null")
                     .Append(encloseIn == EnclosedIn.Instance ? ")" : "");
 
-        private static StringBuilder InsertTopFFuncDefinitionIfNeeded(StringBuilder sb) =>
+        private static StringBuilder InsertTopFFuncDefinitionOnce(StringBuilder sb) =>
             sb[0] != 'T' || sb[2] != '_' || sb[3] != '_' || sb[4] != 'f' || sb[5] != '<'
                 ? sb.Insert(0, "T __f<T>(System.Func<T> f) => f();\n")
                 : sb;
@@ -7308,10 +7317,14 @@ namespace FastExpressionCompiler
                         x.Expression.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         if (encloseInParens)
                             sb.Append(')');
-                        sb.Append(".Invoke("); // indicate the invocation more explicitly
+
+                        // indicate the invocation more explicitly with the new line, 
+                        // it also helps to pair the identation of invacation expression, specifically where it starts. 
+                        sb.NewLine(lineIdent, identSpaces).Append(".Invoke(");
                         for (var i = 0; i < x.Arguments.Count; i++)
                             (i > 0 ? sb.Append(',') : sb)
-                            .NewLineIdentCs(x.Arguments[i], lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            .NewLineIdentCs(x.Arguments[i], EnclosedIn.AvoidParens,
+                                lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         return sb.Append(")");
                     }
                 case ExpressionType.Conditional:
@@ -7332,9 +7345,11 @@ namespace FastExpressionCompiler
                         {
                             x.Test.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             sb.Append(" ? ");
-                            x.IfTrue.ToCSharpExpression(sb, true, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            var doNewLine = !x.IfTrue.IsParamOrConstantOrDefault();
+                            x.IfTrue.ToCSharpExpression(sb, doNewLine, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             sb.Append(" : ");
-                            x.IfFalse.ToCSharpExpression(sb, true, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            doNewLine = !x.IfFalse.IsParamOrConstantOrDefault();
+                            x.IfFalse.ToCSharpExpression(sb, doNewLine, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         }
                         return sb;
                     }
@@ -7377,7 +7392,7 @@ namespace FastExpressionCompiler
                             sb.Append('.').Append(x.Indexer.Name).Append('(');
 
                         for (var i = 0; i < x.Arguments.Count; i++)
-                            x.Arguments[i].ToCSharpString(i > 0 ? sb.Append(", ") : sb,
+                            x.Arguments[i].ToCSharpString(i > 0 ? sb.Append(", ") : sb, EnclosedIn.AvoidParens,
                                 lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
                         return sb.Append(isStandardIndexer ? ']' : ')');
@@ -7392,7 +7407,9 @@ namespace FastExpressionCompiler
                                 pb.BlockToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
                             else
                             {
-                                sb.NewLineIdent(lineIdent);
+                                // avoid additional new line between `try {\n\n while().. }`
+                                if (!part.NodeType.IsBlockLike())
+                                    sb.NewLineIdent(lineIdent);
                                 if (returnsValue && part.NodeType.IsReturnable())
                                     sb.Append("return ");
                                 part.ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
@@ -7552,7 +7569,8 @@ namespace FastExpressionCompiler
                     }
                 default:
                     {
-                        var encloseInParens = enclosedIn == EnclosedIn.Whatever; // enclose by default, but not for specific cases
+                        // By default enclose in the parentheses, and look at the specific cases for the individual types of expressions
+                        var encloseInParens = enclosedIn == EnclosedIn.Whatever;
 
                         var name = Enum.GetName(typeof(ExpressionType), e.NodeType);
                         if (e is UnaryExpression u)
@@ -7669,6 +7687,10 @@ namespace FastExpressionCompiler
                                 return b.Right.ToCSharpExpression(sb, false, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                             }
 
+                            // remove the parens from the simple comparisons and ops between params, variables and constants
+                            if (b.Left.IsParamOrConstantOrDefault() && b.Right.IsParamOrConstantOrDefault())
+                                encloseInParens = false;
+
                             sb = encloseInParens ? sb.Append('(') : sb;
                             b.Left.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
@@ -7715,7 +7737,7 @@ namespace FastExpressionCompiler
                     ? sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
                     : expr.ToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
 
-            InsertTopFFuncDefinitionIfNeeded(sb);
+            InsertTopFFuncDefinitionOnce(sb);
             sb.NewLineIdent(lineIdent).Append("__f(() => {");
             if (expr is BlockExpression bl)
                 bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
@@ -8413,7 +8435,8 @@ namespace FastExpressionCompiler
 
         internal static StringBuilder NewLineIdentCs(this StringBuilder sb, Expression expr,
             int lineIdent, bool stripNamespace, Func<Type, string, string> printType, int identSpaces, CodePrinter.ObjectToCode notRecognizedToCode) =>
-            expr?.ToCSharpString(sb.NewLineIdent(lineIdent), lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode) ?? sb.Append("null");
+            expr?.ToCSharpString(sb.NewLineIdent(lineIdent), lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode)
+            ?? sb.Append("null");
 
         internal static StringBuilder NewLineIdentCs(this StringBuilder sb, Expression expr, ToCSharpPrinter.EnclosedIn enclosedIn,
             int lineIdent, bool stripNamespace, Func<Type, string, string> printType, int identSpaces, CodePrinter.ObjectToCode notRecognizedToCode) =>
