@@ -155,7 +155,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             Debug.WriteLine(executionPlan.ToCSharpString());
             Debug.WriteLine(executionPlan.ToExpressionString());
             Delegate ff;
-            ff = executionPlan.CompileFast(true, CompilerFlags.NoInvocationLambdaInlining);
+            ff = executionPlan.CompileFast(true);
             Debug.Assert(ff != null);
             Debug.WriteLine(ff.Method.ToILString().ToString());
 #else

@@ -148,7 +148,7 @@ public static class SmallList
             case 3: return ref source._it3;
             default:
                 Debug.Assert(source._rest != null, $"Expecting deeper items are already existing on stack at index: {index}");
-                return ref source._rest[index - SmallList4<TItem>.StackItemCount];
+                return ref source._rest[index - SmallList4<TItem>.OnStackItemCount];
         }
     }
 
@@ -173,7 +173,7 @@ public static class SmallList
             case 2: return ref source._it2;
             case 3: return ref source._it3;
             default:
-                return ref AppendDefaultAndGetRef(ref source._rest, index - SmallList4<TItem>.StackItemCount, SmallList4<TItem>.StackItemCount);
+                return ref AppendDefaultAndGetRef(ref source._rest, index - SmallList4<TItem>.OnStackItemCount, SmallList4<TItem>.OnStackItemCount);
         }
     }
 
@@ -206,13 +206,13 @@ public static class SmallList
                 if (eq.Equals(it, source._it3)) return 3;
                 if (source._rest != null)
                 {
-                    var count = source._count - SmallList4<TItem>.StackItemCount;
+                    var count = source._count - SmallList4<TItem>.OnStackItemCount;
                     var items = source._rest;
                     for (var i = 0; i < count; ++i)
                     {
                         ref var di = ref items[i]; // todo: @perf Marshall?
                         if (eq.Equals(it, di))
-                            return i + SmallList4<TItem>.StackItemCount;
+                            return i + SmallList4<TItem>.OnStackItemCount;
                     }
                 }
                 break;
@@ -259,7 +259,7 @@ public static class SmallList
                 if (eq.Equals(item, source._it2)) return 2;
                 if (eq.Equals(item, source._it3)) return 3;
 
-                var restCount = source._count - SmallList4<TItem>.StackItemCount;
+                var restCount = source._count - SmallList4<TItem>.OnStackItemCount;
                 if (restCount != 0)
                 {
                     var items = source._rest;
@@ -267,10 +267,10 @@ public static class SmallList
                     {
                         ref var di = ref items[i]; // todo: @perf Marshall?
                         if (eq.Equals(item, di))
-                            return i + SmallList4<TItem>.StackItemCount;
+                            return i + SmallList4<TItem>.OnStackItemCount;
                     }
                 }
-                AppendDefaultAndGetRef(ref source._rest, restCount, SmallList4<TItem>.StackItemCount) = item;
+                AppendDefaultAndGetRef(ref source._rest, restCount, SmallList4<TItem>.OnStackItemCount) = item;
                 ++source._count;
                 return -1;
         }
@@ -288,7 +288,7 @@ public static class SmallList
             case 1: return ref source._it1;
             default:
                 Debug.Assert(source._rest != null, $"Expecting deeper items are already existing on stack at index: {index}");
-                return ref source._rest[index - SmallList2<TItem>.StackItemCount];
+                return ref source._rest[index - SmallList2<TItem>.OnStackItemCount];
         }
     }
 
@@ -311,7 +311,7 @@ public static class SmallList
             case 0: return ref source._it0;
             case 1: return ref source._it1;
             default:
-                return ref AppendDefaultAndGetRef(ref source._rest, index - SmallList2<TItem>.StackItemCount, SmallList2<TItem>.StackItemCount);
+                return ref AppendDefaultAndGetRef(ref source._rest, index - SmallList2<TItem>.OnStackItemCount, SmallList2<TItem>.OnStackItemCount);
         }
     }
 
@@ -331,13 +331,13 @@ public static class SmallList
                 if (eq.Equals(it, source._it1)) return 1;
                 if (source._rest != null)
                 {
-                    var count = source._count - SmallList2<TItem>.StackItemCount;
+                    var count = source._count - SmallList2<TItem>.OnStackItemCount;
                     var items = source._rest;
                     for (var i = 0; i < count; ++i)
                     {
                         ref var di = ref items[i]; // todo: @perf Marshall?
                         if (eq.Equals(it, di))
-                            return i + SmallList2<TItem>.StackItemCount;
+                            return i + SmallList2<TItem>.OnStackItemCount;
                     }
                 }
                 break;
@@ -367,7 +367,7 @@ public static class SmallList
                 if (eq.Equals(item, source._it0)) return 0;
                 if (eq.Equals(item, source._it1)) return 1;
 
-                var restCount = source._count - SmallList2<TItem>.StackItemCount;
+                var restCount = source._count - SmallList2<TItem>.OnStackItemCount;
                 if (restCount != 0)
                 {
                     var items = source._rest;
@@ -375,10 +375,10 @@ public static class SmallList
                     {
                         ref var di = ref items[i]; // todo: @perf Marshall?
                         if (eq.Equals(item, di))
-                            return i + SmallList2<TItem>.StackItemCount;
+                            return i + SmallList2<TItem>.OnStackItemCount;
                     }
                 }
-                AppendDefaultAndGetRef(ref source._rest, restCount, SmallList2<TItem>.StackItemCount) = item;
+                AppendDefaultAndGetRef(ref source._rest, restCount, SmallList2<TItem>.OnStackItemCount) = item;
                 ++source._count;
                 return -1;
         }
@@ -387,10 +387,11 @@ public static class SmallList
 
 /// <summary>List with the number of first items (4) stored inside its struct and the rest in the growable array.
 /// Supports addition and removal (removel is without resize) only at the end of the list, aka Stack behavior</summary>
+[DebuggerDisplay("{Count} of {_it0?.ToString()}, {_it1?.ToString()}, {_it2?.ToString()}, {_it3?.ToString()}, ...")]
 public struct SmallList4<TItem>
 {
     /// <summary>The number of entries stored inside the map itself without moving them to array on heap</summary>
-    public const int StackItemCount = 4;
+    public const int OnStackItemCount = 4;
 
     // todo: @check what if someone stores something in it, it would be a memory leak, but isn't it the same as using `out var` in the returning`false` Try...methods?
     internal static TItem Missing; // return the ref to Tombstone when nothing found
@@ -422,7 +423,7 @@ public struct SmallList4<TItem>
                 case 3: return _it3;
                 default:
                     Debug.Assert(_rest != null, $"Expecting deeper items are already existing on stack at index: {index}");
-                    return _rest[index - StackItemCount];
+                    return _rest[index - OnStackItemCount];
             }
         }
     }
@@ -439,7 +440,7 @@ public struct SmallList4<TItem>
             case 2: _it2 = item; break;
             case 3: _it3 = item; break;
             default:
-                SmallList.AppendDefaultAndGetRef(ref _rest, index - StackItemCount, StackItemCount) = item;
+                SmallList.AppendDefaultAndGetRef(ref _rest, index - OnStackItemCount, OnStackItemCount) = item;
                 break;
         }
     }
@@ -452,8 +453,8 @@ public struct SmallList4<TItem>
     [MethodImpl((MethodImplOptions)256)]
     public void AppendDefault()
     {
-        if (++_count >= StackItemCount)
-            SmallList.AppendDefaultAndGetRef(ref _rest, _count - StackItemCount, StackItemCount);
+        if (++_count >= OnStackItemCount)
+            SmallList.AppendDefaultAndGetRef(ref _rest, _count - OnStackItemCount, OnStackItemCount);
     }
 
     /// <summary>Removes the last item from the list aka the Stack Pop. Assumes that the list is not empty!</summary>
@@ -470,18 +471,44 @@ public struct SmallList4<TItem>
             case 3: _it3 = default; break;
             default:
                 Debug.Assert(_rest != null, $"Expecting a deeper parent stack created before accessing it here at level {index}");
-                _rest[index - StackItemCount] = default;
+                _rest[index - OnStackItemCount] = default;
                 break;
         }
     }
+
+    /// <summary>Copy items to new the array</summary>
+    public TItem[] ToArray()
+    {
+        switch (Count)
+        {
+            case 0: return Tools.Empty<TItem>();
+            case 1: return new[] { _it0 };
+            case 2: return new[] { _it0, _it1 };
+            case 3: return new[] { _it0, _it1, _it2 };
+            case 4: return new[] { _it0, _it1, _it2, _it3 };
+            default:
+                var items = new TItem[Count];
+                items[0] = _it0;
+                items[1] = _it1;
+                items[2] = _it2;
+                items[3] = _it3;
+                Array.Copy(_rest, 0, items, 4, Count - OnStackItemCount);
+                return items;
+        }
+    }
+
+    /// <summary>Exposing as list</summary>
+    [MethodImpl((MethodImplOptions)256)]
+    public IList<TItem> AsList() => ToArray();
 }
 
 /// <summary>List with the number of first items (2) stored inside its struct and the rest in the growable array.
 /// Supports addition and removal (removel is without resize) only at the end of the list, aka Stack behavior</summary>
+[DebuggerDisplay("{Count} of {_it0?.ToString()}, {_it1?.ToString()}, ...")]
 public struct SmallList2<TItem>
 {
     /// <summary>The number of entries stored inside the map itself without moving them to array on heap</summary>
-    public const int StackItemCount = 2;
+    public const int OnStackItemCount = 2;
 
     // todo: @check what if someone stores something in it, it would be a memory leak, but isn't it the same as using `out var` in the returning`false` Try...methods?
     internal static TItem Missing; // return the ref to Tombstone when nothing found
@@ -495,8 +522,8 @@ public struct SmallList2<TItem>
     public void InitCount(int count)
     {
         _count = count;
-        if (count > StackItemCount)
-            _rest = new TItem[count - StackItemCount];
+        if (count > OnStackItemCount)
+            _rest = new TItem[count - OnStackItemCount];
     }
 
     /// <summary>Good stiff</summary>
@@ -543,8 +570,8 @@ public struct SmallList2<TItem>
                 _count = items.Length;
                 _it0 = items[0];
                 _it1 = items[1];
-                for (var i = StackItemCount; i < items.Length; ++i)
-                    items[i - StackItemCount] = items[i];
+                for (var i = OnStackItemCount; i < items.Length; ++i)
+                    items[i - OnStackItemCount] = items[i];
                 _rest = items;
                 break;
         }
@@ -570,12 +597,12 @@ public struct SmallList2<TItem>
                 break;
             default:
                 var count = items.Count;
-                var rest = new TItem[count - StackItemCount];
+                var rest = new TItem[count - OnStackItemCount];
                 _count = count;
                 _it0 = items[0];
                 _it1 = items[1];
-                for (var i = StackItemCount; i < count; ++i)
-                    rest[i - StackItemCount] = items[i];
+                for (var i = OnStackItemCount; i < count; ++i)
+                    rest[i - OnStackItemCount] = items[i];
                 _rest = rest;
                 break;
         }
@@ -602,7 +629,7 @@ public struct SmallList2<TItem>
                 case 1: return _it1;
                 default:
                     Debug.Assert(_rest != null, $"Expecting deeper items are already existing on stack at index: {index}");
-                    return _rest[index - StackItemCount];
+                    return _rest[index - OnStackItemCount];
             }
         }
     }
@@ -617,12 +644,12 @@ public struct SmallList2<TItem>
             case 0: _it0 = item; break;
             case 1: _it1 = item; break;
             default:
-                SmallList.AppendDefaultAndGetRef(ref _rest, index - StackItemCount, StackItemCount) = item;
+                SmallList.AppendDefaultAndGetRef(ref _rest, index - OnStackItemCount, OnStackItemCount) = item;
                 break;
         }
     }
 
-    /// <summary>Bridge to go from the List.Add</summary>
+    /// <summary>Sugar bridge from the List.Add</summary>
     [MethodImpl((MethodImplOptions)256)]
     public void Add(in TItem item) => Append(in item);
 
@@ -630,8 +657,8 @@ public struct SmallList2<TItem>
     [MethodImpl((MethodImplOptions)256)]
     public void AppendDefault()
     {
-        if (++_count >= StackItemCount)
-            SmallList.AppendDefaultAndGetRef(ref _rest, _count - StackItemCount, StackItemCount);
+        if (++_count >= OnStackItemCount)
+            SmallList.AppendDefaultAndGetRef(ref _rest, _count - OnStackItemCount, OnStackItemCount);
     }
 
     /// <summary>Removes the last item from the list aka the Stack Pop. Assumes that the list is not empty!</summary>
@@ -646,14 +673,14 @@ public struct SmallList2<TItem>
             case 1: _it1 = default; break;
             default:
                 Debug.Assert(_rest != null, $"Expecting a deeper parent stack created before accessing it here at level {index}");
-                _rest[index - StackItemCount] = default;
+                _rest[index - OnStackItemCount] = default;
                 break;
         }
     }
 
     /// <summary>Copy items to new the array</summary>
     [MethodImpl((MethodImplOptions)256)]
-    public TItem[] CopyToArray()
+    public TItem[] ToArray()
     {
         switch (Count)
         {
@@ -664,14 +691,14 @@ public struct SmallList2<TItem>
                 var items = new TItem[Count];
                 items[0] = _it0;
                 items[1] = _it1;
-                Array.Copy(_rest, 0, items, 2, Count - StackItemCount);
+                Array.Copy(_rest, 0, items, 2, Count - OnStackItemCount);
                 return items;
         }
     }
 
     /// <summary>Exposing as list</summary>
     [MethodImpl((MethodImplOptions)256)]
-    public IList<TItem> AsList() => CopyToArray();
+    public IList<TItem> AsList() => ToArray();
 }
 
 /// <summary>Configiration and the tools for the FHashMap map data structure</summary>
@@ -713,6 +740,8 @@ public static class FHashMap
         }
     }
 
+    /// binary reprsentation of the `int`
+    public static string ToB(int x) => System.Convert.ToString(x, 2).PadLeft(32, '0');
 
     [MethodImpl((MethodImplOptions)256)]
 #if NET7_0_OR_GREATER
@@ -1256,6 +1285,7 @@ public static class FHashMap
 /// For instance, for the `RefEq` the tombstone is <see langword="null"/>. You may redefine it in the `IEq{K}.GetTombstone()` implementation.
 /// 
 /// </summary>
+[DebuggerDisplay("{Count} of {_e0}, {_e1}, {_e2}, {_e3}, ...")]
 public struct FHashMap<K, V, TEq, TEntries>
     where TEq : struct, IEq<K>
     where TEntries : struct, IEntries<K, V, TEq>
