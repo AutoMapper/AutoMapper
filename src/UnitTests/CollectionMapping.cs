@@ -148,7 +148,6 @@ public class AmbigousMethod : AutoMapperSpecBase
     }
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
 
-    // todo: @wip @fixme
     [Fact]
     public void Should_work() => Map<Destination[]>(new[] { new Source() }.OrderBy(s => s.Value));
 }

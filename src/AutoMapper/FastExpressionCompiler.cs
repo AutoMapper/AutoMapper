@@ -631,12 +631,12 @@ namespace FastExpressionCompiler
             /// <summary>Tracks the use of the variables in the blocks stack per variable, 
             /// (uint) contains (ushort) BlockIndex in the upper bits and (ushort) VarIndex in the lower bits.
             /// to determine if variable is the local variable and in what block it's defined</summary>
-            private FHashMap<PE, SmallList4<uint>, 
+            private FHashMap<PE, SmallList4<uint>,
                 RefEq<PE>, FHashMap.SingleArrayEntries<PE, SmallList4<uint>, RefEq<PE>>
                 > _varInBlockMap;
 
             /// The map of inlined invocations collected in TryCollect and then used in TryEmit
-            internal FHashMap<InvocationExpression, Expression, RefEq<InvocationExpression>, 
+            internal FHashMap<InvocationExpression, Expression, RefEq<InvocationExpression>,
                 FHashMap.SingleArrayEntries<InvocationExpression, Expression, RefEq<InvocationExpression>>
                 > InlinedLambdaInvocationMap;
 
@@ -1711,7 +1711,7 @@ namespace FastExpressionCompiler
 
         private static Result TryCollectListInitExprConstants(ref ClosureInfo closure, ListInitExpression expr,
 #if LIGHT_EXPRESSION
-            IParameterProvider paramExprs, 
+            IParameterProvider paramExprs,
 #else
             IReadOnlyList<PE> paramExprs,
 #endif
@@ -3374,6 +3374,15 @@ namespace FastExpressionCompiler
                 return locVarIndex;
             }
 
+            private static int InitValueTypeVariable(ILGenerator il, Type exprType, int locVarIndex)
+            {
+                if (locVarIndex == -1)
+                    locVarIndex = il.GetNextLocalVarIndex(exprType);
+                EmitLoadLocalVariableAddress(il, locVarIndex);
+                il.Demit(OpCodes.Initobj, exprType);
+                return locVarIndex;
+            }
+
 #if LIGHT_EXPRESSION
             private static bool EmitNewArrayBounds(NewArrayExpression expr, IParameterProvider paramExprs,
                 ILGenerator il, ref ClosureInfo closure, CompilerFlags setup, ParentFlags parent)
@@ -3496,12 +3505,7 @@ namespace FastExpressionCompiler
                     if (newExpr.Constructor != null)
                         il.Demit(OpCodes.Newobj, newExpr.Constructor);
                     else if (newExpr.Type.IsValueType)
-                    {
-                        if (valueVarIndex == -1)
-                            valueVarIndex = il.GetNextLocalVarIndex(expr.Type);
-                        EmitLoadLocalVariableAddress(il, valueVarIndex);
-                        il.Demit(OpCodes.Initobj, newExpr.Type);
-                    }
+                        valueVarIndex = InitValueTypeVariable(il, newExpr.Type, valueVarIndex);
                     else
                         return false; // null constructor and not a value type, better to fallback
                 }
@@ -3587,12 +3591,7 @@ namespace FastExpressionCompiler
                 if (newExpr.Constructor != null)
                     il.Demit(OpCodes.Newobj, newExpr.Constructor);
                 else if (exprType.IsValueType)
-                {
-                    if (valueVarIndex == -1)
-                        valueVarIndex = il.GetNextLocalVarIndex(expr.Type);
-                    EmitLoadLocalVariableAddress(il, valueVarIndex);
-                    il.Demit(OpCodes.Initobj, exprType);
-                }
+                    valueVarIndex = InitValueTypeVariable(il, exprType, valueVarIndex);
                 else
                     return false; // null constructor and not a value type, better to fallback
 
@@ -4406,7 +4405,7 @@ namespace FastExpressionCompiler
 
             private static bool TryEmitMethodCall(Expression expr,
 #if LIGHT_EXPRESSION
-                IParameterProvider paramExprs, 
+                IParameterProvider paramExprs,
 #else
                 IReadOnlyList<PE> paramExprs,
 #endif
@@ -4528,7 +4527,11 @@ namespace FastExpressionCompiler
 
                         closure.LastEmitIsAddress = isByAddress;
                         if (!isByAddress)
+                        {
+                            if (objExpr.Type.IsEnum)
+                                EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
                             il.Demit(OpCodes.Ldfld, field);
+                        }
                         else
                         {
                             il.Demit(OpCodes.Ldflda, field);
@@ -4930,11 +4933,11 @@ namespace FastExpressionCompiler
                 var rightOpType = right.Type;
 
                 // if on member is `null` object then list its type to match other member
-                var rightIsNull = right is ConstantExpression r && r.Value == null;
+                var rightIsNull = IsExpressionContainsNullValue(right);
                 if (rightIsNull & rightOpType == typeof(object))
                     rightOpType = leftOpType;
 
-                var leftIsNull = left is ConstantExpression l && l.Value == null;
+                var leftIsNull = IsExpressionContainsNullValue(left);
                 if (leftIsNull & leftOpType == typeof(object))
                     leftOpType = rightOpType;
 
@@ -5344,6 +5347,10 @@ namespace FastExpressionCompiler
                 return true;
             }
 
+            private static bool IsExpressionContainsNullValue(Expression expr) =>
+                expr is DefaultExpression ld && (ld.Type.IsClass || ld.Type.IsNullable()) ||
+                expr is ConstantExpression lc && lc.Value == null;
+
             private static bool TryEmitConditional(
                 Expression testExpr, Expression ifTrueExpr, Expression ifFalseExpr,
                 // Type type, // todo: @wip what about the type, what if it is a void?
@@ -5378,6 +5385,7 @@ namespace FastExpressionCompiler
                 {
                     var testLeftExpr = tb.Left;
                     var testRightExpr = tb.Right;
+
                     Expression oppositeTestExpr = null;
                     var sideConstExpr = testRightExpr as ConstantExpression ?? testLeftExpr as ConstantExpression;
                     if (sideConstExpr != null)
@@ -5420,11 +5428,9 @@ namespace FastExpressionCompiler
                         return false;
                 }
 
-                if (useBrFalseOrTrue == -1)
-                {
-                    if (!TryEmit(testExpr, paramExprs, il, ref closure, setup, parent & ~ParentFlags.IgnoreResult))
-                        return false;
-                }
+                if (useBrFalseOrTrue == -1 &&
+                    !TryEmit(testExpr, paramExprs, il, ref closure, setup, parent & ~ParentFlags.IgnoreResult))
+                    return false;
 
                 if (nullOfValueType != null)
                 {
@@ -7305,9 +7311,9 @@ namespace FastExpressionCompiler
                         sb.Append(") => //").Append(lambdaMethod.ReturnType.ToCode(stripNamespace, printType));
                         var body = x.Body;
                         var bNodeType = body.NodeType;
-                        var isReturnableExpression = bNodeType.IsReturnable();
+                        var isReturnable = bNodeType.IsReturnable();
                         var ignoresResult = x.ReturnType == typeof(void);
-                        if (isReturnableExpression & !ignoresResult)
+                        if (isReturnable & !ignoresResult)
                             sb.NewLineIdentCs(body, EnclosedIn.LambdaBody, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                         else
                         {
@@ -7319,8 +7325,8 @@ namespace FastExpressionCompiler
                             else
                             {
                                 sb.NewLineIdentCs(body, EnclosedIn.LambdaBody, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
-                                if (isReturnableExpression)
-                                    sb.AddSemicolonOnce();
+                                if (isReturnable)
+                                    sb.AppendSemicolonOnce();
                             }
                             sb.NewLine(lineIdent, identSpaces).Append('}');
                         }
@@ -7433,9 +7439,11 @@ namespace FastExpressionCompiler
                                 // avoid additional new line between `try {\n\n while().. }`
                                 if (!part.NodeType.IsBlockLike())
                                     sb.NewLineIdent(lineIdent);
-                                if (returnsValue && part.NodeType.IsReturnable())
+                                var isReturnable = returnsValue && part.NodeType.IsReturnable();
+                                if (isReturnable)
                                     sb.Append("return ");
-                                part.ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                                part.ToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode)
+                                    .AppendSemicolonOnce();
                             }
                         }
 
@@ -7495,9 +7503,12 @@ namespace FastExpressionCompiler
                             if (gtValue == null)
                                 return sb.Append("return;");
 
-                            if (gtValue.NodeType.IsReturnable())
+                            var isReturnable = gtValue.NodeType.IsReturnable();
+                            if (isReturnable)
                                 sb.Append("return ");
                             gtValue.ToCSharpString(sb, lineIdent - identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                            if (isReturnable)
+                                sb.AppendSemicolonOnce();
                             return sb;
                         }
                         return gt.Target.ToCSharpString(sb.Append("goto "));
@@ -7523,10 +7534,10 @@ namespace FastExpressionCompiler
                                 if (cs.Body is BlockExpression bl)
                                     bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
                                 else
-                                    cs.Body.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                                    cs.Body.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AppendSemicolonOnce();
                             }
                             else
-                                cs.Body.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                                cs.Body.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AppendSemicolonOnce();
                         }
 
                         if (x.DefaultBody != null)
@@ -7537,10 +7548,10 @@ namespace FastExpressionCompiler
                                 if (x.DefaultBody is BlockExpression bl)
                                     bl.BlockToCSharpString(sb, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: true);
                                 else
-                                    x.DefaultBody.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                                    x.DefaultBody.ToCSharpString(sb.Append("return "), EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AppendSemicolonOnce();
                             }
                             else
-                                x.DefaultBody.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                                x.DefaultBody.ToCSharpString(sb, enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AppendSemicolonOnce();
                         }
 
                         return sb.NewLine(lineIdent, identSpaces).Append("}");
@@ -7750,7 +7761,7 @@ namespace FastExpressionCompiler
             if (expr is BlockExpression fb)
                 fb.BlockToCSharpString(sb, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode, inTheLastBlock: false);
             else
-                sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AddSemicolonOnce();
+                sb.NewLineIdentCs(expr, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode).AppendSemicolonOnce();
             return sb.NewLine(lineIdent, identSpaces).Append('}');
         }
 
@@ -7771,8 +7782,20 @@ namespace FastExpressionCompiler
             return sb.NewLineIdent(lineIdent).Append("})");
         }
 
-        private static StringBuilder AddSemicolonOnce(this StringBuilder sb) =>
+        internal static StringBuilder AppendSemicolonOnce(this StringBuilder sb) =>
             sb[sb.Length - 1] != ';' ? sb.Append(";") : sb;
+
+        internal static StringBuilder AppendLineOnce(this StringBuilder sb)
+        {
+            for (var end = sb.Length - 1; end >= 0; --end)
+            {
+                if (sb[end] == '\n')
+                    return sb; // return the unchanged sb when new line is already present
+                if (sb[end] != ' ') // skip spaces if any
+                    break;
+            }
+            return sb.Append(NewLine);
+        }
 
         private const string NotSupportedExpression = "// NOT_SUPPORTED_EXPRESSION: ";
 
@@ -7838,7 +7861,7 @@ namespace FastExpressionCompiler
                 st0.Left == vars[0] && st1.Right == vars[0])
                 return Assign(st1.Left, st0.Right).ToCSharpString(sb.NewLineIdent(lineIdent),
                     EnclosedIn.Block, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
-                    .AddSemicolonOnce();
+                    .AppendSemicolonOnce();
 
             foreach (var v in vars)
             {
@@ -7871,7 +7894,7 @@ namespace FastExpressionCompiler
                     else
                         gt.Value.ToCSharpString(sb.Append("return "),
                             EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
-                            .AddSemicolonOnce();
+                            .AppendSemicolonOnce();
 
                     sb.NewLineIdent(lineIdent);
                     label.Target.ToCSharpString(sb).Append(':');
@@ -7880,7 +7903,7 @@ namespace FastExpressionCompiler
                     sb.NewLineIdent(lineIdent);
                     return label.DefaultValue.ToCSharpString(sb.Append("return "),
                         EnclosedIn.Return, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
-                        .AddSemicolonOnce();
+                        .AppendSemicolonOnce();
                 }
 
                 if (expr is BlockExpression bl)
@@ -7902,7 +7925,7 @@ namespace FastExpressionCompiler
                     if (nodeType.IsBlockLikeOrConditional())
                         sb.NewLineIdent(lineIdent);
                     else if (nodeType != ExpressionType.Label & nodeType != ExpressionType.Default)
-                        sb.AddSemicolonOnce();
+                        sb.AppendSemicolonOnce();
                 }
             }
 
@@ -7920,7 +7943,7 @@ namespace FastExpressionCompiler
             {
                 lastExpr.ToCSharpString(sb, EnclosedIn.Block, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
                 if (inTheLastBlock)
-                    sb.AddSemicolonOnce(); // the last label forms the invalid C#, so we need at least ';' at the end
+                    sb.AppendSemicolonOnce(); // the last label forms the invalid C#, so we need at least ';' at the end
                 return sb;
             }
 
@@ -7950,10 +7973,7 @@ namespace FastExpressionCompiler
                 }
             }
 
-            if (lastExpr is ConditionalExpression || // todo: @wip use IsBlockLike
-                lastExpr is TryExpression ||
-                lastExpr is LoopExpression ||
-                lastExpr is SwitchExpression ||
+            if (lastExpr.NodeType.IsBlockLike() ||
                 lastExpr is DefaultExpression d && d.Type == typeof(void))
             {
                 lastExpr.ToCSharpString(sb, EnclosedIn.Block, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
@@ -7961,12 +7981,14 @@ namespace FastExpressionCompiler
             else if (lastExpr.NodeType == ExpressionType.Assign && ((BinaryExpression)lastExpr).Right is BlockExpression)
             {
                 lastExpr.ToCSharpString(sb, EnclosedIn.Block, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode);
+                if (enclosedIn == EnclosedIn.Return)
+                    sb.AppendSemicolonOnce();
             }
             else
             {
                 lastExpr.ToCSharpString(sb, enclosedIn, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode);
                 sb = blockResultAssignment?.NodeType == ExpressionType.PowerAssign ? sb.Append(')') : sb;
-                sb.AddSemicolonOnce();
+                sb.AppendSemicolonOnce();
             }
             return sb;
         }
@@ -8106,7 +8128,7 @@ namespace FastExpressionCompiler
         }
 
         internal static StringBuilder AppendName<T>(this StringBuilder sb, string name, string typeCode, T identity, string suffix = "") =>
-            name != null
+            !string.IsNullOrWhiteSpace(name)
                 ? sb.Append(name + suffix)
                 : sb.Append(typeCode.Replace('.', '_').Replace('<', '_').Replace('>', '_').Replace(", ", "_").Replace("?", "").ToLowerInvariant())
                     .Append("__").Append(identity.GetHashCode())
@@ -8416,8 +8438,12 @@ namespace FastExpressionCompiler
             return notRecognizedToCode?.Invoke(x, stripNamespace, printType) ?? x.ToString();
         }
 
-        internal static StringBuilder NewLineIdent(this StringBuilder sb, int lineIdent) =>
-            sb.AppendLine().Append(' ', lineIdent);
+        internal static StringBuilder NewLineIdent(this StringBuilder sb, int lineIdent)
+        {
+            var originalLength = sb.Length;
+            sb.AppendLineOnce();
+            return originalLength == sb.Length ? sb : sb.Append(' ', lineIdent);
+        }
 
         internal static StringBuilder NewLine(this StringBuilder sb, int lineIdent, int identSpaces) =>
             sb.AppendLine().Append(' ', Math.Max(lineIdent - identSpaces, 0));
@@ -8465,7 +8491,7 @@ namespace FastExpressionCompiler
 
         internal static StringBuilder NewLineIdentCs(this StringBuilder sb, Expression expr, ToCSharpPrinter.EnclosedIn enclosedIn,
             int lineIdent, bool stripNamespace, Func<Type, string, string> printType, int identSpaces, CodePrinter.ObjectToCode notRecognizedToCode) =>
-            expr?.ToCSharpString(sb.NewLineIdent(lineIdent), enclosedIn, lineIdent + identSpaces, stripNamespace, printType, identSpaces, notRecognizedToCode)
+            expr?.ToCSharpString(sb.NewLineIdent(lineIdent), enclosedIn, lineIdent, stripNamespace, printType, identSpaces, notRecognizedToCode)
             ?? sb.Append("null");
 
         /// <summary>Helper method to find the number of lambdas in the C# `code` string</summary>
