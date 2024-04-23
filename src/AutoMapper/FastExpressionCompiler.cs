@@ -4418,26 +4418,76 @@ namespace FastExpressionCompiler
                 var methodParams = method.GetParameters(); // todo: @perf @mem find how to avoid the call, look at `NewNoByRefArgs` expressions as example
 
                 var objIsValueType = false;
+                var loadObjByAddress = false;
                 if (objExpr != null)
                 {
                     if (!TryEmit(objExpr, paramExprs, il, ref closure, setup, flags | ParentFlags.InstanceAccess))
                         return false;
-
                     objIsValueType = objExpr.Type.IsValueType;
-                    if (objIsValueType && objExpr.NodeType != ExpressionType.Parameter && !closure.LastEmitIsAddress)
-                        EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
+                    loadObjByAddress = objIsValueType && objExpr.NodeType != ExpressionType.Parameter && !closure.LastEmitIsAddress;
                 }
 
-                if (methodParams.Length > 0)
+                if (methodParams.Length == 0)
+                {
+                    if (loadObjByAddress)
+                        EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
+                }
+                else
                 {
 #if SUPPORTS_ARGUMENT_PROVIDER
                     var callArgs = (IArgumentProvider)callExpr;
 #else
                     var callArgs = callExpr.Arguments;
 #endif
+                    var hasComplexArgs = false;
                     for (var i = 0; i < methodParams.Length; i++)
-                        if (!TryEmit(callArgs.GetArgument(i), paramExprs, il, ref closure, setup, flags, methodParams[i].ParameterType.IsByRef ? i : -1))
-                            return false;
+                    {
+                        var argExpr = callArgs.GetArgument(i);
+                        argExpr = argExpr.StripConvertRecursively();
+                        if (argExpr.NodeType == ExpressionType.Invoke ||
+                            argExpr.NodeType.IsBlockLikeOrConditional())
+                        {
+                            hasComplexArgs = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasComplexArgs)
+                    {
+                        if (loadObjByAddress)
+                            EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
+
+                        for (var i = 0; i < methodParams.Length; i++)
+                            if (!TryEmit(callArgs.GetArgument(i), paramExprs, il, ref closure, setup, flags, methodParams[i].ParameterType.IsByRef ? i : -1))
+                                return false;
+                    }
+                    else
+                    {
+                        // don't forget to store the object into the variable first, before emitting the arguments
+                        var objVar = objExpr != null ? EmitStoreLocalVariable(il, objExpr.Type) : -1;
+
+                        SmallList4<int> argVars = default;
+                        for (var i = 0; i < methodParams.Length; i++)
+                        {
+                            var argExpr = callArgs.GetArgument(i);
+                            var parType = methodParams[i].ParameterType;
+                            if (!TryEmit(argExpr, paramExprs, il, ref closure, setup, flags, parType.IsByRef ? i : -1))
+                                return false;
+                            argVars.Add(EmitStoreLocalVariable(il, parType));
+                        }
+
+                        // restore the object and the args from the variables in the proper order to emit the call
+                        if (objExpr != null)
+                        {
+                            if (loadObjByAddress)
+                                EmitLoadLocalVariableAddress(il, objVar);
+                            else
+                                EmitLoadLocalVariable(il, objVar);
+                        }
+
+                        for (var i = 0; i < methodParams.Length; i++)
+                            EmitLoadLocalVariable(il, argVars[i]);
+                    }
                 }
 
                 var ok = true;
@@ -4933,11 +4983,11 @@ namespace FastExpressionCompiler
                 var rightOpType = right.Type;
 
                 // if on member is `null` object then list its type to match other member
-                var rightIsNull = IsExpressionContainsNullValue(right);
+                var rightIsNull = IsNullContainingExpression(right);
                 if (rightIsNull & rightOpType == typeof(object))
                     rightOpType = leftOpType;
 
-                var leftIsNull = IsExpressionContainsNullValue(left);
+                var leftIsNull = IsNullContainingExpression(left);
                 if (leftIsNull & leftOpType == typeof(object))
                     leftOpType = rightOpType;
 
@@ -5347,7 +5397,7 @@ namespace FastExpressionCompiler
                 return true;
             }
 
-            private static bool IsExpressionContainsNullValue(Expression expr) =>
+            private static bool IsNullContainingExpression(Expression expr) =>
                 expr is DefaultExpression ld && (ld.Type.IsClass || ld.Type.IsNullable()) ||
                 expr is ConstantExpression lc && lc.Value == null;
 
@@ -5440,15 +5490,12 @@ namespace FastExpressionCompiler
                 }
 
                 var labelIfFalse = il.DefineLabel();
+
+                // todo: @perf try to recognize the patterns like `b == 1` and replace Ceq, Brtrue with Beq, and respectively Ceq, Brfalse with Bne_Un
+                // for this we need to inline here the logic from the TryEmitComparison.
                 if ((testNodeType == ExpressionType.Equal & useBrFalseOrTrue == 0) ||
                     (testNodeType == ExpressionType.NotEqual & useBrFalseOrTrue == 1))
-                {
-                    // todo: @perf incomplete:
-                    // try to recognize the pattern like in #301(300) `if (b == null) { goto return_label; }` 
-                    // and instead of generating two branches e.g. Brtrue to else branch and Br or Ret to the end of the body,
-                    // let's generate a single one e.g. Brfalse to return.
                     il.Demit(OpCodes.Brtrue, labelIfFalse);
-                }
                 else
                     il.Demit(OpCodes.Brfalse, labelIfFalse);
 
@@ -5900,7 +5947,8 @@ namespace FastExpressionCompiler
             !IsBlockLike(nodeType);
 
         internal static bool IsBlockLikeOrConditional(this ExpressionType nodeType) =>
-            nodeType == ExpressionType.Conditional | nodeType == ExpressionType.Coalesce || IsBlockLike(nodeType);
+            nodeType == ExpressionType.Conditional | nodeType == ExpressionType.Coalesce ||
+            IsBlockLike(nodeType);
 
         internal static Expression StripConvertRecursively(this Expression expr) =>
             expr is UnaryExpression convert && convert.NodeType == ExpressionType.Convert
