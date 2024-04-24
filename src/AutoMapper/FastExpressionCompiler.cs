@@ -1303,7 +1303,7 @@ namespace FastExpressionCompiler
                             if ((flags & CompilerFlags.NoInvocationLambdaInlining) == 0 && invokedExpr is LambdaExpression lambdaExpr)
                             {
                                 var oldIndex = closure.CurrentInlinedLambdaInvokeIndex;
-                                closure.CurrentInlinedLambdaInvokeIndex = closure.AddInlinedLambdaInvoke(invokeExpr); // todo: @wip check that the invoke expression actually contains Return(LabelTarget), BUT what if it is a conditional expression without return, what happens when inlining? 
+                                closure.CurrentInlinedLambdaInvokeIndex = closure.AddInlinedLambdaInvoke(invokeExpr);
 
                                 ref var inlinedExpr = ref closure.InlinedLambdaInvocationMap.GetOrAddValueRef(invokeExpr, out var found);
                                 if (!found)
@@ -2176,12 +2176,12 @@ namespace FastExpressionCompiler
 #endif
                 var argCount = argExprs.GetCount();
                 var ctor = newExpr.Constructor;
-                if (argCount > 0)
+                if (argCount != 0)
                 {
-                    var args = ctor.GetParameters(); // todo: @perf move into loop
+                    var pars = ctor.GetParameters();
                     for (var i = 0; i < argCount; ++i)
                         if (!TryEmit(argExprs.GetArgument(i),
-                            paramExprs, il, ref closure, setup, parent, args[i].ParameterType.IsByRef ? i : -1))
+                            paramExprs, il, ref closure, setup, parent, pars[i].ParameterType.IsByRef ? i : -1))
                             return false;
                 }
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
@@ -4427,7 +4427,8 @@ namespace FastExpressionCompiler
                     loadObjByAddress = objIsValueType && objExpr.NodeType != ExpressionType.Parameter && !closure.LastEmitIsAddress;
                 }
 
-                if (methodParams.Length == 0)
+                var parCount = methodParams.Length;
+                if (parCount == 0)
                 {
                     if (loadObjByAddress)
                         EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
@@ -4440,31 +4441,22 @@ namespace FastExpressionCompiler
                     var callArgs = callExpr.Arguments;
 #endif
                     var hasComplexArgs = false;
-                    for (var i = 0; i < methodParams.Length; i++)
-                    {
-                        var argExpr = callArgs.GetArgument(i);
-                        argExpr = argExpr.StripConvertRecursively();
-                        if (argExpr.NodeType == ExpressionType.Invoke ||
-                            argExpr.NodeType.IsBlockLikeOrConditional())
-                        {
-                            hasComplexArgs = true;
-                            break;
-                        }
-                    }
+                    for (var i = 0; !hasComplexArgs && i < parCount; i++)
+                        hasComplexArgs = callArgs.GetArgument(i).IsComplexExpression();
 
                     if (!hasComplexArgs)
                     {
                         if (loadObjByAddress)
                             EmitStoreAndLoadLocalVariableAddress(il, objExpr.Type);
 
-                        for (var i = 0; i < methodParams.Length; i++)
+                        for (var i = 0; i < parCount; i++)
                             if (!TryEmit(callArgs.GetArgument(i), paramExprs, il, ref closure, setup, flags, methodParams[i].ParameterType.IsByRef ? i : -1))
                                 return false;
                     }
                     else
                     {
                         // don't forget to store the object into the variable first, before emitting the arguments
-                        var objVar = objExpr != null ? EmitStoreLocalVariable(il, objExpr.Type) : -1;
+                        var objVar = objExpr == null ? -1 : EmitStoreLocalVariable(il, objExpr.Type);
 
                         SmallList4<int> argVars = default;
                         for (var i = 0; i < methodParams.Length; i++)
@@ -4750,7 +4742,7 @@ namespace FastExpressionCompiler
                     if (!TryEmit(inlinedExpr, paramExprs, il, ref closure, setup, parent))
                         return false;
 
-                    if ((parent & ParentFlags.IgnoreResult) == 0 && lambdaExpr.Body.Type != typeof(void))
+                    if ((parent & ParentFlags.IgnoreResult) == 0 && inlinedExpr.Type != typeof(void))
                     {
                         // find if the variable with the result is exist in the label infos
                         ref var label = ref closure.Labels.GetLabelOrInvokeIndexByTarget(expr, out var labelFound);
@@ -5954,6 +5946,13 @@ namespace FastExpressionCompiler
             expr is UnaryExpression convert && convert.NodeType == ExpressionType.Convert
                 ? StripConvertRecursively(convert.Operand)
                 : expr;
+
+        internal static bool IsComplexExpression(this Expression expr)
+        {
+            expr = expr.StripConvertRecursively();
+            return expr.NodeType == ExpressionType.Invoke
+                || expr.NodeType.IsBlockLikeOrConditional();
+        }
 
         internal static bool IsConstantOrDefault(this Expression expr)
         {
