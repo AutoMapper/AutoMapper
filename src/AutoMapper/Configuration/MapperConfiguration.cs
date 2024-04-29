@@ -149,14 +149,14 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         {
             var executionPlan = ((IGlobalConfiguration)this).BuildExecutionPlan(mapRequest);
 #if DEBUG
-            var fs = executionPlan.Compile(); // breakpoint here to inspect all execution plans
-            Debug.WriteLine(fs.Method.ToILString().ToString());
-
+            // note: @debug put breakpoint here to inspect all execution plans
             Debug.WriteLine(executionPlan.ToCSharpString());
             Debug.WriteLine(executionPlan.ToExpressionString());
-            Delegate ff;
-            ff = executionPlan.CompileFast(true);
-            Debug.Assert(ff != null);
+
+            var fs = executionPlan.Compile();
+            Debug.WriteLine(fs.Method.ToILString().ToString());
+
+            var ff = executionPlan.CompileFast(true);
             Debug.WriteLine(ff.Method.ToILString().ToString());
 #else
             var ff = executionPlan.CompileFast();
