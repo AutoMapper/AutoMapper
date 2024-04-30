@@ -77,7 +77,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
         {
             var sourceType = derivedMap.SourceType;
             var derivedRequest = request.InnerRequest(sourceType, derivedMap.DestinationType);
-            var derivedProjection = CreateProjectionCore(derivedRequest, letPropertyMaps, derivedMap, Convert(source, sourceType));
+            var derivedProjection = CreateProjectionCore(derivedRequest, letPropertyMaps, derivedMap, TypeAs(source, sourceType));
             projection = Condition(TypeIs(source, sourceType), derivedProjection, projection, projection.Type);
         }
         return projection;
