@@ -147,7 +147,6 @@ public class AmbigousMethod : AutoMapperSpecBase
         public string Value { get; set; }
     }
     protected override MapperConfiguration CreateConfiguration() => new(c => c.CreateMap<Source, Destination>());
-
     [Fact]
     public void Should_work() => Map<Destination[]>(new[] { new Source() }.OrderBy(s => s.Value));
 }
@@ -442,6 +441,7 @@ public class When_mapping_to_existing_observable_collection : AutoMapperSpecBase
     }
 
     protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<CollectionHolderDto, CollectionHolder>().ForMember(a => a.Observable, opt => opt.UseDestinationValue()));
+
     [Fact]
     public void Should_map_ok()
     {
