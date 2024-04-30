@@ -2,7 +2,7 @@ namespace AutoMapper;
 using Features;
 using Internal.Mappers;
 using QueryableExtensions.Impl;
-using FastExpressionCompiler.ILDecoder;
+// using FastExpressionCompiler.ILDecoder;
 
 public interface IConfigurationProvider
 {
@@ -154,10 +154,10 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             Debug.WriteLine(executionPlan.ToExpressionString());
 
             var fs = executionPlan.Compile();
-            Debug.WriteLine(fs.Method.ToILString().ToString());
+            // Debug.WriteLine(fs.Method.ToILString().ToString());
 
             var ff = executionPlan.CompileFast(true);
-            Debug.WriteLine(ff.Method.ToILString().ToString());
+            // Debug.WriteLine(ff.Method.ToILString().ToString());
 #else
             var ff = executionPlan.CompileFast();
 #endif
