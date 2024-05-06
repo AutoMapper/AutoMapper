@@ -1,14 +1,14 @@
 # AutoMapper.Extensions.EnumMapping
 
-The built-in enum mapper is not configurable, it can only be replaced. Alternatively, AutoMapper supports convention based mapping of enum values in a separate package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/).
+The built-in enum mapper is not configurable, it can only be replaced. Alternatively, AutoMapper supports the convention-based mapping of enum values in a separate package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/).
 
 ### Usage
 
-For method `CreateMap` this library provide a `ConvertUsingEnumMapping` method. This method add all default mappings from source to destination enum values.
+For the method `CreateMap` this library provides a `ConvertUsingEnumMapping` method. This method adds all default mappings from source to destination enum values.
 
-If you want to change some mappings, then you can use `MapValue` method. This is a chainable method.
+If you want to change some mappings, then you can use the `MapValue` method. This is a chainable method.
 
-Default the enum values are mapped by value (explicitly: `MapByValue()`), but it is possible to map by name calling  `MapByName()`.
+Default the enum values are mapped by value (explicitly: `MapByValue()`), but it is possible to map by name-calling  `MapByName()`.
 
 ```c#
 using AutoMapper.Extensions.EnumMapping;
@@ -41,15 +41,43 @@ internal class YourProfile : Profile
     ...
 ```
 
+### Mapping Enum's names
+
+Just like with [Flattening](https://docs.automapper.org/en/stable/Flattening.html), Enum's values' names can be automatically mapped by using the `ToString` suffix. That can be useful when you need both the `int` value of an Enum and its `string` name as well.
+
+By default, Enums are automatically mapped either by `MapByValue()` or `MapByName()` depending on the destination's property type (`int` or `string`). For Automapper to map to both properties you can create the `int Enum` and `string EnumToString` properties which will be automatically mapped from the source's `Enum` and `Enum.ToString()` respectively.
+
+When mapping back, the `Enum` in the source gets mapped from the destination's `int Enum` value, and the `string EnumToString` gets ignored.
+
+```c#
+public enum Source
+{
+    Default = 0,
+    First = 1,
+    Second = 2
+}
+
+public Class1 Source
+{
+    Source Enum; // when this is set to Source.First
+}
+
+public Class2 Destination
+{
+    int Enum; // this will be mapped to 1
+    string EnumToString; // and this will be mapped to First
+}
+```
+
 ### Default Convention
 
-The package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/) will map all values from Source type to Destination type if both enum types have the same value (or by name or by value). All Source enum values which have no Target equivalent, will throw an exception if EnumMappingValidation is enabled.
+The package [AutoMapper.Extensions.EnumMapping](https://www.nuget.org/packages/AutoMapper.Extensions.EnumMapping/) will map all values from Source type to Destination type if both enum types have the same value (or by name or by value). All Source enum values that have no Target equivalent will throw an exception if EnumMappingValidation is enabled.
 
 ### ReverseMap Convention
 
 For method `ReverseMap` the same convention is used as for default mappings, but it also respects override enum value mappings if possible.
 
-The following steps determines the reversed overrides:
+The following steps determine the reversed overrides:
 
 1) Create mappings for `Source` to `Destination` (default convention), including custom overrides.
 
@@ -66,19 +94,19 @@ The following steps determines the reversed overrides:
 
     For every `Source` value per grouped `Destination` value:
 
-        3b) if the `Source` enum value does not exists in the `Destination` enum type, then that mapping cannot reversed
+        3b) if the `Source` enum value does not exist in the `Destination` enum type, then that mapping cannot reversed,
     
-        3c) if there is a `Source` value which is not a `Destination` part of the mappings from step 1, then that mapping cannot reversed
+        3c) if there is a `Source` value that is not a `Destination` part of the mappings from step 1, then that mapping cannot reversed,
     
-        3d) if the `Source` value is not excluded by option b and c, the that `Source` value is the new `Destination` value.
+        3d) if the `Source` value is not excluded by options b and c, the `Source` value is the new `Destination` value.
 
 4) All overrides which are determined in step 3 will be applied to mappings from step 2.
 
-5) Finally, the custom mappings provided to method `ReverseMap` will be applied.
+5) Finally, the custom mappings provided to the method `ReverseMap` will be applied.
 
 ### Testing
 
-[AutoMapper](https://www.nuget.org/packages/AutoMapper/) provides a nice tooling for validating typemaps. This package adds an extra `EnumMapperConfigurationExpressionExtensions.EnableEnumMappingValidation` extension method to extend the existing `AssertConfigurationIsValid()` method to validate also the enum mappings.
+[AutoMapper](https://www.nuget.org/packages/AutoMapper/) provides nice tooling for validating type maps. This package adds an extra `EnumMapperConfigurationExpressionExtensions.EnableEnumMappingValidation` extension method to extend the existing `AssertConfigurationIsValid()` method to validate also the enum mappings.
 
 To enable testing the enum mapping configuration:
 
