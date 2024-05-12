@@ -13,7 +13,7 @@ public class ConversionOperatorMapper : IObjectMapper
                 return sourceMethod;
             }
         }
-        return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags, null, new[] { sourceType }, null);
+        return destinationType.GetMethod(_operatorName, TypeExtensions.StaticFlags, null, [sourceType], null);
     }
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)
     {

@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    static readonly Type[] AmTypes = [typeof(IValueResolver<,,>), typeof(IMemberValueResolver<,,,>), typeof(ITypeConverter<,>), typeof(IValueConverter<,>), typeof(IMappingAction<,>)];
     public static IServiceCollection AddAutoMapper(this IServiceCollection services, Action<IMapperConfigurationExpression> configAction)
         => AddAutoMapperClasses(services, (sp, cfg) => configAction?.Invoke(cfg), null);
 
@@ -68,18 +69,9 @@ public static class ServiceCollectionExtensions
         }
         if (assembliesToScan != null)
         {
-            assembliesToScan = new HashSet<Assembly>(assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Mapper).Assembly));
+            assembliesToScan = assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Mapper).Assembly).Distinct();
             services.Configure<MapperConfigurationExpression>(options => options.AddMaps(assembliesToScan));
-            var openTypes = new[]
-            {
-                typeof(IValueResolver<,,>),
-                typeof(IMemberValueResolver<,,,>),
-                typeof(ITypeConverter<,>),
-                typeof(IValueConverter<,>),
-                typeof(IMappingAction<,>)
-            };
-            foreach (var type in assembliesToScan.SelectMany(a => a.GetTypes().Where(type => type.IsClass && !type.IsAbstract && Array.Exists(openTypes,
-                openType => type.GetGenericInterface(openType) != null))))
+            foreach (var type in assembliesToScan.SelectMany(a => a.GetTypes().Where(type => type.IsClass && !type.IsAbstract && IsAmType(type))))
             {
                 // use try add to avoid double-registration
                 services.TryAddTransient(type);
@@ -96,7 +88,8 @@ public static class ServiceCollectionExtensions
             var options = sp.GetRequiredService<IOptions<MapperConfigurationExpression>>();
             return new MapperConfiguration(options.Value);
         });
-        services.Add(new ServiceDescriptor(typeof(IMapper), sp => new Mapper(sp.GetRequiredService<IConfigurationProvider>(), sp.GetService), serviceLifetime));
+        services.Add(new(typeof(IMapper), sp => new Mapper(sp.GetRequiredService<IConfigurationProvider>(), sp.GetService), serviceLifetime));
         return services;
+        bool IsAmType(Type type) => Array.Exists(AmTypes, openType => type.GetGenericInterface(openType) != null);
     }
 }

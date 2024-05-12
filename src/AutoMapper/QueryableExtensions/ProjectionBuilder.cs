@@ -18,14 +18,7 @@ public interface IProjectionMapper
 public sealed class ProjectionBuilder : IProjectionBuilder
 {
     internal static List<IProjectionMapper> DefaultProjectionMappers() =>
-        new(capacity: 5)
-        {
-            new AssignableProjectionMapper(),
-            new EnumerableProjectionMapper(),
-            new NullableSourceProjectionMapper(),
-            new StringProjectionMapper(),
-            new EnumProjectionMapper(),
-        };
+        [new AssignableProjectionMapper(), new EnumerableProjectionMapper(), new NullableSourceProjectionMapper(), new StringProjectionMapper(), new EnumProjectionMapper()];
     readonly LockingConcurrentDictionary<ProjectionRequest, QueryExpressions> _projectionCache;
     readonly IGlobalConfiguration _configuration;
     readonly IProjectionMapper[] _projectionMappers;
@@ -37,7 +30,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
     }
     public QueryExpressions GetProjection(Type sourceType, Type destinationType, object parameters, MemberPath[] membersToExpand)
     {
-        var projectionRequest = new ProjectionRequest(sourceType, destinationType, membersToExpand, Array.Empty<ProjectionRequest>());
+        ProjectionRequest projectionRequest = new(sourceType, destinationType, membersToExpand, []);
         var cachedExpressions = _projectionCache.GetOrAdd(projectionRequest);
         if (parameters == null && !_configuration.EnableNullPropagationForQueryMapping)
         {
@@ -48,7 +41,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
     QueryExpressions CreateProjection(ProjectionRequest request)
     {
         var (typeMap, polymorphicMaps) = PolymorphicMaps(request);
-        var letPropertyMaps = polymorphicMaps.Length > 0 ? new LetPropertyMaps(_configuration, MemberPath.Empty, new()) : new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, new());
+        var letPropertyMaps = polymorphicMaps.Length > 0 ? new LetPropertyMaps(_configuration, MemberPath.Empty, []) : new FirstPassLetPropertyMaps(_configuration, MemberPath.Empty, []);
         return CreateProjection(request, letPropertyMaps, typeMap, polymorphicMaps);
     }
     (TypeMap, TypeMap[]) PolymorphicMaps(in ProjectionRequest request)
@@ -88,7 +81,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
             {
                 return customProjection;
             }
-            var propertiesProjections = new List<MemberBinding>();
+            List<MemberBinding> propertiesProjections = [];
             int depth;
             if(OverMaxDepth())
             {
@@ -126,7 +119,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
             }
             Expression TryProjectMember(MemberMap memberMap, Expression defaultSource = null)
             {
-                var memberProjection = new MemberProjection(memberMap);
+                MemberProjection memberProjection = new(memberMap);
                 letPropertyMaps.Push(memberProjection);
                 var memberExpression = ShouldExpand() ? ProjectMemberCore() : null;
                 letPropertyMaps.Pop();
@@ -225,13 +218,12 @@ public sealed class ProjectionBuilder : IProjectionBuilder
         $"Unable to create a map expression from {memberMap.SourceMember?.DeclaringType?.Name}.{memberMap.SourceMember?.Name} ({sourceType}) to {memberMap.DestinationType.Name}.{memberMap.DestinationName} ({memberMap.DestinationType})",
         null, memberMap);
     [EditorBrowsable(EditorBrowsableState.Never)]
-    sealed class FirstPassLetPropertyMaps : LetPropertyMaps
+    sealed class FirstPassLetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections) : LetPropertyMaps(configuration, parentPath, builtProjections)
     {
-        readonly List<SubQueryPath> _savedPaths = new();
-        public FirstPassLetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections) : base(configuration, parentPath, builtProjections) { }
+        readonly List<SubQueryPath> _savedPaths = [];
         public override Expression GetSubQueryMarker(LambdaExpression letExpression)
         {
-            var subQueryPath = new SubQueryPath(_currentPath.Reverse().ToArray(), letExpression);
+            SubQueryPath subQueryPath = new([.._currentPath.Reverse()], letExpression);
             var existingPath = _savedPaths.SingleOrDefault(s => s.IsEquivalentTo(subQueryPath));
             if (existingPath.Marker != null)
             {
@@ -259,7 +251,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
             }
             var secondParameter = Parameter(letType, "dtoLet");
             ReplaceSubQueries();
-            var letClause = builder.CreateProjection(request, base.New(), letTypeMap, Array.Empty<TypeMap>(), instanceParameter);
+            var letClause = builder.CreateProjection(request, base.New(), letTypeMap, [], instanceParameter);
             return new(Lambda(projection, secondParameter), Lambda(letClause, instanceParameter));
             void ReplaceSubQueries()
             {
@@ -290,11 +282,10 @@ public sealed class ProjectionBuilder : IProjectionBuilder
             internal bool IsEquivalentTo(SubQueryPath other) => LetExpression == other.LetExpression && Members.Length == other.Members.Length &&
                 Members.Take(Members.Length - 1).Zip(other.Members, (left, right) => left.MemberMap == right.MemberMap).All(item => item);
         }
-        sealed class GePropertiesVisitor : ExpressionVisitor
+        sealed class GePropertiesVisitor(Expression target) : ExpressionVisitor
         {
-            readonly Expression _target;
-            public List<MemberInfo> Members { get; } = new();
-            public GePropertiesVisitor(Expression target) => _target = target;
+            readonly Expression _target = target;
+            public List<MemberInfo> Members { get; } = [];
             protected override Expression VisitMember(MemberExpression node)
             {
                 if(node.Expression == _target)
@@ -305,19 +296,14 @@ public sealed class ProjectionBuilder : IProjectionBuilder
             }
             public static IEnumerable<PropertyDescription> Retrieve(Expression expression, Expression target)
             {
-                var visitor = new GePropertiesVisitor(target);
+                GePropertiesVisitor visitor = new(target);
                 visitor.Visit(expression);
                 return visitor.Members.Select(member => new PropertyDescription(member.Name, member.GetMemberType()));
             }
         }
-        sealed class ReplaceMemberAccessesVisitor : ExpressionVisitor
+        sealed class ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject) : ExpressionVisitor
         {
-            readonly Expression _oldObject, _newObject;
-            public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
-            {
-                _oldObject = oldObject;
-                _newObject = newObject;
-            }
+            readonly Expression _oldObject = oldObject, _newObject = newObject;
             protected override Expression VisitMember(MemberExpression node)
             {
                 if(node.Expression != _oldObject)
@@ -332,7 +318,7 @@ public sealed class ProjectionBuilder : IProjectionBuilder
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class LetPropertyMaps
 {
-    protected private readonly Stack<MemberProjection> _currentPath = new();
+    protected private readonly Stack<MemberProjection> _currentPath = [];
     readonly MemberPath _parentPath;
     protected internal LetPropertyMaps(IGlobalConfiguration configuration, MemberPath parentPath, TypePairCount builtProjections)
     {
@@ -373,7 +359,7 @@ public readonly record struct QueryExpressions(LambdaExpression Projection, Lamb
         return new(Prepare(Projection), Prepare(LetClause));
         LambdaExpression Prepare(Expression cachedExpression)
         {
-            var result = parameters == null ? cachedExpression : ParameterExpressionVisitor.SetParameters(parameters, cachedExpression);
+            var result = parameters == null ? cachedExpression : ParameterVisitor.SetParameters(parameters, cachedExpression);
             return (LambdaExpression)(enableNullPropagationForQueryMapping ? NullsafeQueryRewriter.NullCheck(result) : result);
         }
     }
@@ -382,11 +368,11 @@ public sealed record MemberProjection(MemberMap MemberMap)
 {
     public Expression Expression { get; set; }
 }
-abstract class ParameterExpressionVisitor : ExpressionVisitor
+abstract class ParameterVisitor : ExpressionVisitor
 {
     public static Expression SetParameters(object parameters, Expression expression)
     {
-        ParameterExpressionVisitor visitor = parameters is ParameterBag dictionary ? new ConstantExpressionReplacementVisitor(dictionary) : new ObjectParameterExpressionReplacementVisitor(parameters);
+        ParameterVisitor visitor = parameters is ParameterBag dictionary ? new ConstantVisitor(dictionary) : new PropertyVisitor(parameters);
         return visitor.Visit(expression);
     }
     protected abstract Expression GetValue(string name);
@@ -409,20 +395,18 @@ abstract class ParameterExpressionVisitor : ExpressionVisitor
         }
         return ToType(parameterValue, member.GetMemberType());
     }
-    sealed class ObjectParameterExpressionReplacementVisitor : ParameterExpressionVisitor
+    sealed class PropertyVisitor(object parameters) : ParameterVisitor
     {
-        readonly object _parameters;
-        public ObjectParameterExpressionReplacementVisitor(object parameters) => _parameters = parameters;
+        readonly object _parameters = parameters;
         protected override Expression GetValue(string name)
         {
             var matchingMember = _parameters.GetType().GetProperty(name);
             return matchingMember != null ? Property(Constant(_parameters), matchingMember) : null;
         }
     }
-    sealed class ConstantExpressionReplacementVisitor : ParameterExpressionVisitor
+    sealed class ConstantVisitor(ParameterBag paramValues) : ParameterVisitor
     {
-        readonly ParameterBag _paramValues;
-        public ConstantExpressionReplacementVisitor(ParameterBag paramValues) => _paramValues = paramValues;
+        readonly ParameterBag _paramValues = paramValues;
         protected override Expression GetValue(string name) => _paramValues.TryGetValue(name, out object parameterValue) ? Constant(parameterValue) : null;
     }
 }
@@ -441,7 +425,7 @@ public readonly record struct ProjectionRequest(Type SourceType, Type Destinatio
         MembersToExpand.SequenceEqual(other.MembersToExpand);
     public override int GetHashCode()
     {
-        var hashCode = new HashCode();
+        HashCode hashCode = new();
         hashCode.Add(SourceType);
         hashCode.Add(DestinationType);
         foreach (var member in MembersToExpand)

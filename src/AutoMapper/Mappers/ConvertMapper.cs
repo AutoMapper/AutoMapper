@@ -7,7 +7,7 @@ public class ConvertMapper : IObjectMapper
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap,
         MemberMap memberMap, Expression sourceExpression, Expression destExpression)
     {
-        var convertMethod = typeof(Convert).GetMethod("To" + destExpression.Type.Name, new[] { sourceExpression.Type });
+        var convertMethod = typeof(Convert).GetMethod("To" + destExpression.Type.Name, [sourceExpression.Type]);
         return Call(convertMethod, sourceExpression);
     }
 }

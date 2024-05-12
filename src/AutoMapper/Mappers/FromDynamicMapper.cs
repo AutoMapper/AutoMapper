@@ -27,8 +27,7 @@ public class FromDynamicMapper : IObjectMapper
     }
     private static object GetDynamically(string memberName, object target)
     {
-        var binder = Binder.GetMember(CSharpBinderFlags.None, memberName, null,
-            new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
+        var binder = Binder.GetMember(CSharpBinderFlags.None, memberName, null, [CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)]);
         var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
         return callsite.Target(callsite, target);
     }

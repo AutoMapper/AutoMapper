@@ -8,17 +8,12 @@ public interface IPropertyMapConfiguration
     IPropertyMapConfiguration Reverse();
     bool Ignored => false;
 }
-public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
+public class MemberConfigurationExpression<TSource, TDestination, TMember>(MemberInfo destinationMember, Type sourceType) : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
 {
     private MemberInfo[] _sourceMembers;
-    private readonly Type _sourceType;
-    protected List<Action<PropertyMap>> PropertyMapActions { get; } = new();
-    public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
-    {
-        DestinationMember = destinationMember;
-        _sourceType = sourceType;
-    }
-    public MemberInfo DestinationMember { get; }
+    private readonly Type _sourceType = sourceType;
+    protected List<Action<PropertyMap>> PropertyMapActions { get; } = [];
+    public MemberInfo DestinationMember { get; } = destinationMember;
     public void MapAtRuntime() => PropertyMapActions.Add(pm => pm.Inline = false);
     public void NullSubstitute(object nullSubstitute) => PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
     public void MapFrom<TValueResolver>() where TValueResolver : IValueResolver<TSource, TDestination, TMember> =>
@@ -31,9 +26,8 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     public void MapFrom<TValueResolver, TSourceMember>(string sourceMemberName) where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
             MapFromCore<TValueResolver, TSourceMember>(null, sourceMemberName);
     private void MapFromCore<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember, string sourceMemberName = null) where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> =>
-        MapFromCore(new(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
+        MapFromCore(new(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>), sourceMemberName)
         {
-            SourceMemberName = sourceMemberName,
             SourceMemberLambda = sourceMember
         });
     public void MapFrom(IValueResolver<TSource, TDestination, TMember> valueResolver) =>
@@ -112,18 +106,16 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     public void ConvertUsing<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter, string sourceMemberName)  =>
         ConvertUsingCore(valueConverter, null, sourceMemberName);
     private void ConvertUsingCore<TValueConverter, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
-        ConvertUsingCore(new(typeof(TValueConverter), typeof(IValueConverter<TSourceMember, TMember>))
+        ConvertUsingCore(new(typeof(TValueConverter), typeof(IValueConverter<TSourceMember, TMember>), sourceMemberName)
         {
             SourceMemberLambda = sourceMember,
-            SourceMemberName = sourceMemberName
         });
     protected void ConvertUsingCore(ValueConverter converter) => SetResolver(converter);
     private void ConvertUsingCore<TSourceMember>(IValueConverter<TSourceMember, TMember> valueConverter,
         Expression<Func<TSource, TSourceMember>> sourceMember = null, string sourceMemberName = null) =>
-        ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TMember>))
+        ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TMember>), sourceMemberName)
         {
             SourceMemberLambda = sourceMember,
-            SourceMemberName = sourceMemberName
         });
     public void Configure(TypeMap typeMap)
     {
@@ -154,7 +146,7 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
             {
                 return null;
             }
-            var reversedMemberConfiguration = new MemberConfigurationExpression<TDestination, TSource, object>(_sourceMembers[0], destinationType);
+            MemberConfigurationExpression<TDestination, TSource, object> reversedMemberConfiguration = new(_sourceMembers[0], destinationType);
             reversedMemberConfiguration.MapFrom(DestinationMember.Name);
             return reversedMemberConfiguration;
         }
@@ -166,30 +158,17 @@ public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMe
     }
     public void DoNotUseDestinationValue() => SetUseDestinationValue(false);
 }
-public sealed class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+public sealed class MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : MemberConfigurationExpression<object, object, object>(destinationMember, sourceType), IMemberConfigurationExpression
 {
-    public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) : base(destinationMember, sourceType){}
     public void MapFrom(Type valueResolverType) => MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>))));
     public void MapFrom(Type valueResolverType, string sourceMemberName) =>
-            MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
-        {
-            SourceMemberName = sourceMemberName
-        });
+            MapFromCore(new(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)), sourceMemberName));
     public void MapFrom<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string sourceMemberName) =>
-        MapFromCore(new(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
-        {
-            SourceMemberName = sourceMemberName
-        });
+        MapFromCore(new(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>), sourceMemberName));
     public void ConvertUsing(Type valueConverterType) => ConvertUsingCore(valueConverterType);
     public void ConvertUsing(Type valueConverterType, string sourceMemberName) => ConvertUsingCore(valueConverterType, sourceMemberName);
     public void ConvertUsing<TSourceMember, TDestinationMember>(IValueConverter<TSourceMember, TDestinationMember> valueConverter, string sourceMemberName) =>
-        base.ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>))
-        {
-            SourceMemberName = sourceMemberName
-        });
+        base.ConvertUsingCore(new(valueConverter, typeof(IValueConverter<TSourceMember, TDestinationMember>), sourceMemberName));
     private void ConvertUsingCore(Type valueConverterType, string sourceMemberName = null) =>
-        base.ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)))
-        {
-            SourceMemberName = sourceMemberName
-        });
+        base.ConvertUsingCore(new(valueConverterType, valueConverterType.GetGenericInterface(typeof(IValueConverter<,>)), sourceMemberName));
 }

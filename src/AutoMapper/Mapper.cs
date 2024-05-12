@@ -141,6 +141,7 @@ public sealed class Mapper : IMapper, IInternalRuntimeMapper
 {
     private readonly IGlobalConfiguration _configuration;
     private readonly Factory _serviceCtor;
+    private readonly ResolutionContext _defaultContext;
     public Mapper(IConfigurationProvider configuration) : this(configuration, configuration.Internal().ServiceCtor) { }
     public Mapper(IConfigurationProvider configuration, Factory serviceCtor)
     {
@@ -148,10 +149,9 @@ public sealed class Mapper : IMapper, IInternalRuntimeMapper
         ArgumentNullException.ThrowIfNull(serviceCtor);
         _configuration = (IGlobalConfiguration)configuration;
         _serviceCtor = serviceCtor;
-        DefaultContext = new(this);
+        _defaultContext = new(this);
     }
-    internal ResolutionContext DefaultContext { get; }
-    ResolutionContext IInternalRuntimeMapper.DefaultContext => DefaultContext;
+    ResolutionContext IInternalRuntimeMapper.DefaultContext => _defaultContext;
     Factory IInternalRuntimeMapper.ServiceCtor => _serviceCtor;
     public IConfigurationProvider ConfigurationProvider => _configuration;
     public TDestination Map<TDestination>(object source) => Map(source, default(TDestination));
@@ -160,14 +160,14 @@ public sealed class Mapper : IMapper, IInternalRuntimeMapper
     public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
         Map(source, default, opts);
     public TDestination Map<TSource, TDestination>(TSource source, TDestination destination) =>
-        MapCore(source, destination, DefaultContext);
+        MapCore(source, destination, _defaultContext);
     public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts) =>
         MapWithOptions(source, destination, opts);
     public object Map(object source, Type sourceType, Type destinationType) => Map(source, null, sourceType, destinationType);
     public object Map(object source, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
         Map(source, null, sourceType, destinationType, opts);
     public object Map(object source, object destination, Type sourceType, Type destinationType) =>
-        MapCore(source, destination, DefaultContext, sourceType, destinationType);
+        MapCore(source, destination, _defaultContext, sourceType, destinationType);
     public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IObjectMappingOperationOptions> opts) =>
         MapWithOptions(source, destination, opts, sourceType, destinationType);
     public IQueryable<TDestination> ProjectTo<TDestination>(IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)

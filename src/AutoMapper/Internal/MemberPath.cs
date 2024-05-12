@@ -2,7 +2,7 @@
 [EditorBrowsable(EditorBrowsableState.Never)]
 public readonly record struct MemberPath(MemberInfo[] Members)
 {
-    public static readonly MemberPath Empty = new(Array.Empty<MemberInfo>());
+    public static readonly MemberPath Empty = new(Members: []);
     public MemberPath(Stack<Member> members) : this(members.ToMemberInfos()){}
     public MemberInfo Last => Members[^1];
     public MemberInfo First => Members[0];
@@ -10,7 +10,7 @@ public readonly record struct MemberPath(MemberInfo[] Members)
     public bool Equals(MemberPath other) => Members.SequenceEqual(other.Members);
     public override int GetHashCode()
     {
-        var hashCode = new HashCode();
+        HashCode hashCode = new();
         foreach(var member in Members)
         {
             hashCode.Add(member);
@@ -33,5 +33,5 @@ public readonly record struct MemberPath(MemberInfo[] Members)
         }
         return true;
     }
-    public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new(Members.Concat(memberInfos).ToArray());
+    public MemberPath Concat(IEnumerable<MemberInfo> memberInfos) => new([..Members.Concat(memberInfos)]);
 }

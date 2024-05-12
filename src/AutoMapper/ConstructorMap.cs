@@ -3,7 +3,7 @@
 public sealed class ConstructorMap
 {
     private bool? _canResolve;
-    private readonly List<ConstructorParameterMap> _ctorParams = new();
+    private readonly List<ConstructorParameterMap> _ctorParams = [];
     public ConstructorInfo Ctor { get; private set; }
     public IReadOnlyCollection<ConstructorParameterMap> CtorParams => _ctorParams;
     public void Reset(ConstructorInfo ctor)
@@ -76,7 +76,7 @@ public class ConstructorParameterMap : MemberMap
         }
         else
         {
-            SourceMembers = Array.Empty<MemberInfo>();
+            SourceMembers = [];
         }
     }
     public ParameterInfo Parameter { get; }

@@ -6,7 +6,7 @@ using static Internal.ReflectionHelper;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class ExpressionBuilder
 {
-    public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
+    public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(ToString));
     public static readonly Expression True = Constant(true, typeof(bool));
     public static readonly Expression Null = Expression.Default(typeof(object));
     public static readonly Expression Empty = Empty();
@@ -42,7 +42,7 @@ public static class ExpressionBuilder
         var variables = configuration?.Variables;
         if (variables == null)
         {
-            variables = new();
+            variables = [];
         }
         else
         {
@@ -51,7 +51,7 @@ public static class ExpressionBuilder
         var expressions = configuration?.Expressions;
         if (expressions == null)
         {
-            expressions = new();
+            expressions = [];
         }
         else
         {
@@ -180,12 +180,8 @@ public static class ExpressionBuilder
         var perMember = memberMap.ValueTransformers;
         var perMap = memberMap.TypeMap.ValueTransformers;
         var perProfile = memberMap.Profile.ValueTransformers;
-        var result = source;
-        if (perMember.Count > 0 || perMap.Count > 0 || perProfile.Count > 0)
-        {
-            result = memberMap.ApplyTransformers(source, configuration, perMember.Concat(perMap).Concat(perProfile));
-        }
-        return result;
+        return perMember.Count > 0 || perMap.Count > 0 || perProfile.Count > 0 ? 
+            memberMap.ApplyTransformers(source, configuration, perMember.Concat(perMap).Concat(perProfile)) : source;
     }
     static Expression ApplyTransformers(this MemberMap memberMap, Expression result, IGlobalConfiguration configuration, IEnumerable<ValueTransformerConfiguration> transformers)
     {
@@ -234,7 +230,7 @@ public static class ExpressionBuilder
     }
     public static Stack<Member> GetChain(this Expression expression)
     {
-        var stack = new Stack<Member>();
+        Stack<Member> stack = [];
         while (expression != null)
         {
             var member = expression switch
@@ -256,14 +252,8 @@ public static class ExpressionBuilder
         }
         return stack;
     }
-    public static IEnumerable<MemberExpression> GetMemberExpressions(this Expression expression)
-    {
-        if (expression is not MemberExpression memberExpression)
-        {
-            return Array.Empty<MemberExpression>();
-        }
-        return expression.GetChain().Select(m => m.Expression as MemberExpression).TakeWhile(m => m != null);
-    }
+    public static IEnumerable<MemberExpression> GetMemberExpressions(this Expression expression) => expression is MemberExpression ?
+        expression.GetChain().Select(m => m.Expression as MemberExpression).TakeWhile(m => m != null) : [];
     public static bool IsMemberPath(this LambdaExpression lambda, out Stack<Member> members)
     {
         Expression currentExpression = null;
