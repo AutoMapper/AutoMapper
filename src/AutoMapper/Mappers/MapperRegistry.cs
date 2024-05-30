@@ -18,9 +18,9 @@ internal static class MapperRegistry
         new ConstructorMapper(),// new Destination(source)
         new ConversionOperatorMapper("op_Implicit"),// implicit operator Destination or implicit operator Source
         new ConversionOperatorMapper("op_Explicit"),// explicit operator Destination or explicit operator Source
-        new FromStringDictionaryMapper(),// property values to typed object
-        new ToStringDictionaryMapper(),// typed object to property values
         new FromDynamicMapper(),// dynamic to typed object
         new ToDynamicMapper(),// typed object to dynamic
+        new FromStringDictionaryMapper(),// property values to typed object
+        new ToStringDictionaryMapper(),// typed object to property values
     ];
 }
