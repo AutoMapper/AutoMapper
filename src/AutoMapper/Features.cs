@@ -39,7 +39,7 @@ public class Features<TFeature>
         }
         else
         {
-            _features ??= new();
+            _features ??= [];
             _features.Add(feature);
         }
     }

@@ -87,14 +87,10 @@ public interface IMapperConfigurationExpression : IProfileExpression
 }
 public sealed class MapperConfigurationExpression : Profile, IGlobalConfigurationExpression
 {
-    private readonly List<Profile> _profiles = new();
-    private readonly List<Validator> _validators = new();
-    private readonly List<IObjectMapper> _mappers;
+    private readonly List<Profile> _profiles = [];
+    private readonly List<Validator> _validators = [];
     private Func<Type, object> _serviceCtor = Activator.CreateInstance;
     private List<IProjectionMapper> _projectionMappers;
-
-    public MapperConfigurationExpression() : base() => _mappers = MapperRegistry.Mappers();
-
     /// <summary>
     /// Add an action to be called when validating the configuration.
     /// </summary>
@@ -123,9 +119,9 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
     public void CreateProfile(string profileName, Action<IProfileExpression> config)
         => AddProfile(new Profile(profileName, config));
 
-    List<IObjectMapper> IGlobalConfigurationExpression.Mappers => _mappers;
+    List<IObjectMapper> IGlobalConfigurationExpression.Mappers { get; } = MapperRegistry.Mappers();
 
-    Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new Features<IGlobalFeature>();
+    Features<IGlobalFeature> IGlobalConfigurationExpression.Features { get; } = new();
 
     public void AddProfile(Profile profile) => _profiles.Add(profile);
 
@@ -161,7 +157,7 @@ public sealed class MapperConfigurationExpression : Profile, IGlobalConfiguratio
 
     private void AddMapsCore(IEnumerable<Assembly> assembliesToScan)
     {
-        var autoMapAttributeProfile = new Profile(nameof(AutoMapAttribute));
+        Profile autoMapAttributeProfile = new(nameof(AutoMapAttribute));
         foreach (var type in assembliesToScan.Where(a => !a.IsDynamic && a != typeof(Profile).Assembly).SelectMany(a => a.GetTypes()))
         {
             if (typeof(Profile).IsAssignableFrom(type) && !type.IsAbstract && !type.ContainsGenericParameters)

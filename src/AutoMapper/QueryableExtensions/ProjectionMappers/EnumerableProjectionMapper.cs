@@ -33,7 +33,7 @@ public class EnumerableProjectionMapper : IProjectionMapper
             }
             else
             {
-                var ctorInfo = destinationType.GetConstructor(new[] { sourceExpression.Type });
+                var ctorInfo = destinationType.GetConstructor([sourceExpression.Type]);
                 if (ctorInfo is not null)
                 {
                     sourceExpression = New(ctorInfo, sourceExpression);

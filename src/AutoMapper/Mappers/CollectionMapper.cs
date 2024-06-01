@@ -54,7 +54,7 @@ public class CollectionMapper : IObjectMapper
                             Throw(Constant(new NotSupportedException($"Unknown collection. Consider a custom type converter from {sourceType} to {destinationType}.")), destinationType);
             }
             var itemParam = Parameter(sourceElementType, "item");
-            var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+            var itemExpr = configuration.MapExpression(profileMap, new(sourceElementType, destinationElementType), itemParam);
             Expression destination, assignNewExpression;
             UseDestinationValue();
             var (variables, statements) = configuration.Scratchpad();
@@ -141,11 +141,11 @@ public class CollectionMapper : IObjectMapper
         }
     }
     private static Expression CreateNameValueCollection(Expression sourceExpression) =>
-        New(typeof(NameValueCollection).GetConstructor(new[] { typeof(NameValueCollection) }), sourceExpression);
+        New(typeof(NameValueCollection).GetConstructor([typeof(NameValueCollection)]), sourceExpression);
     static class ArrayMapper
     {
         private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetStaticMethod("ToArray");
-        private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", new[] { typeof(Array), typeof(int) });
+        private static readonly MethodInfo CopyToMethod = typeof(Array).GetMethod("CopyTo", [typeof(Array), typeof(int)]);
         private static readonly MethodInfo CountMethod = typeof(Enumerable).StaticGenericMethod("Count", parametersCount: 1);
         private static readonly MethodInfo MapMultidimensionalMethod = typeof(ArrayMapper).GetStaticMethod(nameof(MapMultidimensional));
         private static readonly ParameterExpression Index = Variable(typeof(int), "destinationArrayIndex");
@@ -155,7 +155,7 @@ public class CollectionMapper : IObjectMapper
         {
             var sourceElementType = source.GetType().GetElementType();
             var destinationArray = Array.CreateInstance(destinationElementType, Enumerable.Range(0, source.Rank).Select(source.GetLength).ToArray());
-            var filler = new MultidimensionalArrayFiller(destinationArray);
+            MultidimensionalArrayFiller filler = new(destinationArray);
             foreach (var item in source)
             {
                 filler.NewValue(context.Map(item, null, sourceElementType, destinationElementType, null));
@@ -194,7 +194,7 @@ public class CollectionMapper : IObjectMapper
                 createDestination = Assign(destination, NewArrayBounds(destinationElementType, statements));
             }
             var itemParam = Parameter(sourceElementType, "sourceItem");
-            var itemExpr = configuration.MapExpression(profileMap, new TypePair(sourceElementType, destinationElementType), itemParam);
+            var itemExpr = configuration.MapExpression(profileMap, new(sourceElementType, destinationElementType), itemParam);
             var setItem = Assign(ArrayAccess(destination, IncrementIndex), itemExpr);
             variables.Clear();
             statements.Clear();
@@ -239,15 +239,10 @@ public class CollectionMapper : IObjectMapper
         }
     }
 }
-public class MultidimensionalArrayFiller
+public readonly struct MultidimensionalArrayFiller(Array destination)
 {
-    private readonly int[] _indices;
-    private readonly Array _destination;
-    public MultidimensionalArrayFiller(Array destination)
-    {
-        _indices = new int[destination.Rank];
-        _destination = destination;
-    }
+    private readonly int[] _indices = new int[destination.Rank];
+    private readonly Array _destination = destination;
     public void NewValue(object value)
     {
         var dimension = _destination.Rank - 1;

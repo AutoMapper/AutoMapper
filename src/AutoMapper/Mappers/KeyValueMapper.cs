@@ -8,8 +8,8 @@ public class KeyValueMapper : IObjectMapper
         var sourceArguments = sourceExpression.Type.GenericTypeArguments;
         var destinationType = destExpression.Type;
         var destinationArguments = destinationType.GenericTypeArguments;
-        var keys = new TypePair(sourceArguments[0], destinationArguments[0]);
-        var values = new TypePair(sourceArguments[1], destinationArguments[1]);
+        TypePair keys = new(sourceArguments[0], destinationArguments[0]);
+        TypePair values = new(sourceArguments[1], destinationArguments[1]);
         var mapKeys = configuration.MapExpression(profileMap, keys, ExpressionBuilder.Property(sourceExpression, "Key"));
         var mapValues = configuration.MapExpression(profileMap, values, ExpressionBuilder.Property(sourceExpression, "Value"));
         return New(destinationType.GetConstructor(destinationArguments), mapKeys, mapValues);

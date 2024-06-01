@@ -1,6 +1,5 @@
 using AutoMapper.Internal.Mappers;
 namespace AutoMapper.Configuration;
-
 [EditorBrowsable(EditorBrowsableState.Never)]
 public readonly record struct ConfigurationValidator(IGlobalConfigurationExpression Expression)
 {
@@ -11,7 +10,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             validator(context);
         }
     }
-    public void AssertConfigurationExpressionIsValid(IGlobalConfiguration config, IEnumerable<TypeMap> typeMaps)
+    public void AssertConfigurationExpressionIsValid(IGlobalConfiguration config, TypeMap[] typeMaps)
     {
         var duplicateTypeMapConfigs = Expression.Profiles.Append((Profile)Expression)
             .SelectMany(p => p.TypeMapConfigs, (profile, typeMap) => (profile, typeMap))
@@ -26,25 +25,23 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
         }
         AssertConfigurationIsValid(config, typeMaps);
     }
-    public void AssertConfigurationIsValid(IGlobalConfiguration config, IEnumerable<TypeMap> typeMaps)
+    public void AssertConfigurationIsValid(IGlobalConfiguration config, TypeMap[] typeMaps)
     {
-        var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
         var badTypeMaps =
-            (from typeMap in maps
+            (from typeMap in typeMaps
                 where typeMap.ShouldCheckForValid
                 let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
                 let canConstruct = typeMap.PassesCtorValidation
                 where unmappedPropertyNames.Length > 0 || !canConstruct
                 select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, canConstruct)
                 ).ToArray();
-
-        if (badTypeMaps.Any())
+        if (badTypeMaps.Length > 0)
         {
             throw new AutoMapperConfigurationException(badTypeMaps);
         }
-        var typeMapsChecked = new HashSet<TypeMap>();
-        var configExceptions = new List<Exception>();
-        foreach (var typeMap in maps)
+        HashSet<TypeMap> typeMapsChecked = [];
+        List<Exception> configExceptions = [];
+        foreach (var typeMap in typeMaps)
         {
             try
             {
@@ -81,8 +78,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
                 return;
             }
             typeMapsChecked.Add(typeMap);
-            var context = new ValidationContext(types, memberMap, typeMap);
-            Validate(context);
+            Validate(new(types, memberMap, typeMap));
             if(!typeMap.ShouldCheckForValid)
             {
                 return;
@@ -96,8 +92,7 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             {
                 throw new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap };
             }
-            var context = new ValidationContext(types, memberMap, ObjectMapper: mapperToUse);
-            Validate(context);
+            Validate(new(types, memberMap, ObjectMapper: mapperToUse));
             if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
             {
                 DryRunTypeMap(config, typeMapsChecked, newTypes, null, memberMap);

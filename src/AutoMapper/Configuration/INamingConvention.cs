@@ -11,7 +11,7 @@ public interface INamingConvention
 public sealed class ExactMatchNamingConvention : INamingConvention
 {
     public static readonly ExactMatchNamingConvention Instance = new();
-    public string[] Split(string _) => Array.Empty<string>();
+    public string[] Split(string _) => [];
     public string SeparatorCharacter => null;
 }
 public sealed class PascalCaseNamingConvention : INamingConvention
@@ -26,17 +26,17 @@ public sealed class PascalCaseNamingConvention : INamingConvention
         {
             if (char.IsUpper(input[index]))
             {
-                result ??= new();
+                result ??= [];
                 result.Add(input[lower..index]);
                 lower = index;
             }
         }
         if (result == null)
         {
-            return Array.Empty<string>();
+            return [];
         }
         result.Add(input[lower..]);
-        return result.ToArray();
+        return [..result];
     }
 }
 public sealed class LowerUnderscoreNamingConvention : INamingConvention

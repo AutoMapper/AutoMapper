@@ -74,12 +74,12 @@ public static class Extensions
 }
 public sealed class MemberVisitor : ExpressionVisitor
 {
-    private readonly List<MemberInfo> _members = new();
+    private readonly List<MemberInfo> _members = [];
     public static MemberInfo[] GetMemberPath(Expression expression)
     {
-        var memberVisitor = new MemberVisitor();
+        MemberVisitor memberVisitor = new();
         memberVisitor.Visit(expression);
-        return memberVisitor._members.ToArray();
+        return [.. memberVisitor._members];
     }
     protected override Expression VisitMember(MemberExpression node)
     {

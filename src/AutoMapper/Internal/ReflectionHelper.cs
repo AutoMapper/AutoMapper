@@ -52,7 +52,7 @@ public static class ReflectionHelper
         var sourceDetails = typeMap?.SourceTypeDetails;
         if (sourceDetails != null && memberNames.Length == 1)
         {
-            return new[] { sourceDetails.GetMember(memberNames[0]) };
+            return [sourceDetails.GetMember(memberNames[0])];
         }
         var members = new MemberInfo[memberNames.Length];
         Type previousType = type;

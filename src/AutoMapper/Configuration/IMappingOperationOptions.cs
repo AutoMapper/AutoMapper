@@ -45,10 +45,9 @@ public interface IMappingOperationOptions<TSource, TDestination> : IMappingOpera
     /// <param name="afterFunction">Callback for the source/destination types</param>
     void AfterMap(Action<TSource, TDestination> afterFunction);
 }
-public sealed class MappingOperationOptions<TSource, TDestination> : IMappingOperationOptions<TSource, TDestination>
+public sealed class MappingOperationOptions<TSource, TDestination>(Func<Type, object> serviceCtor) : IMappingOperationOptions<TSource, TDestination>
 {
-    public MappingOperationOptions(Func<Type, object> serviceCtor) => ServiceCtor = serviceCtor;
-    public Func<Type, object> ServiceCtor { get; private set; }
+    public Func<Type, object> ServiceCtor { get; private set; } = serviceCtor;
     public StringDictionary Items => (StringDictionary) (State ??= new StringDictionary());
     public object State { get; set; }
     public Action<TSource, TDestination> BeforeMapAction { get; private set; }

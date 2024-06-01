@@ -28,10 +28,10 @@ public class ToDynamicMapper : IObjectMapper
     private static void SetDynamically(string memberName, object target, object value)
     {
         var binder = Binder.SetMember(CSharpBinderFlags.None, memberName, null,
-            new[]{
+            [
                 CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),
                 CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
-            });
+            ]);
         var callsite = CallSite<Func<CallSite, object, object, object>>.Create(binder);
         callsite.Target(callsite, target, value);
     }

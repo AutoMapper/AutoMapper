@@ -19,7 +19,7 @@ public static class ObjectFactory
     };
     private static Expression CallConstructor(Type type, IGlobalConfiguration configuration)
     {
-        var defaultCtor = type.GetConstructor(Internal.TypeExtensions.InstanceFlags, null, Type.EmptyTypes, null);
+        var defaultCtor = type.GetConstructor(Internal.TypeExtensions.InstanceFlags, []);
         if (defaultCtor != null)
         {
             return New(defaultCtor);
@@ -39,7 +39,7 @@ public static class ObjectFactory
         type.IsGenericType(typeof(ISet<>)) ? CreateCollection(type, typeof(HashSet<>)) : 
         type.IsCollection() ? CreateCollection(type, typeof(List<>), GetIEnumerableArguments(type)) :
         InvalidType(type, $"Cannot create an instance of interface type {type}.");
-    private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? new[] { typeof(object) };
+    private static Type[] GetIEnumerableArguments(Type type) => type.GetIEnumerableType()?.GenericTypeArguments ?? [typeof(object)];
     private static Expression CreateCollection(Type type, Type collectionType, Type[] genericArguments = null) => 
         ToType(New(collectionType.MakeGenericType(genericArguments ?? type.GenericTypeArguments)), type);
     private static Expression CreateReadOnlyDictionary(Type[] typeArguments)

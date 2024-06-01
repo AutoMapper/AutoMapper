@@ -28,7 +28,7 @@ public class StringToEnumMapper : IObjectMapper
             var enumToObject = Constant(Enum.ToObject(enumType, memberInfo.GetValue(null)));
             var attributeConstant = Constant(attributeValue);
             var (body, testValue) = comparison == null ? (attributeConstant, enumToObject) : (ToType(enumToObject, enumType), attributeConstant);
-            switchCases ??= new();
+            switchCases ??= [];
             switchCases.Add(SwitchCase(body, testValue));
         }
         return switchCases == null ? defaultExpression : Switch(sourceExpression, defaultExpression, comparison, switchCases);

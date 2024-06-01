@@ -46,16 +46,16 @@ public sealed class MapperConfiguration : IGlobalConfiguration
     private readonly ConfigurationValidator _validator;
     private readonly Features<IRuntimeFeature> _features = new();
     private readonly bool _hasOpenMaps;
-    private readonly HashSet<TypeMap> _typeMapsPath = new();
-    private readonly List<MemberInfo> _sourceMembers = new();
-    private readonly List<ParameterExpression> _variables = new();
-    private readonly ParameterExpression[] _parameters = new[] { null, null, ContextParameter };
-    private readonly CatchBlock[] _catches = new CatchBlock[1];
-    private readonly List<Expression> _expressions = new();
+    private readonly HashSet<TypeMap> _typeMapsPath = [];
+    private readonly List<MemberInfo> _sourceMembers = [];
+    private readonly List<ParameterExpression> _variables = [];
+    private readonly ParameterExpression[] _parameters = [null, null, ContextParameter];
+    private readonly CatchBlock[] _catches = [null];
+    private readonly List<Expression> _expressions = [];
     private readonly Dictionary<Type, DefaultExpression> _defaults;
     private readonly ParameterReplaceVisitor _parameterReplaceVisitor = new();
     private readonly ConvertParameterReplaceVisitor _convertParameterReplaceVisitor = new();
-    private readonly List<Type> _typesInheritance = new();
+    private readonly List<Type> _typesInheritance = [];
     public MapperConfiguration(MapperConfigurationExpression configurationExpression)
     {
         var configuration = (IGlobalConfigurationExpression)configurationExpression;
@@ -63,7 +63,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         {
             configuration.IncludeSourceExtensionMethods(typeof(Enumerable));
         }
-        _mappers = configuration.Mappers.ToArray();
+        _mappers = [..configuration.Mappers];
         _executionPlans = new(CompileExecutionPlan);
         _validator = new(configuration);
         _projectionBuilder = new(CreateProjectionBuilder);
@@ -75,7 +75,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         int index = 1;
         foreach (var profile in configuration.Profiles)
         {
-            var profileMap = new ProfileMap(profile, configuration);
+            ProfileMap profileMap = new(profile, configuration);
             Profiles[index++] = profileMap;
             typeMapsCount += profileMap.TypeMapsCount;
             openTypeMapsCount += profileMap.OpenTypeMapsCount;
@@ -117,7 +117,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
                 profile.Configure(this);
             }
             IGlobalConfiguration globalConfiguration = this;
-            var derivedMaps = new List<TypeMap>();
+            List<TypeMap> derivedMaps = [];
             foreach (var typeMap in _configuredMaps.Values)
             {
                 _resolvedMaps[typeMap.Types] = typeMap;
@@ -125,8 +125,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
                 GetDerivedTypeMaps(typeMap, derivedMaps);
                 foreach (var derivedMap in derivedMaps)
                 {
-                    var includedPair = new TypePair(derivedMap.SourceType, typeMap.DestinationType);
-                    _resolvedMaps.TryAdd(includedPair, derivedMap);
+                    _resolvedMaps.TryAdd(new(derivedMap.SourceType, typeMap.DestinationType), derivedMap);
                 }
             }
             foreach (var typeMap in _configuredMaps.Values)
@@ -156,21 +155,17 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         configure(expr);
         return expr;
     }
-    public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(this, _configuredMaps.Values);
+    public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(this, [.._configuredMaps.Values]);
     public IMapper CreateMapper() => new Mapper(this);
     public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
     public void CompileMappings()
     {
-        foreach (var request in _resolvedMaps.Keys.Where(t => !t.ContainsGenericParameters).Select(types => new MapRequest(types, types, MemberMap.Instance)).ToArray())
+        foreach (var request in _resolvedMaps.Keys.Where(t => !t.ContainsGenericParameters).Select(types => new MapRequest(types)).ToArray())
         {
             GetExecutionPlan(request);
         }
     }
-    public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
-    {
-        var typePair = new TypePair(sourceType, destinationType);
-        return this.Internal().BuildExecutionPlan(new(typePair, typePair, MemberMap.Instance));
-    }
+    public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType) => this.Internal().BuildExecutionPlan(new(new(sourceType, destinationType)));
     LambdaExpression IGlobalConfiguration.BuildExecutionPlan(in MapRequest mapRequest)
     {
         var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
@@ -204,7 +199,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             Expression fullExpression;
             if (mapper == null)
             {
-                var exception = new AutoMapperMappingException("Missing type map configuration or unsupported mapping.", null, mapRequest.RuntimeTypes)
+                AutoMapperMappingException exception = new("Missing type map configuration or unsupported mapping.", null, mapRequest.RuntimeTypes)
                 {
                     MemberMap = mapRequest.MemberMap
                 };
@@ -224,7 +219,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         }
     }
     IGlobalConfigurationExpression ConfigurationExpression => _validator.Expression;
-    ProjectionBuilder CreateProjectionBuilder() => new(this, ConfigurationExpression.ProjectionMappers.ToArray());
+    ProjectionBuilder CreateProjectionBuilder() => new(this, [..ConfigurationExpression.ProjectionMappers]);
     IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder.Value;
     Func<Type, object> IGlobalConfiguration.ServiceCtor => ConfigurationExpression.ServiceCtor;
     bool IGlobalConfiguration.EnableNullPropagationForQueryMapping => ConfigurationExpression.EnableNullPropagationForQueryMapping.GetValueOrDefault();
@@ -320,7 +315,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         List<Type> typesInheritance;
         if (_typesInheritance == null)
         {
-            typesInheritance = new();
+            typesInheritance = [];
         }
         else
         {
@@ -340,7 +335,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
                 {
                     continue;
                 }
-                var types = new TypePair(sourceType, destinationType);
+                TypePair types = new(sourceType, destinationType);
                 if (_resolvedMaps.TryGetValue(types, out typeMap))
                 {
                     if(typeMap == null)
@@ -432,7 +427,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
     {
         if (includedTypes.Count == 0)
         {
-            return Array.Empty<TypeMap>();
+            return [];
         }
         var typeMaps = new TypeMap[includedTypes.Count];
         int index = 0;
@@ -476,23 +471,22 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         return null;
     }
     void IGlobalConfiguration.RegisterTypeMap(TypeMap typeMap) => _configuredMaps[typeMap.Types] = typeMap;
-    void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(this, new[] { typeMap });
+    void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(this, [typeMap]);
     void IGlobalConfiguration.AssertConfigurationIsValid(string profileName)
     {
         if (Array.TrueForAll(Profiles, x => x.Name != profileName))
         {
             throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
         }
-        _validator.AssertConfigurationIsValid(this, _configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName));
+        _validator.AssertConfigurationIsValid(this, _configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName).ToArray());
     }
     void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
     void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>
         _resolvedMaps[typeMapConfiguration.Types] = GetIncludedTypeMap(new(typeMapConfiguration.SourceType, typeMapConfiguration.DestinationTypeOverride));
 }
-struct LazyValue<T> where T : class
+struct LazyValue<T>(Func<T> factory) where T : class
 {
-    readonly Func<T> _factory;
+    readonly Func<T> _factory = factory;
     T _value = null;
     public T Value => LazyInitializer.EnsureInitialized(ref _value, _factory);
-    public LazyValue(Func<T> factory) => _factory = factory;
 }

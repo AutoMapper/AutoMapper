@@ -30,7 +30,7 @@ public sealed class PropertyMap : MemberMap
     public MemberInfo DestinationMember { get; }
     public override string DestinationName => DestinationMember?.Name;
     public override Type DestinationType { get; protected set; }
-    public override MemberInfo[] SourceMembers { get; set; } = Array.Empty<MemberInfo>();
+    public override MemberInfo[] SourceMembers { get; set; } = [];
     public override bool CanBeSet => DestinationMember.CanBeSet();
     public override bool Ignored { get; set; }
     public void ApplyInheritedPropertyMap(PropertyMap inheritedMap)
@@ -73,13 +73,13 @@ public sealed class PropertyMap : MemberMap
             ExplicitExpansion ??= inheritedMappedProperty.ExplicitExpansion;
             if (inheritedMappedProperty.ValueTransformers != null)
             {
-                ValueTransformers ??= new();
+                ValueTransformers ??= [];
                 ValueTransformers.InsertRange(0, inheritedMappedProperty.ValueTransformers);
             }
         }
         public void AddValueTransformation(ValueTransformerConfiguration valueTransformerConfiguration)
         {
-            ValueTransformers ??= new();
+            ValueTransformers ??= [];
             ValueTransformers.Add(valueTransformerConfiguration);
         }
     }
