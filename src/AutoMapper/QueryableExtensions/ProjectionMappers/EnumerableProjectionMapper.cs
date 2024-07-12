@@ -1,7 +1,7 @@
 namespace AutoMapper.QueryableExtensions.Impl;
 using static ReflectionHelper;
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class EnumerableProjectionMapper : IProjectionMapper
+public sealed class EnumerableProjectionMapper : IProjectionMapper
 {
     private static readonly MethodInfo SelectMethod = typeof(Enumerable).StaticGenericMethod("Select", parametersCount: 2);
     private static readonly MethodInfo ToArrayMethod = typeof(Enumerable).GetStaticMethod("ToArray");

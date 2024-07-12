@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 namespace AutoMapper.Internal.Mappers;
 using static ReflectionHelper;
-public class CollectionMapper : IObjectMapper
+public sealed class CollectionMapper : IObjectMapper
 {
     static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
     public TypePair? GetAssociatedTypes(TypePair context) => new(GetElementType(context.SourceType), GetElementType(context.DestinationType));

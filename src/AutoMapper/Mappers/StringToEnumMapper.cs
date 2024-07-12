@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 namespace AutoMapper.Internal.Mappers;
-public class StringToEnumMapper : IObjectMapper
+public sealed class StringToEnumMapper : IObjectMapper
 {
     private static readonly MethodInfo EqualsMethod = typeof(StringToEnumMapper).GetMethod(nameof(StringCompareOrdinalIgnoreCase));
     private static readonly MethodInfo ParseMethod = typeof(Enum).StaticGenericMethod("Parse", parametersCount: 2);

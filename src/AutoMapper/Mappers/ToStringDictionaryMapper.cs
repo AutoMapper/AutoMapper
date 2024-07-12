@@ -1,5 +1,5 @@
 ﻿namespace AutoMapper.Internal.Mappers;
-public class ToStringDictionaryMapper : IObjectMapper
+public sealed class ToStringDictionaryMapper : IObjectMapper
 {
     private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetStaticMethod(nameof(MembersDictionary));
     public bool IsMatch(TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);

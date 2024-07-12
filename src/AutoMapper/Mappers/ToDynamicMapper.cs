@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 namespace AutoMapper.Internal.Mappers;
-public class ToDynamicMapper : IObjectMapper
+public sealed class ToDynamicMapper : IObjectMapper
 {
     private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetStaticMethod(nameof(Map));
     private static object Map(object source, object destination, Type destinationType, ResolutionContext context, ProfileMap profileMap)

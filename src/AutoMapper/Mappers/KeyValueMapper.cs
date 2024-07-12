@@ -1,5 +1,5 @@
 ﻿namespace AutoMapper.Internal.Mappers;
-public class KeyValueMapper : IObjectMapper
+public sealed class KeyValueMapper : IObjectMapper
 {
     public bool IsMatch(TypePair context) => IsKeyValue(context.SourceType) && IsKeyValue(context.DestinationType);
     public static bool IsKeyValue(Type type) => type.IsGenericType(typeof(KeyValuePair<,>));
