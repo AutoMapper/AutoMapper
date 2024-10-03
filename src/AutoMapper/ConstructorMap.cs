@@ -67,11 +67,13 @@ public sealed class ConstructorMap
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class ConstructorParameterMap : MemberMap
 {
-    public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap)
+    public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap, parameter.ParameterType)
     {
         Parameter = parameter;
-        var parameterType = parameter.ParameterType;
-        DestinationType = parameterType.IsByRef ? parameterType.GetElementType() : parameterType;
+        if(DestinationType.IsByRef)
+        {
+            DestinationType = DestinationType.GetElementType();
+        }
         if (sourceMembers.Length > 0)
         {
             MapByConvention(sourceMembers);
@@ -82,7 +84,6 @@ public class ConstructorParameterMap : MemberMap
         }
     }
     public ParameterInfo Parameter { get; }
-    public override Type DestinationType { get; protected set; }
     public override IncludedMember IncludedMember { get; protected set; }
     public override MemberInfo[] SourceMembers { get; set; }
     public override string DestinationName => Parameter.Name;

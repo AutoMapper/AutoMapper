@@ -6,8 +6,8 @@ namespace AutoMapper;
 public class MemberMap : IValueResolver
 {
     private protected Type _sourceType;
-    protected MemberMap(TypeMap typeMap) => TypeMap = typeMap;
-    internal static readonly MemberMap Instance = new(null);
+    protected MemberMap(TypeMap typeMap, Type destinationType) => (TypeMap, DestinationType) = (typeMap, destinationType);
+    internal static readonly MemberMap Instance = new(null, null);
     public TypeMap TypeMap { get; protected set; }
     public LambdaExpression CustomMapExpression => Resolver?.ProjectToExpression;
     public bool IsResolveConfigured => Resolver != null && Resolver != this;
@@ -22,7 +22,7 @@ public class MemberMap : IValueResolver
     public virtual MemberInfo[] SourceMembers { get => []; set { } }
     public virtual IncludedMember IncludedMember { get => default; protected set { } }
     public virtual string DestinationName => default;
-    public virtual Type DestinationType { get => default; protected set { } }
+    public Type DestinationType { get; protected set; }
     public virtual TypePair Types() => new(SourceType, DestinationType);
     public bool CanResolveValue => !Ignored && Resolver != null;
     public bool IsMapped => Ignored || Resolver != null;
