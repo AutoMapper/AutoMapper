@@ -70,6 +70,8 @@ public class ConstructorParameterMap : MemberMap
     public ConstructorParameterMap(TypeMap typeMap, ParameterInfo parameter, MemberInfo[] sourceMembers) : base(typeMap)
     {
         Parameter = parameter;
+        var parameterType = parameter.ParameterType;
+        DestinationType = parameterType.IsByRef ? parameterType.GetElementType() : parameterType;
         if (sourceMembers.Length > 0)
         {
             MapByConvention(sourceMembers);
@@ -80,7 +82,7 @@ public class ConstructorParameterMap : MemberMap
         }
     }
     public ParameterInfo Parameter { get; }
-    public override Type DestinationType => Parameter.ParameterType;
+    public override Type DestinationType { get; protected set; }
     public override IncludedMember IncludedMember { get; protected set; }
     public override MemberInfo[] SourceMembers { get; set; }
     public override string DestinationName => Parameter.Name;
