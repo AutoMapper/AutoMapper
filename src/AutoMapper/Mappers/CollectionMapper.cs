@@ -241,24 +241,23 @@ public sealed class CollectionMapper : IObjectMapper
 }
 public readonly struct MultidimensionalArrayFiller(Array destination)
 {
-    private readonly int[] _indices = new int[destination.Rank];
-    private readonly Array _destination = destination;
+    readonly int[] _indices = new int[destination.Rank];
     public void NewValue(object value)
     {
-        var dimension = _destination.Rank - 1;
+        var dimension = destination.Rank - 1;
         var changedDimension = false;
-        while (_indices[dimension] == _destination.GetLength(dimension))
+        while (_indices[dimension] == destination.GetLength(dimension))
         {
             _indices[dimension] = 0;
             dimension--;
             if (dimension < 0)
             {
-                throw new InvalidOperationException("Not enough room in destination array " + _destination);
+                throw new InvalidOperationException("Not enough room in destination array " + destination);
             }
             _indices[dimension]++;
             changedDimension = true;
         }
-        _destination.SetValue(value, _indices);
+        destination.SetValue(value, _indices);
         if (changedDimension)
         {
             _indices[dimension + 1]++;
