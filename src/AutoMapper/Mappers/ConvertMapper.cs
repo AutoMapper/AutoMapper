@@ -1,5 +1,5 @@
 ﻿namespace AutoMapper.Internal.Mappers;
-public class ConvertMapper : IObjectMapper
+public sealed class ConvertMapper : IObjectMapper
 {
     public static bool IsPrimitive(Type type) => type.IsPrimitive || type == typeof(string) || type == typeof(decimal);
     public bool IsMatch(TypePair types) => (types.SourceType == typeof(string) && types.DestinationType == typeof(DateTime)) || 

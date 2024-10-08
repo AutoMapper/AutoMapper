@@ -1,5 +1,5 @@
 ﻿namespace AutoMapper.Internal.Mappers;
-public class ToStringMapper : IObjectMapper
+public sealed class ToStringMapper : IObjectMapper
 {
     public bool IsMatch(TypePair context) => context.DestinationType == typeof(string);
     public Expression MapExpression(IGlobalConfiguration configuration, ProfileMap profileMap, MemberMap memberMap, Expression sourceExpression, Expression destExpression)

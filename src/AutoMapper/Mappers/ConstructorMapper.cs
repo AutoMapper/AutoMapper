@@ -1,5 +1,5 @@
 ﻿namespace AutoMapper.Internal.Mappers;
-public class ConstructorMapper : IObjectMapper
+public sealed class ConstructorMapper : IObjectMapper
 {
     public bool IsMatch(TypePair context) => GetConstructor(context.SourceType, context.DestinationType) != null;
     private static ConstructorInfo GetConstructor(Type sourceType, Type destinationType) => 

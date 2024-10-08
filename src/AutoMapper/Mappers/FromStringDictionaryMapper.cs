@@ -1,6 +1,6 @@
 ﻿using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 namespace AutoMapper.Internal.Mappers;
-public class FromStringDictionaryMapper : IObjectMapper
+public sealed class FromStringDictionaryMapper : IObjectMapper
 {
     private static readonly MethodInfo MapDynamicMethod = typeof(FromStringDictionaryMapper).GetStaticMethod(nameof(MapDynamic));
     public bool IsMatch(TypePair context) => typeof(StringDictionary).IsAssignableFrom(context.SourceType);
