@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security;
 using AutoMapper.Configuration;
 using AutoMapper.Features;
 using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
+using Serilog;
 
 namespace AutoMapper
 {
@@ -270,6 +272,7 @@ namespace AutoMapper
                 && !ExcludedTypes.Contains(initialTypes.SourceType)
                 && !ExcludedTypes.Contains(initialTypes.DestinationType))
             {
+                LogMissingTypeMap(initialTypes);
                 lock (this)
                 {
                     return Configuration.CreateInlineMap(initialTypes, this);
@@ -277,6 +280,21 @@ namespace AutoMapper
             }
 
             return null;
+        }
+
+        [SecuritySafeCritical]
+        private void LogMissingTypeMap(TypePair initialTypes)
+        {
+            try
+            {
+                var src = initialTypes.SourceType.FullName;
+                var dst = initialTypes.DestinationType.FullName;
+                Log.Warning($"Missing mapping {src} => {dst}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private TypeMap GetCachedMap(TypePair initialTypes, TypePair types) => (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap)) ? typeMap : null;
