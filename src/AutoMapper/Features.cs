@@ -46,7 +46,7 @@ public class Features<TFeature>
     private int IndexOf(Type featureType)
     {
         int index = 0;
-        for (; index < Count && _features[index].GetType() != featureType; index++);
+        for (; index < Count && _features[index].GetType() != featureType; index++) ;
         return index;
     }
     public List<TFeature>.Enumerator GetEnumerator() => _features.GetEnumerator();
@@ -58,57 +58,42 @@ public static class FeatureExtensions
         configuration.Internal().Features.Set(feature);
         return configuration;
     }
+
     public static IMappingExpression<TSource, TDestination> SetFeature<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mapping, IMappingFeature feature)
     {
         mapping.Features.Set(feature);
         return mapping;
     }
-    internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration)
-    {
-        if (features.Count == 0)
-        {
-            return;
-        }
-        foreach (var feature in features)
-        {
-            feature.Configure(mapperConfiguration);
-        }
-    }
-    public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures)
-    {
-        if (features.Count == 0)
-        {
-            return;
-        }
-        foreach (var feature in features)
+
+    internal static void Configure(this Features<IGlobalFeature> features, MapperConfiguration mapperConfiguration) => 
+        features.ExecuteForEachFeature(feature => feature.Configure(mapperConfiguration));
+
+    public static void ReverseTo(this Features<IMappingFeature> features, Features<IMappingFeature> reversedFeatures) =>
+        features.ExecuteForEachFeature(feature =>
         {
             var reverse = feature.Reverse();
             if (reverse != null)
             {
                 reversedFeatures.Set(reverse);
             }
-        }
-    }
-    internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap)
+        });
+
+    internal static void Configure(this Features<IMappingFeature> features, TypeMap typeMap) =>
+        features.ExecuteForEachFeature(feature => feature.Configure(typeMap));
+  
+    internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)=>
+        features.ExecuteForEachFeature(feature => feature.Seal(configuration));
+
+    private static void ExecuteForEachFeature<TFeature>(this Features<TFeature> features, Action<TFeature> action)
     {
         if (features.Count == 0)
         {
             return;
         }
+
         foreach (var feature in features)
         {
-            feature.Configure(typeMap);
-        }
-    }
-    internal static void Seal(this Features<IRuntimeFeature> features, IGlobalConfiguration configuration)
-    {
-        if (features.Count == 0)
-        {
-            return;
-        }
-        foreach (var feature in features)
-        {
-            feature.Seal(configuration);
+            action(feature);
         }
     }
 }
