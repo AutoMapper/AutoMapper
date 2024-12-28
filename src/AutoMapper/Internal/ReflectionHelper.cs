@@ -88,7 +88,7 @@ public static class ReflectionHelper
         {
             switch (expressionToCheck)
             {
-                case MemberExpression { Member: var member, Expression: { NodeType: ExpressionType.Parameter or ExpressionType.Convert } }:
+                case MemberExpression { Member: var member, Expression.NodeType: ExpressionType.Parameter or ExpressionType.Convert }:
                     return member;
                 case UnaryExpression { Operand: var operand }:
                     expressionToCheck = operand;
