@@ -18,6 +18,7 @@ jobs:
         with:
           issue-inactive-days: 31
           pr-inactive-days: 31
+          discussion-inactive-days: 31
           issue-comment: >
             This issue has been automatically locked since there
             has not been any recent activity after it was closed.
@@ -25,4 +26,6 @@ jobs:
           pr-comment: >
             This pull request has been automatically locked since there
             has not been any recent activity after it was closed.
-            Please open a new issue for related bugs.
+          discussion-comment: >
+            This discussion has been automatically locked since there
+            has not been any recent activity after it was closed.
