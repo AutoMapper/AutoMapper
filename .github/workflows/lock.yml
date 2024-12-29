@@ -13,6 +13,7 @@ jobs:
     permissions:
       issues: write  # for dessant/lock-threads to lock issues
       pull-requests: write  # for dessant/lock-threads to lock PRs
+      discussions: write  # for dessant/lock-threads to lock discussions
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/lock-threads@v5
