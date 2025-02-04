@@ -27,6 +27,8 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
     }
     public void AssertConfigurationIsValid(IGlobalConfiguration config, TypeMap[] typeMaps)
     {
+        List<Exception> configExceptions = [];
+
         var badTypeMaps =
             (from typeMap in typeMaps
                 where typeMap.ShouldCheckForValid
@@ -37,10 +39,11 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
                 ).ToArray();
         if (badTypeMaps.Length > 0)
         {
-            throw new AutoMapperConfigurationException(badTypeMaps);
+            configExceptions.Add(new AutoMapperConfigurationException(badTypeMaps));
         }
+
         HashSet<TypeMap> typeMapsChecked = [];
-        List<Exception> configExceptions = [];
+
         foreach (var typeMap in typeMaps)
         {
             try
