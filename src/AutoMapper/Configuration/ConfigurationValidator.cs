@@ -1,4 +1,5 @@
 using AutoMapper.Internal.Mappers;
+using System.Security.AccessControl;
 namespace AutoMapper.Configuration;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public readonly record struct ConfigurationValidator(IGlobalConfigurationExpression Expression)
@@ -43,17 +44,12 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
         }
 
         HashSet<TypeMap> typeMapsChecked = [];
-
         foreach (var typeMap in typeMaps)
         {
-            try
-            {
-                DryRunTypeMap(config, typeMapsChecked, typeMap.Types, typeMap, null);
-            }
-            catch (Exception e)
-            {
-                configExceptions.Add(e);
-            }
+            var failedMemberMaps = GetInvalidMemberMaps(config, typeMapsChecked, typeMap.Types, typeMap, null);
+
+            configExceptions.AddRange(failedMemberMaps.Select(memberMap => 
+                new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap }));
         }
         if (configExceptions.Count > 1)
         {
@@ -64,13 +60,13 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
             throw configExceptions[0];
         }
     }
-    private void DryRunTypeMap(IGlobalConfiguration config, HashSet<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
+    private IEnumerable<MemberMap> GetInvalidMemberMaps(IGlobalConfiguration config, HashSet<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, MemberMap memberMap)
     {
         if(typeMap == null)
         {
             if (types.ContainsGenericParameters)
             {
-                return;
+                yield break;
             }
             typeMap = config.ResolveTypeMap(types.SourceType, types.DestinationType);
         }
@@ -78,46 +74,62 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
         {
             if (typeMapsChecked.Contains(typeMap))
             {
-                return;
+                yield break;
             }
             typeMapsChecked.Add(typeMap);
             Validate(new(types, memberMap, typeMap));
             if(!typeMap.ShouldCheckForValid)
             {
-                return;
+                yield break;
             }
-            CheckPropertyMaps(config, typeMapsChecked, typeMap);
+
+            foreach (var propertyMemberMap in GetPropertyMemberMaps(typeMap))
+            {
+                foreach (var invalidMemberMap in GetInvalidMemberMaps(config, typeMapsChecked, new TypePair(propertyMemberMap.SourceType, propertyMemberMap.DestinationType), null, propertyMemberMap)) {
+                    yield return invalidMemberMap;
+                }
+            }
         }
         else
         {
             var mapperToUse = config.FindMapper(types);
             if (mapperToUse == null)
             {
-                throw new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap };
+                yield return memberMap;
             }
-            Validate(new(types, memberMap, ObjectMapper: mapperToUse));
-            if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
+            else
             {
-                DryRunTypeMap(config, typeMapsChecked, newTypes, null, memberMap);
+                Validate(new(types, memberMap, ObjectMapper: mapperToUse));
+                if (mapperToUse.GetAssociatedTypes(types) is TypePair newTypes && newTypes != types)
+                {
+                    foreach (var failedMemberMap in GetInvalidMemberMaps(config, typeMapsChecked, newTypes, null, memberMap))
+                    {
+                        yield return failedMemberMap;
+                    };
+                }
             }
         }
     }
-    private void CheckPropertyMaps(IGlobalConfiguration config, HashSet<TypeMap> typeMapsChecked, TypeMap typeMap)
+
+    private IEnumerable<MemberMap> GetPropertyMemberMaps(TypeMap typeMap)
     {
-        foreach (var memberMap in typeMap.MemberMaps)
+        return typeMap.MemberMaps.Where(memberMap =>
         {
-            if(memberMap.Ignored || (memberMap is PropertyMap && typeMap.ConstructorParameterMatches(memberMap.DestinationName)))
+            if (memberMap.Ignored || (memberMap is PropertyMap &&
+                                      typeMap.ConstructorParameterMatches(memberMap.DestinationName)))
             {
-                continue;
+                return false;
             }
+
             var sourceType = memberMap.SourceType;
             // when we don't know what the source type is, bail
             if (sourceType.IsGenericParameter || sourceType == typeof(object))
             {
-                continue;
+                return false;
             }
-            DryRunTypeMap(config, typeMapsChecked, new(sourceType, memberMap.DestinationType), null, memberMap);
-        }
+
+            return true;
+        });
     }
 }
 public readonly record struct ValidationContext(TypePair Types, MemberMap MemberMap, TypeMap TypeMap = null, IObjectMapper ObjectMapper = null);
