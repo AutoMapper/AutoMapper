@@ -37,10 +37,10 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
 
         foreach (var typeMap in typeMaps)
         {
-            var invalidMemberMaps = GetInvalidMemberMaps(typeMap.Types, typeMap, Expression.Validators);
-
-            configExceptions.AddRange(invalidMemberMaps.Select(memberMap => 
-                new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap }));
+            var badMemberMaps = GetInvalidMemberMaps(typeMap.Types, typeMap, Expression.Validators)
+                .Select(memberMap =>
+                    new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap });
+            configExceptions.AddRange(badMemberMaps);
         }
         if (configExceptions.Count > 1)
         {
@@ -122,15 +122,9 @@ public readonly record struct ConfigurationValidator(IGlobalConfigurationExpress
                 {
                     return false;
                 }
-
                 var sourceType = memberMap.SourceType;
                 // when we don't know what the source type is, bail
-                if (sourceType.IsGenericParameter || sourceType == typeof(object))
-                {
-                    return false;
-                }
-
-                return true;
+                return !sourceType.IsGenericParameter && sourceType != typeof(object);
             });
         }
     }
