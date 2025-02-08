@@ -6,6 +6,8 @@ end_of_line = lf
 indent_style = space
 indent_size = 4
 
+csharp_space_around_binary_operators = before_and_after
+
 #### Naming styles ####
 
 # Constants are PascalCase
