@@ -13,7 +13,7 @@ public class ConfigurationValidator(IGlobalConfiguration config)
             .Select(g => (TypePair: g.Key, ProfileNames: g.Select(tmc => tmc.profile.ProfileName).ToArray()))
             .Select(g => new DuplicateTypeMapConfigurationException.TypeMapConfigErrors(g.TypePair, g.ProfileNames))
             .ToArray();
-        if(duplicateTypeMapConfigs.Length != 0)
+        if (duplicateTypeMapConfigs.Length != 0)
         {
             throw new DuplicateTypeMapConfigurationException(duplicateTypeMapConfigs);
         }
@@ -29,36 +29,36 @@ public class ConfigurationValidator(IGlobalConfiguration config)
              let canConstruct = typeMap.PassesCtorValidation
              where unmappedPropertyNames.Length > 0 || !canConstruct
              select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, canConstruct)).ToArray();
-        if(badTypeMaps.Length > 0)
+        if (badTypeMaps.Length > 0)
         {
             configExceptions.Add(new AutoMapperConfigurationException(badTypeMaps));
         }
         HashSet<TypeMap> typeMapsChecked = [];
-        foreach(var typeMap in typeMaps)
+        foreach (var typeMap in typeMaps)
         {
             DryRunTypeMap(typeMap.Types, typeMap, null);
         }
-        if(configExceptions.Count > 1)
+        if (configExceptions.Count > 1)
         {
             throw new AggregateException(configExceptions);
         }
-        if(configExceptions.Count > 0)
+        if (configExceptions.Count > 0)
         {
             throw configExceptions[0];
         }
         void DryRunTypeMap(TypePair types, TypeMap typeMap, MemberMap memberMap)
         {
-            if(typeMap == null)
+            if (typeMap == null)
             {
-                if(types.ContainsGenericParameters)
+                if (types.ContainsGenericParameters)
                 {
                     return;
                 }
                 typeMap = config.ResolveTypeMap(types.SourceType, types.DestinationType);
             }
-            if(typeMap != null)
+            if (typeMap != null)
             {
-                if(typeMapsChecked.Add(typeMap) && Validate(new(types, memberMap, configExceptions, typeMap)) && typeMap.ShouldCheckForValid)
+                if (typeMapsChecked.Add(typeMap) && Validate(new(types, memberMap, configExceptions, typeMap)) && typeMap.ShouldCheckForValid)
                 {
                     CheckPropertyMaps(typeMap);
                 }
@@ -66,12 +66,12 @@ public class ConfigurationValidator(IGlobalConfiguration config)
             else
             {
                 var mapperToUse = config.FindMapper(types);
-                if(mapperToUse == null)
+                if (mapperToUse == null)
                 {
                     configExceptions.Add(new AutoMapperConfigurationException(memberMap.TypeMap.Types) { MemberMap = memberMap });
                     return;
                 }
-                if(Validate(new(types, memberMap, configExceptions, ObjectMapper: mapperToUse)) && mapperToUse.GetAssociatedTypes(types) is TypePair newTypes &&
+                if (Validate(new(types, memberMap, configExceptions, ObjectMapper: mapperToUse)) && mapperToUse.GetAssociatedTypes(types) is TypePair newTypes &&
                     newTypes != types)
                 {
                     DryRunTypeMap(newTypes, null, memberMap);
@@ -80,15 +80,15 @@ public class ConfigurationValidator(IGlobalConfiguration config)
         }
         void CheckPropertyMaps(TypeMap typeMap)
         {
-            foreach(var memberMap in typeMap.MemberMaps)
+            foreach (var memberMap in typeMap.MemberMaps)
             {
-                if(memberMap.Ignored || (memberMap is PropertyMap && typeMap.ConstructorParameterMatches(memberMap.DestinationName)))
+                if (memberMap.Ignored || (memberMap is PropertyMap && typeMap.ConstructorParameterMatches(memberMap.DestinationName)))
                 {
                     continue;
                 }
                 var sourceType = memberMap.SourceType;
                 // when we don't know what the source type is, bail
-                if(sourceType.IsGenericParameter || sourceType == typeof(object))
+                if (sourceType.IsGenericParameter || sourceType == typeof(object))
                 {
                     continue;
                 }
@@ -97,17 +97,17 @@ public class ConfigurationValidator(IGlobalConfiguration config)
         }
         bool Validate(ValidationContext context)
         {
-            foreach(var validator in Expression.Validators)
+            try
             {
-                try
+                foreach (var validator in Expression.Validators)
                 {
                     validator(context);
                 }
-                catch(Exception e)
-                {
-                    configExceptions.Add(e);
-                    return false;
-                }
+            }
+            catch (Exception e)
+            {
+                configExceptions.Add(e);
+                return false;
             }
             return true;
         }

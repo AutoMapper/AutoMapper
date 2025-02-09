@@ -5,16 +5,12 @@ public class When_testing_a_dto_with_mismatched_member_names_and_mismatched_type
     {
         public decimal Foo { get; set; }
     }
-
     public class Destination
     {
         public Type Foo { get; set; }
         public string Bar { get; set; }
     }
-
-    protected override MapperConfiguration CreateConfiguration() =>
-        new(cfg => { cfg.CreateMap<Source, Destination>(); });
-
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Destination>());
     [Fact]
     public void Should_throw_unmapped_member_and_mismatched_type_exceptions()
     {
@@ -35,7 +31,6 @@ public class When_testing_a_dto_with_mismatched_member_names_and_mismatched_type
             );
     }
 }
-
 public class When_testing_a_dto_with_mismatches_in_multiple_children : AutoMapperSpecBase
 {
     public class Source
@@ -43,16 +38,12 @@ public class When_testing_a_dto_with_mismatches_in_multiple_children : AutoMappe
         public Type Foo { get; set; }
         public Type Bar { get; set; }
     }
-
     public class Destination
     {
         public int Foo { get; set; }
         public int Bar { get; set; }
     }
-
-    protected override MapperConfiguration CreateConfiguration() =>
-        new(cfg => { cfg.CreateMap<Source, Destination>(); });
-
+    protected override MapperConfiguration CreateConfiguration() => new(cfg => cfg.CreateMap<Source, Destination>());
     [Fact]
     public void Should_throw_for_both_mismatched_children()
     {
