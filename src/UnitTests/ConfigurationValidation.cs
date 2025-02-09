@@ -35,6 +35,44 @@ public class When_testing_a_dto_with_mismatched_member_names_and_mismatched_type
             );
     }
 }
+
+public class When_testing_a_dto_with_mismatches_in_multiple_children : AutoMapperSpecBase
+{
+    public class Source
+    {
+        public Type Foo { get; set; }
+        public Type Bar { get; set; }
+    }
+
+    public class Destination
+    {
+        public int Foo { get; set; }
+        public int Bar { get; set; }
+    }
+
+    protected override MapperConfiguration CreateConfiguration() =>
+        new(cfg => { cfg.CreateMap<Source, Destination>(); });
+
+    [Fact]
+    public void Should_throw_for_both_mismatched_children()
+    {
+        new Action(AssertConfigurationIsValid)
+            .ShouldThrow<AggregateException>()
+            .ShouldSatisfyAllConditions(
+                aex => aex.InnerExceptions.ShouldBeOfLength(2),
+                aex => aex.InnerExceptions[0]
+                    .ShouldBeOfType<AutoMapperConfigurationException>()
+                    .ShouldSatisfyAllConditions(
+                        ex => ex.MemberMap.ShouldNotBeNull(),
+                        ex => ex.MemberMap.DestinationName.ShouldBe("Foo")),
+                aex => aex.InnerExceptions[1]
+                    .ShouldBeOfType<AutoMapperConfigurationException>()
+                    .ShouldSatisfyAllConditions(
+                        ex => ex.MemberMap.ShouldNotBeNull(),
+                        ex => ex.MemberMap.DestinationName.ShouldBe("Bar"))
+            );
+    }
+}
 public class ConstructorMappingValidation : NonValidatingSpecBase
 {
     public class Destination
