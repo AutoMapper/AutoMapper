@@ -55,4 +55,4 @@ To skip validation altogether for this map, use `MemberList.None`. That's the de
 
 ## Custom validations
 
-You can add custom validations through an extension point. See [here](https://github.com/AutoMapper/AutoMapper/blob/bdc0120497d192a2741183415543f6119f50a982/src/UnitTests/CustomValidations.cs#L42).
+You can add custom validations through an extension point. See [here](https://github.com/AutoMapper/AutoMapper/blob/master/src/UnitTests/CustomValidations.cs).

@@ -43,7 +43,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
     private readonly LockingConcurrentDictionary<TypePair, TypeMap> _runtimeMaps;
     private LazyValue<ProjectionBuilder> _projectionBuilder;
     private readonly LockingConcurrentDictionary<MapRequest, Delegate> _executionPlans;
-    private readonly ConfigurationValidator _validator;
+    private readonly MapperConfigurationExpression _configurationExpression;
     private readonly Features<IRuntimeFeature> _features = new();
     private readonly bool _hasOpenMaps;
     private readonly HashSet<TypeMap> _typeMapsPath = [];
@@ -58,6 +58,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
     private readonly List<Type> _typesInheritance = [];
     public MapperConfiguration(MapperConfigurationExpression configurationExpression)
     {
+        _configurationExpression=configurationExpression;
         var configuration = (IGlobalConfigurationExpression)configurationExpression;
         if (configuration.MethodMappingEnabled != false)
         {
@@ -65,7 +66,6 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         }
         _mappers = [..configuration.Mappers];
         _executionPlans = new(CompileExecutionPlan);
-        _validator = new(configuration);
         _projectionBuilder = new(CreateProjectionBuilder);
         Configuration = new((IProfileConfiguration)configuration);
         int typeMapsCount = Configuration.TypeMapsCount;
@@ -155,7 +155,8 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         configure(expr);
         return expr;
     }
-    public void AssertConfigurationIsValid() => _validator.AssertConfigurationExpressionIsValid(this, [.._configuredMaps.Values]);
+    public void AssertConfigurationIsValid() => Validator().AssertConfigurationExpressionIsValid([.._configuredMaps.Values]);
+    ConfigurationValidator Validator() => new(this);
     public IMapper CreateMapper() => new Mapper(this);
     public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
     public void CompileMappings()
@@ -218,7 +219,7 @@ public sealed class MapperConfiguration : IGlobalConfiguration
             return Lambda(fullExpression, source, destination, ContextParameter);
         }
     }
-    IGlobalConfigurationExpression ConfigurationExpression => _validator.Expression;
+    internal IGlobalConfigurationExpression ConfigurationExpression => _configurationExpression;
     ProjectionBuilder CreateProjectionBuilder() => new(this, [..ConfigurationExpression.ProjectionMappers]);
     IProjectionBuilder IGlobalConfiguration.ProjectionBuilder => _projectionBuilder.Value;
     Func<Type, object> IGlobalConfiguration.ServiceCtor => ConfigurationExpression.ServiceCtor;
@@ -471,14 +472,14 @@ public sealed class MapperConfiguration : IGlobalConfiguration
         return null;
     }
     void IGlobalConfiguration.RegisterTypeMap(TypeMap typeMap) => _configuredMaps[typeMap.Types] = typeMap;
-    void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => _validator.AssertConfigurationIsValid(this, [typeMap]);
+    void IGlobalConfiguration.AssertConfigurationIsValid(TypeMap typeMap) => Validator().AssertConfigurationIsValid([typeMap]);
     void IGlobalConfiguration.AssertConfigurationIsValid(string profileName)
     {
         if (Array.TrueForAll(Profiles, x => x.Name != profileName))
         {
             throw new ArgumentOutOfRangeException(nameof(profileName), $"Cannot find any profiles with the name '{profileName}'.");
         }
-        _validator.AssertConfigurationIsValid(this, _configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName).ToArray());
+        Validator().AssertConfigurationIsValid(_configuredMaps.Values.Where(typeMap => typeMap.Profile.Name == profileName).ToArray());
     }
     void IGlobalConfiguration.AssertConfigurationIsValid<TProfile>() => this.Internal().AssertConfigurationIsValid(typeof(TProfile).FullName);
     void IGlobalConfiguration.RegisterAsMap(TypeMapConfiguration typeMapConfiguration) =>
