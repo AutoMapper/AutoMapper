@@ -54,7 +54,7 @@ public class ConfigurationValidator(IGlobalConfiguration config)
                 {
                     return;
                 }
-                typeMap = config.ResolveTypeMap(types.SourceType, types.DestinationType);
+                typeMap = config.ResolveTypeMap(types);
             }
             if (typeMap != null)
             {
